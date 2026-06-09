@@ -1,0 +1,9 @@
+
+.record-menu {
+    position: absolute;
+    top: 10px;
+    left: 150px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}

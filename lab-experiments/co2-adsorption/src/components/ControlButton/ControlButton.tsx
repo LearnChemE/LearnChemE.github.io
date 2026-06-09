@@ -30,7 +30,7 @@ export const ControlButton: Component<ControlButtonProps> = (props: ControlButto
             ) : (
             <button 
                 class={active() ? "control-button active" : "control-button"} 
-                style={`top: ${top()}px; left: ${left()}px; background-color: ${activeColor()};`} 
+                style={`top: ${top()}px; left: ${left()}px;` + (active() ? ` background-color: ${activeColor()};` : "")} 
                 onClick={() => { props.onClick(); }} 
                 title={label()}
                 >

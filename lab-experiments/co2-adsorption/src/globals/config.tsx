@@ -5,7 +5,7 @@ const mode = urlParams.get('mode');
 export const SIM_MODE = (mode === "adsorption" || mode === "desorption") ? mode : "adsorption";
 
 export const MIN_SCCM_FLOWRATE = 5;
-export const MAX_SCCM_FLOWRATE = 100;
+export const MAX_SCCM_FLOWRATE = 200;
 export const SCCM_FLOW_STEP = 5;
 export const SCCM_FLOW_INIT = (SIM_MODE === "adsorption") ? MAX_SCCM_FLOWRATE / 2 : MAX_SCCM_FLOWRATE;
 

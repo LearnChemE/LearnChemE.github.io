@@ -8,18 +8,18 @@ const RHO_ZEOLITE = 0.75; // g/cc
 const MASS_ZEOLITE = 100; // g
 const MM_CO2 = 44.009; // g/mol
 const MM_N2 = 14.041; // g/mol
-// const R = 83.14; // bar cc / mol / K
+const R = 83.14; // bar cc / mol / K
 const BED_MAX_CAPACITY = MASS_ZEOLITE / 1000 * 2.5; // mols
 const DIFFUSIVITY = 1.8e-3 * 60; // m^2/s, diffusivity of CO2 in zeolite
 
 // Spatial info
 const N = 50; // number of points in spatial discretization
-const E = 4; // number of equations per point (tot pressure, co2 pressure, theta, velocity); stride
+const E = 3; // number of equations per point (tot pressure, co2 pressure, theta, velocity); stride
 const NE = N * E; // number of equations in the system
 const NT = NE + 2 * E; // Size of arrays including padding
 const dx = LENGTH_BED / N; // cm, spatial step size
-const x = Array.from({ length: N }).map((_,i) => i * dx); // spatial points
-const centroids = Array.from({ length: N }).map((_,i) => (i + .5) * dx); // spatial points
+// const x = Array.from({ length: N }).map((_,i) => i * dx); // spatial points
+// const centroids = Array.from({ length: N }).map((_,i) => (i + .5) * dx); // spatial points
 
 // Geometry
 const BED_VOLUME = MASS_ZEOLITE / RHO_ZEOLITE; // cc
@@ -28,16 +28,16 @@ const BED_RADIUS = Math.sqrt(BED_CROSS_SECTION / Math.PI); // cm
 console.log("Radius: ", BED_RADIUS)
 
 // Kinetic parameters
-const ka0 = 4.196e0; // min^-1
+const ka0 = 0.9; // min^-1
 const ea = 1000; // convert from kJ/mol to K
-const kd0 = 8e3;
-const ed = 6e3;
+const kd0 = 8e4; // min^-1
+const ed = 8e3;
 function k_val(k0: number, ea: number, T: number) {
   return k0 * Math.exp(-ea / T);
 }
 
 export type TVDMethod = "Upwind" | "SuperBee" | "MinMod" | "VanLeer";
-const TVD_METHOD: TVDMethod = "MinMod";
+const TVD_METHOD: TVDMethod = "SuperBee";
 
 function fluxLimiter(r: number, method: TVDMethod) {
     if (method == "SuperBee") {
@@ -57,8 +57,7 @@ function fluxLimiter(r: number, method: TVDMethod) {
 // type BedPoint = [
 //   pco2: Number,
 //   pn2: Number,
-//   th_co2: Number,
-//   u: Number
+//   th_co2: Number
 // ]
 
 /**
@@ -94,7 +93,7 @@ function calc_velocity(sccm: number, T: number, P: number) {
 }
 
 // RHS for advection-diffusion eqn with reaction term
-function rhs(_: number, y: number[], dx: number, ka: number, kd: number) {
+function rhs(_: number, y: number[], u: number, dx: number, ka: number, kd: number) {
     const dydt = Array.from({ length: NT }).fill(0) as number[];
     const inv_dx = 1 / dx;
     // const inv_dx2 = inv_dx / dx;
@@ -117,8 +116,8 @@ function rhs(_: number, y: number[], dx: number, ka: number, kd: number) {
     }
 
     let prevFace = [
-        y[0] * y[3] * inv_dx, // p * u
-        y[1] * y[3] * inv_dx, // P * u
+        y[0] * u * inv_dx, // p * u
+        y[1] * u * inv_dx, // P * u
         dl // dif_p
     ]; // [ adv_p, adv_P, dif_p ]
 
@@ -126,7 +125,6 @@ function rhs(_: number, y: number[], dx: number, ka: number, kd: number) {
         const ip = i;
         const iP = i + 1;
         const it = i + 2;
-        // const iu = i + 3;
 
         // Pre allocate variables for clarity
         // Values at relevant centroids
@@ -136,25 +134,19 @@ function rhs(_: number, y: number[], dx: number, ka: number, kd: number) {
         const P_n = y[iP + E];
         const P_p = y[iP];
         const P_pp= y[iP - E];
-        // const u_n = y[iu + E];
-        // const u_p = y[iu];
-        // const u_pp= y[iu - E];
 
         // TVD
         // Assume forward flow for upwinding
         const rp = (p_p - p_pp) ? (p_n - p_p) / (p_p - p_pp) : 0;
         const rP = (P_p - P_pp) ? (P_n - P_p) / (P_p - P_pp) : 0;
-        // const ru = (u_p - u_pp) ? (u_n - u_p) / (u_p - u_pp) : 0;
         // Use for flux limiting
         const rhph = p_p + 1/2 * fluxLimiter(rp, TVD_METHOD) * (p_p - p_pp); // * inv_RT
         const rh   = P_p + 1/2 * fluxLimiter(rP, TVD_METHOD) * (P_p - P_pp); // * inv_RT
-        const u    = y[3]; //u_p + 1/2 * fluxLimiter(ru, TVD_METHOD) * (u_p - u_pp);
 
         // calc next face
         // adv = sum [ S * rh * u * ph ] for each face
-        const adv_p = rhph * u * inv_dx
-        const adv_P = rh * u * inv_dx
-        // const adv_u = u * inv_dx;
+        const adv_p = rhph * u * inv_dx;
+        const adv_P = rh * u * inv_dx;
 
         // Diffusion for pco2
         // dif_face = S * rh * DIFFUSIVITY * P * del y since the mole fraction will be diffused, but not total pressure
@@ -181,14 +173,13 @@ function rhs(_: number, y: number[], dx: number, ka: number, kd: number) {
         const ads = ka * y[ip] * th_star;
         const des = kd * th;
 
-        const rxn_p = des - ads; // Pressure changes
-        const rxn_t = (ads - des) / BED_MAX_CAPACITY; // Theta changes
+        const rxn_p = (des - ads) * R * 298 * (dx / LENGTH_BED); // Pressure changes
+        const rxn_t = (ads - des) * (dx * BED_CROSS_SECTION) / BED_MAX_CAPACITY; // Theta changes
 
         // Sum
         dydt[ip] = (prevFace[0] - adv_p) + (prevFace[2] - dif_p) + rxn_p;
         dydt[iP] = (prevFace[1] - adv_P) + rxn_p;
         dydt[it] = rxn_t;
-        // dydt[iu] = (prevFace[0] - adv_u);
 
         prevFace = [ adv_p, adv_P, dif_p ];
     }
@@ -237,7 +228,6 @@ export class BedCalc {
         const P = this.presBar();
         const y = this.yIn();
         const T = this.tempK();
-        const u = calc_velocity(this.sccm(), T, P);
 
         // Solve the steady state balance to determine theta
         const ka = k_val(ka0, ea, T);
@@ -248,7 +238,6 @@ export class BedCalc {
             this.bed[i] = P * y;
             this.bed[i + 1] = P;
             this.bed[i + 2] = th;
-            this.bed[i + 3] = u;
         }
     }
 
@@ -296,36 +285,35 @@ export class BedCalc {
      * @returns {number} - The outlet mole fraction of CO2 in the gas mixture.
      */
     public yCO2_out(dt: number, sccm: number, T: number, P: number, y: number, flowing: boolean) {
-        let ul = calc_velocity(sccm, T, P);
-        // console.log("Velocity: ", ul.toFixed(5), "cm/min")
-        ul = isNaN(ul) ? 0 : ul;
+        let u = calc_velocity(sccm, T, P);
+        // console.log("Velocity: ", u.toFixed(5), "cm/min")
+        u = isNaN(u) ? 0 : u;
         if (flowing) {
-            const left = [ y * P, P, 0, ul ];
+            const left = [ y * P, P, 0 ];
             const y0 = pad(this.bed, left);
-            this.evolve(dt, T, y0);
+            this.evolve(dt, T, y0, u);
         }
         else {
             const rightYP = this.bed[NE - E]
             const rightP = this.bed[NE - E + 1]; // Pressure at the right boundary;
-            const u = this.bed[NE - 1] * 0.8;
-            const y0 = pad(this.bed, [rightYP, rightP, 0, u], [rightYP, rightP, 0, u]);
-            this.evolve(dt, T, y0);
+            const u = 0; // No flow when not flowing
+            const y0 = pad(this.bed, [rightYP, rightP, 0], [rightYP, rightP, 0]);
+            this.evolve(dt, T, y0, u);
         }
 
         // return this.bed[NE - E + 3]
         const pc = this.bed[NE - E];
         const pt = this.bed[NE - E + 1];
-        const u = this.bed[NE - 1];
         const outlet = pt !== 0 ? pc / pt : 0;
         return { y: Math.max(0, outlet), u };
     }
 
-    private evolve(tstep: number, T: number, y0: number[]) {
+    private evolve(tstep: number, T: number, y0: number[], u: number) {
         const ka = k_val(ka0, ea, T);
         const kd = k_val(kd0, ed, T);
 
         const f: ODEFunc = (t: number, y: number[]) => {
-            return rhs(t, y, dx, ka, kd);
+            return rhs(t, y, u, dx, ka, kd);
         };
 
         const sol = rk45(f, y0, 0, tstep);
@@ -341,7 +329,7 @@ export class BedCalc {
         }
     }
 
-    public view(which: "p" | "total pressure" | "theta" | "u" = "p") {
+    public view(which: "p" | "total pressure" | "theta" = "p") {
         switch (which) {
             case "p":
                 return this.bed.filter((_, i) => i % E === 0);
@@ -349,8 +337,6 @@ export class BedCalc {
                 return this.bed.filter((_, i) => i % E === 1);
             case "theta":
                 return this.bed.filter((_, i) => i % E === 2);
-            case "u":
-                return this.bed.filter((_, i) => i % E === 3);
         }
     }
 }
