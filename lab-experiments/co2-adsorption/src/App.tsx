@@ -11,7 +11,7 @@ import { HamburgerMenu } from './components/Hamburger/Hamburger'
 import worksheet from './assets/worksheet.pdf?url';
 import { AboutText, DirectionsText } from './components/Modal/modals'
 import { ControlButton } from './components/ControlButton/ControlButton'
-import { BETA_MAX, BETA_MIN, BETA_STEP, createCylinders, expMemo, MAX_SCCM_FLOWRATE, MIN_SCCM_FLOWRATE, molar_mass, SCCM_FLOW_INIT, SCCM_FLOW_STEP, SIM_MODE, TEMP_ROOM, V1_ANGLE_INIT, V2_ANGLE_INIT, V2_BED_ANGLE, V2_BYPASS_ANGLE, VALVE_1_ANGLES, VALVE_2_ANGLES } from './globals'
+import { BETA_MAX, BETA_MIN, BETA_STEP, createCylinders, expMemo, MAX_SCCM_FLOWRATE, MIN_SCCM_FLOWRATE, SCCM_FLOW_INIT, SCCM_FLOW_STEP, SIM_MODE, TEMP_ROOM, V1_ANGLE_INIT, V2_ANGLE_INIT, V2_BED_ANGLE, V2_BYPASS_ANGLE, VALVE_1_ANGLES, VALVE_2_ANGLES } from './globals'
 import { MultiValve } from './components/MultiValve/MultiValve'
 import { Manometer } from './components/Manometer/Manometer'
 import { BetaCtrl } from './components/BetaCtrl/BetaCtrl'
@@ -44,6 +44,18 @@ function App() {
   const [temperature, setTemperature] = createSignal(TEMP_ROOM);
   const [out, setOut] = createSignal({ y: 0, u: 0 });
 
+  const comp = createMemo(() => {
+    if (valve2Angle() === V2_BYPASS_ANGLE) {
+      const y = currentCylinder().yCO2;
+      const flowing = sccmSP() > 0 && currentCylinder().linePres() > 0;
+      return flowing ? y.toFixed(4) : 0;
+    }
+    else {
+      const { y, u } = out();
+      return u > 0.01 ? y.toFixed(4) : 0;
+    }
+    
+  });
   const compLabel = createMemo(() => {
     if (valve2Angle() === V2_BYPASS_ANGLE) {
       const y = currentCylinder().yCO2;
@@ -56,24 +68,24 @@ function App() {
     }
   });
 
-  const flowLabel = createMemo(() => {
-    if (valve2Angle() === V2_BYPASS_ANGLE) {
-      // PV = nRT
-      // n = m/M = PV / RT; P = 1 bar, T = 273.15, R = 83.14 mL bar / mol K
-      // m = MPV / RT
-      if (currentCylinder().linePres() <= 0) return "0.0";
-      const sccm = sccmSP();
-      const ndot = sccm / 83.14 / 273.15; // mol / min
-      const y = currentCylinder().yCO2;
-      const MM = molar_mass(y);
-      const mdot = ndot * MM * 1000; // mg/min
-      return `${mdot.toFixed(1)}`;
-    }
-    else {
-      const { y, u } = out();
-      return `${u.toFixed(1)}`;
-    }
-  });
+  // const flowLabel = createMemo(() => {
+  //   if (valve2Angle() === V2_BYPASS_ANGLE) {
+  //     // PV = nRT
+  //     // n = m/M = PV / RT; P = 1 bar, T = 273.15, R = 83.14 mL bar / mol K
+  //     // m = MPV / RT
+  //     if (currentCylinder().linePres() <= 0) return "0.0";
+  //     const sccm = sccmSP();
+  //     const ndot = sccm / 83.14 / 273.15; // mol / min
+  //     const y = currentCylinder().yCO2;
+  //     const MM = molar_mass(y);
+  //     const mdot = ndot * MM * 1000; // mg/min
+  //     return `${mdot.toFixed(1)}`;
+  //   }
+  //   else {
+  //     const { y, u } = out();
+  //     return `${u.toFixed(1)}`;
+  //   }
+  // });
 
   const reset = () => window.location.reload();
 
@@ -92,8 +104,7 @@ function App() {
       "bed pressure (bar)": bedPressure(),
       "sccm setpoint": sccmSP(),
       "bypass bed": valve2Angle() === V2_BYPASS_ANGLE,
-      "outlet composition": compLabel(),
-      "outlet flow (mg/min)": flowLabel()
+      "outlet mole fraction CO2": comp(),
     }
   };
 
@@ -127,7 +138,7 @@ function App() {
 
           <DigitalGauge x={556} y={310} label={() => `${temperature().toFixed(0)} K`} />
           <DigitalGauge x={597} y={110} label={compLabel} />
-          <DigitalGauge x={601} y={16} label={flowLabel} />
+          {/* <DigitalGauge x={601} y={16} label={flowLabel} /> */}
           
           <AniLines 
             isShowing={showLines} 
