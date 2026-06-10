@@ -2,10 +2,11 @@ import { type Accessor, type Setter } from "solid-js";
 
 import rk45, { type ODEFunc } from "./rk45";
 import { animate } from "./helpers";
+import { SIM_MODE } from "./config";
 
 export const LENGTH_BED = 20; // cm
 const RHO_ZEOLITE = 0.75; // g/cc
-const MASS_ZEOLITE = 100; // g
+const MASS_ZEOLITE = (SIM_MODE === "adsorption") ? 10 : 1; // g
 const MM_CO2 = 44.009; // g/mol
 const MM_N2 = 14.041; // g/mol
 const R = 83.14; // bar cc / mol / K
@@ -13,7 +14,7 @@ const BED_MAX_CAPACITY = MASS_ZEOLITE / 1000 * 2.5; // mols
 const DIFFUSIVITY = 1.8e-3 * 60; // m^2/s, diffusivity of CO2 in zeolite
 
 // Spatial info
-const N = 50; // number of points in spatial discretization
+const N = (SIM_MODE === "adsorption") ? 50 : 5; // number of points in spatial discretization
 const E = 3; // number of equations per point (tot pressure, co2 pressure, theta, velocity); stride
 const NE = N * E; // number of equations in the system
 const NT = NE + 2 * E; // Size of arrays including padding
@@ -28,7 +29,7 @@ const BED_RADIUS = Math.sqrt(BED_CROSS_SECTION / Math.PI); // cm
 console.log("Radius: ", BED_RADIUS)
 
 // Kinetic parameters
-const ka0 = 0.9; // min^-1
+const ka0 = 6.0; // min^-1
 const ea = 1000; // convert from kJ/mol to K
 const kd0 = 8e4; // min^-1
 const ed = 8e3;

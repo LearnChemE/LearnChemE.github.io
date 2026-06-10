@@ -11,6 +11,7 @@ export const SCCM_FLOW_INIT = (SIM_MODE === "adsorption") ? MAX_SCCM_FLOWRATE / 
 
 export const MAX_CYL_VALVE_ROTATION = 360;
 export const MAX_PRESSURE = (SIM_MODE === "adsorption") ? 10 : 1; // bar
+export const MAX_NEEDLE_PRESSURE = 10; // bar
 export const REG_ROTATION_RANGE = (SIM_MODE === "adsorption") ? 720 : 120; // degrees
 
 export const V1_90_ANGLE = 180;

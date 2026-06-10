@@ -19,9 +19,9 @@ import { DigitalGauge } from './components/DigitalGauge/DigitalGauge'
 import { BedContextProvider, type ContextDescriptor } from './components/Context'
 import { AniLines } from './components/AniLines/AniLines'
 import { SVGTooltip } from './components/Tooltip/TooltipSelector'
-
-import { PlotlyChart } from './components/PlotlyChart'
 import { RecordMenu } from './components/RecordMenu/RecordMenu'
+
+// import { PlotlyChart } from './components/PlotlyChart'
 
 function App() {
   const cylinders = createCylinders();
@@ -163,7 +163,7 @@ function App() {
         <RecordMenu exportData={exportData} />
       </div>
 
-      <PlotlyChart />
+      {/* <PlotlyChart /> */}
 
     </BedContextProvider>
   )

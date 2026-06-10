@@ -37,7 +37,7 @@ if __name__ == "__main__":
 
     beta = [0.3, 3.0]
 
-    sccms = [50, 100]
+    sccms = [100, 200]
     tf = 30
 
     for sccm in sccms:
