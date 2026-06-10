@@ -139,6 +139,10 @@ export function rk45_dormand_prince(
       }
       err = 2;
       h = h * 0.5; // Reduce step size on error
+
+      if (h < dtMin && err > 1.0 && !opts.onUnderflow) {
+          throw new Error(e instanceof Error ? e.message : String(e));
+    }
     }
 
     if (h < dtMin && err > 1.0) {

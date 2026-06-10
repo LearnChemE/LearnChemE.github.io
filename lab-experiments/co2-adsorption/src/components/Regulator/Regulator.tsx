@@ -1,5 +1,5 @@
 import { createMemo, type Accessor, type Component, type Setter } from "solid-js";
-import { constrain, getAngleFromDown, getSVGCoords, MAX_PRESSURE } from "../../globals";
+import { constrain, getAngleFromDown, getSVGCoords, MAX_NEEDLE_PRESSURE, MAX_PRESSURE, REG_ROTATION_RANGE } from "../../globals";
 
 type RegulatorProps = {
     inPres: Accessor<number>;
@@ -10,19 +10,18 @@ type RegulatorProps = {
     y: number;
 };
 
-const minAngle = -135;
-const maxAngle = 135;
+const minAngle = -135; // degrees, for 0 pressure
+const maxAngle = +135; // degrees, for MAX_PRESSURE
 
 export const Regulator: Component<RegulatorProps> = (props) => {
-    const rAngle = createMemo(() => minAngle + (maxAngle - minAngle) * props.inPres() / MAX_PRESSURE);
-    const lAngle = createMemo(() => minAngle + (maxAngle - minAngle) * props.outPres() / MAX_PRESSURE);
+    const rAngle = createMemo(() => minAngle + (maxAngle - minAngle) * props.inPres() / MAX_NEEDLE_PRESSURE);
+    const lAngle = createMemo(() => minAngle + (maxAngle - minAngle) * props.outPres() / MAX_NEEDLE_PRESSURE);
 
-    const maxAngle_knob = 720; // Degrees for fully open
     const cx = 27;
     const cy = 38;
 
     // State
-    const currentAngle_knob = createMemo(() => props.gasSP() * maxAngle_knob / MAX_PRESSURE); // in pixels, range from 0 (closed) to 20 (fully open)
+    const currentAngle_knob = createMemo(() => props.gasSP() * REG_ROTATION_RANGE / MAX_PRESSURE); // in pixels, range from 0 (closed) to 20 (fully open)
     let isDragging = false;
     let prevTh = 0;
 
@@ -61,7 +60,7 @@ export const Regulator: Component<RegulatorProps> = (props) => {
 
         // Update state and callback if changed
         if (newAngle !== angle) {
-            let sp = newAngle * MAX_PRESSURE / maxAngle_knob;
+            let sp = newAngle * MAX_PRESSURE / REG_ROTATION_RANGE;
             sp = constrain(sp, 0, MAX_PRESSURE);
             props.setGasSP(sp);
         }

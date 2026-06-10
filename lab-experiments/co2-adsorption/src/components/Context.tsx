@@ -5,7 +5,7 @@ export type ContextDescriptor = {
     tempK: Accessor<number>,
     cylinder: Accessor<GasCylinder>,
     v2Angle: Accessor<number>,
-    massSP: Accessor<number>,
+    sccmSP: Accessor<number>,
     onOut: (val: { y: number, u: number }) => void;
 };
 
@@ -40,7 +40,7 @@ export const BedContextProvider = (props: { children: any, descriptor: ContextDe
         presBar,
         yIn,
         flowing,
-        mdot: props.descriptor.massSP,
+        sccm: props.descriptor.sccmSP,
         // Outputs
         onOut: props.descriptor.onOut as Setter<{ y: number, u: number }>,
         onUpdate: () => setBedUpdated(v => !v)

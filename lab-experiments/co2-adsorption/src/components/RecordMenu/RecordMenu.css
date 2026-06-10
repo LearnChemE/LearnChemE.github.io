@@ -1,0 +1,91 @@
+
+.record-menu {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    /* gap: 5px; */
+
+    background-color: white;
+    border: 1px solid black;
+    border-radius: 8px;
+    height: max-content;
+    width: max-content;
+}
+
+.record-btn {
+  background-color: white;
+  color: black;
+
+  border: none;
+  text-align: center;
+  cursor: pointer;
+  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  transition: all 0.3s;
+  outline: none;
+  box-shadow: 0 0 2px 2px rgba(.2,.2,.2,.2);
+
+}
+
+.record-btn-container {
+    display: flex;
+    justify-content: space-evenly;
+    margin-top: 0.8em;
+    margin-bottom: 0.8em;
+}
+
+.record-btn.play {
+    background-color: #259c25;
+    color: white;
+}
+.record-btn.pause {
+    background-color: rgb(255, 59, 59);
+    color: white;
+}
+
+.disabled {
+    pointer-events: none;
+    cursor: none;
+    color: grey;
+}
+
+.menu-header {
+    width: max-content;
+    padding: 0.2em 3em;
+    font-size: 1em;
+    margin: auto;
+    user-select: none;
+
+    cursor: grab;
+}
+.menu-header:active {
+    cursor: grabbing;
+}
+
+hr {
+    display: block;
+    height: 1px;
+    width: 90%;
+    border: 0;
+    border-top: 1px solid #ccc;
+    margin: 0 auto;
+    padding: 0;
+}
+
+.confirm-wrapper {
+    display: flex;
+    margin: .5em 0;
+    margin-top: 1em;
+    width: 100%;
+    justify-content: flex-end;
+}
+
+.confirm-btn {
+    margin-right: 5%;
+    background-color: var(--hamburger-color);
+}
