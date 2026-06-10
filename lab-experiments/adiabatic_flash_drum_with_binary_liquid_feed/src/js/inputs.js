@@ -72,7 +72,7 @@ function initializeTakeSample() {
         dropdownContainer.classList.remove("disabled");
         controlsActiveLabel.style.color = "black";
         controlsActiveLabel.style.fontWeight = "normal";
-        controlsActiveLabel.innerHTML = "Tank is empty. You may now change the composition of the mixture.";
+        controlsActiveLabel.innerHTML = "Tank is empty. Select the mole fraction of component 1 in the feed.";
       } else {
         zSlider.setAttribute("disabled", "true");
         mixtureDropdown.setAttribute("disabled", "true");
@@ -159,7 +159,7 @@ function initializeDropdown() {
     const selectedOption = e.target.value;
     switch (selectedOption) {
       case "a":
-        zSliderLabel.innerHTML = `x<sub>F</sub> (${state.chemicals.chemical1.name})`;
+        zSliderLabel.innerHTML = `z<sub>1</sub>`;
         chemical1label.innerHTML = state.chemicals.chemical1.name;
         chemical2label.innerHTML = state.chemicals.chemical2.name;
         A1.innerHTML = state.chemicals.chemical1.A.toFixed(3);
@@ -173,7 +173,7 @@ function initializeDropdown() {
         window.mixture = [state.chemicals.chemical1, state.chemicals.chemical2];
         break;
       case "b":
-        zSliderLabel.innerHTML = `x<sub>F</sub> (${state.chemicals.chemical3.name})`;
+        zSliderLabel.innerHTML = `z<sub>3</sub>`;
         chemical1label.innerHTML = state.chemicals.chemical3.name;
         chemical2label.innerHTML = state.chemicals.chemical4.name;
         A1.innerHTML = state.chemicals.chemical3.A.toFixed(3);
@@ -187,7 +187,7 @@ function initializeDropdown() {
         window.mixture = [state.chemicals.chemical3, state.chemicals.chemical4];
         break;
       case "c":
-        zSliderLabel.innerHTML = `x<sub>F</sub> (${state.chemicals.chemical5.name})`;
+        zSliderLabel.innerHTML = `z<sub>5</sub>`;
         chemical1label.innerHTML = state.chemicals.chemical5.name;
         chemical2label.innerHTML = state.chemicals.chemical6.name;
         A1.innerHTML = state.chemicals.chemical5.A.toFixed(3);
@@ -201,7 +201,7 @@ function initializeDropdown() {
         window.mixture = [state.chemicals.chemical5, state.chemicals.chemical6];
         break;
       case "d":
-        zSliderLabel.innerHTML = `x<sub>F</sub> (${state.chemicals.chemical7.name})`;
+        zSliderLabel.innerHTML = `z<sub>7</sub>`;
         chemical1label.innerHTML = state.chemicals.chemical7.name;
         chemical2label.innerHTML = state.chemicals.chemical8.name;
         A1.innerHTML = state.chemicals.chemical7.A.toFixed(3);

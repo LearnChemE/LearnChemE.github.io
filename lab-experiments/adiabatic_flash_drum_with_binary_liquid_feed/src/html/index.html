@@ -6,21 +6,6 @@
   <meta charset="utf-8">
   <meta http-equiv="content-language" content="en">
   <title>Adiabatic Flash Drum with Binary Liquid Feed Digital Experiment</title>
-  
-
-  <!-- Global site tag (gtag.js) - Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-204988035-3"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-
-    function gtag() {
-      dataLayer.push(arguments);
-    }
-    gtag('js', new Date());
-
-    gtag('config', 'UA-204988035-3');
-  </script>
-  <script src="https://kit.fontawesome.com/57b4de50ab.js" crossorigin="anonymous"></script>
 </head>
 
 <body>
@@ -50,9 +35,9 @@
             <a href="./assets/adiabatic_flash_drum_with_binary_liquid_feed_worksheet.pdf" class="btn btn-primary menu-item" id="worksheet" download>
               <i class="fa-solid fa-download"></i><span>Worksheet</span>
             </a>
-            <div id="controls-active-label">Tank is empty. You may now change the composition of the mixture.</div>
+            <div id="controls-active-label">Tank is empty. Select the mole fraction of component 1 in the feed.</div>
             <div class="slider-container">
-              <div id="z-slider-label" class="slider-label">x<sub>F</sub> (chemical 1)</div>
+              <div id="z-slider-label" class="slider-label">z<sub>1</sub></div>
               <input type="range" id="z-slider" min="0" max="1" step="0.01" value="0.5">
               <div id="z-value" class="slider-value">0.50</div>
             </div>

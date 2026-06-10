@@ -1,8 +1,10 @@
 import "bootstrap";
 import "p5";
+import "@fortawesome/fontawesome-free/css/all.css";
 import "./style/style.scss";
 import "./assets/digital-7.ttf";
 import "./assets/adiabatic_flash_drum_with_binary_liquid_feed_worksheet.pdf";
+import "./gtag.js";
 import { drawAll } from "./js/draw";
 import { handleInputs } from "./js/inputs";
 import { calcAll, setDefaults } from "./js/calcs";
@@ -87,4 +89,4 @@ window.windowResized = () => {
 
 window.relativeSize = () => containerElement.offsetWidth / 150;
 
-require("./js/events.js");
+import "./js/events.js";
