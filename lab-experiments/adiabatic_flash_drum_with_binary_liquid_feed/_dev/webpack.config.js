@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs');
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
@@ -17,7 +18,8 @@ const module_rules = [{
       MiniCssExtractPlugin.loader,
       "css-loader",
       "sass-loader",
-    ]
+    ],
+    type: 'javascript/auto'
   },
   {
     test: /\.svg$/i,
@@ -29,15 +31,42 @@ const module_rules = [{
     options: {
       name: 'assets/[name].[ext]',
     },
-  }
+  },
+  {
+    test: /\.html$/,
+    loader: 'html-loader',
+    exclude: path.resolve(__dirname, '../src/html/index.html'),
+    options: {
+      // This tells html-loader to only process local, relative files
+      sources: {
+        urlFilter: (attribute, value, resourcePath) => {
+          // Skip external URLs and script src attributes
+          if (value.startsWith('http://') || value.startsWith('https://')) {
+            return false;
+          }
+          // Skip data URIs
+          if (value.startsWith('data:')) {
+            return false;
+          }
+          return true;
+        },
+      },
+    },
+  },
 ];
 
 const html_options = {
   title: "Antoine Constants",
   filename: "index.html",
-  template: path.resolve(__dirname, '../src/html/index.html'),
+  templateContent: fs.readFileSync(path.resolve(__dirname, '../src/html/index.html'), 'utf-8'),
   scriptLoading: "blocking",
   hash: true,
+  minify: false,
+  templateParameters: {
+    // Prevent HtmlWebpackPlugin from running html-loader on the template
+    webpack: undefined,
+    webpackConfig: undefined,
+  },
   meta: {
     "viewport": "width=device-width, initial-scale=1, shrink-to-fit=no",
     "keywords": "LearnChemE, chemical engineering, engineering, simulation",
@@ -48,7 +77,6 @@ const html_options = {
 }
 
 let config = {
-  stats: 'errors-only',
   entry: {
     index: path.resolve(__dirname, '../src/index.js'),
   },
@@ -65,7 +93,7 @@ let config = {
         warnings: false,
       },
       logging: 'error',
-    }
+    },
   },
   plugins: [
     new HtmlWebpackPlugin(html_options),
