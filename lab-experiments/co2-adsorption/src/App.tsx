@@ -11,7 +11,7 @@ import { HamburgerMenu } from './components/Hamburger/Hamburger'
 import worksheet from './assets/worksheet.pdf?url';
 import { AboutText, DirectionsText } from './components/Modal/modals'
 import { ControlButton } from './components/ControlButton/ControlButton'
-import { BETA_MAX, BETA_MIN, BETA_STEP, createCylinders, expMemo, MAX_SCCM_FLOWRATE, MIN_SCCM_FLOWRATE, SCCM_FLOW_INIT, SCCM_FLOW_STEP, SIM_MODE, TEMP_ROOM, V1_ANGLE_INIT, V2_ANGLE_INIT, V2_BED_ANGLE, V2_BYPASS_ANGLE, VALVE_1_ANGLES, VALVE_2_ANGLES } from './globals'
+import { BETA_MAX, BETA_MIN, BETA_STEP, createCylinders, expMemo, MAX_SCCM_FLOWRATE, MIN_SCCM_FLOWRATE, resetSignal, SCCM_FLOW_INIT, SCCM_FLOW_STEP, SIM_MODE, TEMP_ROOM, V1_ANGLE_INIT, V2_ANGLE_INIT, V2_BED_ANGLE, V2_BYPASS_ANGLE, VALVE_1_ANGLES, VALVE_2_ANGLES } from './globals'
 import { MultiValve } from './components/MultiValve/MultiValve'
 import { Manometer } from './components/Manometer/Manometer'
 import { BetaCtrl } from './components/BetaCtrl/BetaCtrl'
@@ -87,7 +87,12 @@ function App() {
   //   }
   // });
 
-  const reset = () => window.location.reload();
+  // Reset logic
+  resetSignal.init();
+  const reset = () => {
+    resetSignal.triggerSignal();
+    setValve2Angle(V2_ANGLE_INIT);
+  };
 
   const ctxDescriptor: ContextDescriptor = {
     tempK: temperature,
@@ -99,15 +104,14 @@ function App() {
 
   const exportData = () => {
     return {
-      "temperature (K)": temperature(),
-      "inlet composition": currentCylinder().yCO2,
-      "bed pressure (bar)": bedPressure(),
-      "sccm setpoint": sccmSP(),
+      "temperature (K)": temperature().toFixed(1),
+      "inlet composition": currentCylinder().yCO2.toFixed(2),
+      "bed pressure (bar)": bedPressure().toFixed(2),
+      "sccm setpoint": sccmSP().toFixed(1),
       "bypass bed": valve2Angle() === V2_BYPASS_ANGLE,
       "outlet mole fraction CO2": comp(),
     }
   };
-
 
   return (
     <BedContextProvider descriptor={ctxDescriptor}>
@@ -129,7 +133,7 @@ function App() {
           </For>
           <Controller sp={sccmSP} setSP={setSccmSP} range={[MIN_SCCM_FLOWRATE, MAX_SCCM_FLOWRATE]} step={SCCM_FLOW_STEP} />
           <MultiValve x={303} y={240} key="valve1-ani" angle={valve1Angle} setAngle={setValve1Angle} directions={VALVE_1_ANGLES} setShowLines={setShowLines} />
-          <MultiValve x={487} y={184} key="valve2-ani" angle={valve2Angle} setAngle={setValve2Angle} directions={VALVE_2_ANGLES} setShowLines={setShowLines} />
+          <MultiValve x={487} y={184} key="valve2-ani" angle={valve2Angle} setAngle={setValve2Angle} directions={VALVE_2_ANGLES} setShowLines={setShowLines} resetTo={V2_ANGLE_INIT} />
 
           <Manometer pressure={bedPressure} maxPressure={12} />
           <Show when={SIM_MODE === "desorption"}>

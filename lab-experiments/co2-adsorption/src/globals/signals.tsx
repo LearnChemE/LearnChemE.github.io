@@ -1,4 +1,4 @@
-import { createEffect, createMemo, createSignal, type Accessor, type Setter } from "solid-js";
+import { createEffect, createMemo, createSignal, onMount, type Accessor, type Setter } from "solid-js";
 import { animate, smoothLerp } from "./helpers";
 import { MAX_PRESSURE, SIM_MODE } from "./config";
 
@@ -185,3 +185,40 @@ export function expMemo(f: () => number, tau: number = 0.5, threshold: number = 
  
     return actual;
 }
+
+class ResetSignal {
+    private signal: [Accessor<boolean>, Setter<boolean>] | null = null;
+
+    init() {
+        this.signal = createSignal(false);
+    }
+
+    triggerSignal() {
+        if (this.signal === null) {
+            return false;
+        }
+
+        const set = this.signal[1];
+        set(sig => !sig);
+        return true;
+    }
+
+    subscribe(callback: () => void) {
+        if (this.signal === null) {
+            onMount(() => {
+                if (this.subscribe(callback) === false) throw new Error("uninitialized ResetSignal")
+            });
+            return false;
+        }
+
+        const get = this.signal[0];
+        createEffect(() => {
+            get();
+            callback();
+        });
+
+        return true;
+    }
+}
+
+export const resetSignal = new ResetSignal();

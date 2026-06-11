@@ -1,4 +1,4 @@
-import { animate, resolveProperty, smoothLerp } from "../../globals";
+import { animate, resetSignal, resolveProperty, smoothLerp } from "../../globals";
 import "./MultiValve.css";
 import { createSignal, type Accessor, type Component, type Setter } from "solid-js";
 
@@ -10,6 +10,7 @@ interface MultiValveProps {
   angle?: Accessor<number>;
   setAngle: Setter<number>;
   setShowLines?: Setter<boolean>;
+  resetTo?: number;
 }
 
 export const MultiValve: Component<MultiValveProps> = (props) => {
@@ -58,6 +59,13 @@ export const MultiValve: Component<MultiValveProps> = (props) => {
 
     const pointerEnter = () => props.setShowLines?.(true);
     const pointerLeave = () => props.setShowLines?.(false);
+
+    if (props.resetTo !== undefined) {
+      resetSignal.subscribe(() => {
+        props.setAngle(props.resetTo!);
+        animateDispAngle();
+      });
+    }
 
   // Render
   return (

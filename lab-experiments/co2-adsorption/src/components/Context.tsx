@@ -1,5 +1,5 @@
-import { createContext, createMemo, createSignal, type Accessor, type Setter } from "solid-js";
-import { BedCalc, GasCylinder, SIM_MODE, V2_BED_ANGLE, type BedDescriptor } from "../globals";
+import { createContext, createMemo, createSignal, onMount, type Accessor, type Setter } from "solid-js";
+import { BedCalc, GasCylinder, resetSignal, SIM_MODE, V2_BED_ANGLE, type BedDescriptor } from "../globals";
 
 export type ContextDescriptor = {
     tempK: Accessor<number>,
@@ -51,7 +51,14 @@ export const BedContextProvider = (props: { children: any, descriptor: ContextDe
     bed.play();
     const store: BedContextType = { bed, bedUpdated };
 
-    console.log("Providing bed context");
+    onMount(() => {
+        resetSignal.subscribe(() => {
+            bed.reset();
+            if (SIM_MODE === "desorption") bed.fill();
+            bed.play();
+        });
+    });
+
     return (
     <BedContext.Provider value={store}>
         {props.children}

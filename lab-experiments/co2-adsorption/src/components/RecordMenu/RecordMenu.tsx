@@ -2,6 +2,7 @@ import { createEffect, createMemo, createSignal, Show, type Component } from "so
 import { DataRecorder } from "./record";
 import { ControlButton } from "../ControlButton/ControlButton";
 import "./RecordMenu.css";
+import { SIM_MODE } from "../../globals";
 
 type RecordMenuProps = {
   exportData: () => Record<string, any>;
@@ -89,7 +90,7 @@ export const RecordMenu: Component<RecordMenuProps> = (props) => {
                     </button> 
                     <button 
                         class={`record-btn` + (state() !== "finished" ? " disabled" : "")}
-                        onClick={() => recorder.export("co2_adsorption_data.csv")} 
+                        onClick={() => recorder.export(`co2_${SIM_MODE}_data.csv`)} 
                         title={"download recorded data"}
                         disabled={state() !== "finished"}
                         aria-disabled={state() !== "finished"}
