@@ -345,12 +345,19 @@ export function initSvgDrag(exemptIDs?: string[]) {
 export function enableWindowResize() {
     const e = document.querySelector("svg")!;
     const asp = e.clientWidth / e.clientHeight;
+    if (e.clientWidth === 0 || e.clientHeight === 0) {
+        console.warn("svg resized before initial loading. Retrying.");
+        window.setTimeout(enableWindowResize, 10);
+        return;
+    }
     // Attach event handler
     const resize = () => {
         let windowWidth = Math.max(Math.min(window.innerWidth * .8, 1800), 400);
-        let windowHeight = window.innerHeight * .95 - 50;
+        let windowHeight = Math.max(window.innerHeight * .95 - 50, 400 * asp);
+        if (windowHeight < 0) throw new Error(`${windowWidth}, ${windowHeight}`)
         // Enforce asp
         windowWidth = Math.min(windowWidth, windowHeight * asp);
+        if (windowWidth !== windowWidth) throw new Error(`e: ${e.clientWidth}, ${e.clientHeight}`)
         windowHeight = windowWidth / asp;
         // Resize canvas
         e.setAttribute("width", `${windowWidth}`);
