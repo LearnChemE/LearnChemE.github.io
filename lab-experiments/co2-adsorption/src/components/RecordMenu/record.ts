@@ -1,10 +1,5 @@
 import { createSignal, type Accessor, type Setter } from "solid-js";
 
-function getTime() {
-    const now = new Date();
-    return now.toISOString();
-}
-
 export class DataRecorder {
     private data: Array<Object> = [];
     private dataAccessor: () => Object;
@@ -27,16 +22,20 @@ export class DataRecorder {
         if (this.recording()) return;
         this.setRecording(true);
         this.setExportReady(true);
+        let startTime: number | null = null;
         
         const recordLoop = () => {
             if (!this.recording()) return;
-            const timestamp = getTime();
+            if (startTime === null) startTime = Date.now();
+
+            const elapsed = (Date.now() - startTime) / 1000;
             const dataPoint = this.dataAccessor();
-            this.data.push({ timestamp, ...dataPoint });
+            this.data.push({ "simulation time (min)": elapsed.toFixed(1), ...dataPoint });
+            console.table(this.data.at(-1));
             setTimeout(recordLoop, this.interval);
         }
 
-        setTimeout(recordLoop, this.interval);
+        setTimeout(recordLoop, 100);
     }
 
     stop() {

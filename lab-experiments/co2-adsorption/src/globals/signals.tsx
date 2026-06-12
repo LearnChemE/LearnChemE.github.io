@@ -1,6 +1,6 @@
-import { createEffect, createMemo, createSignal, type Accessor, type Setter } from "solid-js";
+import { createEffect, createMemo, createSignal, onMount, type Accessor, type Setter } from "solid-js";
 import { animate, smoothLerp } from "./helpers";
-import { MAX_PRESSURE, SIM_MODE } from "./config";
+import { SIM_MODE } from "./config";
 
 export type Signal<T> = { get: Accessor<T>, set: Setter<T> };
 export function Signal<T>(raw: [() => T, (v: T) => null]) {
@@ -89,8 +89,8 @@ const cylinderDescriptors: GasCylinderDescriptor[] = (SIM_MODE === "adsorption")
         yCO2: 0.9,
         color: "#BF0000",
 
-        initCylPres: MAX_PRESSURE,
-        initRegSP: MAX_PRESSURE / 2
+        initCylPres: 0,
+        initRegSP: 0
     }, 
     {
         name: "N2",
@@ -147,6 +147,13 @@ export function expSignal(init: number, tau: number, threshold: number = 0.1) {
     return [actual, setTarget];
 }
 
+/**
+ * 
+ * @param f 
+ * @param tau 
+ * @param threshold 
+ * @returns 
+ */
 export function expMemo(f: () => number, tau: number = 0.5, threshold: number = 0.1) {
     const target = createMemo(f);
     const [actual, setActual] = createSignal(target());
@@ -185,3 +192,40 @@ export function expMemo(f: () => number, tau: number = 0.5, threshold: number = 
  
     return actual;
 }
+
+class ResetSignal {
+    private signal: [Accessor<boolean>, Setter<boolean>] | null = null;
+
+    init() {
+        this.signal = createSignal(false);
+    }
+
+    triggerSignal() {
+        if (this.signal === null) {
+            return false;
+        }
+
+        const set = this.signal[1];
+        set(sig => !sig);
+        return true;
+    }
+
+    subscribe(callback: () => void) {
+        if (this.signal === null) {
+            onMount(() => {
+                if (this.subscribe(callback) === false) throw new Error("uninitialized ResetSignal")
+            });
+            return false;
+        }
+
+        const get = this.signal[0];
+        createEffect(() => {
+            get();
+            callback();
+        });
+
+        return true;
+    }
+}
+
+export const resetSignal = new ResetSignal();
