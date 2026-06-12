@@ -21,7 +21,7 @@ export const V1_ANGLE_INIT = (SIM_MODE === "adsorption") ? V1_N2_ANGLE : V1_10_A
 
 export const V2_BED_ANGLE = 90;
 export const V2_BYPASS_ANGLE = 180;
-export const V2_ANGLE_INIT = (SIM_MODE === "adsorption") ? V2_BYPASS_ANGLE : V2_BED_ANGLE;
+export const V2_ANGLE_INIT = V2_BYPASS_ANGLE;
 
 export const VALVE_1_ANGLES = (SIM_MODE === "adsorption") ? [V1_90_ANGLE, V1_N2_ANGLE, V1_10_ANGLE] : [V1_N2_ANGLE, V1_10_ANGLE];
 export const VALVE_2_ANGLES = [V2_BED_ANGLE, V2_BYPASS_ANGLE];

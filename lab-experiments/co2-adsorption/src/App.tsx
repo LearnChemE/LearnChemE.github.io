@@ -44,28 +44,20 @@ function App() {
   const [temperature, setTemperature] = createSignal(TEMP_ROOM);
   const [out, setOut] = createSignal({ y: 0, u: 0 });
 
-  const comp = createMemo(() => {
+  const comp = expMemo(() => {
     if (valve2Angle() === V2_BYPASS_ANGLE) {
       const y = currentCylinder().yCO2;
       const flowing = sccmSP() > 0 && currentCylinder().linePres() > 0;
-      return flowing ? y.toFixed(4) : 0;
+      return flowing ? y : 0;
     }
     else {
       const { y, u } = out();
-      return u > 0.01 ? y.toFixed(4) : 0;
+      return u > 0.01 ? y : 0;
     }
-    
-  });
+  }, 0.1);
   const compLabel = createMemo(() => {
-    if (valve2Angle() === V2_BYPASS_ANGLE) {
-      const y = currentCylinder().yCO2;
-      const flowing = sccmSP() > 0 && currentCylinder().linePres() > 0;
-      return `${flowing ? (y * 100).toFixed(2) : "--"} %`;
-    }
-    else {
-      const { y, u } = out();
-      return `${u > 0.01 ? (y * 100).toFixed(2) : "--"} %`;
-    }
+    const u = out().u;
+    return `${u > 0.01 ? comp().toFixed(2) : "--"} %`;
   });
 
   // const flowLabel = createMemo(() => {
