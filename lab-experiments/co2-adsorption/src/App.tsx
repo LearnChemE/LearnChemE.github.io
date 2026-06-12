@@ -101,7 +101,7 @@ function App() {
       "bed pressure (bar)": bedPressure().toFixed(2),
       "sccm setpoint": sccmSP().toFixed(1),
       "bypass bed": valve2Angle() === V2_BYPASS_ANGLE,
-      "outlet mole fraction CO2": comp(),
+      "outlet mole fraction CO2": comp().toFixed(4),
     }
   };
 
