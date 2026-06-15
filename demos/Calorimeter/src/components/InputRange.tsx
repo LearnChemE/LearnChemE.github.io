@@ -7,6 +7,7 @@ interface InputRangeProps {
   val: number;
   setVal: (newVal: number) => void;
   disabled?: boolean;
+  fixed?: number;
 }
 
 export const InputRange: React.FC<InputRangeProps> = ({
@@ -18,6 +19,7 @@ export const InputRange: React.FC<InputRangeProps> = ({
   val,
   setVal,
   disabled = false,
+  fixed = 0
 }) => {
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setVal(Number(event.target.value));
@@ -40,7 +42,7 @@ export const InputRange: React.FC<InputRangeProps> = ({
           disabled={disabled}
           aria-disabled={disabled}
         />
-        <div className="slider-val-label">{val}</div>
+        <div className="slider-val-label">{val.toFixed(fixed)}</div>
       </div>
     </>
   );
