@@ -40,7 +40,7 @@ export const Controls: React.FC<ControlProps> = ({
         <ModalButtons />
         {/* Water Temp Slider */}
         <InputRange
-          label="starting water temperature (°C):"
+          label="initial water temperature (°C):"
           id="temp-range"
           min={0}
           max={25}
@@ -48,10 +48,11 @@ export const Controls: React.FC<ControlProps> = ({
           val={simState.waterTemp}
           setVal={(newVal) => setSimState({ ...simState, waterTemp: newVal })}
           disabled={simState.started}
+          fixed={1}
         />
         {/* Block Temp Slider */}
         <InputRange
-          label="starting block temperature (°C):"
+          label="initial block temperature (°C):"
           id="temp-range"
           min={25}
           max={60}
@@ -110,7 +111,7 @@ export const Controls: React.FC<ControlProps> = ({
         {/* Pt Label */}
         <div style={{ height: "27px" }}>
           {simState.mat === "Pt (Sample)" &&
-            "Specific Heat Capacity: 0.133 J/(g K)"}
+            "heat capacity: 0.133 J/(g K)"}
         </div>
         <div className="btn-container" id="play-sim-btns">
           {/* Drop Button */}
