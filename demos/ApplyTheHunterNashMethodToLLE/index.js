@@ -66,7 +66,8 @@ function setup(){
     startingPoints();
     definePhaseCurve();
     defineTieLines();
-    generateAnswers();
+    generateAnswers()
+    textFont('Arial');
 }
 
 function draw(){
