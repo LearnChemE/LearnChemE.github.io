@@ -40,6 +40,7 @@ function setup() {
 let t = [1,2,3,4,5]
 
 function draw(){
+    textFont('Arimo');
     background(250);
     alphaManipulation();
     frameDraw();
