@@ -89,9 +89,7 @@ export const ModalDialogues: React.FC = () => {
             <a href="https://github.com/LearnChemE/LearnChemE.github.io/">
               LearnChemE GitHub repository
             </a>
-            . If this simulation is too big or too small for your screen, zoom
-            out or in using command - or command + on Mac or ctrl - or ctrl + on
-            Windows.
+            .
           </p>
         }
       />
