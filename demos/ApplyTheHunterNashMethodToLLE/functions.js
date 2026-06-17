@@ -1012,7 +1012,7 @@ function questionOrHintDisplay() {
         text('Step 1: move the feed point     to the correction location, then submit answer', x, y);
         push();
         textStyle(ITALIC);
-        text('F', x + 265, y);
+        text('F', x + 252, y);
         pop();
       } else {
         text('Hint: read the compositions on the axes', x, y);
@@ -1038,7 +1038,7 @@ function questionOrHintDisplay() {
         text('Step 2: move the solvent point     to the correct location, then submit answer', x, y);
         push();
         textStyle(ITALIC);
-        text('S', x + 291, y);
+        text('S', x + 275, y);
         pop();
       } else {
         text('Hint: read the compositions on the axes', x, y);
@@ -1061,13 +1061,12 @@ function questionOrHintDisplay() {
       break;
     case (2):
       if (!g.hintTruth) {
-        text('Step 3: move the desired raffinate point      to the correct location, ', x, y);
-        text('then submit answer', x + 70, y + 30);
+        text('Step 3: move the desired raffinate point      to the correct location, then submit answer', x, y);
         push();
         textStyle(ITALIC);
-        text('R', x + 375, y);
+        text('R', x + 353, y);
         textSize(15);
-        text('N', x + 387.5, y + 4);
+        text('N', x + 366.5, y + 4);
         pop();
       } else {
         text('Hint: read the compositions on the axes', x, y);
@@ -1095,11 +1094,11 @@ function questionOrHintDisplay() {
     case (3):
       if (!g.hintTruth) {
         text('Step 4: for the indicated flow rates (       ), use mass balances to determine the ', x, y);
-        text('mixing point composition    , then submit answer', x + 70, y + 30);
+        text('mixing point composition    , then submit answer', x + 70, y + 25);
         push();
         textStyle(ITALIC);
-        text('F, S', x + 335, y);
-        text('M', x + 313, y + 30);
+        text('F, S', x + 317, y);
+        text('M', x + 295, y + 25);
         pop();
       } else {
         text('Hint: use the lever rule', x, y);
@@ -1140,20 +1139,20 @@ function questionOrHintDisplay() {
         text('Step 5: move the first extract point      to the correct location, then submit answer', x, y)
         push();
         textStyle(ITALIC);
-        text('E', x + 328, y);
+        text('E', x + 310, y);
         textSize(15);
         textStyle(NORMAL);
-        text('1', x + 340, y + 4);
+        text('1', x + 323, y + 4);
         pop();
       } else {
         text('Hint: use mass balance for two exit streams (     ,     )', x, y);
         push();
         textStyle(ITALIC);
-        text('R    E', x + 420, y);
+        text('R    E', x + 400, y);
         textSize(15);
-        text('N', x + 432, y + 4);
+        text('N', x + 414, y + 4);
         textStyle(NORMAL);
-        text('1', x + 465, y + 4);
+        text('1', x + 450, y + 4);
         pop();
       }
       break;
@@ -1162,21 +1161,21 @@ function questionOrHintDisplay() {
         text('Step 6: move the operating point     to the correct location, then submit answer', x, y);
         push();
         textStyle(ITALIC);
-        text('P', x + 313, y);
+        text('P', x + 296, y);
         pop();
       } else {
-        text('Hint: the operating point is at the intersection of a line through    and     and a line', x, y);
+        text('Hint: the operating point is at the intersection of a line through    and      and a line', x, y);
         text('through    and   ', x + 48, y + 25);
         push();
         textStyle(ITALIC);
-        text('F', x + 594, y);
-        text('E', x + 652, y);
-        text('S', x + 129, y + 25);
-        text('R', x + 187, y + 25);
+        text('F', x + 549, y);
+        text('E', x + 607, y);
+        text('S', x + 119, y + 25);
+        text('R', x + 177, y + 25);
         textSize(15);
-        text('N', x + 200, y + 29);
+        text('N', x + 191, y + 29);
         textStyle(NORMAL);
-        text('1', x + 662, y + 4);
+        text('1', x + 620, y + 4);
         pop();
       }
       break;
@@ -1185,10 +1184,10 @@ function questionOrHintDisplay() {
         text('Step 7: move the first raffinate point      to the correct location, then submit answer', x, y);
         push();
         textStyle(ITALIC);
-        text('R', x + 344, y);
+        text('R', x + 323, y);
         textSize(15);
         textStyle(NORMAL);
-        text('1', x + 356, y + 4);
+        text('1', x + 336, y + 4);
         pop();
       } else {
         text('Hint: follow the tie line to the other side of the phase boundary', x, y);
@@ -1196,14 +1195,13 @@ function questionOrHintDisplay() {
       break;
     case (7):
       if (!g.hintTruth) {
-        text('Step 8: move the second extract point      to the correct location,', x, y)
-        text('then submit answer', x + 70, y + 30);
+        text('Step 8: move the second extract point      to the correct location, then submit answer', x, y)
         push();
         textStyle(ITALIC);
-        text('E', x + 360, y);
+        text('E', x + 342, y);
         textSize(15);
         textStyle(NORMAL);
-        text('2', x + 371, y + 4);
+        text('2', x + 355, y + 4);
         pop();
       } else {
         text('Hint: draw a line to the operating point', x, y);
@@ -1211,14 +1209,13 @@ function questionOrHintDisplay() {
       break;
     case (8):
       if (!g.hintTruth) {
-        text('Step 9: move the second raffinate point      to the correct location,', x, y);
-        text('then submit answer', x + 70, y + 30);
+        text('Step 9: move the second raffinate point      to the correct location, then submit answer', x, y);
         push();
         textStyle(ITALIC);
-        text('R', x + 375, y);
+        text('R', x + 354, y);
         textSize(15);
         textStyle(NORMAL);
-        text('2', x + 386, y + 4);
+        text('2', x + 368, y + 4);
         pop();
       } else {
         text('Hint: follow the tie line to the other side of the phase boundary', x, y);
@@ -1226,13 +1223,13 @@ function questionOrHintDisplay() {
       break;
     case (9):
       if (!g.hintTruth) {
-        text('Step 10: move the third extract point      to the correct location, then submit answer', x, y)
+        text('Step 5: move the third extract point      to the correct location, then submit answer', x, y)
         push();
         textStyle(ITALIC);
-        text('E', x + 348, y);
+        text('E', x + 316, y);
         textSize(15);
         textStyle(NORMAL);
-        text('3', x + 360, y + 4);
+        text('3', x + 329, y + 4);
         pop();
       } else {
         text('Hint: draw a line to the operating point', x, y);
