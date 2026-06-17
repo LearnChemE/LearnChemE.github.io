@@ -84,12 +84,8 @@ export const ModalDialogues: React.FC = () => {
             under the direction of Professor John L. Falconer and Michelle
             Medlin. It was prepared with financial support from the National
             Science Foundation (DUE 2336987 and 2336988). Address any questions
-            or comments to LearnChemE@gmail.com. Our simulations are open source
-            at{" "}
-            <a href="https://github.com/LearnChemE/LearnChemE.github.io/">
-              LearnChemE GitHub repository
-            </a>
-            .
+            or comments to LearnChemE@gmail.com. If this simulation is too big or too small for your screen, zoom
+            out or in using command - or command + on Mac or ctrl - or ctrl + on Windows.
           </p>
         }
       />
