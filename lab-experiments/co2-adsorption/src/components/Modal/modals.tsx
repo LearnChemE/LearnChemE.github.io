@@ -1,13 +1,15 @@
 import type { Component } from "solid-js";
+import { SIM_MODE } from "../../globals";
 
 export const DirectionsText: Component = () => {
     return <>
     <p>
-        This virtual experiment shows the adsorption and desorption of carbon dioxide from a zeolite bed.
+        This digital experiment measures CO₂ {SIM_MODE} on a zeolite bed.
         Click the cylinder valves and click and drag the regulators to allow flow into the system.
         Use the left valve handle to change what cylinder is connected to the bed system. Use the right valve handle to direct the flow of gas towards the bed or bypass it.
         Click the buttons on the mass flow controller to adjust the mass flowrate.
         Use the recording menu to record data from the simulation, then download a csv for further processing with other software.
+        Move the mouse over either of the valve handles to show in red lines through which gas flows. Lines where gas does not flow are in black. 
         
         To reset the experiment, click the reset button with the rotating arrows in the top left. 
         Click on Worksheet to see a detailed experimental plan. Scroll to zoom and drag the screen to pan. 

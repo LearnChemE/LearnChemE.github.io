@@ -2,16 +2,20 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
 import math as m
+import builtins
+
+MODE = getattr(builtins, 'MODE', 'adsorption')
+print(MODE)
 
 PERMEABILITY = 1e0 # permeability (cm2)
 MU = 1.8e-5 # viscosity of CO2 (kg/m/s)
 T = 298 # temperature (K)
 
 LENGTH_BED = 20 # cm
-EXTENDED_LENGTH = 0.125 * LENGTH_BED # cm, for numerical stability
+EXTENDED_LENGTH = 0.125 * LENGTH_BED if (MODE == "adsorption") else 0 # cm, for numerical stability
 TOTAL_LENGTH = LENGTH_BED + EXTENDED_LENGTH
 RHO_ZEOLITE = 0.75 # g/cc
-MASS_ZEOLITE = 1 # g
+MASS_ZEOLITE = 10 if (MODE == "adsorption") else 0.1 # g
 MM_CO2 = 44.009 # g/mol
 MM_N2 = 14.041 # g/mol
 R = 83.14 # bar cc / mol / K
@@ -23,7 +27,7 @@ inv_RT = 1 / R / T # 1 / (R * T) in mol / bar / cc
 # [ pco2, Ptot, theta_co2 ], referred to as [p, P, th]
 
 # Spatial info
-N = 50 # number of points in spatial discretization
+N = 50 if (MODE == "adsorption") else 1 # number of points in spatial discretization
 E = 3 # number of equations per point (tot pressure, co2 pressure, theta, velocity) stride
 NE = N * E # number of equations in the system
 NT = NE + 2 * E # Size of arrays including padding
@@ -46,14 +50,14 @@ def molar_mass(x_co2):
     return x_co2 * MM_CO2 + (1 - x_co2) * MM_N2
 
 # Kinetic parameters
-ka0 = 6.0 # bar^-1 min^-1
+ka0 = 2.0e-1 # bar^-1 min^-1
 ea = 1000 # convert from kJ/mol to K
-kd0 = 8e4 # 
-ed = 6e3
+kd0 = 1e7 # 
+ed = 1e4
 def k_val(k0, ea, T):
     return k0 * np.exp(-ea / T)
 
-TVD_METHOD = "MinMod" # "MinMod", "VanLeer", or "SuperBee"
+TVD_METHOD = "SuperBee" # "MinMod", "VanLeer", or "SuperBee"
 
 def fluxLimiter(r, method):
     if method == "SuperBee":
@@ -68,7 +72,7 @@ def fluxLimiter(r, method):
 # 1D linear coordinates
 # V d(ph)/dt = -adv + dif + src
 
-def rhs(t, y, y_l, P_l, u_l, ka, kd):
+def rhs(t, y, y_l, P_l, u_l, ka, kd, T):
     S = AREA_BED
     V = VOL_BED
     dydt = np.zeros_like(y)
@@ -92,6 +96,7 @@ def rhs(t, y, y_l, P_l, u_l, ka, kd):
         dif_p
     ] # [ adv_p, adv_P, dif_p ] for the first face (inlet)
     # print(P_l * inv_RT)
+    # print(P_l, u_l)
     
     for i in range(N):
         # indices
@@ -142,8 +147,8 @@ def rhs(t, y, y_l, P_l, u_l, ka, kd):
         ads = ka * y[ip] * th_star
         des = kd * th
 
-        rxn_p = (des - ads) * R * T * (dx / LENGTH_BED) # Pressure changes: mol/cm3/min to bar/min
-        rxn_t = (ads - des) * (dx * AREA_BED) / CAPACITY # Theta changes: mol/cm3/min to min^-1
+        rxn_p = (des - ads) * R * T # Pressure changes: mol/cm3/min to bar/min
+        rxn_t = (ads - des) * VOL_BED / CAPACITY # Theta changes: mol/cm3/min to min^-1
         # if (i == N-1):
         #     rxn_p = 0
         #     rxn_t = 0
@@ -197,8 +202,8 @@ def smooth(y, window_size):
     return smoothed
 
 if __name__ == "__main__":
-    P_l = 1 # bar
-    y_l = 0.9 # mol fraction of CO2 in feed
+    P_l = 2 # bar
+    y_l = 0.1 # mol fraction of CO2 in feed
     sccm = 100
     y0 = np.zeros(NE)
 
@@ -217,9 +222,9 @@ if __name__ == "__main__":
 
     def rhs_wrapped(t, y):
         # print("solving at time", t)
-        return rhs(t, y, y_l, P_l, u_l, ka, kd)
+        return rhs(t, y, y_l, P_l, u_l, ka, kd, T)
 
-    sol = solve_ivp(rhs_wrapped, [0, 11], y0, 'RK45')
+    sol = solve_ivp(rhs_wrapped, [0, 80], y0, 'RK45')
 
     yf = sol.y[:, -1]
     
@@ -271,13 +276,13 @@ if __name__ == "__main__":
         print("Warning: Breakthrough or saturation point not found in data.")
         exit(1)
     
-    n = y * Q / R / T # mol/min
+    n = y * Q / R / T * 1000 # mmol/min
     n_final = n[-1]
-    m = n * molar_mass(y_l) * 1000 # mg/min
-    m_final = m[-1]
+    # m = n * molar_mass(y_l) * 1000 # mg/min
+    # m_final = m[-1]
 
-    area_under = np.trapezoid(n, t)
-    area_total = n_final * (t[-1] - t[0])
+    area_under = np.trapezoid(n, t) / 1000
+    area_total = n_final * (t[-1] - t[0]) / 1000
     n_over = y_l * P_l * VOL_BED / R / T # number of moles in the bed in gas phase
     n_adsorbed = area_total - area_under
     
@@ -286,12 +291,12 @@ if __name__ == "__main__":
     print(f"Accounting for {n_over} moles in gas phase in bed, {n_adsorbed - n_over} moles adsorbed")
     
     # Show plot integrated to breakthrough
-    plt.plot(t, m, 'k-', label=r'outlet $CO_2$ pressure')
-    plt.vlines(t[idx_breakthrough], 0, m_final, color='k', linewidth=1, linestyle='--', label='breakthrough time')
-    plt.fill_between(t[:idx_breakthrough+1], m[:idx_breakthrough+1], m_final, color="b", alpha=0.3, label=r"$CO_2$ adsorbed")
+    plt.plot(t, n, 'k-', label=r'outlet $CO_2$ pressure')
+    plt.vlines(t[idx_breakthrough], 0, n_final, color='k', linewidth=1, linestyle='--', label='breakthrough time')
+    plt.fill_between(t[:idx_breakthrough+1], n[:idx_breakthrough+1], n_final, color="purple", alpha=0.3, label=r"$CO_2$ adsorbed")
     # plt.legend()
     plt.xlabel('time (min)')
-    plt.ylabel(r'outlet $CO_2$ flowrate (mg/min)')
+    plt.ylabel(r'outlet $CO_2$ flowrate (mmol/min)')
     plt.show()
 
     # ndot = PQ/RT
@@ -299,18 +304,18 @@ if __name__ == "__main__":
     # mdot = MM * PQ/RT
     
     # Show plot integrated to saturation
-    plt.plot(t, m, 'k-', label='outlet $CO_2$ pressure')
-    plt.fill_between(t[:idx_breakthrough+1], m[:idx_breakthrough+1], m_final, color="b", alpha=0.3, label=r"$CO_2$ adsorbed")
-    plt.vlines(t[idx_breakthrough], 0, m_final, color='k', linewidth=1, linestyle='--', label='breakthrough time')
-    plt.vlines(t[idx_saturation], 0, m_final, color='k', linewidth=1, linestyle=':', label='saturation time')
+    plt.plot(t, n, 'k-', label='outlet $CO_2$ pressure')
+    plt.fill_between(t[:idx_breakthrough+1], n[:idx_breakthrough+1], n_final, color="purple", alpha=0.3, label=r"$CO_2$ adsorbed")
+    plt.vlines(t[idx_breakthrough], 0, n_final, color='k', linewidth=1, linestyle='--', label='breakthrough time')
+    plt.vlines(t[idx_saturation], 0, n_final, color='k', linewidth=1, linestyle=':', label='saturation time')
 
     line_t = np.array([t[idx_breakthrough], t[idx_saturation]])
-    line_y = np.array([m[idx_breakthrough], m[idx_saturation]])
+    line_y = np.array([n[idx_breakthrough], n[idx_saturation]])
 
-    plt.plot(line_t, line_y, color='b', linestyle='-', label='integration symmetry line')
-    plt.fill_between(line_t, line_y, m_final, color="b", alpha=0.3)
+    plt.plot(line_t, line_y, color='purple', linestyle='-', label='integration symmetry line')
+    plt.fill_between(line_t, line_y, n_final, color="purple", alpha=0.3)
 
     # plt.legend()
     plt.xlabel('time (min)')
-    plt.ylabel(r'outlet $CO_2$ flowrate (mg/min)')
+    plt.ylabel(r'outlet $CO_2$ flowrate (mmol/min)')
     plt.show()

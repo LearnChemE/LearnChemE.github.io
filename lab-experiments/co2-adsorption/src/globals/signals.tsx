@@ -220,7 +220,7 @@ class ResetSignal {
 
         const get = this.signal[0];
         createEffect(() => {
-            get();
+            get(); 
             callback();
         });
 

@@ -46,7 +46,7 @@ export const BedContextProvider = (props: { children: any, descriptor: ContextDe
         onUpdate: () => setBedUpdated(v => !v)
     };
 
-    const bed = new BedCalc(bedDescriptor);
+    let bed = new BedCalc(bedDescriptor);
     // if (SIM_MODE === "desorption") bed.fill();
     bed.play();
     const store: BedContextType = { bed, bedUpdated };
@@ -54,8 +54,6 @@ export const BedContextProvider = (props: { children: any, descriptor: ContextDe
     onMount(() => {
         resetSignal.subscribe(() => {
             bed.reset();
-            // if (SIM_MODE === "desorption") bed.fill();
-            bed.play();
         });
     });
 

@@ -1,5 +1,5 @@
 import { createEffect, createSignal, Match, Switch, type Accessor, type Component, type Setter } from "solid-js"
-import { animate, BETA_INIT, repeatClick, smoothLerp, TEMP_MAX, TEMP_ROOM } from "../../globals";
+import { animate, BETA_INIT, repeatClick, resetSignal, smoothLerp, TEMP_MAX, TEMP_ROOM } from "../../globals";
 
 export type HeatingState = "heating" | "paused" | "cooling";
 
@@ -59,6 +59,11 @@ export const BetaCtrl: Component<BetaCtrlProps> = (props: BetaCtrlProps) => {
     };
     const increment = () => setBeta(prev => Math.min(prev + props.step, props.range[1]));
     const decrement = () => setBeta(prev => Math.max(prev - props.step, props.range[0]));
+
+    resetSignal.subscribe(() => {
+        setState("cooling")
+        props.setTemperature(TEMP_ROOM);
+    });
 
     return (<g transform="translate(625, 436.5)">
 <g transform="translate(-15, -20) scale(1.25)">

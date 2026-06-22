@@ -1,4 +1,5 @@
 import { createSignal, type Accessor, type Setter } from "solid-js";
+import { SIM_MODE } from "../../globals";
 
 export class DataRecorder {
     private data: Array<Object> = [];
@@ -30,7 +31,14 @@ export class DataRecorder {
 
             const elapsed = (Date.now() - startTime) / 1000;
             const dataPoint = this.dataAccessor();
-            this.data.push({ "simulation time (min)": elapsed.toFixed(1), ...dataPoint });
+
+            if (SIM_MODE === "adsorption") {
+                this.data.push({ "simulation time (min)": elapsed.toFixed(1), ...dataPoint });
+            }
+            else {
+                this.data.push({ "simulation time (s)": elapsed.toFixed(1), ...dataPoint });
+            }
+
             console.table(this.data.at(-1));
             setTimeout(recordLoop, this.interval);
         }
@@ -70,4 +78,31 @@ export class DataRecorder {
 
         URL.revokeObjectURL(url);
     }
+}
+
+export function sfToDec(value: number, sigfigs: number) {
+    if (value <= 0) return 2;
+    return -Math.floor(Math.log10(value)) + sigfigs - 1;
+}
+
+export function sigfigs(value: number, how: number | { decimals?: number, sigfigs?: number, maxDecimals?: number }) {
+    let decimals;
+    if (typeof how === "number") {
+        decimals = how;
+    }
+    else if (how.decimals !== undefined) {
+        decimals = how.decimals;
+    }
+    else if (how.sigfigs !== undefined) {
+        decimals = sfToDec(value, how.sigfigs);
+    }
+    else {
+        decimals = 0;
+    }
+
+    if (typeof how !== "number" && how.maxDecimals !== undefined) {
+        decimals = Math.min(decimals, how.maxDecimals);
+    }
+
+    return value.toFixed(decimals);
 }
