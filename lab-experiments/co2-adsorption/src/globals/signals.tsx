@@ -1,4 +1,4 @@
-import { createEffect, createMemo, createSignal, onMount, type Accessor, type Setter } from "solid-js";
+import { createEffect, createMemo, createSignal, on, onMount, type Accessor, type Setter } from "solid-js";
 import { animate, smoothLerp } from "./helpers";
 import { SIM_MODE } from "./config";
 
@@ -220,8 +220,7 @@ class ResetSignal {
 
         const get = this.signal[0];
         createEffect(() => {
-            get();
-            callback();
+            on(get, callback, { defer: true });
         });
 
         return true;

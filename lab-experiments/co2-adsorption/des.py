@@ -1,3 +1,7 @@
+import builtins
+
+builtins.MODE = "desorption"
+
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
@@ -14,7 +18,7 @@ def createActual(tmax, beta):
         dydt = - kd * y * VOL_BED / CAPACITY
         return dydt
     
-    sol = solve_ivp(rhs_actual, [0, tmax], [y0], 'BDF', t_eval=np.linspace(0, tmax, 300))
+    sol = solve_ivp(rhs_actual, [0, tmax], [y0], 'BDF', t_eval=np.linspace(0, tmax, 301))
     t = sol.t
     T = 298 + beta * t * 60
     kd = k_val(kd0, ed, T)
@@ -27,7 +31,7 @@ def createActual(tmax, beta):
     return t, n
 
 if __name__ == "__main__":
-    P_l = 1 # bar
+    P_l = 2 # bar
     y_l = 0.0 # mol fraction of CO2 in feed
     y0 = np.zeros(NE)
     for i in range(N):
@@ -35,10 +39,10 @@ if __name__ == "__main__":
         y0[i * E + 1] = P_l
         y0[i * E + 2] = 1
 
-    beta = [0.3, 3.0]
+    beta = [.3, 3]
 
-    sccms = [100, 200]
-    tf = 30
+    sccms = [200, 2000]
+    tf = 15
 
     for sccm in sccms:
 
@@ -52,17 +56,27 @@ if __name__ == "__main__":
                 ka = k_val(ka0, ea, T)
                 kd = k_val(kd0, ed, T)
 
-                Q = sccm * (1 / P_l) * 298 / 273.15
+                Q = sccm * (1 / P_l) * T / 273.15
                 u = Q / AREA_BED # cm / min
 
-                return rhs(t, y, y_l, P_l, u, ka, kd)
+                return rhs(t, y, y_l, P_l, u, ka, kd, 298) # for some reason the actual T makes this one too high?
 
-            sol = solve_ivp(rhs_wrapped, [0, tf], y0, 'BDF')
+            tstep = 1/60
+            ts = np.arange(0, tf, tstep)
+            y = []
+            y_init = y0
 
-            t = sol.t
+            for t in ts:
+                sol = solve_ivp(rhs_wrapped, [t, t + tstep], y_init, 'BDF')
+                y.append(sol.y[BED_END_IDX * E, -1])
+                y_init = sol.y[:,-1]
+
+            # t = sol.t
+            t = ts
             T = 298 + t * b * 60
-            Q = sccm * (1 / P_l) * (298 / 273.15)
-            y = sol.y[BED_END_IDX * E, :] * Q / R / 298
+            Q = sccm * (1 / P_l) * (T / 273.15)
+            # y = sol.y[BED_END_IDX * E, :] * Q / R / 298
+            y = np.array(y) * Q / R / 298
             tot = np.trapezoid(y, t)
             y = smooth(y, window_size=3) # smooth out numerical noise
 
@@ -108,6 +122,6 @@ if __name__ == "__main__":
 
 
     plt.xlabel('time (min)')
-    plt.ylabel(r'outlet $CO_2$ flowrate (mg/min)')
+    plt.ylabel(r'outlet $CO_2$ flowrate (mol/min)')
     plt.legend()
     plt.show()

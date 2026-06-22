@@ -6,15 +6,15 @@ import { SIM_MODE } from "./config";
 
 export const LENGTH_BED = 20; // cm
 const RHO_ZEOLITE = 0.75; // g/cc
-const MASS_ZEOLITE = (SIM_MODE === "adsorption") ? 10 : 1; // g
+const MASS_ZEOLITE = (SIM_MODE === "adsorption") ? 10 : 0.1; // g
 const MM_CO2 = 44.009; // g/mol
 const MM_N2 = 14.041; // g/mol
 const R = 83.14; // bar cc / mol / K
 const BED_MAX_CAPACITY = MASS_ZEOLITE / 1000 * 2.5; // mols
-const DIFFUSIVITY = 1.8e-3 * 60; // m^2/s, diffusivity of CO2 in zeolite
+const DIFFUSIVITY = 1.8e-2 * 60; // m^2/s, diffusivity of CO2 in zeolite
 
 // Spatial info
-const N = (SIM_MODE === "adsorption") ? 50 : 5; // number of points in spatial discretization
+const N = (SIM_MODE === "adsorption") ? 50 : 1; // number of points in spatial discretization
 const E = 3; // number of equations per point (tot pressure, co2 pressure, theta, velocity); stride
 const NE = N * E; // number of equations in the system
 const NT = NE + 2 * E; // Size of arrays including padding
@@ -29,10 +29,13 @@ const BED_RADIUS = Math.sqrt(BED_CROSS_SECTION / Math.PI); // cm
 console.log("Radius: ", BED_RADIUS)
 
 // Kinetic parameters
-const ka0 = 6.0; // min^-1
-const ea = 1000; // convert from kJ/mol to K
-const kd0 = 8e4; // min^-1
-const ed = 8e3;
+const ka0 = 2.0e-1 // min^-1
+const ea  = 1000 // convert from kJ/mol to K
+const kd0 = 1e7 // min^-1
+const ed  = 1e4
+
+const MINUTE_SCALE = (SIM_MODE === "adsorption") ? 1 : 1/60;
+
 function k_val(k0: number, ea: number, T: number) {
   return k0 * Math.exp(-ea / T);
 }
@@ -89,12 +92,16 @@ export function molar_mass(x_co2: number) {
  */
 function calc_velocity(sccm: number, T: number, P: number) {
     // pv = nrt; Vdot = ndot * RT / P
-    const ccm = sccm * (1 / (P + 1)) * (T / 273.15); // cc/min
+    const ccm = sccm * (1 / P) * (T / 273.15); // cc/min
     return ccm / BED_CROSS_SECTION; // cm/min
 }
 
+// function calculateFaceFlux() {
+
+// }
+
 // RHS for advection-diffusion eqn with reaction term
-function rhs(_: number, y: number[], u: number, dx: number, ka: number, kd: number) {
+function rhs(_: number, y: number[], u: number, dx: number, ka: number, kd: number, T: number) {
     const dydt = Array.from({ length: NT }).fill(0) as number[];
     const inv_dx = 1 / dx;
     // const inv_dx2 = inv_dx / dx;
@@ -121,7 +128,7 @@ function rhs(_: number, y: number[], u: number, dx: number, ka: number, kd: numb
         y[1] * u * inv_dx, // P * u
         dl // dif_p
     ]; // [ adv_p, adv_P, dif_p ]
-
+    
     for (let i = E; i < NT - E; i += E) {
         const ip = i;
         const iP = i + 1;
@@ -173,9 +180,10 @@ function rhs(_: number, y: number[], u: number, dx: number, ka: number, kd: numb
 
         const ads = ka * y[ip] * th_star;
         const des = kd * th;
+        const r_a = des - ads; // rate of generation
 
-        const rxn_p = (des - ads) * R * 298 * (dx / LENGTH_BED); // Pressure changes
-        const rxn_t = (ads - des) * (dx * BED_CROSS_SECTION) / BED_MAX_CAPACITY; // Theta changes
+        const rxn_p = +r_a * R * T; // Pressure changes
+        const rxn_t = -r_a * BED_VOLUME / BED_MAX_CAPACITY; // Theta changes
 
         // Sum
         dydt[ip] = (prevFace[0] - adv_p) + (prevFace[2] - dif_p) + rxn_p;
@@ -184,6 +192,11 @@ function rhs(_: number, y: number[], u: number, dx: number, ka: number, kd: numb
 
         prevFace = [ adv_p, adv_P, dif_p ];
     }
+
+    // Right pad should always match right edge
+    dydt[NT - E]     = dydt[NT - 2 * E];
+    dydt[NT - E + 1] = dydt[NT - 2 * E + 1];
+    dydt[NT - E + 2] = dydt[NT - 2 * E + 2];
 
     return dydt;
 }
@@ -220,7 +233,7 @@ export class BedCalc {
         this.yIn = desc.yIn;
         this.flowing = desc.flowing;
         this.sccm = desc.sccm;
-        console.table(desc)
+        // console.table(desc)
         this.onOut = desc.onOut;
         this.onUpdate = desc.onUpdate;
     }
@@ -245,7 +258,7 @@ export class BedCalc {
     public play() {
         if (this.playing) return;
         this.playing = true;
-        animate(dt => this.iterate(dt));
+        animate(dt => this.iterate(dt * MINUTE_SCALE));
     }
 
     public reset() {
@@ -256,10 +269,10 @@ export class BedCalc {
 
     private iterate(dt: number) {
         const T = this.tempK();
-        const P = this.presBar(); // absolute pressure
+        const P = this.presBar() + 1; // absolute pressure
         const y = this.yIn();
         const flowing = this.flowing();
-        const sccm = (P > 0) ? this.sccm() : 0;
+        const sccm = (P > 1) ? this.sccm() : 0;
 
         const out = this.yCO2_out(dt, sccm, T, P, y, flowing);
         this.onOut(out);
@@ -287,6 +300,7 @@ export class BedCalc {
      */
     public yCO2_out(dt: number, sccm: number, T: number, P: number, y: number, flowing: boolean) {
         let u = calc_velocity(sccm, T, P);
+
         // console.log("Velocity: ", u.toFixed(5), "cm/min")
         u = isNaN(u) ? 0 : u;
         if (flowing) {
@@ -296,7 +310,7 @@ export class BedCalc {
         }
         else {
             const rightYP = this.bed[NE - E]
-            const rightP = this.bed[NE - E + 1]; // Pressure at the right boundary;
+            const rightP  = this.bed[NE - E + 1]; // Pressure at the right boundary;
             const u = 0; // No flow when not flowing
             const y0 = pad(this.bed, [rightYP, rightP, 0], [rightYP, rightP, 0]);
             this.evolve(dt, T, y0, u);
@@ -314,11 +328,12 @@ export class BedCalc {
         const kd = k_val(kd0, ed, T);
 
         const f: ODEFunc = (t: number, y: number[]) => {
-            return rhs(t, y, u, dx, ka, kd);
+            return rhs(t, y, u, dx, ka, kd, T);
         };
 
         const sol = rk45(f, y0, 0, tstep);
         const soly = sol.y.at(-1)!;
+        // console.log("theta:", soly[5])
         
         this.updateBed(soly);
         // updatePlot();

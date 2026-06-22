@@ -20,6 +20,7 @@ import { BedContextProvider, type ContextDescriptor } from './components/Context
 import { AniLines } from './components/AniLines/AniLines'
 import { SVGTooltip } from './components/Tooltip/TooltipSelector'
 import { RecordMenu } from './components/RecordMenu/RecordMenu'
+import { sigfigs } from './components/RecordMenu/record'
 
 // import { PlotlyChart } from './components/PlotlyChart'
 
@@ -56,8 +57,18 @@ function App() {
     }
   }, 0.1);
   const compLabel = createMemo(() => {
-    const u = out().u;
-    return `${u > 0.01 ? comp().toFixed(2) : "--"} %`;
+    const percent = comp() * 100;
+
+    if (SIM_MODE === "adsorption") {
+      const dec = 2;
+      return `${percent.toFixed(dec)}%`;
+    }
+    else {
+      let dec = -Math.floor(Math.log10(percent)) + 2; // 3 sig figs
+      dec = Math.max(Math.min(dec, 4), 2);
+      return `${percent.toFixed(dec)}%`;
+    }
+
   });
 
   // const flowLabel = createMemo(() => {
@@ -96,12 +107,12 @@ function App() {
 
   const exportData = () => {
     return {
-      "temperature (K)": temperature().toFixed(1),
-      "inlet composition": currentCylinder().yCO2.toFixed(2),
-      "bed pressure (bar)": bedPressure().toFixed(2),
-      "sccm setpoint": sccmSP().toFixed(1),
-      "bypass bed": valve2Angle() === V2_BYPASS_ANGLE,
-      "outlet mole fraction CO2": comp().toFixed(4),
+      "temperature (K)":            temperature().toFixed(1),
+      "inlet CO2 mole fraction":    sigfigs(currentCylinder().yCO2, { sigfigs: 3 }),
+      "bed pressure (bar)":         bedPressure().toFixed(2),
+      "sccm setpoint":              sccmSP().toFixed(1),
+      "bypass bed":                 (valve2Angle() === V2_BYPASS_ANGLE),
+      "outlet CO2 mole fraction":   sigfigs(comp(), { sigfigs: 3, maxDecimals: 6 }),
     }
   };
 
