@@ -262,7 +262,6 @@ export class BedCalc {
     }
 
     public reset() {
-        this.playing = false;
         this.bed = this.bed.fill(0);
         this.onOut({ y: 0, u: 0 });
     }

@@ -54,8 +54,6 @@ export const BedContextProvider = (props: { children: any, descriptor: ContextDe
     onMount(() => {
         resetSignal.subscribe(() => {
             bed.reset();
-            bed = new BedCalc(bedDescriptor);
-            bed.play();
         });
     });
 
