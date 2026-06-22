@@ -15,7 +15,7 @@ LENGTH_BED = 20 # cm
 EXTENDED_LENGTH = 0.125 * LENGTH_BED if (MODE == "adsorption") else 0 # cm, for numerical stability
 TOTAL_LENGTH = LENGTH_BED + EXTENDED_LENGTH
 RHO_ZEOLITE = 0.75 # g/cc
-MASS_ZEOLITE = 10 if (MODE == "adsorption") else 0.1 # g
+MASS_ZEOLITE = 10 if (MODE == "adsorption") else 1 # g
 MM_CO2 = 44.009 # g/mol
 MM_N2 = 14.041 # g/mol
 R = 83.14 # bar cc / mol / K
