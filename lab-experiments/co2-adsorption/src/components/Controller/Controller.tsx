@@ -1,5 +1,5 @@
 import { createMemo, type Accessor, type Component, type Setter } from "solid-js";
-import { constrain, repeatClick } from "../../globals";
+import { constrain, repeatClick, SIM_MODE } from "../../globals";
 import "./Controller.css";
 
 type ControllerProps = {
@@ -53,7 +53,7 @@ export const Controller: Component<ControllerProps> = (props) => {
     y="15"
     font-family="Arial"
     font-size="12"
-    fill="black">SCCM</text>
+    fill="black">{SIM_MODE === "adsorption" ? "SCCM" : "SCCS"}</text>
 <g id="display">
     <text
         id="gmVal"

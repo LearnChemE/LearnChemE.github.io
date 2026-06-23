@@ -6,7 +6,7 @@ import { SIM_MODE } from "./config";
 
 export const LENGTH_BED = 20; // cm
 const RHO_ZEOLITE = 0.75; // g/cc
-const MASS_ZEOLITE = (SIM_MODE === "adsorption") ? 10 : 0.1; // g
+const MASS_ZEOLITE = (SIM_MODE === "adsorption") ? 10 : 1; // g
 const MM_CO2 = 44.009; // g/mol
 const MM_N2 = 14.041; // g/mol
 const R = 83.14; // bar cc / mol / K
