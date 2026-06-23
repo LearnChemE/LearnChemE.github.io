@@ -54,7 +54,7 @@ const cylinderDescriptors: GasCylinderDescriptor[] = (SIM_MODE === "adsorption")
         x: 40,
         angle: 180,
         yCO2: 0.9,
-        color: "#BF0000",
+        color: "#1cb700",
 
         initCylPres: 0,
         initRegSP: 0
@@ -63,18 +63,18 @@ const cylinderDescriptors: GasCylinderDescriptor[] = (SIM_MODE === "adsorption")
         name: "10%",
         x: 194,
         angle: 90,
-        yCO2: 0.1,
-        color: "#EA6C6C",
+        yCO2: 0.5,
+        color: "#5e9b3a",
 
         initCylPres: 0,
         initRegSP: 0
     }, 
     {
-        name: "N2",
+        name: "10%",
         x: 348,
         angle: 0,
-        yCO2: 0,
-        color: "#68A246",
+        yCO2: 0.1,
+        color: "#93bf79",
 
         initCylPres: 0,
         initRegSP: 0
@@ -87,7 +87,7 @@ const cylinderDescriptors: GasCylinderDescriptor[] = (SIM_MODE === "adsorption")
         x: 194,
         angle: 90,
         yCO2: 0.9,
-        color: "#BF0000",
+        color: "#1cb700",
 
         initCylPres: 0,
         initRegSP: 0
@@ -97,7 +97,7 @@ const cylinderDescriptors: GasCylinderDescriptor[] = (SIM_MODE === "adsorption")
         x: 348,
         angle: 0,
         yCO2: 0,
-        color: "#68A246",
+        color: "#a2d3e7",
 
         initCylPres: 0,
         initRegSP: 0

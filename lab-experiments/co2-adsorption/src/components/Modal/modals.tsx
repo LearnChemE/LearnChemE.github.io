@@ -9,7 +9,7 @@ export const DirectionsText: Component = () => {
         Use the left valve handle to change what cylinder is connected to the bed system. Use the right valve handle to direct the flow of gas towards the bed or bypass it.
         Click the buttons on the mass flow controller to adjust the mass flowrate.
         Use the recording menu to record data from the simulation, then download a csv for further processing with other software.
-        Move the mouse over either of the valve handles to show in red lines through which gas flows. Lines where gas does not flow are in black. 
+        Move the mouse over either of the valve handles to show in green lines through which gas flows. Lines where gas does not flow are in black. 
         
         To reset the experiment, click the reset button with the rotating arrows in the top left. 
         Click on Worksheet to see a detailed experimental plan. Scroll to zoom and drag the screen to pan. 

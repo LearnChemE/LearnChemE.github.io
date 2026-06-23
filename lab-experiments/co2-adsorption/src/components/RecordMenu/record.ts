@@ -36,7 +36,12 @@ export class DataRecorder {
                 this.data.push({ "simulation time (min)": elapsed.toFixed(1), ...dataPoint });
             }
             else {
-                this.data.push({ "simulation time (s)": elapsed.toFixed(1), ...dataPoint });
+                const keysToExclude = ["bed pressure (bar)", "inlet CO2 mole fraction", "bypass bed"];
+                const cleanedData = Object.fromEntries(
+                    Object.entries(dataPoint).filter(([key]) => !keysToExclude.includes(key))
+                );
+
+                this.data.push({ "simulation time (s)": elapsed.toFixed(1), ...cleanedData });
             }
 
             console.table(this.data.at(-1));
@@ -64,6 +69,8 @@ export class DataRecorder {
         // Append timestamp and .csv extension
         const timestamp = new Date().toLocaleTimeString().replace(/:/g, '_');
         filename = `${filename}_${timestamp}.csv`;
+        
+        
         const csvHeader = Object.keys(this.data[0]).join(',') + '\n';
         const csvRows = this.data.map(row => Object.values(row).join(',')).join('\n');
         const csvContent = csvHeader + csvRows;

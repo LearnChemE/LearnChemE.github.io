@@ -11,7 +11,7 @@ import { HamburgerMenu } from './components/Hamburger/Hamburger'
 import worksheet from './assets/worksheet.pdf?url';
 import { AboutText, DirectionsText } from './components/Modal/modals'
 import { ControlButton } from './components/ControlButton/ControlButton'
-import { BETA_MAX, BETA_MIN, BETA_STEP, createCylinders, expMemo, MAX_SCCM_FLOWRATE, MIN_SCCM_FLOWRATE, resetSignal, SCCM_FLOW_INIT, SCCM_FLOW_STEP, SIM_MODE, TEMP_ROOM, V1_ANGLE_INIT, V2_ANGLE_INIT, V2_BED_ANGLE, V2_BYPASS_ANGLE, VALVE_1_ANGLES, VALVE_2_ANGLES } from './globals'
+import { BETA_MAX, BETA_MIN, BETA_STEP, createCylinders, expMemo, MAX_SCCM_FLOWRATE, MIN_SCCM_FLOWRATE, resetSignal, SCCM_CONVERSION, SCCM_FLOW_INIT, SCCM_FLOW_STEP, SIM_MODE, TEMP_ROOM, V1_ANGLE_INIT, V2_ANGLE_INIT, V2_BED_ANGLE, V2_BYPASS_ANGLE, VALVE_1_ANGLES, VALVE_2_ANGLES } from './globals'
 import { MultiValve } from './components/MultiValve/MultiValve'
 import { Manometer } from './components/Manometer/Manometer'
 import { BetaCtrl } from './components/BetaCtrl/BetaCtrl'
@@ -31,7 +31,8 @@ function App() {
   const [valve2Angle, setValve2Angle] = createSignal(V2_ANGLE_INIT);
   const [showLines, setShowLines] = createSignal(false);
 
-  const [sccmSP, setSccmSP] = createSignal(SCCM_FLOW_INIT);
+  const [sccSP, setSccSP] = createSignal(SCCM_FLOW_INIT);
+  const sccmSP = createMemo(() => sccSP() * SCCM_CONVERSION);
   const currentCylinder = createMemo(() => {
     const cyl = cylinders.find(cyl => cyl.angle === valve1Angle());
     if (cyl === undefined) throw new Error(`Cylinder undefined for angle ${valve1Angle()}`);
@@ -48,7 +49,7 @@ function App() {
   const comp = expMemo(() => {
     if (valve2Angle() === V2_BYPASS_ANGLE) {
       const y = currentCylinder().yCO2;
-      const flowing = sccmSP() > 0 && currentCylinder().linePres() > 0;
+      const flowing = sccSP() > 0 && currentCylinder().linePres() > 0;
       return flowing ? y : 0;
     }
     else {
@@ -109,7 +110,7 @@ function App() {
     return {
       "temperature (K)":            temperature().toFixed(1),
       "inlet CO2 mole fraction":    sigfigs(currentCylinder().yCO2, { sigfigs: 3 }),
-      "bed pressure (bar)":         bedPressure().toFixed(2),
+      "bed gauge pressure (bar)":         bedPressure().toFixed(2),
       "sccm setpoint":              sccmSP().toFixed(1),
       "bypass bed":                 (valve2Angle() === V2_BYPASS_ANGLE),
       "outlet CO2 mole fraction":   sigfigs(comp(), { sigfigs: 3, maxDecimals: 6 }),
@@ -134,7 +135,7 @@ function App() {
               </>}
             }
           </For>
-          <Controller sp={sccmSP} setSP={setSccmSP} range={[MIN_SCCM_FLOWRATE, MAX_SCCM_FLOWRATE]} step={SCCM_FLOW_STEP} />
+          <Controller sp={sccSP} setSP={setSccSP} range={[MIN_SCCM_FLOWRATE, MAX_SCCM_FLOWRATE]} step={SCCM_FLOW_STEP} />
           <MultiValve x={303} y={240} key="valve1-ani" angle={valve1Angle} setAngle={setValve1Angle} directions={VALVE_1_ANGLES} setShowLines={setShowLines} />
           <MultiValve x={487} y={184} key="valve2-ani" angle={valve2Angle} setAngle={setValve2Angle} directions={VALVE_2_ANGLES} setShowLines={setShowLines} resetTo={V2_ANGLE_INIT} />
 
