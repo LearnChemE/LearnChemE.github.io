@@ -1,5 +1,5 @@
-import { createMemo, Match, Show, Switch, type Accessor, type Component } from "solid-js";
-import { expMemo, GasCylinder, SIM_MODE } from "../../globals";
+import { createMemo, Match, Switch, type Accessor, type Component } from "solid-js";
+import { expMemo, GasCylinder, } from "../../globals";
 import "./AniLines.css"
 import { Portal } from "solid-js/web";
 

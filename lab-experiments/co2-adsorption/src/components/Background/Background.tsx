@@ -1,4 +1,4 @@
-import { Show, type Component } from "solid-js";
+import { type Component } from "solid-js";
 import { SIM_MODE } from "../../globals";
 
 const Background: Component = () => {
