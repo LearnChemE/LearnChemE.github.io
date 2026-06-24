@@ -49,22 +49,22 @@ export function GasCylinder(descriptor: GasCylinderDescriptor) {
 const cylinderDescriptors: GasCylinderDescriptor[] = (SIM_MODE === "adsorption") ? 
 // Adsorption: All three cylinders
 [
+    // {
+    //     name: "90%",
+    //     x: 40,
+    //     angle: 180,
+    //     yCO2: 0.9,
+    //     color: "#1cb700",
+
+    //     initCylPres: 0,
+    //     initRegSP: 0
+    // }, 
     {
         name: "90%",
-        x: 40,
-        angle: 180,
-        yCO2: 0.9,
-        color: "#1cb700",
-
-        initCylPres: 0,
-        initRegSP: 0
-    }, 
-    {
-        name: "10%",
         x: 194,
         angle: 90,
-        yCO2: 0.5,
-        color: "#5e9b3a",
+        yCO2: 0.9,
+        color: "#1cb700", // "#5e9b3a",
 
         initCylPres: 0,
         initRegSP: 0

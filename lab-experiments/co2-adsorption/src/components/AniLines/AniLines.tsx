@@ -49,7 +49,7 @@ export const AniLines: Component<AniLinesProps> = (props) => {
             <path d="M442 120L442 380H596V346" stroke={color()} stroke-width={showLoop()} stroke-linejoin="round" class="colored-line"/>
             
             <Switch>
-                <Match when={SIM_MODE === "adsorption"}>
+                <Match when={false}>
                     {/* cyl lines - always same color */}
                     <path d="M217 248H155V269.5" stroke={props.cyls[1].color} stroke-width={showCyl[1]()} stroke-linejoin="round" class="colored-line" />
                     <path d="M63 247H1L1 268.5" stroke={props.cyls[0].color}  stroke-width={showCyl[0]()} stroke-linejoin="round" class="colored-line" />
@@ -60,7 +60,7 @@ export const AniLines: Component<AniLinesProps> = (props) => {
                     <path d="M371 248H412V158H276.5" stroke={props.cyls[2].color} stroke-width={showReg[2]()} stroke-linejoin="round" class="colored-line"/>
                     <path d="M217 248H258V176" stroke={props.cyls[1].color}       stroke-width={showReg[1]()} stroke-linejoin="round" class="colored-line"/>
                 </Match>
-                <Match when={SIM_MODE === "desorption"}>
+                <Match when={true}>
                     <path d="M217 248H155V269.5" stroke={props.cyls[0].color}  stroke-width={showCyl[0]()} stroke-linejoin="round" class="colored-line" />
                     <path d="M217 248H258V176" stroke={props.cyls[0].color}    stroke-width={showReg[0]()} stroke-linejoin="round" class="colored-line"/>
                     <path d="M371 248H309V269.5" stroke={props.cyls[1].color} stroke-width={showCyl[1]()} stroke-linejoin="round" class="colored-line"/>
@@ -100,10 +100,10 @@ const DarkLines = () => {
 <path d="M372 249H413V159H277.5" stroke="black" stroke-width="6" stroke-linejoin="round"/>
 <path d="M218 249H259V177" stroke="black" stroke-width="6" stroke-linejoin="round"/>
 <path d="M218 249H156V270.5" stroke="black" stroke-width="6" stroke-linejoin="round"/>
-<Show when={SIM_MODE === "adsorption"}>
+{/* <Show when={SIM_MODE === "adsorption"}>
     <path d="M64 248H105V159H241" stroke="black" stroke-width="6" stroke-linejoin="round"/>
     <path d="M64 248H2L2 269.5" stroke="black" stroke-width="6" stroke-linejoin="round"/>
-</Show>
+</Show> */}
 <path d="M372 249H310V270.5" stroke="black" stroke-width="6" stroke-linejoin="round"/>
 </>)
 }
