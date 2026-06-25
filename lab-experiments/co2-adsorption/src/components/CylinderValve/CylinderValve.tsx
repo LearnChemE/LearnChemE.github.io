@@ -1,11 +1,12 @@
 import { createEffect, createMemo, createSignal, type Accessor, type Component, type Setter } from "solid-js";
-import { animate, constrain, MAX_PRESSURE, MAX_CYL_VALVE_ROTATION, resolveProperty } from "../../globals";
+import { animate, constrain, MAX_CYL_VALVE_ROTATION, resolveProperty } from "../../globals";
 import "./CylinderValve.css";
 
 type CylinderValveProps = {
     pressure: Accessor<number>;
     setPressure: Setter<number>;
     disabled?: Accessor<boolean>;
+    maxPressure: number;
     x: number;
     y: number;
 }
@@ -21,7 +22,7 @@ const VALVE_WIDTH = 47;
 const BAFFLE_WIDTH = 12;
 
 export const CylinderValve: Component<CylinderValveProps> = (props) => {
-    const rotation = createMemo(() => (1 - props.pressure() / MAX_PRESSURE) * -MAX_CYL_VALVE_ROTATION % 60);
+    const rotation = createMemo(() => (1 - props.pressure() / props.maxPressure) * -MAX_CYL_VALVE_ROTATION % 60);
     const disabled = resolveProperty(props.disabled, false);
     const [flash, setFlash] = createSignal(false);
 
@@ -47,10 +48,10 @@ export const CylinderValve: Component<CylinderValveProps> = (props) => {
         // Determine direction
         const dthdt = (props.pressure() === 0) ? -90 : +90;
         const target = (props.pressure() === 0) ? 
-                    (p: number) => p >= MAX_PRESSURE :
+                    (p: number) => p >= props.maxPressure :
                     (p: number) => p <= 0;
         // Convert to pressure
-        const dpdt = dthdt * MAX_PRESSURE / -MAX_CYL_VALVE_ROTATION;
+        const dpdt = dthdt * props.maxPressure / -MAX_CYL_VALVE_ROTATION;
 
         // Create the animation callback
         const frame = (dt: number) => {
@@ -58,7 +59,7 @@ export const CylinderValve: Component<CylinderValveProps> = (props) => {
             p += dpdt * dt;
 
             if (target(p)) {
-                p = constrain(p, 0, MAX_PRESSURE);
+                p = constrain(p, 0, props.maxPressure);
                 playing = false;
             }
 
