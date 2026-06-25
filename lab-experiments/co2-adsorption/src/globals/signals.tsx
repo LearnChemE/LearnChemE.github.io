@@ -1,5 +1,5 @@
 import { createEffect, createMemo, createSignal, onMount, type Accessor, type Setter } from "solid-js";
-import { animate, smoothLerp } from "./helpers";
+import { animate, expDecay, resolveProperty, smoothLerp } from "./helpers";
 import { SIM_MODE } from "./config";
 
 export type Signal<T> = { get: Accessor<T>, set: Setter<T> };
@@ -16,6 +16,9 @@ type GasCylinderDescriptor = {
 
     initCylPres: number;
     initRegSP: number;
+
+    maxPressure: number;
+    rotationRange: number;
 }
 
 export type GasCylinder = {
@@ -28,6 +31,9 @@ export type GasCylinder = {
     cylPres: Signal<number>,
     regSP: Signal<number>,
     linePres: Accessor<number>,
+
+    maxPressure: number;
+    rotationRange: number;
 };
 
 export function GasCylinder(descriptor: GasCylinderDescriptor) {
@@ -42,7 +48,10 @@ export function GasCylinder(descriptor: GasCylinderDescriptor) {
 
         cylPres,
         regSP,
-        linePres: createMemo(() => Math.min(cylPres.get(), regSP.get()))
+        linePres: createMemo(() => Math.min(cylPres.get(), regSP.get())),
+
+        maxPressure: descriptor.maxPressure,
+        rotationRange: descriptor.rotationRange
     } as GasCylinder;
 }
 
@@ -67,7 +76,10 @@ const cylinderDescriptors: GasCylinderDescriptor[] = (SIM_MODE === "adsorption")
         color: "#1cb700", // "#5e9b3a",
 
         initCylPres: 0,
-        initRegSP: 0
+        initRegSP: 0,
+
+        maxPressure: 10,
+        rotationRange: 720
     }, 
     {
         name: "10%",
@@ -77,7 +89,10 @@ const cylinderDescriptors: GasCylinderDescriptor[] = (SIM_MODE === "adsorption")
         color: "#93bf79",
 
         initCylPres: 0,
-        initRegSP: 0
+        initRegSP: 0,
+
+        maxPressure: 10,
+        rotationRange: 120
     }
 ] :
 // Desorption: N2 only
@@ -90,7 +105,10 @@ const cylinderDescriptors: GasCylinderDescriptor[] = (SIM_MODE === "adsorption")
         color: "#1cb700",
 
         initCylPres: 0,
-        initRegSP: 0
+        initRegSP: 0,
+
+        maxPressure: 6,
+        rotationRange: 720
     }, 
     {
         name: "N2",
@@ -100,7 +118,10 @@ const cylinderDescriptors: GasCylinderDescriptor[] = (SIM_MODE === "adsorption")
         color: "#a2d3e7",
 
         initCylPres: 0,
-        initRegSP: 0
+        initRegSP: 0,
+
+        maxPressure: 1,
+        rotationRange: 720
     }
 ];
 
@@ -148,16 +169,16 @@ export function expSignal(init: number, tau: number, threshold: number = 0.1) {
 }
 
 /**
- * 
- * @param f 
- * @param tau 
- * @param threshold 
- * @returns 
+ * Create a memo that automatically creates an animation to create an exponential decay towards values on update. Must be a number signal.
+ * @param f memo callback function
+ * @param tau time constant (s) or accessor for time constant.
+ * @param threshold cutoff threshold (if abs(target - current) <= threshold current jumps to the target value).
+ * @returns accessor for exponential
  */
-export function expMemo(f: () => number, tau: number = 0.5, threshold: number = 0.1) {
+export function expMemo(f: () => number, tau: number | (() => number) = 0.5, threshold: number = 0.1) {
     const target = createMemo(f);
     const [actual, setActual] = createSignal(target());
-    const r = Math.exp(-1/tau);
+    tau = resolveProperty(tau);
 
     const evaluate = (val: number) => {
         const dist = Math.abs(val - target());
@@ -166,7 +187,7 @@ export function expMemo(f: () => number, tau: number = 0.5, threshold: number = 
 
     let playing = false;
     const frame = (dt: number) => {
-        const nextVal = smoothLerp(actual(), target(), r, dt);
+        const nextVal = expDecay(actual(), target(), tau(), dt);
         const done = evaluate(nextVal);
         if (done) {
             setActual(target());

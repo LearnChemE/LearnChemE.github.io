@@ -459,6 +459,7 @@ export function repeatClick(fn: () => void, initialDelay: number = 600, successi
 }
 
 /**
+ * Deprecated; please use expDecay instead.
  * Smoothly lerp x towards targ using a framerate independant exponential decay function
  * @param x number to lerp
  * @param targ lerp target
@@ -468,4 +469,16 @@ export function repeatClick(fn: () => void, initialDelay: number = 600, successi
  */
 export function smoothLerp(x: number, targ: number, r: number, dt: number) {
     return (x - targ) * r ** dt + targ;
+}
+
+/**
+ * Decay x towards targ using a framerate independant exponential decay function
+ * @param x number to lerp
+ * @param targ lerp target
+ * @param tau time constant. Tau must have same units as dt
+ * @param dt deltaTime. Same units as tau, as used in r.
+ * @returns x, but now lerped towards targ
+ */
+export function expDecay(x: number, targ: number, tau: number, dt: number) {
+    return (x - targ) * Math.exp(-dt / tau) + targ;
 }

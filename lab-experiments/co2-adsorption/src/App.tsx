@@ -46,17 +46,29 @@ function App() {
   const [temperature, setTemperature] = createSignal(TEMP_ROOM);
   const [out, setOut] = createSignal({ y: 0, u: 0 });
 
+  const outletResTime = createMemo(() => {
+      const outletVol = 8;
+      const maxResTime = 1.5;
+
+      const sccs = sccmSP() / SCCM_CONVERSION;
+      const pres = currentCylinder().linePres();
+      const flowing = sccs > 0 && pres > 0;
+      const ccs = flowing ? sccs * 1 / (1 + pres) : 0;
+      console.log(outletVol / ccs)
+      return Math.min(outletVol / ccs, maxResTime);
+  });
+
   const comp = expMemo(() => {
     if (valve2Angle() === V2_BYPASS_ANGLE) {
       const y = currentCylinder().yCO2;
       const flowing = sccSP() > 0 && currentCylinder().linePres() > 0;
-      return flowing ? y : 0;
+      return flowing ? y : 4.3e-6;
     }
     else {
       const { y, u } = out();
-      return u > 0.01 ? y : 0;
+      return u > 0.01 ? y : 4.3e-6;
     }
-  }, 0.1);
+  }, outletResTime, 1e-6);
   const compLabel = createMemo(() => {
     const percent = comp() * 100;
 
@@ -107,11 +119,15 @@ function App() {
   };
 
   const exportData = () => {
+    const sccReport = (SIM_MODE === 'adsorption') ? 
+      { "sccm setpoint": sccmSP().toFixed(1) } :
+      { "sccs setpoint": sccSP().toFixed(1) };
+
     return {
       "temperature (K)":            temperature().toFixed(1),
       "inlet CO2 mole fraction":    sigfigs(currentCylinder().yCO2, { sigfigs: 3 }),
       "bed gauge pressure (bar)":         bedPressure().toFixed(2),
-      "sccm setpoint":              sccmSP().toFixed(1),
+      ...sccReport,
       "bypass bed":                 (valve2Angle() === V2_BYPASS_ANGLE),
       "outlet CO2 mole fraction":   sigfigs(comp(), { sigfigs: 3, maxDecimals: 6 }),
     }
@@ -127,9 +143,9 @@ function App() {
               cyl => { 
                 let ref!: SVGGElement;
               return <>
-                <CylinderValve x={cyl.x} y={324} pressure={cyl.cylPres.get} setPressure={cyl.cylPres.set} />
+                <CylinderValve x={cyl.x} y={324} pressure={cyl.cylPres.get} setPressure={cyl.cylPres.set} maxPressure={cyl.maxPressure} />
                 <g ref={ref}>
-                  <Regulator x={59 + cyl.x} y={310} inPres={cyl.cylPres.get} outPres={cyl.linePres} gasSP={cyl.regSP.get} setGasSP={cyl.regSP.set} />
+                  <Regulator x={59 + cyl.x} y={310} inPres={cyl.cylPres.get} outPres={cyl.linePres} gasSP={cyl.regSP.get} setGasSP={cyl.regSP.set} maxPressure={cyl.maxPressure} rotationRange={cyl.rotationRange} />
                   <SVGTooltip x={59 + cyl.x} y={370} anchor={ref} label={() => `${(cyl.linePres()).toFixed(2)} bar`} width={70} height={26} />
                 </g>
               </>}
