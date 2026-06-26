@@ -250,3 +250,58 @@ class ResetSignal {
 }
 
 export const resetSignal = new ResetSignal();
+
+interface PendingTimeout {
+    id: number;
+    callTime: number; // timestamp of timeout creation (ms)
+}
+
+/**
+ * Create a memo that automatically uses window animation and delays to create a first-order-plus-time-delay (FOPTD) response.
+ * @param f memo callback function
+ * @param tau time constant (s) or accessor for time constant.
+ * @param theta time delay (ms)
+ * @param threshold cutoff threshold (if abs(target - current) <= threshold current jumps to the target value).
+ * @returns accessor for exponential
+ */
+export function foptdMemo(f: () => number, tau: number | (() => number) = 0.5, theta: number | (() => number) = 1000, threshold: number = 0.1) {
+    theta = resolveProperty(theta);
+    tau = resolveProperty(tau);
+    
+    const immediate = createMemo(f);
+    const [delayed, setDelayed] = createSignal(immediate());
+    const [tauDelayed, setTauDelayed] = createSignal(tau());
+
+    let pending: Array<PendingTimeout> = [];
+
+    interface UpdateData { value: number, tau: number };
+
+    const execute = (id: number, callTime: number, payload: UpdateData) => {
+        // Set new value
+        setDelayed(payload.value);
+        setTauDelayed(payload.tau);
+        // Filter list to remove self and any timeouts that were scheduled before self
+        pending = pending.filter(t => {
+            if (t.id === id) return false; // Remove self from list
+            if (t.callTime < callTime) { // If any timeouts remain that were created before this one, clear them
+                window.clearTimeout(t.id);
+                return false;
+            } 
+            return true;
+        });
+    }
+
+    createEffect(() => {
+        const newVal = immediate();
+        const payload = { value: newVal, tau: tau() };
+        
+        // Create a new call
+        const callTime = Date.now();
+        const id = window.setTimeout(() => execute(id, callTime, payload), theta());
+
+        // Add the pending timeout to the array
+        pending.push({ id, callTime });
+    });
+    
+    return expMemo(delayed, tauDelayed, threshold);
+}
