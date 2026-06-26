@@ -13,8 +13,8 @@ const Background: Component = () => {
 <path d="M355 343H322C320.895 343 320 343.895 320 345V356C320 357.105 320.895 358 322 358H355C356.105 358 357 357.105 357 356V345C357 343.895 356.105 343 355 343Z" fill="url(#paint6_linear_113_30)" stroke="black"/>
 
 {/* 3rd cylinder label */}
-<rect x="321.213" y={SIM_MODE === "adsorption" ? 396 : 464} width="36" height={SIM_MODE === "adsorption" ? 185 : 55} fill="white"/>
-<text x={SIM_MODE === "adsorption" ? 85 : 152} y="647" font-family="Arial" font-size="31" font-weight="500" fill="black" transform="rotate(-90, 183, 480)">{SIM_MODE === "adsorption" ? "10% CO₂/N₂" : "N₂"}</text>
+<rect x="321.213" y={SIM_MODE === "adsorption" ? 374 : 464} width="36" height={SIM_MODE === "adsorption" ? 248 : 55} fill="white"/>
+<text x={SIM_MODE === "adsorption" ? 45 : 152} y="647" font-family="Arial" font-size="31" font-weight="500" fill="black" transform="rotate(-90, 183, 480)">{SIM_MODE === "adsorption" ? "10% CO₂/90% N₂" : "N₂"}</text>
 {/* <path d="M325.523 488.439H348V491.073L330.352 503.321V503.54H348V506.262H325.523V503.628L343.215 491.336V491.117H325.523V488.439ZM351.863 484.178H350.151L345.586 479.042C345.132 478.53 344.726 478.102 344.367 477.758C344.009 477.414 343.661 477.154 343.325 476.978C342.988 476.803 342.63 476.715 342.249 476.715C341.591 476.715 341.068 476.967 340.68 477.472C340.292 477.977 340.098 478.603 340.098 479.349C340.098 480.139 340.31 480.776 340.735 481.259C341.152 481.742 341.7 481.983 342.381 481.983V484.266C341.13 484.266 340.124 483.801 339.363 482.872C338.595 481.943 338.21 480.754 338.21 479.305C338.21 478.339 338.386 477.491 338.737 476.759C339.081 476.027 339.557 475.457 340.164 475.047C340.764 474.637 341.444 474.432 342.205 474.432C342.805 474.432 343.361 474.553 343.873 474.794C344.386 475.036 344.916 475.413 345.465 475.925C346.014 476.437 346.639 477.096 347.342 477.9L349.844 480.754H349.932V474.037H351.863V484.178Z" fill="black"/> */}
 
 <path d="M197 328V314H191V328H197Z" fill="url(#paint7_linear_113_30)" stroke="black"/>
@@ -26,8 +26,8 @@ const Background: Component = () => {
 <path d="M218 326V316H197V326H218Z" fill="url(#paint13_linear_113_30)" stroke="black"/>
 
 {/* 2nd cylinder label */}
-<rect x="165.213" y="396" width="37" height="185" fill="white"/>
-<text x="85" y="492" font-family="Arial" font-size="31" font-weight="500" fill="black" transform="rotate(-90, 183, 480)">{SIM_MODE === "adsorption" ? "90% CO₂/N₂" : "90% CO₂/N₂"}</text>
+<rect x="165.213" y="374" width="37" height="248" fill="white"/>
+<text x="45" y="492" font-family="Arial" font-size="31" font-weight="500" fill="black" transform="rotate(-90, 183, 480)">{SIM_MODE === "adsorption" ? "90% CO₂/10% N₂" : "90% CO₂/10% N₂"}</text>
 
 {/* 1st cylinder */}
 {/* <Show when={SIM_MODE === "adsorption"}>
