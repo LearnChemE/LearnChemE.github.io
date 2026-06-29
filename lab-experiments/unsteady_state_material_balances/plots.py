@@ -98,7 +98,7 @@ if __name__ == "__main__":
     ax[0].plot(t, volumeFromMoles(pent[1], hex[1]), label='20 °C')
     ax[0].plot(t, volumeFromMoles(pent[2], hex[2]), label='25 °C')
     ax[0].set_xlabel('time in hours')
-    ax[0].set_ylabel('total volume of liquid in bubbler, cm^3')
+    ax[0].set_ylabel(r'total volume of liquid in bubbler, cm$^3$')
     ax[0].set_title('total volume with time')
     ax[0].grid()
     ax[0].legend()
