@@ -11,7 +11,7 @@ import { HamburgerMenu } from './components/Hamburger/Hamburger'
 import worksheet from './assets/worksheet.pdf?url';
 import { AboutText, DirectionsText } from './components/Modal/modals'
 import { ControlButton } from './components/ControlButton/ControlButton'
-import { BETA_MAX, BETA_MIN, BETA_STEP, createCylinders, expMemo, MAX_SCCM_FLOWRATE, MIN_SCCM_FLOWRATE, resetSignal, SCCM_CONVERSION, SCCM_FLOW_INIT, SCCM_FLOW_STEP, SIM_MODE, TEMP_ROOM, V1_ANGLE_INIT, V2_ANGLE_INIT, V2_BED_ANGLE, V2_BYPASS_ANGLE, VALVE_1_ANGLES, VALVE_2_ANGLES } from './globals'
+import { BETA_MAX, BETA_MIN, BETA_STEP, createCylinders, expMemo, foptdMemo, MAX_SCCM_FLOWRATE, MIN_SCCM_FLOWRATE, resetSignal, SCCM_CONVERSION, SCCM_FLOW_INIT, SCCM_FLOW_STEP, SIM_MODE, TEMP_ROOM, V1_ANGLE_INIT, V2_ANGLE_INIT, V2_BED_ANGLE, V2_BYPASS_ANGLE, VALVE_1_ANGLES, VALVE_2_ANGLES } from './globals'
 import { MultiValve } from './components/MultiValve/MultiValve'
 import { Manometer } from './components/Manometer/Manometer'
 import { BetaCtrl } from './components/BetaCtrl/BetaCtrl'
@@ -46,19 +46,25 @@ function App() {
   const [temperature, setTemperature] = createSignal(TEMP_ROOM);
   const [out, setOut] = createSignal({ y: 0, u: 0 });
 
-  const outletResTime = createMemo(() => {
-      const outletVol = 8;
-      const maxResTime = 1.5;
-
-      const sccs = sccmSP() / SCCM_CONVERSION;
-      const pres = currentCylinder().linePres();
-      const flowing = sccs > 0 && pres > 0;
-      const ccs = flowing ? sccs * 1 / (1 + pres) : 0;
-      console.log(outletVol / ccs)
-      return Math.min(outletVol / ccs, maxResTime);
+  const ccs = createMemo(() => {
+    const sccs = sccmSP() / SCCM_CONVERSION;
+    const pres = currentCylinder().linePres();
+    const flowing = sccs > 0 && pres > 0;
+    return flowing ? sccs * 1 / (1 + pres) : 0;
   });
 
-  const comp = expMemo(() => {
+  const outletResTime = createMemo(() => {
+      const outletVol = 1;
+      const maxResTime = 500;
+      return Math.min(outletVol / ccs(), maxResTime);
+  });
+  const timeToOutlet = createMemo(() => {
+      const outletVol = 1000;
+      const maxDelay = 5000;
+      return Math.min(outletVol / ccs(), maxDelay);
+  });
+
+  const comp = foptdMemo(() => {
     if (valve2Angle() === V2_BYPASS_ANGLE) {
       const y = currentCylinder().yCO2;
       const flowing = sccSP() > 0 && currentCylinder().linePres() > 0;
@@ -68,7 +74,7 @@ function App() {
       const { y, u } = out();
       return u > 0.01 ? y : 4.3e-6;
     }
-  }, outletResTime, 1e-6);
+  }, outletResTime, timeToOutlet, 1e-6);
   const compLabel = createMemo(() => {
     const percent = comp() * 100;
 

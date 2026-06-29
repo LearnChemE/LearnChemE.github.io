@@ -89,3 +89,9 @@ p {
   position: relative;
 }
 
+.arimo-font {
+  font-family: "Arimo", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
