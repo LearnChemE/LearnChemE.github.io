@@ -8,7 +8,8 @@ import { CylinderValve } from './components/CylinderValve/CylinderValve'
 import { Controller } from './components/Controller/Controller'
 import { HamburgerMenu } from './components/Hamburger/Hamburger'
 
-import worksheet from './assets/worksheet.pdf?url';
+import adsWorksheet from './assets/adsWorksheet.pdf?url';
+import desWorksheet from './assets/desWorksheet.pdf?url';
 import { AboutText, DirectionsText } from './components/Modal/modals'
 import { ControlButton } from './components/ControlButton/ControlButton'
 import { BETA_MAX, BETA_MIN, BETA_STEP, createCylinders, expMemo, foptdMemo, MAX_SCCM_FLOWRATE, MIN_SCCM_FLOWRATE, resetSignal, SCCM_CONVERSION, SCCM_FLOW_INIT, SCCM_FLOW_STEP, SIM_MODE, TEMP_ROOM, V1_ANGLE_INIT, V2_ANGLE_INIT, V2_BED_ANGLE, V2_BYPASS_ANGLE, VALVE_1_ANGLES, VALVE_2_ANGLES } from './globals'
@@ -186,7 +187,7 @@ function App() {
         </SVGCanvas>
 
         {/* Hamburger */}
-        <HamburgerMenu path={worksheet} downloadName="co2AdsorptionWorksheet.pdf" Directions={DirectionsText} About={AboutText} />
+        <HamburgerMenu path={(SIM_MODE === "adsorption") ? adsWorksheet : desWorksheet} downloadName="co2AdsorptionWorksheet.pdf" Directions={DirectionsText} About={AboutText} />
 
         {/* Stages/Reset Button */}
         <ControlButton icon="fa-solid fa-arrows-rotate" label="reset" left={90} onClick={reset} active={() => true} activeColor='#FF3B3B' />
