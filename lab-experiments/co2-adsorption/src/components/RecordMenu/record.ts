@@ -33,7 +33,7 @@ export class DataRecorder {
             const dataPoint = this.dataAccessor();
 
             if (SIM_MODE === "adsorption") {
-                this.data.push({ "simulation time (min)": elapsed.toFixed(1), ...dataPoint });
+                this.data.push({ "time (min)": elapsed.toFixed(1), ...dataPoint });
             }
             else {
                 const keysToExclude = ["bed pressure (bar)", "inlet CO2 mole fraction", "bypass bed"];
@@ -41,7 +41,7 @@ export class DataRecorder {
                     Object.entries(dataPoint).filter(([key]) => !keysToExclude.includes(key))
                 );
 
-                this.data.push({ "simulation time (s)": elapsed.toFixed(1), ...cleanedData });
+                this.data.push({ "time (s)": elapsed.toFixed(1), ...cleanedData });
             }
 
             console.table(this.data.at(-1));
