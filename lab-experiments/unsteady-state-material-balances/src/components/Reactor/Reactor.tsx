@@ -1,6 +1,6 @@
-import { createMemo, createSignal, type Accessor, type Component } from "solid-js";
+import { createMemo, createSignal, onMount, type Accessor, type Component } from "solid-js";
 import "./Reactor.css";
-import { MainLoop, REACTOR_VOL_INIT } from "../../globals";
+import { MainLoop, REACTOR_VOL_INIT, resetSignal } from "../../globals";
 import { Boils } from "../Boils/Boils";
 
 type ReactorProps = {
@@ -39,6 +39,12 @@ export const Reactor: Component<ReactorProps> = (props) => {
 
     const ml = new MainLoop(props.pressure, actualCCS, props.temp, setVol);
     ml.play();
+
+    onMount(() => {
+        resetSignal.subscribe(() => {
+            ml.reset();
+        });
+    });
 
     return (<g transform={`translate(${props.x}, ${props.y})`}>
 
