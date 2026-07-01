@@ -1,5 +1,5 @@
 import { createEffect, createMemo, createSignal, onMount, type Accessor, type Setter } from "solid-js";
-import { animate, expDecay, resolveProperty, smoothLerp } from "./helpers";
+import { animate, expDecay, resolveProperty } from "./helpers";
 
 export type Signal<T> = { get: Accessor<T>, set: Setter<T> };
 export function Signal<T>(raw: [() => T, (v: T) => null]) {
