@@ -3,7 +3,12 @@ import type { Component } from "solid-js";
 export const DirectionsText: Component = () => {
     return <>
     <p>
-        
+        This digital experiment simulates a small vessel with a 50% propane / 50% hexane mixture exaporating.
+        Click the cylinder valve to open it and click and drag the regulator to change the nitrogen pressure. 
+        Click the arrow buttons on the controllers to change the flowrate of nitrogen and the temperature of the vessel.
+        Record the liquid level mixture evaporates to determine how the composition changes with time.
+        Scroll the mouse wheel to zoom and click and drag to pan the view.  
+        Click the "Reset" button to reset the experiment.
     </p>
 </>;
 }

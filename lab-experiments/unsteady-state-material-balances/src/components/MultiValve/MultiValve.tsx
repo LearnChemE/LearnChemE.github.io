@@ -1,4 +1,4 @@
-import { animate, resetSignal, resolveProperty, smoothLerp } from "../../globals";
+import { animate, expDecay, resetSignal, resolveProperty } from "../../globals";
 import "./MultiValve.css";
 import { createSignal, type Accessor, type Component, type Setter } from "solid-js";
 
@@ -32,7 +32,7 @@ export const MultiValve: Component<MultiValveProps> = (props) => {
       const frame = (dt: number) => {
         const curAngle = dispAngle();
         const targetAngle = angle();
-        const newAngle = smoothLerp(curAngle, targetAngle, r, dt);
+        const newAngle = expDecay(curAngle, targetAngle, r, dt);
         setDispAngle(newAngle);
 
         if (Math.abs(newAngle - targetAngle) < 0.5) {

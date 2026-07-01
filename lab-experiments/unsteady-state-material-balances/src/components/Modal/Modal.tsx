@@ -32,7 +32,7 @@ export const Modal: Component<ModalProps> = ({ key, title, BodyHTML, show }) => 
             else {
                 document.removeEventListener("click", hideIfClickedOut);
             }
-        })
+        });
     });
 
     return (

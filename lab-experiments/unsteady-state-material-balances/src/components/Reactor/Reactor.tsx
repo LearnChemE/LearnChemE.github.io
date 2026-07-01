@@ -1,6 +1,7 @@
 import { createMemo, createSignal, type Accessor, type Component } from "solid-js";
 import "./Reactor.css";
 import { MainLoop, REACTOR_VOL_INIT } from "../../globals";
+import { Boils } from "../Boils/Boils";
 
 type ReactorProps = {
     x: number;
@@ -72,6 +73,7 @@ export const Reactor: Component<ReactorProps> = (props) => {
 
 {/* Fill */}
 <rect x="9.25" y={fillY()} width="74.5" height={fillH()} fill="#3B8CCF" fill-opacity="0.6" stroke="black" stroke-width="0.5"/>
+<Boils x={9.25} y={fillY} w={74.5} h={fillH} showing={() => actualCCS() > 0 && fillH() > 10} nbubbles={() => 5 + Math.floor(actualCCS() * 3/4)} maxBubbles={30} />
 
 <rect x="0.5" y="28.5" width="92" height="209" fill="url(#paint8_linear_2082_140)" stroke="black"/>
 <rect x="9.5" y="28.5" width="74" height="209" stroke="black"/>

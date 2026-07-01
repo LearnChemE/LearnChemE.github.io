@@ -20,6 +20,7 @@ function randNormal(mean: number, stdev: number): number {
 type Bubble = {
     cx: number;
     cy: number;
+    hrel: number;
     r: number;
     aniScale: number;
     interpolant: { get: Accessor<number>, set: Setter<number> };
@@ -33,27 +34,46 @@ interface BoilProps {
     y: number | (() => number);
     w: number | (() => number);
     h: number | (() => number);
-    nbubbles: number
+    maxBubbles: number;
+    nbubbles?: number | Accessor<number>;
     rate?: () => number;
 }
 
+function bcx(b: Bubble, amp: number) {
+    return b.cx + amp * Math.cos(4 * b.interpolant.get() + 100 * b.cx);
+}
+
+function bcy(b: Bubble, h: Accessor<number>) {
+    return b.cy - b.interpolant.get() * b.hrel * h();
+}
+
 export const Boils: Component<BoilProps> = (props) => {
-    const {showing, nbubbles} = props;
     const x = resolveProperty(props.x);
     const y = resolveProperty(props.y);
     const w = resolveProperty(props.w);
     const h = resolveProperty(props.h);
     const rate = resolveProperty(props.rate, 1);
+    const nbubbles = resolveProperty(props.nbubbles, props.maxBubbles);
+
+    const amplitude = 0.05 * w();
 
     // Initialize the bubbles
     const bubbles: Array<Bubble> = [];
-    for (let i=0; i<nbubbles; i++) {
+    for (let i=0; i<props.maxBubbles; i++) {
         const [get, set] = createSignal(Math.random())
         const [gr, sr] = createSignal(false);
+
+        const r = randNormal(4, 2);
+        const minx = x() + r + amplitude;
+        const maxx = x() + w() - r - amplitude;
+        const miny = y() + h() - r
+        const maxy = y() + r;
+
         const bubble: Bubble = {
-            cx: Math.random() * w() + x(),
-            cy: Math.random() * 30 + y(),
-            r: randNormal(4, 2),
+            cx: Math.random() * (maxx - minx) + minx,
+            cy: miny,
+            hrel: (miny - maxy) / h(),
+            r,
             aniScale: randNormal(1.4, .05),
             interpolant: { get, set },
             timeScale: randNormal(.5, .1),
@@ -65,20 +85,20 @@ export const Boils: Component<BoilProps> = (props) => {
     // Animate while showing
     let playing = false;
     createEffect(() => {
-        if (showing()) {
+        if (props.showing()) {
             // Dont double-enqueue
             if (playing) return;
             playing = true;
             // Animation
             animate((dt: number) => {
                 let lingering = false;
-                for (const b of bubbles) {
+                for (const [i, b] of bubbles.entries()) {
                     // Interpolate the 
                     let next = b.interpolant.get() + b.timeScale * dt * rate();
                     // Only change whether it's rendering when b 
                     if (next > 1) {
                         next -= 1;
-                        b.render.set(showing());
+                        b.render.set(props.showing() && i < nbubbles());
                     }
                     b.interpolant.set(next);
                     lingering = lingering || b.render.get();
@@ -89,24 +109,24 @@ export const Boils: Component<BoilProps> = (props) => {
         }
     });
 
-  return (
-    <Show when={showing()}>
+  return (<>
+    {/* <Show when={showing()}> */}
       <For each={bubbles}>
           {
-          (b, i) => <Show when={(i() <= rate() * nbubbles)}>
+          (b, i) => <Show when={(i() <= rate() * props.maxBubbles)}>
                 <circle 
-                    fill="white"
-                    stroke="#83dbdb"
-                    stroke-width="2px"
-                    cx={b.cx + .05 * w() * Math.cos(4 * b.interpolant.get() + 100 * b.cx)}
-                    cy={b.cy + b.interpolant.get() * h()}
+                    fill="none"
+                    stroke="white"
+                    stroke-width="1.5px"
+                    cx={bcx(b, amplitude)}
+                    cy={bcy(b, h)}
                     r={b.r}
-                    transform={`translate(${b.cx}, ${b.cy}) scale(${1 + (b.aniScale - 1) * b.interpolant.get()}) translate(${-b.cx}, ${-b.cy})`}
+                    transform={`translate(${bcx(b, amplitude)}, ${bcy(b, h)}) scale(${1 + (b.aniScale - 1) * b.interpolant.get()}) translate(${-bcx(b, amplitude)}, ${-bcy(b, h)})`}
                     opacity={b.render.get() ? 1 - (2 * b.interpolant.get() - 1) ** 6 : 0}
                 />    
             </Show>
           }
       </For>
-    </Show>
-  );
+    {/* </Show> */}
+  </>);
 };

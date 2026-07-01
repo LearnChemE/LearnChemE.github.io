@@ -87,7 +87,7 @@ export class MainLoop {
             const y0 = this.moles;
             const Tc = this.temp();
             const P = 1 + this.pressure();
-            const flow = P * this.ccs() / 83.14 / (Tc + 273.15);
+            const flow = this.ccs() / 83.14 / 298;
             
             const f = (t: number, y: Array<number>) => {
                 return rhs(t, y, Tc, P, flow);
