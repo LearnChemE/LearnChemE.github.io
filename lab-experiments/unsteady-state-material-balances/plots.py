@@ -77,6 +77,7 @@ if __name__ == "__main__":
     ndot_N2 = sccmToMolPerMin(QN2)
     temps = [15, 20, 25]
     y0 = initialMolesFromVolumeEquimolar(V0)
+    print(y0)
 
     tmax = 600
     t_eval = np.linspace(0, tmax, 101)
