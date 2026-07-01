@@ -32,7 +32,11 @@ function App() {
   
   resetSignal.init();
   const reset = () => {
-
+    resetSignal.triggerSignal();
+    setCylLift(0);
+    setRegLift(0);
+    setCcsSp(CCS_DEFAULT);
+    setTemp(15);
   };
 
   return (

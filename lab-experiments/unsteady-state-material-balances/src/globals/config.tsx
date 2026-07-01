@@ -1,4 +1,4 @@
-
+export const INIT_COMPOSITION = 0.5;
 export const REACTOR_VOL_INIT = 61.5;
 
 export const PRESSURE_LIFT_GAIN = 0.5; // bar

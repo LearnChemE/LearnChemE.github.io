@@ -1,6 +1,6 @@
 import type { Accessor, Setter } from "solid-js";
-import { animate } from "./helpers";
-import { REACTOR_VOL_INIT } from "./config";
+import { animate, gaussNoise } from "./helpers";
+import { INIT_COMPOSITION, REACTOR_VOL_INIT } from "./config";
 import rk45_dormand_prince from "./rk45";
 
 const MW_PENT = 72.151;
@@ -76,7 +76,7 @@ export class MainLoop {
         this.ccs = ccs;
         this.temp = temp;
         this.setVol = setVol;
-        this.moles = molesFromVol(REACTOR_VOL_INIT, 0.5);
+        this.moles = molesFromVol(REACTOR_VOL_INIT, gaussNoise(INIT_COMPOSITION, INIT_COMPOSITION / 10));
     }
 
     public play() {
@@ -97,12 +97,17 @@ export class MainLoop {
 
             const newMoles = sol.y.at(-1)!;
             this.moles = newMoles;
-            console.log(`moles: [${newMoles[0].toFixed(4)}, ${newMoles[1].toFixed(4)}]\nvol: ${volFromMoles(newMoles as [number, number]).toFixed(1)}`)
+            // console.log(`moles: [${newMoles[0].toFixed(4)}, ${newMoles[1].toFixed(4)}]\nvol: ${volFromMoles(newMoles as [number, number]).toFixed(1)}`)
             this.setVol(volFromMoles(newMoles as [number, number]));
 
             return this.playing;
         }
 
         animate(frame);
+    }
+
+    public reset() {
+        this.moles = molesFromVol(REACTOR_VOL_INIT, gaussNoise(INIT_COMPOSITION, INIT_COMPOSITION / 10));
+        this.setVol(REACTOR_VOL_INIT);
     }
 }
