@@ -1,0 +1,573 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Multiple States in an Isothermal Continuous Stirred-Tank Reactor</title>
+<style>
+  :root{
+    /* Mathematica / Wolfram CDF palette */
+    --paper:#ffffff;
+    --ink:#000000;
+    --demo-red:rgb(152,0,13);
+    --title-ink:#2b2b2b;
+    --btn-face-top:#fdfdfd;
+    --btn-face-bot:#e2e2e2;
+    --btn-border:#9a9a9a;
+    --btn-down-top:#bcbcbc;
+    --btn-down-bot:#cfcfcf;
+    --groove:#9c9c9c;
+    --thumb-top:#fcfcfc;
+    --thumb-bot:#cfcfcf;
+    --panel-bg:#fbfbfb;
+    --panel-border:#d8d8d8;
+    /* curve colors taken straight from the CDF (RGBColor values) */
+    --green:rgb(0,153,0);
+    --blue:rgb(0,0,255);
+    --orange:rgb(255,89,0);
+    /* font roles chosen to echo the Demonstrations look */
+    --serif:Georgia,"Times New Roman",serif;
+    --sans:"Helvetica Neue",Helvetica,Arial,"Segoe UI",sans-serif;
+    --verdana:Verdana,Geneva,Tahoma,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--paper);color:var(--ink);}
+  body{
+    font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;
+    padding:22px 18px 60px;
+    display:flex;justify-content:center;
+  }
+  .demo{width:560px;max-width:100%;}
+
+  .demo-title{
+    font-family:var(--sans);
+    font-size:21px;
+    font-weight:700;
+    line-height:1.25;
+    color:var(--title-ink);
+    margin:0 0 14px;
+    letter-spacing:.1px;
+  }
+
+  /* ---- control panel (sits above the plot, Manipulate style) ---- */
+  .controls{margin-bottom:10px;}
+
+  /* setter bar */
+  .setter{display:inline-flex;margin:0 0 12px;border-radius:3px;overflow:hidden;
+          box-shadow:0 1px 0 rgba(0,0,0,.04);}
+  .setter button{
+    font-family:var(--sans);
+    font-size:12.5px;
+    color:#1a1a1a;
+    padding:5px 13px;
+    border:1px solid var(--btn-border);
+    border-left-width:0;
+    background:linear-gradient(var(--btn-face-top),var(--btn-face-bot));
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .setter button:first-child{border-left-width:1px;border-radius:3px 0 0 3px;}
+  .setter button:last-child{border-radius:0 3px 3px 0;}
+  .setter button.sel{
+    background:linear-gradient(var(--btn-down-top),var(--btn-down-bot));
+    box-shadow:inset 0 1px 3px rgba(0,0,0,.35);
+    color:#000;
+  }
+  .setter button:focus-visible{outline:2px solid #4a90d9;outline-offset:-2px;}
+
+  /* labeled sliders */
+  .slider-row{display:flex;align-items:center;gap:9px;margin:7px 0;min-height:24px;}
+  .slider-row.hidden{display:none;}
+  .slider-label{font-size:17px;color:#111;min-width:300px;text-align:right;}
+  .slider-wrap{flex:1;min-width:120px;display:flex;align-items:center;}
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;width:100%;height:18px;background:transparent;
+    cursor:pointer;margin:0;
+  }
+  input[type=range]:focus{outline:none;}
+  input[type=range]:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 2px #4a90d9;}
+  /* track */
+  input[type=range]::-webkit-slider-runnable-track{
+    height:4px;border-radius:2px;
+    background:linear-gradient(#8f8f8f,#b9b9b9);
+    border:1px solid #7d7d7d;border-top-color:#6f6f6f;
+  }
+  input[type=range]::-moz-range-track{
+    height:4px;border-radius:2px;background:#a8a8a8;border:1px solid #7d7d7d;
+  }
+  /* thumb: small Mathematica "paddle" */
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;appearance:none;
+    width:11px;height:17px;margin-top:-7.5px;border-radius:2px;
+    background:linear-gradient(var(--thumb-top),var(--thumb-bot));
+    border:1px solid #8a8a8a;box-shadow:0 1px 1px rgba(0,0,0,.15);
+  }
+  input[type=range]::-moz-range-thumb{
+    width:11px;height:17px;border-radius:2px;
+    background:linear-gradient(var(--thumb-top),var(--thumb-bot));
+    border:1px solid #8a8a8a;box-shadow:0 1px 1px rgba(0,0,0,.15);
+  }
+  .slider-val{
+    font-size:17px;min-width:50px;text-align:left;color:#000;
+    padding:1px 7px;border:1px solid #cfcfcf;border-radius:2px;background:#fff;
+  }
+
+  /* ---- plot ---- */
+  .plot-wrap{width:520px;max-width:100%;}
+  canvas{width:100%;height:auto;display:block;}
+
+  /* ---- Directions / Details / About ---- */
+  .actions{display:flex;gap:9px;margin:16px 0 0;}
+  .actions button{
+    font-family:var(--sans);font-size:13px;color:#1a1a1a;
+    padding:6px 16px;border:1px solid var(--btn-border);border-radius:3px;
+    background:linear-gradient(var(--btn-face-top),var(--btn-face-bot));cursor:pointer;
+  }
+  .actions button.open{
+    background:linear-gradient(var(--btn-down-top),var(--btn-down-bot));
+    box-shadow:inset 0 1px 3px rgba(0,0,0,.3);
+  }
+  .actions button:focus-visible{outline:2px solid #4a90d9;outline-offset:1px;}
+
+  .panel{
+    display:none;margin-top:12px;padding:14px 16px;
+    background:var(--panel-bg);border:1px solid var(--panel-border);border-radius:3px;
+    font-family:var(--verdana);font-size:13px;line-height:1.5;color:#1c1c1c;
+  }
+  .panel.show{display:block;}
+  .panel p{margin:0 0 9px;}
+  .panel p:last-child{margin-bottom:0;}
+  .panel .eq{font-family:var(--serif);font-style:italic;margin:6px 0;font-size:14px;}
+  .panel .eq .gk{font-family:var(--verdana);font-style:normal;} /* match the τ in body text */
+  .panel ul{margin:6px 0;padding-left:20px;}
+  .panel li{margin:2px 0;}
+  .panel a{color:#1a5fb4;}
+  sub{font-size:.72em;}
+  sup{font-size:.72em;}
+  .frac{display:inline-flex;flex-direction:column;text-align:center;vertical-align:middle;
+        margin:0 2px;}
+  .frac .num{border-bottom:1px solid #333;padding:0 5px;}
+  .frac .den{padding:0 5px;}
+  .muted{color:#6a6a6a;}
+</style>
+
+<div class="demo">
+  <h1 class="demo-title">Multiple States in an Isothermal Continuous Stirred-Tank Reactor</h1>
+
+  <div class="controls">
+    <div class="setter" role="group" aria-label="plot selector">
+      <button data-view="1" class="sel">&nbsp;rate vs. concentration&nbsp;</button>
+      <button data-view="2">&nbsp;concentration vs. time&nbsp;</button>
+      <button data-view="3">&nbsp;rate vs. time&nbsp;</button>
+    </div>
+
+    <div class="slider-row" id="row-tau">
+      <span class="slider-label">residence time (min)</span>
+      <span class="slider-wrap">
+        <input id="tau" type="range" min="1.5" max="2.35" step="0.01" value="1.7"
+               aria-label="residence time (min)">
+      </span>
+      <span class="slider-val" id="tau-val">1.7</span>
+    </div>
+
+    <div class="slider-row" id="row-cao">
+      <span class="slider-label">initial reactant concentration (mol/L)</span>
+      <span class="slider-wrap">
+        <input id="cao" type="range" min="0.1" max="6" step="0.05" value="6"
+               aria-label="initial reactant concentration (mol/L)">
+      </span>
+      <span class="slider-val" id="cao-val">6</span>
+    </div>
+  </div>
+
+  <div class="plot-wrap">
+    <canvas id="plot" width="1040" height="740"></canvas>
+  </div>
+
+  <div class="actions">
+    <button id="btn-dir">Directions</button>
+    <button id="btn-det">Details</button>
+    <button id="btn-abt">About</button>
+  </div>
+
+  <div class="panel" id="panel-dir">
+    <p>An irreversible reaction <em>A&nbsp;&rarr;&nbsp;B</em> is carried out in an isothermal,
+       continuous stirred-tank reactor (CSTR). Select a plot with the three buttons at the top.</p>
+    <p>In <strong>rate vs. concentration</strong>, the green <em>generation</em> curve is the reaction
+       rate and the blue <em>removal</em> line is the CSTR mass balance. Their intersections are the
+       steady-state solutions. Drag the <strong>residence time</strong> slider: when three intersections
+       exist, only two are stable (the middle one is unstable); at high and low residence times only one
+       steady state remains.</p>
+    <p>In <strong>concentration vs. time</strong> and <strong>rate vs. time</strong>, also drag the
+       <strong>initial reactant concentration</strong> slider to set the reactor's starting concentration,
+       then watch how the reactor approaches steady state. When three steady states exist, starting above
+       the middle steady-state concentration sends the reactor to the higher steady state; otherwise it
+       settles to the lower one.</p>
+  </div>
+
+  <div class="panel" id="panel-det">
+    <p>Rate equations:</p>
+    <p class="eq"><span class="gk">&tau;</span> = V / v ,</p>
+    <p class="eq">r<sub>A</sub> = &minus;
+      <span class="frac"><span class="num">25&nbsp;C<sub>A</sub></span>
+      <span class="den">2 + C<sub>A</sub> + 5&nbsp;C<sub>A</sub><sup>2</sup></span></span> ,</p>
+    <p class="eq">r<sub>A,&thinsp;r</sub> = ( C<sub>A,&thinsp;f</sub> &minus; C<sub>A,&thinsp;s</sub> ) / <span class="gk">&tau;</span> ,</p>
+    <p class="eq">r<sub>A,&thinsp;g</sub> = &minus;
+      <span class="frac"><span class="num">25&nbsp;C<sub>A,&thinsp;s</sub></span>
+      <span class="den">2 + C<sub>A,&thinsp;s</sub> + 5&nbsp;C<sub>A,&thinsp;s</sub><sup>2</sup></span></span> ,</p>
+    <p>where &tau; is residence time (min), <em>V</em> is reactor volume (L), <em>v</em> is the volumetric
+       flow rate (L/min), r<sub>A</sub> is reaction rate (mol/[L&nbsp;min]), r<sub>A,&thinsp;r</sub> is the
+       steady-state removal rate (mol/[L&nbsp;min]) from a mass balance, r<sub>A,&thinsp;g</sub> is the transient generation
+       rate (mol/[L&nbsp;min]), C<sub>A</sub> is the concentration of reactant <em>A</em> (mol/L), and
+       C<sub>A,&thinsp;f</sub> is the feed concentration of <em>A</em> (mol/L).</p>
+    <p>The transient mass balance solved for each plot is</p>
+    <p class="eq">dC<sub>A</sub>/dt =
+      ( C<sub>A,&thinsp;f</sub> &minus; C<sub>A</sub> ) / <span class="gk">&tau;</span> + r<sub>A</sub> ,&nbsp;&nbsp;
+      C<sub>A</sub>(0) = C<sub>A,&thinsp;0</sub> ,</p>
+    <p>where C<sub>A,&thinsp;0</sub> is the initial concentration of <em>A</em> in the reactor (mol/L).
+       Here <em>V</em>&nbsp;=&nbsp;5.5&nbsp;L and the feed concentration C<sub>A,&thinsp;f</sub>&nbsp;=&nbsp;6.0&nbsp;mol/L.</p>
+  </div>
+
+  <div class="panel" id="panel-abt">
+    <p>This simulation was created in the
+       <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and
+       Biological Engineering</a> at University of Colorado Boulder for
+       <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by
+       John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a
+       <a href="https://demonstrations.wolfram.com/MultipleStatesInAnIsothermalContinuousStirredTankReactor/"
+          target="_blank" rel="noopener">Mathematica simulation</a> by Rachael L. Baumann. It was prepared
+       with financial support from the National Science Foundation (DUE 2336987 and 2336988) in
+       collaboration with Washington State University. Address any questions or comments to
+       <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.</p>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- physical model ----------
+  var V = 5.5, CAF = 6.0;
+  // generation rate magnitude  (= -r_A as a positive number)
+  function gen(c){ return 25*c/(2 + c + 5*c*c); }
+  // removal line (CSTR mass balance)
+  function rem(c, tau){ return (CAF - c)/tau; }
+  // dCa/dt = (CAF - Ca)/tau - gen(Ca)
+  function deriv(c, tau){ return (CAF - c)/tau - gen(c); }
+
+  // integrate ODE with RK4; returns {t:[],c:[]} up to tEnd and steady state at t=100
+  function solve(tau, Cao){
+    var dt = 0.005, tEnd = 100;
+    var n = Math.round(tEnd/dt);
+    var t = [], c = [];
+    var x = Cao, cur = 0;
+    // store a sample every ~0.05 min for plotting (0..25), keep full march for ss
+    var sampleEvery = Math.round(0.05/dt);
+    for(var i=0;i<=n;i++){
+      if(i % sampleEvery === 0 && cur*0.05 <= 25.0001){
+        t.push(i*dt); c.push(x); cur++;
+      }
+      var k1 = deriv(x,tau);
+      var k2 = deriv(x + 0.5*dt*k1, tau);
+      var k3 = deriv(x + 0.5*dt*k2, tau);
+      var k4 = deriv(x + dt*k3, tau);
+      x += (dt/6)*(k1 + 2*k2 + 2*k3 + k4);
+    }
+    return { t:t, c:c, ss:x };   // ss = Ca at t=100
+  }
+
+  // ---------- number formatting ----------
+  // 2 significant figures, matching Mathematica NumberForm[x,2]
+  // (keeps trailing zeros: 4.042 -> "4.0", 3 -> "3.0", 0.456 -> "0.46")
+  function sig2(x){
+    if(x === 0) return "0";
+    var s = x.toPrecision(2);
+    if(s.indexOf("e") >= 0) s = Number(s).toString(); // guard large values
+    return s;
+  }
+  // slider readout: trim trailing zeros, like a Mathematica "Labeled" slider
+  function sliderFmt(x){
+    var s = (Math.round(x*100)/100).toFixed(2);
+    s = s.replace(/0+$/,"").replace(/\.$/,"");
+    return s;
+  }
+
+  // ---------- plotting ----------
+  var cv = document.getElementById("plot");
+  var ctx = cv.getContext("2d");
+  var Wp = 520, Hp = 370;           // logical plot size (matches ImageSize->{520,370})
+  // frame margins (logical px) — widened to fit the larger axis text
+  var ML = 70, MR = 16, MT = 16, MB = 52;
+
+  // Size the backing store to the ACTUAL displayed size (× device pixel ratio),
+  // then scale the drawing so we keep working in logical 520×370 coordinates.
+  // This renders all text at native resolution, so nothing is CSS-downscaled
+  // (which is what made the rotated y-axis label look heavy and run letters together).
+  function setup(){
+    var dpr = window.devicePixelRatio || 1;
+    var cssW = cv.clientWidth || Wp;
+    var ratio = cssW / Wp;                 // logical -> displayed px
+    cv.width  = Math.round(cssW * dpr);
+    cv.height = Math.round(Hp * ratio * dpr);
+    cv.style.height = (Hp * ratio) + "px";
+    var k = ratio * dpr;                   // logical -> backing px
+    ctx.setTransform(k, 0, 0, k, 0, 0);
+  }
+
+  function niceTicks(lo, hi, step){
+    var a=[]; var k = Math.round(lo/step);
+    for(var v=k*step; v<=hi+1e-9; v+=step){ a.push(Math.round(v/step)*step); }
+    return a;
+  }
+
+  // map data->pixel
+  function makeMap(xlo,xhi,ylo,yhi){
+    var px0=ML, px1=Wp-MR, py0=Hp-MB, py1=MT;
+    return {
+      x:function(x){ return px0 + (x-xlo)/(xhi-xlo)*(px1-px0); },
+      y:function(y){ return py0 + (y-ylo)/(yhi-ylo)*(py1-py0); },
+      box:{l:px0,r:px1,t:py1,b:py0}
+    };
+  }
+
+  function drawFrame(m, xlo,xhi,ylo,yhi, xticks,yticks, xlab,ylab, xfmt,yfmt){
+    var b=m.box;
+    // frame
+    ctx.lineWidth=1; ctx.strokeStyle="#000"; ctx.fillStyle="#000";
+    ctx.strokeRect(b.l+0.5,b.t+0.5,b.r-b.l,b.b-b.t);
+    ctx.font='17px '+getFont();
+    ctx.textBaseline="alphabetic";
+    var tickLen=6, minorLen=3;
+
+    // x ticks (bottom + top)
+    ctx.textAlign="center";
+    var i,xx,px,yy,py,v;
+    // minor x
+    var xminor=(xticks.length>1)?(xticks[1]-xticks[0])/2:0;
+    if(xminor>0){
+      for(v=xlo; v<=xhi+1e-9; v+=xminor){
+        px=m.x(v);
+        ctx.beginPath();ctx.moveTo(px,b.b);ctx.lineTo(px,b.b-minorLen);ctx.stroke();
+        ctx.beginPath();ctx.moveTo(px,b.t);ctx.lineTo(px,b.t+minorLen);ctx.stroke();
+      }
+    }
+    for(i=0;i<xticks.length;i++){
+      xx=xticks[i]; px=m.x(xx);
+      ctx.beginPath();ctx.moveTo(px,b.b);ctx.lineTo(px,b.b-tickLen);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(px,b.t);ctx.lineTo(px,b.t+tickLen);ctx.stroke();
+      ctx.fillText(xfmt(xx), px, b.b+19);
+    }
+    // y ticks (left + right)
+    ctx.textAlign="right";
+    var yminor=(yticks.length>1)?(yticks[1]-yticks[0])/2:0;
+    if(yminor>0){
+      for(v=ylo; v<=yhi+1e-9; v+=yminor){
+        py=m.y(v);
+        ctx.beginPath();ctx.moveTo(b.l,py);ctx.lineTo(b.l+minorLen,py);ctx.stroke();
+        ctx.beginPath();ctx.moveTo(b.r,py);ctx.lineTo(b.r-minorLen,py);ctx.stroke();
+      }
+    }
+    for(i=0;i<yticks.length;i++){
+      yy=yticks[i]; py=m.y(yy);
+      ctx.beginPath();ctx.moveTo(b.l,py);ctx.lineTo(b.l+tickLen,py);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(b.r,py);ctx.lineTo(b.r-tickLen,py);ctx.stroke();
+      ctx.textBaseline="middle";
+      ctx.fillText(yfmt(yy), b.l-9, py);
+      ctx.textBaseline="alphabetic";
+    }
+    // axis labels (rounded coords; identical font for both)
+    ctx.font='18px '+getFont();
+    ctx.textAlign="center";
+    ctx.textBaseline="alphabetic";
+    ctx.fillText(xlab, Math.round((b.l+b.r)/2), Hp-9);
+    ctx.save();
+    ctx.translate(17, Math.round((b.t+b.b)/2));
+    ctx.rotate(-Math.PI/2);
+    ctx.fillText(ylab, 0, 0);
+    ctx.restore();
+  }
+
+  function getFont(){
+    return '"Helvetica Neue",Helvetica,Arial,sans-serif';
+  }
+
+  function clip(m){var b=m.box;ctx.save();ctx.beginPath();
+    ctx.rect(b.l,b.t,b.r-b.l,b.b-b.t);ctx.clip();}
+  function unclip(){ctx.restore();}
+
+  function curve(m, fn, x0, x1, N, color, width, dash){
+    ctx.save();ctx.lineWidth=width;ctx.strokeStyle=color;
+    ctx.setLineDash(dash||[]);
+    ctx.beginPath();
+    for(var i=0;i<=N;i++){
+      var x=x0+(x1-x0)*i/N, y=fn(x);
+      var px=m.x(x), py=m.y(y);
+      if(i===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);
+    }
+    ctx.stroke();ctx.setLineDash([]);ctx.restore();
+  }
+  function polyline(m, xs, ys, color, width, dash){
+    ctx.save();ctx.lineWidth=width;ctx.strokeStyle=color;ctx.setLineDash(dash||[]);
+    ctx.beginPath();
+    for(var i=0;i<xs.length;i++){
+      var px=m.x(xs[i]),py=m.y(ys[i]);
+      if(i===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);
+    }
+    ctx.stroke();ctx.setLineDash([]);ctx.restore();
+  }
+  function hline(m, yval, x0, x1, color, width, dash){
+    ctx.save();ctx.lineWidth=width;ctx.strokeStyle=color;ctx.setLineDash(dash||[]);
+    ctx.beginPath();ctx.moveTo(m.x(x0),m.y(yval));ctx.lineTo(m.x(x1),m.y(yval));
+    ctx.stroke();ctx.setLineDash([]);ctx.restore();
+  }
+
+  // white-boxed on-graph text label (mimics Framed[Style[...],Background->White])
+  function label(m, text, dx, dy, color, fontPx){
+    ctx.font=(fontPx||16)+'px '+getFont();
+    ctx.textAlign="center";ctx.textBaseline="middle";
+    var px=m.x(dx), py=m.y(dy);
+    var w=ctx.measureText(text).width;
+    var padX=4, padY=3, h=(fontPx||16)+2;
+    // keep inside frame
+    var b=m.box;
+    px=Math.max(b.l+w/2+padX+2, Math.min(b.r-w/2-padX-2, px));
+    py=Math.max(b.t+h/2+padY+2, Math.min(b.b-h/2-padY-2, py));
+    ctx.fillStyle="#fff";
+    ctx.fillRect(px-w/2-padX, py-h/2-padY, w+2*padX, h+2*padY);
+    ctx.fillStyle=color;
+    ctx.fillText(text, px, py+0.5);
+  }
+
+  // rich on-graph label supporting subscripts.
+  // segs: array of {t:"text"} or {t:"text", sub:true}
+  function richLabel(m, segs, dx, dy, color, fontPx){
+    var fp = fontPx||16, sp = Math.round(fp*0.72), subDrop = fp*0.18;
+    function segFont(s){ ctx.font=(s.sub?sp:fp)+'px '+getFont(); }
+    // measure
+    var total=0, i;
+    for(i=0;i<segs.length;i++){ segFont(segs[i]); total+=ctx.measureText(segs[i].t).width; }
+    var padX=4, padY=3, h=fp+2, b=m.box;
+    var px=m.x(dx), py=m.y(dy);
+    px=Math.max(b.l+total/2+padX+2, Math.min(b.r-total/2-padX-2, px));
+    py=Math.max(b.t+h/2+padY+2, Math.min(b.b-h/2-padY-2, py));
+    px=Math.round(px); py=Math.round(py);
+    // white background box
+    ctx.fillStyle="#fff";
+    ctx.fillRect(px-total/2-padX, py-h/2-padY, total+2*padX, h+2*padY);
+    // draw segments left-aligned from the box start
+    ctx.fillStyle=color; ctx.textAlign="left"; ctx.textBaseline="middle";
+    var x=px-total/2;
+    for(i=0;i<segs.length;i++){
+      segFont(segs[i]);
+      ctx.fillText(segs[i].t, x, py + (segs[i].sub?subDrop:0) + 0.5);
+      x += ctx.measureText(segs[i].t).width;
+    }
+  }
+
+  // ---------- state ----------
+  var state = { view:1, tau:1.7, cao:6 };
+
+  function render(){
+    setup();
+    ctx.clearRect(0,0,Wp,Hp);
+    var tau=state.tau, cao=state.cao;
+
+    if(state.view===1){
+      var m=makeMap(0,6,0,4);
+      drawFrame(m,0,6,0,4,
+        niceTicks(0,6,1), niceTicks(0,4,1),
+        "reactant concentration (mol/L)","rate (mol/[L min])",
+        function(v){return String(Math.round(v));},
+        function(v){return String(Math.round(v));});
+      clip(m);
+      curve(m, function(c){return gen(c);}, 0,6, 400, getCSS('--green'), 2.5);     // generation (green)
+      curve(m, function(c){return rem(c,tau);}, 0,6, 2, getCSS('--blue'), 2.5);    // removal (blue)
+      unclip();
+      label(m,"generation", 1, gen(1), getCSS('--green'),16);
+      label(m,"removal", 5.3, rem(5.3,tau), getCSS('--blue'),16);
+    }
+    else if(state.view===2){
+      var sol=solve(tau,cao), css=sol.ss;
+      var m2=makeMap(0,25,0,6);
+      drawFrame(m2,0,25,0,6,
+        niceTicks(0,25,5), niceTicks(0,6,1),
+        "time (min)","reactant concentration (mol/L)",
+        function(v){return String(Math.round(v));},
+        function(v){return String(Math.round(v));});
+      clip(m2);
+      hline(m2, css, 0,25, getCSS('--orange'),2.5,[7,5]);     // steady-state line (orange dashed)
+      polyline(m2, sol.t, sol.c, "#000", 2.5);               // transient (black)
+      unclip();
+      var dy=css + 0.55*(css>=0.5?1:-1);
+      richLabel(m2, [{t:"C"},{t:"A",sub:true},
+                     {t:" at steady state = "+sig2(css)+" mol/L"}],
+                10, dy, getCSS('--orange'), 15);
+    }
+    else{
+      var sol3=solve(tau,cao), css3=sol3.ss;
+      var rss=gen(css3);
+      var rate_t=sol3.c.map(gen);
+      var m3=makeMap(0,25,0,3.5);
+      drawFrame(m3,0,25,0,3.5,
+        niceTicks(0,25,5), niceTicks(0,3.5,0.5),
+        "time (min)","product rate (mol/[L min])",
+        function(v){return String(Math.round(v));},
+        function(v){return v.toFixed(1);});
+      clip(m3);
+      hline(m3, rss, 0,25, getCSS('--orange'),2.5,[7,5]);    // steady-state rate (orange dashed)
+      polyline(m3, sol3.t, rate_t, "#000", 2.5);             // transient rate (black)
+      unclip();
+      var dy3=rss + 0.5*(tau>=2?-1:1);
+      label(m3, "steady state rate = "+sig2(rss)+" mol/[L min]", 10, dy3, getCSS('--orange'),15);
+    }
+  }
+
+  var cssCache={};
+  function getCSS(name){
+    if(cssCache[name])return cssCache[name];
+    var v=getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    cssCache[name]=v; return v;
+  }
+
+  // ---------- wire up controls ----------
+  var setterBtns=document.querySelectorAll('.setter button');
+  var rowCao=document.getElementById('row-cao');
+  function setView(v){
+    state.view=v;
+    setterBtns.forEach(function(b){b.classList.toggle('sel', +b.dataset.view===v);});
+    // initial-concentration slider only matters for the time-based plots
+    rowCao.classList.toggle('hidden', v===1);
+    render();
+  }
+  setterBtns.forEach(function(b){
+    b.addEventListener('click',function(){ setView(+b.dataset.view); });
+  });
+
+  var tau=document.getElementById('tau'), tauVal=document.getElementById('tau-val');
+  var cao=document.getElementById('cao'), caoVal=document.getElementById('cao-val');
+  tau.addEventListener('input',function(){
+    state.tau=+tau.value; tauVal.textContent=sliderFmt(state.tau); render();
+  });
+  cao.addEventListener('input',function(){
+    state.cao=+cao.value; caoVal.textContent=sliderFmt(state.cao); render();
+  });
+
+  // ---------- Directions / Details / About ----------
+  function toggler(btn, panel){
+    var all=[['btn-dir','panel-dir'],['btn-det','panel-det'],['btn-abt','panel-abt']];
+    btn.addEventListener('click',function(){
+      var willOpen=!panel.classList.contains('show');
+      all.forEach(function(p){
+        document.getElementById(p[0]).classList.remove('open');
+        document.getElementById(p[1]).classList.remove('show');
+      });
+      if(willOpen){btn.classList.add('open');panel.classList.add('show');}
+    });
+  }
+  toggler(document.getElementById('btn-dir'),document.getElementById('panel-dir'));
+  toggler(document.getElementById('btn-det'),document.getElementById('panel-det'));
+  toggler(document.getElementById('btn-abt'),document.getElementById('panel-abt'));
+
+  window.addEventListener('resize', render);
+  setView(1);
+})();
+</script>

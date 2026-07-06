@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fugacity from Equation of State for Water</title>
+<style>
+  :root{
+    --ui: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --math: "Times New Roman", Times, serif;
+    --panel:#ffffff;
+    --line:#c8c8c8;
+  }
+  html,body{margin:0;padding:0;background:#ffffff;color:#000;}
+  body{font-family:var(--ui);font-size:14px;-webkit-font-smoothing:antialiased;}
+  .demo{
+    width:600px;max-width:100%;margin:14px auto;padding:0 6px 14px;
+    box-sizing:border-box;
+  }
+  .title{
+    font-family:var(--ui);font-size:21px;font-weight:bold;color:#000;
+    padding:2px 0 10px;
+  }
+  /* ---- control band ---- */
+  .controls{
+    border:1px solid var(--line);
+    background:#fbfbfb;
+    padding:10px 12px 12px;
+    border-radius:2px;
+  }
+  .setterRow{display:flex;align-items:center;gap:0;margin-bottom:8px;}
+  .setter{
+    font-family:var(--ui);font-size:14px;color:#000;
+    background:linear-gradient(#fdfdfd,#e9e9e9);
+    border:1px solid #9a9a9a;
+    padding:3px 16px;cursor:pointer;user-select:none;
+    margin-right:-1px;
+  }
+  .setter:first-child{border-radius:3px 0 0 3px;}
+  .setter:last-child{border-radius:0 3px 3px 0;}
+  .setter.active{
+    background:linear-gradient(#cfcfcf,#bdbdbd);
+    box-shadow:inset 0 1px 2px rgba(0,0,0,.35);
+    border-color:#7d7d7d;
+  }
+  .ctrl{display:flex;align-items:center;margin:7px 0;min-height:22px;}
+  .ctrl .lbl{
+    width:150px;text-align:right;padding-right:12px;
+    font-family:var(--ui);font-size:14px;color:#000;flex:0 0 auto;
+  }
+  .ctrl .lbl .u{font-style:normal;}
+  .ctrl input[type=range]{
+    flex:1 1 auto;height:18px;cursor:pointer;
+    accent-color:#5a8bd6;
+  }
+  .ctrl .val{
+    flex:0 0 auto;width:54px;margin-left:10px;
+    font-family:var(--ui);font-size:13px;text-align:center;
+    background:#fff;border:1px solid #b6b6b6;border-radius:3px;
+    padding:2px 0;color:#222;
+  }
+  .hidden{display:none !important;}
+  /* ---- plot ---- */
+  .plotWrap{margin-top:12px;display:flex;justify-content:center;}
+  canvas{display:block;}
+  /* ---- action buttons ---- */
+  .actions{margin-top:14px;display:flex;gap:8px;}
+  .abtn{
+    font-family:var(--ui);font-size:13px;font-weight:bold;
+    color:#7a0a0a;background:linear-gradient(#ffffff,#efefef);
+    border:1px solid #b9b9b9;border-radius:3px;
+    padding:5px 14px;cursor:pointer;
+  }
+  .abtn.active{background:linear-gradient(#f1d9d9,#e7c4c4);border-color:#a06b6b;}
+  .panel{
+    display:none;margin-top:10px;border:1px solid var(--line);
+    background:#fff;padding:14px 16px;border-radius:2px;
+    line-height:1.5;font-size:14px;color:#111;
+  }
+  .panel.show{display:block;}
+  .panel a{color:#1463b8;text-decoration:none;}
+  .panel a:hover{text-decoration:underline;}
+  /* math */
+  .math{font-family:var(--math);font-style:italic;font-size:16px;}
+  .math .op,.math .num0,.math .paren{font-style:normal;}
+  .eq{font-family:var(--math);font-size:16px;text-align:center;margin:10px 0;}
+  .eq .v{font-style:italic;}
+  .eq .n{font-style:normal;}
+  .frac{display:inline-flex;flex-direction:column;text-align:center;
+        vertical-align:middle;margin:0 .18em;}
+  .frac .fn{border-bottom:1px solid #000;padding:0 .4em 1px;}
+  .frac .fd{padding:1px .4em 0;}
+  sub,sup{font-style:normal;}
+  .imath{font-family:var(--math);font-style:italic;}
+  .imath .n{font-style:normal;}
+</style>
+</head>
+<body>
+<div class="demo">
+  <div class="title">Fugacity from Equation of State for Water</div>
+
+  <div class="controls">
+    <div class="setterRow">
+      <div class="setter active" id="btnFug" data-cs="1">&nbsp;fugacity&nbsp;</div>
+      <div class="setter" id="btnIso" data-cs="2">&nbsp;isotherms&nbsp;</div>
+    </div>
+
+    <!-- fugacity controls -->
+    <div id="fugCtrls">
+      <div class="ctrl">
+        <div class="lbl">pressure <span class="u">(MPa)</span></div>
+        <input type="range" id="sP" min="1" max="30" step="1" value="10">
+        <div class="val" id="vP">10</div>
+      </div>
+      <div class="ctrl">
+        <div class="lbl">volume <span class="u">(cm<sup>3</sup>/mol)</span></div>
+        <input type="range" id="sV" min="22" max="2000" step="1" value="100">
+        <div class="val" id="vV">100</div>
+      </div>
+    </div>
+
+    <!-- isotherm controls -->
+    <div id="isoCtrls" class="hidden">
+      <div class="ctrl">
+        <div class="lbl">temperature <span class="u">(K)</span></div>
+        <input type="range" id="sT" min="500" max="710" step="1" value="583">
+        <div class="val" id="vT">583</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="plotWrap">
+    <canvas id="plot" width="600" height="470"></canvas>
+  </div>
+
+  <div class="actions">
+    <div class="abtn" data-panel="pDir">Directions</div>
+    <div class="abtn" data-panel="pDet">Details</div>
+    <div class="abtn" data-panel="pAbo">About</div>
+  </div>
+
+  <div class="panel" id="pDir">
+    The fugacity <span class="imath">f</span> and the fugacity coefficient
+    <span class="imath">&phi;</span> are calculated for water using the
+    Peng&ndash;Robinson equation of state (EOS). Select &ldquo;fugacity&rdquo;
+    and change pressure and volume with sliders; the corresponding state is
+    indicated by the black dot on the log pressure versus log volume diagram.
+    The fugacity coefficient indicates how much the fluid deviates from
+    ideal-gas behavior (<span class="imath">&phi;<span class="n">&nbsp;=&nbsp;1</span></span>
+    for an ideal gas). Select &ldquo;isotherms&rdquo; to display isotherms on the
+    log&nbsp;<span class="imath">P</span>&ndash;&thinsp;log&nbsp;<span class="imath">V</span>
+    diagram and change temperature with a slider; the horizontal blue line
+    represents vapor-liquid equilibrium. The yellow areas between the isotherm
+    and the horizontal blue line are equal when viewed on a linear scale.
+  </div>
+
+  <div class="panel" id="pDet">
+    <div>The Peng&ndash;Robinson EOS is used to calculate pressure:</div>
+    <div class="eq">
+      <span class="v">P</span> <span class="n">=</span>
+      <span class="frac"><span class="fn"><span class="v">R&thinsp;T</span></span><span class="fd"><span class="v">V</span> <span class="n">&minus;</span> <span class="v">b</span></span></span>
+      <span class="n">&minus;</span>
+      <span class="frac"><span class="fn"><span class="v">a</span></span><span class="fd"><span class="v">V</span><sup>2</sup> <span class="n">+</span> 2<span class="v">b&thinsp;V</span> <span class="n">&minus;</span> <span class="v">b</span><sup>2</sup></span></span>
+      <span class="n">,</span>
+    </div>
+    <div>where <span class="imath">P</span> is pressure (MPa),
+      <span class="imath">R</span> is the ideal gas constant
+      ([cm<sup>3</sup>&thinsp;MPa]&thinsp;/&thinsp;[mol&thinsp;K]),
+      <span class="imath">T</span> is temperature (K),
+      <span class="imath">V</span> is volume (cm<sup>3</sup>) and
+      <span class="imath">a</span> and <span class="imath">b</span> are constants:</div>
+    <div class="eq">
+      <span class="v">a</span> <span class="n">=</span> <span class="n">0.457</span>
+      <span class="paren">(</span>1 <span class="n">+</span> <span class="v">&kappa;</span>
+      <span class="paren">(</span>1 <span class="n">&minus;</span>
+      <span style="font-style:normal">&radic;</span><span style="border-top:1px solid #000;font-style:italic">T&thinsp;/&thinsp;Tc</span><span class="paren">)</span><span class="paren">)</span><sup>2</sup>
+      <span class="frac"><span class="fn"><span class="v">R</span><sup>2</sup><span class="v">&thinsp;Tc</span><sup>2</sup></span><span class="fd"><span class="v">Pc</span></span></span>
+      <span class="n">,</span>
+    </div>
+    <div class="eq">
+      <span class="v">b</span> <span class="n">=</span> <span class="n">0.0778</span>
+      <span class="frac"><span class="fn"><span class="v">R&thinsp;Tc</span></span><span class="fd"><span class="v">Pc</span></span></span>
+      <span class="n">,</span>
+    </div>
+    <div class="eq">
+      <span class="v">&kappa;</span> <span class="n">=</span> <span class="n">0.375</span>
+      <span class="n">+</span> <span class="n">1.542</span>&thinsp;<span class="v">&omega;</span>
+      <span class="n">&minus;</span> <span class="n">0.270</span>&thinsp;<span class="v">&omega;</span><sup>2</sup>
+      <span class="n">.</span>
+    </div>
+    <div>Here <span class="imath">&kappa;</span> is a constant associated with the
+      acentric factor <span class="imath">&omega;<span class="n">&nbsp;=&nbsp;0.344</span></span>,
+      <span class="imath">Tc</span> is the critical temperature (K) and
+      <span class="imath">Pc</span> is the critical pressure (MPa).</div>
+    <div style="margin-top:8px">The following equation is solved in order to obtain
+      the compressibility factor <span class="imath">Z</span>:</div>
+    <div class="eq">
+      <span class="v">Z</span><sup>3</sup> <span class="n">+</span>
+      <span class="v">a</span><sub>2</sub>&thinsp;<span class="v">Z</span><sup>2</sup> <span class="n">+</span>
+      <span class="v">a</span><sub>1</sub>&thinsp;<span class="v">Z</span> <span class="n">+</span>
+      <span class="v">a</span><sub>0</sub> <span class="n">= 0 ,</span>
+    </div>
+    <div>where <span class="imath">a<sub>2</sub></span>,
+      <span class="imath">a<sub>1</sub></span>, <span class="imath">a<sub>0</sub></span>,
+      <span class="imath">A</span> and <span class="imath">B</span> are all constants:</div>
+    <div class="eq"><span class="v">a</span><sub>2</sub> <span class="n">=</span> <span class="v">B</span> <span class="n">&minus; 1 ,</span></div>
+    <div class="eq"><span class="v">a</span><sub>1</sub> <span class="n">=</span> <span class="v">A</span> <span class="n">&minus;</span> 3<span class="v">B</span><sup>2</sup> <span class="n">&minus;</span> 2<span class="v">B</span> <span class="n">,</span></div>
+    <div class="eq"><span class="v">a</span><sub>0</sub> <span class="n">=</span> <span class="n">&minus;</span><span class="v">A&thinsp;B</span> <span class="n">+</span> <span class="v">B</span><sup>2</sup> <span class="n">+</span> <span class="v">B</span><sup>3</sup> <span class="n">,</span></div>
+    <div class="eq">
+      <span class="v">A</span> <span class="n">=</span> <span class="v">a</span>
+      <span class="frac"><span class="fn"><span class="v">P</span></span><span class="fd"><span class="v">R</span><sup>2</sup><span class="v">&thinsp;T</span><sup>2</sup></span></span>
+      <span class="n">,</span>
+    </div>
+    <div class="eq">
+      <span class="v">B</span> <span class="n">=</span> <span class="v">b</span>
+      <span class="frac"><span class="fn"><span class="v">P</span></span><span class="fd"><span class="v">R&thinsp;T</span></span></span>
+      <span class="n">.</span>
+    </div>
+    <div style="margin-top:8px">The fugacity <span class="imath">f</span> and activity
+      coefficient <span class="imath">&phi;</span> are calculated by:</div>
+    <div class="eq"><span class="v">f</span> <span class="n">=</span> <span class="v">&phi;&thinsp;P</span> <span class="n">,</span></div>
+    <div class="eq">
+      <span class="n">ln</span>&thinsp;<span class="v">&phi;</span> <span class="n">=</span>
+      <span class="paren">(</span><span class="v">Z</span> <span class="n">&minus; 1</span><span class="paren">)</span>
+      <span class="n">&minus;</span> <span class="n">ln</span>&thinsp;<span class="paren">(</span><span class="v">Z</span> <span class="n">&minus;</span> <span class="v">B</span><span class="paren">)</span>
+      <span class="n">&minus;</span>
+      <span class="frac"><span class="fn"><span class="v">A</span></span><span class="fd">2<span style="font-style:normal">&radic;</span>2&thinsp;<span class="v">B</span></span></span>
+      <span class="n">ln</span>&thinsp;
+      <span class="frac"><span class="fn"><span class="v">Z</span> <span class="n">+</span> <span class="paren">(</span><span style="font-style:normal">&radic;</span>2 <span class="n">+ 1</span><span class="paren">)</span><span class="v">B</span></span><span class="fd"><span class="v">Z</span> <span class="n">&minus;</span> <span class="paren">(</span><span style="font-style:normal">&radic;</span>2 <span class="n">&minus; 1</span><span class="paren">)</span><span class="v">B</span></span></span>
+      <span class="n">.</span>
+    </div>
+    <div style="margin-top:8px">When the EOS has three roots, the correct solution is
+      the one that has the lowest fugacity.</div>
+  </div>
+
+  <div class="panel" id="pAbo">
+    This simulation was created in the
+    <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a>
+    at University of Colorado Boulder for
+    <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a>
+    by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a
+    <a href="https://demonstrations.wolfram.com/FugacityFromEquationOfStateForWater/" target="_blank" rel="noopener">Mathematica simulation</a>
+    by Rachael L. Baumann, John L. Falconer, and Nick Bongiardina. It was prepared with
+    financial support from the National Science Foundation (DUE 2336987 and 2336988) in
+    collaboration with Washington State University. Address any questions or comments to
+    LearnChemE@gmail.com.
+  </div>
+</div>
+
+<script>
+"use strict";
+/* ============================================================
+   Peng-Robinson EOS for water
+   ============================================================ */
+const Pc = 22.12, Tc = 647.3, R = 8.314, kappa = 0.873236;
+const a0coef = 0.4572355289 * R*R * Tc*Tc / Pc;
+const bcon   = 0.0777960739 * R * Tc / Pc;
+const SQ2 = Math.SQRT2;
+
+function aT(T){ const t = 1 + kappa*(1 - Math.sqrt(T/Tc)); return a0coef*t*t; }
+function Pv(T,V){ return R*T/(V-bcon) - aT(T)/(V*V + 2*bcon*V - bcon*bcon); }
+function dPdV(T,V){
+  return -R*T/Math.pow(V-bcon,2) + aT(T)*(2*V+2*bcon)/Math.pow(V*V+2*bcon*V-bcon*bcon,2);
+}
+function cbrt(x){ return Math.cbrt(x); }
+
+// positive Z-roots (>B) of the cubic for given P,T
+function Zroots(P,T){
+  const A = aT(T)*P/(R*R*T*T);
+  const B = bcon*P/(R*T);
+  const a2 = B-1, a1 = A-3*B*B-2*B, a0 = -A*B + B*B + B*B*B;
+  const p = (3*a1 - a2*a2)/3;
+  const q = (2*a2*a2*a2 - 9*a2*a1 + 27*a0)/27;
+  const r = q*q/4 + p*p*p/27;
+  let roots;
+  if(r > 0){
+    const s1 = -q/2 + Math.sqrt(r), s2 = -q/2 - Math.sqrt(r);
+    roots = [cbrt(s1) + cbrt(s2) - a2/3];
+  } else {
+    const m = 2*Math.sqrt(-p/3);
+    let c = 3*q/(p*m); c = Math.max(-1,Math.min(1,c));
+    const th = Math.acos(c)/3;
+    roots = [ m*Math.cos(th) - a2/3,
+              m*Math.cos(th+2*Math.PI/3) - a2/3,
+              m*Math.cos(th+4*Math.PI/3) - a2/3 ];
+  }
+  roots = roots.filter(z => z > B + 1e-12).sort((x,y)=>x-y);
+  return {A,B,roots};
+}
+function lnphi(Z,A,B){
+  return (Z-1) - Math.log(Z-B)
+       - A/(2*SQ2*B)*Math.log((Z+(SQ2+1)*B)/(Z-(SQ2-1)*B));
+}
+// fugacity at (P,T): min over valid roots
+function fugacity(P,T){
+  const {A,B,roots} = Zroots(P,T);
+  let best = Infinity;
+  for(const z of roots){
+    const f = P*Math.exp(lnphi(z,A,B));
+    if(isFinite(f) && f < best) best = f;
+  }
+  return best;
+}
+
+/* ----- spinodals & VLE ----- */
+function spinodals(T){
+  const out=[]; let g=[];
+  for(let i=0;i<800;i++) g.push(bcon + 0.01*Math.pow(1.03,i));
+  for(let i=0;i<g.length-1;i++){
+    if((dPdV(T,g[i])<0) !== (dPdV(T,g[i+1])<0)){
+      let lo=g[i],hi=g[i+1];
+      for(let k=0;k<80;k++){ const m=(lo+hi)/2;
+        if((dPdV(T,lo)<0)!==(dPdV(T,m)<0)) hi=m; else lo=m; }
+      out.push((lo+hi)/2);
+    }
+  }
+  return out;
+}
+// returns {P,vL,vV} or null
+function vle(T){
+  if(T>=Tc) return null;
+  const sp = spinodals(T);
+  if(sp.length<2) return null;
+  const P1=Pv(T,sp[0]), P2=Pv(T,sp[1]);
+  const Plow=Math.min(P1,P2), Phigh=Math.max(P1,P2);
+  let lo=Math.max(1e-6,Plow)+1e-6, hi=Phigh-1e-6;
+  if(hi<=lo) return null;
+  const g = P=>{ const {A,B,roots}=Zroots(P,T); if(roots.length<2) return null;
+                 return lnphi(roots[0],A,B)-lnphi(roots[roots.length-1],A,B); };
+  // robust sign-change scan across the bracket, skipping null samples
+  const Ns=400; let prevP=null, prevG=null, a=null, bb=null;
+  for(let i=0;i<=Ns;i++){
+    const P=lo+(hi-lo)*i/Ns; const gg=g(P);
+    if(gg===null){ prevP=null; prevG=null; continue; }
+    if(prevG!==null && (prevG<0)!==(gg<0)){ a=prevP; bb=P; break; }
+    prevP=P; prevG=gg;
+  }
+  if(a===null) return null;
+  let ga=g(a);
+  for(let k=0;k<200;k++){
+    const m=(a+bb)/2, gm=g(m);
+    if(gm===null) break;
+    if((ga<0)===(gm<0)){ a=m; ga=gm; } else bb=m;
+  }
+  const P=(a+bb)/2; const {roots}=Zroots(P,T);
+  if(roots.length<2) return null;
+  return {P, vL:roots[0]*R*T/P, vV:roots[roots.length-1]*R*T/P};
+}
+
+/* ----- saturation dome (built once) ----- */
+const dome = (function(){
+  const L=[],G=[],TP=[];     // L:{V,P}  G:{V,P}  TP:{P,T}
+  for(let T=398;T<=646.8;T+=1){
+    const r=vle(T);
+    if(r && r.P>=0.16){ L.push({V:r.vL,P:r.P}); G.push({V:r.vV,P:r.P}); TP.push({P:r.P,T}); }
+  }
+  for(const T of [646.9,647.0,647.1,647.2,647.29]){
+    const r=vle(T);
+    if(r){ L.push({V:r.vL,P:r.P}); G.push({V:r.vV,P:r.P}); TP.push({P:r.P,T}); }
+  }
+  const Vc = 0.307*R*Tc/Pc;
+  return {L,G,TP,Vc};
+})();
+
+// saturation temperature at pressure P (invert TP table, P ascending)
+function Tsat(P){
+  const TP=dome.TP;
+  if(P<=TP[0].P) return TP[0].T;
+  if(P>=TP[TP.length-1].P) return Tc;
+  for(let i=0;i<TP.length-1;i++){
+    if(P>=TP[i].P && P<=TP[i+1].P){
+      const f=(P-TP[i].P)/(TP[i+1].P-TP[i].P);
+      return TP[i].T + f*(TP[i+1].T-TP[i].T);
+    }
+  }
+  return Tc;
+}
+// saturation pressure on liquid branch at volume V (V ascending in L)
+function PVL(V){
+  const L=dome.L;
+  if(V<L[0].V || V>L[L.length-1].V) return null;
+  for(let i=0;i<L.length-1;i++){
+    if(V>=L[i].V && V<=L[i+1].V){
+      const f=(V-L[i].V)/(L[i+1].V-L[i].V);
+      return L[i].P + f*(L[i+1].P-L[i].P);
+    }
+  }
+  return null;
+}
+// saturation pressure on vapor branch (G: V descending as P ascends)
+function PVG(V){
+  const G=dome.G;            // index 0 = largest V (lowest P)
+  const Vmax=G[0].V, Vmin=G[G.length-1].V;
+  if(V<Vmin || V>Vmax) return null;
+  for(let i=0;i<G.length-1;i++){
+    const Va=G[i].V, Vb=G[i+1].V;       // Va>Vb
+    if(V<=Va && V>=Vb){
+      const f=(V-Va)/(Vb-Va);
+      return G[i].P + f*(G[i+1].P-G[i].P);
+    }
+  }
+  return null;
+}
+// is (V,P) inside the two-phase dome?
+function insideDome(V,P){
+  if(V<=dome.Vc){ const pl=PVL(V); return pl!==null && P<=pl; }
+  else          { const pg=PVG(V); return pg!==null && P<=pg; }
+}
+// solve Pv(T,Vfix)=Ptar for T  (Pv increases with T at fixed V)
+function solveT(Vfix,Ptar){
+  let lo=150, hi=6000;
+  if(Pv(hi,Vfix)<Ptar) return hi;
+  if(Pv(lo,Vfix)>Ptar) return lo;
+  for(let k=0;k<200;k++){
+    const m=(lo+hi)/2;
+    if(Pv(m,Vfix)<Ptar) lo=m; else hi=m;
+  }
+  return (lo+hi)/2;
+}
+
+/* ============================================================
+   Plot rendering
+   ============================================================ */
+const Vmin=7, Vmax=100000, Pmin=0.17, Pmax=200;
+const cv = document.getElementById('plot');
+const ctx = cv.getContext('2d');
+const CSSW=600, CSSH=470;
+const M = {l:84, r:14, t:16, b:64};   // plot margins (enlarged for bigger axis fonts)
+let PW, PH, PL, PT;                    // plot area in CSS px
+
+function setupCanvas(){
+  const dpr = window.devicePixelRatio || 1;
+  cv.style.width = CSSW+"px"; cv.style.height = CSSH+"px";
+  cv.width = CSSW*dpr; cv.height = CSSH*dpr;
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  PL=M.l; PT=M.t; PW=CSSW-M.l-M.r; PH=CSSH-M.t-M.b;
+}
+const lg=Math.log10;
+function xPix(V){ return PL + (lg(V)-lg(Vmin))/(lg(Vmax)-lg(Vmin))*PW; }
+function yPix(P){ return PT + (1-(lg(P)-lg(Pmin))/(lg(Pmax)-lg(Pmin)))*PH; }
+function clampP(P){ return Math.max(Pmin, Math.min(Pmax,P)); }
+
+function drawFrame(){
+  ctx.clearRect(0,0,CSSW,CSSH);
+  // frame
+  ctx.lineWidth=1; ctx.strokeStyle="#000";
+  ctx.strokeRect(PL+0.5,PT+0.5,PW,PH);
+  ctx.font='19.5px '+getComputedStyle(document.body).fontFamily;
+  ctx.fillStyle="#000";
+  // ---- x ticks (log) ----
+  const xMajor=[10,100,1000,10000,100000];
+  const xLabel={10:"10",100:"100",1000:"1000",10000:"10\u2074",100000:"10\u2075"};
+  ctx.textAlign="center"; ctx.textBaseline="top";
+  for(let d=1;d<=5;d++){
+    for(let m=1;m<10;m++){
+      const V=m*Math.pow(10,d); if(V<Vmin||V>Vmax) continue;
+      const x=xPix(V); const major=(m===1);
+      ctx.beginPath(); ctx.moveTo(x,PT+PH); ctx.lineTo(x,PT+PH-(major?8:4));
+      ctx.moveTo(x,PT); ctx.lineTo(x,PT+(major?8:4)); ctx.stroke();
+    }
+  }
+  for(const V of xMajor){ if(V<Vmin||V>Vmax) continue;
+    ctx.fillText(xLabel[V], xPix(V), PT+PH+9); }
+  // ---- y ticks (log) ----
+  ctx.textAlign="right"; ctx.textBaseline="middle";
+  for(let d=-1;d<=2;d++){
+    for(let m=1;m<10;m++){
+      const P=m*Math.pow(10,d); if(P<Pmin||P>Pmax) continue;
+      const y=yPix(P); const major=(m===1);
+      ctx.beginPath(); ctx.moveTo(PL,y); ctx.lineTo(PL+(major?8:4),y);
+      ctx.moveTo(PL+PW,y); ctx.lineTo(PL+PW-(major?8:4),y); ctx.stroke();
+    }
+  }
+  for(const P of [1,10,100]){ ctx.fillText(String(P), PL-9, yPix(P)); }
+  ctx.fillText("0.2", PL-9, yPix(0.2));
+  // ---- axis labels ----
+  ctx.save();
+  ctx.textAlign="center"; ctx.textBaseline="alphabetic";
+  ctx.font='22.5px '+getComputedStyle(document.body).fontFamily;
+  // x label with superscript cm^3
+  drawVolLabel(PL+PW/2, CSSH-10);
+  // y label rotated
+  ctx.translate(24, PT+PH/2); ctx.rotate(-Math.PI/2);
+  ctx.fillText("pressure (MPa)",0,0);
+  ctx.restore();
+}
+function drawVolLabel(cx,cy){
+  ctx.font='22.5px '+getComputedStyle(document.body).fontFamily;
+  const main1="volume (cm", sup="3", main2="/mol)";
+  const w1=ctx.measureText(main1).width;
+  ctx.font='15px '+getComputedStyle(document.body).fontFamily;
+  const ws=ctx.measureText(sup).width;
+  ctx.font='22.5px '+getComputedStyle(document.body).fontFamily;
+  const w2=ctx.measureText(main2).width;
+  const total=w1+ws+w2; let x=cx-total/2;
+  ctx.textAlign="left";
+  ctx.fillText(main1,x,cy); x+=w1;
+  ctx.font='15px '+getComputedStyle(document.body).fontFamily;
+  ctx.fillText(sup,x,cy-9); x+=ws;
+  ctx.font='22.5px '+getComputedStyle(document.body).fontFamily;
+  ctx.fillText(main2,x,cy);
+  ctx.textAlign="center";
+}
+
+function drawDome(){
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(PL,PT,PW,PH); ctx.clip();
+  ctx.lineWidth=2; ctx.strokeStyle="#000";
+  ctx.beginPath();
+  let started=false;
+  const pts = dome.L.concat([{V:dome.Vc,P:Pc}], dome.G.slice().reverse());
+  for(const pt of pts){
+    const x=xPix(pt.V), y=yPix(pt.P);
+    if(!started){ ctx.moveTo(x,y); started=true; } else ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+  ctx.restore();
+}
+
+const labelFont='18px '+`"Helvetica Neue",Helvetica,Arial,sans-serif`;
+// positions: liquid(14,4) vapor(20000,4) two phases(800,0.25) supercritical moved right(200,70)
+const plotLabels=[
+  {t:"liquid",       V:14,   P:4},
+  {t:"vapor",        V:20000,P:4},
+  {t:"two phases",   V:800,  P:0.25},
+  {t:"supercritical",V:200,  P:70}
+];
+function drawLabels(){
+  ctx.save(); ctx.beginPath(); ctx.rect(PL,PT,PW,PH); ctx.clip();
+  ctx.font=labelFont; ctx.textAlign="center"; ctx.textBaseline="middle";
+  for(const L of plotLabels){
+    const x=xPix(L.V), y=yPix(L.P);
+    const w=ctx.measureText(L.t).width, h=18;
+    ctx.fillStyle="rgba(255,255,255,0.85)";
+    ctx.fillRect(x-w/2-2,y-h/2-1,w+4,h+2);
+    ctx.fillStyle="rgba(102,102,102,1)";   // GrayLevel 0.4
+    ctx.fillText(L.t,x,y+1);
+  }
+  ctx.restore();
+}
+
+/* ---------- FUGACITY mode ---------- */
+function fmtP(P){ return P.toFixed(2); }
+function fmtF(f){ return f<0.1 ? f.toFixed(3) : f.toFixed(2); }
+function fmtPhi(phi){
+  if(phi<0.99){            // 2 significant figures
+    if(phi===0) return "0";
+    const d=Math.ceil(-Math.log10(Math.abs(phi)))+1;
+    return phi.toFixed(Math.max(2,d));
+  }
+  return phi.toFixed(2);   // {3,2} -> 2 decimals
+}
+function fmtT(T){ return String(Math.round(T)); }  // no trailing decimal
+
+function drawFugacity(P,V){
+  const inside = insideDome(V,P);
+  const T = inside ? Tsat(P) : solveT(V,P);
+  const f = fugacity(P,T);
+  const phi = f/P;
+
+  ctx.save(); ctx.beginPath(); ctx.rect(PL,PT,PW,PH); ctx.clip();
+  const dotx=xPix(V), doty=yPix(P);
+  // dashed vertical guide to bottom
+  ctx.strokeStyle="rgba(102,102,102,1)"; ctx.lineWidth=1;
+  ctx.setLineDash([4,4]);
+  ctx.beginPath(); ctx.moveTo(dotx,doty); ctx.lineTo(dotx,yPix(0.17)); ctx.stroke();
+  ctx.setLineDash([]);
+  // short gray connector from dot toward box anchor (2V,2P)
+  const ax=xPix(2*V), ay=yPix(2*P);
+  ctx.beginPath(); ctx.moveTo(dotx,doty); ctx.lineTo(ax,ay); ctx.stroke();
+  ctx.restore();
+
+  // ----- info box (drawn ON TOP so any overlapping label sits behind it) -----
+  const rows=[
+    {l:"P", r:"= "+fmtP(P)+" MPa", it:true},
+    {l:"f", r:"= "+fmtF(f)+" MPa", it:true},
+    {l:"\u03D5", r:"= "+fmtPhi(phi), it:false},
+    {l:"T", r:"= "+fmtT(T)+" K", it:true}
+  ];
+  const fs=19.5;                        // 50% bigger than prior 13px
+  const uiFont=getComputedStyle(document.body).fontFamily;
+  const italic='italic '+fs+'px '+uiFont;
+  const roman=fs+'px '+uiFont;
+  ctx.textBaseline="alphabetic";
+  let maxL=0,maxR=0;
+  for(const rw of rows){
+    ctx.font = rw.it? italic: roman; maxL=Math.max(maxL,ctx.measureText(rw.l).width);
+    ctx.font = roman; maxR=Math.max(maxR,ctx.measureText(rw.r).width);
+  }
+  const padX=9, padY=7, gap=5, lh=fs+5;
+  const boxW=padX*2+maxL+gap+maxR;
+  const boxH=padY*2+lh*rows.length;
+  let bx=ax, by=ay-boxH/2;              // anchor: left-middle at (2V,2P)
+  // keep inside plot
+  if(bx+boxW>PL+PW-2) bx=PL+PW-2-boxW;
+  if(bx<PL+2) bx=PL+2;
+  if(by<PT+2) by=PT+2;
+  if(by+boxH>PT+PH-2) by=PT+PH-2-boxH;
+
+  ctx.save();
+  ctx.fillStyle="rgb(173,216,230)";     // LightBlue
+  ctx.strokeStyle="#000"; ctx.lineWidth=1;
+  ctx.fillRect(bx,by,boxW,boxH);
+  ctx.strokeRect(bx+0.5,by+0.5,boxW,boxH);
+  ctx.fillStyle="#000";
+  for(let i=0;i<rows.length;i++){
+    const rw=rows[i];
+    const baseY=by+padY+lh*(i)+fs;
+    ctx.textAlign="right"; ctx.font = rw.it? italic: roman;
+    ctx.fillText(rw.l, bx+padX+maxL, baseY);
+    ctx.textAlign="left"; ctx.font = roman;
+    ctx.fillText(rw.r, bx+padX+maxL+gap, baseY);
+  }
+  ctx.restore();
+
+  // black dot
+  ctx.save(); ctx.beginPath(); ctx.rect(PL,PT,PW,PH); ctx.clip();
+  ctx.fillStyle="#000"; ctx.beginPath();
+  ctx.arc(dotx,doty,5,0,2*Math.PI); ctx.fill();
+  ctx.restore();
+}
+
+/* ---------- ISOTHERM mode ---------- */
+function drawIsotherm(T){
+  ctx.save(); ctx.beginPath(); ctx.rect(PL,PT,PW,PH); ctx.clip();
+
+  if(T>=Tc){
+    // single supercritical isotherm
+    ctx.strokeStyle="#1f4fd6"; ctx.lineWidth=2.5; ctx.beginPath();
+    let started=false;
+    for(let i=0;i<=400;i++){
+      const V=Vmin*Math.pow(Vmax/Vmin,i/400);
+      const P=Pv(T,V); if(P<=0) {started=false; continue;}
+      const x=xPix(V), y=yPix(clampP(P));
+      if(P<Pmin||P>Pmax){ /* keep drawing along clamp edge */ }
+      if(!started){ctx.moveTo(x,y);started=true;} else ctx.lineTo(x,y);
+    }
+    ctx.stroke(); ctx.restore(); return;
+  }
+
+  const sat=vle(T);
+  if(!sat){
+    // very near critical: spinodals merged, no distinct VLE — draw plain monotonic isotherm
+    ctx.strokeStyle="#1f4fd6"; ctx.lineWidth=2.5; ctx.beginPath();
+    let started=false;
+    for(let i=0;i<=400;i++){
+      const V=Vmin*Math.pow(Vmax/Vmin,i/400);
+      const P=Pv(T,V); if(P<=0){started=false; continue;}
+      const x=xPix(V), y=yPix(clampP(P));
+      if(!started){ctx.moveTo(x,y);started=true;} else ctx.lineTo(x,y);
+    }
+    ctx.stroke(); ctx.restore(); return;
+  }
+  const {P:Ps, vL, vV}=sat;
+  const yPs=yPix(clampP(Ps));
+
+  // ---- yellow equal-area fill between the loop and the horizontal tie line ----
+  // Clamp the loop to the plot range so the lower lobe (where the loop dips below
+  // the bottom of a log axis) still fills down to the bottom edge.
+  ctx.fillStyle="rgba(255,255,102,1)";   // RGBColor[1,1,0.4]
+  const N=300;
+  for(let i=0;i<N;i++){
+    const Va=vL*Math.pow(vV/vL,i/N), Vb=vL*Math.pow(vV/vL,(i+1)/N);
+    const Pa=clampP(Pv(T,Va)), Pb=clampP(Pv(T,Vb));
+    const xa=xPix(Va), xb=xPix(Vb);
+    ctx.beginPath();
+    ctx.moveTo(xa,yPix(Pa)); ctx.lineTo(xb,yPix(Pb));
+    ctx.lineTo(xb,yPs); ctx.lineTo(xa,yPs); ctx.closePath(); ctx.fill();
+  }
+
+  // ---- dashed loop (metastable / unstable), clamped to the plot bottom ----
+  ctx.strokeStyle="#1f4fd6"; ctx.lineWidth=2; ctx.setLineDash([6,5]);
+  ctx.beginPath();
+  for(let i=0;i<=N;i++){
+    const V=vL*Math.pow(vV/vL,i/N); const P=Pv(T,V);
+    const x=xPix(V), y=yPix(clampP(P));
+    if(i===0){ctx.moveTo(x,y);} else ctx.lineTo(x,y);
+  }
+  ctx.stroke(); ctx.setLineDash([]);
+
+  // ---- solid isotherm: liquid branch, tie line, vapor branch ----
+  ctx.strokeStyle="#1f4fd6"; ctx.lineWidth=2.5;
+  // liquid branch V in [Vmin, vL]
+  ctx.beginPath(); let st=false;
+  for(let i=0;i<=200;i++){
+    const V=Vmin*Math.pow(vL/Vmin,i/200); const P=Pv(T,V);
+    if(P<=Pmin||P>Pmax){ if(P>Pmax){const x=xPix(V),y=yPix(Pmax); if(!st){ctx.moveTo(x,y);st=true;}else ctx.lineTo(x,y);} continue;}
+    const x=xPix(V), y=yPix(P);
+    if(!st){ctx.moveTo(x,y);st=true;} else ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+  // horizontal tie line
+  ctx.beginPath(); ctx.moveTo(xPix(vL),yPs); ctx.lineTo(xPix(vV),yPs); ctx.stroke();
+  // vapor branch V in [vV, Vmax]
+  ctx.beginPath(); st=false;
+  for(let i=0;i<=200;i++){
+    const V=vV*Math.pow(Vmax/vV,i/200); const P=Pv(T,V);
+    if(P<=Pmin) {st=false; continue;}
+    const x=xPix(V), y=yPix(clampP(P));
+    if(!st){ctx.moveTo(x,y);st=true;} else ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+  ctx.restore();
+}
+
+/* ============================================================
+   State + interaction
+   ============================================================ */
+let cs=1, setP=10, setV=100, setT=583;
+function render(){
+  drawFrame();
+  drawDome();
+  if(cs===1){ drawLabels(); drawFugacity(setP,setV); }
+  else      { drawIsotherm(setT); drawLabels(); }
+}
+
+// sliders
+const sP=document.getElementById('sP'), vPel=document.getElementById('vP');
+const sV=document.getElementById('sV'), vVel=document.getElementById('vV');
+const sT=document.getElementById('sT'), vTel=document.getElementById('vT');
+sP.addEventListener('input',()=>{setP=+sP.value; vPel.textContent=sP.value; render();});
+sV.addEventListener('input',()=>{setV=+sV.value; vVel.textContent=sV.value; render();});
+sT.addEventListener('input',()=>{setT=+sT.value; vTel.textContent=sT.value; render();});
+
+// setter buttons
+const btnFug=document.getElementById('btnFug'), btnIso=document.getElementById('btnIso');
+const fugCtrls=document.getElementById('fugCtrls'), isoCtrls=document.getElementById('isoCtrls');
+function setMode(mode){
+  cs=mode;
+  btnFug.classList.toggle('active',mode===1);
+  btnIso.classList.toggle('active',mode===2);
+  fugCtrls.classList.toggle('hidden',mode!==1);
+  isoCtrls.classList.toggle('hidden',mode!==2);
+  render();
+}
+btnFug.addEventListener('click',()=>setMode(1));
+btnIso.addEventListener('click',()=>setMode(2));
+
+// action panels
+document.querySelectorAll('.abtn').forEach(b=>{
+  b.addEventListener('click',()=>{
+    const id=b.dataset.panel; const panel=document.getElementById(id);
+    const open=panel.classList.contains('show');
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('show'));
+    document.querySelectorAll('.abtn').forEach(x=>x.classList.remove('active'));
+    if(!open){ panel.classList.add('show'); b.classList.add('active'); }
+  });
+});
+
+setupCanvas();
+render();
+window.addEventListener('resize',()=>{ setupCanvas(); render(); });
+</script>
+</body>
+</html>
