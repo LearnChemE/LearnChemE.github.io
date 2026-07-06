@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Membrane Reactor for an Equilibrium-Limited Reaction</title>
+<style>
+  :root{
+    --ui: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --math: "Times New Roman", Times, serif;
+    --line:#c8c8c8;
+  }
+  html,body{margin:0;padding:0;background:#ffffff;color:#000;}
+  body{font-family:var(--ui);font-size:14px;-webkit-font-smoothing:antialiased;}
+  .demo{ width:600px;max-width:100%;margin:14px auto;padding:0 6px 14px;box-sizing:border-box; }
+  .title{ font-family:var(--ui);font-size:21px;font-weight:bold;color:#000;padding:2px 0 10px; }
+  /* ---- control band ---- */
+  .controls{ border:1px solid var(--line);background:#fbfbfb;padding:10px 14px 12px;border-radius:2px; }
+  .sliders{ display:grid;grid-template-columns:1fr 1fr;gap:4px 26px; }
+  .cell .clabel{ font-family:var(--ui);font-size:14px;color:#000;margin:2px 0 1px; }
+  .crow{ display:flex;align-items:center; }
+  .crow input[type=range]{ flex:1 1 auto;height:18px;cursor:pointer;accent-color:#5a8bd6;min-width:60px; }
+  .crow .val{
+    flex:0 0 auto;width:46px;margin-left:9px;
+    font-family:var(--ui);font-size:13px;text-align:center;
+    background:#fff;border:1px solid #b6b6b6;border-radius:3px;padding:2px 0;color:#222;
+  }
+  /* ---- plot ---- */
+  .plotWrap{margin-top:12px;display:flex;justify-content:center;}
+  canvas{display:block;}
+  /* ---- action buttons ---- */
+  .actions{margin-top:14px;display:flex;gap:8px;}
+  .abtn{
+    font-family:var(--ui);font-size:13px;font-weight:bold;color:#7a0a0a;
+    background:linear-gradient(#ffffff,#efefef);border:1px solid #b9b9b9;border-radius:3px;
+    padding:5px 14px;cursor:pointer;
+  }
+  .abtn.active{background:linear-gradient(#f1d9d9,#e7c4c4);border-color:#a06b6b;}
+  .panel{
+    display:none;margin-top:10px;border:1px solid var(--line);background:#fff;
+    padding:14px 16px;border-radius:2px;line-height:1.5;font-size:14px;color:#111;
+  }
+  .panel.show{display:block;}
+  .panel a{color:#1463b8;text-decoration:none;}
+  .panel a:hover{text-decoration:underline;}
+  /* math */
+  .eq{font-family:var(--math);font-size:17px;margin:8px 0;}
+  .eq .v{font-style:italic;}
+  .eq .n{font-style:normal;}
+  .frac{display:inline-flex;flex-direction:column;text-align:center;vertical-align:middle;margin:0 .15em;}
+  .frac .fn{border-bottom:1px solid #000;padding:0 .4em 1px;}
+  .frac .fd{padding:1px .4em 0;}
+  sub,sup{font-style:normal;}
+  .imath{font-family:var(--math);font-style:italic;}
+  .imath .n{font-style:normal;}
+</style>
+</head>
+<body>
+<div class="demo">
+  <div class="title">Membrane Reactor for an Equilibrium-Limited Reaction</div>
+
+  <div class="controls">
+    <div class="sliders">
+      <div class="cell">
+        <div class="clabel">rate constant (m&sup3;/[mol s])</div>
+        <div class="crow">
+          <input type="range" id="sK" min="0.1" max="5" step="0.1" value="1.5">
+          <div class="val" id="vK">1.5</div>
+        </div>
+      </div>
+      <div class="cell">
+        <div class="clabel">reactor diameter (m)</div>
+        <div class="crow">
+          <input type="range" id="sD" min="0.1" max="5" step="0.1" value="1">
+          <div class="val" id="vD">1.0</div>
+        </div>
+      </div>
+      <div class="cell">
+        <div class="clabel">membrane permeance (mol/[m&sup2; s])</div>
+        <div class="crow">
+          <input type="range" id="sKm" min="0" max="5" step="0.1" value="2.5">
+          <div class="val" id="vKm">2.5</div>
+        </div>
+      </div>
+      <div class="cell">
+        <div class="clabel">equilibrium constant</div>
+        <div class="crow">
+          <input type="range" id="sKeq" min="0.1" max="5" step="0.1" value="2.4">
+          <div class="val" id="vKeq">2.4</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="plotWrap">
+    <canvas id="plot" width="550" height="375"></canvas>
+  </div>
+
+  <div class="actions">
+    <div class="abtn" data-panel="pDir">Directions</div>
+    <div class="abtn" data-panel="pDet">Details</div>
+    <div class="abtn" data-panel="pAbo">About</div>
+  </div>
+
+  <div class="panel" id="pDir">
+    The elementary reversible reaction <span class="imath">A</span>&thinsp;+&thinsp;<span class="imath">B</span>
+    &#10231; <span class="imath">C</span>&thinsp;+&thinsp;<span class="imath">D</span> is carried out in a
+    tubular membrane reactor, which combines reaction with separation. Higher conversions are obtained
+    for this equilibrium-limited reaction by selectively removing product <span class="imath">D</span>
+    through the membrane, which is assumed to only permeate product <span class="imath">D</span>. The
+    permeate pressure of <span class="imath">D</span> (the pressure outside the tube) is assumed to be
+    zero. The molar flow rates of reactants and products are divided by the cross-sectional area of the
+    reactor tube in the plot to make the comparison easier when the reactor diameter changes. All values
+    are dimensionless. Use sliders to change the forward reaction rate constant, equilibrium constant,
+    and membrane permeance. When the membrane permeance is low, the reaction is equilibrium limited for
+    large enough rate constants. Increasing the permeance shifts the equilibrium to the right to obtain
+    higher conversions. Increasing the reactor diameter decreases the conversion because the permeation
+    area per reactor volume decreases.
+  </div>
+
+  <div class="panel" id="pDet">
+    <div>Material balances:</div>
+
+    <div class="eq">
+      <span class="frac"><span class="fn"><span class="n">d</span><span class="v">F</span><sub>A</sub></span><span class="fd"><span class="n">d</span><span class="v">z</span></span></span>
+      <span class="n">=</span>
+      <span class="frac"><span class="fn"><span class="n">d</span><span class="v">F</span><sub>B</sub></span><span class="fd"><span class="n">d</span><span class="v">z</span></span></span>
+      <span class="n">=</span> <span class="n">&minus;</span><span class="v">r</span>&thinsp;<span class="v">A</span><sub>x</sub> ,
+    </div>
+
+    <div class="eq">
+      <span class="frac"><span class="fn"><span class="n">d</span><span class="v">F</span><sub>C</sub></span><span class="fd"><span class="n">d</span><span class="v">z</span></span></span>
+      <span class="n">=</span> <span class="v">r</span>&thinsp;<span class="v">A</span><sub>x</sub> ,
+    </div>
+
+    <div class="eq">
+      <span class="frac"><span class="fn"><span class="n">d</span><span class="v">F</span><sub>D</sub></span><span class="fd"><span class="n">d</span><span class="v">z</span></span></span>
+      <span class="n">=</span> <span class="v">r</span>&thinsp;<span class="v">A</span><sub>x</sub>
+      <span class="n">&minus;</span> <span class="v">r</span><sub>perm</sub>&thinsp;<span class="n">&pi;</span>&thinsp;<span class="v">&delta;</span> ,
+    </div>
+
+    <div class="eq">
+      <span class="v">r</span> <span class="n">=</span> <span class="v">k</span>&thinsp;<span class="n">(</span><span class="v">C</span><sub>A</sub>&thinsp;<span class="v">C</span><sub>B</sub>
+      <span class="n">&minus;</span>
+      <span class="frac"><span class="fn"><span class="v">C</span><sub>C</sub>&thinsp;<span class="v">C</span><sub>D</sub></span><span class="fd"><span class="v">K</span><sub>eq</sub></span></span><span class="n">)</span> ,
+    </div>
+
+    <div class="eq">
+      <span class="v">r</span><sub>perm</sub> <span class="n">=</span> <span class="v">k</span><sub>m</sub>&thinsp;<span class="n">(</span><span class="v">C</span><sub>D</sub>
+      <span class="n">&minus;</span> <span class="v">C</span><sub>D,perm</sub><span class="n">)</span> ,
+    </div>
+
+    <div class="eq">
+      <span class="v">F</span><sub>T,0</sub> <span class="n">=</span> <span class="v">F</span><sub>A,0</sub>
+      <span class="n">+</span> <span class="v">F</span><sub>B,0</sub> ,
+    </div>
+
+    <div class="eq">
+      <span class="v">v</span> <span class="n">=</span> <span class="v">v</span><sub>0</sub>&thinsp;
+      <span class="frac"><span class="fn"><span class="v">F</span><sub>T</sub></span><span class="fd"><span class="v">F</span><sub>T,0</sub></span></span> ,
+    </div>
+
+    <div class="eq">
+      <span class="v">C</span><sub>i</sub> <span class="n">=</span> <span class="v">F</span><sub>i</sub><span class="n">/</span><span class="v">v</span> ,
+    </div>
+
+    <div class="eq">
+      <span class="v">A</span><sub>x</sub> <span class="n">=</span>
+      <span class="frac"><span class="fn"><span class="n">&pi;</span></span><span class="fd">4</span></span>
+      <span class="v">&delta;</span><sup>2</sup> ,
+    </div>
+
+    <div>where <span class="imath">F</span><sub>i</sub> is the molar flow rate of component
+      <span class="imath">i</span>&thinsp;=&thinsp;<span class="imath">A</span>, <span class="imath">B</span>,
+      <span class="imath">C</span>, <span class="imath">D</span> (mol/min),
+      <span class="imath">F</span><sub>T</sub>&thinsp;=&thinsp;&sum;<span class="imath">F</span><sub>i</sub>
+      is the total molar flow rate (mol/min), <span class="imath">F</span><sub>T,0</sub> is the initial
+      total molar flow rate (mol/min), <span class="imath">F</span><sub>A,0</sub> and
+      <span class="imath">F</span><sub>B,0</sub> are the initial molar flow rates of reactants
+      <span class="imath">A</span> and <span class="imath">B</span> (mol/min), <span class="imath">A</span><sub>x</sub>
+      is the reactor cross-sectional area (m<sup>2</sup>), <span class="imath">&delta;</span> is the reactor
+      diameter (m), <span class="imath">v</span> and <span class="imath">v</span><sub>0</sub> are the volumetric
+      flow rates down the reactor and initially (m<sup>3</sup>/min), <span class="imath">r</span> is rate of
+      reaction (mol/[m<sup>3</sup> s]), <span class="imath">r</span><sub>perm</sub> is the rate
+      <span class="imath">D</span> permeating (mol/min), <span class="imath">k</span> is the reaction rate
+      constant (m<sup>3</sup>/[mol s]), <span class="imath">K</span><sub>eq</sub> is the equilibrium constant
+      (unitless), and <span class="imath">k</span><sub>m</sub> is the membrane permeance, based on
+      concentration difference (mol/[m<sup>2</sup> s]).</div>
+  </div>
+
+  <div class="panel" id="pAbo">
+    This simulation was created in the
+    <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a>
+    at University of Colorado Boulder for
+    <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a>
+    by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a Mathematica
+    simulation by Rachael L. Baumann. It was prepared with financial support from the National Science
+    Foundation (DUE 2336987 and 2336988) in collaboration with Washington State University. Address any
+    questions or comments to LearnChemE@gmail.com.
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   Model parameters + ODE solution
+   ============================================================ */
+let kRate=1.5, dDia=1.0, kmPerm=2.5, Keq=2.4;
+const ZMAX=5;
+
+function solve(){
+  const Ax=Math.PI*dDia*dDia/4;
+  const FAo=10*Ax, FBo=7*Ax, vo=5*Ax, FTo=FAo+FBo, cDperm=0;
+  function deriv(F){
+    const FA=F[0],FB=F[1],FC=F[2],FD=F[3];
+    const FT=FA+FB+FC+FD;
+    const v=vo*(FT/FTo);
+    const cA=FA/v, cB=FB/v, cC=FC/v, cD=FD/v;
+    const r=kRate*(cA*cB - cC*cD/Keq);
+    const rperm=kmPerm*(cD-cDperm);
+    return [-r*Ax, -r*Ax, r*Ax, r*Ax - rperm*Math.PI*dDia];
+  }
+  const N=600, h=ZMAX/N;
+  let F=[FAo,FBo,0,0];
+  const zs=[0], YA=[FAo/Ax], YB=[FBo/Ax], YC=[0], YD=[0];
+  for(let i=0;i<N;i++){
+    const k1=deriv(F);
+    const k2=deriv(F.map((x,j)=>x+h/2*k1[j]));
+    const k3=deriv(F.map((x,j)=>x+h/2*k2[j]));
+    const k4=deriv(F.map((x,j)=>x+h*k3[j]));
+    F=F.map((x,j)=>x+h/6*(k1[j]+2*k2[j]+2*k3[j]+k4[j]));
+    const z=(i+1)*h;
+    zs.push(z); YA.push(F[0]/Ax); YB.push(F[1]/Ax); YC.push(F[2]/Ax); YD.push(F[3]/Ax);
+  }
+  return {zs,YA,YB,YC,YD,Ax};
+}
+// linear interpolation of a series at z
+function interp(zs,ys,z){
+  if(z<=zs[0]) return ys[0];
+  if(z>=zs[zs.length-1]) return ys[ys.length-1];
+  let lo=0,hi=zs.length-1;
+  while(hi-lo>1){const m=(lo+hi)>>1; if(zs[m]<=z) lo=m; else hi=m;}
+  const t=(z-zs[lo])/(zs[hi]-zs[lo]);
+  return ys[lo]+t*(ys[hi]-ys[lo]);
+}
+
+/* ============================================================
+   Canvas / plot
+   ============================================================ */
+const cv=document.getElementById('plot');
+const ctx=cv.getContext('2d');
+const CSSW=550, CSSH=375;
+const M={l:62, r:16, t:40, b:50};
+let PL,PT,PW,PH;
+const XMIN=0, XMAX=5, YMIN=-0.35, YMAX=10.35;   // PlotRange All + Scaled[0.035] y-pad
+
+function setupCanvas(){
+  const dpr=window.devicePixelRatio||1;
+  cv.style.width=CSSW+"px"; cv.style.height=CSSH+"px";
+  cv.width=CSSW*dpr; cv.height=CSSH*dpr;
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  PL=M.l; PT=M.t; PW=CSSW-M.l-M.r; PH=CSSH-M.t-M.b;
+}
+function xPix(x){ return PL + (x-XMIN)/(XMAX-XMIN)*PW; }
+function yPix(y){ return PT + (1-(y-YMIN)/(YMAX-YMIN))*PH; }
+
+const COL={A:"rgb(0,153,0)", B:"rgb(0,0,255)", C:"rgb(128,0,128)", D:"rgb(0,0,0)"};
+
+function drawFrame(){
+  ctx.clearRect(0,0,CSSW,CSSH);
+  ctx.strokeStyle="#000"; ctx.lineWidth=1;
+  ctx.strokeRect(PL+0.5,PT+0.5,PW,PH);
+  ctx.fillStyle="#000";
+  ctx.font='15px '+getComputedStyle(document.body).fontFamily;
+  // x ticks 0..5
+  ctx.textAlign="center"; ctx.textBaseline="top";
+  for(let x=0;x<=5;x++){
+    const px=xPix(x);
+    ctx.beginPath(); ctx.moveTo(px,PT+PH); ctx.lineTo(px,PT+PH-7); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(px,PT); ctx.lineTo(px,PT+7); ctx.stroke();
+    ctx.fillText(String(x), px, PT+PH+7);
+  }
+  // y ticks 0,2,4,6,8,10
+  ctx.textAlign="right"; ctx.textBaseline="middle";
+  for(let y=0;y<=10;y+=2){
+    const py=yPix(y);
+    ctx.beginPath(); ctx.moveTo(PL,py); ctx.lineTo(PL+7,py); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(PL+PW,py); ctx.lineTo(PL+PW-7,py); ctx.stroke();
+    ctx.fillText(String(y), PL-7, py);
+  }
+  // minor x ticks
+  for(let x=0.5;x<5;x+=0.5){ if(Math.abs(x-Math.round(x))<1e-9) continue;
+    const px=xPix(x);
+    ctx.beginPath(); ctx.moveTo(px,PT+PH); ctx.lineTo(px,PT+PH-4); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(px,PT); ctx.lineTo(px,PT+4); ctx.stroke();
+  }
+  for(let y=1;y<10;y+=2){
+    const py=yPix(y);
+    ctx.beginPath(); ctx.moveTo(PL,py); ctx.lineTo(PL+4,py); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(PL+PW,py); ctx.lineTo(PL+PW-4,py); ctx.stroke();
+  }
+  // frame labels
+  ctx.font='16px '+getComputedStyle(document.body).fontFamily;
+  ctx.textAlign="center"; ctx.textBaseline="alphabetic";
+  ctx.fillText("distance down the reactor (m)", PL+PW/2, CSSH-12);
+  ctx.save();
+  ctx.translate(15, PT+PH/2); ctx.rotate(-Math.PI/2);
+  ctx.fillText("flow rate/cross sectional area (mol/[m\u00B2 min])", 0, 0);
+  ctx.restore();
+  // plot title
+  ctx.font='17px '+getComputedStyle(document.body).fontFamily;
+  ctx.textAlign="center"; ctx.textBaseline="alphabetic";
+  ctx.fillText("A + B \u27F7 C + D", PL+PW/2, PT-14);
+}
+
+function drawCurve(zs,ys,color){
+  ctx.strokeStyle=color; ctx.lineWidth=2.5;
+  ctx.beginPath();
+  for(let i=0;i<zs.length;i++){
+    const px=xPix(zs[i]), py=yPix(ys[i]);
+    if(i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+  }
+  ctx.stroke();
+}
+
+// F_X label with white background at (z, value)
+function drawLabel(letter,color,z,yval){
+  const ui=getComputedStyle(document.body).fontFamily;
+  const px=xPix(z), py=yPix(yval);
+  ctx.font='italic 17px '+ui;
+  const fW=ctx.measureText("F").width;
+  ctx.font='italic 11px '+ui;
+  const sW=ctx.measureText(letter).width;
+  const totW=fW+sW+2, totH=20;
+  // white background box
+  ctx.fillStyle="#fff";
+  ctx.fillRect(px-totW/2-2, py-totH/2-1, totW+4, totH+2);
+  // draw F
+  ctx.fillStyle=color; ctx.textAlign="left"; ctx.textBaseline="middle";
+  ctx.font='italic 17px '+ui;
+  const x0=px-totW/2;
+  ctx.fillText("F", x0, py-1);
+  // subscript
+  ctx.font='italic 11px '+ui;
+  ctx.fillText(letter, x0+fW+1, py+5);
+}
+
+function render(){
+  const s=solve();
+  drawFrame();
+  ctx.save();
+  ctx.beginPath(); ctx.rect(PL,PT,PW,PH); ctx.clip();
+  drawCurve(s.zs,s.YA,COL.A);
+  drawCurve(s.zs,s.YB,COL.B);
+  drawCurve(s.zs,s.YC,COL.C);
+  drawCurve(s.zs,s.YD,COL.D);
+  ctx.restore();
+  // epilog labels
+  drawLabel("A",COL.A,2.5, interp(s.zs,s.YA,2.5));
+  drawLabel("B",COL.B,3.0, interp(s.zs,s.YB,3.0));
+  drawLabel("C",COL.C,3.5, interp(s.zs,s.YC,3.5));
+  drawLabel("D",COL.D,1.7, interp(s.zs,s.YD,1.7));
+}
+
+/* ============================================================
+   Controls
+   ============================================================ */
+const sK=document.getElementById('sK'),  vK=document.getElementById('vK');
+const sD=document.getElementById('sD'),  vD=document.getElementById('vD');
+const sKm=document.getElementById('sKm'),vKm=document.getElementById('vKm');
+const sKeq=document.getElementById('sKeq'),vKeq=document.getElementById('vKeq');
+
+function labels(){
+  vK.textContent=kRate.toFixed(1);
+  vD.textContent=dDia.toFixed(1);
+  vKm.textContent=kmPerm.toFixed(1);
+  vKeq.textContent=Keq.toFixed(1);
+}
+sK.addEventListener('input',e=>{kRate=parseFloat(e.target.value);labels();render();});
+sD.addEventListener('input',e=>{dDia=parseFloat(e.target.value);labels();render();});
+sKm.addEventListener('input',e=>{kmPerm=parseFloat(e.target.value);labels();render();});
+sKeq.addEventListener('input',e=>{Keq=parseFloat(e.target.value);labels();render();});
+
+// action panels
+document.querySelectorAll('.abtn').forEach(b=>{
+  b.addEventListener('click',()=>{
+    const id=b.dataset.panel, panel=document.getElementById(id);
+    const open=panel.classList.contains('show');
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('show'));
+    document.querySelectorAll('.abtn').forEach(a=>a.classList.remove('active'));
+    if(!open){ panel.classList.add('show'); b.classList.add('active'); }
+  });
+});
+
+setupCanvas();
+labels();
+render();
+</script>
+</body>
+</html>
