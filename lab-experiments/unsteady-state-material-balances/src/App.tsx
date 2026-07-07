@@ -16,6 +16,8 @@ import { SVGTooltip } from './components/Tooltip/TooltipSelector';
 import { Controller } from './components/Controller/Controller';
 import { Reactor } from './components/Reactor/Reactor';
 
+// import { PlotlyChart } from './components/PlotlyChart';
+
 function App() {
   const [cylLift, setCylLift] = createSignal(0);
   const [regLift, setRegLift] = createSignal(0);

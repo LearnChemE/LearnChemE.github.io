@@ -1,7 +1,8 @@
-import { createMemo, createSignal, onMount, type Accessor, type Component } from "solid-js";
+import { createMemo, onMount, useContext, type Accessor, type Component, type Setter } from "solid-js";
 import "./Reactor.css";
-import { MainLoop, REACTOR_VOL_INIT, resetSignal } from "../../globals";
+import { MainLoop, resetSignal } from "../../globals";
 import { Boils } from "../Boils/Boils";
+import { RxrContext } from "../Context";
 
 type ReactorProps = {
     x: number;
@@ -16,28 +17,28 @@ const areaXS = Math.PI * diameterRxr ** 2 / 4;
 const spWeight = 98.1e-5; // bar / cm
 
 export const Reactor: Component<ReactorProps> = (props) => {
-    const [vol, setVol] = createSignal(REACTOR_VOL_INIT);
+    const ctx = useContext(RxrContext)!;
 
     // Fill
     const y65 = 42.25;
     const h = 195;
     const fillY = createMemo(() => {
-        const v = vol();
+        const v = ctx.vol();
         return h * (1 - v / 65) + y65;
     });
     const fillH = createMemo(() => {
-        const v = vol();
+        const v = ctx.vol();
         return h * (v / 65);
     });
     
     // Conditions
     const actualCCS = createMemo(() => {
-        const hydrostatic = vol() / areaXS * spWeight;
+        const hydrostatic = ctx.vol() / areaXS * spWeight;
         if (props.pressure() < hydrostatic) return 0;
         else return props.ccsSP();
     });
 
-    const ml = new MainLoop(props.pressure, actualCCS, props.temp, setVol);
+    const ml = new MainLoop(props.pressure, actualCCS, props.temp, ctx.setVol as Setter<number>);
     ml.play();
 
     onMount(() => {

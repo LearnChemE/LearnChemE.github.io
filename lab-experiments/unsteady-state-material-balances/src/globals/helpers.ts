@@ -532,3 +532,10 @@ function invNorm(p: number) {
 
   return retVal;
 }
+
+// export function addOUNoise(x: number, dt: number, tau: number, sigma: number, prevNoise: number) {
+//     // Calculate the new noise value using the Ornstein-Uhlenbeck process
+//     const newNoise = prevNoise + (-(prevNoise / tau) * dt) + (sigma * Math.sqrt(dt) * gaussNoise(0, 1));
+//     // Return the new value with noise added
+//     return x + newNoise;
+// }

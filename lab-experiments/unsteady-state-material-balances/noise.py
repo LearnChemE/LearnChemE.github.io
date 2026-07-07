@@ -77,43 +77,56 @@ if __name__ == "__main__":
     ndot_N2 = sccmToMolPerMin(QN2)
     print(ndot_N2)
     temps = [15, 20, 25]
-    y0 = initialMolesFromVolumeEquimolar(V0)
-    print(y0)
+    y00 = initialMolesFromVolumeEquimolar(V0)
+    y00.append(0) # add noise state variable
 
     tmax = 600
     t_eval = np.linspace(0, tmax, 101)
 
-    pent = []
-    hex = []
-    for tc in temps:
-        psat = getPsatBar(tc)
+
+    tau = 10
+    stds = [0, 0.1, 0.25, 0.5] # standard deviations for noise
+
+    for std in stds:
+        pent = []
+        hex = []
+        y0 = y00.copy()
+
+        psat = getPsatBar(15)
         print(f"psat: {psat}")
-        def f(t, y):
-            return rhs(y[0], y[1], psat[0], psat[1], ndot_N2)
-        sol = solve_ivp(f, [0, tmax], y0, 'RK45', t_eval)
-        pent.append(sol.y[0])
-        hex.append(sol.y[1])
+        
+        dt = t_eval[1] - t_eval[0]
+        for t in t_eval:
+            dw = np.random.normal(0, std * np.sqrt(dt)) # Wiener process increment
 
-    fig, ax = plt.subplots(2, 1)
-    t = t_eval / 60
+            def f(t, y):
+                yrhs = rhs(y[0], y[1], psat[0], psat[1], ndot_N2)
+                noise = max(min(y[2], 1), -1) # Ensure noise is bounded
+                dnoise = (-noise / tau) + dw / tau
 
-    ax[0].plot(t, volumeFromMoles(pent[0], hex[0]), label='15 °C')
-    ax[0].plot(t, volumeFromMoles(pent[1], hex[1]), label='20 °C')
-    ax[0].plot(t, volumeFromMoles(pent[2], hex[2]), label='25 °C')
-    ax[0].set_xlabel('time in hours')
-    ax[0].set_ylabel(r'total volume of liquid in bubbler, cm$^3$')
-    ax[0].set_title('total volume with time')
-    ax[0].grid()
-    ax[0].legend()
+                return [yrhs[0] * (1 + noise), yrhs[1] * (1 + noise), dnoise]
 
-    ax[1].plot(t, pent[0] / (hex[0] + pent[0]), label='15 °C')
-    ax[1].plot(t, pent[1] / (hex[1] + pent[1]), label='20 °C')
-    ax[1].plot(t, pent[2] / (hex[2] + pent[2]), label='25 °C')
-    ax[1].set_xlabel('time in hours')
-    ax[1].set_ylabel('mole fraction of pentane in bubbler')
-    ax[1].set_title('mole fraction of pentane with time')
-    ax[1].grid()
-    ax[1].legend()
+            sol = solve_ivp(f, [t, t + dt], y0, 'RK45', [t, t + dt])
+            
+            pent.append(sol.y[0][0])
+            hex.append(sol.y[1][0])
+
+            y0 = [sol.y[0][-1], sol.y[1][-1], sol.y[2][-1]] # update initial conditions for next step
+
+        t = t_eval / 60
+
+        pent = np.array(pent)
+        hex = np.array(hex)
+        print(pent)
+        print(pent.shape, hex.shape, t.shape)
+
+        plt.plot(t, volumeFromMoles(pent, hex), label='std=' + str(std))
+
+    plt.xlabel('time in hours')
+    plt.ylabel(r'total volume of liquid in bubbler, cm$^3$')
+    plt.title('total volume with time')
+    plt.grid()
+    plt.legend()
 
     plt.show()
 
