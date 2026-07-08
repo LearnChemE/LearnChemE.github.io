@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inhibition of Enzyme Reactions in a CSTR and a Batch Reactor</title>
+<style>
+  :root{
+    --blue:   rgb(0,0,255);
+    --green:  rgb(0,153,0);
+    --orange: rgb(255,102,0);
+    --purple: rgb(235,0,255);
+    --ink:#000;
+    --panel:#ffffff;
+    --line:#bdbdbd;
+    --font: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{ font-family:var(--font); color:var(--ink); }
+  .app{
+    max-width:700px; margin:14px auto; background:var(--panel);
+    border:1px solid #d6d6d6; border-radius:4px; padding:16px 20px 22px;
+  }
+
+  /* ---- Header ---- */
+  .header{ position:relative; padding-right:0; }
+  .title{
+    font-size:20px; font-weight:700; line-height:1.25; text-align:center;
+    margin:2px 0 14px; padding:0 4px;
+  }
+  .topbtns{ display:flex; justify-content:center; gap:10px; margin-bottom:16px; }
+  .topbtn{
+    font-family:var(--font); font-size:14px; cursor:pointer;
+    background:#f7f7f7; border:1px solid #9a9a9a; border-radius:3px;
+    padding:5px 16px; color:#1a1a1a;
+  }
+  .topbtn:hover{ background:#ececec; }
+  .topbtn:active{ background:#e0e0e0; }
+
+  /* ---- Control rows ---- */
+  .row1{
+    display:flex; align-items:center; justify-content:center;
+    flex-wrap:wrap; gap:26px; margin-bottom:14px;
+  }
+
+  /* Setter (two-button) control */
+  .setter{ display:inline-flex; border:1px solid #8a8a8a; border-radius:3px; overflow:hidden; }
+  .setter button{
+    font-family:var(--font); font-size:17px; cursor:pointer;
+    background:#f4f4f4; border:none; padding:7px 16px; color:#1a1a1a;
+    border-right:1px solid #8a8a8a;
+  }
+  .setter button:last-child{ border-right:none; }
+  .setter button.active{ background:#cfd8e8; font-weight:600; box-shadow:inset 0 1px 3px rgba(0,0,0,.18); }
+  .setter button:not(.active):hover{ background:#e8e8e8; }
+
+  /* Reactor radio group */
+  .reactor{ display:inline-flex; align-items:center; gap:22px; }
+  .reactor label{ display:inline-flex; align-items:center; font-size:17px; cursor:pointer; }
+  .reactor input[type=radio]{ width:16px; height:16px; margin:0 9px 0 0; cursor:pointer; }
+
+  /* Slider block (concentration vs time view) */
+  .sliders{ display:flex; justify-content:center; gap:34px; flex-wrap:wrap; margin:2px 0 4px; }
+  .sliderbox{ display:flex; flex-direction:column; align-items:flex-start; min-width:280px; }
+  .sliderlabel{ font-size:16px; font-weight:400; margin-bottom:4px; }
+  .sliderrow{ display:flex; align-items:center; gap:12px; width:100%; }
+  input[type=range]{
+    -webkit-appearance:none; appearance:none; height:4px; width:210px;
+    background:#9a9a9a; border-radius:2px; outline:none; cursor:pointer;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none; appearance:none; width:15px; height:15px; border-radius:50%;
+    background:#5b5b5b; border:1px solid #3a3a3a; cursor:pointer; margin-top:0;
+  }
+  input[type=range]::-moz-range-thumb{
+    width:15px; height:15px; border-radius:50%; background:#5b5b5b; border:1px solid #3a3a3a; cursor:pointer;
+  }
+  .sliderval{ font-size:16px; min-width:34px; text-align:left; }
+
+  /* Path radios (inhibition type view) */
+  .pathwrap{ margin:4px 0 8px; }
+  .pathtitle{ font-size:16px; font-weight:700; margin-bottom:6px; text-align:center; }
+  .pathradios{ display:flex; justify-content:center; gap:24px; flex-wrap:wrap; }
+  .pathradios label{ display:inline-flex; align-items:center; font-size:15px; cursor:pointer; }
+  .pathradios input[type=radio]{ width:15px; height:15px; margin:0 7px 0 0; cursor:pointer; }
+
+  /* ---- Stage ---- */
+  .stage{ margin-top:8px; display:flex; justify-content:center; }
+  canvas{ display:block; width:100%; max-width:620px; height:auto; }
+
+  /* Pathway (inhibition type) display */
+  .pathview{ width:100%; max-width:620px; font-size:16px; }
+  .pathcols{ display:flex; gap:34px; justify-content:flex-start; flex-wrap:wrap; }
+  .pathcol h4{ font-size:16px; font-weight:700; margin:0 0 8px; }
+  .diagram{ font-size:17px; line-height:1.5; }
+  .diagram .vchain{ display:flex; flex-direction:column; align-items:flex-start; line-height:1.2; margin-left:6px; }
+  .diagram .row2col{ display:grid; grid-template-columns:auto auto; column-gap:30px; row-gap:2px; }
+  .steps div{ line-height:1.55; white-space:nowrap; }
+  .pathdesc{ margin-top:18px; font-size:16px; line-height:1.5; max-width:600px; }
+
+  /* ---- Modal ---- */
+  .overlay{
+    position:fixed; inset:0; background:rgba(0,0,0,.45); display:none;
+    align-items:center; justify-content:center; padding:18px; z-index:50;
+  }
+  .overlay.open{ display:flex; }
+  .modal{
+    background:#fff; max-width:620px; width:100%; max-height:84vh; overflow:auto;
+    border-radius:6px; padding:22px 26px 26px; position:relative;
+    box-shadow:0 10px 40px rgba(0,0,0,.3);
+  }
+  .modal h3{ margin:0 0 12px; font-size:19px; }
+  .modal p{ font-size:15px; line-height:1.55; margin:0 0 12px; }
+  .modal .eq{ font-size:16px; margin:6px 0; padding-left:6px; }
+  .modal a{ color:#1352b0; }
+  .closeX{
+    position:absolute; top:10px; right:14px; border:none; background:none;
+    font-size:22px; line-height:1; cursor:pointer; color:#666;
+  }
+  .closeX:hover{ color:#000; }
+  .frac{ display:inline-flex; flex-direction:column; vertical-align:middle; text-align:center; margin:0 3px; }
+  .frac .num{ border-bottom:1.4px solid #000; padding:0 6px; }
+  .frac .den{ padding:0 6px; }
+  sub,sup{ font-size:75%; }
+  .modal ul{ margin:4px 0 12px; padding-left:22px; }
+  .modal li{ font-size:15px; line-height:1.6; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="topbtns">
+      <button class="topbtn" data-modal="directions">Directions</button>
+      <button class="topbtn" data-modal="details">Details</button>
+      <button class="topbtn" data-modal="about">About</button>
+    </div>
+  </div>
+
+  <!-- View setter + reactor radios -->
+  <div class="row1">
+    <div class="setter" id="viewSetter">
+      <button data-view="conc" class="active">concentration vs. time</button>
+      <button data-view="path">inhibition type</button>
+    </div>
+    <div class="reactor" id="reactorGroup">
+      <label><input type="radio" name="reactor" value="cstr" checked> CSTR</label>
+      <label><input type="radio" name="reactor" value="batch"> batch reactor</label>
+    </div>
+  </div>
+
+  <!-- Concentration-vs-time controls -->
+  <div id="concControls">
+    <div class="sliders">
+      <div class="sliderbox">
+        <div class="sliderlabel">feed substrate concentration (kmol/m<sup>3</sup>)</div>
+        <div class="sliderrow">
+          <input type="range" id="cs0" min="0.1" max="20" step="0.1" value="1.3">
+          <span class="sliderval" id="cs0val">1.3</span>
+        </div>
+      </div>
+      <div class="sliderbox">
+        <div class="sliderlabel">inhibitor concentration (kmol/m<sup>3</sup>)</div>
+        <div class="sliderrow">
+          <input type="range" id="ci" min="1" max="10" step="0.1" value="1.5">
+          <span class="sliderval" id="cival">1.5</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Inhibition-type controls -->
+  <div id="pathControls" class="pathwrap" style="display:none;">
+    <div class="pathtitle">inhibition type:</div>
+    <div class="pathradios" id="pathGroup">
+      <label><input type="radio" name="path" value="0"> competitive</label>
+      <label><input type="radio" name="path" value="1"> uncompetitive</label>
+      <label><input type="radio" name="path" value="2"> noncompetitive (mixed)</label>
+      <label><input type="radio" name="path" value="3" checked> no inhibitor</label>
+    </div>
+  </div>
+
+  <!-- Stage -->
+  <div class="stage">
+    <canvas id="plot" width="1240" height="840"></canvas>
+    <div class="pathview" id="pathView" style="display:none;"></div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="overlay" id="overlay">
+  <div class="modal" id="modal">
+    <button class="closeX" id="closeX" aria-label="Close">&times;</button>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+/* ============ MODEL ============ */
+const Vmax = 1.33, Ki = 0.36, Km = 0.4, TAU = 2.65;
+
+// type: 0 competitive, 1 uncompetitive, 2 noncompetitive, 3 no inhibitor
+function rate(Cs, type, Ci){
+  let denom;
+  if(type===0)      denom = Cs + Km*(1 + Ci/Ki);
+  else if(type===1) denom = Km + Cs*(1 + Ci/Ki);
+  else if(type===2) denom = (Cs + Km)*(1 + Ci/Ki);
+  else              denom = Km + Cs;
+  return Vmax*Cs/denom;            // positive substrate-consumption rate
+}
+function deriv(Cs, type, Ci, isCSTR, Cfeed){
+  let d = -rate(Cs, type, Ci);
+  if(isCSTR) d += (Cfeed - Cs)/TAU;   // feed concentration = slider value
+  return d;
+}
+function solveCurve(type, Ci, Cs0, isCSTR){
+  const tEnd=10, n=1200, dt=tEnd/n;
+  let Cs=Cs0; const pts=[{t:0,c:Cs0}];   // Cs0 is both feed and initial charge
+  for(let i=1;i<=n;i++){
+    const k1=deriv(Cs,type,Ci,isCSTR,Cs0);
+    const k2=deriv(Cs+0.5*dt*k1,type,Ci,isCSTR,Cs0);
+    const k3=deriv(Cs+0.5*dt*k2,type,Ci,isCSTR,Cs0);
+    const k4=deriv(Cs+dt*k3,type,Ci,isCSTR,Cs0);
+    Cs += dt*(k1+2*k2+2*k3+k4)/6;
+    if(Cs<0) Cs=0;
+    pts.push({t:i*dt, c:Cs});
+  }
+  return pts;
+}
+
+const SPECIES=[
+  {name:"competitive",   color:"rgb(0,0,255)"},
+  {name:"uncompetitive", color:"rgb(0,153,0)"},
+  {name:"noncompetitive",color:"rgb(255,102,0)"},
+  {name:"no inhibitor",  color:"rgb(235,0,255)"}
+];
+
+/* ============ STATE ============ */
+const state={ view:"conc", reactor:"cstr", Cs0:1.3, Ci:1.5, path:3 };
+
+/* ============ PLOT ============ */
+const canvas=document.getElementById("plot");
+const ctx=canvas.getContext("2d");
+const DPR=2;                       // canvas backing scale (1240x840 -> 620x420 css)
+const CW=canvas.width/DPR, CH=canvas.height/DPR;
+
+function niceStep(range, target){
+  const raw=range/target;
+  const mag=Math.pow(10,Math.floor(Math.log10(raw)));
+  const n=raw/mag;
+  let s;
+  if(n<1.5) s=1; else if(n<3) s=2; else if(n<7) s=5; else s=10;
+  return s*mag;
+}
+function fmt(v){
+  if(Math.abs(v)<1e-9) return "0";
+  let s=v.toFixed(2);
+  s=s.replace(/\.?0+$/,"");
+  return s;
+}
+
+function drawPlot(){
+  ctx.save();
+  ctx.scale(DPR,DPR);
+  ctx.clearRect(0,0,CW,CH);
+
+  const isCSTR = state.reactor==="cstr";
+  const xmax=10, ymax=state.Cs0;
+
+  // plot frame margins
+  const mL=64, mR=18, mT=16, mB=52;
+  const pw=CW-mL-mR, ph=CH-mT-mB;
+  const x0=mL, y0=mT;
+
+  const X=t=> x0 + (t/xmax)*pw;
+  const Y=c=> y0 + ph - (c/ymax)*ph;
+
+  // ---- gridlines (light) ----
+  const xStep=2, xMinor=1;
+  const yStep=niceStep(ymax,5);
+
+  ctx.lineWidth=1;
+  // ---- compute curves ----
+  const curves=SPECIES.map((sp,i)=>{
+    const pts=solveCurve(i,state.Ci,state.Cs0,isCSTR);
+    return {name:sp.name,color:sp.color,
+            px:pts.map(p=>({x:X(p.t), y:Y(Math.min(p.c,ymax))}))};
+  });
+
+  // ---- frame box ----
+  ctx.strokeStyle="#000"; ctx.lineWidth=1.2;
+  ctx.strokeRect(x0,y0,pw,ph);
+
+  // ---- ticks ----
+  ctx.fillStyle="#000";
+  ctx.font="14px "+getFont();
+  const tick=6, tickMinor=3.5;
+  // x ticks
+  ctx.textAlign="center"; ctx.textBaseline="top";
+  for(let t=0;t<=xmax+1e-9;t+=xMinor){
+    const px=X(t), major=(Math.abs(t%xStep)<1e-9);
+    ctx.beginPath();
+    ctx.moveTo(px,y0+ph); ctx.lineTo(px,y0+ph-(major?tick:tickMinor)); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(px,y0); ctx.lineTo(px,y0+(major?tick:tickMinor)); ctx.stroke();
+    if(major) ctx.fillText(fmt(t), px, y0+ph+7);
+  }
+  // y ticks
+  ctx.textAlign="right"; ctx.textBaseline="middle";
+  const yMinorStep=yStep/2;
+  for(let c=0;c<=ymax+1e-9;c+=yMinorStep){
+    const py=Y(c), major=(Math.abs((c/yStep)-Math.round(c/yStep))<1e-6);
+    ctx.beginPath();
+    ctx.moveTo(x0,py); ctx.lineTo(x0+(major?tick:tickMinor),py); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x0+pw,py); ctx.lineTo(x0+pw-(major?tick:tickMinor),py); ctx.stroke();
+    if(major) ctx.fillText(fmt(c), x0-8, py);
+  }
+
+  // ---- curves ----
+  ctx.lineWidth=2.4; ctx.lineJoin="round";
+  curves.forEach(cv=>{
+    ctx.strokeStyle=cv.color;
+    ctx.beginPath();
+    cv.px.forEach((p,i)=> i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));
+    ctx.stroke();
+  });
+
+  // ---- direct curve labels (no legend) ----
+  placeLabels(curves, x0, y0, pw, ph);
+
+  // ---- axis titles ----
+  ctx.fillStyle="#000";
+  ctx.font="17px "+getFont();
+  ctx.textAlign="center"; ctx.textBaseline="alphabetic";
+  ctx.fillText(isCSTR?"residence time (min)":"time (min)", x0+pw/2, CH-14);
+  // y title (rotated) with superscript handled manually
+  ctx.save();
+  ctx.translate(16, y0+ph/2);
+  ctx.rotate(-Math.PI/2);
+  ctx.textAlign="center";
+  drawSupText(ctx,"substrate concentration (kmol/m","3",")",0,0,17);
+  ctx.restore();
+
+  ctx.restore();
+}
+
+// draw "....m" + superscript "3" + ")" centered at (cx,cy)
+function drawSupText(c,pre,sup,post,cx,cy,size){
+  c.font=size+"px "+getFont();
+  const wPre=c.measureText(pre).width;
+  c.font=Math.round(size*0.72)+"px "+getFont();
+  const wSup=c.measureText(sup).width;
+  c.font=size+"px "+getFont();
+  const wPost=c.measureText(post).width;
+  const total=wPre+wSup+wPost;
+  let x=cx-total/2;
+  c.textAlign="left"; c.textBaseline="middle";
+  c.font=size+"px "+getFont();
+  c.fillText(pre,x,cy); x+=wPre;
+  c.font=Math.round(size*0.72)+"px "+getFont();
+  c.fillText(sup,x,cy-size*0.28); x+=wSup;
+  c.font=size+"px "+getFont();
+  c.fillText(post,x,cy);
+}
+
+function getFont(){ return '"Helvetica Neue", Helvetica, Arial, sans-serif'; }
+
+function placeLabels(curves,x0,y0,pw,ph){
+  const N=curves[0].px.length;
+  const lo=Math.floor(N*0.10), hi=Math.floor(N*0.92);
+  const chosen=[];
+  curves.forEach((cv,ci)=>{
+    let best=Math.floor(N*0.5), bestScore=-Infinity;
+    for(let i=lo;i<hi;i+=4){
+      const y=cv.px[i].y;
+      let gap=Infinity;
+      curves.forEach((o,oi)=>{ if(oi!==ci) gap=Math.min(gap,Math.abs(o.px[i].y-y)); });
+      let pen=0;
+      chosen.forEach(c=>{ if(Math.abs(cv.px[i].x-c.x)<90) pen+=55; });
+      const score=gap-pen;
+      if(score>bestScore){ bestScore=score; best=i; }
+    }
+    chosen.push({x:cv.px[best].x, y:cv.px[best].y, name:cv.name, color:cv.color});
+  });
+
+  // resolve vertical text overlaps for labels close in x
+  chosen.sort((a,b)=>a.y-b.y);
+  for(let i=1;i<chosen.length;i++){
+    if(Math.abs(chosen[i].x-chosen[i-1].x)<130 && (chosen[i].ty??chosen[i].y) - (chosen[i-1].ty??chosen[i-1].y) < 23){
+      chosen[i].ty=(chosen[i-1].ty??chosen[i-1].y)+23;
+    }
+  }
+
+  ctx.font="19.5px "+getFont();
+  ctx.textBaseline="bottom";
+  chosen.forEach(c=>{
+    const ty=(c.ty??c.y)-9;
+    const w=ctx.measureText(c.name).width;
+    let tx=c.x+7;
+    ctx.textAlign="left";
+    if(tx+w > x0+pw-2){ tx=c.x-7-w; }            // flip left near right edge
+    if(tx < x0+2) tx=x0+2;
+    const yc=Math.max(y0+15, Math.min(ty, y0+ph-2));
+    // halo for readability
+    ctx.lineWidth=4; ctx.strokeStyle="rgba(255,255,255,.9)";
+    ctx.strokeText(c.name, tx, yc);
+    ctx.fillStyle=c.color;
+    ctx.fillText(c.name, tx, yc);
+  });
+}
+
+/* ============ PATHWAY (inhibition type) VIEW ============ */
+const PATH_DESC=[
+ "In competitive inhibition, the substrate (S) and inhibitor (I) compete for the enzyme (E) to form either an enzyme\u2013substrate (E\u00B7S) or an enzyme\u2013inhibitor (E\u00B7I) complex.",
+ "In uncompetitive inhibition, the inhibitor (I) does not compete with the substrate (S) for the enzyme (E). Instead, the inhibitor (I) reacts with the enzyme\u2013substrate complex (E\u00B7S) to form the inactive enzyme\u2013inhibitor\u2013substrate complex (E\u00B7I\u00B7S).",
+ "In noncompetitive, or mixed inhibition, the inhibitor (I) can attack either the enzyme (E) or the enzyme\u2013substrate complex (E\u00B7S). The deactivated complex (E\u00B7I\u00B7S) can form two ways: (1) the inhibitor (I) attaches to the enzyme\u2013substrate complex (E\u00B7S), or (2) the substrate (S) attaches to the enzyme\u2013inhibitor complex (I\u00B7E).",
+ "No inhibitor is present in this case. The substrate (S) attaches to the active site of the enzyme (E) to form the enzyme\u2013substrate complex (E\u00B7S)."
+];
+const PATH_STEPS=[
+ ["(1)  E+S \u2192 E\u00B7S","(2)  E\u00B7S \u2192 E+S","(3)  E\u00B7S \u2192 P+E","(4)  I+E \u2192 E\u00B7I  (inactive)","(5)  E\u00B7I \u2192 E+I"],
+ ["(1)  E+S \u2192 E\u00B7S","(2)  E\u00B7S \u2192 E+S","(3)  E\u00B7S \u2192 P+E","(4)  I+E\u00B7S \u2192 I\u00B7E\u00B7S (inactive)","(5)  I\u00B7E\u00B7S \u2192 I+E\u00B7S"],
+ ["(1)  E+S \u21CC E\u00B7S","(2)  E+I \u21CC I\u00B7E (inactive)","(3)  I+E\u00B7S \u21CC I\u00B7E\u00B7S (inactive)","(4)  S+I\u00B7E \u21CC I\u00B7E\u00B7S (inactive)","(5)  E\u00B7S \u2192 P+E"],
+ ["(1)  E+S \u2192 E\u00B7S","(2)  E\u00B7S \u2192 E+S","(3)  E\u00B7S \u2192 E+P"]
+];
+function pathwayDiagram(p){
+  if(p===0){
+    return `<div class="diagram">E+S \u21CC E\u00B7S \u2192 E+P
+      <div class="vchain"><span>+</span><span>I</span><span>\u21C5</span><span>E\u00B7I</span></div></div>`;
+  }
+  if(p===1){
+    return `<div class="diagram">E+S \u21CC E\u00B7S \u2192 E+P
+      <div class="vchain"><span>+</span><span>I</span><span>\u21C5</span><span>E\u00B7S\u00B7I</span></div></div>`;
+  }
+  if(p===2){
+    return `<div class="diagram"><div class="row2col">
+      <span>E+S \u21CC</span><span>E\u00B7S \u2192 E+P</span>
+      <span>+</span><span>+</span>
+      <span>I</span><span>I</span>
+      <span>\u21C5</span><span>\u21C5</span>
+      <span>E\u00B7I+S \u21CC</span><span>E\u00B7S\u00B7I</span>
+      </div></div>`;
+  }
+  return `<div class="diagram">E+S \u21CC E\u00B7S \u2192 E+P</div>`;
+}
+function renderPathView(){
+  const p=state.path;
+  const steps=PATH_STEPS[p].map(s=>`<div>${s}</div>`).join("");
+  document.getElementById("pathView").innerHTML=`
+    <div class="pathcols">
+      <div class="pathcol">
+        <h4>reaction pathway</h4>
+        ${pathwayDiagram(p)}
+      </div>
+      <div class="pathcol">
+        <h4>reaction steps</h4>
+        <div class="steps">${steps}</div>
+      </div>
+    </div>
+    <div class="pathdesc">${PATH_DESC[p]}</div>`;
+}
+
+/* ============ VIEW SWITCH ============ */
+function applyView(){
+  const conc = state.view==="conc";
+  document.getElementById("concControls").style.display = conc?"block":"none";
+  document.getElementById("reactorGroup").style.display = conc?"inline-flex":"none";
+  document.getElementById("pathControls").style.display = conc?"none":"block";
+  canvas.style.display = conc?"block":"none";
+  document.getElementById("pathView").style.display = conc?"none":"block";
+  if(conc) drawPlot(); else renderPathView();
+}
+
+/* ============ EVENTS ============ */
+document.querySelectorAll("#viewSetter button").forEach(b=>{
+  b.addEventListener("click",()=>{
+    document.querySelectorAll("#viewSetter button").forEach(x=>x.classList.remove("active"));
+    b.classList.add("active");
+    state.view=b.dataset.view;
+    applyView();
+  });
+});
+document.querySelectorAll('input[name=reactor]').forEach(r=>{
+  r.addEventListener("change",()=>{ state.reactor=r.value; drawPlot(); });
+});
+document.querySelectorAll('input[name=path]').forEach(r=>{
+  r.addEventListener("change",()=>{ state.path=parseInt(r.value,10); renderPathView(); });
+});
+const cs0=document.getElementById("cs0"), cs0val=document.getElementById("cs0val");
+cs0.addEventListener("input",()=>{ state.Cs0=parseFloat(cs0.value); cs0val.textContent=state.Cs0.toFixed(1); drawPlot(); });
+const ci=document.getElementById("ci"), cival=document.getElementById("cival");
+ci.addEventListener("input",()=>{ state.Ci=parseFloat(ci.value); cival.textContent=state.Ci.toFixed(1); drawPlot(); });
+
+/* ============ MODALS ============ */
+const MODAL_HTML={
+ directions:`<h3>Directions</h3>
+  <p>Inhibitors decrease the rates that enzymes bind to substrates and convert them to products. Three types of inhibition (competitive, uncompetitive, noncompetitive/mixed) and reaction with no inhibitor are compared for an enzyme reaction that obeys Michaelis\u2013Menten kinetics. Substrate concentration is plotted versus time for a continuous stirred-tank reactor (CSTR) and for a batch reactor. Change the inhibitor concentration, which remains constant during reaction, with a slider. Set the substrate feed concentration with a slider. Select &ldquo;inhibition type&rdquo; to see the reaction steps, pathways, and a brief description of the type of inhibition.</p>
+  <p>In competitive inhibition, the inhibitor attacks the enzyme to form an enzyme-inhibitor complex E\u00B7I; adding more substrate minimizes the inhibitor effect. In uncompetitive inhibition, the inhibitor attacks the enzyme-substrate complex E\u00B7S; adding more substrate does not overcome this type of inhibition since the inhibitor does not compete with the substrate for the enzyme sites. In noncompetitive inhibition, the inhibitor attacks the enzyme to form an enzyme-inhibitor complex E\u00B7I or it attacks the enzyme-substrate complex E\u00B7S to form an enzyme-substrate-inhibitor complex E\u00B7S\u00B7I.</p>`,
+
+ details:`<h3>Details</h3>
+  <p>For a continuous stirred-tank reactor (CSTR) the material balance is written in the form of a differential equation:</p>
+  <div class="eq"><span class="frac"><span class="num">dC<sub>S</sub></span><span class="den">dt</span></span> = (C<sub>S,i</sub> &minus; C<sub>S</sub>)/&tau; &minus; r<sub>S</sub> ,</div>
+  <p>for a batch reactor the material balance is:</p>
+  <div class="eq"><span class="frac"><span class="num">dC<sub>S</sub></span><span class="den">dt</span></span> = &minus;r<sub>S</sub> ,</div>
+  <p>where C<sub>S</sub> is substrate concentration (kmol/m<sup>3</sup>), C<sub>S,i</sub> is the feed substrate concentration (kmol/m<sup>3</sup>), r<sub>S</sub> is the rate of substrate consumption for various types of inhibition (kmol/[m<sup>3</sup> min]), &tau; is residence time (min), and t is time (min).</p>
+  <p>Rate laws are different for each type of inhibition:</p>
+  <div class="eq">competitive: &minus;r<sub>S</sub> = <span class="frac"><span class="num">V<sub>max</sub> C<sub>S</sub></span><span class="den">C<sub>S</sub> + K<sub>M</sub>(1 + C<sub>I</sub>/K<sub>I</sub>)</span></span> ,</div>
+  <div class="eq">uncompetitive: &minus;r<sub>S</sub> = <span class="frac"><span class="num">V<sub>max</sub> C<sub>S</sub></span><span class="den">K<sub>M</sub> + C<sub>S</sub>(1 + C<sub>I</sub>/K<sub>I</sub>)</span></span> ,</div>
+  <div class="eq">noncompetitive (mixed): &minus;r<sub>S</sub> = <span class="frac"><span class="num">V<sub>max</sub> C<sub>S</sub></span><span class="den">(C<sub>S</sub> + K<sub>M</sub>)(1 + C<sub>I</sub>/K<sub>I</sub>)</span></span> ,</div>
+  <div class="eq">no inhibitor: &minus;r<sub>S</sub> = <span class="frac"><span class="num">V<sub>max</sub> C<sub>S</sub></span><span class="den">K<sub>M</sub> + C<sub>S</sub></span></span> ,</div>
+  <p>where C<sub>I</sub> is inhibitor concentration (kmol/m<sup>3</sup>), K<sub>I</sub> and K<sub>M</sub> are inhibitor and Michaelis constants (kmol/m<sup>3</sup>), and V<sub>max</sub> is the rate of reaction (kmol/[m<sup>3</sup> min]).</p>
+  <p>Parameter values used in this simulation: V<sub>max</sub> = 1.33 kmol/[m<sup>3</sup> min], K<sub>M</sub> = 0.4 kmol/m<sup>3</sup>, K<sub>I</sub> = 0.36 kmol/m<sup>3</sup>, and &tau; = 2.65 min. The feed substrate concentration C<sub>S,i</sub> equals the substrate feed concentration set with the slider.</p>
+  <p><b>Reference</b><br>[1] H. S. Fogler, <i>Essentials of Chemical Reaction Engineering</i>, Boston: Pearson Education, 2011 pp. 349&ndash;370.</p>`,
+
+ about:`<h3>About</h3>
+  <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/InhibitionOfEnzymeReactionsInContinuousStirredTankReactorAnd/" target="_blank" rel="noopener">Mathematica simulation</a> by Rachael L. Baumann. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988) in collaboration with Washington State University. Address any questions or comments to <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.</p>`
+};
+const overlay=document.getElementById("overlay");
+const modalBody=document.getElementById("modalBody");
+document.querySelectorAll(".topbtn").forEach(b=>{
+  b.addEventListener("click",()=>{ modalBody.innerHTML=MODAL_HTML[b.dataset.modal]; overlay.classList.add("open"); });
+});
+function closeModal(){ overlay.classList.remove("open"); }
+document.getElementById("closeX").addEventListener("click",closeModal);
+overlay.addEventListener("click",e=>{ if(e.target===overlay) closeModal(); });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape") closeModal(); });
+
+/* ============ INIT ============ */
+applyView();
+</script>
+</body>
+</html>
