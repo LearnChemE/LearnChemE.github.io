@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Water Contact Angle for Heterogeneous Surface</title>
+<style>
+  :root{
+    --ink:#1a1a1a;
+    --panel:#ffffff;
+    --frame:#c9c9c9;
+    --btn:#e9e2d0;
+    --btn-edge:#c9bd9c;
+    --btn-active:#d8cbab;
+    --track:#cfcfcf;
+    --fill:#7c7c7c;
+    --water:#24c9ff;
+    --note:#f7f5ef;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:Verdana,Geneva,"Helvetica Neue",Helvetica,Arial,sans-serif;
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+  }
+  .demo{
+    max-width:640px;
+    margin:18px auto;
+    background:var(--panel);
+    border:1px solid var(--frame);
+    box-shadow:0 1px 4px rgba(0,0,0,.12);
+    padding:16px 18px 20px;
+    display:flex;
+    flex-direction:column;
+  }
+  .title{order:0;}
+  .controls{order:1;}
+  .plotwrap{order:2;}
+  .btnrow{order:3;}
+  .panel{order:4;}
+  .title{
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size:21px;
+    font-weight:700;
+    text-align:center;
+    margin:2px 0 14px;
+    letter-spacing:.2px;
+  }
+  .btnrow{
+    display:flex;
+    gap:10px;
+    justify-content:center;
+    margin-top:16px;
+    padding-top:14px;
+    border-top:1px solid #ededed;
+  }
+  .btnrow button{
+    font-family:inherit;
+    font-size:14.4px;
+    padding:6px 17px;
+    background:#98000D;
+    border:1px solid #7a000a;
+    border-radius:4px;
+    cursor:pointer;
+    color:#ffffff;
+  }
+  .btnrow button:hover{background:#b3101c;}
+  .btnrow button.active{
+    background:#7a000a;
+    box-shadow:inset 0 1px 3px rgba(0,0,0,.35);
+  }
+  .panel{
+    display:none;
+    background:var(--note);
+    border:1px solid #e2ddd0;
+    border-radius:4px;
+    padding:12px 15px;
+    margin:10px 0 4px;
+    font-size:12.5px;
+    line-height:1.6;
+  }
+  .panel.show{display:block;}
+  .panel a{color:#1257a8;}
+  .eq{
+    text-align:center;
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:15px;
+    margin:8px 0;
+  }
+  .controls{
+    padding-top:12px;
+  }
+  .srow{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px 26px;
+  }
+  .sgroup-head{
+    font-size:18px;
+    margin:12px 0 3px;
+    color:#333;
+  }
+  .slider{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex:1 1 260px;
+    min-width:260px;
+    padding:3px 0;
+  }
+  .slider .lab{
+    font-size:19px;
+    width:150px;
+    text-align:right;
+    flex:0 0 auto;
+  }
+  .slider input[type=range]{
+    flex:1 1 auto;
+    min-width:60px;
+    accent-color:#5a5a5a;
+    height:18px;
+  }
+  .slider .val{
+    font-size:18px;
+    min-width:54px;
+    text-align:center;
+    border:1px solid #cfcfcf;
+    border-radius:3px;
+    background:#fafafa;
+    padding:2px 5px;
+    flex:0 0 auto;
+  }
+  .slider.disabled{opacity:.4;}
+  .slider.disabled input{pointer-events:none;}
+  i{font-style:italic;}
+  .plotwrap{margin-top:14px;text-align:center;}
+  .angle-cap{
+    font-size:21px;
+    margin:4px 0 2px;
+    min-height:28px;
+  }
+  .angle-cap .sub{font-size:.78em;vertical-align:-0.18em;}
+  .cw{display:block;font-size:18px;color:#0a7a3a;}
+  canvas{max-width:100%;height:auto;}
+  sub{font-size:.72em;}
+  sup{font-size:.72em;}
+</style>
+</head>
+<body>
+<div class="demo">
+
+  <div class="btnrow">
+    <button id="b-dir">Directions</button>
+    <button id="b-det">Details</button>
+    <button id="b-abt">About</button>
+  </div>
+
+  <div class="panel" id="p-dir">
+    This simulation calculates the measured contact angle for a rough, heterogeneous
+    surface using the Wenzel and Cassie laws. The contact surface is a mixture of
+    materials <i>A</i> and <i>B</i>. Change the fraction of component <i>A</i> and the
+    surface contact angles of each material (&theta;<sub><i>A</i></sub> and
+    &theta;<sub><i>B</i></sub>) with sliders. Another slider changes the surface
+    roughness; for a completely smooth surface, the surface roughness ratio used in the
+    Wenzel equation is 1. The measured contact angle (&theta;<sub><i>W</i></sub>) is
+    calculated and displayed above the water droplet graphic; arrows on this plot show
+    where &theta;<sub><i>W</i></sub> is measured. Surfaces with water contact angles
+    &gt; 90&deg; have low wettability and are considered hydrophobic, whereas &lt; 90&deg;
+    means the surface has high wettability and is considered hydrophilic. When
+    &theta;<sub><i>W</i></sub> = 0&deg;, complete wetting occurs.
+  </div>
+
+  <div class="panel" id="p-det">
+    <p style="margin-top:0">The Cassie model is used to determine the apparent contact
+    angle for a heterogeneous surface &theta;<sub><i>C</i></sub>:</p>
+    <div class="eq">cos&nbsp;&theta;<sub><i>C</i></sub> =
+      <i>f</i><sub><i>A</i></sub>&nbsp;cos&nbsp;&theta;<sub><i>A</i></sub> +
+      <i>f</i><sub><i>B</i></sub>&nbsp;cos&nbsp;&theta;<sub><i>B</i></sub>,</div>
+    <p>where <i>f</i><sub><i>A</i></sub> and <i>f</i><sub><i>B</i></sub> are the fractions
+    of components <i>A</i> and <i>B</i> on the surface, and
+    <i>f</i><sub><i>B</i></sub> = 1 &minus; <i>f</i><sub><i>A</i></sub>;
+    &theta;<sub><i>A</i></sub> and &theta;<sub><i>B</i></sub> are the flat contact angles
+    for <i>A</i> and <i>B</i>.</p>
+
+    <p>The Wenzel apparent (or measured) contact angle &theta;<sub><i>W</i></sub> and
+    roughness ratio <i>r</i> is</p>
+    <div class="eq">cos&nbsp;&theta;<sub><i>W</i></sub> =
+      <i>r</i>&nbsp;cos&nbsp;&theta;<sub><i>C</i></sub>,</div>
+    <p>where <i>r</i> is the actual area divided by the apparent area; for a completely
+    smooth surface, <i>r</i> = 1, while for a rough surface, <i>r</i> &gt; 1.</p>
+
+    <p>The droplet represents a spherical cap; its volume <i>V</i> (&mu;L) based on the
+    volume of a sphere of radius <i>R</i> is</p>
+    <div class="eq"><i>V</i> = (&pi;/3)&nbsp;<i>R</i><sup>3</sup>
+      (2 &minus; 3&nbsp;cos&nbsp;&theta;<sub><i>W</i></sub> +
+      cos<sup>3</sup>&theta;<sub><i>W</i></sub>).</div>
+    <p>Solving for <i>R</i> (mm) and eliminating extraneous solutions gives</p>
+    <div class="eq"><i>R</i> = 3<sup>1/3</sup>&nbsp;<i>V</i><sup>1/3</sup> &frasl;
+      (2&pi; &minus; 3&pi;&nbsp;cos&nbsp;&theta;<sub><i>W</i></sub> +
+      &pi;&nbsp;cos<sup>3</sup>&theta;<sub><i>W</i></sub>)<sup>1/3</sup>.</div>
+    <p>The measured droplet height <i>h</i> (mm) is</p>
+    <div class="eq"><i>h</i> = <i>R</i> &minus;
+      <i>R</i>&nbsp;sin(&pi;/2 &minus; &theta;<sub><i>W</i></sub>).</div>
+    <p>Complete wetting occurs when &theta;<sub><i>W</i></sub> = 0&deg;, and no wetting
+    occurs when &theta;<sub><i>W</i></sub> = 180&deg;.</p>
+
+    <p style="margin-bottom:0"><b>Reference</b><br>
+    [1]&nbsp;Wikipedia. "Wetting." (Oct&nbsp;26,&nbsp;2015)
+    <a href="https://en.wikipedia.org/wiki/Wetting" target="_blank" rel="noopener">en.wikipedia.org/wiki/Wetting</a>.</p>
+  </div>
+
+  <div class="panel" id="p-abt">
+    This simulation was created in the
+    <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of
+    Chemical and Biological Engineering</a> at University of Colorado Boulder for
+    <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a>
+    by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a
+    <a href="https://demonstrations.wolfram.com/WaterContactAngleForHeterogeneousSurface/" target="_blank" rel="noopener">Mathematica
+    simulation</a> by Rachael L. Baumann. It was prepared with financial support from the
+    National Science Foundation (DUE 2336987 and 2336988) in collaboration with Washington
+    State University. Address any questions or comments to LearnChemE@gmail.com.
+  </div>
+
+  <div class="controls">
+    <div class="srow">
+      <label class="slider" id="s-fA">
+        <span class="lab">fraction of surface <i>A</i></span>
+        <input type="range" min="0" max="1" step="0.01" value="0.25">
+        <span class="val"></span>
+      </label>
+      <label class="slider" id="s-r">
+        <span class="lab">roughness ratio</span>
+        <input type="range" min="1" max="1.9" step="0.1" value="1">
+        <span class="val"></span>
+      </label>
+    </div>
+
+    <div class="sgroup-head">surface contact angles (degrees):</div>
+    <div class="srow">
+      <label class="slider" id="s-thA">
+        <span class="lab">&theta;<sub><i>A</i></sub></span>
+        <input type="range" min="10" max="110" step="1" value="20">
+        <span class="val"></span>
+      </label>
+      <label class="slider" id="s-thB">
+        <span class="lab">&theta;<sub><i>B</i></sub></span>
+        <input type="range" min="10" max="110" step="1" value="80">
+        <span class="val"></span>
+      </label>
+    </div>
+  </div>
+
+  <div class="plotwrap">
+    <div class="angle-cap" id="angleCap"></div>
+    <canvas id="plot" width="560" height="430"></canvas>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var D2R = Math.PI/180, R2D = 180/Math.PI;
+
+  // ---- controls ----
+  var inFA  = document.querySelector('#s-fA input');
+  var inR   = document.querySelector('#s-r input');
+  var inThA = document.querySelector('#s-thA input');
+  var inThB = document.querySelector('#s-thB input');
+  var sThA = document.getElementById('s-thA');
+  var sThB = document.getElementById('s-thB');
+  var cap  = document.getElementById('angleCap');
+
+  // ---- info buttons ----
+  var btns = {dir:'b-dir', det:'b-det', abt:'b-abt'};
+  var pans = {dir:'p-dir', det:'p-det', abt:'p-abt'};
+  var open = null;
+  function toggle(key){
+    Object.keys(pans).forEach(function(k){
+      var on = (k===key && open!==key);
+      document.getElementById(pans[k]).classList.toggle('show', on);
+      document.getElementById(btns[k]).classList.toggle('active', on);
+    });
+    open = (open===key) ? null : key;
+  }
+  document.getElementById('b-dir').onclick = function(){toggle('dir');};
+  document.getElementById('b-det').onclick = function(){toggle('det');};
+  document.getElementById('b-abt').onclick = function(){toggle('abt');};
+
+  // ---- deterministic jagged surface (regenerated only when r changes) ----
+  var lastR = null, teeth = [];
+  function rng(seed){ // small deterministic PRNG
+    return function(){ seed = (seed*9301 + 49297) % 233280; return seed/233280; };
+  }
+  function buildTeeth(r){
+    if(r===lastR) return;
+    lastR = r;
+    teeth = [];
+    if(r<=1.0001) return;
+    var step = 0.1*(2-r);                 // smaller step -> denser teeth (matches source)
+    var rnd = rng(Math.round(r*100)+7);
+    for(var x=-0.5; x<=0.5+1e-9; x+=step){
+      teeth.push([x, rnd()*0.025]);
+    }
+  }
+
+  // ---- physics ----
+  function model(fA, r, thA, thB){
+    var cosC = fA*Math.cos(thA*D2R) + (1-fA)*Math.cos(thB*D2R);
+    var thetaC = Math.acos(Math.max(-1,Math.min(1,cosC)));
+    var rc = r*cosC, thetaW, complete=false;
+    if(rc > 0.866){ thetaW = 0.0005; complete = true; }
+    else { thetaW = Math.acos(Math.max(-1,Math.min(1,rc))); }
+    var V = 0.05;
+    var cw = Math.cos(thetaW);
+    var denom = 2*Math.PI - 3*Math.PI*cw + Math.PI*cw*cw*cw;
+    var R = Math.cbrt(3)*Math.cbrt(V)/Math.cbrt(denom);
+    var h = R - R*Math.sin(Math.PI/2 - thetaW);
+    var x0 = Math.sqrt(Math.max(0, -h*h + 2*h*R));
+    return {thetaC:thetaC, thetaW:thetaW, complete:complete, R:R, h:h, x0:x0, cw:cw};
+  }
+
+  // ---- plot geometry ----
+  var cv = document.getElementById('plot');
+  var ctx = cv.getContext('2d');
+
+  // ---- geometry: equal aspect (same px per mm on x and y) ----
+  var xMin=-0.5, xMax=0.5, yMin=0, yMax=0.45;
+  var PPMM=496;                               // pixels per millimetre (both axes)
+  var mL=64, mR=20, mT=16, mB=60;             // margins (room for larger axis fonts)
+  var pW=(xMax-xMin)*PPMM;                     // plot area width  (1.00 mm)
+  var pH=(yMax-yMin)*PPMM;                     // plot area height (0.45 mm)
+  var W=mL+pW+mR, H=mT+pH+mB;
+
+  // crisp on HiDPI
+  var DPR = Math.max(1, window.devicePixelRatio||1);
+  cv.width = W*DPR; cv.height = H*DPR;
+  cv.style.width = W+'px'; cv.style.height = H+'px';
+  ctx.scale(DPR,DPR);
+
+  function px(x){ return mL + (x-xMin)/(xMax-xMin)*pW; }
+  function py(y){ return mT + (1-(y-yMin)/(yMax-yMin))*pH; }
+
+  function drawFrame(){
+    ctx.lineWidth=1;
+    ctx.strokeStyle='#000';
+    ctx.fillStyle='#000';
+    ctx.font='18px Verdana, Helvetica, Arial, sans-serif';
+    // frame box
+    ctx.strokeRect(mL, mT, pW, pH);
+    // x ticks
+    var xt=[-0.4,-0.2,0,0.2,0.4];
+    ctx.textAlign='center'; ctx.textBaseline='top';
+    xt.forEach(function(v){
+      var X=px(v);
+      ctx.beginPath(); ctx.moveTo(X,mT+pH); ctx.lineTo(X,mT+pH-6); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(X,mT); ctx.lineTo(X,mT+6); ctx.stroke();
+      ctx.fillText(v.toFixed(1), X, mT+pH+6);
+    });
+    // y ticks
+    var yt=[0,0.1,0.2,0.3,0.4];
+    ctx.textAlign='right'; ctx.textBaseline='middle';
+    yt.forEach(function(v){
+      var Y=py(v);
+      ctx.beginPath(); ctx.moveTo(mL,Y); ctx.lineTo(mL+6,Y); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(mL+pW,Y); ctx.lineTo(mL+pW-6,Y); ctx.stroke();
+      ctx.fillText(v.toFixed(1), mL-6, Y);
+    });
+    // axis labels "mm"
+    ctx.textAlign='center'; ctx.textBaseline='alphabetic';
+    ctx.fillText('mm', mL+pW/2, H-8);
+    ctx.save();
+    ctx.translate(17, mT+pH/2); ctx.rotate(-Math.PI/2);
+    ctx.textBaseline='middle';
+    ctx.fillText('mm', 0, 0);
+    ctx.restore();
+  }
+
+  function drawSubstrate(r){
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(mL,mT,pW,pH); ctx.clip();
+    ctx.fillStyle='#4d4d4d';
+    if(r<=1.0001){
+      // smooth: thin flat band at baseline
+      ctx.fillRect(mL, py(0), pW, 4);
+    } else {
+      ctx.beginPath();
+      ctx.moveTo(px(-0.5), py(0)+5);
+      for(var i=0;i<teeth.length;i++){
+        ctx.lineTo(px(teeth[i][0]), py(teeth[i][1]));
+      }
+      ctx.lineTo(px(0.5), py(0)+5);
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  function arcPts(cx,cy,rad,a0,a1,n){
+    var pts=[]; for(var i=0;i<=n;i++){var a=a0+(a1-a0)*i/n; pts.push([cx+rad*Math.cos(a), cy+rad*Math.sin(a)]);} return pts;
+  }
+  function strokeData(pts){
+    ctx.beginPath();
+    ctx.moveTo(px(pts[0][0]), py(pts[0][1]));
+    for(var i=1;i<pts.length;i++) ctx.lineTo(px(pts[i][0]), py(pts[i][1]));
+    ctx.stroke();
+  }
+  // arrowhead in data coords; ang = data-space pointing direction (y up)
+  function arrowhead(x,y,ang){
+    var sz=8, spread=0.45;
+    var aS = -ang; // canvas y is down -> negate angle for screen
+    var X=px(x), Y=py(y);
+    ctx.beginPath();
+    ctx.moveTo(X,Y);
+    ctx.lineTo(X - sz*Math.cos(aS-spread), Y - sz*Math.sin(aS-spread));
+    ctx.lineTo(X - sz*Math.cos(aS+spread), Y - sz*Math.sin(aS+spread));
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  function draw(){
+    var fA=parseFloat(inFA.value), r=parseFloat(inR.value);
+    var thA=parseFloat(inThA.value), thB=parseFloat(inThB.value);
+    buildTeeth(r);
+    var m=model(fA,r,thA,thB);
+
+    ctx.clearRect(0,0,W,H);
+
+    // water cap (only when not complete wetting)
+    if(!m.complete){
+      var R=m.R, h=m.h, x0=m.x0, cy=h-R;
+      var aR=Math.atan2(0-cy, x0);   // right contact angle from center
+      var aL=Math.PI - aR;           // left contact; always sweep over the apex (+pi/2)
+      ctx.save();
+      ctx.beginPath(); ctx.rect(mL,mT,pW,pH); ctx.clip();
+      var pts=arcPts(0,cy,R,aR,aL,80);
+      ctx.beginPath();
+      ctx.moveTo(px(pts[0][0]), py(pts[0][1]));
+      for(var i=1;i<pts.length;i++) ctx.lineTo(px(pts[i][0]), py(pts[i][1]));
+      ctx.closePath();
+      ctx.fillStyle='rgba(36,201,255,0.92)';
+      ctx.fill();
+      ctx.lineWidth=1.4; ctx.strokeStyle='#0e93c4'; ctx.stroke();
+      ctx.restore();
+    }
+
+    drawSubstrate(r);
+    drawFrame();
+
+    if(m.complete){
+      // thin film
+      ctx.save(); ctx.beginPath(); ctx.rect(mL,mT,pW,pH); ctx.clip();
+      ctx.fillStyle='rgba(36,201,255,0.92)';
+      ctx.fillRect(px(-0.5), py(0.055), pW, py(0)-py(0.055));
+      ctx.restore();
+    } else {
+      // contact-angle indicators at both contact points
+      var x0=m.x0, tw=m.thetaW;
+      var rise=0.13, arcR=0.032;
+      var tanw=Math.tan(tw);
+      ctx.save();
+      ctx.beginPath(); ctx.rect(mL,mT,pW,pH); ctx.clip();
+      ctx.lineWidth=1.6; ctx.strokeStyle='#000'; ctx.fillStyle='#000';
+
+      // ---- right side ----
+      // tangent endpoint
+      var rxEnd = x0 - rise/tanw, ryEnd = rise;
+      // poly arrow: (0.05,0)->(x0,0)->(rxEnd,ryEnd)
+      ctx.beginPath();
+      ctx.moveTo(px(0.05),py(0)); ctx.lineTo(px(x0),py(0)); ctx.lineTo(px(rxEnd),py(ryEnd));
+      ctx.stroke();
+      // arrowhead at start pointing toward center (-x)
+      arrowhead(0.05,0, Math.PI);
+      // arrowhead at tangent end, direction along (rxEnd-x0, ryEnd)
+      arrowhead(rxEnd,ryEnd, Math.atan2(ryEnd, rxEnd-x0));
+      // arc from (pi-tw) to pi
+      strokeData(arcPts(x0,0,arcR, Math.PI-tw, Math.PI, 24));
+
+      // ---- left side (mirror) ----
+      var lxEnd = -x0 + rise/tanw;
+      ctx.beginPath();
+      ctx.moveTo(px(-0.05),py(0)); ctx.lineTo(px(-x0),py(0)); ctx.lineTo(px(lxEnd),py(rise));
+      ctx.stroke();
+      arrowhead(-0.05,0, 0);
+      arrowhead(lxEnd,rise, Math.atan2(rise, lxEnd-(-x0)));
+      strokeData(arcPts(-x0,0,arcR, 0, tw, 24));
+
+      ctx.restore();
+
+      // theta_W labels near contacts
+      ctx.fillStyle='#000';
+      ctx.font='italic 14px Georgia, "Times New Roman", serif';
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      drawThetaWat(0.9*x0 - 0.04, 0.052);
+      drawThetaWat(-0.9*x0 + 0.04, 0.052);
+    }
+
+    updateCaption(m);
+  }
+
+  // draw "θ" with subscript W at data point (50% larger)
+  function drawThetaWat(xd, yd){
+    var X=px(xd), Y=py(yd);
+    ctx.fillStyle='#000';
+    ctx.font='italic 21px Georgia, "Times New Roman", serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('\u03B8', X-6, Y);
+    ctx.font='16px Georgia, "Times New Roman", serif';
+    ctx.fillText('W', X+7, Y+6);
+  }
+
+  function updateCaption(m){
+    var deg = Math.round(m.thetaW*R2D);
+    var html = 'measured contact angle &theta;<span class="sub"><i>W</i></span> = '+deg+'&deg;';
+    if(m.complete){ html += '<span class="cw">complete wetting</span>'; }
+    cap.innerHTML = html;
+  }
+
+  // ---- value labels + enable/disable ----
+  function refreshLabels(){
+    var fA=parseFloat(inFA.value);
+    document.querySelector('#s-fA  .val').textContent = fA.toFixed(2);
+    document.querySelector('#s-r   .val').textContent = parseFloat(inR.value).toFixed(1);
+    document.querySelector('#s-thA .val').textContent = parseInt(inThA.value,10)+'\u00B0';
+    document.querySelector('#s-thB .val').textContent = parseInt(inThB.value,10)+'\u00B0';
+    sThA.classList.toggle('disabled', fA<=0);   // A irrelevant when fraction A = 0
+    sThB.classList.toggle('disabled', fA>=1);   // B irrelevant when fraction A = 1
+    inThA.disabled = fA<=0;
+    inThB.disabled = fA>=1;
+  }
+
+  function update(){ refreshLabels(); draw(); }
+  [inFA,inR,inThA,inThB].forEach(function(el){ el.addEventListener('input', update); });
+  update();
+})();
+</script>
+</body>
+</html>
