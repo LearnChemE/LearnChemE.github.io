@@ -1,0 +1,10 @@
+.tv-disabled {
+    pointer-events: none;
+    filter: grayscale(50%) brightness(70%);
+}
+
+.tv-flash {
+    filter: brightness(1.1)
+        drop-shadow(-1px -1px 1px rgba(255, 205, 39, 255))
+        drop-shadow(1px 1px 1px rgba(223, 56, 255, 255));
+}
