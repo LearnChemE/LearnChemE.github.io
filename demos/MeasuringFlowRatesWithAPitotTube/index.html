@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Measuring Flow Rates with a Pitot Tube</title>
+<style>
+  :root{
+    --ui: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --math: "Times New Roman", Times, serif;
+    --panel:#ffffff;
+    --line:#c8c8c8;
+  }
+  html,body{margin:0;padding:0;background:#ffffff;color:#000;}
+  body{font-family:var(--ui);font-size:14px;-webkit-font-smoothing:antialiased;}
+  .demo{
+    width:600px;max-width:100%;margin:14px auto;padding:0 6px 14px;
+    box-sizing:border-box;
+  }
+  .title{
+    font-family:var(--ui);font-size:21px;font-weight:bold;color:#000;
+    padding:2px 0 10px;
+  }
+  /* ---- control band ---- */
+  .controls{
+    border:1px solid var(--line);
+    background:#fbfbfb;
+    padding:10px 12px 12px;
+    border-radius:2px;
+  }
+  .setterRow{display:flex;align-items:center;gap:0;margin-bottom:8px;}
+  .setter{
+    font-family:var(--ui);font-size:15.4px;color:#000;
+    background:linear-gradient(#fdfdfd,#e9e9e9);
+    border:1px solid #9a9a9a;
+    padding:3px 16px;cursor:pointer;user-select:none;
+    margin-right:-1px;
+  }
+  .setter:first-child{border-radius:3px 0 0 3px;}
+  .setter:last-child{border-radius:0 3px 3px 0;}
+  .setter.active{
+    background:linear-gradient(#cfcfcf,#bdbdbd);
+    box-shadow:inset 0 1px 2px rgba(0,0,0,.35);
+    border-color:#7d7d7d;
+  }
+  .ctrl{display:flex;align-items:center;margin:7px 0;min-height:22px;}
+  .ctrl .lbl{
+    width:236px;text-align:right;padding-right:12px;
+    font-family:var(--ui);font-size:16.1px;color:#000;flex:0 0 auto;
+  }
+  .ctrl .lbl .u{font-style:normal;}
+  .ctrl input[type=range]{
+    flex:1 1 auto;height:18px;cursor:pointer;
+    accent-color:rgb(229,229,255);
+  }
+  .ctrl .val{
+    flex:0 0 auto;width:54px;margin-left:10px;
+    font-family:var(--ui);font-size:15px;text-align:center;
+    background:#fff;border:1px solid #b6b6b6;border-radius:3px;
+    padding:2px 0;color:#222;
+  }
+  .hidden{display:none !important;}
+  /* ---- plot ---- */
+  .plotWrap{margin-top:12px;display:flex;justify-content:center;}
+  canvas{display:block;}
+  /* ---- action buttons ---- */
+  .actions{margin-top:14px;display:flex;justify-content:center;gap:8px;}
+  .abtn{
+    font-family:var(--ui);font-size:15.6px;font-weight:normal;
+    color:#ffffff;background:#98000D;
+    border:1px solid #98000D;border-radius:3px;
+    padding:5px 15px;cursor:pointer;
+  }
+  .abtn.active{background:#6f000a;border-color:#6f000a;}
+  .panel{
+    display:none;margin-top:10px;border:1px solid var(--line);
+    background:#fff;padding:14px 16px;border-radius:2px;
+    line-height:1.5;font-size:14px;color:#111;
+  }
+  .panel.show{display:block;}
+  .panel a{color:#1463b8;text-decoration:none;}
+  .panel a:hover{text-decoration:underline;}
+  /* math */
+  .eq{font-family:var(--math);font-size:17px;text-align:center;margin:12px 0;}
+  .eq .v{font-style:italic;}
+  .eq .n{font-style:normal;}
+  .frac{display:inline-flex;flex-direction:column;text-align:center;
+        vertical-align:middle;margin:0 .18em;}
+  .frac .fn{border-bottom:1px solid #000;padding:0 .4em 1px;}
+  .frac .fd{padding:1px .4em 0;}
+  .sqrt{border-top:1px solid #000;padding:0 .25em;}
+  .radical{display:inline-flex;align-items:stretch;vertical-align:middle;}
+  .radical .radsvg{width:13px;align-self:stretch;overflow:visible;color:#000;margin-right:-1px;}
+  .radical .rcand{border-top:1.5px solid #000;padding:3px 6px 2px 2px;display:flex;align-items:center;}
+  sub,sup{font-style:normal;}
+  .imath{font-family:var(--math);font-style:italic;}
+  .imath .n{font-style:normal;}
+</style>
+</head>
+<body>
+<div class="demo">
+  <div class="controls">
+    <div class="setterRow">
+      <div class="setter active" id="btnH">&nbsp;change height&nbsp;</div>
+      <div class="setter" id="btnV">&nbsp;change fluid velocity&nbsp;</div>
+    </div>
+
+    <div class="ctrl" id="rowH">
+      <div class="lbl">manometer height (cm)</div>
+      <input type="range" id="sH" min="0.1" max="9.9" step="0.1" value="4.7">
+      <div class="val" id="vH">4.7</div>
+    </div>
+
+    <div class="ctrl hidden" id="rowV">
+      <div class="lbl">fluid velocity (m/s)</div>
+      <input type="range" id="sV" min="0" max="1.4" step="0.01" value="1.17">
+      <div class="val" id="vV">1.17</div>
+    </div>
+
+    <div class="ctrl" id="rowRho">
+      <div class="lbl">density of manometer fluid (kg/L)</div>
+      <input type="range" id="sRho" min="2" max="13.5" step="0.1" value="7.9">
+      <div class="val" id="vRho">7.9</div>
+    </div>
+  </div>
+
+  <div class="plotWrap">
+    <canvas id="plot" width="540" height="375"></canvas>
+  </div>
+
+  <div class="actions">
+    <div class="abtn" data-panel="pDir">Directions</div>
+    <div class="abtn" data-panel="pDet">Details</div>
+    <div class="abtn" data-panel="pAbo">About</div>
+  </div>
+
+  <div class="panel" id="pDir">
+    A pitot tube determines the velocity of a fluid by measuring the fluid&rsquo;s
+    stagnation pressure. The stagnation pressure is measured with a manometer.
+    The manometer height differential is a function of the manometer fluid
+    density, and the flowing fluid&rsquo;s kinetic energy. Bernoulli&rsquo;s
+    equation relates these terms, and is used to solve for velocity. Vary the
+    manometer fluid (green) height or the velocity of the fluid in the pipe
+    (blue) to see how each variable is related. Also, use a slider to vary the
+    density of the fluid in the manometer.
+  </div>
+
+  <div class="panel" id="pDet">
+    <div>Pitot tubes are used to measure the velocity of a fluid moving through a
+      pipe by taking advantage of the fact that the velocity at the height of the
+      bend in the tube (stagnation point) is zero. Some kinetic energy density of
+      the fluid flowing through the pipe is converted into pressure, resulting in
+      a change in manometer height. Bernoulli&rsquo;s equation is used to
+      calculate the velocity of the bulk fluid in the pipe by using this pressure
+      difference in the pitot tube:</div>
+
+    <div class="eq">
+      <span class="v">P</span><sub>1</sub>
+      <span class="n">+</span>
+      <span class="frac"><span class="fn">1</span><span class="fd">2</span></span>
+      <span class="v">&rho;</span>&thinsp;<span class="v">v</span><sub>1</sub><sup>2</sup>
+      <span class="n">+</span>
+      <span class="v">&gamma;</span>&thinsp;<span class="v">z</span><sub>1</sub>
+      <span class="n">=</span>
+      <span class="v">P</span><sub>2</sub>
+      <span class="n">+</span>
+      <span class="frac"><span class="fn">1</span><span class="fd">2</span></span>
+      <span class="v">&rho;</span>&thinsp;<span class="v">v</span><sub>2</sub><sup>2</sup>
+      <span class="n">+</span>
+      <span class="v">&gamma;</span>&thinsp;<span class="v">z</span><sub>2</sub>
+    </div>
+
+    <div>All terms on the left side represent the stagnation point (entrance of
+      the pitot tube); here <span class="imath">P</span><sub>1</sub> is the
+      stagnation pressure and <span class="imath">v</span><sub>1</sub>&nbsp;=&nbsp;0
+      is the velocity of fluid in the pipe at point 1. All terms on the right side
+      refer to point 2, a point upstream from the pitot tube. The two points that
+      are being evaluated are at the same height, so
+      <span class="imath">z</span><sub>1</sub> and
+      <span class="imath">z</span><sub>2</sub> drop out. Thus we obtain the
+      simplified form of Bernoulli&rsquo;s equation:</div>
+
+    <div class="eq">
+      <span class="v">P</span><sub>1</sub>
+      <span class="n">&minus;</span>
+      <span class="v">P</span><sub>2</sub>
+      <span class="n">=</span>
+      <span class="n">&Delta;</span><span class="v">P</span>
+      <span class="n">=</span>
+      <span class="frac"><span class="fn">1</span><span class="fd">2</span></span>
+      <span class="v">&rho;</span>&thinsp;<span class="v">v</span><sub>2</sub><sup>2</sup>
+    </div>
+
+    <div>The equation for the difference in pressure in a manometer is substituted
+      into the simplified Bernoulli equation:</div>
+
+    <div class="eq">
+      <span class="n">&Delta;</span><span class="v">P</span>
+      <span class="n">=</span>
+      <span class="v">g</span>&thinsp;<span class="n">&Delta;</span><span class="v">h</span>&thinsp;
+      <span class="paren">(</span><span class="v">&rho;</span><sub>m</sub>
+      <span class="n">&minus;</span> <span class="v">&rho;</span><span class="paren">)</span>
+    </div>
+
+    <div class="eq">
+      <span class="frac"><span class="fn">1</span><span class="fd">2</span></span>
+      <span class="v">&rho;</span>&thinsp;<span class="v">v</span><sub>2</sub><sup>2</sup>
+      <span class="n">=</span>
+      <span class="v">g</span>&thinsp;<span class="n">&Delta;</span><span class="v">h</span>&thinsp;
+      <span class="paren">(</span><span class="v">&rho;</span><sub>m</sub>
+      <span class="n">&minus;</span> <span class="v">&rho;</span><span class="paren">)</span>
+    </div>
+
+    <div>This equation can be rearranged and used to solve for difference in height of the fluids
+      (<span class="n">&Delta;</span><span class="imath">h</span>) in the manometer or the fluid velocity
+      (<span class="imath">v<sub>2</sub></span>):</div>
+
+    <div class="eq">
+      <span class="n">&Delta;</span><span class="v">h</span>
+      <span class="n">=</span>
+      <span class="frac">
+        <span class="fn"><span class="v">&rho;</span>&thinsp;<span class="v">v</span><sub>2</sub><sup>2</sup></span>
+        <span class="fd">2&thinsp;<span class="v">g</span>&thinsp;<span class="paren">(</span><span class="v">&rho;</span><sub>m</sub> <span class="n">&minus;</span> <span class="v">&rho;</span><span class="paren">)</span></span>
+      </span>
+    </div>
+
+    <div class="eq">
+      <span class="v">v</span><sub>2</sub>
+      <span class="n">=</span>
+      <span class="radical">
+        <svg class="radsvg" viewBox="0 0 13 40" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M0.4,26 L4,39.2 L8.4,0.75 L13,0.75" fill="none" stroke="currentColor" stroke-width="1.5" vector-effect="non-scaling-stroke" stroke-linejoin="miter" stroke-linecap="round"/>
+        </svg>
+        <span class="rcand">
+          <span class="frac">
+            <span class="fn">2&thinsp;<span class="v">g</span>&thinsp;<span class="n">&Delta;</span><span class="v">h</span>&thinsp;<span class="paren">(</span><span class="v">&rho;</span><sub>m</sub> <span class="n">&minus;</span> <span class="v">&rho;</span><span class="paren">)</span></span>
+            <span class="fd"><span class="v">&rho;</span></span>
+          </span>
+        </span>
+      </span>
+    </div>
+
+    <div>Where <span class="imath">&rho;</span> and
+      <span class="imath">&rho;</span><sub>m</sub> are the densities of the fluid
+      in the pipe and manometer fluid, <span class="imath">&gamma;</span> is
+      specific gravity of fluid in the pipe, and <span class="imath">g</span> is the
+      gravitational constant.</div>
+  </div>
+
+  <div class="panel" id="pAbo">
+    This simulation was created in the
+    <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a>
+    at University of Colorado Boulder for
+    <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a>
+    by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a
+    <a href="https://demonstrations.wolfram.com/MeasuringFlowRatesWithAPitotTube/" target="_blank" rel="noopener">Mathematica simulation</a>
+    by Jon Barbieri and Rachael L. Baumann. It was prepared with financial support
+    from the National Science Foundation (DUE 2336987 and 2336988) in collaboration
+    with Washington State University. Address any questions or comments to
+    LearnChemE@gmail.com.
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   Physics  (Peng pitot / Bernoulli manometer relation)
+   ============================================================ */
+const g = 9.81;        // m/s^2
+const rhoW = 1000;     // kg/m^3  (flowing fluid in the pipe = water)
+
+let mode = 1;          // 1 = change height, 2 = change fluid velocity
+let H   = 4.7;         // manometer height (cm)
+let Vin = 1.17;        // fluid velocity (m/s)
+let rho = 7.9;         // density of manometer fluid (kg/L)
+
+function compute(){
+  const rhoM = 1000*rho;        // kg/m^3
+  let h, v;
+  if(mode===1){
+    h = H/100;                  // m
+    v = Math.sqrt(2*g*h*(rhoM-rhoW)/rhoW);
+  } else {
+    v = Vin;
+    h = rhoW*v*v/(2*g*(rhoM-rhoW));
+  }
+  return {h, v, rhoM};
+}
+
+/* ============================================================
+   Canvas world -> pixel mapping  (AspectRatio Full style)
+   ============================================================ */
+const cv  = document.getElementById('plot');
+const ctx = cv.getContext('2d');
+const CSSW=540, CSSH=375;
+// Mathematica PlotRange -> All (+ default padding), AspectRatio -> Full
+const WX0=-6.26, WX1=7.26, WY0=-5.59, WY1=5.72;
+function setupCanvas(){
+  const dpr = window.devicePixelRatio||1;
+  cv.style.width=CSSW+"px"; cv.style.height=CSSH+"px";
+  cv.width=CSSW*dpr; cv.height=CSSH*dpr;
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+function X(x){ return (x-WX0)/(WX1-WX0)*CSSW; }
+function Y(y){ return (WY1-y)/(WY1-WY0)*CSSH; }
+
+/* colors */
+const PALE  = "rgb(229,229,255)";   // RGBColor[0.9,0.9,1]  pipe + water in tubes
+const GREEN = "rgb(0,153,0)";       // RGBColor[0,0.6,0]    manometer fluid
+
+/* helpers (world coords) */
+function fillRectW(x0,y0,x1,y1,col){
+  ctx.fillStyle=col; ctx.beginPath();
+  ctx.rect(X(x0),Y(y1),X(x1)-X(x0),Y(y0)-Y(y1)); ctx.fill();
+}
+// Trace a Mathematica FilledCurve/JoinedCurve made of Line + BSplineCurve segments.
+// segs: [{t:'L'|'B', p:[[x,y],...]}]  (consecutive segments share endpoints)
+function tracePath(segs){
+  let started=false;
+  for(const s of segs){
+    const p=s.p;
+    if(!started){ ctx.moveTo(X(p[0][0]),Y(p[0][1])); started=true; }
+    if(s.t==='L'){
+      for(let i=1;i<p.length;i++) ctx.lineTo(X(p[i][0]),Y(p[i][1]));
+    } else if(p.length===4){            // cubic corner -> bezier through endpoints
+      ctx.bezierCurveTo(X(p[1][0]),Y(p[1][1]),X(p[2][0]),Y(p[2][1]),X(p[3][0]),Y(p[3][1]));
+    } else {                             // multi-point spline (arc) -> dense polyline
+      for(let i=1;i<p.length;i++) ctx.lineTo(X(p[i][0]),Y(p[i][1]));
+    }
+  }
+}
+// ---- fixed geometry (Mathematica coordinates) ----
+const SEG_PITOT=[
+ {t:'B',p:[[-0.5,4.5],[-0.433013,4.6],[-0.25,4.67321],[0,4.7]]},
+ {t:'L',p:[[0,4.7],[1.5,4.7]]},
+ {t:'B',p:[[1.5,4.7],[1.75,4.67321],[1.93301,4.6],[2,4.5]]},
+ {t:'L',p:[[2,4.5],[2,0],[1,0],[1,3.8],[0,3.8]]},
+ {t:'B',p:[[0,3.8],[-0.25,3.82679],[-0.433013,3.9],[-0.5,4]]},
+ {t:'L',p:[[-0.5,4],[1.25,4],[1.25,2.5],[1.75,2.5],[1.75,4.25]]},
+ {t:'B',p:[[1.75,4.25],[1.69641,4.375],[1.55,4.46651],[1.35,4.5]]},
+ {t:'L',p:[[1.35,4.5],[-0.5,4.5]]}
+];
+const TAP_CURVE=[[3,0.5],[3.2588,0.465926],[3.5,0.366025],[3.70711,0.207107],[3.86603,0],[3.96593,-0.241181],[4,-0.5]];
+const TAP_CURVE2=[[3.5,-0.5],[3.48296,-0.37059],[3.43301,-0.25],[3.35355,-0.146447],[3.25,-0.0669873],[3.12941,-0.0170371],[3,0]];
+const U_INNER=[[1.75,-4],[1.77981,-4.22647],[1.86723,-4.4375],[2.00628,-4.61872],[2.1875,-4.75777],[2.39853,-4.84519],[2.625,-4.875],[2.85147,-4.84519],[3.0625,-4.75777],[3.24372,-4.61872],[3.38277,-4.4375],[3.47019,-4.22647],[3.5,-4]];
+const U_OUTER=[[4,-4],[3.95315,-4.35588],[3.81578,-4.6875],[3.59727,-4.97227],[3.3125,-5.19078],[2.98088,-5.32815],[2.625,-5.375],[2.26912,-5.32815],[1.9375,-5.19078],[1.65273,-4.97227],[1.43422,-4.6875],[1.29685,-4.35588],[1.25,-4]];
+const SEG_TAP=[
+ {t:'L',p:[[1.9,0.5],[3,0.5]]},
+ {t:'B',p:TAP_CURVE},
+ {t:'L',p:[[4,-0.5],[4,-2],[3.5,-2],[3.5,-0.5]]},
+ {t:'B',p:TAP_CURVE2},
+ {t:'L',p:[[3,0],[1.9,0],[1.9,0.5]]}
+];
+const SEG_WALL1=[
+ {t:'L',p:[[2,0.5],[3,0.5]]},
+ {t:'B',p:TAP_CURVE},
+ {t:'L',p:[[4,-0.5],[4,-4]]},
+ {t:'B',p:U_OUTER},
+ {t:'L',p:[[1.25,-4],[1.25,2.6]]}
+];
+const SEG_WALL2=[
+ {t:'L',p:[[1.75,2.6],[1.75,-4]]},
+ {t:'B',p:U_INNER},
+ {t:'L',p:[[3.5,-4],[3.5,-0.5]]},
+ {t:'B',p:TAP_CURVE2},
+ {t:'L',p:[[3,0],[1.9,0]]}
+];
+
+/* ============================================================
+   Drawing
+   ============================================================ */
+function render(){
+  const {h,v} = compute();
+  const off = Math.max(0, Math.min(1.2, h/0.1));   // Rescale[h,{0,0.1}]
+  const sL = -2-off;   // left (stagnation) surface — pushed down
+  const sR = -2+off;   // right (static) surface — pushed up
+  const TH = 2.2;      // Mathematica "Thick"
+
+  ctx.clearRect(0,0,CSSW,CSSH);
+  ctx.lineJoin="round"; ctx.lineCap="round";
+
+  /* 1. pipe interior (pale fluid) */
+  fillRectW(-6,2.53,7,5.47,PALE);
+
+  /* 2. pipe walls (thick) — gap at bottom x in [1,2] for the pitot stem */
+  ctx.strokeStyle="#000"; ctx.lineWidth=TH;
+  ctx.beginPath();
+  ctx.moveTo(X(-6),Y(5.5)); ctx.lineTo(X(7),Y(5.5));   // top
+  ctx.moveTo(X(2),Y(2.5));  ctx.lineTo(X(7),Y(2.5));    // bottom-right
+  ctx.moveTo(X(-6),Y(2.5)); ctx.lineTo(X(1),Y(2.5));    // bottom-left
+  ctx.stroke();
+
+  /* 3. pitot tube (pale fill + thick black edge) */
+  ctx.beginPath(); tracePath(SEG_PITOT); ctx.closePath();
+  ctx.fillStyle=PALE; ctx.fill();
+  ctx.strokeStyle="#000"; ctx.lineWidth=TH; ctx.stroke();
+
+  /* 4. static-pressure tap + right leg : water (pale, no edge) */
+  ctx.beginPath(); tracePath(SEG_TAP); ctx.closePath();
+  ctx.fillStyle=PALE; ctx.fill();
+
+  /* 5. manometer fluid (green, no edge) */
+  const SEG_GREEN=[
+    {t:'L',p:[[1.25,sL],[1.75,sL],[1.75,-4]]},
+    {t:'B',p:U_INNER},
+    {t:'L',p:[[3.5,-4],[3.5,sR],[4,sR],[4,-4]]},
+    {t:'B',p:U_OUTER}
+  ];
+  ctx.beginPath(); tracePath(SEG_GREEN); ctx.closePath();
+  ctx.fillStyle=GREEN; ctx.fill();
+
+  /* 6. water above the green in the left leg */
+  fillRectW(1.25,sL,1.75,2.6,PALE);
+
+  /* 7,8. manometer tube walls (thick black outlines) */
+  ctx.strokeStyle="#000"; ctx.lineWidth=TH;
+  ctx.beginPath(); tracePath(SEG_WALL1); ctx.stroke();
+  ctx.beginPath(); tracePath(SEG_WALL2); ctx.stroke();
+
+  /* 9. small pale openings across the pitot lips */
+  fillRectW(0.2,4.6,0.4,5.0,PALE);
+  fillRectW(0.2,3.5,0.4,3.9,PALE);
+
+  /* 10. Delta-h dimension lines (thin) */
+  ctx.strokeStyle="#000"; ctx.lineWidth=1;
+  ctx.beginPath();
+  ctx.moveTo(X(-0.5),Y(sR)); ctx.lineTo(X(3.5),Y(sR));
+  ctx.moveTo(X(-0.5),Y(sL)); ctx.lineTo(X(1.25),Y(sL));
+  ctx.moveTo(X(0),Y(sR));    ctx.lineTo(X(0),Y(sL));
+  ctx.stroke();
+
+  /* 11. velocity arrows (Table i = 3, 3.5, 4, 4.5) */
+  const aLen = 4.5*Math.max(0,Math.min(1,v/5));
+  ctx.strokeStyle="#000"; ctx.fillStyle="#000"; ctx.lineWidth=1.4;
+  if(aLen>0.03){
+    for(let i=3;i<=4.5;i+=0.5){
+      const x1=-5.8+aLen;
+      ctx.beginPath(); ctx.moveTo(X(-5.8),Y(i)); ctx.lineTo(X(x1),Y(i)); ctx.stroke();
+      const hx=X(x1), hy=Y(i), s=7;
+      ctx.beginPath(); ctx.moveTo(hx,hy);
+      ctx.lineTo(hx-s,hy-s*0.5); ctx.lineTo(hx-s,hy+s*0.5); ctx.closePath(); ctx.fill();
+    }
+  }
+
+  /* ---- text labels ---- */
+  ctx.fillStyle="#000";
+  ctx.font='16px '+getComputedStyle(document.body).fontFamily;
+  ctx.textAlign="left"; ctx.textBaseline="middle";
+  ctx.fillText("velocity = "+v.toFixed(2)+" m/s", X(-5.8), Y(5));
+
+  // Delta-h text at (-0.7,-2) right aligned
+  ctx.textAlign="right";
+  let dhTxt;
+  if(h>=0.001) dhTxt="\u0394h = "+(h*100).toFixed(1)+" cm";
+  else         dhTxt="\u0394h < 0.1 cm";
+  ctx.fillText(dhTxt, X(-0.7), Y(-2));
+}
+
+/* ============================================================
+   Controls
+   ============================================================ */
+const sH=document.getElementById('sH'), vHb=document.getElementById('vH');
+const sV=document.getElementById('sV'), vVb=document.getElementById('vV');
+const sRho=document.getElementById('sRho'), vRhob=document.getElementById('vRho');
+const rowH=document.getElementById('rowH'), rowV=document.getElementById('rowV');
+const btnH=document.getElementById('btnH'), btnV=document.getElementById('btnV');
+
+function refreshLabels(){
+  vHb.textContent  = H.toFixed(1);
+  vVb.textContent  = Vin.toFixed(2);
+  vRhob.textContent= rho.toFixed(1);
+}
+function setMode(m){
+  mode=m;
+  btnH.classList.toggle('active',m===1);
+  btnV.classList.toggle('active',m===2);
+  rowH.classList.toggle('hidden',m!==1);
+  rowV.classList.toggle('hidden',m!==2);
+  render();
+}
+btnH.addEventListener('click',()=>setMode(1));
+btnV.addEventListener('click',()=>setMode(2));
+sH.addEventListener('input',e=>{H=parseFloat(e.target.value); refreshLabels(); render();});
+sV.addEventListener('input',e=>{Vin=parseFloat(e.target.value); refreshLabels(); render();});
+sRho.addEventListener('input',e=>{rho=parseFloat(e.target.value); refreshLabels(); render();});
+
+// action panels
+document.querySelectorAll('.abtn').forEach(b=>{
+  b.addEventListener('click',()=>{
+    const id=b.dataset.panel; const panel=document.getElementById(id);
+    const open=panel.classList.contains('show');
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('show'));
+    document.querySelectorAll('.abtn').forEach(a=>a.classList.remove('active'));
+    if(!open){ panel.classList.add('show'); b.classList.add('active'); }
+  });
+});
+
+setupCanvas();
+refreshLabels();
+setMode(1);
+</script>
+</body>
+</html>
