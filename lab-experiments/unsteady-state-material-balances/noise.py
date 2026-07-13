@@ -84,8 +84,8 @@ if __name__ == "__main__":
     t_eval = np.linspace(0, tmax, 101)
 
 
-    tau = 10
-    stds = [0, 0.1, 0.25, 0.5] # standard deviations for noise
+    tau = 10 # time constant for noise
+    stds = [0, 0.1, 0.1, 0.1, 0.1, 0.1] # standard deviations for noise
 
     for std in stds:
         pent = []
