@@ -4,6 +4,20 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Measuring Flow Rates with a Pitot Tube</title>
+<script>
+    MathJax = {
+        chtml: {
+            scale: 1.2,
+            mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
+            displayAlign: 'left', // default for indentalign when set to 'auto'
+        },
+        tex: {
+            inlineMath: [['$', '$'], ['\\(', '\\)']],
+            displayMath: [['$$', '$$'], ['\\[', '\\]']]
+        }
+    };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <style>
   :root{
     --ui: "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -51,7 +65,7 @@
   .ctrl .lbl .u{font-style:normal;}
   .ctrl input[type=range]{
     flex:1 1 auto;height:18px;cursor:pointer;
-    accent-color:rgb(229,229,255);
+    accent-color:#5a8bd6;
   }
   .ctrl .val{
     flex:0 0 auto;width:54px;margin-left:10px;
@@ -66,12 +80,12 @@
   /* ---- action buttons ---- */
   .actions{margin-top:14px;display:flex;justify-content:center;gap:8px;}
   .abtn{
-    font-family:var(--ui);font-size:15.6px;font-weight:normal;
-    color:#ffffff;background:#98000D;
-    border:1px solid #98000D;border-radius:3px;
-    padding:5px 15px;cursor:pointer;
+    font-family:var(--ui);font-size:13px;font-weight:bold;
+    color:#7a0a0a;background:linear-gradient(#ffffff,#efefef);
+    border:1px solid #b9b9b9;border-radius:3px;
+    padding:5px 14px;cursor:pointer;
   }
-  .abtn.active{background:#6f000a;border-color:#6f000a;}
+  .abtn.active{background:linear-gradient(#f1d9d9,#e7c4c4);border-color:#a06b6b;}
   .panel{
     display:none;margin-top:10px;border:1px solid var(--line);
     background:#fff;padding:14px 16px;border-radius:2px;
@@ -89,9 +103,9 @@
   .frac .fn{border-bottom:1px solid #000;padding:0 .4em 1px;}
   .frac .fd{padding:1px .4em 0;}
   .sqrt{border-top:1px solid #000;padding:0 .25em;}
-  .radical{display:inline-flex;align-items:stretch;vertical-align:middle;}
-  .radical .radsvg{width:13px;align-self:stretch;overflow:visible;color:#000;margin-right:-1px;}
-  .radical .rcand{border-top:1.5px solid #000;padding:3px 6px 2px 2px;display:flex;align-items:center;}
+  .radical{display:inline-flex;align-items:flex-start;vertical-align:middle;}
+  .radical > .rsign{font-family:var(--math);font-size:2.5em;line-height:.86;font-style:normal;}
+  .radical > .rcand{border-top:1.6px solid #000;padding:3px 5px 1px 2px;margin-top:.34em;}
   sub,sup{font-style:normal;}
   .imath{font-family:var(--math);font-style:italic;}
   .imath .n{font-style:normal;}
@@ -211,9 +225,8 @@
       <span class="n">&minus;</span> <span class="v">&rho;</span><span class="paren">)</span>
     </div>
 
-    <div>This equation can be rearranged and used to solve for difference in height of the fluids
-      (<span class="n">&Delta;</span><span class="imath">h</span>) in the manometer or the fluid velocity
-      (<span class="imath">v<sub>2</sub></span>):</div>
+    <div>This equation can be rearranged and used to solve for fluid velocity or
+      difference in height of the fluids in the manometer:</div>
 
     <div class="eq">
       <span class="n">&Delta;</span><span class="v">h</span>
@@ -227,24 +240,25 @@
     <div class="eq">
       <span class="v">v</span><sub>2</sub>
       <span class="n">=</span>
-      <span class="radical">
-        <svg class="radsvg" viewBox="0 0 13 40" preserveAspectRatio="none" aria-hidden="true">
-          <path d="M0.4,26 L4,39.2 L8.4,0.75 L13,0.75" fill="none" stroke="currentColor" stroke-width="1.5" vector-effect="non-scaling-stroke" stroke-linejoin="miter" stroke-linecap="round"/>
-        </svg>
+      <span font-size="2em">\( \sqrt{ \frac{2g \Delta h (\rho_m - \rho)}{\rho} } \)</span>
+      <!-- <span class="radical">
+        <span class="rsign">&radic;</span>
         <span class="rcand">
           <span class="frac">
             <span class="fn">2&thinsp;<span class="v">g</span>&thinsp;<span class="n">&Delta;</span><span class="v">h</span>&thinsp;<span class="paren">(</span><span class="v">&rho;</span><sub>m</sub> <span class="n">&minus;</span> <span class="v">&rho;</span><span class="paren">)</span></span>
             <span class="fd"><span class="v">&rho;</span></span>
           </span>
         </span>
-      </span>
+      </span> -->
     </div>
 
-    <div>Where <span class="imath">&rho;</span> and
+    <div>Where <span class="imath">P</span><sub>2</sub> is the static pressure of
+      fluid in the pipe, <span class="imath">&rho;</span> and
       <span class="imath">&rho;</span><sub>m</sub> are the densities of the fluid
       in the pipe and manometer fluid, <span class="imath">&gamma;</span> is
-      specific gravity of fluid in the pipe, and <span class="imath">g</span> is the
-      gravitational constant.</div>
+      specific gravity of fluid in the pipe, <span class="imath">g</span> is the
+      gravitational constant, and <span class="n">&Delta;</span><span class="imath">h</span>
+      is the difference in height of the manometer fluid.</div>
   </div>
 
   <div class="panel" id="pAbo">
