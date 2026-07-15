@@ -9,6 +9,7 @@ import { resetSignal } from './globals'
 import { Cartridge } from './components/Cartridge/Cartridge'
 import { AnimationTimer } from './globals/animate'
 import { ControlButton } from './components/ControlButton/ControlButton'
+import { InjectMenu } from './components/InjectMenu/InjectMenu'
 
 function App() {
   const aniTimer = new AnimationTimer();
@@ -31,6 +32,7 @@ function App() {
               <Cartridge />
             </SVGCanvas>
           </div>
+          <InjectMenu onClose={() => {}} />
         </RxrContextProvider>
     </>
   )

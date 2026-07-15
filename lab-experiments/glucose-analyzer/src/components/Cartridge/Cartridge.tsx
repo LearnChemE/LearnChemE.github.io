@@ -122,7 +122,7 @@ const DelayDuration = (t: number, delay: number, duration: number) => {
     return Math.min(normalized, 1);
 }
 
-const FlowPath: Component<FlowProps> = (props) => {
+const FlowPath: Component<FlowProps> = () => {
     const [s, setS] = createSignal(0);
     const ctx = useContext(RxrContext)!;
 
