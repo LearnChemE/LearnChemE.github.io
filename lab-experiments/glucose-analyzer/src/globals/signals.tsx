@@ -59,7 +59,7 @@ class ResetSignal {
         this.signal = createSignal(false);
     }
 
-    triggerSignal() {
+    emit() {
         if (this.signal === null) {
             return false;
         }

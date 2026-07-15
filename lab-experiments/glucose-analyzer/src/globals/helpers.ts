@@ -382,7 +382,7 @@ export function getSVGCoords(evt: MouseEvent | Touch) {
 
 /**
  * Animate function to be called every frame.
- * @param fn Function to call every frame. dt is time since last call in seconds, t is total time in ms. Return true to continue, false to stop.
+ * @param fn Function to call every frame. dt is time since last call in seconds, t is total time in s. Return true to continue, false to stop.
  * @param then Optional function to call when animation ends.
  */
 export function animate(fn: (dt: number, t: number) => boolean, then?: () => void) {
@@ -396,7 +396,7 @@ export function animate(fn: (dt: number, t: number) => boolean, then?: () => voi
         prevtime = time;
 
         // Call the function
-        const playing = fn(dt, time - startTime);
+        const playing = fn(dt, (time - startTime) / 1000);
 
         // Request next frame
         if (playing) requestAnimationFrame(frame);

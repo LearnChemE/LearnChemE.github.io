@@ -1,13 +1,14 @@
 import { createContext, onMount } from "solid-js";
 import { resetSignal } from "../globals";
+import { AnimationTimer } from "../globals/animate";
 
 export type ContextDescriptor = {
-    
+    aniTimer: AnimationTimer;
 };
 
 // Context definition and creation for column calculations
 export type ReactorContextType = {
-    
+    aniTimer: AnimationTimer;
 };
 export const RxrContext = createContext<ReactorContextType>();
 export const RxrContextProvider = (props: { children: any, descriptor: ContextDescriptor }) => {
@@ -19,7 +20,9 @@ export const RxrContextProvider = (props: { children: any, descriptor: ContextDe
     // Create calculations objects, etc
 
     // Create the store for the context object
-    const store: ReactorContextType = {  };
+    const store: ReactorContextType = { 
+        aniTimer: props.descriptor.aniTimer
+     };
 
     onMount(() => {
         resetSignal.subscribe(() => {
