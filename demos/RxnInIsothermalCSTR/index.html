@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reaction in an Isothermal Continuous Stirred-Tank Reactor (CSTR)</title>
+<style>
+  :root{
+    --darkred: rgb(153,0,13);
+    --panelborder: #c8c8c8;
+    --ink:#111;
+  }
+  html,body{margin:0;padding:0;background:#fff;}
+  #app{
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+    color:var(--ink);
+    width:1060px;
+    margin:14px auto 14px 40px;
+    position:relative;
+    -webkit-font-smoothing:antialiased;
+  }
+  .demo-title{
+    font-size:17px;
+    font-weight:bold;
+    margin:0 0 10px 2px;
+  }
+  /* ---- controls ---- */
+  .controls{ padding:4px 2px 8px 2px; }
+  .ctrl-row{
+    display:flex;
+    align-items:center;
+    gap:24px;
+    margin:6px 0;
+    flex-wrap:wrap;
+  }
+  .ctrl-row.row1{ gap:14px; flex-wrap:nowrap; }
+  .infobar{ display:flex; gap:10px; align-self:center; }
+  .order-group{ display:inline-flex; flex-direction:column; align-items:center; gap:3px; }
+  .order-label{ font-size:16.9px; white-space:nowrap; }
+  .slider-group{ display:flex; align-items:center; gap:8px; }
+  .slider-label{ font-size:16.1px; white-space:nowrap; }
+  input[type=range]{
+    -webkit-appearance:none;
+    appearance:none;
+    width:140px;
+    height:3px;
+    background:#b8b8b8;
+    border-radius:2px;
+    outline:none;
+    cursor:pointer;
+    margin:0;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none; appearance:none;
+    width:13px; height:13px; border-radius:50%;
+    background:#5b6066; border:1px solid #3a3d42; cursor:pointer;
+  }
+  input[type=range]::-moz-range-thumb{
+    width:13px; height:13px; border-radius:50%;
+    background:#5b6066; border:1px solid #3a3d42; cursor:pointer;
+  }
+  .readout{
+    font-size:16.1px; min-width:46px; text-align:left;
+    font-variant-numeric:tabular-nums;
+  }
+  .k-label{ font-size:16.1px; white-space:nowrap; }
+  .setterbar{ display:inline-flex; border:1px solid #9a9a9a; border-radius:3px; overflow:hidden; }
+  .setterbar button{
+    font-family:inherit; font-size:14px;
+    border:none; background:#ececec; color:#222;
+    padding:3px 11px; cursor:pointer; line-height:1.1;
+  }
+  .setterbar button + button{ border-left:1px solid #9a9a9a; }
+  .setterbar button.sel{ background:var(--darkred); color:#fff; }
+  .setterbar sup{ font-size:9px; }
+  /* ---- figure ---- */
+  .figwrap{ margin:6px 0 4px 0; }
+  canvas{ display:block; width:600px; height:400px; }
+  /* ---- info buttons / panels ---- */
+  /* .infobar-bottom-unused{} */
+  .infobar button{
+    font-family:inherit; font-size:16.8px;
+    background:var(--darkred); color:#fff;
+    border:1px solid var(--darkred); border-radius:3px;
+    padding:4.5px 13.5px; cursor:pointer;
+  }
+  .infobar button:hover{ background:#b3000f; border-color:#b3000f; }
+  .infobar button.active{ background:#6f000a; color:#fff; border-color:#6f000a; }
+  .panel{
+    display:none;
+    position:absolute;
+    width:430px;
+    box-sizing:border-box;
+    background:#fff;
+    border:1px solid var(--panelborder);
+    border-radius:3px;
+    padding:12px 14px;
+    font-size:13.5px;
+    line-height:1.5;
+    color:#1a1a1a;
+    box-shadow:0 3px 10px rgba(0,0,0,0.18);
+    z-index:20;
+  }
+  .panel.show{ display:block; }
+  .panel p{ margin:0 0 9px 0; }
+  .panel p:last-child{ margin-bottom:0; }
+  .panel .eq{ margin:4px 0 9px 14px; font-style:italic; }
+  .panel a{ color:var(--darkred); text-decoration:none; }
+  .panel a:hover{ text-decoration:underline; }
+  i.var{ font-style:italic; }
+  sub{ font-size:.72em; } sup{ font-size:.72em; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="controls">
+    <div class="ctrl-row row1">
+      <div class="slider-group">
+        <span class="slider-label"><i class="var">C</i><sub>A0</sub> (mol/L)</span>
+        <input type="range" id="ca0" min="0.1" max="1" step="0.05" value="0.5">
+        <span class="readout" id="ca0out">0.50</span>
+      </div>
+      <div class="infobar">
+        <button id="btnDir">Directions</button>
+        <button id="btnDet">Details</button>
+      </div>
+    </div>
+
+    <div class="ctrl-row row1">
+      <div class="slider-group">
+        <span class="slider-label">volumetric flow rate (L/min)</span>
+        <input type="range" id="nu0" min="10" max="50" step="0.5" value="30">
+        <span class="readout" id="nu0out">30.0</span>
+      </div>
+      <div class="infobar">
+        <button id="btnAbt">About</button>
+      </div>
+    </div>
+
+    <div class="ctrl-row">
+      <div class="slider-group">
+        <span class="k-label">reaction rate constant <i class="var">k</i> (<span id="kunits"></span>)</span>
+        <input type="range" id="k" min="0.001" max="0.07" step="0.003" value="0.04">
+        <span class="readout" id="kout">0.040</span>
+      </div>
+      <div class="order-group">
+        <span class="order-label">reaction order</span>
+        <div class="setterbar" id="orderbar">
+          <button data-n="1" class="sel">1<sup>st</sup></button>
+          <button data-n="2">2<sup>nd</sup></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="figwrap">
+    <canvas id="cv" width="1200" height="800"></canvas>
+  </div>
+
+  <div class="panel" id="panelDir">
+    <p>In this Demonstration, the liquid-phase reaction <i>A</i> &#10230; <i>B</i> takes place in an
+    isothermal, continuous stirred-tank reactor (CSTR). Use the sliders to set the feed concentration of
+    <i>A</i>, <i class="var">C</i><sub>A,0</sub>, the volumetric flow rate <i class="var">v</i>, and the
+    rate constant <i class="var">k</i>. Use the buttons to select the reaction order with respect to
+    <i>A</i> (first, second). The rate constant has the same numerical value when the reaction order
+    changes, but its units are different. The figure shows the feed molar flow rate
+    <i class="var">F</i><sub>A,0</sub>, the feed concentration <i class="var">C</i><sub>A,0</sub>, the
+    outlet molar flow rates <i class="var">F</i><sub>A</sub>, <i class="var">F</i><sub>B</sub>, and the
+    outlet concentrations <i class="var">C</i><sub>A</sub>, <i class="var">C</i><sub>B</sub>. Note that
+    the outlet concentrations are identical to the concentrations in the reactor. The reactor residence
+    time τ = <i class="var">V</i>/<i class="var">v</i> is also calculated.</p>
+  </div>
+
+  <div class="panel" id="panelDet">
+    <p>The constant-density, liquid-phase reaction takes place in an isothermal CSTR:
+    <i>A</i> &#8594; <i>B</i>, with reaction rate</p>
+    <p class="eq">&minus;<i class="var">r</i><sub>A</sub> = <i class="var">r</i><sub>B</sub> =
+    <i class="var">k</i> <i class="var">C</i><sub>A</sub><sup><i>m</i></sup>,</p>
+    <p>where <i class="var">C</i><sub>A</sub> is the concentration of component <i>A</i>,
+    <i class="var">r</i><sub>i</sub> is the rate of reaction of component <i>i</i>, <i>m</i> is the order
+    of reaction with respect to <i>A</i>, and <i class="var">k</i> is the rate constant.</p>
+
+    <p>Mass balances on each component:</p>
+    <p class="eq">component <i>A</i>:&nbsp;&nbsp;<i class="var">F</i><sub>A,0</sub> &minus;
+    <i class="var">F</i><sub>A</sub> + <i class="var">r</i><sub>A</sub><i class="var">V</i> = 0,</p>
+    <p class="eq">component <i>B</i>:&nbsp;&nbsp;<i class="var">F</i><sub>B,0</sub> &minus;
+    <i class="var">F</i><sub>B</sub> + <i class="var">r</i><sub>B</sub><i class="var">V</i> = 0.</p>
+
+    <p>Mass balances in terms of volumetric flow rates and concentrations:</p>
+    <p class="eq">component <i>A</i>:&nbsp;&nbsp;<i class="var">C</i><sub>A,0</sub><i class="var">v</i>
+    &minus; <i class="var">C</i><sub>A</sub><i class="var">v</i> +
+    <i class="var">r</i><sub>A</sub><i class="var">V</i> = 0,</p>
+    <p class="eq">component <i>B</i>:&nbsp;&nbsp;<i class="var">C</i><sub>B,0</sub><i class="var">v</i>
+    &minus; <i class="var">C</i><sub>B</sub><i class="var">v</i> +
+    <i class="var">r</i><sub>B</sub><i class="var">V</i> = 0.</p>
+
+    <p><i class="var">F</i><sub>i,0</sub> is the molar flow rate of component <i>i</i> at the inlet;
+    <i class="var">F</i><sub>i</sub> is the molar flow rate of component <i>i</i> at the outlet;
+    <i class="var">C</i><sub>i,0</sub> and <i class="var">C</i><sub>i</sub> are molar concentrations of
+    component <i>i</i> at the inlet and outlet, respectively; and <i class="var">v</i> is the volumetric
+    flow rate, which is equal at the inlet and outlet for constant-density reactions.</p>
+
+    <p>The solutions to these mass balances for first- and second-order reactions are:</p>
+    <p class="eq">first-order:&nbsp;&nbsp;<i class="var">C</i><sub>A</sub>(τ) =
+    <i class="var">C</i><sub>A,0</sub> / (1 + <i class="var">k</i>τ),&nbsp;&nbsp;
+    <i class="var">C</i><sub>B</sub>(τ) = <i class="var">C</i><sub>B,0</sub> +
+    <i class="var">C</i><sub>A,0</sub> &minus; <i class="var">C</i><sub>A</sub>(τ),</p>
+    <p class="eq">second-order:&nbsp;&nbsp;<i class="var">C</i><sub>A</sub>(τ) =
+    [&minus;1 + &radic;(1 + 4<i class="var">k</i>τ<i class="var">C</i><sub>A,0</sub>)] / (2<i class="var">k</i>τ),&nbsp;&nbsp;
+    <i class="var">C</i><sub>B</sub>(τ) = <i class="var">C</i><sub>B,0</sub> +
+    <i class="var">C</i><sub>A,0</sub> &minus; <i class="var">C</i><sub>A</sub>(τ),</p>
+    <p>where τ = <i class="var">V</i>/<i class="var">v</i> is the residence time in
+    the reactor.</p>
+  </div>
+
+  <div class="panel" id="panelAbt">
+    <p>This simulation was created in the
+    <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and
+    Biological Engineering</a> at University of Colorado Boulder for
+    <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by
+    John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a
+    <a href="https://demonstrations.wolfram.com/ReactionInAnIsothermalContinuousStirredTankReactorCSTR/"
+    target="_blank" rel="noopener">Mathematica simulation</a> by Neil Hendren. It was prepared with
+    financial support from the National Science Foundation (DUE 2336987 and 2336988) in collaboration
+    with Washington State University. Address any questions or comments to LearnChemE@gmail.com.</p>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- state ----------
+  var state = { CA0:0.5, nu0:30, k:0.04, n:1 };
+  var V = 1000; // L (fixed reactor volume)
+
+  // ---------- elements ----------
+  var $ = function(id){ return document.getElementById(id); };
+  var ca0 = $("ca0"), nu0 = $("nu0"), k = $("k");
+  var ca0out = $("ca0out"), nu0out = $("nu0out"), kout = $("kout");
+  var kunits = $("kunits");
+  var cv = $("cv"), ctx = cv.getContext("2d");
+
+  // ---------- helpers ----------
+  function roundTo(x, inc){ return Math.round(x/inc)*inc; }
+  function fixed(x, d){ return x.toFixed(d); }
+
+  // ---------- physics (steady-state isothermal CSTR mass balance) ----------
+  // C_A,0 - C_A - k C_A^m tau = 0
+  function compute(){
+    var CA0 = state.CA0, nu = state.nu0, kk = state.k, n = state.n;
+    var tau = V/nu;                       // residence time
+    var cA;
+    if(n===1){
+      cA = CA0/(1 + kk*tau);              // first order
+    } else {
+      var a = kk*tau;                     // second order: a cA^2 + cA - CA0 = 0
+      cA = (-1 + Math.sqrt(1 + 4*a*CA0))/(2*a);
+    }
+    var cB  = CA0 - cA;
+    var FA0 = CA0*nu;
+    var FA  = cA*nu;
+    var FB  = cB*nu;
+    return { tau:tau, cA:cA, cB:cB, FA0:FA0, FA:FA, FB:FB };
+  }
+
+  // ---------- canvas rich text (sub/super/italic) ----------
+  // segment: {s:string, k:'n'|'i'|'sub'|'sup'}
+  function measureRich(segs, fpx){
+    var w = 0;
+    for(var i=0;i<segs.length;i++){
+      var g = segs[i];
+      var sz = (g.k==='sub'||g.k==='sup') ? fpx*0.72 : fpx;
+      ctx.font = (g.k==='i' ? 'italic ' : '') + sz + 'px Helvetica, Arial, sans-serif';
+      w += ctx.measureText(g.s).width;
+    }
+    return w;
+  }
+  // x,y = left baseline anchor
+  function drawRich(segs, x, y, fpx, color){
+    ctx.fillStyle = color; ctx.textBaseline = 'alphabetic'; ctx.textAlign = 'left';
+    var cx = x;
+    for(var i=0;i<segs.length;i++){
+      var g = segs[i];
+      var sub = g.k==='sub', sup = g.k==='sup', ital = g.k==='i';
+      var sz = (sub||sup) ? fpx*0.72 : fpx;
+      ctx.font = (ital ? 'italic ' : '') + sz + 'px Helvetica, Arial, sans-serif';
+      var dy = sub ? fpx*0.22 : (sup ? -fpx*0.42 : 0);
+      ctx.fillText(g.s, cx, y+dy);
+      cx += ctx.measureText(g.s).width;
+    }
+    return cx - x;
+  }
+
+  // ---------- coordinate transform (world -> canvas px, on 600x400 logical) ----------
+  var SXR = 600/10.5, SYR = 400/10;
+  function X(x){ return (x+0.25)*SXR; }
+  function Y(y){ return (10-y)*SYR; }
+
+  function ellipse(cx,cy,rx,ry,a0,a1,ccw){
+    ctx.ellipse(X(cx),Y(cy), rx*SXR, ry*SYR, 0, a0, a1, ccw);
+  }
+  function rectW(x0,y0,x1,y1){ ctx.rect(X(x0),Y(y1),(x1-x0)*SXR,(y1-y0)*SYR); }
+  function lineW(x0,y0,x1,y1){ ctx.beginPath(); ctx.moveTo(X(x0),Y(y0)); ctx.lineTo(X(x1),Y(y1)); ctx.stroke(); }
+
+  function arrowW(x0,y0,x1,y1,head){
+    ctx.beginPath(); ctx.moveTo(X(x0),Y(y0)); ctx.lineTo(X(x1),Y(y1)); ctx.stroke();
+    var ang = Math.atan2(Y(y1)-Y(y0), X(x1)-X(x0));
+    var h = head||9;
+    ctx.beginPath();
+    ctx.moveTo(X(x1),Y(y1));
+    ctx.lineTo(X(x1)-h*Math.cos(ang-0.4), Y(y1)-h*Math.sin(ang-0.4));
+    ctx.lineTo(X(x1)-h*Math.cos(ang+0.4), Y(y1)-h*Math.sin(ang+0.4));
+    ctx.closePath(); ctx.fillStyle="#000"; ctx.fill();
+  }
+
+  // lower-half filled ellipse (world lower half = canvas angles 0..PI)
+  function bowl(cx,cy,rx,ry){
+    ctx.beginPath();
+    ctx.ellipse(X(cx),Y(cy), rx*SXR, ry*SYR, 0, 0, Math.PI, false);
+    ctx.closePath();
+  }
+  function bowlArc(cx,cy,rx,ry){
+    ctx.beginPath();
+    ctx.ellipse(X(cx),Y(cy), rx*SXR, ry*SYR, 0, 0, Math.PI, false);
+  }
+  // uniform cubic B-spline through control pts (world) -> filled path
+  function bsplineFill(rawpts){
+    function seg(p0,p1,p2,p3,t){
+      var t2=t*t, t3=t2*t;
+      var b0=(-t3+3*t2-3*t+1)/6, b1=(3*t3-6*t2+4)/6,
+          b2=(-3*t3+3*t2+3*t+1)/6, b3=t3/6;
+      return [b0*p0[0]+b1*p1[0]+b2*p2[0]+b3*p3[0],
+              b0*p0[1]+b1*p1[1]+b2*p2[1]+b3*p3[1]];
+    }
+    // clamp: repeat the end control points so the curve reaches the pipe mouth
+    var f=rawpts[0], l=rawpts[rawpts.length-1];
+    var pts=[f,f].concat(rawpts).concat([l,l]);
+    ctx.beginPath(); var first=true;
+    for(var i=1;i<pts.length-2;i++){
+      for(var t=0;t<=1.0001;t+=0.1){
+        var p=seg(pts[i-1],pts[i],pts[i+1],pts[i+2],t);
+        if(first){ ctx.moveTo(X(p[0]),Y(p[1])); first=false; }
+        else ctx.lineTo(X(p[0]),Y(p[1]));
+      }
+    }
+    ctx.closePath();
+  }
+
+  // ---------- the reactor schematic ----------
+  function drawReactor(){
+    var LIGHTBLUE="#e9f3fc", GRAY85="#d9d9d9", GRAY60="#999999", BROWN="#b89c8f";
+    ctx.lineJoin="round"; ctx.lineCap="round";
+
+    // ===== fills (back to front) =====
+    // outer bottom bowl (gray)
+    ctx.fillStyle=GRAY85; bowl(5,2,2.25,1.1); ctx.fill();
+
+    // inlet & outlet pipes (light blue)
+    ctx.fillStyle=LIGHTBLUE;
+    ctx.beginPath(); rectW(1.5,7.0,3.0,7.5); ctx.fill();
+    ctx.beginPath(); rectW(7.0,2.0,8.5,2.5); ctx.fill();
+
+    // inflow stream curve (light blue)
+    bsplineFill([[3,7.5],[3.5,7.5],[4,7.25],[4.5,5.5],[4,5.5],
+                 [3.75,5.5],[3.75,6.75],[3.1,7],[3,7],[2.5,7]]);
+    ctx.fillStyle=LIGHTBLUE; ctx.fill();
+
+    // inner bottom bowl (light blue)
+    ctx.fillStyle=LIGHTBLUE; bowl(5,2,2.0,0.75); ctx.fill();
+    // main liquid body (light blue)
+    ctx.beginPath(); rectW(3,2,7.25,6); ctx.fill();
+
+    // left wall (gray)
+    ctx.fillStyle=GRAY85; ctx.beginPath(); rectW(2.75,2,3,7); ctx.fill();
+    // right wall + top rim (gray polygon)
+    ctx.beginPath();
+    ctx.moveTo(X(2.75),Y(7.5)); ctx.lineTo(X(2.75),Y(7.75));
+    ctx.lineTo(X(7.25),Y(7.75)); ctx.lineTo(X(7.25),Y(2.5));
+    ctx.lineTo(X(7.0),Y(2.5));  ctx.lineTo(X(7.0),Y(7.5));
+    ctx.closePath(); ctx.fill();
+    // top dome (gray upper half)
+    ctx.beginPath();
+    ctx.ellipse(X(5),Y(7.75), 2.1*SXR, 0.5*SYR, 0, Math.PI, 2*Math.PI, false);
+    ctx.closePath(); ctx.fill();
+
+    // ===== outlines =====
+    ctx.strokeStyle="#000"; ctx.lineWidth=1; ctx.fillStyle="none";
+    bowlArc(5,2,2.0,0.75); ctx.stroke();      // inner bottom arc
+    bowlArc(5,2,2.25,1.1); ctx.stroke();      // outer bottom arc
+    // left wall outline
+    ctx.beginPath();
+    ctx.moveTo(X(3),Y(2)); ctx.lineTo(X(3),Y(7));
+    ctx.lineTo(X(2.75),Y(7)); ctx.lineTo(X(2.75),Y(2)); ctx.stroke();
+    // right wall + rim outline
+    ctx.beginPath();
+    ctx.moveTo(X(2.75),Y(7.5)); ctx.lineTo(X(2.75),Y(7.75));
+    ctx.lineTo(X(7.25),Y(7.75)); ctx.lineTo(X(7.25),Y(2.5));
+    ctx.lineTo(X(7.0),Y(2.5));  ctx.lineTo(X(7.0),Y(7.5)); ctx.stroke();
+    // top dome outline
+    ctx.beginPath();
+    ctx.ellipse(X(5),Y(7.75), 2.1*SXR, 0.5*SYR, 0, Math.PI, 2*Math.PI, false);
+    ctx.stroke();
+
+    // ===== baffles (brown) + connectors =====
+    ctx.fillStyle=BROWN;
+    ctx.beginPath(); rectW(3.15,2.6,3.45,5.5); ctx.fill();
+    ctx.beginPath(); rectW(6.55,2.6,6.85,5.5); ctx.fill();
+    ctx.strokeStyle="#000";
+    lineW(3,3,3.15,3); lineW(3,5,3.15,5);
+    lineW(6.85,3,7,3); lineW(6.85,5,7,5);
+
+    // ===== impeller shaft =====
+    ctx.fillStyle=GRAY60; ctx.beginPath(); rectW(4.95,3.5,5.05,8.5); ctx.fill();
+
+    // ===== impeller blades =====
+    ctx.fillStyle=GRAY85; ctx.strokeStyle="#666"; ctx.lineWidth=1;
+    ctx.beginPath();
+    for(var t=0;t<=2*Math.PI+0.001;t+=0.08){
+      var px = 5 + Math.cos(t);
+      var py = 3.5 + 0.8*Math.sin(t)*Math.cos(t);
+      if(t===0) ctx.moveTo(X(px),Y(py)); else ctx.lineTo(X(px),Y(py));
+    }
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+
+    // ===== recirculation arrow =====
+    ctx.strokeStyle="#000"; ctx.lineWidth=1; ctx.beginPath();
+    var started=false;
+    for(var a=0.6*Math.PI;a<=2.45*Math.PI;a+=0.1){
+      var rx2=5+0.4*Math.cos(a), ry2=4.2+0.125*Math.sin(a);
+      if(!started){ ctx.moveTo(X(rx2),Y(ry2)); started=true; } else ctx.lineTo(X(rx2),Y(ry2));
+    }
+    ctx.stroke();
+    (function(){
+      var a=2.45*Math.PI, a2=2.35*Math.PI;
+      var ex=X(5+0.4*Math.cos(a)), ey=Y(4.2+0.125*Math.sin(a));
+      var ang=Math.atan2(ey-Y(4.2+0.125*Math.sin(a2)), ex-X(5+0.4*Math.cos(a2)));
+      var h=7; ctx.beginPath(); ctx.moveTo(ex,ey);
+      ctx.lineTo(ex-h*Math.cos(ang-0.5),ey-h*Math.sin(ang-0.5));
+      ctx.lineTo(ex-h*Math.cos(ang+0.5),ey-h*Math.sin(ang+0.5));
+      ctx.closePath(); ctx.fillStyle="#000"; ctx.fill();
+    })();
+
+    // ===== motor on top =====
+    ctx.fillStyle=GRAY85; ctx.strokeStyle="#000"; ctx.lineWidth=1;
+    ctx.beginPath(); rectW(4.75,8.5,5.25,9.75); ctx.fill(); ctx.stroke();
+    lineW(4.75,8.9,5.25,8.9); lineW(4.75,9.3,5.25,9.3);
+
+    // ===== pipe outlines + arrows (drawn last, on top) =====
+    ctx.strokeStyle="#000"; ctx.lineWidth=1;
+    lineW(1.5,7.0,3.0,7.0); lineW(1.5,7.5,3.0,7.5);   // inlet
+    lineW(7.0,2.0,8.5,2.0); lineW(7.0,2.5,8.5,2.5);   // outlet
+    arrowW(1.0,7.25,2.0,7.25);
+    arrowW(7.75,2.25,9.0,2.25);
+  }
+
+  // ---------- labels ----------
+  function I(s){ return {s:s,k:'i'}; }
+  function T(s){ return {s:s,k:'n'}; }
+  function SB(s){ return {s:s,k:'sub'}; }
+  function SP(s){ return {s:s,k:'sup'}; }
+
+  function drawLabels(r){
+    var F = 16;                 // label font px (logical, scaled by DPR)
+    var CA0 = state.CA0, n = state.n;
+
+    // decimals (match Mathematica)
+    var cDec = (r.cA < 0.03) ? 3 : 2;
+    var fDec = (r.FA < 0.2) ? 2 : 1;
+
+    var vStr   = "1.0";
+    var tauStr = String(Math.trunc(r.tau));
+    var ca0Str = fixed(roundTo(CA0,0.1), 2);
+    var cAStr  = fixed(roundTo(r.cA,0.001), cDec);
+    var cBStr  = fixed(roundTo(r.cB,0.001), cDec);
+    var FA0Str = fixed(roundTo(r.FA0,0.1), 1);
+    var FAStr  = fixed(roundTo(r.FA,0.01), fDec);
+    var FBStr  = fixed(roundTo(r.FB,0.01), fDec);
+
+    // inside reactor
+    drawRich([I("V"),T(" = "+vStr+" m"),SP("3")], X(3.35), Y(6.55), F, "#000");
+    drawRich([T("\u03C4 = "+tauStr+" min")],        X(5.25), Y(6.55), F, "#000");
+    drawRich([I("C"),SB("A"),T(" = "+cAStr+" mol/L")], X(3.95), Y(2.55), F, "#000");
+    drawRich([I("C"),SB("B"),T(" = "+cBStr+" mol/L")], X(3.95), Y(1.95), F, "#000");
+
+    // feed (upper left)
+    drawRich([I("F"),SB("A,0"),T(" = "+FA0Str+" mol/min")], X(-0.2), Y(6.5), F, "#000");
+    drawRich([I("C"),SB("A,0"),T(" = "+ca0Str+" mol/L")],   X(-0.2), Y(5.75), F, "#000");
+
+    // outlet (right)
+    drawRich([I("F"),SB("A"),T(" = "+FAStr+" mol/min")], X(7.55), Y(3.5), F, "#000");
+    drawRich([I("C"),SB("A"),T(" = "+cAStr+" mol/L")],   X(7.55), Y(2.8), F, "#000");
+    drawRich([I("F"),SB("B"),T(" = "+FBStr+" mol/min")], X(7.55), Y(1.6), F, "#000");
+    drawRich([I("C"),SB("B"),T(" = "+cBStr+" mol/L")],   X(7.55), Y(0.95), F, "#000");
+  }
+
+  function drawTitle(){
+    var F = 17;
+    var segs = [ T("A \u27F6 B") ];
+    var rate = [ I("r"), SB("A"), T(" = "+fixed(state.k,3)+" "), I("C"), SB("A") ];
+    if(state.n===2) rate.push(SP("2"));
+    rate.push(T(" mol/(L\u00B7min)"));
+
+    // place: A->B on the left, rate roughly centered-right (mimic Spacer[90])
+    var y = 22;
+    drawRich(segs, X(2.2), y, F, "#000");
+    var rateW = measureRich(rate, F);
+    drawRich(rate, 600 - rateW - 70, y, F, "#000");
+  }
+
+  // ---------- main render ----------
+  function render(){
+    var DPR = 2; // hi-DPI
+    cv.width = 600*DPR; cv.height = 400*DPR;
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+    ctx.clearRect(0,0,600,400);
+
+    var r = compute();
+    drawReactor();
+    drawLabels(r);
+    drawTitle();
+  }
+
+  // ---------- UI wiring ----------
+  function updateUnits(){
+    kunits.innerHTML = (state.n===1) ? "min<sup>&minus;1</sup>" : "L/(mol&middot;min)";
+  }
+
+  ca0.addEventListener("input", function(){
+    state.CA0 = parseFloat(this.value); ca0out.textContent = fixed(state.CA0,2); render();
+  });
+  nu0.addEventListener("input", function(){
+    state.nu0 = parseFloat(this.value); nu0out.textContent = fixed(state.nu0,1); render();
+  });
+  k.addEventListener("input", function(){
+    state.k = parseFloat(this.value); kout.textContent = fixed(state.k,3); render();
+  });
+
+  var bar = $("orderbar");
+  Array.prototype.forEach.call(bar.querySelectorAll("button"), function(b){
+    b.addEventListener("click", function(){
+      Array.prototype.forEach.call(bar.querySelectorAll("button"), function(x){ x.classList.remove("sel"); });
+      b.classList.add("sel");
+      state.n = parseInt(b.getAttribute("data-n"),10);
+      updateUnits(); render();
+    });
+  });
+
+  // info panels (toggle, one at a time)
+  var app = document.getElementById("app");
+  var panels = {Dir:$("panelDir"), Det:$("panelDet"), Abt:$("panelAbt")};
+  var btns   = {Dir:$("btnDir"),   Det:$("btnDet"),   Abt:$("btnAbt")};
+  function placePanel(key){
+    var b = btns[key], p = panels[key];
+    var appW = app.clientWidth;
+    var pw = p.offsetWidth || 430;
+    // a few pixels below the button, starting just to the right of it
+    var top  = b.offsetTop + b.offsetHeight + 6;
+    var left = b.offsetLeft + b.offsetWidth + 8;
+    if(left + pw + 6 > appW) left = appW - pw - 6;  // keep on-canvas
+    if(left < 0) left = 0;
+    p.style.top  = top  + "px";
+    p.style.left = left + "px";
+  }
+  function toggle(key){
+    var open = panels[key].classList.contains("show");
+    for(var kk in panels){ panels[kk].classList.remove("show"); btns[kk].classList.remove("active"); }
+    if(!open){ panels[key].classList.add("show"); btns[key].classList.add("active"); placePanel(key); }
+  }
+  btns.Dir.addEventListener("click", function(){ toggle("Dir"); });
+  btns.Det.addEventListener("click", function(){ toggle("Det"); });
+  btns.Abt.addEventListener("click", function(){ toggle("Abt"); });
+
+  // init
+  ca0out.textContent = fixed(state.CA0,2);
+  nu0out.textContent = fixed(state.nu0,1);
+  kout.textContent   = fixed(state.k,3);
+  updateUnits();
+  render();
+})();
+</script>
+</body>
+</html>

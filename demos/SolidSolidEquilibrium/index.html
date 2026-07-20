@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Solid-Solid-Liquid Equilibrium</title>
+<style>
+  html,body{margin:0;padding:0;background:#fff;}
+  *{box-sizing:border-box;}
+  #app{
+    font-family:Helvetica, Arial, sans-serif;
+    color:#000;
+    width:990px;
+    margin:8px auto;
+    padding:6px 10px 14px 10px;
+  }
+  .title{
+    font-size:19px;font-weight:bold;text-align:center;margin:2px 0 10px 0;
+  }
+  .controls{margin:0 4px 6px 4px;}
+  .ctrlrow{display:flex;align-items:center;margin:5px 0;font-size:15px;}
+  .ctrllabel{width:150px;text-align:right;padding-right:10px;}
+  .valbox{
+    display:inline-block;min-width:46px;text-align:center;
+    border:1px solid #c8c8c8;border-radius:3px;background:#fbfbfb;
+    padding:1px 6px;margin-right:10px;font-size:14px;
+  }
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;height:4px;background:#bdbdbd;
+    border-radius:2px;outline:none;flex:1;max-width:330px;margin:0 4px;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;appearance:none;width:14px;height:14px;border-radius:50%;
+    background:#5f6368;border:1px solid #3c4043;cursor:pointer;margin-top:0;
+  }
+  input[type=range]::-moz-range-thumb{
+    width:14px;height:14px;border-radius:50%;background:#5f6368;border:1px solid #3c4043;cursor:pointer;
+  }
+  .resetbtn,.tabbtn{
+    font-family:Helvetica, Arial, sans-serif;
+    background:#8b1a1a;color:#fff;border:1px solid #6e1414;border-radius:4px;
+    padding:4px 12px;font-size:14px;cursor:pointer;
+  }
+  .tabbtn{padding:5px 15px;font-size:17px;}
+  .resetbtn:hover,.tabbtn:hover{background:#751515;}
+  .tabbtn.active{background:#5e1010;border-color:#4a0c0c;}
+  .plots{display:flex;justify-content:center;align-items:flex-start;gap:2px;margin:4px 0;}
+  .btnbar{position:relative;display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:12px 4px 6px 4px;}
+  .panel{
+    position:absolute;box-sizing:border-box;z-index:5;
+    border:1px solid #c0c0c0;border-radius:4px;background:#fcfcfc;
+    padding:12px 16px;font-size:13.5px;line-height:1.5;
+    display:none;
+  }
+  .panel.show{display:block;}
+  .panel h4{margin:0 0 6px 0;font-size:15px;}
+  .panel p{margin:7px 0;}
+  .eq{margin:7px 0 7px 18px;font-style:italic;}
+  .panel a{color:#8b1a1a;text-decoration:none;}
+  .panel a:hover{text-decoration:underline;}
+  sub,sup{font-size:0.72em;}
+  ol{margin:6px 0 6px 22px;padding:0;}
+  ol li{margin:4px 0;}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="controls">
+    <div class="ctrlrow">
+      <span class="ctrllabel">mole fraction B</span>
+      <span class="valbox" id="zbval">0.15</span>
+      <input type="range" id="zb" min="0.01" max="0.99" step="0.01" value="0.15">
+    </div>
+    <div class="ctrlrow">
+      <span class="ctrllabel">heat added (kJ)</span>
+      <span class="valbox" id="heatval">0</span>
+      <input type="range" id="heat" min="0" max="241" step="1" value="0">
+    </div>
+  </div>
+
+  <div class="btnbar">
+    <button class="resetbtn" id="reset">reset to initial conditions</button>
+    <button class="tabbtn" data-panel="directions">Directions</button>
+    <button class="tabbtn" data-panel="details">Details</button>
+    <button class="tabbtn" data-panel="about">About</button>
+
+  <div class="panel" id="directions">
+    <p>This Demonstration illustrates the behavior of a system of two pure substances
+    (A and B) and a solid compound of the two (A<sub>2</sub>B<sub>3</sub>). Solid&ndash;solid
+    equilibrium, solid&ndash;liquid equilibrium, and solid&ndash;solid&ndash;liquid equilibrium
+    are represented in the phase diagram. Mixtures of the pure solids
+    (A&nbsp;+&nbsp;A<sub>2</sub>B<sub>3</sub> and B&nbsp;+&nbsp;A<sub>2</sub>B<sub>3</sub>)
+    are immiscible.</p>
+
+    <p>At the selected temperature and mole fraction of B (represented by the black point on
+    the <i>T</i>&ndash;mole fraction diagram), the relative amounts of the four possible phases
+    are shown in the bar graph. The mole fraction of B in the liquid phase (mixture of A and B)
+    is given above the liquid bar in the bar graph. Move the black point by adjusting the sliders
+    for the mole fraction B and heat added.</p>
+
+    <p>When heat is added, the temperature increases, except when the point is on one of the two
+    horizontal lines (at about 200&nbsp;&deg;C and 300&nbsp;&deg;C) or when pure
+    A<sub>2</sub>B<sub>3</sub> is in equilibrium with the liquid phase. On the lines at
+    200&nbsp;&deg;C and 300&nbsp;&deg;C, three phases can be in equilibrium: solid
+    A<sub>2</sub>B<sub>3</sub>, liquid, and either solid A or B. A mole balance is used to find
+    the relative amounts of each phase on these lines. The amount of heat added represents what
+    phases are present in this system; it is not meant to represent a real system.</p>
+
+    <p>In the two-phase regions, the relative amounts of each phase are obtained using the lever
+    rule, and the mole fraction of B in the liquid phase is shown by a vertical dotted line.</p>
+  </div>
+
+  <div class="panel" id="details">
+    <p>The lever rule is used to find the relative molar contents of each phase. An example in
+    the solid A&nbsp;+&nbsp;liquid region is given by:</p>
+    <p class="eq"><i>r</i><sub>liquid</sub> = (<i>z</i><sub>B</sub> &minus; 0) /
+      (<i>x</i><sub>B</sub> &minus; 0) = <i>z</i><sub>B</sub> / <i>x</i><sub>B</sub> ,</p>
+    <p class="eq"><i>r</i><sub>solid&nbsp;of&nbsp;A</sub> =
+      (<i>z</i><sub>B</sub> &minus; <i>x</i><sub>B</sub>) / (0 &minus; <i>x</i><sub>B</sub>) =
+      1 &minus; (<i>z</i><sub>B</sub> &minus; 0)/(<i>x</i><sub>B</sub> &minus; 0) =
+      1 &minus; <i>r</i><sub>liquid</sub> ,</p>
+    <p>where <i>z</i><sub>B</sub> is the overall mole fraction of the mixture (the mole fraction
+    of the point on the <i>T</i>&ndash;<i>x</i>&ndash;<i>y</i> diagram), <i>x</i><sub>B</sub> is
+    the mole fraction of B in the liquid phase, the mole fraction of B in the solid A phase is
+    zero, <i>r</i><sub>liquid</sub> is the relative amount of liquid, and
+    <i>r</i><sub>solid</sub> is the relative amount of solid A.</p>
+
+    <p>When the system is in solid&ndash;solid&ndash;liquid equilibrium, the relative amounts of
+    each phase are found from mass balances. For example, using a value of 10% melted and an
+    initial mole fraction of B of 0.7 in the diagram:</p>
+    <ol>
+      <li>Determine the initial mole fraction of B: <i>z</i><sub>B</sub> = 0.7.</li>
+      <li>Determine the mole fraction of component B in each phase:
+        <i>S</i><sub>solid, A<sub>2</sub>B<sub>3</sub></sub> = 0.6,
+        <i>S</i><sub>solid, B</sub> = 1, <i>x</i><sub>B</sub> = 0.8.</li>
+      <li>Set a basis for the total moles in the system: <i>S</i><sub>total</sub> = 1.</li>
+      <li>Determine the percentage melted: &mu; = 0.1.</li>
+      <li>Determine the amount of liquid in the system:
+        <i>L</i> = &mu;&thinsp;<i>S</i><sub>total</sub> = 0.1(1) = 0.1.</li>
+      <li>Mole balance on the whole system:
+        1 = <i>S</i><sub>solid, A<sub>2</sub>B<sub>3</sub></sub> + <i>S</i><sub>solid, B</sub> + 0.1.</li>
+      <li>Mole balance on component B:
+        0.7(1) = 0.6&thinsp;<i>S</i><sub>A<sub>2</sub>B<sub>3</sub></sub> + 1&thinsp;<i>S</i><sub>B</sub> + 0.8(0.1),
+        so 0.7 = 0.6&thinsp;<i>S</i><sub>A<sub>2</sub>B<sub>3</sub></sub> + <i>S</i><sub>B</sub> + 0.08.</li>
+      <li>Simultaneously solve the two balance equations (number of equations equals number of
+        unknowns).</li>
+      <li>Relative amounts of each phase:
+        <i>S</i><sub>solid, A<sub>2</sub>B<sub>3</sub></sub> = 0.7 (solid A<sub>2</sub>B<sub>3</sub>),
+        <i>S</i><sub>B</sub> = 0.2 (solid B),
+        <i>V</i> = 0.1 (liquid).</li>
+    </ol>
+  </div>
+
+  <div class="panel" id="about">
+    <p>This simulation was created in the
+    <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological
+    Engineering</a> at University of Colorado Boulder for
+    <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by John L. Falconer
+    using Claude AI. It is a JavaScript/HTML5 implementation of a
+    <a href="https://demonstrations.wolfram.com/SolidSolidLiquidEquilibrium/" target="_blank">Mathematica
+    simulation</a> by Megan E. Maguire, Neil Hendren, Rachael L. Baumann, and John L. Falconer. It
+    was prepared with financial support from the National Science Foundation (DUE 2336987 and
+    2336988) in collaboration with Washington State University. Address any questions or comments
+    to LearnChemE@gmail.com.</p>
+  </div>
+  </div>
+
+  <div class="plots">
+    <canvas id="phase" width="508" height="552"></canvas>
+    <canvas id="bars" width="470" height="552"></canvas>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* ===================== Physics ===================== */
+const cpS = 0.3, cpl = 0.3, gammaM = 100;
+const Tlo = 203.502, Thi = 302.71, Tcomp = 450.865, T0 = 150;
+
+// liquidus coefficients  f = a x^2 + b x + c
+const F = {
+  1:{a:-1722.2, b:-75.783, c:509.367, lo:0,    hi:0.4},
+  2:{a:-2008.9, b:3245.715,c:-773.36, lo:0.4,  hi:0.6},
+  3:{a:-1929,   b:1942.5,  c:-20.195, lo:0.6,  hi:0.796},
+  4:{a:-6655.1, b:13526,   c:-6250,   lo:0.796,hi:1}
+};
+function f(i,x){const p=F[i];return p.a*x*x+p.b*x+p.c;}
+function f1(x){return f(1,x);} function f2(x){return f(2,x);}
+function f3(x){return f(3,x);} function f4(x){return f(4,x);}
+
+// invert liquidus i for temperature T -> x in [lo,hi]
+function invF(i,T){
+  const p=F[i], a=p.a, b=p.b, c=p.c - T;
+  const disc=b*b-4*a*c; if(disc<0) return p.lo;
+  const s=Math.sqrt(disc);
+  let r1=(-b+s)/(2*a), r2=(-b-s)/(2*a);
+  const eps=1e-6;
+  const inrange=r=> r>=p.lo-eps && r<=p.hi+eps;
+  let r= inrange(r1)?r1:(inrange(r2)?r2:r1);
+  return Math.min(p.hi,Math.max(p.lo,r));
+}
+
+const heat1solidLeft  = (Tlo  - T0)*cpS;
+const heat1solidRight = (Thi  - T0)*cpS;
+const heat1solidA2B3  = (Tcomp- T0)*cpS;
+
+const heatM1=z=> heat1solidLeft  + (z/0.4)*gammaM;
+const heatM2=z=> heat1solidLeft  + ((0.6-z)/(0.6-0.4))*gammaM;
+const heatM3=z=> heat1solidRight + ((z-0.6)/(0.796-0.6))*gammaM;
+const heatM4=z=> heat1solidRight + ((1-z)/(1-0.796))*gammaM;
+const heatMA2B3 = heat1solidA2B3 + gammaM;
+
+const heatsM1=z=> 0.5*(cpl+cpS)*(f1(z)-Tlo);
+const heatsM2=z=> 0.5*(cpl+cpS)*(f2(z)-Tlo);
+const heatsM3=z=> 0.5*(cpl+cpS)*(f3(z)-Thi);
+const heatsM4=z=> 0.5*(cpl+cpS)*(f4(z)-Thi);
+
+const heatf1=z=> heatsM1(z)+heat1solidLeft +gammaM;
+const heatf2=z=> heatsM2(z)+heat1solidLeft +gammaM;
+const heatf3=z=> heatsM3(z)+heat1solidRight+gammaM;
+const heatf4=z=> heatsM4(z)+heat1solidRight+gammaM;
+
+const clip=(v,lo,hi)=>Math.max(lo,Math.min(hi,v));
+
+function SLE1(z,H){
+  return clip((H-heatM1(z))/cpS+Tlo,0,f1(z))*((0.4-z)/0.4)
+    + (((H-heatM1(z))/(heatf1(z)-heatM1(z)))*(f1(z)-Tlo)+Tlo)*(z/0.4);
+}
+function SLE2(z,H){
+  return clip((H-heatM2(z))/cpS+Tlo,0,f2(z))*((z-0.4)/(0.6-0.4))
+    + (((H-heatM2(z))/(heatf2(z)-heatM2(z)))*(f2(z)-Tlo)+Tlo)*((0.6-z)/(0.6-0.4));
+}
+function SLE3(z,H){
+  return clip((H-heatM3(z))/cpS+Thi,0,f3(z))*((0.796-z)/(0.796-0.6))
+    + (((H-heatM3(z))/(heatf3(z)-heatM3(z)))*(f3(z)-Thi)+Thi)*((z-0.6)/(0.796-0.6));
+}
+function SLE4(z,H){
+  return clip((H-heatM4(z))/cpS+Thi,0,f4(z))*((z-0.796)/(1-0.796))
+    + (((H-heatM4(z))/(heatf4(z)-heatM4(z)))*(f4(z)-Thi)+Thi)*((1-z)/(1-0.796));
+}
+// liquid composition (root of SLE_i == f_i)
+const xLsol1=(H,z)=> invF(1, SLE1(z,H));
+const xLsol2=(H,z)=> invF(2, SLE2(z,H));
+const xLsol3=(H,z)=> invF(3, SLE3(z,H));
+const xLsol4=(H,z)=> invF(4, SLE4(z,H));
+
+function section(z,H){
+  if(z<0.6 && H<heat1solidLeft) return 1;
+  if(z===0.6 && H<heat1solidA2B3) return 2;
+  if(z>0.6 && z<=1 && H<heat1solidRight) return 3;
+  if(z<0.4 && H>=heat1solidLeft && H<heatM1(z)) return 4;
+  if(z>=0.4 && z<0.6 && H>=heat1solidLeft && H<heatM2(z)) return 5;
+  if(z===0.6 && H>=heat1solidA2B3 && H<=heatMA2B3) return 6;
+  if(z>0.6 && z<0.796 && H>=heat1solidRight && H<heatM3(z)) return 7;
+  if(z>=0.796 && z<=1 && H>=heat1solidRight && H<heatM4(z)) return 8;
+  if(z<0.4 && H>=heatM1(z) && H<heatf1(z)) return 9;
+  if(z>=0.4 && z<0.6 && H>=heatM2(z) && H<heatf2(z)) return 10;
+  if(z>0.6 && z<0.796 && H>=heatM3(z) && H<heatf3(z)) return 11;
+  if(z>=0.796 && z<=1 && H>=heatM4(z) && H<heatf4(z)) return 12;
+  if(z<=0.4 && H>=heatf1(z)) return 13;
+  if(z>0.4 && z<=0.6 && H>=heatf2(z)) return 14;
+  if(z>0.6 && z<=0.796 && H>=heatf3(z)) return 15;
+  if(z>0.796 && z<=1 && H>=heatf4(z)) return 16;
+  return 13; // fallback
+}
+
+// returns object {T,a,b,ab,liq,xA,xB,xAB,xL,sec}
+function compute(z,H){
+  const s=section(z,H);
+  let d;
+  switch(s){
+    case 1: d=[T0+(H/heat1solidLeft)*(Tlo-T0),(0.6-z)/0.6,0,z/0.6,0, 0,-1,0.6,-1]; break;
+    case 2: d=[T0+(H/heat1solidA2B3)*(Tcomp-T0),0,0,1,0, -1,-1,0.6,-1]; break;
+    case 3: d=[T0+(H/heat1solidRight)*(Thi-T0),0,(z-0.6)/(1-0.6),(1-z)/(1-0.6),0, -1,1,0.6,-1]; break;
+    case 4: d=[Tlo,
+              (0.4-z)/0.4+((heatM1(z)-H)/(heatM1(z)-heat1solidLeft))*((0.6-z)/0.6-(0.4-z)/0.4),
+              0,
+              ((heatM1(z)-H)/(heatM1(z)-heat1solidLeft))*(z/0.6),
+              (z/0.4)*((H-heat1solidLeft)/(heatM1(z)-heat1solidLeft)),
+              0,-1,0.6,0.4]; break;
+    case 5: d=[Tlo,
+              ((0.6-z)/0.6)*((heatM2(z)-H)/(heatM2(z)-heat1solidLeft)),
+              0,
+              (z-0.4)/(0.6-0.4)+((heatM2(z)-H)/(heatM2(z)-heat1solidLeft))*(z/0.6-(z-0.4)/(0.6-0.4)),
+              ((0.6-z)/(0.6-0.4))*((H-heat1solidLeft)/(heatM2(z)-heat1solidLeft)),
+              0,-1,0.6,0.4]; break;
+    case 6: d=[Tcomp,0,0,
+              (heatMA2B3-H)/(heatMA2B3-heat1solidA2B3),
+              (H-heat1solidA2B3)/(heatMA2B3-heat1solidA2B3),
+              -1,-1,0.6,0.6]; break;
+    case 7: d=[Thi,0,
+              ((z-0.6)/(1-0.6))*((heatM3(z)-H)/(heatM3(z)-heat1solidRight)),
+              (0.796-z)/(0.796-0.6)+((heatM3(z)-H)/(heatM3(z)-heat1solidRight))*((1-z)/(1-0.6)-(0.796-z)/(0.796-0.6)),
+              ((H-heat1solidRight)/(heatM3(z)-heat1solidRight))*((z-0.6)/(0.796-0.6)),
+              -1,1,0.602,0.796]; break;
+    case 8: d=[Thi,0,
+              (z-0.796)/(1-0.796)+((z-0.6)/(1-0.6)-(z-0.796)/(1-0.796))*((heatM4(z)-H)/(heatM4(z)-heat1solidRight)),
+              ((heatM4(z)-H)/(heatM4(z)-heat1solidRight))*((1-z)/(1-0.6)),
+              ((H-heat1solidRight)/(heatM4(z)-heat1solidRight))*((1-z)/(1-0.796)),
+              -1,1,0.6,0.796]; break;
+    case 9: {const xl=xLsol1(H,z); d=[SLE1(z,H),(xl-z)/xl,0,0,z/xl, 0,-1,-1,xl]; break;}
+    case 10:{const xl=xLsol2(H,z); d=[SLE2(z,H),0,0,(z-xl)/(0.6-xl),(0.6-z)/(0.6-xl), -1,-1,0.6,xl]; break;}
+    case 11:{const xl=xLsol3(H,z); d=[SLE3(z,H),0,0,(xl-z)/(xl-0.6),(z-0.6)/(xl-0.6), -1,-1,0.6,xl]; break;}
+    case 12:{const xl=xLsol4(H,z); d=[SLE4(z,H),0,(z-xl)/(1-xl),0,(1-z)/(1-xl), -1,1,-1,xl]; break;}
+    case 13: d=[f1(z)+(H-heatf1(z))/cpl,0,0,0,1, -1,-1,-1,z]; break;
+    case 14: d=[f2(z)+(H-heatf2(z))/cpl,0,0,0,1, -1,-1,-1,z]; break;
+    case 15: d=[f3(z)+(H-heatf3(z))/cpl,0,0,0,1, -1,-1,-1,z]; break;
+    case 16: d=[f4(z)+(H-heatf4(z))/cpl,0,0,0,1, -1,-1,-1,z]; break;
+  }
+  return {T:d[0],a:d[1],b:d[2],ab:d[3],liq:d[4],xA:d[5],xB:d[6],xAB:d[7],xL:d[8],sec:s};
+}
+
+/* ===================== Colors ===================== */
+// phase fill colors (Mathematica directive blended over white) and matching stroke
+const COL = {
+  A:  {fill:'rgb(229,153,153)', stroke:'rgb(150,0,0)',  text:'rgb(191,0,0)'},
+  B:  {fill:'rgb(153,204,153)', stroke:'rgb(0,110,0)',  text:'rgb(0,128,0)'},
+  AB: {fill:'rgb(242,185,128)', stroke:'rgb(200,100,0)',text:'rgb(204,102,0)'},
+  L:  {fill:'rgb(153,153,204)', stroke:'rgb(0,0,150)',  text:'rgb(0,0,128)'}
+};
+// region fill (rgba over white)
+const REG = {
+  liquid:'rgba(0,0,128,0.30)',
+  yellow:'rgba(255,255,0,0.50)',
+  cyan:'rgba(0,230,230,0.30)',
+  gray:'rgb(211,211,211)'
+};
+
+/* ===================== Phase diagram ===================== */
+const phaseCv=document.getElementById('phase');
+const pctx=phaseCv.getContext('2d');
+const PD={x0:64,y0:20,w:430,h:472}; // plot rectangle in CSS px
+const XMIN=0,XMAX=1,YMIN=100,YMAX=625;
+function PX(x){return PD.x0+(x-XMIN)/(XMAX-XMIN)*PD.w;}
+function PY(T){return PD.y0+(YMAX-T)/(YMAX-YMIN)*PD.h;}
+
+function setupHiDPI(cv,ctx,wCSS,hCSS){
+  const dpr=window.devicePixelRatio||1;
+  cv.width=wCSS*dpr; cv.height=hCSS*dpr;
+  cv.style.width=wCSS+'px'; cv.style.height=hCSS+'px';
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+
+function fillRegionBetween(i,xa,xb,Tbottom,color){
+  // area between liquidus f_i and horizontal Tbottom, x in [xa,xb]
+  pctx.beginPath();
+  const N=60;
+  pctx.moveTo(PX(xa),PY(Tbottom));
+  for(let k=0;k<=N;k++){const x=xa+(xb-xa)*k/N; pctx.lineTo(PX(x),PY(f(i,x)));}
+  pctx.lineTo(PX(xb),PY(Tbottom));
+  pctx.closePath();
+  pctx.fillStyle=color; pctx.fill();
+}
+function fillLiquid(){
+  // above the liquidus envelope up to top
+  pctx.beginPath();
+  pctx.moveTo(PX(0),PY(YMAX));
+  pctx.lineTo(PX(0),PY(f1(0)));
+  const segs=[[1,0,0.4],[2,0.4,0.6],[3,0.6,0.796],[4,0.796,1]];
+  const N=40;
+  for(const [i,xa,xb] of segs){
+    for(let k=0;k<=N;k++){const x=xa+(xb-xa)*k/N; pctx.lineTo(PX(x),PY(f(i,x)));}
+  }
+  pctx.lineTo(PX(1),PY(YMAX));
+  pctx.closePath();
+  pctx.fillStyle=REG.liquid; pctx.fill();
+}
+function fillRect(xa,xb,Ta,Tb,color){
+  pctx.fillStyle=color;
+  pctx.fillRect(PX(xa),PY(Tb),PX(xb)-PX(xa),PY(Ta)-PY(Tb));
+}
+function liquidusPath(i,xa,xb){
+  pctx.beginPath();const N=60;
+  for(let k=0;k<=N;k++){const x=xa+(xb-xa)*k/N;const px=PX(x),py=PY(f(i,x));k?pctx.lineTo(px,py):pctx.moveTo(px,py);}
+  pctx.stroke();
+}
+
+function drawSub(ctx,parts,x,y,baseFont,align){
+  // parts: array of {t, type:'n'|'sub'|'sup'}; returns nothing; align 'center'|'left'
+  ctx.font=baseFont;
+  const subFont=baseFont.replace(/(\d+)px/, (m,n)=>Math.round(n*0.72)+'px');
+  let total=0;
+  for(const p of parts){ctx.font=(p.type==='n')?baseFont:subFont; total+=ctx.measureText(p.t).width;}
+  let cx = align==='center'? x-total/2 : x;
+  const sz=parseInt(baseFont);
+  for(const p of parts){
+    if(p.type==='n'){ctx.font=baseFont; ctx.fillText(p.t,cx,y);}
+    else{ctx.font=subFont; const dy=(p.type==='sub')?sz*0.20:-sz*0.38; ctx.fillText(p.t,cx,y+dy);}
+    ctx.font=(p.type==='n')?baseFont:subFont; cx+=ctx.measureText(p.t).width;
+  }
+}
+
+function drawPhaseStatic(){
+  pctx.clearRect(0,0,phaseCv.width,phaseCv.height);
+  pctx.fillStyle='#fff';pctx.fillRect(0,0,520,560);
+  // regions
+  fillLiquid();
+  fillRegionBetween(1,0,0.4,Tlo,REG.yellow);
+  fillRegionBetween(2,0.4,0.6,Tlo,REG.cyan);
+  fillRegionBetween(3,0.6,0.796,Thi,REG.cyan);
+  fillRegionBetween(4,0.796,1,Thi,REG.yellow);
+  fillRect(0,0.6,YMIN,Tlo,REG.gray);
+  fillRect(0.6,1,YMIN,Thi,REG.gray);
+
+  // liquidus + invariant lines
+  pctx.strokeStyle='#000'; pctx.lineWidth=2.2; pctx.lineJoin='round';
+  liquidusPath(1,0,0.4); liquidusPath(2,0.4,0.6);
+  liquidusPath(3,0.6,0.796); liquidusPath(4,0.796,1);
+  pctx.beginPath();pctx.moveTo(PX(0),PY(Tlo));pctx.lineTo(PX(0.6),PY(Tlo));pctx.stroke();
+  pctx.beginPath();pctx.moveTo(PX(0.6),PY(Thi));pctx.lineTo(PX(1),PY(Thi));pctx.stroke();
+  pctx.beginPath();pctx.moveTo(PX(0.6),PY(YMIN));pctx.lineTo(PX(0.6),PY(Tcomp));pctx.stroke();
+
+  // frame
+  pctx.lineWidth=1.1;pctx.strokeStyle='#000';
+  pctx.strokeRect(PD.x0,PD.y0,PD.w,PD.h);
+  // ticks
+  pctx.fillStyle='#000';pctx.font='18px Helvetica, Arial, sans-serif';
+  pctx.textAlign='center';pctx.textBaseline='top';
+  const xt=[0,0.2,0.4,0.6,0.8,1.0];
+  for(const t of xt){const px=PX(t);pctx.beginPath();pctx.moveTo(px,PD.y0+PD.h);pctx.lineTo(px,PD.y0+PD.h-6);pctx.stroke();
+    pctx.fillText(t.toFixed(1),px,PD.y0+PD.h+5);}
+  pctx.textAlign='right';pctx.textBaseline='middle';
+  const yt=[100,200,300,400,500,600];
+  for(const t of yt){const py=PY(t);pctx.beginPath();pctx.moveTo(PD.x0,py);pctx.lineTo(PD.x0+6,py);pctx.stroke();
+    pctx.fillText(t,PD.x0-6,py);}
+  // axis labels
+  pctx.textAlign='center';pctx.textBaseline='alphabetic';
+  pctx.font='21px Helvetica, Arial, sans-serif';
+  pctx.fillText('mole fraction B',PD.x0+PD.w/2,PD.y0+PD.h+48);
+  pctx.save();
+  pctx.translate(17,PD.y0+PD.h/2);pctx.rotate(-Math.PI/2);
+  pctx.fillText('temperature (\u00B0C)',0,0);pctx.restore();
+
+  // region text labels
+  drawRegionLabels();
+}
+
+function regText(str,color,xd,Td,baseFont){
+  pctx.fillStyle=color;pctx.textAlign='center';pctx.textBaseline='middle';
+  pctx.font=baseFont; pctx.fillText(str,PX(xd),PY(Td));
+}
+function regTextSub(parts,color,xd,Td,baseFont){
+  pctx.fillStyle=color;pctx.textAlign='left';pctx.textBaseline='middle';
+  pctx.font=baseFont;
+  let total=0;const subFont=baseFont.replace(/(\d+)px/,(m,n)=>Math.round(n*0.72)+'px');
+  for(const p of parts){pctx.font=(p.type==='n')?baseFont:subFont;total+=pctx.measureText(p.t).width;}
+  drawSub(pctx,parts,PX(xd)-total/2,PY(Td),baseFont,'left');
+}
+function drawRegionLabels(){
+  const bf='15px Helvetica, Arial, sans-serif';
+  const AB=[{t:'solid A',type:'n'},{t:'2',type:'sub'},{t:'B',type:'n'},{t:'3',type:'sub'}];
+  // tweak: AB parts need "A" then sub2 then "B" then sub3
+  const ABp=[{t:'solid A',type:'n'},{t:'2',type:'sub'},{t:'B',type:'n'},{t:'3',type:'sub'}];
+  regText('liquid',COL.L.text,0.55,548,bf);
+  // lower-left gray
+  regText('solid A +',COL.A.text,0.30,176,bf);
+  regTextSub(ABp,COL.AB.text,0.29,150,bf);
+  // lower-right gray
+  regText('solid B +',COL.B.text,0.80,226,bf);
+  regTextSub(ABp,COL.AB.text,0.79,200,bf);
+  // left yellow SLE
+  regText('solid A +',COL.A.text,0.135,352,bf);
+  regText('liquid',COL.L.text,0.135,326,bf);
+  // left cyan SLE
+  regText('liquid +',COL.L.text,0.515,246,bf);
+  regTextSub(ABp,COL.AB.text,0.51,220,bf);
+  // right cyan SLE
+  regText('liquid +',COL.L.text,0.687,344,bf);
+  regTextSub(ABp,COL.AB.text,0.697,318,bf);
+  // right yellow SLE
+  regText('solid B +',COL.B.text,0.905,352,bf);
+  regText('liquid',COL.L.text,0.905,326,bf);
+}
+
+function dot(x,T,fill,stroke){
+  const px=PX(x),py=PY(T);
+  pctx.beginPath();pctx.arc(px,py,5.5,0,2*Math.PI);
+  pctx.fillStyle=fill;pctx.fill();
+  pctx.lineWidth=1.4;pctx.strokeStyle=stroke;pctx.stroke();
+}
+function dashLine(x1,T1,x2,T2,color){
+  pctx.save();pctx.setLineDash([5,4]);pctx.lineWidth=1.8;pctx.strokeStyle=color;
+  pctx.beginPath();pctx.moveTo(PX(x1),PY(T1));pctx.lineTo(PX(x2),PY(T2));pctx.stroke();
+  pctx.restore();
+}
+
+let staticDrawn=false;
+function drawPhaseDynamic(z,H,res){
+  if(!staticDrawn){drawPhaseStatic();staticDrawn=true;}
+  // We must redraw everything each frame (overlay not separable on one canvas)
+  drawPhaseStatic();
+  const T=res.T, sec=res.sec, xL=res.xL;
+  pctx.save();
+  pctx.beginPath();pctx.rect(PD.x0,PD.y0,PD.w,PD.h);pctx.clip();
+
+  const showLiq = res.xL>=0 && [4,5,7,8,9,10,11,12].includes(sec);
+  const showA   = [1,4,5,9].includes(sec);
+  const showB   = [3,7,8,12].includes(sec);
+  const showAB  = [1,3,4,5,7,8,10,11].includes(sec);
+
+  // dashed lines first (under dots)
+  // vertical at z -> black ; vertical at liquid -> blue
+  if(showLiq){
+    dashLine(xL,T,xL,YMIN,COL.L.stroke);                 // vertical liquid (blue)
+    dashLine(z,T,xL,T,COL.L.stroke);                     // horizontal to liquid
+  }
+  dashLine(z,T,z,YMIN,'#000');                           // vertical at black point
+  if(showA)  dashLine(z,T,0,T,COL.A.stroke);
+  if(showB)  dashLine(z,T,1,T,COL.B.stroke);
+  if(showAB) dashLine(z,T,0.6,T,COL.AB.stroke);
+
+  // dots
+  if(showA)  dot(0,T,COL.A.fill,COL.A.stroke);
+  if(showB)  dot(1,T,COL.B.fill,COL.B.stroke);
+  if(showAB) dot(0.6,T,COL.AB.fill,COL.AB.stroke);
+  if(showLiq)dot(xL,T,COL.L.fill,COL.L.stroke);
+  // moving black point on top
+  dot(z,T,'#000','#000');
+  pctx.restore();
+}
+
+/* ===================== Bar chart ===================== */
+const barCv=document.getElementById('bars');
+const bctx=barCv.getContext('2d');
+const BD={x0:56,y0:26,w:400,h:472};
+const BYMAX=1.1;
+function BBY(v){return BD.y0+(BYMAX-v)/BYMAX*BD.h;}
+
+function drawBars(res){
+  bctx.clearRect(0,0,barCv.width,barCv.height);
+  bctx.fillStyle='#fff';bctx.fillRect(0,0,480,560);
+
+  // title
+  bctx.fillStyle='#000';bctx.textAlign='center';bctx.textBaseline='alphabetic';
+  bctx.font='16px Helvetica, Arial, sans-serif';
+  bctx.fillText('relative amounts',BD.x0+BD.w/2,20);
+
+  // frame (left + bottom)
+  bctx.strokeStyle='#000';bctx.lineWidth=1.1;
+  bctx.beginPath();
+  bctx.moveTo(BD.x0,BD.y0);bctx.lineTo(BD.x0,BD.y0+BD.h);bctx.lineTo(BD.x0+BD.w,BD.y0+BD.h);
+  bctx.stroke();
+  // y ticks
+  bctx.font='18px Helvetica, Arial, sans-serif';
+  bctx.textAlign='right';bctx.textBaseline='middle';
+  for(const t of [0,0.2,0.4,0.6,0.8,1.0]){
+    const py=BBY(t);bctx.beginPath();bctx.moveTo(BD.x0,py);bctx.lineTo(BD.x0+6,py);bctx.stroke();
+    bctx.fillText(t.toFixed(1),BD.x0-6,py);
+  }
+
+  const vals=[res.a,res.b,res.ab,res.liq].map(v=>Math.max(0,Math.round(v*1000)/1000));
+  const xs=[res.xA,res.xB,res.xAB,res.xL];
+  const fills=[COL.A.fill,COL.B.fill,COL.AB.fill,COL.L.fill];
+  const strokes=[COL.A.stroke,COL.B.stroke,COL.AB.stroke,COL.L.stroke];
+  const supLabels=['A','B','AB','L'];
+
+  const n=4, slot=BD.w/n, bw=slot*0.52;
+  for(let i=0;i<n;i++){
+    const cx=BD.x0+slot*(i+0.5);
+    const v=vals[i];
+    if(v>0.0005){
+      const top=BBY(v), bot=BBY(0);
+      bctx.fillStyle=fills[i];bctx.fillRect(cx-bw/2,top,bw,bot-top);
+      bctx.strokeStyle=strokes[i];bctx.lineWidth=1;bctx.strokeRect(cx-bw/2,top,bw,bot-top);
+    }
+    // x_B value label above bar (one line) if xs[i] >= 0
+    if(xs[i]>=0){
+      const yTop=BBY(v)-9;
+      drawXBlabel(cx,yTop,supLabels[i],xs[i]);
+    }
+    // under-bar phase name
+    drawBarName(cx,BD.y0+BD.h+24,i);
+  }
+}
+
+function drawXBlabel(cx,yBarTop,sup,val){
+  // single line: x_B^sup = value, centered at cx, baseline at yBarTop
+  const bf='13px Helvetica, Arial, sans-serif';
+  const subF='9px Helvetica, Arial, sans-serif';
+  bctx.fillStyle='#000';bctx.textBaseline='alphabetic';bctx.textAlign='left';
+  let parts=[{t:'x',type:'n'},{t:'B',type:'sub'}];
+  if(sup==='AB'){parts.push({t:'A',type:'sup'},{t:'2',type:'supsub'},{t:'B',type:'sup'},{t:'3',type:'supsub'});}
+  else parts.push({t:sup,type:'sup'});
+  parts.push({t:' = '+val.toFixed(2),type:'n'});
+  // measure total width
+  let total=0;
+  for(const p of parts){bctx.font=(p.type==='n')?bf:subF; total+=bctx.measureText(p.t).width;}
+  let x=cx-total/2;
+  const y=yBarTop;
+  for(const p of parts){
+    if(p.type==='n'){bctx.font=bf;bctx.fillText(p.t,x,y);}
+    else{bctx.font=subF;
+      let dy=0;
+      if(p.type==='sub')dy=3; else if(p.type==='sup')dy=-7; else if(p.type==='supsub')dy=-2;
+      bctx.fillText(p.t,x,y+dy);}
+    bctx.font=(p.type==='n')?bf:subF; x+=bctx.measureText(p.t).width;
+  }
+}
+
+function drawBarName(cx,y,i){
+  const bf='19.5px Helvetica, Arial, sans-serif';
+  const subF='13.5px Helvetica, Arial, sans-serif';
+  bctx.fillStyle='#000';bctx.textBaseline='alphabetic';
+  if(i===0){bctx.textAlign='center';bctx.font=bf;bctx.fillText('solid A',cx,y);}
+  else if(i===1){bctx.textAlign='center';bctx.font=bf;bctx.fillText('solid B',cx,y);}
+  else if(i===3){bctx.textAlign='center';bctx.font=bf;bctx.fillText('liquid',cx,y);}
+  else{
+    // solid A2B3
+    const parts=[{t:'solid A',type:'n'},{t:'2',type:'sub'},{t:'B',type:'n'},{t:'3',type:'sub'}];
+    bctx.textAlign='left';
+    let total=0;
+    for(const p of parts){bctx.font=(p.type==='n')?bf:subF;total+=bctx.measureText(p.t).width;}
+    let x=cx-total/2;
+    for(const p of parts){
+      if(p.type==='n'){bctx.font=bf;bctx.fillText(p.t,x,y);}
+      else{bctx.font=subF;bctx.fillText(p.t,x,y+4);}
+      bctx.font=(p.type==='n')?bf:subF;x+=bctx.measureText(p.t).width;
+    }
+  }
+}
+
+/* ===================== Wiring ===================== */
+const zbEl=document.getElementById('zb'), heatEl=document.getElementById('heat');
+const zbVal=document.getElementById('zbval'), heatVal=document.getElementById('heatval');
+
+function render(){
+  const z=parseFloat(zbEl.value), H=parseFloat(heatEl.value);
+  zbVal.textContent=z.toFixed(2);
+  heatVal.textContent=Math.round(H);
+  const res=compute(z,H);
+  drawPhaseDynamic(z,H,res);
+  drawBars(res);
+}
+zbEl.addEventListener('input',render);
+heatEl.addEventListener('input',render);
+document.getElementById('reset').addEventListener('click',()=>{
+  zbEl.value='0.2'; heatEl.value='0'; render();
+});
+
+// tabs
+const tabbtns=document.querySelectorAll('.tabbtn');
+const btnbar=document.querySelector('.btnbar');
+function placePanel(b,panel){
+  const left=b.offsetLeft;
+  const top=b.offsetTop+b.offsetHeight+6;
+  panel.style.left=left+'px';
+  panel.style.top=top+'px';
+  panel.style.width=(btnbar.clientWidth-left)+'px';
+}
+tabbtns.forEach(b=>b.addEventListener('click',()=>{
+  const id=b.dataset.panel;const panel=document.getElementById(id);
+  const isShown=panel.classList.contains('show');
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('show'));
+  tabbtns.forEach(x=>x.classList.remove('active'));
+  if(!isShown){panel.classList.add('show');b.classList.add('active');placePanel(b,panel);}
+}));
+
+setupHiDPI(phaseCv,pctx,508,552);
+setupHiDPI(barCv,bctx,470,552);
+render();
+</script>
+</body>
+</html>
