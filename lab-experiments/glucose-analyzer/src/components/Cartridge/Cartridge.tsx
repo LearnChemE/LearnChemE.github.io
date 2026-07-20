@@ -1,19 +1,30 @@
-import { createMemo, createSignal, onMount, useContext, type Component } from "solid-js";
+import { createMemo, createSignal, onMount, useContext, type Accessor, type Component } from "solid-js";
 import "./Cartridge.css";
-import { resetSignal } from "../../globals";
+import { dyeLookup, resetSignal } from "../../globals";
 import { RxrContext } from "../Context";
+import { delay, delayDuration } from "../../globals/animate";
 
 type CartridgeProps = {
 
 };
 
-export const Cartridge: Component<CartridgeProps> = (props) => {
+export const Cartridge: Component<CartridgeProps> = () => {
     const [rotate, setRotate] = createSignal(-90);
     const ctx = useContext(RxrContext)!;
 
-    const rCol = "#0077FF";
-    const lCol = "#F2FF00";
-    const mCol = "#00FF04";
+    const rDye = dyeLookup("blue");
+    const lDye = dyeLookup("yellow");
+    const mDye = rDye.mix(lDye);
+
+    const rCol = rDye.toColorHex();
+    const lCol = lDye.toColorHex();
+    const mCol = mDye.toColorHex();
+    console.log(rDye.x, rDye.y, rDye.z);
+    console.log(mCol)
+
+    // const rCol = "#0077FF";
+    // const lCol = "#F2FF00";
+    // const mCol = "#00FF04";
 
     onMount(() => {
         resetSignal.subscribe(() => {
@@ -21,12 +32,13 @@ export const Cartridge: Component<CartridgeProps> = (props) => {
         });
 
         ctx.aniTimer.subscribe((_: number, t: number) => {
-            const rt = DelayDuration(t, 0, 1);
+            const rt = delayDuration(t, 0, 1);
             setRotate(rt * 90 - 90);
         });
     });
 
-    return (<g transform={`translate(140, 139.5) rotate(${rotate()}) translate(-36, -120.5)`}>
+    return (
+<g transform={`translate(140, 139.5) rotate(${rotate()}) translate(-36, -120.5)`}>
 
 <defs>
     <filter id="background-blur" x="-100%" y="-100%" width="300%" height="300%">
@@ -84,7 +96,7 @@ export const Cartridge: Component<CartridgeProps> = (props) => {
 {/* Fluid */}
 <mask id="flow-mask" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="72" height="241">
     <g mask="url(#mask0_0_1)">
-        <FlowPath />
+        <FlowPath rotate={() => -90 - rotate()} />
     </g>
 </mask>
 
@@ -106,24 +118,12 @@ export const Cartridge: Component<CartridgeProps> = (props) => {
 };
 
 type FlowProps = {
-
+    rotate: Accessor<number>;
 };
 
-const Step = (t: number) => {
-    return (t < 0) ? 0 : 1;
-}
-const Delay = (t: number, by?: number) => {
-    by = by ?? 0;
-    return Step(t - by) * (t - by);
-}
-const DelayDuration = (t: number, delay: number, duration: number) => {
-    const delayed = Delay(t, delay);
-    const normalized = delayed / duration;
-    return Math.min(normalized, 1);
-}
-
-const FlowPath: Component<FlowProps> = () => {
+const FlowPath: Component<FlowProps> = (props) => {
     const [s, setS] = createSignal(0);
+    const [injS, setInjS] = createSignal(0);
     const ctx = useContext(RxrContext)!;
 
     // Animation segment times
@@ -149,58 +149,79 @@ const FlowPath: Component<FlowProps> = () => {
         ctx.aniTimer.subscribe((_: number, t: number) => {
             setS(t);
         });
+        ctx.injTimer.subscribe((_: number, t: number) => {
+            setInjS(t);
+        });
     });
 
-    const chamber_height = 30;
+    // const chamber_height = 30;
     const y_height = 32;
     const z_height = 180;
 
     const ch_h = createMemo(() => {
-        const time = s();
-        const init_height = 30;
-        const y_fill = Math.min(time / yFillTime * y_height, y_height);
-        const y_empty = Math.min(Delay(time, yEmptyStart) / yFillTime * y_height, y_height);
+        const injTime = injS();
+        const totInjTime = 4;
 
-        const ch_height = Math.max(init_height - time / chFillTime * chamber_height, 0);
+        if (injTime < totInjTime) {
+            const time = delayDuration(injTime, 0, 2);
+            const final_w = 24;
+            const eased = 1 - (1 - time) ** 2;
+            const w_raw = eased * final_w;
+            return w_raw > 5 ? w_raw : 0;
+        }
+        else {
+            const time = s();
+            const init_height = 24;
+            const pad_height = 5;
+            const delta_height = init_height - pad_height;
 
-        return ch_height + y_fill - y_empty;
+            const ch_height = Math.max(init_height - time / chFillTime * delta_height, 0);
+
+            return (ch_height > pad_height) ? ch_height : 0; //+ y_fill - y_empty;
+        }
     });
-    const ch_y = createMemo(() => {
-        const time = s();
-        const ch_empty_s = DelayDuration(time, 0, chFillTime);
-        const y_empty_s = DelayDuration(time, yEmptyStart, yFillTime);
 
-        const ch_empty = ch_empty_s * chamber_height;
+    const y_h = createMemo(() => {
+        const time = s();
+        const y_fill = Math.min(time / yFillTime * y_height, y_height);
+        const y_empty_s = delayDuration(time, yEmptyStart, yFillTime); // Math.min(delay(time, yEmptyStart) / yFillTime * y_height, y_height);
         const y_empty = y_empty_s * y_height;
 
-        return 1 + ch_empty + y_empty;
+        return y_fill - y_empty;
+    });
+    const y_y = createMemo(() => {
+        const time = s();
+        const y_init = 31;
+        const y_empty = Math.min(delay(time, yEmptyStart) / yFillTime * y_height, y_height);
+
+        return y_init + y_empty;
     });
 
     const z_h = createMemo(() => {
         const time = s();
-        const fill = DelayDuration(time, zFillStart, zFillTime);
-        const empty = DelayDuration(time, zEmptyStart, zFillTime);
+        const fill = delayDuration(time, zFillStart, zFillTime);
+        const empty = delayDuration(time, zEmptyStart, zFillTime);
 
         return (fill - empty) * z_height;
     });
     const z_z = createMemo(() => {
         const time = s();
         const init = 63;
-        const empty = DelayDuration(time, zEmptyStart, zFillTime) * z_height;
+        const empty = delayDuration(time, zEmptyStart, zFillTime) * z_height;
         return init + empty;
     });
 
     const bot_h = createMemo(() => {
         const time = s();
-        const botFill = DelayDuration(time, bottomFillStart, bottomFillTime);
-        const totHeight = 30;
+        const botFill = delayDuration(time, bottomFillStart, bottomFillTime);
+        const totHeight = 25;
 
         return botFill * totHeight;
     })
     const bot_z = createMemo(() => {
         const time = s();
-        const botFill = DelayDuration(time, bottomFillStart, bottomFillTime);
-        const botFinalY = 210;
+        const botFill = delayDuration(time, bottomFillStart, bottomFillTime);
+        const botFinalY = 210+6;
 
         return botFinalY + (1 - botFill) * 30;
     });
@@ -208,7 +229,9 @@ const FlowPath: Component<FlowProps> = () => {
     return (<>
 
 <g filter="url(#goo)">
-<rect x="1" y={ch_y()} width="70" height={ch_h()} fill="red" />
+<rect x="-5" y="-5" width={ch_h()} height="38"  fill="red" transform={`translate(57, 16) rotate(${props.rotate()}) translate(-15, -15)`} />
+<rect x="-5" y="-5" width={ch_h()} height="38"  fill="red" transform={`translate(16, 16) rotate(${props.rotate()}) translate(-15, -15)`} />
+<rect x="1" y={y_y()} width="70" height={y_h()} fill="red" />
 <rect x="43" y={z_z()} width="8" height={z_h()} fill="purple" filter="url(#background-blur)" />
 <rect x="24" y={bot_z()} width="46" height={bot_h()} fill="yellow" filter="url(#background-blur)" />
 

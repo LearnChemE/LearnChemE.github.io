@@ -10,19 +10,29 @@ import { Cartridge } from './components/Cartridge/Cartridge'
 import { AnimationTimer } from './globals/animate'
 import { ControlButton } from './components/ControlButton/ControlButton'
 import { InjectMenu } from './components/InjectMenu/InjectMenu'
+import { createSignal, Show } from 'solid-js'
 
 function App() {
+  const [showInj, setShowInj] = createSignal(true);
+
   const aniTimer = new AnimationTimer();
+  const injTimer = new AnimationTimer();
   
   resetSignal.init();
 
   const reset = () => {
     resetSignal.emit();
+    setShowInj(false);
+  }
+
+  const inject = () => {
+    injTimer.play();
+    setShowInj(false);
   }
 
   return (
     <>
-        <RxrContextProvider descriptor={{ aniTimer }}>
+        <RxrContextProvider descriptor={{ aniTimer, injTimer }}>
           <div class="canvas-container">
             {/* Hamburger */}
             <HamburgerMenu path={worksheet} downloadName="glucoseAnalyzerWorksheet.pdf" Directions={DirectionsText} About={AboutText} />
@@ -32,7 +42,9 @@ function App() {
               <Cartridge />
             </SVGCanvas>
           </div>
-          <InjectMenu onClose={() => {}} />
+          <Show when={showInj()}>
+            <InjectMenu key="upper" onInject={inject} />
+          </Show>
         </RxrContextProvider>
     </>
   )

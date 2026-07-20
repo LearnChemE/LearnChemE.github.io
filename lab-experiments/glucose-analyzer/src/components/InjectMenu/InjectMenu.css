@@ -9,6 +9,16 @@
   border-radius: 8px;
   height: max-content;
   width: 18em;
+
+  span {
+    margin-top: .35em;
+  }
+}
+
+.inj-menu-content {
+    display: flex;
+    flex-direction: column;
+    margin-top: 1em;
 }
 
 .menu-header {
@@ -30,7 +40,6 @@ hr {
 .confirm-wrapper {
     display: flex;
     margin: .5em 0;
-    margin-top: 1em;
     width: 100%;
     justify-content: flex-end;
 }

@@ -4,11 +4,13 @@ import { AnimationTimer } from "../globals/animate";
 
 export type ContextDescriptor = {
     aniTimer: AnimationTimer;
+    injTimer: AnimationTimer;
 };
 
 // Context definition and creation for column calculations
 export type ReactorContextType = {
     aniTimer: AnimationTimer;
+    injTimer: AnimationTimer;
 };
 export const RxrContext = createContext<ReactorContextType>();
 export const RxrContextProvider = (props: { children: any, descriptor: ContextDescriptor }) => {
@@ -21,7 +23,8 @@ export const RxrContextProvider = (props: { children: any, descriptor: ContextDe
 
     // Create the store for the context object
     const store: ReactorContextType = { 
-        aniTimer: props.descriptor.aniTimer
+        aniTimer: props.descriptor.aniTimer,
+        injTimer: props.descriptor.injTimer
      };
 
     onMount(() => {
