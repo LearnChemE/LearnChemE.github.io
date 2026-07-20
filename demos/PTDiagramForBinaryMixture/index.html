@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pressure-Temperature Diagram for a Binary Mixture</title>
+
+<style>
+  :root{
+    --darkred:#8b1a1a;
+    --darkred-hi:#a52121;
+    --panelborder:#bdbdbd;
+    --ink:#000;
+  }
+  html,body{margin:0;padding:0;background:#fff;color:var(--ink);
+    font-family:Helvetica,Arial,sans-serif;}
+  #app{width:760px;max-width:100%;margin:8px auto;padding:0 6px;}
+  .title{font-size:19px;font-weight:bold;text-align:center;margin:6px 0 10px;}
+  .controls{margin:0 0 4px;}
+  .ctrlrow{display:flex;align-items:center;gap:10px;margin:3px 0;font-size:15px;}
+  .ctrllabel{display:inline-block;text-align:right;width:165px;}
+  input[type=range]{-webkit-appearance:none;appearance:none;height:3px;
+    background:#bcbcbc;border-radius:2px;outline:none;flex:1;max-width:340px;}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
+    width:13px;height:20px;border-radius:3px;background:var(--darkred);cursor:pointer;
+    border:1px solid #5e1010;}
+  input[type=range]::-moz-range-thumb{width:13px;height:20px;border-radius:3px;
+    background:var(--darkred);cursor:pointer;border:1px solid #5e1010;}
+  .valbox{display:inline-block;min-width:46px;padding:2px 7px;border:1px solid #c9c9c9;
+    border-radius:3px;background:#f6f6f6;font-size:14px;text-align:center;}
+  .chk{display:flex;align-items:center;gap:8px;}
+  .chk input{width:15px;height:15px;accent-color:var(--darkred);}
+  #canvasWrap{width:600px;max-width:100%;margin:2px auto 0;}
+  canvas{width:600px;max-width:100%;height:auto;display:block;}
+  .btnrow{display:flex;justify-content:center;gap:10px;margin:12px 0 6px;}
+  .tbtn{font-family:Helvetica,Arial,sans-serif;font-size:15px;color:#fff;
+    background:var(--darkred);border:1px solid #5e1010;border-radius:4px;
+    padding:5px 16px;cursor:pointer;}
+  .tbtn:hover{background:var(--darkred-hi);}
+  .tbtn.active{background:#5e1010;}
+  .panel{border:1px solid var(--panelborder);border-radius:3px;background:#fff;
+    padding:12px 16px;margin:4px auto 10px;width:700px;max-width:100%;
+    font-size:14.5px;line-height:1.5;box-sizing:border-box;display:none;}
+  .panel.show{display:block;}
+  .panel p{margin:7px 0;}
+  .eq{font-style:italic;font-family:"Times New Roman",Georgia,serif;margin:8px 0;
+    text-align:center;font-size:16px;}
+  .eq .nf{font-style:normal;}
+  sub{font-size:0.72em;} sup{font-size:0.72em;}
+  /* proper square roots rendered with MathML (connected radical + vinculum) */
+  math{font-family:"Times New Roman",Georgia,serif;font-size:1.05em;}
+  math mi,math mn{font-style:italic;}
+  a{color:#1a4f8b;text-decoration:none;} a:hover{text-decoration:underline;}
+</style>
+<script>
+    MathJax = {
+        chtml: {
+            scale: 0.95,
+            mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
+            displayAlign: 'left', // default for indentalign when set to 'auto'
+        },
+        tex: {
+            inlineMath: [['$', '$'], ['\\(', '\\)']],
+            displayMath: [['$$', '$$'], ['\\[', '\\]']]
+        }
+    };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+<div id="app">
+  <div class="title">Pressure-Temperature Diagram for a Binary Mixture</div>
+
+  <div class="controls">
+    <div class="ctrlrow">
+      <span class="ctrllabel">ethane mole fraction</span>
+      <input id="xsl" type="range" min="0" max="1" step="0.01" value="0.20">
+      <span id="xval" class="valbox">0.20</span>
+    </div>
+    <div class="ctrlrow chk">
+      <span class="ctrllabel">show all curves</span>
+      <input id="allchk" type="checkbox" checked>
+    </div>
+  </div>
+
+  <div id="canvasWrap"><canvas id="cv" width="1200" height="900"></canvas></div>
+
+  <div class="btnrow">
+    <button class="tbtn" data-p="dir">Directions</button>
+    <button class="tbtn" data-p="det">Details</button>
+    <button class="tbtn" data-p="abt">About</button>
+  </div>
+
+  <div id="dir" class="panel">
+    <p>This Demonstration shows a pressure&ndash;temperature (\(P\)&ndash;\(T\)) diagram
+    for an ethane/heptane mixture in vapor&ndash;liquid equilibrium. For each ethane
+    mole fraction \(x_1\), the liquid (bubble-point) curve is drawn in blue and the
+    vapor (dew-point) curve in green. Curves are shown at six fixed mole fractions;
+    use the slider to add a dashed curve at the selected value \(x_1\).</p>
+    <p>Along each curve the two phases are in equilibrium, so that</p>
+    $$y_i\,P = x_i\,P_i^{\text{sat}}, \qquad x_1 + x_2 = 1, \qquad y_1 + y_2 = 1,$$
+    <p>where \(x_i\) and \(y_i\) are the liquid and vapor mole fractions of component
+    \(i\) (\(i=1\) for ethane, \(i=2\) for heptane) and \(P_i^{\text{sat}}\) is the
+    saturation pressure. The critical locus (black curve) connects the critical points
+    \((T_c,\,P_c)\) of all ethane/heptane mixtures. Uncheck &ldquo;show all curves&rdquo;
+    to display only the pure components and the selected mole fraction.</p>
+  </div>
+
+  <div id="det" class="panel">
+    <p>At equilibrium the partial pressures of each component in the vapor and
+    liquid phases are equal, which for an ideal solution gives Raoult&rsquo;s law:</p>
+    <p class="eq">\(y_i P = x_i P_i^{\mathrm{sat}}\)</p>
+    <p class="eq">\(x_1 + x_2 = 1\)</p>
+    <p>where \(x_i\) and \(y_i\) are the liquid and vapor mole fractions
+    of component \(i\) (\(i = 1\) for ethane and \(i = 2\) for heptane) and \(P_i^{\mathrm{sat}}\)
+    is the saturation pressure.</p>
+    <p>The saturation pressures are calculated using the Antoine equations:</p>
+    <p class="eq">\(P_i^{\mathrm{sat}} = 10^{\,A_i - \frac{B_i}{T + C_i}}\)</p>
+    <p>where \(A_i\), \(B_i\) and \(C_i\) are Antoine constants and
+    \(T\) is temperature.</p>
+    <p>The Peng&ndash;Robinson equation of state for mixtures is used to determine the
+    phase envelope and the critical locus. The critical point is where the bubble
+    and dew curves meet; connecting these points is the critical locus. The
+    K-values are calculated:</p>
+    <p class="eq">\(K_i = \frac{y_i}{x_i}\)</p>
+    <p class="eq">\(K_i = \frac{\phi_i^{\mathrm{L}}}{\phi_i^{\mathrm{V}}}\).</p>
+    <p>The fugacity coefficient \(\phi^{k}\) is calculated:</p>
+    <p class="eq">\(\ln\phi^{k} = \frac{B}{B^{k}}(Z^{k}-1) - \ln(Z^{k}-B^{k}) - \frac{A^{k}}{2\sqrt{2}B^{k}}\ln\!\left(\frac{Z^{k}+B^{k}(1+\sqrt{2})}{Z^{k}+B^{k}(1-\sqrt{2})}\right)\,(\frac{2\sum_j x_jA_j}{A^{k}} - \frac{B}{B^{k}})\)</p>
+    <p class="eq">\(A = \frac{a_{m}P}{R^{2}T^{2}},\qquad B = \frac{b_{m}P}{RT}\)</p>
+    <p>where \(Z\) is the compressibility factor, the superscript \(k=(L,V)\) is for liquid
+    and vapor, \(A\) and \(B\) are constants, and \(P\) is pressure.</p>
+    <p>For a mixture:</p>
+    <p class="eq">\(a_{m} = \sum_i\sum_j x_i x_j a_{ij},\qquad a_{ij} = \sqrt{a_i a_j}\,(1-k_{ij}),\qquad b_{m} = \sum_i x_i b_i\)</p>
+    <p class="eq">\(a_i = 0.457\frac{R^{2}T_{c,i}^{2}}{P_{c,i}}\left(1+\kappa_i\left(1-\sqrt{\frac{T}{T_{c,i}}}\right)\right)^{2}\)</p>
+    <p class="eq">\(b_i = 0.0778\frac{R T_{c,i}}{P_{c,i}},\qquad \kappa_i = 0.37464 + 1.54226\,\omega_i - 0.26992\,\omega_i^{2}\)</p>
+    <p>where \(a_{m}\) and \(b_{m}\) are the attraction and
+    repulsion factors for the mixture, \(a_i\) and \(b_i\) are the attraction
+    and repulsion parameters for the pure component, \(k_{ij}=0\) is the binary
+    interaction parameter, \(T_c\) and \(P_c\) are the critical temperature and pressure,
+    \(\kappa\) is a simplification term, and \(\omega\) is the acentric factor.</p>
+    <p>The equation \(Z^{3}+\alpha_2 Z^{2}+\alpha_1 Z+\alpha_0=0\)
+    is solved for the compressibility factor,</p>
+    <p class="eq">\(\alpha_2 = B-1,\qquad \alpha_1 = A - 3B^{2} - 2B,\qquad \alpha_0 = -AB + B^{2} + B^{3}\)</p>
+    <p>where \(\alpha_2\), \(\alpha_1\) and \(\alpha_0\) are constants.</p>
+  </div>
+
+  <div id="abt" class="panel">
+    <p>This simulation was created in the
+    <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a>
+    at University of Colorado Boulder for
+    <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a>
+    by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a
+    Mathematica simulation by Adam J. Johnson and Rachael L. Baumann. It was prepared
+    with financial support from the National Science Foundation (DUE 2336987 and 2336988)
+    in collaboration with Washington State University. Address any questions or comments
+    to LearnChemE@gmail.com.</p>
+  </div>
+</div>
+
+<script>
+const DATA={"T0":[[451.0,0.658],[453.5,0.692],[456.0,0.725],[458.5,0.759],[461.0,0.792],[466.0,0.875],[471.0,0.959],[476.0,1.042],[481.0,1.125],[483.5,1.175],[486.0,1.225],[488.5,1.275],[491.0,1.326],[493.5,1.382],[496.0,1.439],[498.5,1.496],[501.0,1.553],[502.25,1.584],[503.5,1.615],[504.75,1.646],[506.0,1.677],[507.25,1.71],[508.5,1.743],[509.75,1.776],[511.0,1.808],[513.5,1.88],[516.0,1.951],[518.5,2.023],[521.0,2.094],[522.25,2.133],[523.5,2.172],[524.75,2.21],[526.0,2.249],[527.25,2.29],[528.5,2.331],[529.75,2.372],[531.0,2.413],[531.75,2.439],[532.5,2.464],[533.25,2.49],[534.0,2.516],[534.25,2.525],[534.5,2.533],[534.75,2.542],[535.0,2.55],[538.848,2.69],[540.13,2.736]],"T1":[[367.5,0.1],[373.7,0.125],[379.9,0.15],[392.3,0.2],[408.7,0.3],[421.1,0.4],[431.3,0.5],[435.73,0.55],[440.16,0.6],[443.96,0.65],[447.76,0.7],[451.26,0.75],[454.76,0.8],[457.86,0.85],[460.96,0.9],[466.56,1.0],[472.0,1.1],[476.8,1.2],[481.4,1.3],[482.45,1.325],[483.5,1.35],[485.6,1.4],[487.7,1.45],[489.8,1.5],[493.56,1.6],[495.36,1.65],[497.16,1.7],[500.56,1.8],[503.96,1.9],[506.96,2.0],[509.93,2.1],[511.43,2.15],[512.93,2.2],[515.53,2.3],[518.13,2.4],[520.53,2.5],[523.01,2.6],[524.11,2.65],[525.21,2.7],[527.21,2.8],[529.11,2.9],[530.81,3.0],[532.32,3.1],[532.91,3.1488],[533.5,3.1976],[533.7,3.251],[532.68,3.29]],"T3":[[359.1,0.1],[370.8,0.15],[382.5,0.2],[397.7,0.3],[409.3,0.4],[418.7,0.5],[426.82,0.6],[433.82,0.7],[440.02,0.8],[445.62,0.9],[450.62,1.0],[455.36,1.1],[463.76,1.3],[467.56,1.4],[471.16,1.5],[474.5,1.6],[477.5,1.7],[480.5,1.8],[483.3,1.9],[486.1,2.0],[488.48,2.1],[490.88,2.2],[493.28,2.3],[495.48,2.4],[497.48,2.5],[499.52,2.6],[501.32,2.7],[502.22,2.75],[503.12,2.8],[504.72,2.9],[506.32,3.0],[507.8,3.1],[510.5,3.3],[511.7,3.4],[512.82,3.5],[513.93,3.6],[514.77,3.7],[515.53,3.8],[516.33,3.9],[516.93,4.0],[517.32,4.1],[517.52,4.2],[517.52,4.3],[517.52,4.4],[517.08,4.5],[515.29,4.6],[513.16,4.7]],"T5":[[348.84,0.1],[366.54,0.2],[384.24,0.3],[410.24,0.6],[417.04,0.7],[427.64,0.9],[431.975,1.0],[436.31,1.1],[447.01,1.4],[450.31,1.5],[455.91,1.7],[458.41,1.8],[460.91,1.9],[465.46,2.1],[467.46,2.2],[469.46,2.3],[473.06,2.5],[474.76,2.6],[476.46,2.7],[479.46,2.9],[480.785,3.0],[482.11,3.1],[484.51,3.3],[485.61,3.4],[486.71,3.5],[488.7,3.7],[489.605,3.8],[490.51,3.9],[492.01,4.1],[492.6,4.2],[493.19,4.3],[494.21,4.5],[494.61,4.6],[495.01,4.7],[495.62,4.9],[495.785,5.0],[495.95,5.1],[496.06,5.3],[495.885,5.4],[495.71,5.5],[495.26,5.7],[494.85,5.8],[494.44,5.9],[493.48,6.1],[492.525,6.2],[491.57,6.3],[490.5,6.4]],"T6":[[341.63,0.1],[370.98,0.3],[384.68,0.425],[405.83,0.725],[414.98,0.925],[422.73,1.1],[427.6825,1.25],[433.35,1.45],[440.15,1.675],[443.25,1.8],[447.3,1.975],[450.85,2.175],[453.15,2.3],[458.475,2.625],[460.3,2.75],[462.81,2.925],[464.37,3.05],[465.825,3.175],[467.93,3.35],[469.1075,3.475],[470.285,3.6],[471.785,3.75],[472.985,3.925],[473.885,4.05],[475.18,4.225],[476.1325,4.425],[476.91,4.625],[477.785,4.8],[478.1525,4.925],[478.52,5.05],[479.0175,5.2],[479.205,5.3],[479.315,5.425],[479.53,5.6],[479.2475,5.8],[479.0275,5.925],[478.78,6.1],[477.8325,6.3],[477.145,6.425],[476.32,6.6],[475.5825,6.7],[475.0,6.8],[474.0,6.96],[472.3,7.2],[471.1,7.3],[469.28,7.42],[466.48,7.57]],"T7":[[334.42,0.1],[375.42,0.4],[385.12,0.55],[401.42,0.85],[412.92,1.15],[417.82,1.3],[423.39,1.5],[430.39,1.8],[433.29,1.95],[436.19,2.1],[438.69,2.25],[443.29,2.55],[445.39,2.7],[446.615,2.8],[449.49,3.05],[451.14,3.2],[452.56,3.35],[453.98,3.5],[455.19,3.65],[456.4,3.8],[457.43,3.95],[458.46,4.1],[459.06,4.2],[460.36,4.45],[461.06,4.6],[461.66,4.75],[462.66,5.05],[463.31,5.35],[463.56,5.5],[463.705,5.65],[463.85,5.8],[463.825,5.9],[463.8,6.0],[463.62,6.15],[463.44,6.3],[462.71,6.6],[462.105,6.75],[461.5,6.9],[459.78,7.2],[458.58,7.35],[457.38,7.5],[456.315,7.6],[455.25,7.7],[453.375,7.85],[451.5,8.0],[449.79,8.1],[448.08,8.2]],"T75":[[329.105,0.1],[341.0344,0.18675],[352.9638,0.2735],[361.1725,0.372],[376.04,0.569],[387.7225,0.797],[396.105,0.95],[403.89,1.175],[412.39,1.45],[414.69,1.55],[416.99,1.65],[421.59,1.85],[425.11,2.05],[429.68,2.325],[432.43,2.525],[434.7425,2.7],[437.53,2.95],[439.03,3.0875],[439.7225,3.15625],[440.415,3.225],[442.125,3.425],[443.73,3.625],[445.085,3.825],[446.35,4.025],[447.415,4.225],[447.99,4.3375],[448.4525,4.43125],[448.915,4.525],[449.665,4.725],[450.365,4.925],[451.015,5.2],[451.49,5.475],[451.64,5.675],[451.7375,5.875],[451.6737,5.975],[451.61,6.075],[451.4975,6.1875],[451.385,6.3],[450.87,6.5],[450.355,6.7],[448.5,7.2],[446.84,7.5],[443.6,7.9],[441.0,8.1],[438.1,8.3],[434.4,8.5],[427.8,8.7]],"T8":[[323.79,0.1],[330.5075,0.147],[337.225,0.194],[350.66,0.288],[362.525,0.444],[374.39,0.6],[384.39,0.85],[394.39,1.1],[400.69,1.35],[406.99,1.6],[411.53,1.85],[416.07,2.1],[419.47,2.35],[422.87,2.6],[425.57,2.85],[426.92,2.975],[428.27,3.1],[430.27,3.35],[432.27,3.6],[433.77,3.85],[435.27,4.1],[436.37,4.35],[436.92,4.475],[437.47,4.6],[438.27,4.85],[439.07,5.1],[439.37,5.35],[439.67,5.6],[439.72,5.85],[439.77,6.1],[439.37,6.35],[439.17,6.475],[438.97,6.6],[438.12,6.85],[437.27,7.1],[435.82,7.35],[434.37,7.6],[433.035,7.8],[431.7,8.0],[430.175,8.14],[428.65,8.28],[424.825,8.455],[421.0,8.63],[418.5,8.675],[416.0,8.72],[413.5,8.735],[411.0,8.75]],"T9":[[323.37,0.2],[332.07,0.3],[340.77,0.4],[351.57,0.6],[359.57,0.8],[365.97,1.0],[370.97,1.2],[375.37,1.4],[379.17,1.6],[382.37,1.8],[385.17,2.0],[387.58,2.2],[389.98,2.4],[391.78,2.6],[393.58,2.8],[395.18,3.0],[396.58,3.2],[397.78,3.4],[398.98,3.6],[399.78,3.8],[400.58,4.0],[401.37,4.2],[401.95,4.4],[402.41,4.6],[402.77,4.8],[403.03,5.0],[403.17,5.2],[403.19,5.3],[403.21,5.4],[403.15,5.6],[402.97,5.8],[402.68,6.0],[402.24,6.2],[401.72,6.4],[401.04,6.6],[400.2,6.8],[399.2,7.0],[397.96,7.2],[396.49,7.4],[394.68,7.6],[392.38,7.8],[389.28,8.0],[384.18,8.2],[383.33,8.22],[382.65,8.24],[380.65,8.26],[375.0,8.28]],"T92":[[298.896,0.206],[305.236,0.278],[311.576,0.351],[319.921,0.492],[327.006,0.654],[332.696,0.817],[337.351,0.982],[341.366,1.148],[345.276,1.319],[348.331,1.485],[351.026,1.651],[353.782,1.822],[355.954,1.988],[357.764,2.153],[359.704,2.324],[361.274,2.489],[362.684,2.655],[364.184,2.825],[364.729,2.899],[365.274,2.973],[366.124,3.121],[367.344,3.296],[368.978,3.487],[369.911,3.662],[370.77,3.838],[371.952,4.029],[372.775,4.212],[373.1405,4.304],[373.506,4.396],[374.119,4.499],[374.732,4.603],[375.199,4.786],[375.57,4.949],[376.35,5.136],[376.599,5.33],[376.776,5.523],[377.744,5.784],[378.022,5.914],[378.3,6.044],[378.96,6.397],[379.62,6.75],[379.95,7.12],[378.8,7.44],[376.48,7.7],[372.4,7.91],[368.4,7.99],[360.8,7.95]],"T95":[[262.185,0.214],[264.985,0.24575],[267.785,0.2775],[272.4475,0.331],[278.16,0.4345],[282.785,0.5415],[286.9225,0.656],[290.36,0.77],[294.435,0.8985],[297.2725,1.013],[299.81,1.127],[303.085,1.2555],[304.915,1.369],[306.74,1.4825],[308.89,1.6093],[310.415,1.7225],[311.84,1.8364],[313.79,1.9634],[314.715,2.03247],[315.64,2.10155],[317.49,2.2405],[320.39,2.41753],[321.8525,2.556],[323.31,2.69454],[325.725,2.872],[327.3925,3.03057],[329.01,3.189],[330.5125,3.29775],[332.015,3.4065],[333.2725,3.5645],[334.47,3.673],[336.855,3.8406],[338.1375,4.024],[339.36,4.2075],[342.8,4.56],[345.45,4.91],[347.37,5.3],[347.845,5.515],[348.32,5.73],[348.72,5.99],[347.88,6.23],[347.2,6.41],[345.45,6.6],[344.5,6.71],[342.58,6.78],[340.11,6.81],[337.07,6.77]],"P10":[[201.0,0.228],[203.5,0.255],[204.125,0.262],[204.75,0.269],[206.0,0.283],[207.875,0.312],[209.75,0.34],[213.5,0.397],[215.375,0.426],[217.25,0.454],[221.0,0.511],[222.25,0.538],[223.5,0.565],[226.0,0.618],[227.25,0.645],[228.5,0.672],[231.0,0.726],[233.5,0.803],[236.0,0.88],[241.0,1.035],[243.125,1.112],[245.25,1.189],[249.5,1.344],[252.375,1.461],[255.25,1.578],[261.0,1.812],[263.375,1.929],[265.75,2.046],[270.5,2.28],[273.125,2.448],[275.75,2.615],[281.0,2.95],[283.5,3.117],[286.0,3.285],[291.0,3.62],[292.25,3.726],[293.5,3.832],[296.0,4.045],[297.25,4.151],[298.5,4.257],[301.0,4.47],[301.5,4.521],[302.0,4.572],[303.0,4.675],[303.5,4.726],[304.0,4.778],[305.0,4.88]],"P1":[[200.0,0.021],[215.0,0.041],[230.0,0.061],[237.5,0.081],[289.95,0.0855],[297.45,0.0955],[245.0,0.101],[252.5,0.121],[260.0,0.141],[379.9,0.15],[267.5,0.171],[282.5,0.241],[290.0,0.281],[297.5,0.319],[312.5,0.397],[320.0,0.437],[327.5,0.487],[335.0,0.537],[342.5,0.597],[350.0,0.657],[365.0,0.777],[372.5,0.847],[380.0,0.917],[395.0,1.057],[402.5,1.138],[410.0,1.219],[417.5,1.319],[425.0,1.419],[440.0,1.619],[447.5,1.729],[455.0,1.839],[462.5,1.969],[470.0,2.099],[477.5,2.239],[485.0,2.379],[492.5,2.537],[500.0,2.695],[507.5,2.865],[515.0,3.035],[518.4173,3.1175],[521.8345,3.2],[523.78,3.2338],[525.734,3.2675],[527.8669,3.2838],[532.68,3.29],[531.34,3.295],[530.0,3.3]],"P3":[[200.0,0.062],[205.0,0.082],[220.0,0.142],[225.0,0.172],[230.0,0.202],[240.0,0.262],[245.0,0.312],[250.0,0.362],[265.0,0.512],[270.0,0.562],[280.0,0.702],[285.0,0.772],[290.0,0.842],[300.0,1.016],[305.0,1.096],[310.0,1.176],[320.0,1.376],[325.0,1.476],[330.0,1.576],[345.0,1.876],[350.0,1.976],[360.0,2.196],[365.0,2.306],[380.0,2.656],[385.0,2.766],[390.0,2.876],[400.0,3.096],[405.0,3.206],[410.0,3.316],[420.0,3.536],[425.0,3.646],[430.0,3.756],[440.0,3.976],[445.0,4.075],[450.0,4.174],[460.0,4.374],[465.0,4.4665],[470.0,4.559],[480.0,4.72],[485.0,4.775],[490.0,4.83],[500.0,4.87],[503.015,4.854],[506.03,4.8389],[510.0,4.78],[511.5815,4.74],[513.163,4.7]],"P5":[[200.0,0.104],[205.0,0.134],[220.0,0.244],[225.0,0.294],[230.0,0.344],[240.0,0.464],[245.0,0.534],[250.0,0.604],[260.0,0.784],[265.0,0.884],[270.0,0.984],[280.0,1.224],[285.0,1.354],[290.0,1.484],[300.0,1.774],[305.0,1.934],[310.0,2.094],[320.0,2.434],[325.0,2.614],[330.0,2.794],[340.0,3.154],[345.0,3.344],[350.0,3.534],[360.0,3.914],[365.0,4.104],[370.0,4.294],[380.0,4.674],[385.0,4.854],[390.0,5.034],[400.0,5.374],[405.0,5.534],[410.0,5.694],[420.0,5.994],[425.0,6.134],[430.0,6.274],[440.0,6.494],[445.0,6.5815],[450.0,6.669],[460.0,6.779],[465.0,6.8025],[470.0,6.826],[480.0,6.78],[483.0,6.7122],[486.0,6.644],[490.0,6.451],[490.25,6.4255],[490.5,6.4]],"P6":[[200.0,0.1245],[203.75,0.152],[207.5,0.1795],[217.5,0.2645],[222.5,0.3195],[227.5,0.3795],[235.0,0.4745],[242.5,0.5895],[247.5,0.6795],[255.0,0.8245],[258.75,0.9145],[262.5,1.0045],[267.5,1.1345],[277.5,1.4245],[282.5,1.5795],[287.5,1.7445],[295.0,1.9895],[302.5,2.2935],[307.5,2.4985],[311.25,2.646],[315.0,2.7935],[320.0,3.0135],[325.0,3.2335],[335.0,3.6935],[340.0,3.9285],[345.0,4.1635],[355.0,4.646],[360.0,4.881],[365.0,5.116],[375.0,5.576],[380.0,5.791],[385.0,6.006],[392.5,6.291],[397.5,6.486],[402.5,6.6625],[410.0,6.909],[415.0,7.05825],[420.0,7.2075],[427.5,7.37],[430.0,7.41812],[432.5,7.46625],[437.5,7.535],[445.0,7.615],[454.28,7.69],[458.66,7.71],[462.75,7.68],[466.48,7.57]],"P7":[[200.0,0.145],[210.0,0.225],[215.0,0.285],[220.0,0.345],[225.0,0.415],[230.0,0.485],[240.0,0.645],[245.0,0.755],[250.0,0.865],[260.0,1.125],[265.0,1.285],[275.0,1.625],[280.0,1.805],[285.0,2.005],[290.0,2.205],[300.0,2.653],[305.0,2.903],[310.0,3.153],[315.0,3.413],[320.0,3.673],[330.0,4.233],[335.0,4.513],[340.0,4.793],[350.0,5.378],[355.0,5.658],[360.0,5.938],[370.0,6.478],[375.0,6.728],[380.0,6.978],[385.0,7.208],[390.0,7.438],[395.0,7.631],[400.0,7.824],[405.0,7.9825],[410.0,8.141],[415.0,8.246],[420.0,8.351],[425.0,8.401],[430.0,8.451],[432.5985,8.465],[435.197,8.479],[437.5985,8.4595],[440.0,8.44],[442.205,8.39835],[444.41,8.3567],[446.244,8.27835],[448.078,8.2]],"P75":[[200.0,0.1555],[203.75,0.188],[207.5,0.2205],[212.5,0.2755],[217.5,0.3355],[222.5,0.4005],[227.5,0.4755],[235.0,0.5955],[240.0,0.7005],[245.0,0.8055],[248.75,0.90287],[252.5,1.00025],[257.5,1.145],[265.0,1.395],[270.0,1.565],[275.0,1.755],[280.0,1.945],[287.5,2.274],[292.5,2.504],[295.0,2.6265],[297.5,2.749],[302.5,2.999],[307.5,3.26825],[315.0,3.6875],[320.0,3.9775],[325.0,4.2675],[332.5,4.72],[337.5,5.02],[342.5,5.325],[346.25,5.5425],[350.0,5.76],[355.0,6.055],[360.0,6.35],[365.0,6.633],[370.0,6.916],[375.0,7.1725],[380.0,7.429],[385.0,7.6515],[390.0,7.874],[392.5,7.96112],[395.0,8.04825],[400.0,8.2225],[405.0,8.4],[408.77,8.51],[414.14,8.6],[419.8,8.68],[427.8,8.7]],"P8":[[200.0,0.166],[205.0,0.216],[210.0,0.266],[215.0,0.326],[220.0,0.386],[225.0,0.466],[230.0,0.546],[235.0,0.646],[240.0,0.746],[245.0,0.8755],[250.0,1.005],[255.0,1.165],[260.0,1.325],[265.0,1.505],[270.0,1.685],[275.0,1.895],[280.0,2.105],[285.0,2.345],[290.0,2.585],[295.0,2.8635],[300.0,3.142],[305.0,3.442],[310.0,3.742],[315.0,4.062],[320.0,4.382],[325.0,4.712],[330.0,5.042],[335.0,5.382],[340.0,5.722],[345.0,6.058],[350.0,6.394],[355.0,6.714],[360.0,7.034],[365.0,7.3205],[370.0,7.607],[375.0,7.8505],[380.0,8.094],[385.0,8.284],[390.0,8.474],[392.4785,8.545],[394.9571,8.6167],[397.4785,8.665],[400.0,8.713],[402.4142,8.7315],[404.8283,8.75],[407.9142,8.75],[411.0,8.75]],"P9":[[200.0,0.187],[202.5,0.217],[210.0,0.307],[215.0,0.367],[217.5,0.407],[220.0,0.447],[225.0,0.527],[230.0,0.627],[232.5,0.677],[235.0,0.727],[240.0,0.867],[245.0,0.987],[247.5,1.067],[250.0,1.147],[255.0,1.327],[260.0,1.507],[262.5,1.607],[265.0,1.707],[270.0,1.927],[275.0,2.167],[277.5,2.297],[280.0,2.427],[285.0,2.707],[290.0,3.007],[292.5,3.167],[295.0,3.327],[300.0,3.651],[305.0,4.011],[307.5,4.191],[310.0,4.371],[315.0,4.751],[320.0,5.131],[322.5,5.331],[325.0,5.531],[330.0,5.911],[335.0,6.292],[337.5,6.477],[340.0,6.662],[345.0,7.012],[350.0,7.332],[352.5,7.482],[355.0,7.632],[360.0,7.872],[365.0,8.052],[367.5,8.128],[370.0,8.204],[375.0,8.278]],"P92":[[200.2,0.2],[201.2,0.20705],[202.2,0.2189],[207.2,0.2786],[211.825,0.334],[214.45,0.3714],[216.7,0.4062],[220.575,0.468],[222.76,0.51],[224.95,0.549],[228.2,0.611],[229.1687,0.63],[230.1375,0.649],[233.575,0.7408],[237.45,0.8285],[240.7,0.9158],[243.45,0.9932],[247.2,1.1226],[251.2,1.2572],[253.95,1.3586],[255.0125,1.4],[256.075,1.4393],[259.7,1.592],[263.7,1.7668],[266.2,1.88],[269.2,2.0176],[274.2,2.2646],[278.125,2.48],[280.55,2.6234],[282.225,2.7149],[283.9,2.8064],[288.475,3.0842],[292.55,3.3556],[295.7,3.5424],[298.675,3.7386],[303.15,4.062],[307.7,4.3728],[308.9125,4.4676],[310.125,4.5624],[312.3875,4.73723],[318.39,5.291],[321.854,5.5595],[325.318,5.828],[332.58,6.37],[342.8,7.03],[352.22,7.56],[360.8,7.95]],"P95":[[200.5,0.2075],[201.75,0.22175],[203.0,0.236],[207.0625,0.2845],[209.875,0.318],[211.75,0.345],[213.9375,0.3795],[217.375,0.4335],[221.75,0.512],[222.8438,0.53175],[223.9375,0.5515],[226.125,0.5905],[230.5,0.689],[233.625,0.7625],[235.5,0.816],[238.0,0.8825],[241.125,0.986],[242.6875,1.03775],[244.25,1.0895],[246.75,1.1665],[249.25,1.255],[253.0,1.4035],[258.0,1.601],[260.3125,1.7045],[262.625,1.808],[267.25,2.0255],[271.1875,2.234],[273.875,2.3725],[278.0,2.5695],[281.6875,2.79],[285.375,3.0285],[289.0,3.2355],[291.5625,3.40953],[293.4688,3.54657],[295.375,3.6836],[300.5,4.04055],[303.0,4.224],[305.0,4.408],[307.0,4.58],[309.0,4.7655],[311.39,4.98],[313.5,5.14],[315.15,5.275],[316.8,5.41],[320.17,5.65],[327.1,6.15],[337.07,6.77]],"xlabel":[[512.44,1.85],[503.55,1.82],[498.7,1.88],[491.02,1.85],[487.6,1.89],[487.48,1.97],[489.0739,2.0972],[477.88,1.98],[475.55,2.03],[474.5325,2.1173],[474.5325,2.15738],[465.72,2.14],[461.2,2.18],[456.85,2.22],[452.8,2.27],[448.85,2.31],[445.47,2.37],[442.37,2.44],[438.58,2.49],[435.11,2.54],[432.44,2.61],[430.16,2.68],[427.93,2.75],[409.26,2.53],[423.3,2.89],[421.1,2.96],[419.07,3.04],[417.28,3.12],[415.57,3.2],[413.9,3.28],[412.23,3.37],[410.49,3.44],[408.73,3.5],[407.07,3.58],[405.53,3.65],[404.08,3.72],[402.68,3.8],[401.32,3.87],[399.97,3.95],[398.6,4.02],[397.23,4.09],[395.87,4.17],[394.52,4.24],[393.19,4.31],[391.89,4.39],[390.64,4.46],[389.42,4.54],[388.23,4.61],[387.06,4.69],[385.91,4.77],[384.78,4.85],[383.22,4.9],[381.66,4.95],[380.12,5.01],[378.59,5.06],[377.06,5.11],[375.55,5.15],[374.04,5.2],[372.55,5.25],[371.06,5.29],[369.58,5.33],[368.11,5.37],[366.64,5.41],[365.19,5.45],[363.74,5.48],[362.3,5.52],[360.88,5.55],[359.45,5.58],[358.04,5.61],[356.64,5.64],[355.24,5.67],[353.05,5.62],[350.88,5.57],[348.71,5.52],[346.55,5.48],[344.38,5.44],[342.21,5.39],[340.03,5.35],[337.86,5.32],[335.69,5.3],[333.56,5.28],[331.54,5.21],[329.53,5.14],[327.5,5.07],[325.47,5.0],[323.43,4.93],[321.39,4.87],[319.36,4.8],[317.33,4.73],[315.3,4.67],[313.26,4.62],[309.31,4.4],[305.36,4.19],[301.46,3.98],[297.62,3.77],[293.87,3.57],[290.02,3.37],[286.18,3.16],[282.54,2.97],[278.88,2.78],[275.28,2.59]],"locus":[[540.13,2.736],[532.68,3.29],[513.16,4.7],[490.5,6.4],[466.0,7.6],[441.97,8.4588],[411.0,8.75],[375.0,8.28],[354.724,7.724],[335.0,6.6411],[305.0,4.88]]};
+</script>
+<script>
+(function(){
+  "use strict";
+  const cv = document.getElementById('cv');
+  const ctx = cv.getContext('2d');
+  const DPR = 2;                 // hi-DPI: 1200x900 backing for 600x450 css
+  const W = 600, H = 450;        // logical
+  // plot ranges
+  const Tmin=215, Tmax=570, Pmin=1.2, Pmax=9.25;
+  // plot margins (logical px)
+  const mL=66, mR=14, mT=12, mB=52;
+  const plotW = W-mL-mR, plotH = H-mT-mB;
+  const BLUE='rgb(0,0,255)', GREEN='rgb(0,153,0)';
+
+  function TX(t){ return mL + (t-Tmin)/(Tmax-Tmin)*plotW; }
+  function PY(p){ return mT + (1-(p-Pmin)/(Pmax-Pmin))*plotH; }
+
+  // ---- interpolation tables (lever rule between stored curves) ----
+  // each entry: [lo, hi, denom, vaporFrom, vaporTo, liqFrom, liqTo]
+  const SEG = [
+    [0.00,0.10,0.10,'T0','T1','T0','P1'],
+    [0.10,0.30,0.20,'T1','T3','P1','P3'],
+    [0.30,0.50,0.20,'T3','T5','P3','P5'],
+    [0.50,0.60,0.10,'T5','T6','P5','P6'],
+    [0.60,0.70,0.10,'T6','T7','P6','P7'],
+    [0.70,0.75,0.05,'T7','T75','P7','P75'],
+    [0.75,0.80,0.05,'T75','T8','P75','P8'],
+    [0.80,0.90,0.10,'T8','T9','P8','P9'],
+    [0.90,0.92,0.02,'T9','T92','P9','P92'],
+    [0.92,0.95,0.03,'T92','T95','P92','P95'],
+    [0.95,1.00,0.05,'T95','P10','P95','P10']
+  ];
+  function lerpCurve(A,B,f){
+    const out=[];
+    for(let i=0;i<A.length;i++)
+      out.push([(1-f)*A[i][0]+f*B[i][0], (1-f)*A[i][1]+f*B[i][1]]);
+    return out;
+  }
+  function selected(x){
+    let seg=SEG[0];
+    for(const s of SEG){ if(x>s[0]-1e-9 && x<=s[1]+1e-9){ seg=s; break; } }
+    if(x<=0.0) seg=SEG[0];
+    const f=Math.min(1,Math.max(0,(x-seg[0])/seg[2]));
+    let liq=lerpCurve(DATA[seg[5]],DATA[seg[6]],f);
+    const vap=lerpCurve(DATA[seg[3]],DATA[seg[4]],f);
+    liq=liq.slice().sort((a,b)=>a[0]-b[0]);  // dataP is sorted in original
+    return {liq,vap};
+  }
+
+  // ---- drawing helpers ----
+  function poly(pts,color,width,dash){
+    ctx.save();
+    ctx.beginPath();
+    ctx.lineJoin='round'; ctx.lineCap='round';
+    ctx.strokeStyle=color; ctx.lineWidth=width;
+    if(dash) ctx.setLineDash(dash); else ctx.setLineDash([]);
+    let started=false;
+    for(const p of pts){
+      const X=TX(p[0]), Y=PY(p[1]);
+      if(!started){ ctx.moveTo(X,Y); started=true; } else ctx.lineTo(X,Y);
+    }
+    ctx.stroke();
+    ctx.restore();
+  }
+  // light gray fill between a liquid (blue) and vapor (green) envelope curve
+  function fillEnvelope(liq,vap){
+    ctx.save();
+    ctx.beginPath();
+    let started=false;
+    for(const p of vap){ const X=TX(p[0]),Y=PY(p[1]); if(!started){ctx.moveTo(X,Y);started=true;}else ctx.lineTo(X,Y);} 
+    for(let i=liq.length-1;i>=0;i--){ const p=liq[i]; ctx.lineTo(TX(p[0]),PY(p[1])); }
+    ctx.closePath();
+    ctx.fillStyle='rgba(140,140,140,0.05)';
+    ctx.fill();
+    ctx.restore();
+  }
+  // draw a sequence of text runs [{t, sub}] centered at (0,0) in current transform
+  function drawRuns(runs,size,color){
+    const subSize=Math.round(size*0.72);
+    let total=0;
+    for(const r of runs){ ctx.font=(r.sub?subSize:size)+'px Helvetica,Arial,sans-serif';
+      total+=ctx.measureText(r.t).width; }
+    ctx.textAlign='left'; ctx.textBaseline='middle'; ctx.fillStyle=color;
+    let x=-total/2;
+    for(const r of runs){
+      const fs=r.sub?subSize:size;
+      ctx.font=fs+'px Helvetica,Arial,sans-serif';
+      ctx.fillText(r.t, x, r.sub?size*0.18:0);
+      x+=ctx.measureText(r.t).width;
+    }
+  }
+  function runsWidth(runs,size){
+    const subSize=Math.round(size*0.72); let w=0;
+    for(const r of runs){ ctx.font=(r.sub?subSize:size)+'px Helvetica,Arial,sans-serif';
+      w+=ctx.measureText(r.t).width; }
+    return w;
+  }
+  function rotText(runs,t,p,deg,color,size){
+    ctx.save();
+    ctx.translate(TX(t),PY(p));
+    ctx.rotate(-deg*Math.PI/180);
+    drawRuns(runs,size,color);
+    ctx.restore();
+  }
+  // linear interpolation of P along a {T,P} curve (sorted ascending in T) at temperature t
+  function curveP(curve,t){
+    for(let i=0;i<curve.length-1;i++){
+      if(t>=curve[i][0] && t<=curve[i+1][0]){
+        const f=(t-curve[i][0])/(curve[i+1][0]-curve[i][0]);
+        return curve[i][1]+f*(curve[i+1][1]-curve[i][1]);
+      }
+    }
+    return curve[curve.length-1][1];
+  }
+  // Catmull-Rom smooth path through locus points (sorted by T ascending)
+  function smoothLocus(pts){
+    const P=pts.slice().sort((a,b)=>a[0]-b[0]);
+    const out=[];
+    for(let i=0;i<P.length-1;i++){
+      const p0=P[i>0?i-1:i], p1=P[i], p2=P[i+1], p3=P[i<P.length-2?i+2:i+1];
+      for(let s=0;s<=12;s++){
+        const u=s/12, u2=u*u, u3=u2*u;
+        const T=0.5*((2*p1[0])+(-p0[0]+p2[0])*u+(2*p0[0]-5*p1[0]+4*p2[0]-p3[0])*u2+(-p0[0]+3*p1[0]-3*p2[0]+p3[0])*u3);
+        const Pr=0.5*((2*p1[1])+(-p0[1]+p2[1])*u+(2*p0[1]-5*p1[1]+4*p2[1]-p3[1])*u2+(-p0[1]+3*p1[1]-3*p2[1]+p3[1])*u3);
+        out.push([T,Pr]);
+      }
+    }
+    return out;
+  }
+
+  // linear interpolation of the critical locus P at a given T (for label placement)
+  function locusInterp(t){
+    const P=DATA.locus.slice().sort((a,b)=>a[0]-b[0]);
+    for(let i=0;i<P.length-1;i++){
+      if(t>=P[i][0] && t<=P[i+1][0]){
+        const f=(t-P[i][0])/(P[i+1][0]-P[i][0]);
+        return P[i][1]+f*(P[i+1][1]-P[i][1]);
+      }
+    }
+    return P[P.length-1][1];
+  }
+  // "critical locus" label: parallel to the locus tangent, offset off the line
+  function drawLocusLabel(){
+    const ta=458, tb=486, tc=(ta+tb)/2;
+    const x1=TX(ta), y1=PY(locusInterp(ta));
+    const x2=TX(tb), y2=PY(locusInterp(tb));
+    const dx=x2-x1, dy=y2-y1, len=Math.hypot(dx,dy)||1;
+    const ang=Math.atan2(dy,dx);          // rotation parallel to the line
+    const nx=dy/len, ny=-dx/len;          // perpendicular pointing up-right (outside the dome)
+    const off=30;
+    const cx=TX(tc)+nx*off, cy=PY(locusInterp(tc))+ny*off;
+    ctx.save();
+    ctx.translate(cx,cy); ctx.rotate(ang);
+    ctx.fillStyle='#000'; ctx.font='21px Helvetica,Arial,sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('critical locus',0,0);
+    ctx.restore();
+  }
+
+  function niceTicks(lo,hi,target){
+    const span=hi-lo, raw=span/target, mag=Math.pow(10,Math.floor(Math.log10(raw)));
+    const norm=raw/mag; let step;
+    if(norm<1.5)step=1;else if(norm<3)step=2;else if(norm<7)step=5;else step=10;
+    step*=mag;
+    const first=Math.ceil(lo/step)*step, out=[];
+    for(let v=first;v<=hi+1e-9;v+=step) out.push(Math.round(v/step)*step);
+    return out;
+  }
+
+  function drawFrame(){
+    ctx.save();
+    ctx.strokeStyle='#000'; ctx.lineWidth=1; ctx.fillStyle='#000';
+    ctx.font='18px Helvetica,Arial,sans-serif';
+    // frame box
+    ctx.strokeRect(mL,mT,plotW,plotH);
+    // ticks
+    const tT=niceTicks(Tmin,Tmax,7), tP=niceTicks(Pmin,Pmax,7);
+    ctx.textAlign='center'; ctx.textBaseline='top';
+    for(const t of tT){
+      if(t<Tmin||t>Tmax)continue;
+      const X=TX(t);
+      ctx.beginPath();ctx.moveTo(X,mT+plotH);ctx.lineTo(X,mT+plotH-6);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(X,mT);ctx.lineTo(X,mT+6);ctx.stroke();
+      ctx.fillText(String(t),X,mT+plotH+6);
+    }
+    ctx.textAlign='right'; ctx.textBaseline='middle';
+    for(const p of tP){
+      if(p<Pmin||p>Pmax)continue;
+      const Y=PY(p);
+      ctx.beginPath();ctx.moveTo(mL,Y);ctx.lineTo(mL+6,Y);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(mL+plotW,Y);ctx.lineTo(mL+plotW-6,Y);ctx.stroke();
+      ctx.fillText(String(p),mL-7,Y);
+    }
+    // axis labels
+    ctx.font='21px Helvetica,Arial,sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='alphabetic';
+    ctx.fillText('temperature (K)', mL+plotW/2, H-10);
+    ctx.save();
+    ctx.translate(18, mT+plotH/2); ctx.rotate(-Math.PI/2);
+    ctx.fillText('pressure (MPa)',0,0);
+    ctx.restore();
+    ctx.restore();
+  }
+
+  function render(){
+    const x=parseFloat(document.getElementById('xsl').value);
+    const showAll=document.getElementById('allchk').checked;
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+    ctx.clearRect(0,0,W,H);
+
+    drawFrame();
+    // clip to plot area for curves
+    ctx.save();
+    ctx.beginPath(); ctx.rect(mL,mT,plotW,plotH); ctx.clip();
+
+    const sixV=['T1','T3','T5','T7','T8','T9'];
+    const sixL=['P1','P3','P5','P7','P8','P9'];
+
+    if(showAll){
+      for(let i=0;i<6;i++) fillEnvelope(DATA[sixL[i]],DATA[sixV[i]]);
+      for(let i=0;i<6;i++){
+        poly(DATA[sixL[i]],BLUE,2.0);
+        poly(DATA[sixV[i]],GREEN,2.0);
+      }
+    }
+    // pure components (always)
+    poly(DATA.P10,BLUE,2.0);  // ethane x=1
+    poly(DATA.T0,BLUE,2.0);   // heptane x=0
+
+    // critical locus
+    poly(smoothLocus(DATA.locus),'#000',2.4);
+
+    // selected curve (dashed) / pure endpoints
+    const sel=selected(x);
+    if(x<=0.0){
+      poly(DATA.T0,GREEN,3.2);
+    } else if(x>=1.0){
+      poly(DATA.P10,BLUE,3.2);
+    } else {
+      poly(sel.liq,BLUE,3.2,[8,5]);
+      poly(sel.vap,GREEN,3.2,[8,5]);
+    }
+    ctx.restore();
+
+    // rotated text labels (pure component identities + locus)
+    rotText([{t:'ethane: x'},{t:'1',sub:1},{t:' = 1'}],275,3.15,61,BLUE,20);
+    drawHeptaneLabel();
+    drawLocusLabel();
+
+    // dynamic framed x= / y= labels for the selected curve
+    if(x>0.0 && x<1.0){
+      const pos=Math.round(100*x);
+      const xl=DATA.xlabel[Math.min(DATA.xlabel.length-1,Math.max(0,pos))];
+      drawFramedLabel([{t:'x'},{t:'1',sub:1},{t:' = '+x.toFixed(2)}], xl[0], xl[1], BLUE);
+      // green label: point on vapor curve at pressure nearest the blue label pressure
+      const targetP=xl[1];
+      let best=sel.vap[0], bd=1e9;
+      for(const q of sel.vap){ const d=Math.abs(q[1]-targetP); if(d<bd){bd=d;best=q;} }
+      drawFramedLabel([{t:'y'},{t:'1',sub:1},{t:' = '+x.toFixed(2)}], best[0], best[1], GREEN);
+    }
+  }
+
+  // "heptane: x1 = 0" label, parallel to the heptane curve and offset just below it.
+  // (Slightly smaller than the other curve label because the heptane curve hugs the
+  //  lower frame, leaving a narrow band; 17px is the largest that clears the line here.)
+  function drawHeptaneLabel(){
+    const ta=520, tb=540, tc=531;
+    const x1=TX(ta), y1=PY(curveP(DATA.T0,ta));
+    const x2=TX(tb), y2=PY(curveP(DATA.T0,tb));
+    const dx=x2-x1, dy=y2-y1, len=Math.hypot(dx,dy)||1;
+    const ang=Math.atan2(dy,dx);          // parallel to the curve
+    const nx=-dy/len, ny=dx/len;          // perpendicular pointing down-right (below curve)
+    const off=10;
+    const cx=TX(tc)+nx*off, cy=PY(curveP(DATA.T0,tc))+ny*off;
+    ctx.save();
+    ctx.translate(cx,cy); ctx.rotate(ang);
+    drawRuns([{t:'heptane: x'},{t:'1',sub:1},{t:' = 0'}],17,BLUE);
+    ctx.restore();
+  }
+
+  function drawFramedLabel(runs,t,p,color){
+    let X=TX(t), Y=PY(p);
+    ctx.save();
+    const size=20;
+    const w=runsWidth(runs,size), padx=8, bw=w+2*padx, bh=26;
+    // keep inside plot
+    X=Math.min(mL+plotW-bw/2-2, Math.max(mL+bw/2+2, X));
+    Y=Math.min(mT+plotH-bh/2-2, Math.max(mT+bh/2+2, Y));
+    ctx.fillStyle='#fff';
+    ctx.fillRect(X-bw/2,Y-bh/2,bw,bh);
+    ctx.strokeStyle=color; ctx.lineWidth=1.3; ctx.setLineDash([4,3]);
+    ctx.strokeRect(X-bw/2,Y-bh/2,bw,bh);
+    ctx.setLineDash([]);
+    ctx.save();
+    ctx.translate(X,Y);
+    drawRuns(runs,size,color);
+    ctx.restore();
+    ctx.restore();
+  }
+
+  // ---- wire up controls ----
+  const xsl=document.getElementById('xsl'), xval=document.getElementById('xval');
+  xsl.addEventListener('input',()=>{ xval.textContent=parseFloat(xsl.value).toFixed(2); render(); });
+  document.getElementById('allchk').addEventListener('change',render);
+  document.querySelectorAll('.tbtn').forEach(b=>{
+    b.addEventListener('click',()=>{
+      const id=b.dataset.p, panel=document.getElementById(id);
+      const open=panel.classList.contains('show');
+      document.querySelectorAll('.panel').forEach(p=>p.classList.remove('show'));
+      document.querySelectorAll('.tbtn').forEach(x=>x.classList.remove('active'));
+      if(!open){ panel.classList.add('show'); b.classList.add('active'); }
+    });
+  });
+
+  xval.textContent=parseFloat(xsl.value).toFixed(2);
+  render();
+})();
+</script>
+</body>
+</html>
