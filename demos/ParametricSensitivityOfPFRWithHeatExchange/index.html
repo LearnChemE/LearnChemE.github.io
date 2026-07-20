@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parametric Sensitivity of Plug Flow Reactor With Heat Exchange</title>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }
+  };
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #ffffff;
+    font-family: Helvetica, Arial, sans-serif;
+    color: #000000;
+  }
+  #app {
+    width: 745px;
+    margin: 12px auto;
+    padding: 0 8px 8px 8px;
+    position: relative;
+  }
+  .demo-title {
+    font-size: 17px;
+    font-weight: bold;
+    text-align: center;
+    margin: 4px 0 10px 0;
+    font-family: Helvetica, Arial, sans-serif;
+  }
+  .controls {
+    border: 1px solid #cccccc;
+    background: #ffffff;
+    padding: 10px 12px 12px 12px;
+    margin-bottom: 6px;
+  }
+  /* Setter (toggle) row */
+  .setter-row {
+    margin-bottom: 10px;
+  }
+  .setter-label {
+    display: inline-block;
+    vertical-align: middle;
+  }
+  .setter-btn {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    padding: 3px 12px;
+    margin-right: -1px;
+    border: 1px solid #9a9a9a;
+    background: #f0f0f0;
+    color: #000000;
+    cursor: pointer;
+    outline: none;
+  }
+  #setTemp { border-radius: 3px 0 0 3px; }
+  #setFlow { border-radius: 0 3px 3px 0; }
+  .setter-btn.active {
+    background: #8b1a1a;
+    color: #ffffff;
+    border-color: #6e1414;
+  }
+  /* Slider rows */
+  .slider-row {
+    display: flex;
+    align-items: center;
+    margin: 7px 0;
+  }
+  .slider-label {
+    font-size: 16px;
+    text-align: right;
+    padding-right: 8px;
+    white-space: nowrap;
+  }
+  .slider-val {
+    font-size: 16px;
+    min-width: 42px;
+    text-align: left;
+    padding-left: 8px;
+    font-variant-numeric: tabular-nums;
+  }
+  input[type=range] {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 4px;
+    width: 150px;
+    background: #c8c8c8;
+    border-radius: 2px;
+    outline: none;
+    margin: 0;
+    flex: 0 0 auto;
+  }
+  #ftot { width: 200px; }
+  #tf, #ea { width: 90px; }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 1px solid #7a7a7a;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.3);
+    cursor: pointer;
+  }
+  input[type=range]::-moz-range-thumb {
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 1px solid #7a7a7a;
+    cursor: pointer;
+  }
+  .row-twoup {
+    display: flex;
+    gap: 12px;
+  }
+  .row-twoup .slider-row { margin: 7px 0 0 0; }
+  .row-twoup .slider-label { padding-right: 6px; }
+  .row-twoup .slider-val { min-width: 34px; }
+  /* plot */
+  #plotWrap { text-align: center; }
+  canvas { display: block; margin: 0 auto; }
+  /* bottom buttons */
+  .btn-row {
+    text-align: center;
+    margin-top: 10px;
+  }
+  #btnDir { margin-left: 112px; }
+  .info-btn {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    padding: 5px 20px;
+    margin: 0 5px;
+    border: 1px solid #6e1414;
+    background: #8b1a1a;
+    color: #ffffff;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  .info-btn:hover { background: #741414; }
+  .info-btn.active { background: #5c1010; border-color: #4a0d0d; }
+  .panel {
+    display: none;
+    position: absolute;
+    width: 320px;
+    border: 1px solid #cccccc;
+    background: #fbfbfb;
+    padding: 12px 16px;
+    font-size: 13.5px;
+    line-height: 1.5;
+    text-align: left;
+    box-shadow: 2px 3px 8px rgba(0,0,0,0.15);
+    z-index: 20;
+  }
+  .panel.show { display: block; }
+  .panel p { margin: 8px 0; }
+  .panel .eq {
+    font-style: italic;
+    margin: 6px 0 6px 18px;
+    font-family: "Times New Roman", Georgia, serif;
+    font-size: 15px;
+  }
+  .panel a { color: #1a5fb4; text-decoration: none; }
+  .panel a:hover { text-decoration: underline; }
+  sub, sup {
+    font-size: 0.75em;
+    line-height: 0;
+    position: relative;
+    vertical-align: baseline;
+  }
+  sup { top: -0.5em; }
+  sub { bottom: -0.25em; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="controls">
+    <div class="setter-row">
+      <button class="setter-btn" id="setTemp">temperature</button><button class="setter-btn active" id="setFlow">molar flow rate</button><button class="info-btn" id="btnDir">Directions</button><button class="info-btn" id="btnDet">Details</button><button class="info-btn" id="btnAbout">About</button>
+    </div>
+
+    <div class="slider-row" id="ftotRow">
+      <span class="slider-label">total molar flow rate (mol/s)</span>
+      <input type="range" id="ftot" min="0.05" max="0.15" step="0.01" value="0.09">
+      <span class="slider-val" id="ftotVal">0.09</span>
+    </div>
+
+    <div class="row-twoup">
+      <div class="slider-row">
+        <span class="slider-label">feed temperature (K)</span>
+        <input type="range" id="tf" min="600" max="640" step="1" value="616">
+        <span class="slider-val" id="tfVal">616</span>
+      </div>
+      <div class="slider-row">
+        <span class="slider-label">activation energy (kJ/mol)</span>
+        <input type="range" id="ea" min="83" max="125" step="1" value="98">
+        <span class="slider-val" id="eaVal">98</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="plotWrap">
+    <canvas id="plot" width="719" height="469"></canvas>
+  </div>
+
+  <div class="panel" id="panelDir">
+    <p>This Demonstration plots the temperature and molar flow rate of the reactant as a function of distance down a plug flow reactor for an exothermic, gas-phase reaction. The reactor has heat exchange through the walls. Vary the feed temperature, activation energy for the reaction, and total molar flow rate with the sliders. Conditions that lead to thermal runaway are highly sensitive to feed temperature and the activation energy of the reaction. Parametric sensitivity refers to the analysis of how these parameters affect the runaway behavior.</p>
+  </div>
+
+  <div class="panel" id="panelDet">
+    <p>This is a model of the partial oxidation of o-xylene in a large excess of oxygen in a 1.5 m long plug flow reactor.</p>
+    <p>The first-order rate expression:</p>
+    <p class="eq">r = k e<sup>&minus;E<sub>a</sub>/(R<sub>2</sub>&nbsp;T)</sup> &middot; P/(R&nbsp;T) &middot; F<sub>x</sub>/F<sub>tot</sub> ,</p>
+    <p>where r is rate of reaction (mol/[m<sup>3</sup>&nbsp;s]), k is the pre-exponential factor in the rate constant (1/s), E<sub>a</sub> is activation energy (kJ/mol), R<sub>2</sub> is the ideal gas constant (kJ/[mol&nbsp;K]), T is absolute temperature in the reactor (K), P is pressure (atm), R is the ideal gas constant ([atm&nbsp;m<sup>3</sup>]/[mol&nbsp;K]), F<sub>x</sub> is the molar flow rate of the reactant o-xylene (kmol/s), and F<sub>tot</sub> is the total molar flow rate of the feed (kmol/s).</p>
+    <p>Mole balance as a function of reactor length:</p>
+    <p class="eq">dF<sub>x</sub>/dz = &minus;A&nbsp;r ,</p>
+    <p>where z is distance down the PFR (m), A = &pi;r<sup>2</sup> is the cross section area of the PFR (m<sup>2</sup>), and r is the PFR radius (m).</p>
+    <p>Energy balance as a function of length:</p>
+    <p class="eq">dT/dz = &minus;&beta;&nbsp;r + &gamma;&nbsp;(T<sub>a</sub> &minus; T) ,</p>
+    <p class="eq">&beta; = &Delta;H&nbsp;A/(m&nbsp;Cp<sub>m</sub>) ,</p>
+    <p class="eq">&gamma; = 2&pi;rU/(m&nbsp;Cp<sub>m</sub>) ,</p>
+    <p>where &beta; and &gamma; are simplification terms, T<sub>a</sub> is the temperature of heat transfer fluid surrounding the reactor (K), &Delta;H is heat of reaction (kJ/kmol), m is mass flow rate (kg/s), Cp<sub>m</sub> is the mass heat capacity of gas in reactor (kJ/[kg&nbsp;K]) and U is the overall heat transfer coefficient (kJ/[m<sup>2</sup>&nbsp;s&nbsp;K]).</p>
+    <p>At the PFR inlet (z = 0) T = T<sub>f</sub> and F<sub>x</sub> = y<sub>x,f</sub>&nbsp;F<sub>tot</sub>, where T<sub>f</sub> is the feed temperature (K) and y<sub>x,f</sub> is the mole fraction of reactant in the feed.</p>
+  </div>
+
+  <div class="panel" id="panelAbout">
+    <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/SteadyStateBinaryFickianDiffusion/" target="_blank">Mathematica simulation</a> by Muqbil Alkhalaf, Rachael L. Baumann, Neil Hendren, and John L. Falconer. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988) in collaboration with Washington State University. Address any questions or comments to LearnChemE@gmail.com.</p>
+  </div>
+</div>
+
+<script>
+//============ physics constants (from the Mathematica Demonstration) ============
+const k   = 5e8;       // pre-exponential factor (1/s)
+const Ta  = 625;       // heat-transfer-fluid temperature (K)
+const Cpm = 1;         // mass heat capacity (kJ/[kg K])
+const U   = 0.37;      // overall heat transfer coefficient (kJ/[m^2 s K])
+const Pp  = 1.0;       // pressure (atm)
+const L   = 1.5;       // reactor length (m)
+const rr  = 0.0125;    // reactor radius (m)
+const Rg  = 0.08206;   // ideal gas constant
+const yxf = 0.019;     // feed mole fraction of reactant
+const dH  = -1.28e6;   // heat of reaction (kJ/kmol)
+const R2  = 0.008314;  // ideal gas constant (kJ/[mol K])
+const MW  = 33.41;     // average molecular weight (kg/kmol)
+const AX  = Math.PI * rr * rr; // cross-sectional area
+
+// Adaptive Dormand-Prince RK45 integrator. The reaction is highly stiff near
+// thermal runaway (low activation energy), so a fixed step cannot resolve the
+// sharp temperature spike without either oscillating or diverging. Adaptive
+// stepping places many small steps through the spike and large steps elsewhere.
+function solve(Ftot, Tf, Ea) {
+  const m     = MW * (Ftot/1000);
+  const beta  = dH * AX / (m * Cpm);
+  const gam   = 2 * Math.PI * rr * U / (m * Cpm);
+  const Fnorm = Ftot/1000;
+
+  function deriv(y) {
+    const Fx = y[0] > 0 ? y[0] : 0, T = y[1];
+    const re = k * Math.exp(-Ea/(R2*T)) * (Pp/(Rg*T)) * (Fx/Fnorm);
+    return [ -AX*re, -beta*re + gam*(Ta - T) ];
+  }
+
+  const rtol = 1e-7, atolF = 1e-13, atolT = 1e-4;
+  const hmax = L/500;          // cap so flat regions are smoothly sampled too
+  let h = L/2000;
+  let z = 0, y = [ yxf*Fnorm, Tf ];
+  const zs=[0], Ts=[y[1]], Fs=[y[0]];
+  let steps = 0;
+
+  while (z < L && steps < 200000) {
+    if (z + h > L) h = L - z;
+    const k1 = deriv(y);
+    const k2 = deriv([y[0]+h*(1/5)*k1[0], y[1]+h*(1/5)*k1[1]]);
+    const k3 = deriv([y[0]+h*(3/40*k1[0]+9/40*k2[0]), y[1]+h*(3/40*k1[1]+9/40*k2[1])]);
+    const k4 = deriv([y[0]+h*(44/45*k1[0]-56/15*k2[0]+32/9*k3[0]),
+                      y[1]+h*(44/45*k1[1]-56/15*k2[1]+32/9*k3[1])]);
+    const k5 = deriv([y[0]+h*(19372/6561*k1[0]-25360/2187*k2[0]+64448/6561*k3[0]-212/729*k4[0]),
+                      y[1]+h*(19372/6561*k1[1]-25360/2187*k2[1]+64448/6561*k3[1]-212/729*k4[1])]);
+    const k6 = deriv([y[0]+h*(9017/3168*k1[0]-355/33*k2[0]+46732/5247*k3[0]+49/176*k4[0]-5103/18656*k5[0]),
+                      y[1]+h*(9017/3168*k1[1]-355/33*k2[1]+46732/5247*k3[1]+49/176*k4[1]-5103/18656*k5[1])]);
+    const y5 = [ y[0]+h*(35/384*k1[0]+500/1113*k3[0]+125/192*k4[0]-2187/6784*k5[0]+11/84*k6[0]),
+                 y[1]+h*(35/384*k1[1]+500/1113*k3[1]+125/192*k4[1]-2187/6784*k5[1]+11/84*k6[1]) ];
+    const k7 = deriv(y5);
+    const y4 = [ y[0]+h*(5179/57600*k1[0]+7571/16695*k3[0]+393/640*k4[0]-92097/339200*k5[0]+187/2100*k6[0]+1/40*k7[0]),
+                 y[1]+h*(5179/57600*k1[1]+7571/16695*k3[1]+393/640*k4[1]-92097/339200*k5[1]+187/2100*k6[1]+1/40*k7[1]) ];
+
+    const scF = atolF + rtol*Math.max(Math.abs(y[0]), Math.abs(y5[0]));
+    const scT = atolT + rtol*Math.max(Math.abs(y[1]), Math.abs(y5[1]));
+    const eF = (y5[0]-y4[0])/scF, eT = (y5[1]-y4[1])/scT;
+    const err = Math.sqrt((eF*eF + eT*eT)/2);
+
+    if (err <= 1 || h <= L*1e-9) {
+      z += h; y = y5;
+      if (y[0] < 0) y[0] = 0;
+      zs.push(z); Ts.push(y[1]); Fs.push(y[0]);
+    }
+    const fac = 0.9 * Math.pow(err <= 0 ? 10 : 1/err, 1/5);
+    h *= Math.min(5, Math.max(0.2, fac));
+    if (h > hmax) h = hmax;
+    steps++;
+  }
+  return { z:zs, T:Ts, Fx:Fs };
+}
+
+//============ nice axis ticks ============
+function niceNum(range, round){
+  const exp = Math.floor(Math.log10(range));
+  const f = range/Math.pow(10,exp);
+  let nf;
+  if (round){
+    if (f<1.5) nf=1; else if (f<3) nf=2; else if (f<7) nf=5; else nf=10;
+  } else {
+    if (f<=1) nf=1; else if (f<=2) nf=2; else if (f<=5) nf=5; else nf=10;
+  }
+  return nf*Math.pow(10,exp);
+}
+function makeTicks(lo, hi, maxTicks){
+  const range = niceNum(hi-lo, false);
+  const step  = niceNum(range/(maxTicks-1), true);
+  const niceLo = Math.floor(lo/step)*step;
+  const niceHi = Math.ceil(hi/step)*step;
+  const ticks=[];
+  for (let v=niceLo; v<=niceHi+step*0.5; v+=step) ticks.push(Math.abs(v)<step*1e-6?0:v);
+  return {ticks, lo:niceLo, hi:niceHi, step};
+}
+
+//============ plotting ============
+const canvas = document.getElementById('plot');
+const ctx = canvas.getContext('2d');
+const CW = 719, CH = 469;
+const dpr = window.devicePixelRatio || 1;
+canvas.width = CW*dpr; canvas.height = CH*dpr;
+canvas.style.width = CW+'px'; canvas.style.height = CH+'px';
+ctx.scale(dpr,dpr);
+
+// plot frame margins
+const ML=105, MR=30, MT=24, MB=72;
+const PX0=ML, PX1=CW-MR, PY0=MT, PY1=CH-MB;
+
+function fmtTick(v, step){
+  if (step >= 1) return Math.round(v).toString();
+  const dec = Math.max(0, -Math.floor(Math.log10(step)));
+  return v.toFixed(dec);
+}
+
+function drawPlot(sol, mode){
+  ctx.clearRect(0,0,CW,CH);
+
+  // y-data and labels
+  let ydata, color, yLabel, yloFixed, scale;
+  if (mode==='temp'){
+    ydata = sol.T; color='#0000ff'; yLabel='temperature (K)';
+    yloFixed = 600; scale=1;
+  } else {
+    scale = 1e6;
+    ydata = sol.Fx; color='#000000'; yLabel='molar flow rate of A (mmol/s)';
+    yloFixed = -0.015 * (sol.Fx[0]*scale);
+  }
+  // data range
+  let ymax=-Infinity;
+  for (let i=0;i<ydata.length;i++){ const v=ydata[i]*scale; if(v>ymax)ymax=v; }
+
+  const xT = makeTicks(0, L, 7);
+
+  // y-axis: fixed lower bound (matches Mathematica), nice step and upper just above data max
+  const ylo = yloFixed;
+  const span = Math.max(ymax - ylo, 1e-9);
+  const yStep = niceNum(span/5, true);
+  const yhi = ylo + Math.ceil((ymax - ylo)/yStep + 0.06) * yStep;
+  const yTickStart = Math.ceil(ylo/yStep - 1e-9) * yStep;
+  const yticks = [];
+  for (let v=yTickStart; v<=yhi+yStep*0.5; v+=yStep)
+    yticks.push(Math.abs(v)<yStep*1e-6 ? 0 : v);
+  const yT = { ticks: yticks, step: yStep };
+
+  const xlo=0, xhi=L;
+  function sx(x){ return PX0 + (x-xlo)/(xhi-xlo)*(PX1-PX0); }
+  function sy(y){ return PY1 - (y-ylo)/(yhi-ylo)*(PY1-PY0); }
+
+  // gridless white plot area + frame box
+  ctx.lineWidth=1.5;
+  ctx.strokeStyle='#000000';
+  ctx.strokeRect(PX0, PY0, PX1-PX0, PY1-PY0);
+
+  // all plot text uses one consistent font (matches the axis titles)
+  ctx.font = '21px Helvetica, Arial, sans-serif';
+  ctx.fillStyle='#000000';
+
+  // x ticks (frame: bottom + top inward)
+  ctx.textAlign='center'; ctx.textBaseline='top';
+  for (const t of xT.ticks){
+    if (t<xlo-1e-9||t>xhi+1e-9) continue;
+    const px=sx(t);
+    ctx.beginPath(); ctx.moveTo(px,PY1); ctx.lineTo(px,PY1-8); ctx.stroke();   // bottom
+    ctx.beginPath(); ctx.moveTo(px,PY0); ctx.lineTo(px,PY0+8); ctx.stroke();   // top
+    ctx.fillText(fmtTick(t,xT.step), px, PY1+9);
+  }
+  // y ticks (left + right inward)
+  ctx.textAlign='right'; ctx.textBaseline='middle';
+  for (const t of yT.ticks){
+    if (t<ylo-1e-9||t>yhi+1e-9) continue;
+    const py=sy(t);
+    ctx.beginPath(); ctx.moveTo(PX0,py); ctx.lineTo(PX0+8,py); ctx.stroke();   // left
+    ctx.beginPath(); ctx.moveTo(PX1,py); ctx.lineTo(PX1-8,py); ctx.stroke();   // right
+    ctx.fillText(fmtTick(t,yT.step), PX0-10, py);
+  }
+
+  // axis titles (same 21 px font as the tick labels)
+  ctx.textAlign='center'; ctx.textBaseline='alphabetic';
+  ctx.fillText('PFR length (m)', (PX0+PX1)/2, CH-18);
+  ctx.save();
+  ctx.translate(20, (PY0+PY1)/2);
+  ctx.rotate(-Math.PI/2);
+  ctx.textBaseline='top';
+  ctx.fillText(yLabel, 0, 0);
+  ctx.restore();
+
+  // clip to plot area then draw curve
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(PX0,PY0,PX1-PX0,PY1-PY0);
+  ctx.clip();
+  ctx.lineWidth=3;
+  ctx.strokeStyle=color;
+  ctx.lineJoin='round';
+  ctx.beginPath();
+  for (let i=0;i<sol.z.length;i++){
+    const px=sx(sol.z[i]), py=sy(ydata[i]*scale);
+    if (i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+  }
+  ctx.stroke();
+  ctx.restore();
+}
+
+//============ state + UI wiring ============
+let mode='flow';
+const el = id=>document.getElementById(id);
+
+function getParams(){
+  return {
+    Ftot: parseFloat(el('ftot').value),
+    Tf:   parseFloat(el('tf').value),
+    Ea:   parseFloat(el('ea').value)
+  };
+}
+function render(){
+  const p=getParams();
+  el('ftotVal').textContent = p.Ftot.toFixed(2);
+  el('tfVal').textContent   = p.Tf.toFixed(0);
+  el('eaVal').textContent   = p.Ea.toFixed(0);
+  const sol=solve(p.Ftot,p.Tf,p.Ea);
+  drawPlot(sol, mode);
+}
+
+['ftot','tf','ea'].forEach(id=> el(id).addEventListener('input', render));
+
+el('setTemp').addEventListener('click', ()=>{
+  mode='temp'; el('setTemp').classList.add('active'); el('setFlow').classList.remove('active'); render();
+});
+el('setFlow').addEventListener('click', ()=>{
+  mode='flow'; el('setFlow').classList.add('active'); el('setTemp').classList.remove('active'); render();
+});
+
+// info panels
+const panels = {btnDir:'panelDir', btnDet:'panelDet', btnAbout:'panelAbout'};
+const appEl = el('app');
+Object.keys(panels).forEach(bid=>{
+  el(bid).addEventListener('click', ()=>{
+    const pid=panels[bid];
+    const showing = el(pid).classList.contains('show');
+    Object.values(panels).forEach(p=>el(p).classList.remove('show'));
+    Object.keys(panels).forEach(b=>el(b).classList.remove('active'));
+    if(!showing){
+      const btnRect = el(bid).getBoundingClientRect();
+      const appRect = appEl.getBoundingClientRect();
+      const panel = el(pid);
+      panel.style.left = (btnRect.right - appRect.left + 8) + 'px';
+      panel.style.top  = (btnRect.top   - appRect.top  + 6) + 'px';
+      panel.classList.add('show');
+      el(bid).classList.add('active');
+    }
+  });
+});
+
+render();
+</script>
+</body>
+</html>

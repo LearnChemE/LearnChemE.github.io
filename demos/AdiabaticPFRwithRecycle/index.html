@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Adiabatic Plug Flow Reactor with Recycle</title>
+<style>
+  html,body{margin:0;padding:0;background:#fff;}
+  #app{
+    font-family:Helvetica,Arial,sans-serif;
+    color:#000;
+    width:680px;
+    margin:14px auto;
+    padding:0 6px;
+    -webkit-font-smoothing:antialiased;
+  }
+  #title{font-size:20px;font-weight:bold;text-align:center;margin:2px 0 10px;}
+  .ctrl{display:flex;align-items:center;margin:3px 0;font-size:15px;}
+  .ctrl .lab{width:330px;text-align:right;padding-right:10px;white-space:nowrap;}
+  .ctrl input[type=range]{flex:0 0 170px;margin:0 8px;}
+  .ctrl .val{width:42px;text-align:left;font-variant-numeric:tabular-nums;}
+  .instr{font-size:15px;font-weight:bold;text-align:center;margin:7px 0 4px;}
+  #plots{display:flex;justify-content:center;align-items:flex-start;margin-top:4px;}
+  canvas{display:block;}
+  #btns{display:flex;justify-content:center;gap:10px;margin:14px 0 6px;}
+  .lcbtn{
+    font-family:Helvetica,Arial,sans-serif;font-size:17.25px;
+    color:#fff;background:#8b1a1a;border:1px solid #5e1010;
+    border-radius:3px;padding:6px 21px;cursor:pointer;
+  }
+  .lcbtn:hover{background:#a02020;}
+  .lcbtn.on{background:#5e1010;}
+  .panel{
+    display:none;border:1px solid #999;background:#fafafa;
+    padding:12px 16px;margin:6px 2px 0;font-size:16.7px;line-height:1.5;
+    text-align:left;
+  }
+  .panel.show{display:block;}
+  .panel p{margin:0 0 9px;}
+  .panel .eq{margin:3px 0;font-style:italic;}
+  .panel a{color:#8b1a1a;}
+  sub{font-size:0.78em;}
+  .deflist div{margin:1px 0;}
+  i{font-style:italic;}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="ctrl">
+    <span class="lab">recycle ratio</span>
+    <input id="sR" type="range" min="1" max="25" step="1" value="13">
+    <span class="val" id="vR">13</span>
+  </div>
+  <div class="ctrl">
+    <span class="lab">fresh feed temperature <i>T</i><sub>f</sub> (K)</span>
+    <input id="sTf" type="range" min="250" max="350" step="1" value="300">
+    <span class="val" id="vTf">300</span>
+  </div>
+  <div class="instr">guess <i>T</i><sub>0</sub> until the correct value of <i>T</i><sub>f</sub> is calculated below</div>
+  <div class="ctrl">
+    <span class="lab">PFR feed temperature <i>T</i><sub>0</sub> (K)</span>
+    <input id="sTo" type="range" min="250" max="450" step="1" value="411">
+    <span class="val" id="vTo">411</span>
+  </div>
+
+  <div id="plots">
+    <canvas id="cL" width="200" height="380"></canvas>
+    <canvas id="cR" width="455" height="380"></canvas>
+  </div>
+
+  <div id="btns">
+    <button class="lcbtn" data-p="pDir">Directions</button>
+    <button class="lcbtn" data-p="pDet">Details</button>
+    <button class="lcbtn" data-p="pAbo">About</button>
+  </div>
+
+  <div class="panel" id="pDir">
+    <p>A first-order reaction is carried out in an adiabatic plug flow reactor (PFR) with
+    recycle. The fresh feed concentration is known. Select the fresh feed temperature
+    <i>T</i><sub>f</sub> and the recycle ratio with sliders. The correct exit temperature
+    <i>T</i><sub>e</sub> is obtained iteratively. The PFR feed temperature <i>T</i><sub>0</sub>
+    is guessed with the slider (and the feed concentration to the PFR calculated using the
+    adiabatic relation between temperature and concentration), the PFR mass and energy
+    balances are solved to determine <i>T</i><sub>f</sub> and <i>C</i><sub>A,f</sub>, and an
+    energy balance around the mixing point before the PFR is then solved to determine the
+    calculated <i>T</i><sub>f</sub>. Next, change the <i>T</i><sub>0</sub> guess until the
+    calculated <i>T</i><sub>f</sub> (black arrow on the left) equals the <i>T</i><sub>f</sub>
+    value that was set with the fresh feed temperature slider (the center of the green
+    circle). The graph shows the temperature in the PFR as a function of distance down the
+    reactor using the guessed value for <i>T</i><sub>0</sub>. Multiple solutions are obtained
+    under some conditions, and the solution observed depends on how the reactor starts up.
+    High recycle ratios approach continuous stirred-tank reactor (CSTR) behavior.</p>
+  </div>
+
+  <div class="panel" id="pDet">
+    <p>Mass and energy balance:</p>
+    <div class="eq">d<i>T</i>/d<i>z</i> = &minus;<i>k</i> <i>C</i><sub>A</sub> &Delta;<i>H</i> / (<i>u</i><sub>0</sub> <i>C</i><sub>A,0</sub> <i>C</i><sub>p</sub>) ,</div>
+    <div class="eq">d<i>C</i><sub>A</sub>/d<i>z</i> = &minus;<i>k</i> <i>C</i><sub>A</sub> / <i>u</i><sub>0</sub> ,</div>
+    <div class="eq"><i>k</i> = <i>k</i><sub>o</sub> <i>e</i><sup>&minus;<i>E</i><sub>a</sub>/(<i>R</i> <i>T</i>)</sup> ,</div>
+    <div class="eq"><i>T</i><sub>f</sub> = (1 + &xi;) <i>T</i><sub>0</sub> &minus; &xi; <i>T</i><sub>e</sub> ,</div>
+    <div class="eq"><i>u</i><sub>0</sub> = <i>u</i><sub>f</sub> (1 + &xi;) ,</div>
+    <p style="margin-top:10px">where</p>
+    <div class="deflist">
+      <div><i>T</i> = temperature (K)</div>
+      <div><i>z</i> = length down the reactor (m)</div>
+      <div><i>u</i><sub>0</sub> = velocity of the stream exiting the reactor (m/s)</div>
+      <div><i>C</i><sub>A,0</sub> = concentration of <i>A</i> entering the reactor (mol/m<sup>3</sup>)</div>
+      <div><i>C</i><sub>p</sub> = heat capacity (J/[m<sup>3</sup> K])</div>
+      <div>&Delta;<i>H</i> = heat of reaction (J/mol)</div>
+      <div><i>k</i> = rate constant (1/s)</div>
+      <div><i>C</i><sub>A</sub> = concentration of reactant <i>A</i> (mol/m<sup>3</sup>)</div>
+      <div><i>k</i><sub>o</sub> = pre-exponential factor (1/s)</div>
+      <div><i>T</i><sub>0</sub> and <i>T</i><sub>e</sub> = temperatures of the stream entering and exiting the reactor (K)</div>
+      <div><i>T</i><sub>f</sub> = fresh feed temperature (K)</div>
+      <div><i>E</i><sub>a</sub> = activation energy (J/mol)</div>
+      <div><i>R</i> = ideal gas constant (J/[mol K])</div>
+      <div>&xi; = recycle ratio</div>
+      <div><i>u</i><sub>f</sub> = velocity of the fresh feed (m/s)</div>
+    </div>
+  </div>
+
+  <div class="panel" id="pAbo">
+    <p>This simulation was created in the
+    <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a>
+    at University of Colorado Boulder for
+    <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a>
+    by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a
+    Mathematica simulation by Rachael L. Baumann. It was prepared with financial support
+    from the National Science Foundation (DUE 2336987 and 2336988) in collaboration with
+    Washington State University. Address any questions or comments to
+    <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.</p>
+  </div>
+</div>
+
+<script>
+"use strict";
+// ---- fixed parameters ----
+const L=20, uf=5, ko=100, Ea=25000, Rgas=8.314, Cp=100, dH=-42000, Caf=1;
+
+// ---- DOM ----
+const sR=document.getElementById('sR'), sTf=document.getElementById('sTf'), sTo=document.getElementById('sTo');
+const vR=document.getElementById('vR'), vTf=document.getElementById('vTf'), vTo=document.getElementById('vTo');
+const cL=document.getElementById('cL'), cR=document.getElementById('cR');
+
+// hi-DPI setup
+function hidpi(cv){
+  const dpr=window.devicePixelRatio||1;
+  const w=cv.width, h=cv.height;
+  cv.style.width=w+'px'; cv.style.height=h+'px';
+  cv.width=Math.round(w*dpr); cv.height=Math.round(h*dpr);
+  const ctx=cv.getContext('2d'); ctx.scale(dpr,dpr);
+  cv._w=w; cv._h=h; return ctx;
+}
+const gL=hidpi(cL), gR=hidpi(cR);
+
+// ---- solver: RK4 ----
+function solve(Tf,To,R){
+  const uo=uf*(1+R);
+  const Cao=Caf-(Cp/dH)*(Tf-To);
+  const n=2000, h=L/n;
+  let T=To, Ca=Cao;
+  const zs=new Float64Array(n+1), Ts=new Float64Array(n+1);
+  zs[0]=0; Ts[0]=T;
+  const f=(T,Ca)=>{
+    const k=ko*Math.exp(-Ea/(Rgas*T));
+    return [ (dH/(uo*Cao*Cp))*(-k*Ca), -k*Ca/uo ];
+  };
+  for(let i=0;i<n;i++){
+    const a=f(T,Ca);
+    const b=f(T+0.5*h*a[0], Ca+0.5*h*a[1]);
+    const c=f(T+0.5*h*b[0], Ca+0.5*h*b[1]);
+    const d=f(T+h*c[0], Ca+h*c[1]);
+    T+=h/6*(a[0]+2*b[0]+2*c[0]+d[0]);
+    Ca+=h/6*(a[1]+2*b[1]+2*c[1]+d[1]);
+    zs[i+1]=(i+1)*h; Ts[i+1]=T;
+  }
+  const Te=T;
+  const Tfeed=(1+R)*To-R*Te;   // calculated Tf
+  return {Te,Tfeed,Cao,zs,Ts};
+}
+
+// ---- text helper: draw a rich label with subscripts ----
+// segments: array of {t:text, sub:bool}. align: 'left'|'center'|'right' about (x,y); baseline middle.
+function richText(ctx,x,y,segs,size,align){
+  const base=size+'px Helvetica, Arial, sans-serif';
+  const subF=Math.round(size*0.72)+'px Helvetica, Arial, sans-serif';
+  // measure
+  let total=0;
+  for(const s of segs){ ctx.font=s.sub?subF:base; total+=ctx.measureText(s.t).width; }
+  let cx=x;
+  if(align==='center') cx=x-total/2;
+  else if(align==='right') cx=x-total;
+  ctx.textBaseline='middle'; ctx.textAlign='left';
+  for(const s of segs){
+    ctx.font=s.sub?subF:base;
+    const yy=s.sub?y+size*0.22:y;
+    ctx.fillText(s.t,cx,yy);
+    cx+=ctx.measureText(s.t).width;
+  }
+}
+function arrowHead(ctx,x,y,dir,size){ // dir in radians; filled triangle
+  ctx.save(); ctx.translate(x,y); ctx.rotate(dir);
+  ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(-size,size*0.45); ctx.lineTo(-size,-size*0.45);
+  ctx.closePath(); ctx.fill(); ctx.restore();
+}
+
+// ---- draw left panel (feed temperature) ----
+function drawLeft(st,Tf){
+  const ctx=gL, W=cL._w, H=cL._h;
+  ctx.clearRect(0,0,W,H);
+  const mL=52, mR=14, mT=22, mB=42;
+  const x0=mL, x1=W-mR, y0=H-mB, y1=mT;
+  const ymin=230, ymax=370;
+  const X=v=>x0+(x1-x0)*(v/60);       // v in 0..60 internal
+  const Y=t=>y0+(y1-y0)*((t-ymin)/(ymax-ymin));
+  // frame
+  ctx.strokeStyle='#000'; ctx.lineWidth=1;
+  ctx.strokeRect(x0,y1,x1-x0,y0-y1);
+  // y ticks
+  ctx.fillStyle='#000'; ctx.font='13px Helvetica, Arial, sans-serif';
+  ctx.textAlign='right'; ctx.textBaseline='middle';
+  for(let t=240;t<=360;t+=20){
+    const yy=Y(t);
+    ctx.beginPath(); ctx.moveTo(x0,yy); ctx.lineTo(x0+5,yy); ctx.stroke();
+    ctx.fillText(t,x0-4,yy);
+  }
+  // y axis label
+  ctx.save(); ctx.translate(13,(y0+y1)/2); ctx.rotate(-Math.PI/2);
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.font='15px Helvetica, Arial, sans-serif';
+  ctx.fillText('feed temperature (K)',0,0); ctx.restore();
+  // plot label: Tf = N K
+  richText(ctx,(x0+x1)/2,y1-10,[{t:'T'},{t:'f',sub:true},{t:' = '+Math.round(Tf)+' K'}],15,'center');
+  // green circle (target Tf)
+  const cxv=12;            // internal x for circle
+  const gx=X(cxv), gy=Y(Tf);
+  ctx.strokeStyle='rgb(0,153,0)'; ctx.lineWidth=3.2;
+  ctx.beginPath(); ctx.ellipse(gx,gy,6,7,0,0,2*Math.PI); ctx.stroke();
+  ctx.fillStyle='rgb(0,153,0)';
+  ctx.beginPath(); ctx.arc(gx,gy,4,0,2*Math.PI); ctx.fill();
+  // black arrow at calculated Tf (clamp into view for drawing)
+  let tf=st.Tfeed;
+  const tfc=Math.max(ymin+2,Math.min(ymax-2,tf));
+  const ay=Y(tfc), axTail=X(50), axTip=gx+9;
+  ctx.strokeStyle='#000'; ctx.fillStyle='#000'; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(axTail,ay); ctx.lineTo(axTip,ay); ctx.stroke();
+  arrowHead(ctx,axTip,ay,Math.PI,8);   // pointing left
+  // "calculated Tf" label, centered over the shaft and ABOVE the arrow,
+  // nudged one space right so it clears the green circle; no decimal.
+  const lblX=(axTip+axTail)/2+6;
+  ctx.fillStyle='#000';
+  richText(ctx,lblX,ay-23,[{t:'calculated '},{t:'T'},{t:'f',sub:true}],13,'center');
+  ctx.font='13px Helvetica, Arial, sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(Math.round(tf)+' K',lblX,ay-8);
+}
+
+// ---- draw the reactor schematic (top-center of main plot) ----
+function drawSchematic(ctx,ox,oy,s,Tf,Te){
+  const lw=1.6*s;
+  ctx.lineWidth=lw; ctx.strokeStyle='#000'; ctx.fillStyle='#000';
+  const P=(x,y)=>[ox+x*s,oy+y*s];
+  // geometry (local units)
+  const feedY=20, recY=56, boxL=80,boxR=114,boxT=12,boxB=28,boxMid=20;
+  const mix=52, exitTap=132, exitEnd=158, feedStart=10;
+  // fresh feed arrow ->
+  let a=P(feedStart,feedY), b=P(mix,feedY);
+  ctx.beginPath(); ctx.moveTo(a[0],a[1]); ctx.lineTo(b[0]-7,b[1]); ctx.stroke();
+  arrowHead(ctx,b[0],b[1],0,7);
+  // mixing -> box entrance (with arrowhead into the PFR)
+  let c=P(mix,feedY), d=P(boxL,boxMid);
+  ctx.beginPath(); ctx.moveTo(c[0],c[1]); ctx.lineTo(d[0]-7,d[1]); ctx.stroke();
+  arrowHead(ctx,d[0],d[1],0,7);
+  // PFR box
+  let bl=P(boxL,boxT), br=P(boxR,boxB);
+  ctx.strokeRect(bl[0],bl[1],br[0]-bl[0],br[1]-bl[1]);
+  // exit line -> Te
+  let e=P(boxR,boxMid), g=P(exitEnd,boxMid);
+  ctx.beginPath(); ctx.moveTo(e[0],e[1]); ctx.lineTo(g[0]-7,g[1]); ctx.stroke();
+  arrowHead(ctx,g[0],g[1],0,7);
+  // recycle loop: tap exit -> down -> left -> up to entrance (arrowhead UP near entrance)
+  let r1=P(exitTap,boxMid), r2=P(exitTap,recY), r3=P(mix,recY), r4=P(mix,feedY);
+  ctx.beginPath();
+  ctx.moveTo(r1[0],r1[1]); ctx.lineTo(r2[0],r2[1]);
+  ctx.lineTo(r3[0],r3[1]); ctx.lineTo(r4[0],r4[1]+7);
+  ctx.stroke();
+  arrowHead(ctx,r4[0],r4[1],-Math.PI/2,7);   // pointing up into entrance
+  // labels
+  richText(ctx,...P(95,boxMid),[{t:'PFR'}],15,'center');
+  // Tf at far left, below feed line
+  let tfp=P(feedStart+10,feedY);
+  richText(ctx,tfp[0],tfp[1]+13*s,[{t:'T'},{t:'f',sub:true},{t:' = '+Math.round(Tf)+' K'}],15,'center');
+  // T0 above the line entering the PFR
+  let t0p=P((mix+boxL)/2,boxMid);
+  richText(ctx,t0p[0],t0p[1]-13*s,[{t:'T'},{t:'0',sub:true}],15,'center');
+  // Te above exit line
+  let tep=P(exitEnd-14,boxMid);
+  richText(ctx,tep[0],tep[1]-13*s,[{t:'T'},{t:'e',sub:true},{t:' = '+Math.round(Te)+' K'}],15,'center');
+  // TR on recycle line, below it
+  let trp=P((mix+exitTap)/2,recY);
+  richText(ctx,trp[0],trp[1]+14*s,[{t:'T'},{t:'R',sub:true},{t:' = '+Math.round(Te)+' K'}],15,'center');
+}
+
+// ---- draw main panel (T vs z) ----
+function drawRight(st,To){
+  const ctx=gR, W=cR._w, H=cR._h;
+  ctx.clearRect(0,0,W,H);
+  const mL=80, mR=12, mT=14, mB=58;
+  const x0=mL,x1=W-mR,y0=H-mB,y1=mT;
+  const ymin=To-5, ymax=st.Te+10;
+  const X=z=>x0+(x1-x0)*(z/L);
+  const Y=t=>y0+(y1-y0)*((t-ymin)/(ymax-ymin));
+  // frame
+  ctx.strokeStyle='#000'; ctx.lineWidth=1;
+  ctx.strokeRect(x0,y1,x1-x0,y0-y1);
+  // x ticks
+  ctx.fillStyle='#000'; ctx.font='18px Helvetica, Arial, sans-serif';
+  ctx.textAlign='center'; ctx.textBaseline='top';
+  for(let z=0;z<=20;z+=5){
+    const xx=X(z);
+    ctx.beginPath(); ctx.moveTo(xx,y0); ctx.lineTo(xx,y0-5); ctx.stroke();
+    ctx.fillText(z,xx,y0+5);
+  }
+  // y ticks (nice ~6 steps)
+  function ticks(lo,hi){
+    const span=hi-lo, raw=span/6, p=Math.pow(10,Math.floor(Math.log10(raw)));
+    const c=[1,2,2.5,5,10].map(m=>m*p), step=c.find(v=>v>=raw)||10*p;
+    const out=[]; for(let t=Math.ceil(lo/step)*step;t<=hi+1e-6;t+=step) out.push(t);
+    return out;
+  }
+  ctx.textAlign='right'; ctx.textBaseline='middle';
+  for(const t of ticks(ymin,ymax)){
+    const yy=Y(t);
+    ctx.beginPath(); ctx.moveTo(x0,yy); ctx.lineTo(x0+5,yy); ctx.stroke();
+    ctx.fillText(Math.round(t),x0-5,yy);
+  }
+  // axis labels
+  ctx.textAlign='center'; ctx.textBaseline='bottom';
+  ctx.font='21px Helvetica, Arial, sans-serif';
+  ctx.fillText('distance down the reactor (m)',(x0+x1)/2,H-8);
+  ctx.save(); ctx.translate(20,(y0+y1)/2); ctx.rotate(-Math.PI/2);
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText('final temperature (K)',0,0); ctx.restore();
+  // blue curve
+  ctx.strokeStyle='#0000ff'; ctx.lineWidth=2.4; ctx.beginPath();
+  for(let i=0;i<st.zs.length;i++){
+    const xx=X(st.zs[i]), yy=Y(st.Ts[i]);
+    if(i===0) ctx.moveTo(xx,yy); else ctx.lineTo(xx,yy);
+  }
+  ctx.stroke();
+  // schematic, top-center (30% larger)
+  const sc=1.716, schW=158*sc, sox=(x0+x1)/2-schW/2, soy=y1+14;
+  drawSchematic(ctx,sox,soy,sc,/*Tf*/+sTf.value,st.Te);
+}
+
+// ---- update ----
+function update(){
+  const R=+sR.value, Tf=+sTf.value, To=+sTo.value;
+  vR.textContent=R; vTf.textContent=Tf; vTo.textContent=To;
+  const st=solve(Tf,To,R);
+  drawLeft(st,Tf);
+  drawRight(st,To);
+}
+[sR,sTf,sTo].forEach(s=>s.addEventListener('input',update));
+
+// ---- panel buttons ----
+document.querySelectorAll('.lcbtn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const id=btn.dataset.p, panel=document.getElementById(id);
+    const open=panel.classList.contains('show');
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('show'));
+    document.querySelectorAll('.lcbtn').forEach(b=>b.classList.remove('on'));
+    if(!open){ panel.classList.add('show'); btn.classList.add('on'); }
+  });
+});
+
+update();
+</script>
+</body>
+</html>

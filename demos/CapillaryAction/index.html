@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Capillary Action</title>
+<style>
+  :root{
+    --darkred:#8a1c1c;
+    --darkred-hover:#a82626;
+    --panel-border:#9a9a9a;
+    --panel-bg:#f4f4f4;
+    --ink:#1a1a1a;
+  }
+  html,body{margin:0;padding:0;background:#ffffff;}
+  body{
+    font-family:Helvetica, Arial, sans-serif;
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{
+    max-width:760px;
+    margin:14px auto;
+    padding:0 12px 28px;
+  }
+  .title{
+    font-size:23px;
+    font-weight:700;
+    text-align:center;
+    margin:2px 0 14px;
+    letter-spacing:.2px;
+  }
+  /* ---- controls ---- */
+  .controls{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    column-gap:34px;
+    row-gap:14px;
+    margin:0 4px 14px;
+  }
+  .ctrl{display:flex;flex-direction:column;gap:4px;}
+  .ctrl .lab{font-size:14.5px;color:#222;}
+  .ctrl .row{display:flex;align-items:center;gap:10px;}
+  .ctrl .val{
+    font-size:14.5px;
+    min-width:74px;
+    text-align:left;
+    font-variant-numeric:tabular-nums;
+    color:#111;
+  }
+  input[type=range]{
+    -webkit-appearance:none;
+    appearance:none;
+    flex:1;
+    height:18px;
+    background:transparent;
+    cursor:pointer;
+    margin:0;
+  }
+  input[type=range]::-webkit-slider-runnable-track{
+    height:3px;background:#9a9a9a;border-radius:2px;
+  }
+  input[type=range]::-moz-range-track{
+    height:3px;background:#9a9a9a;border-radius:2px;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;appearance:none;
+    width:13px;height:13px;margin-top:-5px;border-radius:50%;
+    background:#5b6b8c;border:1px solid #3d4a63;
+  }
+  input[type=range]::-moz-range-thumb{
+    width:13px;height:13px;border-radius:50%;
+    background:#5b6b8c;border:1px solid #3d4a63;
+  }
+  input[type=range]:focus{outline:none;}
+  input[type=range]:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(91,107,140,.35);}
+
+  /* ---- figure ---- */
+  .figwrap{text-align:center;margin:6px 0 16px;}
+  canvas{background:#ffffff;}
+
+  /* ---- buttons / panels ---- */
+  .actions{position:relative; margin:2px 4px 12px; min-height:132px;}
+  .btnstack{display:inline-flex; flex-direction:column; gap:8px; align-items:stretch; width:max-content;}
+  .btn{
+    font-family:inherit;
+    font-size:17.25px;
+    color:#fff;
+    background:var(--darkred);
+    border:none;
+    border-radius:4px;
+    padding:8px 23px;
+    cursor:pointer;
+    text-align:center;
+    transition:background .12s ease;
+  }
+  .btn:hover{background:var(--darkred-hover);}
+  .btn.active{background:#5e1010;box-shadow:inset 0 0 0 2px rgba(255,255,255,.25);}
+  .panel{
+    display:none;
+    position:absolute;
+    border:1px solid var(--panel-border);
+    background:var(--panel-bg);
+    border-radius:4px;
+    padding:14px 18px;
+    font-size:14.5px;
+    line-height:1.5;
+    color:#222;
+    box-shadow:0 3px 12px rgba(0,0,0,.16);
+    z-index:5;
+  }
+  .panel.show{display:block;}
+  .panel p{margin:0 0 9px;}
+  .panel p:last-child{margin-bottom:0;}
+  .panel a{color:#8a1c1c;}
+  .eq{font-style:italic;font-size:15.5px;margin:6px 0;text-align:center;}
+  .eq .frac{display:inline-block;vertical-align:middle;text-align:center;}
+  .eq .frac .num{display:block;border-bottom:1px solid #333;padding:0 6px;}
+  .eq .frac .den{display:block;padding:0 6px;}
+  sub{font-size:.75em;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="controls">
+    <div class="ctrl">
+      <div class="lab">surface tension (N/m)</div>
+      <div class="row">
+        <input id="s-gamma" type="range" min="0" max="0.1" step="0.001" value="0.073">
+        <span class="val" id="v-gamma"></span>
+      </div>
+    </div>
+
+    <div class="ctrl">
+      <div class="lab">contact angle (&deg;)</div>
+      <div class="row">
+        <input id="s-theta" type="range" min="10" max="90" step="1" value="20">
+        <span class="val" id="v-theta"></span>
+      </div>
+    </div>
+
+    <div class="ctrl">
+      <div class="lab">liquid density (kg/m&sup3;)</div>
+      <div class="row">
+        <input id="s-rho" type="range" min="500" max="2000" step="100" value="1000">
+        <span class="val" id="v-rho"></span>
+      </div>
+    </div>
+
+    <div class="ctrl">
+      <div class="lab">capillary radius (mm)</div>
+      <div class="row">
+        <input id="s-r" type="range" min="0.1" max="5" step="0.1" value="1">
+        <span class="val" id="v-r"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="actions" id="actions">
+    <div class="btnstack">
+      <button class="btn" data-panel="directions">Directions</button>
+      <button class="btn" data-panel="details">Details</button>
+      <button class="btn" data-panel="about">About</button>
+    </div>
+
+    <div class="panel" id="directions">
+      <p>Liquids (such as water, which has a density of 1000&nbsp;kg/m&sup3;) that wet glass climb upward
+         on the surfaces of their containers until the effects of surface tension and gravity balance.
+         A concave meniscus forms. Change the surface tension, the contact angle, the liquid density,
+         and the capillary radius with the sliders. The capillary rise increases sharply as the tube narrows.</p>
+    </div>
+
+    <div class="panel" id="details">
+      <p>The capillary rise is given by</p>
+      <div class="eq">
+        <i>h</i> =
+        <span class="frac">
+          <span class="num">2&thinsp;&gamma;&thinsp;cos&thinsp;&theta;</span>
+          <span class="den">&rho;&thinsp;<i>g</i>&thinsp;<i>r</i></span>
+        </span>
+      </div>
+      <p>where &gamma; = the solid&ndash;liquid surface tension (N/m),<br>
+         &theta; = the contact angle for the meniscus (measured upward from the vertical wall),<br>
+         &rho; = liquid density (kg/m&sup3;),<br>
+         <i>g</i> = the gravitational acceleration (9.81&nbsp;m/s&sup2;),<br>
+         <i>r</i> = capillary radius (mm).</p>
+    </div>
+
+    <div class="panel" id="about">
+      <p>This simulation was created in the
+         <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a>
+         at University of Colorado Boulder for
+         <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a>
+         by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a
+         <a href="https://demonstrations.wolfram.com/CapillaryAction/" target="_blank" rel="noopener">Mathematica simulation</a>
+         by S. M. Blinder. It was prepared with financial support from the National Science Foundation
+         (DUE 2336987 and 2336988) in collaboration with Washington State University. Address any questions
+         or comments to LearnChemE@gmail.com.</p>
+    </div>
+  </div>
+
+  <div class="figwrap">
+    <canvas id="fig"></canvas>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  const g = 9.81;
+
+  // ---------- canvas / coordinate setup ----------
+  const cv = document.getElementById('fig');
+  const ctx = cv.getContext('2d');
+  const CSSW = 460, CSSH = 500;
+  function setupHiDPI(){
+    const dpr = window.devicePixelRatio || 1;
+    cv.width  = Math.round(CSSW*dpr);
+    cv.height = Math.round(CSSH*dpr);
+    cv.style.width  = CSSW+'px';
+    cv.style.height = CSSH+'px';
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  setupHiDPI();
+
+  // data window (mm). Equal scale in x and y.
+  const yTop = 24, yBottom = -7;
+  const s = CSSH/(yTop - yBottom);          // px per mm (same in x and y)
+  const originX = CSSW/2;
+  const xHalf = (CSSW/s)/2;                  // half-width visible (mm)
+  const xCont = Math.min(13, xHalf-1.2);     // beaker inner wall position (mm)
+  const yBeakerBottom = -6;                  // inner bottom of beaker
+  const yBeakerTop    = 7;                    // top of beaker walls
+
+  function X(xmm){ return originX + xmm*s; }
+  function Y(ymm){ return (yTop - ymm)*s; }
+
+  // colors
+  const C_FILL    = '#cfe8f6';
+  const C_SURFACE = '#4a90c4';
+  const C_GLASS   = '#3a3a3a';
+  const C_DIM     = '#222';
+
+  // ---------- physics ----------
+  function rise_mm(gamma, thetaDeg, rho, r_mm){
+    // h(mm) = 2 gamma cos(theta) / (rho g r)  with r in mm, rho in kg/m^3, output mm
+    const th = thetaDeg*Math.PI/180;
+    return (2e6 * gamma * Math.cos(th)) / (rho * g * r_mm);
+  }
+  function capLength_mm(gamma, rho){
+    return 1000*Math.sqrt(gamma/(rho*g));   // mm
+  }
+  // outer reservoir surface: physical meniscus against a vertical wall.
+  // wall climb  = kappa^-1 * sqrt(2(1 - sin theta));  decay length = kappa^-1.
+  function yResRaw(x, theta, capL, r){
+    const th = theta*Math.PI/180;
+    const rise = capL*Math.sqrt(2*Math.max(0, 1 - Math.sin(th)));
+    const decay = capL;                              // capillary length (mm)
+    let y = 0;
+    const dCont = xCont - Math.abs(x);               // distance to container wall
+    y += rise*Math.exp(-Math.max(dCont,0)/decay);
+    const dTube = Math.abs(x) - r;                   // distance to outer tube wall
+    y += rise*Math.exp(-Math.max(dTube,0)/decay);
+    return y;
+  }
+  // The undisturbed reservoir level (bottom of the reservoir meniscus) is the
+  // lowest point of the surface, midway between the tube and container walls.
+  // Shift the surface so that level sits at y = 0, so the capillary rise h is
+  // measured from the bottom of the reservoir meniscus to the bottom of the
+  // tube meniscus.
+  function yRes(x, theta, capL, r){
+    const xm = (r + xCont)/2;
+    const base = yResRaw(xm, theta, capL, r);
+    return yResRaw(x, theta, capL, r) - base;
+  }
+
+  // ---------- formatting ----------
+  function sig3(x){
+    if (!(x > 5e-3)) return '0';
+    const d = Math.floor(Math.log10(x)) + 1;   // integer-digit count
+    const decimals = Math.max(0, 3 - d);
+    return x.toFixed(decimals);
+  }
+
+  // ---------- drawing helpers ----------
+  function arrowHead(x,y,ang,size){
+    ctx.beginPath();
+    ctx.moveTo(x,y);
+    ctx.lineTo(x - size*Math.cos(ang - Math.PI/7), y - size*Math.sin(ang - Math.PI/7));
+    ctx.lineTo(x - size*Math.cos(ang + Math.PI/7), y - size*Math.sin(ang + Math.PI/7));
+    ctx.closePath();
+    ctx.fill();
+  }
+  function labelBox(text, cx, cy, fontPx){
+    ctx.font = fontPx + 'px Helvetica, Arial, sans-serif';
+    ctx.textBaseline = 'middle';
+    ctx.textAlign = 'center';
+    const w = ctx.measureText(text).width;
+    const padX = 5, padY = 3, h = fontPx + 5;
+    ctx.fillStyle = 'rgba(255,255,255,0.92)';
+    ctx.fillRect(cx - w/2 - padX, cy - h/2 - padY, w + 2*padX, h + 2*padY);
+    ctx.fillStyle = C_DIM;
+    ctx.fillText(text, cx, cy);
+  }
+
+  // ---------- main draw ----------
+  function draw(){
+    const gamma = parseFloat(els.gamma.value);
+    const theta = parseFloat(els.theta.value);
+    const rho   = parseFloat(els.rho.value);
+    const r     = parseFloat(els.r.value);
+
+    const th    = theta*Math.PI/180;
+    const cosT  = Math.cos(th), sinT = Math.sin(th);
+    const h     = rise_mm(gamma, theta, rho, r);
+    const capL  = capLength_mm(gamma, rho);
+
+    // meniscus geometry (arc, radius = r/cosT)
+    const flat = cosT < 1e-4;
+    const secT = flat ? Infinity : 1/cosT;
+    const yc   = flat ? h : h + r*secT;          // arc center height
+    const R    = flat ? 0 : r*secT;              // arc radius
+    function meniscus(x){
+      if (flat) return h;
+      return yc - Math.sqrt(Math.max(0, R*R - x*x));
+    }
+    const edge = flat ? h : (h + r*(1 - sinT)/cosT);  // meniscus height at wall
+    const offscale = (edge > yTop - 1.0);
+
+    // clear
+    ctx.clearRect(0,0,CSSW,CSSH);
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0,0,CSSW,CSSH);
+
+    // ----- liquid fill -----
+    ctx.beginPath();
+    ctx.moveTo(X(-xCont), Y(yBeakerBottom));
+    ctx.lineTo(X(-xCont), Y(yRes(-xCont, theta, capL, r)));
+    const N = 80;
+    for (let i=0;i<=N;i++){
+      const x = -xCont + (xCont - r)*(i/N);
+      ctx.lineTo(X(x), Y(yRes(x, theta, capL, r)));
+    }
+    // climb inside tube + meniscus (or fill to top if offscale)
+    if (offscale){
+      ctx.lineTo(X(-r), Y(yTop));
+      ctx.lineTo(X(r),  Y(yTop));
+    } else {
+      ctx.lineTo(X(-r), Y(edge));
+      const M = 60;
+      for (let i=0;i<=M;i++){
+        const x = -r + 2*r*(i/M);
+        ctx.lineTo(X(x), Y(meniscus(x)));
+      }
+      ctx.lineTo(X(r), Y(edge));
+    }
+    for (let i=0;i<=N;i++){
+      const x = r + (xCont - r)*(i/N);
+      ctx.lineTo(X(x), Y(yRes(x, theta, capL, r)));
+    }
+    ctx.lineTo(X(xCont), Y(yBeakerBottom));
+    ctx.closePath();
+    ctx.fillStyle = C_FILL;
+    ctx.fill();
+
+    // ----- air/liquid surface line -----
+    ctx.strokeStyle = C_SURFACE;
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    ctx.moveTo(X(-xCont), Y(yRes(-xCont, theta, capL, r)));
+    for (let i=0;i<=N;i++){
+      const x = -xCont + (xCont - r)*(i/N);
+      ctx.lineTo(X(x), Y(yRes(x, theta, capL, r)));
+    }
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(X(r), Y(yRes(r, theta, capL, r)));
+    for (let i=0;i<=N;i++){
+      const x = r + (xCont - r)*(i/N);
+      ctx.lineTo(X(x), Y(yRes(x, theta, capL, r)));
+    }
+    ctx.stroke();
+    if (!offscale){
+      ctx.beginPath();
+      const M = 60;
+      for (let i=0;i<=M;i++){
+        const x = -r + 2*r*(i/M);
+        const px = X(x), py = Y(meniscus(x));
+        if (i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+      }
+      ctx.stroke();
+    }
+
+    // ----- beaker walls -----
+    ctx.strokeStyle = C_GLASS;
+    ctx.lineWidth = 3;
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    ctx.moveTo(X(-xCont), Y(yBeakerTop));
+    ctx.lineTo(X(-xCont), Y(yBeakerBottom));
+    ctx.lineTo(X(xCont),  Y(yBeakerBottom));
+    ctx.lineTo(X(xCont),  Y(yBeakerTop));
+    ctx.stroke();
+
+    // ----- capillary tube walls (clip to plot top) -----
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(X(-r), Y(-3.5));
+    ctx.lineTo(X(-r), Y(yTop));
+    ctx.moveTo(X(r),  Y(-3.5));
+    ctx.lineTo(X(r),  Y(yTop));
+    ctx.stroke();
+
+    // ----- break symbol when off-scale -----
+    if (offscale){
+      const yb = yTop - 3.2;          // break centre (mm)
+      const bandPx = 16;              // half band thickness (px)
+      const x0 = X(-r), x1 = X(r);
+      const yc0 = Y(yb);
+      // white band to "cut" the column
+      ctx.save();
+      ctx.fillStyle = '#fff';
+      ctx.beginPath();
+      ctx.moveTo(x0, yc0 - bandPx);
+      ctx.lineTo(x1, yc0 - bandPx);
+      ctx.lineTo(x1, yc0 + bandPx);
+      ctx.lineTo(x0, yc0 + bandPx);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+      // two wavy edges (≈)
+      ctx.strokeStyle = C_SURFACE;
+      ctx.lineWidth = 1.6;
+      const widthPx = x1 - x0;
+      const waves = Math.max(2, Math.round(widthPx/9));
+      for (const off of [-7, 7]){
+        ctx.beginPath();
+        const steps = 40;
+        for (let i=0;i<=steps;i++){
+          const t = i/steps;
+          const px = x0 + widthPx*t;
+          const py = yc0 + off + 3.2*Math.sin(t*waves*2*Math.PI);
+          if (i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+        }
+        ctx.stroke();
+      }
+      // re-stroke tube walls over the band so they stay continuous
+      ctx.strokeStyle = C_GLASS;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(X(-r), yc0 - bandPx); ctx.lineTo(X(-r), yc0 + bandPx);
+      ctx.moveTo(X(r),  yc0 - bandPx); ctx.lineTo(X(r),  yc0 + bandPx);
+      ctx.stroke();
+    }
+
+    // =========== DIMENSIONS ===========
+    const FIG_LABEL = 19.5;   // 50% larger than the previous 13px
+    ctx.fillStyle = C_DIM;
+    ctx.strokeStyle = C_DIM;
+
+    // ---- diameter (horizontal, across tube, below surface) ----
+    const yDia = -3.0;
+    const dy = Y(yDia);
+    const dxl = X(-r), dxr = X(r);
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.moveTo(dxl, dy); ctx.lineTo(dxr, dy);
+    ctx.stroke();
+    const aS = 6;
+    if (dxr - dxl > 14){
+      arrowHead(dxl, dy, Math.PI, aS);
+      arrowHead(dxr, dy, 0, aS);
+    } else {
+      // tube too narrow: arrows pointing inward from outside
+      ctx.beginPath(); ctx.moveTo(dxl-12, dy); ctx.lineTo(dxl, dy);
+      ctx.moveTo(dxr+12, dy); ctx.lineTo(dxr, dy); ctx.stroke();
+      arrowHead(dxl, dy, 0, aS);
+      arrowHead(dxr, dy, Math.PI, aS);
+    }
+    labelBox('diameter = ' + (2*r).toFixed(1) + ' mm', originX, dy + 28, FIG_LABEL);
+
+    // ---- reservoir reference line (y = 0) ----
+    ctx.strokeStyle = '#888';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4,3]);
+    ctx.beginPath();
+    ctx.moveTo(X(r), Y(0)); ctx.lineTo(X(xCont-0.3), Y(0));
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.strokeStyle = C_DIM;
+
+    // ---- height (vertical) ----
+    const xDim = Math.min(r + 2.6, xCont - 2.2);
+    const hx = X(xDim);
+    if (!offscale){
+      const y0 = Y(0), yh = Y(h);
+      // leader at meniscus bottom
+      ctx.strokeStyle = '#888';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4,3]);
+      ctx.beginPath();
+      ctx.moveTo(X(0), yh); ctx.lineTo(hx+4, yh);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      // double arrow
+      ctx.strokeStyle = C_DIM; ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.moveTo(hx, y0); ctx.lineTo(hx, yh); ctx.stroke();
+      if (y0 - yh > 16){
+        arrowHead(hx, y0, Math.PI/2, aS);
+        arrowHead(hx, yh, -Math.PI/2, aS);
+      }
+      labelBox('h = ' + sig3(h) + ' mm', hx + 50, (y0+yh)/2, FIG_LABEL);
+    } else {
+      // off-scale: arrow up near break with value
+      const yb = Y(yTop - 3.2);
+      ctx.strokeStyle = C_DIM; ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.moveTo(hx, Y(0)); ctx.lineTo(hx, yb-4); ctx.stroke();
+      arrowHead(hx, yb-4, -Math.PI/2, aS);
+      labelBox('h = ' + sig3(h) + ' mm', hx + 50, yb + 20, FIG_LABEL);
+    }
+  }
+
+  // ---------- value displays ----------
+  const els = {
+    gamma: document.getElementById('s-gamma'),
+    theta: document.getElementById('s-theta'),
+    rho:   document.getElementById('s-rho'),
+    r:     document.getElementById('s-r')
+  };
+  const vals = {
+    gamma: document.getElementById('v-gamma'),
+    theta: document.getElementById('v-theta'),
+    rho:   document.getElementById('v-rho'),
+    r:     document.getElementById('v-r')
+  };
+  function updateVals(){
+    vals.gamma.textContent = parseFloat(els.gamma.value).toFixed(3);
+    vals.theta.textContent = parseFloat(els.theta.value).toFixed(0) + '\u00B0';
+    vals.rho.textContent   = parseFloat(els.rho.value).toFixed(0);
+    vals.r.textContent     = parseFloat(els.r.value).toFixed(1);
+  }
+  function refresh(){ updateVals(); draw(); }
+  Object.values(els).forEach(el=>{
+    el.addEventListener('input', refresh);
+  });
+
+  // ---------- panels ----------
+  const actions = document.getElementById('actions');
+  const stack   = actions.querySelector('.btnstack');
+  const btns    = document.querySelectorAll('.btn');
+  let activeBtn = null, activePanel = null;
+
+  function positionPanel(btn, panel){
+    const aRect = actions.getBoundingClientRect();
+    const bRect = btn.getBoundingClientRect();
+    const sRect = stack.getBoundingClientRect();
+    const left  = (sRect.right - aRect.left) + 12;   // just right of the button column
+    const top   = (bRect.top   - aRect.top) + 4;     // a few px below the button's top
+    panel.style.left  = left + 'px';
+    panel.style.top   = top + 'px';
+    panel.style.right = '4px';                        // fill to the right edge
+  }
+
+  btns.forEach(b=>{
+    b.addEventListener('click', ()=>{
+      const id = b.dataset.panel;
+      const panel = document.getElementById(id);
+      const isOpen = panel.classList.contains('show');
+      document.querySelectorAll('.panel').forEach(p=>p.classList.remove('show'));
+      btns.forEach(x=>x.classList.remove('active'));
+      if (!isOpen){
+        panel.classList.add('show');
+        b.classList.add('active');
+        activeBtn = b; activePanel = panel;
+        positionPanel(b, panel);
+      } else {
+        activeBtn = null; activePanel = null;
+      }
+    });
+  });
+
+  window.addEventListener('resize', ()=>{
+    setupHiDPI(); draw();
+    if (activeBtn && activePanel) positionPanel(activeBtn, activePanel);
+  });
+  refresh();
+})();
+</script>
+</body>
+</html>
