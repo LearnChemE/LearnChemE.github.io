@@ -4,7 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Pressure-Temperature Diagram for a Binary Mixture</title>
-
 <style>
   :root{
     --darkred:#8b1a1a;
@@ -14,7 +13,7 @@
   }
   html,body{margin:0;padding:0;background:#fff;color:var(--ink);
     font-family:Helvetica,Arial,sans-serif;}
-  #app{width:760px;max-width:100%;margin:8px auto;padding:0 6px;}
+  #app{width:760px;max-width:100%;margin:8px auto;padding:0 6px;position:relative;}
   .title{font-size:19px;font-weight:bold;text-align:center;margin:6px 0 10px;}
   .controls{margin:0 0 4px;}
   .ctrlrow{display:flex;align-items:center;gap:10px;margin:3px 0;font-size:15px;}
@@ -32,15 +31,17 @@
   .chk input{width:15px;height:15px;accent-color:var(--darkred);}
   #canvasWrap{width:600px;max-width:100%;margin:2px auto 0;}
   canvas{width:600px;max-width:100%;height:auto;display:block;}
-  .btnrow{display:flex;justify-content:center;gap:10px;margin:12px 0 6px;}
+  .btnrow{display:flex;gap:8px;margin-left:14px;}
   .tbtn{font-family:Helvetica,Arial,sans-serif;font-size:15px;color:#fff;
     background:var(--darkred);border:1px solid #5e1010;border-radius:4px;
     padding:5px 16px;cursor:pointer;}
   .tbtn:hover{background:var(--darkred-hi);}
   .tbtn.active{background:#5e1010;}
   .panel{border:1px solid var(--panelborder);border-radius:3px;background:#fff;
-    padding:12px 16px;margin:4px auto 10px;width:700px;max-width:100%;
-    font-size:14.5px;line-height:1.5;box-sizing:border-box;display:none;}
+    padding:12px 16px;margin:0;width:600px;max-width:calc(100% - 12px);
+    font-size:14.5px;line-height:1.5;box-sizing:border-box;display:none;
+    position:absolute;z-index:30;box-shadow:0 3px 10px rgba(0,0,0,0.18);
+    max-height:66vh;overflow:auto;}
   .panel.show{display:block;}
   .panel p{margin:7px 0;}
   .eq{font-style:italic;font-family:"Times New Roman",Georgia,serif;margin:8px 0;
@@ -80,16 +81,15 @@
     <div class="ctrlrow chk">
       <span class="ctrllabel">show all curves</span>
       <input id="allchk" type="checkbox" checked>
+      <div class="btnrow">
+        <button class="tbtn" data-p="dir">Directions</button>
+        <button class="tbtn" data-p="det">Details</button>
+        <button class="tbtn" data-p="abt">About</button>
+      </div>
     </div>
   </div>
 
   <div id="canvasWrap"><canvas id="cv" width="1200" height="900"></canvas></div>
-
-  <div class="btnrow">
-    <button class="tbtn" data-p="dir">Directions</button>
-    <button class="tbtn" data-p="det">Details</button>
-    <button class="tbtn" data-p="abt">About</button>
-  </div>
 
   <div id="dir" class="panel">
     <p>This Demonstration shows a pressure&ndash;temperature (\(P\)&ndash;\(T\)) diagram
@@ -150,7 +150,7 @@
     at University of Colorado Boulder for
     <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a>
     by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a
-    Mathematica simulation by Adam J. Johnson and Rachael L. Baumann. It was prepared
+    Mathematica simulation by Adam J. Johnston and Rachael L. Baumann. It was prepared
     with financial support from the National Science Foundation (DUE 2336987 and 2336988)
     in collaboration with Washington State University. Address any questions or comments
     to LearnChemE@gmail.com.</p>
@@ -470,7 +470,19 @@ const DATA={"T0":[[451.0,0.658],[453.5,0.692],[456.0,0.725],[458.5,0.759],[461.0
       const open=panel.classList.contains('show');
       document.querySelectorAll('.panel').forEach(p=>p.classList.remove('show'));
       document.querySelectorAll('.tbtn').forEach(x=>x.classList.remove('active'));
-      if(!open){ panel.classList.add('show'); b.classList.add('active'); }
+      if(!open){
+        // place the panel just to the right of its button, starting a few px below it
+        const app=document.getElementById('app');
+        const pad=6, gap=6, drop=5, minW=260;
+        const innerRight=app.clientWidth-pad;
+        let left=b.offsetLeft+b.offsetWidth+gap;     // just past the button's right edge
+        let width=Math.min(600, innerRight-left);
+        if(width<minW){ width=Math.min(600, innerRight-pad); left=innerRight-width; }
+        panel.style.left=left+'px';
+        panel.style.top=(b.offsetTop+b.offsetHeight+drop)+'px';
+        panel.style.width=width+'px';
+        panel.classList.add('show'); b.classList.add('active');
+      }
     });
   });
 
