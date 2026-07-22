@@ -58,7 +58,7 @@ export class Vec3 {
     }
 }
 
-class DyeEpsilon extends Vec3 { 
+export class DyeEpsilon extends Vec3 { 
     static fromHex(col: string) {
         const [ r, g, b ] = hexToRBG(col);
         console.log(`r: ${r}, g: ${g}, b: ${b}`)
@@ -90,12 +90,14 @@ class DyeEpsilon extends Vec3 {
 }
 
 const DyesRaw: Record<string, string> = {
-    blue:   "#FFFF01",
-    yellow: "#01FFFF",
-    clear:  "#FFFFFF"
+    blue:   "#01FFFF",
+    yellow: "#FFFF01",
+    clear:  "#FFFFFF",
 };
 
-const Epsilon: Record<string, DyeEpsilon> = {};
+const Epsilon: Record<string, DyeEpsilon> = {
+    "Quinoneimine": new DyeEpsilon(0.1, 1.0, 0.3)
+};
 for (let key in DyesRaw) {
     Epsilon[key] = DyeEpsilon.fromHex(DyesRaw[key]);
 }

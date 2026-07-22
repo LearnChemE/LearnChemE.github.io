@@ -20,7 +20,7 @@ abstract class AnimatorBase {
     public play() {
         if (this.playing) return;
         this.playing = true;
-        animate(this.frame);
+        animate(this.frame.bind(this));
     }
     
     public pause() {

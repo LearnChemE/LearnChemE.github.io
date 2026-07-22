@@ -14,6 +14,7 @@ import { createSignal, Show } from 'solid-js'
 
 function App() {
   const [showInj, setShowInj] = createSignal(true);
+  const [playing, setPlaying] = createSignal(false);
 
   const aniTimer = new AnimationTimer();
   const injTimer = new AnimationTimer();
@@ -30,14 +31,25 @@ function App() {
     setShowInj(false);
   }
 
+  const play = () => {
+    aniTimer.play();
+    setPlaying(true);
+  }
+
+  const rxrCtxDescriptor = { 
+    aniTimer, 
+    injTimer,
+    playing
+  };
+
   return (
     <>
-        <RxrContextProvider descriptor={{ aniTimer, injTimer }}>
+        <RxrContextProvider descriptor={rxrCtxDescriptor}>
           <div class="canvas-container">
             {/* Hamburger */}
             <HamburgerMenu path={worksheet} downloadName="glucoseAnalyzerWorksheet.pdf" Directions={DirectionsText} About={AboutText} />
             <ControlButton icon="fa-solid fa-arrows-rotate" label="reset" left={90} onClick={reset} active={() => true} activeColor='#FF3B3B' />
-            <ControlButton icon="fa-solid fa-play" label="reset" left={155} onClick={() => aniTimer.play()} active={() => true} activeColor='#3d9c3b' />
+            <ControlButton icon="fa-solid fa-play" label="reset" left={155} onClick={play} active={() => true} activeColor='#3d9c3b' disabled={showInj} />
             <SVGCanvas width={280} height={280} defs={Defs}>
               <Cartridge />
             </SVGCanvas>
