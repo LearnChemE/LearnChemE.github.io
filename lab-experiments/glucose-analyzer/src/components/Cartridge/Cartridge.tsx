@@ -1,6 +1,6 @@
-import { createMemo, createSignal, onMount, useContext, type Accessor, type Component } from "solid-js";
+import { createEffect, createMemo, createSignal, onMount, useContext, type Accessor, type Component } from "solid-js";
 import "./Cartridge.css";
-import { dyeLookup, resetSignal } from "../../globals";
+import { resetSignal, RxnCalcs } from "../../globals";
 import { RxrContext } from "../Context";
 import { delay, delayDuration } from "../../globals/animate";
 
@@ -9,22 +9,22 @@ type CartridgeProps = {
 };
 
 export const Cartridge: Component<CartridgeProps> = () => {
+    const [mCol, setMCol] = createSignal("#FF0101");
     const [rotate, setRotate] = createSignal(-90);
     const ctx = useContext(RxrContext)!;
 
-    const rDye = dyeLookup("blue");
-    const lDye = dyeLookup("yellow");
-    const mDye = rDye.mix(lDye);
+    const rCol = createMemo(() => {
+        const topFluid = ctx.topFluid[0]();
+        return topFluid.color.toColorHex();
+    });
+    const lCol = createMemo(() => {
+        const botFluid = ctx.botFluid[0]();
+        return botFluid.color.toColorHex();
+    });
 
-    const rCol = rDye.toColorHex();
-    const lCol = lDye.toColorHex();
-    const mCol = mDye.toColorHex();
-    console.log(rDye.x, rDye.y, rDye.z);
-    console.log(mCol)
+    const getFluids = () => [ctx.topFluid[0](), ctx.botFluid[0]()];
 
-    // const rCol = "#0077FF";
-    // const lCol = "#F2FF00";
-    // const mCol = "#00FF04";
+    const calc = new RxnCalcs(getFluids(), ctx.aniTimer, setMCol);
 
     onMount(() => {
         resetSignal.subscribe(() => {
@@ -36,6 +36,12 @@ export const Cartridge: Component<CartridgeProps> = () => {
             setRotate(rt * 90 - 90);
         });
     });
+
+    createEffect(() => {
+        if (ctx.playing()) {
+            calc.setFluids(getFluids());
+        }
+    })
 
     return (
 <g transform={`translate(140, 139.5) rotate(${rotate()}) translate(-36, -120.5)`}>
@@ -77,14 +83,14 @@ export const Cartridge: Component<CartridgeProps> = () => {
 {/* Fill */}
 <g filter="url(#flow-outline)" mask="url(#mask0_0_1)">
     <g mask="url(#flow-mask)">
-        <rect x="-2" y="-2" width="36" height="36" fill={lCol} filter="url(#background-blur)"/>
-        <rect x="38" y="-2" width="36" height="36" fill={rCol}  filter="url(#background-blur)"/>
-        <path d="M67.9999 28.5L45.9999 64" stroke={rCol} stroke-width="14" filter="url(#background-blur)"/>
-        <path d="M23.4999 26.5L46.5 63"    stroke={lCol} stroke-width="11" filter="url(#background-blur)"/>
-        <rect x="40" y="54" width="7" height="10" fill={lCol} filter="url(#background-blur)"/>
-        <rect x="47" y="53" width="7" height="11" fill={rCol} filter="url(#background-blur)"/>
-        <rect x="40" y="61" width="14" height="151" fill={mCol} filter="url(#background-blur)"/>
-        <rect x="20" y="208" width="54" height="34" fill={mCol} filter="url(#background-blur)"/>
+        <rect x="-2" y="-2" width="36" height="36" fill={lCol()} filter="url(#background-blur)"/>
+        <rect x="38" y="-2" width="36" height="36" fill={rCol()}  filter="url(#background-blur)"/>
+        <path d="M67.9999 28.5L45.9999 64" stroke={rCol()} stroke-width="14" filter="url(#background-blur)"/>
+        <path d="M23.4999 26.5L46.5 63"    stroke={lCol()} stroke-width="11" filter="url(#background-blur)"/>
+        <rect x="40" y="54" width="7" height="10" fill={lCol()} filter="url(#background-blur)"/>
+        <rect x="47" y="53" width="7" height="11" fill={rCol()} filter="url(#background-blur)"/>
+        <rect x="40" y="61" width="14" height="151" fill={mCol()} filter="url(#background-blur)"/>
+        <rect x="20" y="208" width="54" height="34" fill={mCol()} filter="url(#background-blur)"/>
     </g>
 </g>
 
@@ -128,10 +134,10 @@ const FlowPath: Component<FlowProps> = (props) => {
 
     // Animation segment times
     // const chFillTime = 5; // seconds
-    const chFillTime = 7; // seconds
+    const chFillTime = 4; // seconds
     const yFillTime = 0.5;
-    const zFillTime = 2;
-    const bottomFillTime = 7; // seconds
+    const zFillTime = 1.5;
+    const bottomFillTime = chFillTime - 0.25; // seconds
 
     // Fill start times
     const yFillStart = 0;
@@ -160,13 +166,12 @@ const FlowPath: Component<FlowProps> = (props) => {
 
     const ch_h = createMemo(() => {
         const injTime = injS();
-        const totInjTime = 4;
 
-        if (injTime < totInjTime) {
-            const time = delayDuration(injTime, 0, 2);
+        if (injTime < 1) {
+            // const time = delayDuration(injTime, 0, 2);
             const final_w = 24;
-            const eased = 1 - (1 - time) ** 2;
-            const w_raw = eased * final_w;
+            // const eased = 1 - (1 - time) ** 2;
+            const w_raw = injTime * final_w;
             return w_raw > 5 ? w_raw : 0;
         }
         else {

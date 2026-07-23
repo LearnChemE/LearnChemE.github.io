@@ -8,10 +8,11 @@
   border: 1px solid black;
   border-radius: 8px;
   height: max-content;
-  width: 18em;
+  width: max-content;
+  padding: 0 1em;
 
   span {
-    margin-top: .35em;
+    margin: .35em 0;
   }
 }
 

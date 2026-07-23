@@ -7,6 +7,7 @@ type SVGCanvasProps = {
     height?: number | Accessor<number>;
     children?: any;
     defs?: any;
+    onSvgRef?: (el: SVGSVGElement) => void;
 }
 
 export const SVGCanvas: Component<SVGCanvasProps> = (props) => {
@@ -31,6 +32,7 @@ export const SVGCanvas: Component<SVGCanvasProps> = (props) => {
             viewBox={`0 0 ${defaultWidth} ${defaultHeight}`}
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
+            ref={props.onSvgRef}
         >
             <g id="canvas">
                 {/* Backdrop */}
