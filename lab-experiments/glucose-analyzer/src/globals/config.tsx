@@ -10,12 +10,14 @@ export type FluidComposition = {
 };
 export type MenuFluidType = { key: string, label: string, contains: FluidComposition }
 
+export const totInjTime = 2;
+
 // [glucose, h2o2, quinoneimine]
 const RXN_IDX_RGNT = -2;
 const RXN_IDX_NONE = -1;
 const RXN_IDX_GLUC = 0;
 const RXN_IDX_H2O2 = 1;
-const RXN_IDX_QUIN = 2;
+// const RXN_IDX_QUIN = 2;
 
 export const Fluids = [
     {
@@ -176,7 +178,7 @@ export class RxnCalcs {
         if (t < AnimationRxnDelay) return;
         
         const y0 = [this.glucose, this.h2o2, this.quinoneimine];
-        console.log(y0)
+        // console.log(y0)
         const rxns = this.createRhs();
         
         const sol = rk45_dormand_prince(rxns, y0, 0, dt);

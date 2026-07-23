@@ -1,17 +1,17 @@
 import { createContext, createSignal, onMount, type Accessor, type Signal } from "solid-js";
 import { Fluids, resetSignal, type FluidComposition } from "../globals";
-import { AnimationTimer } from "../globals/animate";
+import { AnimationTimer, EasedAnimation } from "../globals/animate";
 
 export type ContextDescriptor = {
     aniTimer: AnimationTimer;
-    injTimer: AnimationTimer;
+    injTimer: EasedAnimation;
     playing: Accessor<boolean>;
 };
 
 // Context definition and creation for column calculations
 export type ReactorContextType = {
     aniTimer: AnimationTimer;
-    injTimer: AnimationTimer;
+    injTimer: EasedAnimation;
     topFluid: Signal<FluidComposition>;
     botFluid: Signal<FluidComposition>;
     playing: Accessor<boolean>;

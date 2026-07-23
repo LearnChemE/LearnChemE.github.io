@@ -166,13 +166,12 @@ const FlowPath: Component<FlowProps> = (props) => {
 
     const ch_h = createMemo(() => {
         const injTime = injS();
-        const totInjTime = 4;
 
-        if (injTime < totInjTime) {
-            const time = delayDuration(injTime, 0, 2);
+        if (injTime < 1) {
+            // const time = delayDuration(injTime, 0, 2);
             const final_w = 24;
-            const eased = 1 - (1 - time) ** 2;
-            const w_raw = eased * final_w;
+            // const eased = 1 - (1 - time) ** 2;
+            const w_raw = injTime * final_w;
             return w_raw > 5 ? w_raw : 0;
         }
         else {

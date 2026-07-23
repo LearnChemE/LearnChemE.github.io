@@ -24,8 +24,8 @@ export const ControlButton: Component<ControlButtonProps> = (props: ControlButto
 
     return (<>
             {disabled() ? (
-            <button class="control-button disabled" style={`top: ${top}px; left: ${left}px`} title={label()} disabled>
-                <i class={typeof icon === "function" ? icon() : icon} />
+            <button class="control-button disabled" style={`top: ${top()}px; left: ${left()}px`} title={label()} disabled>
+                <i class={typeof icon === "function" ? icon() : icon} style="color: #333333;" />
             </button>
             ) : (
             <button 

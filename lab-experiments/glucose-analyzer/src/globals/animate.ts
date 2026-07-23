@@ -47,12 +47,14 @@ export class EasedAnimation extends AnimationTimer {
     private delay: number;
     private easing: EasingFn;
     private prevS: number = 0;
+    private finishCallbacks: Array<(() => void)>
 
     constructor(easing: EasingFn, duration: number, delay=0) {
         super();
         this.duration = duration;
         this.delay = delay;
         this.easing = easing;
+        this.finishCallbacks = [];
     }
 
     protected frame(dt: number) {
@@ -63,37 +65,47 @@ export class EasedAnimation extends AnimationTimer {
         const ds = s - this.prevS;
         this.prevS = s;
         this.callbacks.forEach(fn => fn(ds, s));
+
+        if (s >= 1) {
+            this.playing = false;
+            this.finish();
+        }
         return this.playing;
+    }
+
+    private finish() {
+        this.finishCallbacks.forEach(callback => {
+            callback();
+        });
+    }
+
+    public onFinish(callback: () => void) {
+        this.finishCallbacks.push(callback);
     }
 }
 
 export type EasingFn = (t: number) => number;
 
-const clamp = (t: number) => Math.min(Math.max(t, 0), 1);
+// export const createEaseIn = (easing: EasingFn, min = 0, max = 1): EasingFn => {
+//     return (t: number) => {
+//         const clamped = clamp(t);
+//         return min + (max - min) * easing(clamped);
+//     };
+// };
 
-export const createEaseIn = (easing: EasingFn, min = 0, max = 1): EasingFn => {
-    return (t: number) => {
-        const clamped = clamp(t);
-        return min + (max - min) * easing(clamped);
-    };
-};
+export function createEaseOut(n: number) {
+    return (t: number) => 1 - (1 - t) ** n;
+}
 
-export const createEaseOut = (easing: EasingFn, min = 0, max = 1): EasingFn => {
-    return (t: number) => {
-        const clamped = clamp(t);
-        return min + (max - min) * (1 - easing(1 - clamped));
-    };
-};
-
-export const createEaseInOut = (easing: EasingFn, min = 0, max = 1): EasingFn => {
-    return (t: number) => {
-        const clamped = clamp(t);
-        if (clamped < 0.5) {
-            return min + (max - min) * 0.5 * easing(clamped * 2);
-        }
-        return min + (max - min) * (0.5 + 0.5 * (1 - easing((1 - clamped) * 2)));
-    };
-};
+// export const createEaseInOut = (easing: EasingFn, min = 0, max = 1): EasingFn => {
+//     return (t: number) => {
+//         const clamped = clamp(t);
+//         if (clamped < 0.5) {
+//             return min + (max - min) * 0.5 * easing(clamped * 2);
+//         }
+//         return min + (max - min) * (0.5 + 0.5 * (1 - easing((1 - clamped) * 2)));
+//     };
+// };
 
 export const step = (t: number) => {
     return (t < 0) ? 0 : 1;

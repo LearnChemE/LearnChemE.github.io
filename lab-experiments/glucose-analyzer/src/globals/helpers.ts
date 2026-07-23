@@ -539,3 +539,32 @@ function invNorm(p: number) {
 //     // Return the new value with noise added
 //     return x + newNoise;
 // }
+
+export function getCanvasColorAt(svgElement: SVGElement, clickX: number, clickY: number) {
+  return new Promise((resolve) => {
+    // 1. Convert SVG DOM element to a string Data URL
+    const svgData = new XMLSerializer().serializeToString(svgElement);
+    const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(svgBlob);
+
+    const img = new Image();
+    img.onload = () => {
+      // 2. Draw SVG to canvas matching dimensions
+      const canvas = document.createElement('canvas');
+      canvas.width = svgElement.clientWidth;
+      canvas.height = svgElement.clientHeight;
+
+      const ctx = canvas.getContext('2d')!;
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+      // 3. Extract the RGBA values of the target pixel
+      const pixel = ctx.getImageData(clickX, clickY, 1, 1).data;
+      const hex = `#${((1 << 24) + (pixel[0] << 16) + (pixel[1] << 8) + pixel[2]).toString(16).slice(1)}`;
+
+      URL.revokeObjectURL(url);
+      resolve(hex);
+    };
+
+    img.src = url;
+  });
+}
