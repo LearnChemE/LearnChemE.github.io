@@ -8,7 +8,7 @@ export type FluidComposition = {
     color: DyeEpsilon;
     conc: number;
 };
-export type MenuFluidType = { key: string, label: string, contains: FluidComposition }
+export type MenuFluidType = { key: string, label: string, showSlider: boolean, contains: FluidComposition }
 
 export const totInjTime = 2;
 
@@ -23,6 +23,7 @@ export const Fluids = [
     {
         key: "y-dye",
         label: "yellow dye",
+        showSlider: false,
         contains: { 
             rxnIdx: RXN_IDX_NONE, 
             color: dyeLookup("yellow"), 
@@ -32,6 +33,7 @@ export const Fluids = [
     {
         key: "b-dye",
         label: "blue dye",
+        showSlider: false,
         contains: { 
             rxnIdx: RXN_IDX_NONE,
             color: dyeLookup("blue"), 
@@ -41,6 +43,7 @@ export const Fluids = [
     {
         key: "water",
         label: "water",
+        showSlider: false,
         contains: { 
             rxnIdx: RXN_IDX_NONE,
             color: dyeLookup("clear"), 
@@ -50,6 +53,7 @@ export const Fluids = [
     {
         key: "reagent",
         label: "reagent solution",
+        showSlider: false,
         contains: {
             rxnIdx: RXN_IDX_RGNT,
             color: dyeLookup("clear"),
@@ -59,6 +63,7 @@ export const Fluids = [
     {
         key: "peroxides",
         label: "H₂O₂ solution",
+        showSlider: true,
         contains: {
             rxnIdx: RXN_IDX_H2O2,
             color: dyeLookup("clear"),
@@ -68,6 +73,7 @@ export const Fluids = [
     {
         key: "glucose",
         label: "D-glucose solution",
+        showSlider: true,
         contains: {
             rxnIdx: RXN_IDX_GLUC,
             color: dyeLookup("clear"),
