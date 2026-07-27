@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Fanning Moody Diagram</title>
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['\\(', '\\)']] },
+            options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'] }
+        };
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: Helvetica, Arial, sans-serif;
+            /* background-color: #f8fafc; */
+            color: #1e293b;
+            margin: 0;
+            min-height: 700px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        canvas {
+            cursor: crosshair;
+            touch-action: none;
+        }
+        .math { font-family: 'Cambria Math', 'Times New Roman', serif; }
+
+        /* Header */
+        header {
+            background: #ffffff;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            border-bottom: 1px solid #e2e8f0;
+            padding: 16px 24px;
+            flex-shrink: 0;
+        }
+        header h1 {
+            font-size: 24px;
+            font-weight: bold;
+            color: #0f172a;
+            margin: 0;
+        }
+
+        /* Main layout */
+        main {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: row;
+            overflow: hidden;
+            padding: 24px;
+            gap: 24px;
+        }
+        #canvasContainer {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+            position: relative;
+            min-height: 400px;
+        }
+        #moodyCanvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Tooltip */
+        #tooltip {
+            position: absolute;
+            pointer-events: none;
+            background: #0f172a;
+            color: #ffffff;
+            font-size: 14.4px;
+            padding: 8px 12px;
+            border-radius: 4px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            transform: translate(-50%, -100%);
+            margin-bottom: 8px;
+            z-index: 10;
+        }
+        #tooltip .mono { font-family: 'Courier New', monospace; font-weight: bold; }
+        .hidden { display: none !important; }
+
+        /* Info panel */
+        #infoPanel {
+            width: 384px;
+            flex-shrink: 0;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+            padding: 24px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        #infoPanel h2 {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1e293b;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 8px;
+            margin: 0 0 16px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #emptyState {
+            font-size: 14px;
+            color: #64748b;
+            font-style: italic;
+        }
+        #dataState {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .dataCard {
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #f1f5f9;
+        }
+        .dataLabel {
+            font-size: 16px;
+            color: #000000;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            font-family: Helvetica, Arial, sans-serif;
+        }
+        .dataValue {
+            font-size: 16px;
+            font-family: Helvetica, Arial, sans-serif;
+            color: #000000;
+            font-weight: normal;
+            margin-top: 4px;
+        }
+        .dataSub {
+            font-size: 16px;
+            color: #000000;
+            font-family: Helvetica, Arial, sans-serif;
+            margin-top: 4px;
+        }
+        #dataState .math {
+            font-family: Helvetica, Arial, sans-serif;
+        }
+        #pinnedClose {
+            background: none;
+            border: none;
+            font-size: 18px;
+            line-height: 1;
+            color: #64748b;
+            cursor: pointer;
+            padding: 2px 6px;
+            font-weight: normal;
+        }
+        #pinnedClose:hover { color: #0f172a; }
+
+        /* Dark red panel buttons */
+        #buttonColumn {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 8px;
+        }
+        .panelBtn {
+            background: #98000D;
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 15px;
+            font-weight: bold;
+            padding: 10px 0;
+            cursor: pointer;
+            width: 130px;
+        }
+        .panelBtn:hover { background: #7a000a; }
+
+        /* Flyout panels: cover the figure, never the buttons */
+        .flyout {
+            position: absolute;
+            inset: 12px;
+            background: #ffffff;
+            border: 2px solid #98000D;
+            border-radius: 10px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+            padding: 20px 28px;
+            overflow-y: auto;
+            z-index: 20;
+            font-size: 15px;
+            line-height: 1.55;
+        }
+        .flyout h3 {
+            margin: 0 0 12px 0;
+            font-size: 19px;
+            color: #98000D;
+        }
+        .flyoutClose {
+            position: absolute;
+            top: 10px;
+            right: 14px;
+            background: none;
+            border: none;
+            font-size: 22px;
+            line-height: 1;
+            color: #98000D;
+            cursor: pointer;
+            font-weight: bold;
+            padding: 2px 6px;
+        }
+        .flyoutClose:hover { color: #7a000a; }
+        .flyout ul { margin: 6px 0 14px 0; padding-left: 22px; }
+        .flyout li { margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <!-- <header>
+        <h1>Interactive Fanning Friction Factor (Moody) Diagram</h1>
+    </header> -->
+
+    <!-- Main Content -->
+    <main>
+
+        <!-- Canvas Container -->
+        <div id="canvasContainer">
+            <canvas id="moodyCanvas"></canvas>
+
+            <!-- Floating Tooltip -->
+            <div id="tooltip" class="hidden">
+                <div>Re: <span id="ttRe" class="mono"></span></div>
+                <div><span class="math" style="font-style: italic;">f<sub>F</sub></span>: <span id="ttF" class="mono"></span></div>
+            </div>
+
+            <!-- Directions flyout -->
+            <div id="directionsPanel" class="flyout hidden">
+                <button class="flyoutClose" data-close="directionsPanel">&times;</button>
+                <h3>Directions</h3>
+                <p>Hover over the diagram to explore values. Click anywhere to pin a point and calculate equivalent parameters.</p>
+            </div>
+
+            <!-- Details flyout -->
+            <div id="detailsPanel" class="flyout hidden">
+                <button class="flyoutClose" data-close="detailsPanel">&times;</button>
+                <h3>Details</h3>
+                <p>The diagram plots the Fanning friction factor \( f_F \) versus the Reynolds number \( Re \) on logarithmic axes for a family of relative roughness values \( \epsilon / D \).</p>
+                <p><strong>Laminar flow</strong> (\( Re < 2300 \)):</p>
+                <p>\( f_F = \dfrac{16}{Re} \)</p>
+                <p><strong>Turbulent flow</strong> (Colebrook&ndash;White equation, solved by Newton&ndash;Raphson iteration):</p>
+                <p>\( \dfrac{1}{\sqrt{4 f_F}} = -2.0 \, \log_{10}\!\left( \dfrac{\epsilon / D}{3.7} + \dfrac{2.51}{Re \, \sqrt{4 f_F}} \right) \)</p>
+                <p><strong>Darcy&ndash;Fanning relation:</strong></p>
+                <p>\( f_D = 4 \, f_F \)</p>
+                <p><strong>Implied relative roughness</strong> for a pinned point (inverted Colebrook&ndash;White equation):</p>
+                <p>\( \dfrac{\epsilon}{D} = 3.7 \left[ 10^{-1 / \left( 2 \sqrt{f_D} \right)} - \dfrac{2.51}{Re \, \sqrt{f_D}} \right] \)</p>
+                <p><strong>Symbols:</strong></p>
+                <ul>
+                    <li>\( Re \) &mdash; Reynolds number (dimensionless)</li>
+                    <li>\( f_F \) &mdash; Fanning friction factor (dimensionless)</li>
+                    <li>\( f_D \) &mdash; Darcy friction factor (dimensionless)</li>
+                    <li>\( \epsilon \) &mdash; pipe surface roughness (m)</li>
+                    <li>\( D \) &mdash; pipe inner diameter (m)</li>
+                    <li>\( \epsilon / D \) &mdash; relative roughness (dimensionless)</li>
+                </ul>
+            </div>
+
+            <!-- About flyout -->
+            <div id="aboutPanel" class="flyout hidden">
+                <button class="flyoutClose" data-close="aboutPanel">&times;</button>
+                <h3>About</h3>
+                <p>This simulation was generated by Professor David L. Silverstein and Dr. Loyal Murphy of the University of Mississippi using Google Gemini. It was modified for LearnChemE using Claude AI.</p>
+            </div>
+        </div>
+
+        <!-- Info Panel -->
+        <div id="infoPanel">
+
+            <div>
+                <h2><span>Pinned point details</span><button id="pinnedClose" class="hidden" title="Clear pinned point">&times;</button></h2>
+                <div id="emptyState">
+                    Click anywhere on the chart to pin a point and calculate properties.
+                </div>
+
+                <div id="dataState" class="hidden">
+                    <div class="dataCard">
+                        <div class="dataLabel">Reynolds number (Re)</div>
+                        <div class="dataValue" id="panelRe">-</div>
+                        <div class="dataSub" id="panelFlowType">-</div>
+                    </div>
+
+                    <div class="dataCard">
+                        <div class="dataLabel">Fanning friction factor (<span class="math" style="font-style: italic;">f<sub>F</sub></span>)</div>
+                        <div class="dataValue" id="panelF">-</div>
+                        <div class="dataSub">Darcy equivalent (<span class="math" style="font-style: italic;">f<sub>D</sub></span>): <span id="panelFDarcy">-</span></div>
+                    </div>
+
+                    <div class="dataCard">
+                        <div class="dataLabel">Implied relative roughness (<span class="math" style="font-style: italic;">&epsilon;/D</span>)</div>
+                        <div class="dataValue" id="panelED">-</div>
+                        <div class="dataSub" id="panelEDMsg">Calculated via Colebrook-White</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel buttons: vertical, below the pinned point details -->
+            <div id="buttonColumn">
+                <button class="panelBtn" data-panel="directionsPanel">Directions</button>
+                <button class="panelBtn" data-panel="detailsPanel">Details</button>
+                <button class="panelBtn" data-panel="aboutPanel">About</button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Data and Constants
+        const eD_values = [
+            0.05, 0.04, 0.03, 0.02, 0.015, 0.01, 0.008, 0.006, 0.004,
+            0.002, 0.001, 0.0005, 0.0002, 0.0001, 0.00005, 0.00001
+        ];
+
+        // Bounds
+        const xMinLog = 3; // Re = 10^3
+        const xMaxLog = 8; // Re = 10^8
+        const yMinLog = Math.log10(0.0015); // f_Fanning min
+        const yMaxLog = Math.log10(0.025);  // f_Fanning max
+
+        // Margins for canvas drawing (right margin enlarged for bigger labels)
+        const margins = { top: 40, right: 120, bottom: 75, left: 100 };
+
+        // State
+        let hoverPoint = null;
+        let pinnedPoint = null;
+        let chartRect = { x: 0, y: 0, w: 0, h: 0 };
+
+        // Canvas Setup
+        const canvas = document.getElementById('moodyCanvas');
+        const ctx = canvas.getContext('2d');
+        const bgCanvas = document.createElement('canvas'); // Offscreen canvas for caching background
+        const bgCtx = bgCanvas.getContext('2d');
+        const container = document.getElementById('canvasContainer');
+        const tooltip = document.getElementById('tooltip');
+
+        // Math Solvers
+        // Solve Colebrook-White for Darcy friction factor, then divide by 4 for Fanning
+        function solveColebrookDarcy(Re, eD) {
+            if (Re < 2300) return 64.0 / Re;
+
+            // Initial guess using Haaland equation
+            let f = Math.pow(-1.8 * Math.log10(Math.pow(eD/3.7, 1.11) + 6.9/Re), -2);
+
+            // Newton-Raphson
+            for (let i = 0; i < 10; i++) {
+                let x = 1.0 / Math.sqrt(f);
+                let arg = eD / 3.7 + 2.51 * x / Re;
+                let g = x + 2.0 * Math.log10(arg);
+                let dg_dx = 1.0 + (2.0 / Math.LN10) * (2.51 / Re) / arg;
+                let gp = -0.5 * Math.pow(f, -1.5);
+                let dg_df = dg_dx * gp;
+
+                let f_new = f - g / dg_df;
+                if (Math.abs(f_new - f) < 1e-7) return f_new;
+                f = f_new;
+            }
+            return f;
+        }
+
+        function calculateImpliedRoughness(Re, f_F) {
+            const f_D = f_F * 4;
+            if (Re < 2300) return null; // e/D doesn't apply to laminar flow strictly by Moody
+
+            // Reversing Colebrook:
+            // 1/sqrt(f) = -2 * log10( (e/D)/3.7 + 2.51/(Re*sqrt(f)) )
+            // 10^(-1 / (2*sqrt(f))) = (e/D)/3.7 + 2.51/(Re*sqrt(f))
+            // e/D = 3.7 * [ 10^(-1 / (2*sqrt(f))) - 2.51/(Re*sqrt(f)) ]
+
+            const term1 = Math.pow(10, -1.0 / (2.0 * Math.sqrt(f_D)));
+            const term2 = 2.51 / (Re * Math.sqrt(f_D));
+            const eD = 3.7 * (term1 - term2);
+
+            return eD;
+        }
+
+        // Coordinate Mapping
+        function mapX(Re) {
+            const logRe = Math.log10(Re);
+            const ratio = (logRe - xMinLog) / (xMaxLog - xMinLog);
+            return chartRect.x + ratio * chartRect.w;
+        }
+
+        function mapY(f_F) {
+            const logF = Math.log10(f_F);
+            const ratio = (logF - yMinLog) / (yMaxLog - yMinLog);
+            // Y is inverted (0 is top)
+            return chartRect.y + chartRect.h - ratio * chartRect.h;
+        }
+
+        function unmapX(px) {
+            const ratio = (px - chartRect.x) / chartRect.w;
+            const logRe = xMinLog + ratio * (xMaxLog - xMinLog);
+            return Math.pow(10, logRe);
+        }
+
+        function unmapY(py) {
+            const ratio = (chartRect.y + chartRect.h - py) / chartRect.h;
+            const logF = yMinLog + ratio * (yMaxLog - yMinLog);
+            return Math.pow(10, logF);
+        }
+
+        // Formatting: returns HTML with a superscript exponent instead of ^
+        function formatScientificHTML(num) {
+            if (num < 10000 && num >= 100) return num.toFixed(0);
+            const s = num.toExponential(2); // e.g. "3.16e+5"
+            const parts = s.split('e');
+            const mantissa = parts[0];
+            const exponent = parseInt(parts[1], 10);
+            return mantissa + ' &times; 10<sup>' + exponent + '</sup>';
+        }
+
+        // Rendering
+        function resize() {
+            const rect = container.getBoundingClientRect();
+
+            // Guard against InvalidStateError if layout hasn't been assigned yet
+            if (rect.width === 0 || rect.height === 0) return;
+
+            const dpr = window.devicePixelRatio || 1;
+
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            bgCanvas.width = rect.width * dpr;
+            bgCanvas.height = rect.height * dpr;
+
+            ctx.scale(dpr, dpr);
+            bgCtx.scale(dpr, dpr);
+
+            chartRect = {
+                x: margins.left,
+                y: margins.top,
+                w: rect.width - margins.left - margins.right,
+                h: rect.height - margins.top - margins.bottom
+            };
+
+            renderBackground();
+            draw();
+        }
+
+        // Draw "10^p" as 10 with a raised superscript exponent, centered on cx
+        function drawPowerOfTen(c, p, cx, topY) {
+            const baseFont = '16px Helvetica, Arial, sans-serif';
+            const supFont = '13px Helvetica, Arial, sans-serif';
+            c.font = baseFont;
+            const wBase = c.measureText('10').width;
+            c.font = supFont;
+            const wSup = c.measureText(String(p)).width;
+            const total = wBase + wSup + 1;
+            const startX = cx - total / 2;
+
+            c.textAlign = 'left';
+            c.textBaseline = 'top';
+            c.font = baseFont;
+            c.fillText('10', startX, topY + 4);
+            c.font = supFont;
+            c.fillText(String(p), startX + wBase + 1, topY);
+            c.textAlign = 'center';
+        }
+
+        function renderBackground() {
+            bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+
+            // Draw axes backgrounds
+            bgCtx.fillStyle = '#ffffff';
+            bgCtx.fillRect(chartRect.x, chartRect.y, chartRect.w, chartRect.h);
+
+            // Draw Grid (tick numbers: 11px -> 14px, +30%)
+            bgCtx.lineWidth = 1;
+            bgCtx.font = '16px Helvetica, Arial, sans-serif';
+            bgCtx.fillStyle = '#64748b';
+            bgCtx.textAlign = 'center';
+            bgCtx.textBaseline = 'top';
+
+            // X-axis (Reynolds)
+            for (let p = xMinLog; p <= xMaxLog; p++) {
+                for (let i = 1; i < 10; i++) {
+                    const Re = i * Math.pow(10, p);
+                    if (Re > Math.pow(10, xMaxLog)) break;
+
+                    const x = mapX(Re);
+
+                    bgCtx.beginPath();
+                    bgCtx.moveTo(x, chartRect.y);
+                    bgCtx.lineTo(x, chartRect.y + chartRect.h);
+
+                    if (i === 1) {
+                        bgCtx.strokeStyle = '#94a3b8'; // Major gridlines darker
+                        bgCtx.stroke();
+                        drawPowerOfTen(bgCtx, p, x, chartRect.y + chartRect.h + 8);
+                        bgCtx.font = '16px Helvetica, Arial, sans-serif';
+                        bgCtx.textBaseline = 'top';
+                    } else {
+                        bgCtx.strokeStyle = '#cbd5e1'; // Minor gridlines darker
+                        bgCtx.stroke();
+                    }
+                }
+            }
+            // X-axis label (lower-case "number")
+            bgCtx.font = '16px Helvetica, Arial, sans-serif';
+            bgCtx.fillStyle = '#1e293b';
+            bgCtx.textAlign = 'center';
+            bgCtx.textBaseline = 'top';
+            bgCtx.fillText("Reynolds number, Re", chartRect.x + chartRect.w / 2, chartRect.y + chartRect.h + 36);
+
+            // Y-axis (Fanning Friction Factor)
+            bgCtx.fillStyle = '#64748b';
+            bgCtx.textAlign = 'right';
+            bgCtx.textBaseline = 'middle';
+            bgCtx.font = '16px Helvetica, Arial, sans-serif';
+
+            // Y-axis ticks mapping manually for neatness
+            const yTicks = [0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009, 0.01, 0.015, 0.02, 0.025];
+            const yMajor = [0.002, 0.003, 0.004, 0.005, 0.01, 0.015, 0.02, 0.025];
+
+            for (let val of yTicks) {
+                if (val < Math.pow(10, yMinLog) || val > Math.pow(10, yMaxLog)) continue;
+                const y = mapY(val);
+
+                bgCtx.beginPath();
+                bgCtx.moveTo(chartRect.x, y);
+                bgCtx.lineTo(chartRect.x + chartRect.w, y);
+
+                if (yMajor.includes(val)) {
+                    bgCtx.strokeStyle = '#94a3b8'; // Major gridlines darker
+                    bgCtx.stroke();
+                    bgCtx.fillText(val.toFixed(3), chartRect.x - 8, y);
+                } else {
+                    bgCtx.strokeStyle = '#cbd5e1'; // Minor gridlines darker
+                    bgCtx.stroke();
+                }
+            }
+
+            // Y-axis label (12px bold -> 16px normal, +30%, not bold, lower-case)
+            bgCtx.save();
+            bgCtx.translate(chartRect.x - 62, chartRect.y + chartRect.h / 2);
+            bgCtx.rotate(-Math.PI / 2);
+            bgCtx.textAlign = 'center';
+            bgCtx.textBaseline = 'middle';
+            bgCtx.fillStyle = '#1e293b';
+            const yLabelFont = '16px Helvetica, Arial, sans-serif';
+            const yLabelItalic = 'italic 16px Helvetica, Arial, sans-serif';
+            const yLabelSub = 'italic 13px Helvetica, Arial, sans-serif';
+            bgCtx.font = yLabelFont;
+            const w1 = bgCtx.measureText('Fanning friction factor, ').width;
+            bgCtx.font = yLabelItalic;
+            const w2 = bgCtx.measureText('f').width;
+            bgCtx.font = yLabelSub;
+            const w3 = bgCtx.measureText('F').width;
+            const wTot = w1 + w2 + w3;
+            bgCtx.textAlign = 'left';
+            bgCtx.font = yLabelFont;
+            bgCtx.fillText('Fanning friction factor, ', -wTot / 2, 0);
+            bgCtx.font = yLabelItalic;
+            bgCtx.fillText('f', -wTot / 2 + w1, 0);
+            bgCtx.font = yLabelSub;
+            bgCtx.fillText('F', -wTot / 2 + w1 + w2, 4);
+            bgCtx.restore();
+
+            // Draw critical zone (Shaded)
+            const crX1 = mapX(2000);
+            const crX2 = mapX(4000);
+            bgCtx.fillStyle = 'rgba(254, 240, 138, 0.4)'; // Yellow highlight
+            bgCtx.fillRect(crX1, chartRect.y, crX2 - crX1, chartRect.h);
+
+            // Draw Laminar Line (f_F = 16 / Re)
+            bgCtx.beginPath();
+            bgCtx.strokeStyle = '#3b82f6'; // Blue
+            bgCtx.lineWidth = 2;
+            for (let logRe = xMinLog; logRe <= Math.log10(3000); logRe += 0.05) {
+                let Re = Math.pow(10, logRe);
+                let f_F = 16.0 / Re;
+                if (f_F > Math.pow(10, yMaxLog)) continue;
+                let x = mapX(Re);
+                let y = mapY(f_F);
+                if (logRe === xMinLog || f_F >= Math.pow(10, yMaxLog)*0.99) bgCtx.moveTo(x, y);
+                else bgCtx.lineTo(x, y);
+            }
+            bgCtx.stroke();
+
+            // Laminar label (11px -> 14px, +25%) with white background
+            bgCtx.font = '14px Helvetica, Arial, sans-serif';
+            bgCtx.textAlign = 'center';
+            bgCtx.textBaseline = 'middle';
+            const lamX = mapX(1500) + 14;
+            const lamY = mapY(16/1500) - 15;
+            const lamW = bgCtx.measureText('Laminar').width;
+            bgCtx.fillStyle = '#ffffff';
+            bgCtx.fillRect(lamX - lamW / 2 - 4, lamY - 10, lamW + 8, 20);
+            bgCtx.fillStyle = '#3b82f6';
+            bgCtx.fillText("Laminar", lamX, lamY);
+
+            // Draw Smooth Pipe Curve (e/D = 0); label +25% (14px), not capitalized
+            drawCurve(0, '#10b981', 2); // Green
+            bgCtx.fillStyle = '#10b981';
+            bgCtx.textAlign = 'left';
+            bgCtx.font = '15.4px Helvetica, Arial, sans-serif';
+            bgCtx.fillText("smooth pipe", chartRect.x + chartRect.w + 5, mapY(solveColebrookDarcy(Math.pow(10, xMaxLog), 0)/4));
+
+            // Draw e/D curves
+            bgCtx.textAlign = 'left';
+            bgCtx.font = '13.8px Helvetica, Arial, sans-serif';
+            for (let eD of eD_values) {
+                drawCurve(eD, '#64748b', 1.5);
+                let endF = solveColebrookDarcy(Math.pow(10, xMaxLog), eD) / 4.0;
+                bgCtx.fillStyle = '#475569';
+                bgCtx.fillText(eD.toString(), chartRect.x + chartRect.w + 5, mapY(endF));
+            }
+
+            // e/D Label Title (bold 11px -> bold 14px, +25%)
+            bgCtx.font = 'italic 16.1px Helvetica, Arial, sans-serif';
+            bgCtx.fillText("\u03B5/D", chartRect.x + chartRect.w + 5, chartRect.y - 10);
+
+            // Border
+            bgCtx.strokeStyle = '#334155';
+            bgCtx.lineWidth = 1.5;
+            bgCtx.strokeRect(chartRect.x, chartRect.y, chartRect.w, chartRect.h);
+        }
+
+        function drawCurve(eD, color, width) {
+            bgCtx.beginPath();
+            bgCtx.strokeStyle = color;
+            bgCtx.lineWidth = width;
+            let started = false;
+
+            for (let logRe = Math.log10(3000); logRe <= xMaxLog; logRe += 0.05) {
+                let Re = Math.pow(10, logRe);
+                let f_F = solveColebrookDarcy(Re, eD) / 4.0;
+
+                let x = mapX(Re);
+                let y = mapY(f_F);
+
+                if (!started) {
+                    bgCtx.moveTo(x, y);
+                    started = true;
+                } else {
+                    bgCtx.lineTo(x, y);
+                }
+            }
+            bgCtx.stroke();
+        }
+
+        function draw() {
+            // Guard against InvalidStateError if the canvases haven't been successfully initialized
+            if (!canvas.width || !canvas.height || !bgCanvas.width || !bgCanvas.height) return;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw cached background
+            ctx.drawImage(bgCanvas, 0, 0, canvas.width / (window.devicePixelRatio||1), canvas.height / (window.devicePixelRatio||1));
+
+            // Draw crosshairs for Hover
+            if (hoverPoint && isInsideChart(hoverPoint.px, hoverPoint.py)) {
+                ctx.beginPath();
+                ctx.setLineDash([4, 4]);
+                ctx.strokeStyle = 'rgba(15, 23, 42, 0.4)'; // slate-900 transparent
+                ctx.lineWidth = 1;
+
+                // Vertical
+                ctx.moveTo(hoverPoint.px, chartRect.y);
+                ctx.lineTo(hoverPoint.px, chartRect.y + chartRect.h);
+                // Horizontal
+                ctx.moveTo(chartRect.x, hoverPoint.py);
+                ctx.lineTo(chartRect.x + chartRect.w, hoverPoint.py);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // Point
+                ctx.beginPath();
+                ctx.fillStyle = '#0f172a';
+                ctx.arc(hoverPoint.px, hoverPoint.py, 4, 0, 2 * Math.PI);
+                ctx.fill();
+            }
+
+            // Draw Pinned Point
+            if (pinnedPoint) {
+                let px = mapX(pinnedPoint.Re);
+                let py = mapY(pinnedPoint.fF);
+
+                ctx.beginPath();
+                ctx.setLineDash([2, 2]);
+                ctx.strokeStyle = '#ef4444'; // red-500
+
+                ctx.moveTo(px, chartRect.y);
+                ctx.lineTo(px, chartRect.y + chartRect.h);
+                ctx.moveTo(chartRect.x, py);
+                ctx.lineTo(chartRect.x + chartRect.w, py);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // Target icon
+                ctx.beginPath();
+                ctx.strokeStyle = '#ef4444';
+                ctx.lineWidth = 2;
+                ctx.arc(px, py, 6, 0, 2 * Math.PI);
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.fillStyle = '#ef4444';
+                ctx.arc(px, py, 2, 0, 2 * Math.PI);
+                ctx.fill();
+            }
+        }
+
+        function isInsideChart(px, py) {
+            return px >= chartRect.x && px <= chartRect.x + chartRect.w &&
+                   py >= chartRect.y && py <= chartRect.y + chartRect.h;
+        }
+
+        // Interactions
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const px = e.clientX - rect.left;
+            const py = e.clientY - rect.top;
+
+            if (isInsideChart(px, py)) {
+                const Re = unmapX(px);
+                const fF = unmapY(py);
+                hoverPoint = { px, py, Re, fF };
+
+                tooltip.style.left = `${px}px`;
+                tooltip.style.top = `${py - 10}px`;
+                tooltip.classList.remove('hidden');
+
+                document.getElementById('ttRe').innerHTML = formatScientificHTML(Re);
+                document.getElementById('ttF').innerText = fF.toFixed(4);
+            } else {
+                hoverPoint = null;
+                tooltip.classList.add('hidden');
+            }
+            draw();
+        });
+
+        canvas.addEventListener('mouseleave', () => {
+            hoverPoint = null;
+            tooltip.classList.add('hidden');
+            draw();
+        });
+
+        canvas.addEventListener('click', (e) => {
+            if (!hoverPoint) return;
+
+            pinnedPoint = {
+                Re: hoverPoint.Re,
+                fF: hoverPoint.fF
+            };
+
+            updateInfoPanel();
+            draw();
+        });
+
+        function updateInfoPanel() {
+            document.getElementById('emptyState').classList.add('hidden');
+            document.getElementById('dataState').classList.remove('hidden');
+            document.getElementById('pinnedClose').classList.remove('hidden');
+
+            const Re = pinnedPoint.Re;
+            const fF = pinnedPoint.fF;
+            const fD = fF * 4;
+
+            document.getElementById('panelRe').innerHTML = formatScientificHTML(Re);
+
+            let flowType = "Turbulent";
+            if (Re < 2300) flowType = "Laminar";
+            else if (Re < 4000) flowType = "Transitional (Critical Zone)";
+            document.getElementById('panelFlowType').innerText = flowType;
+
+            document.getElementById('panelF').innerText = fF.toFixed(4);
+            document.getElementById('panelFDarcy').innerText = fD.toFixed(4);
+
+            const eD = calculateImpliedRoughness(Re, fF);
+
+            if (Re < 2300) {
+                document.getElementById('panelED').innerText = "N/A";
+                document.getElementById('panelEDMsg').innerText = "Relative roughness not applicable in laminar flow.";
+                document.getElementById('panelEDMsg').style.color = "#000000";
+            } else {
+                if (eD < 0) {
+                    document.getElementById('panelED').innerText = "Unphysical";
+                    document.getElementById('panelEDMsg').innerText = "Point is below the smooth pipe limit line.";
+                    document.getElementById('panelEDMsg').style.color = "#000000";
+                } else {
+                    document.getElementById('panelED').innerText = eD.toFixed(4);
+                    document.getElementById('panelEDMsg').innerText = "Calculated via inverted Colebrook-White.";
+                    document.getElementById('panelEDMsg').style.color = "#000000";
+                }
+            }
+        }
+
+        // Clear pinned point via x
+        document.getElementById('pinnedClose').addEventListener('click', () => {
+            pinnedPoint = null;
+            document.getElementById('dataState').classList.add('hidden');
+            document.getElementById('emptyState').classList.remove('hidden');
+            document.getElementById('pinnedClose').classList.add('hidden');
+            draw();
+        });
+
+        // Flyout panel logic: opening one closes the others; MathJax re-typesets on open
+        const flyoutIds = ['directionsPanel', 'detailsPanel', 'aboutPanel'];
+
+        document.querySelectorAll('.panelBtn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetId = btn.getAttribute('data-panel');
+                const target = document.getElementById(targetId);
+                const wasHidden = target.classList.contains('hidden');
+
+                flyoutIds.forEach(id => document.getElementById(id).classList.add('hidden'));
+
+                if (wasHidden) {
+                    target.classList.remove('hidden');
+                    if (window.MathJax && MathJax.typesetPromise) {
+                        MathJax.typesetPromise([target]).catch(() => {});
+                    }
+                }
+            });
+        });
+
+        document.querySelectorAll('.flyoutClose').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.getElementById(btn.getAttribute('data-close')).classList.add('hidden');
+            });
+        });
+
+        // Initialization
+        window.addEventListener('resize', resize);
+
+        // Use ResizeObserver for robust layout detection to prevent InvalidStateErrors
+        const resizeObserver = new ResizeObserver(() => {
+            resize();
+        });
+        resizeObserver.observe(container);
+
+    </script>
+</body>
+</html>
