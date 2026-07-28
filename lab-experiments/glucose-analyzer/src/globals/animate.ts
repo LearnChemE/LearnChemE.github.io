@@ -30,6 +30,7 @@ abstract class AnimatorBase {
     public reset() {
         this.playing = false;
         this.playTime = 0;
+        this.callbacks.forEach(callback => callback(0, 0));
     }
 }
 
