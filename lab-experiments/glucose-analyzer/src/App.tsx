@@ -27,9 +27,12 @@ function App() {
 
   const reset = () => {
     resetSignal.emit();
-    setShowInj(false);
+    setShowInj(true);
     setUseDropper(false);
+    setPlaying(false);
     setInjFinished(false);
+    aniTimer.reset();
+    injTimer.reset();
   }
 
   const inject = () => {

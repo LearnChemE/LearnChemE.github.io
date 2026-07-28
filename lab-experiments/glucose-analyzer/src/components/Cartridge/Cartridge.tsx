@@ -28,7 +28,7 @@ export const Cartridge: Component<CartridgeProps> = () => {
 
     onMount(() => {
         resetSignal.subscribe(() => {
-            
+            calc.resetAmts();
         });
 
         ctx.aniTimer.subscribe((_: number, t: number) => {
