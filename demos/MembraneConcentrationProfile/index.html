@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Membrane Concentration Profile</title>
+<style>
+  :root{ --darkred:#98000D; --panelborder:#b9b9b9; }
+  html,body{ margin:0; padding:0; }
+  body{
+    font-family:Helvetica, Arial, sans-serif;
+    color:#000; background:#fff;
+    -webkit-font-smoothing:antialiased;
+    padding:14px 16px 26px;
+  }
+  #wrap{ position:relative; width:920px; max-width:100%; margin:0 auto; }
+  .fig{ width:850px; max-width:100%; }
+  .title{ font-size:19px; font-weight:bold; margin:0 0 8px; }
+
+  .controls{
+    border:1px solid var(--panelborder);
+    border-radius:3px;
+    padding:12px 14px 14px;
+    background:#fbfbfb;
+    margin-bottom:10px;
+  }
+  .row{ display:flex; gap:34px; flex-wrap:wrap; }
+  .ctrl{ display:flex; align-items:center; gap:6px; margin:5px 0; }
+  .ctrl.full{ width:100%; }
+  .ctrl.half{ flex:0 1 auto; }
+  .ctrl label{ font-size:14px; white-space:nowrap; }
+  .ctrl .val{
+    font-size:14px; min-width:0; text-align:left;
+    font-variant-numeric:tabular-nums;
+  }
+  input[type=range]{
+    -webkit-appearance:none; appearance:none;
+    height:3px; background:#c8c8c8; border-radius:2px; outline:none;
+    flex:0 0 300px;
+  }
+  .ctrl.half input[type=range]{ flex:0 0 150px; }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none; appearance:none;
+    width:14px; height:14px; border-radius:50%;
+    background:#5a5a5a; cursor:pointer; border:none;
+  }
+  input[type=range]::-moz-range-thumb{
+    width:14px; height:14px; border-radius:50%;
+    background:#5a5a5a; cursor:pointer; border:none;
+  }
+
+  #canvasHolder{ text-align:center; }
+  canvas{ display:block; margin:0 auto; }
+
+  #actions{ margin:-124px 0 0 465px; }
+  .btnrow{ display:flex; gap:11px; }
+  .btn{
+    font-family:inherit; font-size:17px; color:#fff;
+    background:var(--darkred); border:none; border-radius:3px;
+    padding:7px 18px; cursor:pointer;
+  }
+  .btn:hover{ background:#7d000b; }
+  .btn.active{ background:#650009; }
+
+  .panel{
+    display:none; margin-top:6px; width:410px;
+    border:1px solid var(--panelborder); border-radius:3px;
+    padding:12px 16px; font-size:14px; line-height:1.5; background:#fff;
+  }
+  .panel.show{ display:block; }
+  .panel p{ margin:7px 0; }
+  .panel a{ color:var(--darkred); text-decoration:none; }
+  .panel a:hover{ text-decoration:underline; }
+  .eqline{ margin:6px 0 6px 14px; }
+  .lbl{ display:inline-block; width:80px; font-style:normal; }
+  i.v{ font-style:italic; }
+  .frac{ display:inline-block; vertical-align:middle; text-align:center; margin:0 2px; }
+  .frac .num{ display:block; padding:0 3px; }
+  .frac .den{ display:block; padding:0 3px; border-top:1px solid #000; }
+  .scriptP{ font-family:"Brush Script MT","Segoe Script",cursive; font-style:italic; }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div class="fig">
+  <!-- <div class="title">Membrane Concentration Profile</div> -->
+
+  <div class="controls">
+    <div class="ctrl full">
+      <label>diffusion constant (&mu;m<sup>2</sup>/s)</label>
+      <input type="range" id="DA" min="20" max="95" step="5" value="70">
+      <span class="val" id="DAval">70</span>
+    </div>
+    <div class="row">
+      <div class="ctrl half">
+        <label>membrane thickness (&mu;m)</label>
+        <input type="range" id="L" min="8" max="20" step="1" value="15">
+        <span class="val" id="Lval">15</span>
+      </div>
+      <div class="ctrl half">
+        <label>equilibrium constant</label>
+        <input type="range" id="k" min="0.5" max="2" step="0.1" value="1.5">
+        <span class="val" id="kval">1.5</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="canvasHolder">
+    <canvas id="cv" width="850" height="440"></canvas>
+  </div>
+  </div><!-- /.fig -->
+
+  <div id="actions">
+    <div class="btnrow">
+      <button class="btn" data-panel="dir">Directions</button>
+      <button class="btn" data-panel="det">Details</button>
+      <button class="btn" data-panel="abt">About</button>
+    </div>
+
+  <div class="panel" id="dir">
+    <p>This simulation shows the concentration profiles on the feed and permeate sides
+    of a membrane resulting from a diffusion boundary layer and the concentration profile
+    inside the membrane. It also calculates the molar flux through the membrane. Use the
+    sliders to change the membrane diffusion constant, the equilibrium constant, and the
+    membrane thickness. The feed concentration <i class="v">C</i><sub>1</sub> and the
+    desired permeate concentration <i class="v">C</i><sub>2</sub> are set. Place your
+    cursor over a black dot to see its concentration displayed on the right.</p>
+  </div>
+
+  <div class="panel" id="det">
+    <p>The molar flux at steady state is calculated using the analog of series
+    resistances. The flux through each layer is:</p>
+
+    <p class="eqline"><span class="lbl">feed:</span>
+      <i class="v">N</i><sub>A</sub> = <i class="v">k</i><sub>c,&#8202;1</sub>
+      (<i class="v">C</i><sub>1</sub> &minus; <i class="v">C</i><sub>1,&#8202;i</sub>)&thinsp;,</p>
+
+    <p class="eqline"><span class="lbl">membrane:</span>
+      <i class="v">N</i><sub>A</sub> =
+      <span class="frac"><span class="num"><i class="v">D</i><sub>A</sub></span><span class="den"><i class="v">L</i></span></span>
+      (<i class="v">C</i><sub>1,&#8202;i</sub><sup>&#9733;</sup> &minus;
+       <i class="v">C</i><sub>2,&#8202;i</sub><sup>&#9733;</sup>)&thinsp;,</p>
+    <p class="eqline" style="margin-left:94px">
+      <i class="v">C</i><sub>1,&#8202;i</sub><sup>&#9733;</sup> =
+      <i class="v">K</i> <i class="v">C</i><sub>1,&#8202;i</sub>&thinsp;,&emsp;
+      <i class="v">C</i><sub>2,&#8202;i</sub><sup>&#9733;</sup> =
+      <i class="v">K</i> <i class="v">C</i><sub>2,&#8202;i</sub>&thinsp;,</p>
+
+    <p class="eqline"><span class="lbl">permeate:</span>
+      <i class="v">N</i><sub>A</sub> = <i class="v">k</i><sub>c,&#8202;2</sub>
+      (<i class="v">C</i><sub>2,&#8202;i</sub> &minus; <i class="v">C</i><sub>2</sub>)&thinsp;,</p>
+
+    <p>where <i class="v">k</i><sub>c</sub> is the mass transfer coefficient,
+    <i class="v">C</i><sub>1</sub> and <i class="v">C</i><sub>2</sub> are the feed and
+    permeate concentrations, <i class="v">C</i><sub>1,&#8202;i</sub> and
+    <i class="v">C</i><sub>2,&#8202;i</sub> are the concentrations at the interface,
+    <i class="v">C</i><sub>1,&#8202;i</sub><sup>&#9733;</sup> and
+    <i class="v">C</i><sub>2,&#8202;i</sub><sup>&#9733;</sup> are the concentrations at
+    the surfaces, <i class="v">D</i><sub>A</sub> is diffusivity in the membrane,
+    <i class="v">L</i> is membrane thickness and <i class="v">K</i> is the equilibrium
+    constant.</p>
+
+    <p>The flux through the membrane can be written in terms of permeance
+    <i class="v">P</i>:</p>
+    <p class="eqline"><i class="v">P</i> =
+      <span class="frac"><span class="num"><i class="v">D</i><sub>A</sub>&#8202;<i class="v">K</i></span><span class="den"><i class="v">L</i></span></span>&thinsp;,&emsp;
+      <i class="v">N</i><sub>A</sub> = <i class="v">P</i>
+      (<i class="v">C</i><sub>1,&#8202;i</sub> &minus; <i class="v">C</i><sub>2,&#8202;i</sub>)&thinsp;.</p>
+
+    <p>Because the system is at steady state, <i class="v">N</i><sub>A</sub> is the same
+    through all three layers:</p>
+    <p class="eqline">
+      <i class="v">N</i><sub>A</sub> = <i class="v">k</i><sub>c,&#8202;1</sub>
+      (<i class="v">C</i><sub>1</sub> &minus; <i class="v">C</i><sub>1,&#8202;i</sub>) =
+      <i class="v">P</i>
+      (<i class="v">C</i><sub>1,&#8202;i</sub> &minus; <i class="v">C</i><sub>2,&#8202;i</sub>) =
+      <i class="v">k</i><sub>c,&#8202;2</sub>
+      (<i class="v">C</i><sub>2,&#8202;i</sub> &minus; <i class="v">C</i><sub>2</sub>)&thinsp;.</p>
+
+    <p>Solving each <i class="v">N</i><sub>A</sub> equation for the concentration
+    differences:</p>
+    <p class="eqline">
+      <i class="v">C</i><sub>1</sub> &minus; <i class="v">C</i><sub>1,&#8202;i</sub> =
+      <span class="frac"><span class="num"><i class="v">N</i><sub>A</sub></span><span class="den"><i class="v">k</i><sub>c,&#8202;1</sub></span></span>&thinsp;,&emsp;
+      <i class="v">C</i><sub>1,&#8202;i</sub> &minus; <i class="v">C</i><sub>2,&#8202;i</sub> =
+      <span class="frac"><span class="num"><i class="v">N</i><sub>A</sub></span><span class="den"><i class="v">P</i></span></span>&thinsp;,&emsp;
+      <i class="v">C</i><sub>2,&#8202;i</sub> &minus; <i class="v">C</i><sub>2</sub> =
+      <span class="frac"><span class="num"><i class="v">N</i><sub>A</sub></span><span class="den"><i class="v">k</i><sub>c,&#8202;2</sub></span></span>&thinsp;.</p>
+
+    <p>Adding these equations together and solving for <i class="v">N</i><sub>A</sub>
+    gives the flux in terms of series resistances:</p>
+    <p class="eqline">
+      <i class="v">N</i><sub>A</sub> =
+      (<i class="v">C</i><sub>1</sub> &minus; <i class="v">C</i><sub>2</sub>)
+      <span style="white-space:nowrap">(
+      <span class="frac"><span class="num">1</span><span class="den"><i class="v">k</i><sub>c,&#8202;1</sub></span></span> +
+      <span class="frac"><span class="num">1</span><span class="den"><i class="v">P</i></span></span> +
+      <span class="frac"><span class="num">1</span><span class="den"><i class="v">k</i><sub>c,&#8202;2</sub></span></span>
+      )<sup>&minus;1</sup></span>&thinsp;.</p>
+  </div>
+
+  <div class="panel" id="abt">
+    <p>This simulation was created in the
+    <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a>
+    at University of Colorado Boulder for
+    <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a>
+    by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a
+    <a href="https://demonstrations.wolfram.com/MembraneConcentrationProfile/" target="_blank">Mathematica simulation</a>
+    by Rachael L. Baumann. It was prepared with financial support from the National
+    Science Foundation (DUE 2336987 and 2336988) in collaboration with Washington State
+    University. Address any questions or comments to LearnChemE@gmail.com.</p>
+  </div>
+  </div><!-- /#actions -->
+</div>
+
+<script>
+(function(){
+  const cv = document.getElementById('cv');
+  const ctx = cv.getContext('2d');
+  const CSS_W = 850, CSS_H = 440;
+  const dpr = window.devicePixelRatio || 1;
+  cv.style.width = CSS_W + 'px';
+  cv.style.height = CSS_H + 'px';
+  cv.width  = Math.round(CSS_W * dpr);
+  cv.height = Math.round(CSS_H * dpr);
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+
+  // ---- plot mapping (data -> css px) ----
+  const Xmin=-0.050, Xmax=0.088, Ymin=-7, Ymax=64;
+  const ML=10, MT=10, PW=700, PH=CSS_H-20;
+  const mx = x => ML + (x - Xmin)/(Xmax - Xmin) * PW;
+  const my = y => MT + (Ymax - y)/(Ymax - Ymin) * PH;
+
+  const TEAL = 'rgb(166,242,217)';
+
+  // ---- physics ----
+  function compute(DA,L,k){
+    const C1=30, C2=5, kc1=1/25000, kc2=0.0000202;
+    const chi = DA/1e12;
+    const Pi  = chi*(k/(L*1e-6));               // permeance = DA*K/L
+    const nA  = (C1-C2)/(1/kc1 + 1/Pi + 1/kc2);
+    const C1i = C1 - nA/kc1;
+    const C2i = C2 + nA/kc2;
+    const C1is= k*C1i;
+    const C2is= k*C2i;
+    const d   = L/620.2;                          // drawn membrane half-thickness scale
+    const dx  = 0.015;                            // drawn boundary-layer width
+    return {C1,C2,C1i,C2i,C1is,C2is,nA,flux:nA*1e6,d,dx};
+  }
+
+  // format value to 2 significant figures (integers shown without decimal)
+  function sig2(v){
+    if(Math.abs(v-Math.round(v))<1e-9) return String(Math.round(v));
+    let r = Number(v.toPrecision(2));
+    return (Math.abs(r-Math.round(r))<1e-9) ? String(Math.round(r)) : String(r);
+  }
+
+  // draw a "C" glyph with subscript + optional star superscript, anchored left/right/center
+  function drawC(cx, cy, sub, star, anchor, size, color){
+    color = color||'#000';
+    ctx.fillStyle = color;
+    ctx.textBaseline='alphabetic';
+    ctx.font = 'italic '+size+'px Helvetica, Arial';
+    const cW = ctx.measureText('C').width;
+    const ssize = size*0.72;
+    ctx.font = ssize+'px Helvetica, Arial';
+    const subW = sub ? ctx.measureText(sub).width : 0;
+    const starW = star ? ctx.measureText('\u2605').width : 0;
+    const total = cW + Math.max(subW, starW);
+    let x0 = cx;
+    if(anchor==='right') x0 = cx - total;
+    else if(anchor==='center') x0 = cx - total/2;
+    ctx.textAlign='left';
+    ctx.font = 'italic '+size+'px Helvetica, Arial';
+    ctx.fillText('C', x0, cy);
+    ctx.font = ssize+'px Helvetica, Arial';
+    if(sub)  ctx.fillText(sub, x0+cW, cy + size*0.30);
+    if(star) ctx.fillText('\u2605', x0+cW, cy - size*0.44);
+    return {x0, total};
+  }
+
+  function arrowHead(x,y,ang,s){
+    ctx.beginPath();
+    ctx.moveTo(x,y);
+    ctx.lineTo(x - s*Math.cos(ang - 0.4), y - s*Math.sin(ang - 0.4));
+    ctx.lineTo(x - s*Math.cos(ang + 0.4), y - s*Math.sin(ang + 0.4));
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  // little process schematic in the upper-right
+  function drawSchematic(){
+    const sx0=465, sy0=120, sW=308, sH=138;
+    const ex = e => sx0 + (e+1)/4 * sW;     // internal x in [-1,3]
+    const ey = e => sy0 + (1.1-e)/1.6 * sH; // internal y in [-0.5,1.1]
+    ctx.save();
+    ctx.lineWidth=2.2;
+    // outer channel
+    ctx.strokeStyle='#000';
+    ctx.strokeRect(ex(0), ey(1.1), ex(2)-ex(0), ey(-0.1)-ey(1.1));
+    // membrane band
+    ctx.fillStyle=TEAL;
+    ctx.fillRect(ex(0), ey(0.7), ex(2)-ex(0), ey(0.3)-ey(0.7));
+    ctx.strokeRect(ex(0), ey(0.7), ex(2)-ex(0), ey(0.3)-ey(0.7));
+    // arrows
+    ctx.fillStyle='#000';
+    ctx.beginPath(); ctx.moveTo(ex(-1),ey(0.9)); ctx.lineTo(ex(0)-3,ey(0.9)); ctx.stroke();
+    arrowHead(ex(0),ey(0.9),0,10);
+    ctx.beginPath(); ctx.moveTo(ex(2)+3,ey(0.9)); ctx.lineTo(ex(3),ey(0.9)); ctx.stroke();
+    arrowHead(ex(3),ey(0.9),0,10);
+    ctx.beginPath(); ctx.moveTo(ex(1.65),ey(-0.1)); ctx.lineTo(ex(1.65),ey(-0.5)); ctx.lineTo(ex(2.5)-3,ey(-0.5)); ctx.stroke();
+    arrowHead(ex(2.5),ey(-0.5),0,10);
+    // labels
+    ctx.fillStyle='#000';
+    ctx.font='20px Helvetica, Arial';
+    ctx.textBaseline='middle'; ctx.textAlign='center';
+    ctx.fillText('membrane', ex(1), ey(0.5));
+    ctx.textBaseline='alphabetic';
+    ctx.fillText('feed', ex(-0.5), ey(1.1)-8);      // above box, clear of inlet line
+    ctx.fillText('retentate', ex(2.5), ey(1.1)-8);  // above box, clear of outlet line
+    ctx.textAlign='left';
+    ctx.fillText('permeate', ex(2.5)+6, ey(-0.5)+6);
+    ctx.restore();
+  }
+
+  let state=null, hover=-1;
+
+  function draw(){
+    const DA=+dEl.value, L=+lEl.value, k=+kEl.value;
+    const s = compute(DA,L,k);
+    state = s;
+    const xFo=-s.d/2 - s.dx, xL=-s.d/2, xR=s.d/2, xPo=s.d/2 + s.dx;
+
+    ctx.clearRect(0,0,CSS_W,CSS_H);
+
+    // membrane rectangle (teal, thick edge)
+    ctx.fillStyle=TEAL;
+    ctx.fillRect(mx(xL), my(62), mx(xR)-mx(xL), my(0)-my(62));
+    ctx.lineWidth=2.2; ctx.strokeStyle='#000';
+    ctx.strokeRect(mx(xL), my(62), mx(xR)-mx(xL), my(0)-my(62));
+
+    // concentration profile (black thick)
+    ctx.lineWidth=2.4; ctx.strokeStyle='#000'; ctx.lineJoin='round';
+    // feed boundary layer
+    ctx.beginPath();
+    ctx.moveTo(mx(xFo), my(s.C1));
+    ctx.quadraticCurveTo(mx(xL - 0.05*s.dx), my(s.C1), mx(xL), my(s.C1i));
+    ctx.stroke();
+    // permeate boundary layer
+    ctx.beginPath();
+    ctx.moveTo(mx(xR), my(s.C2i));
+    ctx.quadraticCurveTo(mx(xR + 0.05*s.dx), my(s.C2), mx(xPo), my(s.C2));
+    ctx.stroke();
+    // linear profile inside membrane
+    ctx.beginPath();
+    ctx.moveTo(mx(xL), my(s.C1is));
+    ctx.lineTo(mx(xR), my(s.C2is));
+    ctx.stroke();
+
+    // L dimension arrow at y=60
+    ctx.lineWidth=2.2; ctx.fillStyle='#000';
+    ctx.beginPath(); ctx.moveTo(mx(xL), my(60)); ctx.lineTo(mx(xR), my(60)); ctx.stroke();
+    arrowHead(mx(xL), my(60), Math.PI, 8);
+    arrowHead(mx(xR), my(60), 0, 8);
+    // L label with teal background
+    ctx.font='italic 20px Helvetica, Arial'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    const lw = ctx.measureText(' L ').width;
+    ctx.fillStyle=TEAL; ctx.fillRect(mx(0)-lw/2, my(60)-11, lw, 22);
+    ctx.fillStyle='#000'; ctx.fillText('L', mx(0), my(60));
+
+    // the six points
+    const pts = [
+      {x:xFo, y:s.C1 , sub:'1'   , star:false},
+      {x:xPo, y:s.C2 , sub:'2'   , star:false},
+      {x:xL , y:s.C1i, sub:'1, i', star:false},
+      {x:xR , y:s.C2i, sub:'2, i', star:false},
+      {x:xL , y:s.C1is,sub:'1, i', star:true },
+      {x:xR , y:s.C2is,sub:'2, i', star:true }
+    ];
+    ctx.fillStyle='#000';
+    pts.forEach(p=>{
+      ctx.beginPath(); ctx.arc(mx(p.x), my(p.y), 4.4, 0, 2*Math.PI); ctx.fill();
+    });
+
+    // point labels
+    drawC(mx(xFo)-7,  my(s.C1)+6 , '1'   , false, 'right' , 19); // C1  (left of feed pt)
+    drawC(mx(xPo)+7,  my(s.C2)+6 , '2'   , false, 'left'  , 19); // C2  (right of perm pt)
+    drawC(mx(xL)-6,   my(s.C1is)+6,'1, i', true , 'right' , 19); // C*1i (left, feed surface)
+    drawC(mx(xR)+6,   my(s.C2is)+6,'2, i', true , 'left'  , 19); // C*2i (right, perm surface)
+    drawC(mx(xL)+8,   my(s.C1i)+6 ,'1, i', false, 'left'  , 19); // C1i (into membrane)
+    drawC(mx(xR)-8,   my(s.C2i)+6 ,'2, i', false, 'right' , 19); // C2i (into membrane)
+
+    // feed / permeate / membrane text
+    ctx.fillStyle='#000'; ctx.font='19px Helvetica, Arial'; ctx.textBaseline='alphabetic';
+    ctx.textAlign='center'; ctx.fillText('feed', mx(xFo)+2, my(s.C1)+32);
+    ctx.textAlign='center'; ctx.fillText('permeate', mx(xPo)+4, my(s.C2)+32);
+    ctx.textAlign='center'; ctx.fillText('membrane', mx(0), my(0)+22);
+
+    // schematic + flux + hover text (right region)
+    drawSchematic();
+
+    // flux text
+    ctx.fillStyle='#000'; ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+    ctx.font='20px Helvetica, Arial';
+    let fx = mx(0.040), fy = 40;
+    let t1 = 'flux = '+s.flux.toFixed(1)+' \u00B5mol/m';
+    ctx.fillText(t1, fx, fy);
+    let w1 = ctx.measureText(t1).width;
+    ctx.font='14px Helvetica, Arial'; ctx.fillText('2', fx+w1, fy-9);
+    ctx.font='20px Helvetica, Arial';
+    ctx.fillText('s', fx+w1+ctx.measureText('2').width*0.62+2, fy);
+
+    state.pts = pts;
+  }
+
+  // add location strings to pts after draw (kept separate to reuse in hover)
+  const LOC=['feed','permeate','interface 1','interface 2','surface 1','surface 2'];
+
+  // redraw wrapper that also renders hover location text properly
+  function render(){
+    draw();
+    if(hover>=0 && state && state.pts){
+      const p=state.pts[hover];
+      const hx=mx(0.040), hy=72;
+      ctx.font='16px Helvetica, Arial';
+      const anchor = drawC(hx, hy, p.sub, p.star, 'left', 16);
+      let tx = hx + anchor.total + 3;
+      ctx.fillStyle='#000'; ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+      ctx.font='16px Helvetica, Arial';
+      let rest=' = '+sig2(p.y)+' mol/m';
+      ctx.fillText(rest, tx, hy);
+      let wr=ctx.measureText(rest).width;
+      ctx.font='11px Helvetica, Arial'; ctx.fillText('3', tx+wr, hy-7);
+      ctx.font='16px Helvetica, Arial';
+      const w3=ctx.measureText('3').width*0.62;
+      ctx.fillText(' '+LOC[hover], tx+wr+w3+3, hy);
+    }
+  }
+
+  // ---- controls ----
+  const dEl=document.getElementById('DA'), lEl=document.getElementById('L'), kEl=document.getElementById('k');
+  const dV=document.getElementById('DAval'), lV=document.getElementById('Lval'), kV=document.getElementById('kval');
+  function refresh(){
+    dV.textContent = dEl.value;
+    lV.textContent = lEl.value;
+    kV.textContent = (+kEl.value).toFixed(1);
+    render();
+  }
+  [dEl,lEl,kEl].forEach(el=>el.addEventListener('input', refresh));
+
+  // ---- hover detection ----
+  cv.addEventListener('mousemove', e=>{
+    const r=cv.getBoundingClientRect();
+    const px=e.clientX-r.left, py=e.clientY-r.top;
+    let found=-1;
+    if(state && state.pts){
+      for(let i=0;i<state.pts.length;i++){
+        const p=state.pts[i];
+        const dxp=px-mx(p.x), dyp=py-my(p.y);
+        if(dxp*dxp+dyp*dyp <= 100){ found=i; break; }
+      }
+    }
+    if(found!==hover){ hover=found; render(); cv.style.cursor = found>=0?'pointer':'default'; }
+  });
+  cv.addEventListener('mouseleave', ()=>{ if(hover!==-1){ hover=-1; render(); } });
+
+  // ---- panels (open just below the horizontal button row) ----
+  const btns=document.querySelectorAll('.btn');
+  btns.forEach(b=>b.addEventListener('click',()=>{
+    const id=b.getAttribute('data-panel');
+    const panel=document.getElementById(id);
+    const isOpen=panel.classList.contains('show');
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('show'));
+    btns.forEach(x=>x.classList.remove('active'));
+    if(!isOpen){ panel.classList.add('show'); b.classList.add('active'); }
+  }));
+
+  refresh();
+})();
+</script>
+</body>
+</html>
