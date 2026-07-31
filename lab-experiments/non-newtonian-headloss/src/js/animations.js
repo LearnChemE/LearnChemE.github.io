@@ -14,6 +14,10 @@ export function switchLogic(elts) {
       state.switchOn = true;
       let currentLength = 0;
       const interval = setInterval(() => {
+        if (state.switchTilt) {
+          clearInterval(interval);
+          return;
+        }
         if (
           currentLength < elts.intakeLiquidMaxLength &&
           Number(elts.sourceLiquid.getAttribute("height")) > 0
@@ -38,6 +42,10 @@ export function switchLogic(elts) {
       let currentLength = elts.intakeLiquidMaxLength;
       if (Number(elts.sourceLiquid.getAttribute("height")) > 0) {
         const interval = setInterval(() => {
+          if (state.switchTilt) {
+            clearInterval(interval);
+            return;
+          }
           if (currentLength > 0) {
             currentLength -= 2;
             elts.intakeLiquid.style.strokeDashoffset =
@@ -274,6 +282,10 @@ function flowThroughApparatus(elts) {
   let m4Height = 0;
 
   const interval = setInterval(() => {
+    if (state.switchTilt) {
+      clearInterval(interval);
+      return;
+    }
     let beakerFilling = false;
     if (state.valveOpen === false) {
       state.flowing = false;
@@ -290,6 +302,11 @@ function flowThroughApparatus(elts) {
     } else {
       clearInterval(interval);
       const beakerInterval = setInterval(() => {
+        if (state.switchTilt) {
+          clearInterval(interval);
+          clearInterval(beakerInterval);
+          return;
+        }
         if (
           sourceHeight > 0 &&
           state.switchOn === true &&
@@ -298,6 +315,12 @@ function flowThroughApparatus(elts) {
           if (!beakerFilling) {
             elts.wasteBeakerStream.style.strokeDashoffset = 26.25;
             const fillingInterval = setInterval(() => {
+              if (state.switchTilt) {
+                clearInterval(interval);
+                clearInterval(beakerInterval);
+                clearInterval(fillingInterval);
+                return;
+              }
               const streamOffset = Number(
                 elts.wasteBeakerStream.style.strokeDashoffset.replace(/px/, "")
               );
@@ -341,6 +364,10 @@ function emptyApparatus(elts) {
   elts.bubbleStream.style.opacity = "0";
 
   const interval = setInterval(() => {
+    if (state.switchTilt) {
+      clearInterval(interval);
+      return;
+    }
     const wasteCurrentHeight = Number(elts.wasteLiquid.getAttribute("height"));
     const wasteCurrentY = Number(elts.wasteLiquid.getAttribute("y"));
     elts.wasteLiquid.setAttribute("height", Math.min(26.25, wasteCurrentHeight + state.beakerPtsPerFrame));
@@ -379,6 +406,11 @@ function emptyApparatus(elts) {
         elts.bubbleCover.style.strokeDashoffset = 2 * bubbleCoverMaxLength;
 
         const clearWasteStreamInterval = setInterval(() => {
+          if (state.switchTilt) {
+            clearInterval(interval);
+            clearInterval(clearWasteStreamInterval);
+            return;
+          }
           if (currentWasteStreamLength > 0) {
             currentWasteStreamLength -= 2;
             elts.wasteBeakerStream.style.strokeDashoffset = Math.min(
