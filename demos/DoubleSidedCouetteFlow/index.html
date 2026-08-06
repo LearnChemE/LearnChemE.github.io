@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Double-Sided Couette Flow</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    font-family: Helvetica, Arial, sans-serif;
+    background: #ffffff;
+    color: #000000;
+  }
+  #sim-container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 14px 14px 10px 14px;
+    box-sizing: border-box;
+  }
+  h1.title {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 19px;
+    font-weight: bold;
+    text-align: center;
+    margin: 4px 0 10px 0;
+  }
+  .main-row {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .button-col {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 120px;
+    flex-shrink: 0;
+  }
+  .figure-col {
+    flex: 1;
+    min-width: 0;
+  }
+  #canvasWrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 4px;
+  }
+  canvas {
+    border: 1px solid #bbbbbb;
+    max-width: 100%;
+  }
+  .controls {
+    margin-top: 6px;
+  }
+  .slider-row {
+    display: flex;
+    align-items: center;
+    margin: 8px 0;
+    font-size: 16.8px;
+  }
+  .slider-label {
+    width: 190px;
+    flex-shrink: 0;
+    font-size: 16.8px;
+  }
+  .slider-label i {
+    font-style: italic;
+  }
+  .slider-label sub {
+    font-size: 13px;
+  }
+  input[type=range] {
+    flex: 1;
+    margin: 0 4px 0 8px;
+    accent-color: #3F6FCB;
+  }
+  .slider-value {
+    width: 55px;
+    text-align: right;
+    font-size: 16.8px;
+    font-variant-numeric: tabular-nums;
+  }
+  .toggle-btn {
+    background: #98000D;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    padding: 0 12px;
+    height: 40px;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 15.6px;
+    cursor: pointer;
+  }
+  .toggle-btn:hover {
+    background: #7A000A;
+  }
+  .panel {
+    display: none;
+    position: absolute;
+    left: 136px;
+    right: 0;
+    background: #FBF6F6;
+    border: 1px solid #E0C7C9;
+    border-radius: 4px;
+    padding: 12px 14px;
+    font-size: 16.8px;
+    line-height: 1.5;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    z-index: 10;
+    box-sizing: border-box;
+  }
+  .panel.open {
+    display: block;
+  }
+  #panelDirections { top: 6px; }
+  #panelDetails { top: 58px; }
+  #panelAbout { top: 110px; }
+  .panel h3 {
+    margin-top: 0;
+    font-size: 18px;
+    color: #98000D;
+  }
+  .panel a {
+    color: #3F6FCB;
+    text-decoration: none;
+  }
+  .panel a:hover {
+    text-decoration: underline;
+  }
+  .eq {
+    text-align: center;
+    margin: 10px 0;
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+<div id="sim-container">
+  <!-- <h1 class="title">Double-Sided Couette Flow</h1> -->
+
+  <div class="main-row">
+    <div class="button-col">
+      <button class="toggle-btn" id="btnDirections">Directions</button>
+      <button class="toggle-btn" id="btnDetails">Details</button>
+      <button class="toggle-btn" id="btnAbout">About</button>
+    </div>
+
+    <div class="figure-col">
+      <div id="canvasWrap">
+        <canvas id="plot" width="560" height="430"></canvas>
+      </div>
+
+      <div class="controls">
+        <div class="slider-row">
+          <div class="slider-label">upper plate velocity <i>u</i><sub>2</sub></div>
+          <input type="range" id="u2Slider" min="-1" max="1" step="0.1" value="1">
+          <div class="slider-value" id="u2Value">1.0</div>
+        </div>
+        <div class="slider-row">
+          <div class="slider-label">lower plate velocity <i>u</i><sub>1</sub></div>
+          <input type="range" id="u1Slider" min="-1" max="1" step="0.1" value="-1">
+          <div class="slider-value" id="u1Value">-1.0</div>
+        </div>
+        <div class="slider-row">
+          <div class="slider-label">pressure gradient <i>dp</i>/<i>dx</i></div>
+          <input type="range" id="cSlider" min="-0.3" max="0.3" step="0.01" value="0.05">
+          <div class="slider-value" id="cValue">0.05</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" id="panelDirections">
+      <h3>Directions</h3>
+      <p>A fluid is located between two plates that move independently. Their velocities to the left or the right are changed with the two sliders. A pressure gradient can also be imposed on the fluid with a slider.</p>
+    </div>
+
+    <div class="panel" id="panelDetails">
+      <h3>Details</h3>
+      <p>The permanent laminar flow of an incompressible viscous fluid in the space between two parallel plates can be described by a linear ODE for <i>u</i>(<i>y</i>):</p>
+      <div class="eq">d&sup2;<i>u</i> / d<i>y</i>&sup2; = (1/&mu;)(d<i>p</i>/d<i>x</i>)</div>
+      <p>where &mu; is the dynamic viscosity of the fluid and d<i>p</i>/d<i>x</i> is the pressure gradient.</p>
+      <p>The boundary conditions are:</p>
+      <div class="eq">
+        <i>u</i>(&minus;<i>h</i>) = <i>u</i><sub>1</sub> (lower plate velocity),<br>
+        <i>u</i>(<i>h</i>) = <i>u</i><sub>2</sub> (upper plate velocity).
+      </div>
+      <p>This problem has an analytic solution:</p>
+      <div class="eq">
+        <i>u<sub>x</sub></i>(<i>y</i>) = [(<i>y</i>&sup2; &minus; <i>h</i>&sup2;) / 2&mu;](d<i>p</i>/d<i>x</i>) + [(<i>u</i><sub>2</sub> &minus; <i>u</i><sub>1</sub>)/2](<i>y</i>/<i>h</i> + 1) + <i>u</i><sub>1</sub>
+      </div>
+      <p>that varies as a function of the pressure gradient and the upper and lower plate velocity.</p>
+    </div>
+
+    <div class="panel" id="panelAbout">
+      <h3>About</h3>
+      <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/DoubleSidedCouetteFlow/" target="_blank">Mathematica simulation</a> by David Gerhardinger. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988) in collaboration with Washington State University. Address any questions or comments to LearnChemE@gmail.com.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  // ---- Physics constants (from CDF) ----
+  var mu = 1e-3;
+  var h = 0.1;
+
+  function Ux(y, u1, u2, c) {
+    return ((y * y - h * h) / (2 * mu)) * c + ((u2 - u1) / 2) * (y / h + 1) + u1;
+  }
+
+  // ---- DOM references ----
+  var u1Slider = document.getElementById('u1Slider');
+  var u2Slider = document.getElementById('u2Slider');
+  var cSlider = document.getElementById('cSlider');
+  var u1Value = document.getElementById('u1Value');
+  var u2Value = document.getElementById('u2Value');
+  var cValue = document.getElementById('cValue');
+  var canvas = document.getElementById('plot');
+  var ctx = canvas.getContext('2d');
+
+  // ---- Hi-DPI setup ----
+  var cssWidth = 560, cssHeight = 430;
+  function setupHiDPI() {
+    var dpr = window.devicePixelRatio || 1;
+    canvas.width = cssWidth * dpr;
+    canvas.height = cssHeight * dpr;
+    canvas.style.width = cssWidth + 'px';
+    canvas.style.height = cssHeight + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  setupHiDPI();
+
+  // ---- Plot ranges (matching Mathematica PlotRange) ----
+  var xMin = -2.6, xMax = 2.6;
+  var yMin = -h - 0.02, yMax = h + 0.02;
+
+  // margins for axis labels
+  var marginL = 55, marginR = 20, marginT = 20, marginB = 45;
+  var plotW = cssWidth - marginL - marginR;
+  var plotH = cssHeight - marginT - marginB;
+
+  function dataToPxX(x) {
+    return marginL + (x - xMin) / (xMax - xMin) * plotW;
+  }
+  function dataToPxY(y) {
+    return marginT + (yMax - y) / (yMax - yMin) * plotH;
+  }
+
+  function drawArrow(fromX, fromY, toX, toY, color) {
+    var headLen = 10;
+    var dx = toX - fromX;
+    var dy = toY - fromY;
+    var angle = Math.atan2(dy, dx);
+    ctx.strokeStyle = color;
+    ctx.fillStyle = color;
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(fromX, fromY);
+    ctx.lineTo(toX, toY);
+    ctx.stroke();
+    // arrowhead
+    ctx.beginPath();
+    ctx.moveTo(toX, toY);
+    ctx.lineTo(toX - headLen * Math.cos(angle - Math.PI / 7), toY - headLen * Math.sin(angle - Math.PI / 7));
+    ctx.lineTo(toX - headLen * Math.cos(angle + Math.PI / 7), toY - headLen * Math.sin(angle + Math.PI / 7));
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  function render() {
+    var u1 = parseFloat(u1Slider.value);
+    var u2 = parseFloat(u2Slider.value);
+    var c = parseFloat(cSlider.value);
+
+    u1Value.textContent = u1.toFixed(1);
+    u2Value.textContent = u2.toFixed(1);
+    cValue.textContent = c.toFixed(2);
+
+    ctx.clearRect(0, 0, cssWidth, cssHeight);
+
+    // ---- plate lines (gray, thickness matched to 0.10 label text height) ----
+    var plateThickness = 16;
+    ctx.strokeStyle = '#808080';
+    ctx.lineWidth = plateThickness;
+    ctx.beginPath();
+    ctx.moveTo(dataToPxX(xMin), dataToPxY(h));
+    ctx.lineTo(dataToPxX(xMax), dataToPxY(h));
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(dataToPxX(xMin), dataToPxY(-h));
+    ctx.lineTo(dataToPxX(xMax), dataToPxY(-h));
+    ctx.stroke();
+
+    // ---- axes ----
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 1;
+    ctx.font = '15.6px Helvetica, Arial, sans-serif';
+    ctx.fillStyle = '#000000';
+
+    // x axis at y=0
+    var y0px = dataToPxY(0);
+    ctx.beginPath();
+    ctx.moveTo(dataToPxX(xMin), y0px);
+    ctx.lineTo(dataToPxX(xMax), y0px);
+    ctx.stroke();
+
+    // y axis at x=0
+    var x0px = dataToPxX(0);
+    ctx.beginPath();
+    ctx.moveTo(x0px, dataToPxY(yMin));
+    ctx.lineTo(x0px, dataToPxY(yMax));
+    ctx.stroke();
+
+    // x ticks
+    var xTicks = [-2, -1, 0, 1, 2];
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    for (var i = 0; i < xTicks.length; i++) {
+      var xt = xTicks[i];
+      var px = dataToPxX(xt);
+      ctx.beginPath();
+      ctx.moveTo(px, y0px - 4);
+      ctx.lineTo(px, y0px + 4);
+      ctx.stroke();
+      if (xt !== 0) {
+        ctx.fillText(xt.toString(), px, y0px + 7);
+      }
+    }
+
+    // y ticks
+    var yTicks = [-0.1, -0.05, 0, 0.05, 0.1];
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    for (var j = 0; j < yTicks.length; j++) {
+      var yt = yTicks[j];
+      var py = dataToPxY(yt);
+      ctx.strokeStyle = '#000000';
+      ctx.beginPath();
+      ctx.moveTo(x0px - 4, py);
+      ctx.lineTo(x0px + 4, py);
+      ctx.stroke();
+      if (yt !== 0) {
+        var label = (yt === 0.1 || yt === -0.1) ? yt.toFixed(2) : yt.toString();
+        ctx.fillStyle = (yt === 0.1 || yt === -0.1) ? '#ffffff' : '#000000';
+        ctx.fillText(label, x0px - 7, py);
+        ctx.fillStyle = '#000000';
+      }
+    }
+
+    // axis labels
+    ctx.font = 'italic 16.8px Helvetica, Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillText('x', dataToPxX(xMax) + 12, y0px - 7);
+    ctx.textAlign = 'left';
+    ctx.fillText('y', x0px + 6, dataToPxY(yMax) - 16);
+
+    // ---- velocity profile curve ----
+    var profileColor = 'rgb(64,110,209)';
+    ctx.strokeStyle = profileColor;
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    var nPts = 200;
+    for (var k = 0; k <= nPts; k++) {
+      var y = -h + (2 * h) * k / nPts;
+      var ux = Ux(y, u1, u2, c);
+      var px2 = dataToPxX(ux);
+      var py2 = dataToPxY(y);
+      if (k === 0) ctx.moveTo(px2, py2);
+      else ctx.lineTo(px2, py2);
+    }
+    ctx.stroke();
+
+    // ---- velocity arrows ----
+    for (var m = 0; m <= 12; m++) {
+      var yArrow = (2 * (h / 12)) * m - h;
+      var uxArrow = Ux(yArrow, u1, u2, c);
+      var fromPx = dataToPxX(0);
+      var fromPy = dataToPxY(yArrow);
+      var toPx = dataToPxX(uxArrow);
+      var toPy = dataToPxY(yArrow);
+      var onPlate = (m === 0 || m === 12);
+      var arrowColor = onPlate ? '#ffffff' : profileColor;
+      if (Math.abs(toPx - fromPx) > 1) {
+        drawArrow(fromPx, fromPy, toPx, toPy, arrowColor);
+      }
+    }
+
+    // ---- labels U = U2 / U = U1 ----
+    ctx.font = 'italic 18px Helvetica, Arial, sans-serif';
+    ctx.fillStyle = profileColor;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('U = U\u2082', dataToPxX(1.6), dataToPxY(h + 0.015));
+    ctx.fillText('U = U\u2081', dataToPxX(1.6), dataToPxY(-h + 0.015));
+  }
+
+  u1Slider.addEventListener('input', render);
+  u2Slider.addEventListener('input', render);
+  cSlider.addEventListener('input', render);
+
+  window.addEventListener('resize', function() {
+    setupHiDPI();
+    render();
+  });
+
+  render();
+
+  // ---- panel toggles ----
+  function setupToggle(btnId, panelId) {
+    var btn = document.getElementById(btnId);
+    var panel = document.getElementById(panelId);
+    btn.addEventListener('click', function() {
+      var isOpen = panel.classList.contains('open');
+      document.querySelectorAll('.panel').forEach(function(p) { p.classList.remove('open'); });
+      if (!isOpen) panel.classList.add('open');
+    });
+  }
+  setupToggle('btnDirections', 'panelDirections');
+  setupToggle('btnDetails', 'panelDetails');
+  setupToggle('btnAbout', 'panelAbout');
+})();
+</script>
+</body>
+</html>
