@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Autothermal Reactor</title>
+<style>
+  :root{
+    --darkred:#98000D;
+    --panelborder:#c0c0c0;
+    --bg:#ffffff;
+  }
+  html,body{margin:0;padding:0;background:var(--bg);}
+  #app{
+    font-family:Helvetica,Arial,sans-serif;
+    color:#000;
+    width:870px;
+    margin:14px auto;
+    -webkit-font-smoothing:antialiased;
+  }
+  #title{
+    font-size:19px;
+    font-weight:bold;
+    text-align:center;
+    margin:2px 0 10px 158px;
+    width:702px;
+  }
+  /* controls grid */
+  .controls{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:6px 18px;
+    margin:0 0 6px 158px;
+    width:702px;
+  }
+  .ctrl{display:flex;align-items:center;gap:8px;font-size:15.6px;}
+  .ctrl.span{grid-column:1 / span 2;}
+  .ctrl .lab{white-space:nowrap;}
+  .ctrl input[type=range]{
+    flex:1;
+    min-width:70px;
+    height:16px;
+    accent-color:#555;
+  }
+  .ctrl .val{
+    font-family:Helvetica,Arial,sans-serif;
+    font-size:15.6px;
+    min-width:40px;
+    text-align:right;
+    padding:1px 5px;
+    border:1px solid #bbb;
+    border-radius:2px;
+    background:#f7f7f7;
+  }
+  .note{
+    grid-column:1 / span 2;
+    font-size:15.6px;
+    font-weight:bold;
+    margin:2px 0 4px 0;
+  }
+  i{font-style:italic;}
+  canvas{display:block;margin:0;}
+  /* stage: vertical button column at left, graph at right, panels overlay the graph */
+  #stage{position:relative;display:flex;align-items:flex-start;gap:8px;}
+  #btncol{flex:0 0 150px;display:flex;flex-direction:column;gap:9px;}
+  .tbtn{
+    font-family:Helvetica,Arial,sans-serif;
+    font-size:18.7px;
+    color:#fff;
+    background:#6f000a;
+    border:none;
+    border-radius:3px;
+    padding:7px 12px;
+    width:100%;
+    box-sizing:border-box;
+    text-align:center;
+    cursor:pointer;
+  }
+  .tbtn.off{background:var(--darkred);color:#fff;}
+  .panel{
+    position:absolute;
+    z-index:30;
+    border:1px solid var(--panelborder);
+    border-radius:3px;
+    padding:12px 14px;
+    margin:0;
+    font-size:16.2px;
+    line-height:1.5;
+    background:#fff;
+    box-shadow:0 3px 12px rgba(0,0,0,0.28);
+    overflow-y:auto;
+    box-sizing:border-box;
+  }
+  .panel h4{margin:0 0 6px 0;font-size:16.8px;}
+  .panel p{margin:8px 0;}
+  .closex{
+    position:sticky;
+    top:0;
+    float:right;
+    margin-left:10px;
+    font-size:22px;
+    line-height:1;
+    font-weight:bold;
+    color:#6f000a;
+    cursor:pointer;
+    z-index:5;
+    -webkit-user-select:none;
+    user-select:none;
+  }
+  .closex:hover{color:var(--darkred);}
+  .eq{margin:6px 0 6px 10px;font-size:16.8px;}
+  #p_det mjx-container[display="true"]{text-align:left !important;margin:10px 0 10px 12px !important;}
+  .hidden{display:none;}
+  a{color:#0b5;color:#1a6ebd;text-decoration:none;}
+  a:hover{text-decoration:underline;}
+  sub{font-size:0.72em;}
+  sup{font-size:0.72em;}
+</style>
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['\\(', '\\)'], ['$', '$']] },
+      svg: { fontCache: 'global' },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
+</head>
+<body>
+<div id="app">
+  <!-- <div id="title">Autothermal Reactor</div> -->
+
+  <div class="controls">
+    <div class="ctrl">
+      <span class="lab">feed temperature <i>T</i><sub>f</sub> (K)</span>
+      <input type="range" id="Tf" min="300" max="400" step="1" value="335">
+      <span class="val" id="Tf_v">335</span>
+    </div>
+    <div class="ctrl">
+      <span class="lab">feed flow rate (mol/s)</span>
+      <input type="range" id="Fao" min="90" max="190" step="1" value="159">
+      <span class="val" id="Fao_v">159</span>
+    </div>
+    <div class="ctrl span">
+      <span class="lab">reactor length (m)</span>
+      <input type="range" id="L" min="5" max="13" step="0.5" value="9">
+      <span class="val" id="L_v">9.0</span>
+    </div>
+    <div class="note">change the temperature entering the reactor <i>T</i><sub>0</sub> to get the correct feed temperature <i>T</i><sub>f</sub></div>
+    <div class="ctrl span">
+      <span class="lab"><i>T</i><sub>0</sub> (K)</span>
+      <input type="range" id="To" min="265" max="600" step="1" value="595">
+      <span class="val" id="To_v">595</span>
+    </div>
+  </div>
+
+  <div id="stage">
+    <div id="btncol">
+      <button class="tbtn off" id="b_dir">Directions</button>
+      <button class="tbtn off" id="b_det">Details</button>
+      <button class="tbtn off" id="b_abt">About</button>
+    </div>
+    <canvas id="plot" width="702" height="449"></canvas>
+
+  <div class="panel hidden" id="p_dir">
+    <p>This autothermal reactor consists of two concentric tubes. The feed enters an annular region between the tubes at temperature \(T_f\) and flows from right to left. The reactants are at temperature \(T_0\) when they enter the inner tube, which is a packed catalyst bed, where they flow left to right. An exothermic reaction in the catalyst bed raises the gas temperature and heat transfers from the catalyst bed to preheat the gas in the annular region. To solve the ordinary differential equations (ODEs) that model this reactor, a shooting method is used; a value of \(T_0\) (the blue circle) is guessed and then changed until the correct value of \(T_f\) is obtained. This is done by moving the slider for \(T_0\) until the red circle is inside the green circle. Two reactor conditions are possible (two solutions to the mass and energy balances), one of which corresponds to essentially no reaction. Reactor startup determines which condition is obtained.</p>
+  </div>
+
+  <div class="panel hidden" id="p_det">
+    <p>Material balance on packed bed:</p>
+    \[ \frac{dF_A}{dz} = -\pi\, r^2\, k\, C_A, \]
+    \[ k = k_0\, e^{-E_a/(R\,T)}, \]
+    \[ C_A = \frac{F_A}{v}, \]
+    \[ v = \frac{F_{A,0}\,R_g\,T}{P}, \]
+    <p>where \(F_A\) and \(C_A\) are the molar flow rate (mol/s) and concentration (mol/m<sup>3</sup>) of A, \(z\) is distance down the reactor (m), \(r\) is the cross-sectional radius of the reactor (m), \(k\) is the rate constant (1/s), \(k_0\) is a pre-exponential factor (1/s), \(E_a\) is activation energy (J/mol), \(R\) is the ideal gas constant (J/[mol K]), \(T\) is temperature (K), \(v\) is volumetric flow rate (m<sup>3</sup>/s), \(F_{A,0}\) is the inlet molar flow rate of A (mol/s), \(R_g\) is the ideal gas constant ([m<sup>3</sup> bar]/[mol K]), and \(P\) is pressure (bar).</p>
+
+    <p>Energy balance on packed bed:</p>
+    \[ \frac{dT}{dz} = \frac{-\Delta H\, 2\pi\, r^2\, k\, C_A + Q}{F_{A,0}\, C_p}, \]
+    \[ Q = \frac{2\pi\, r^2\, U\, (T_a - T)}{r}, \]
+    <p>where \(\Delta H\) is heat of reaction (J/mol), \(Q\) is heat transfer rate (J/s), \(C_p\) is mass heat capacity (J/[g K]), \(U\) is the overall heat transfer coefficient (J/[m<sup>2</sup> K s]), \(T_a\) is the temperature of the annular region (K), \(T_f\) is the feed temperature to the reactor (K), and \(T_0\) is the feed temperature to the packed bed (K).</p>
+
+    <p>Energy balance on annular region:</p>
+    \[ \frac{dT_a}{dz} = \frac{Q}{F_{A,0}\, C_p}. \]
+    <p>The sign of the heat transfer term in the annular region is negative because integration is opposite to the direction of flow.</p>
+    <p>For the solution in which the reaction rate is nonzero, the feed temperature in the annular region increases as the feed flows to the left and is heated by the packed bed. The temperature increases in the packed bed due to the exothermic reaction and some of the energy transfers to the feed gas in the annular region. As the reactant is used up, the temperature in the packed bed reaches a maximum and decreases as heat is transferred to the feed gas.</p>
+  </div>
+
+  <div class="panel hidden" id="p_abt">
+    <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/AutothermalReactor/" target="_blank">Mathematica simulation</a> by Rachael L. Baumann and John L. Falconer. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988) in collaboration with Washington State University. Address any questions or comments to LearnChemE@gmail.com.</p>
+  </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---- physical constants ----
+  var r = 0.3, A = Math.PI*r*r;
+  var Cp = 80, P = 10, dH = -30000, Ea = 45000, ko = 2000;
+  var Rg = 8.314e-5, U = 900, R2 = 8.314;
+
+  function derivs(Fa, T, Ta, Fao){
+    var v  = Fao*Rg*T/P;
+    var Ca = Fa/v;
+    var k  = ko*Math.exp(-Ea/(R2*T));
+    var Q  = 2*U*A*(Ta - T)/r;
+    return [
+      -k*Ca*A,
+      (-dH*k*Ca*A + Q)/(Fao*Cp),
+      Q/(Fao*Cp)
+    ];
+  }
+
+  // RK4 integration; returns arrays of z, T, Ta
+  function solve(Tf, Fao, L, To){
+    var N = 2000, h = L/N;
+    var Fa = Fao, T = To, Ta = To;
+    var z = new Float64Array(N+1),
+        aT = new Float64Array(N+1),
+        aTa = new Float64Array(N+1);
+    z[0]=0; aT[0]=T; aTa[0]=Ta;
+    for(var i=0;i<N;i++){
+      var k1 = derivs(Fa,T,Ta,Fao);
+      var k2 = derivs(Fa+h/2*k1[0], T+h/2*k1[1], Ta+h/2*k1[2], Fao);
+      var k3 = derivs(Fa+h/2*k2[0], T+h/2*k2[1], Ta+h/2*k2[2], Fao);
+      var k4 = derivs(Fa+h*k3[0],   T+h*k3[1],   Ta+h*k3[2],   Fao);
+      Fa += h/6*(k1[0]+2*k2[0]+2*k3[0]+k4[0]);
+      T  += h/6*(k1[1]+2*k2[1]+2*k3[1]+k4[1]);
+      Ta += h/6*(k1[2]+2*k2[2]+2*k3[2]+k4[2]);
+      if(!isFinite(T)) T = 1e6;
+      z[i+1]=(i+1)*h; aT[i+1]=T; aTa[i+1]=Ta;
+    }
+    return {z:z, T:aT, Ta:aTa};
+  }
+
+  // ---- plot ----
+  var canvas = document.getElementById("plot");
+  var ctx = canvas.getContext("2d");
+  var CW = 702, CH = 449;
+  var dpr = window.devicePixelRatio || 1;
+  canvas.width = CW*dpr; canvas.height = CH*dpr;
+  canvas.style.width = CW+"px"; canvas.style.height = CH+"px";
+  ctx.scale(dpr,dpr);
+
+  // plot frame geometry
+  var mL=75, mR=16, mT=55, mB=55;
+  var pw = CW-mL-mR, ph = CH-mT-mB;
+  var yMin=260, yMax=840;
+
+  function draw(){
+    var Tf  = +document.getElementById("Tf").value;
+    var Fao = +document.getElementById("Fao").value;
+    var L   = +document.getElementById("L").value;
+    var To  = +document.getElementById("To").value;
+
+    var s = solve(Tf, Fao, L, To);
+    var TaL = s.Ta[s.Ta.length-1];
+
+    // extend x-range a bit past both ends so the circles at z=0 and z=L show fully
+    var xpad = 0.07*L;
+    var xMin=-xpad, xMax=L+xpad;
+    function X(x){ return mL + (x-xMin)/(xMax-xMin)*pw; }
+    function Y(y){ return mT + (yMax-y)/(yMax-yMin)*ph; }
+
+    var TICKFONT = "19.5px Helvetica,Arial,sans-serif";
+    var AXISFONT = "20.8px Helvetica,Arial,sans-serif";
+
+    ctx.clearRect(0,0,CW,CH);
+
+    // frame
+    ctx.strokeStyle="#000"; ctx.lineWidth=1;
+    ctx.strokeRect(mL, mT, pw, ph);
+
+    // ticks + labels
+    ctx.fillStyle="#000";
+    ctx.font=TICKFONT;
+
+    // y ticks every 100
+    ctx.textAlign="right"; ctx.textBaseline="middle";
+    for(var yv=300; yv<=800; yv+=100){
+      var yy=Y(yv);
+      ctx.beginPath(); ctx.moveTo(mL,yy); ctx.lineTo(mL+8,yy); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(mL+pw,yy); ctx.lineTo(mL+pw-8,yy); ctx.stroke();
+      ctx.fillText(yv, mL-10, yy);
+    }
+    // x ticks (only within the physical 0..L range)
+    ctx.font=TICKFONT;
+    ctx.textAlign="center"; ctx.textBaseline="top";
+    var xstep = (L<=6)?1:2;
+    for(var xv=0; xv<=L+1e-9; xv+=xstep){
+      var xx=X(xv);
+      ctx.beginPath(); ctx.moveTo(xx,mT+ph); ctx.lineTo(xx,mT+ph-8); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(xx,mT); ctx.lineTo(xx,mT+8); ctx.stroke();
+      ctx.fillText((Math.abs(xv-Math.round(xv))<1e-9)?xv:xv.toFixed(1), xx, mT+ph+8);
+    }
+
+    // axis labels (identical font for both axes)
+    ctx.font=AXISFONT;
+    ctx.textAlign="center"; ctx.textBaseline="alphabetic";
+    ctx.fillText("reactor length (m)", Math.round(mL+pw/2), CH-12);
+    ctx.save();
+    ctx.font=AXISFONT;
+    ctx.translate(20, Math.round(mT+ph/2));
+    ctx.rotate(-Math.PI/2);
+    ctx.textAlign="center"; ctx.textBaseline="alphabetic";
+    ctx.fillText("temperature (K)", 0, 0);
+    ctx.restore();
+
+    // clip to frame for curves
+    ctx.save();
+    ctx.beginPath(); ctx.rect(mL,mT,pw,ph); ctx.clip();
+
+    // draw curve helper
+    function curve(arr, color){
+      ctx.strokeStyle=color; ctx.lineWidth=3.25;
+      ctx.beginPath();
+      for(var i=0;i<arr.length;i++){
+        var xx=X(s.z[i]), yy=Y(arr[i]);
+        if(i===0) ctx.moveTo(xx,yy); else ctx.lineTo(xx,yy);
+      }
+      ctx.stroke();
+    }
+    // arrowheads along a curve; dir=+1 => point toward +z, -1 => -z
+    function arrows(arr, color, dir){
+      ctx.fillStyle=color;
+      var fracs=[0.13,0.34,0.55,0.74,0.90];
+      for(var a=0;a<fracs.length;a++){
+        var idx=Math.round(fracs[a]*(arr.length-1));
+        var i0=Math.max(1,idx), i1=Math.min(arr.length-1,idx+1);
+        var x0=X(s.z[i0-1]), y0=Y(arr[i0-1]);
+        var x1=X(s.z[i1]),   y1=Y(arr[i1]);
+        var dx=(x1-x0)*dir, dy=(y1-y0)*dir;
+        var len=Math.hypot(dx,dy)||1; dx/=len; dy/=len;
+        var px=X(s.z[idx]), py=Y(arr[idx]);
+        var sz=9.75;                // 25% larger arrowheads
+        var nx=-dy, ny=dx;
+        ctx.beginPath();
+        ctx.moveTo(px+dx*sz, py+dy*sz);
+        ctx.lineTo(px-dx*sz*0.4+nx*sz*0.55, py-dy*sz*0.4+ny*sz*0.55);
+        ctx.lineTo(px-dx*sz*0.4-nx*sz*0.55, py-dy*sz*0.4-ny*sz*0.55);
+        ctx.closePath(); ctx.fill();
+      }
+    }
+
+    // reactor T (blue), flow left->right (+z)
+    curve(s.T, "#0000ff");
+    arrows(s.T, "#0000ff", +1);
+    // annular Ta (red), flow right->left (-z)
+    curve(s.Ta, "#ff0000");
+    arrows(s.Ta, "#ff0000", -1);
+
+    // markers
+    function marker(x,y,color,rad){
+      ctx.strokeStyle=color; ctx.lineWidth=3.25;
+      ctx.beginPath(); ctx.arc(X(x),Y(y),rad,0,2*Math.PI); ctx.stroke();
+      ctx.fillStyle=color;
+      ctx.beginPath(); ctx.arc(X(x),Y(y),3.4,0,2*Math.PI); ctx.fill();
+    }
+    // green target (L, Tf)
+    marker(L, Tf, "#009900", 12);
+    // red result (L, Ta(L))
+    marker(L, TaL, "#ff0000", 9);
+    // blue guess (0, To)
+    marker(0, To, "#0000ff", 9);
+
+    // subscript labels near circles
+    // T0 to the lower-right of the blue guess point
+    tLabel(X(0)+11, Y(To)+21, "0", 20.8);
+    // Tf to the upper-left of the green target point (25% larger)
+    tLabel(X(L)-42, Y(Tf)-12, "f", 26);
+
+    ctx.restore();
+
+    // "system solved" text
+    if(Math.abs(TaL - Tf) <= 10){
+      var sx = mL + 0.25*pw;
+      var sy = (To<=400) ? (mT + 0.15*ph) : (mT + 0.85*ph);
+      ctx.fillStyle="#000";
+      ctx.textAlign="left"; ctx.textBaseline="middle";
+      ctx.font="22px Helvetica,Arial,sans-serif";
+      var cx = sx;
+      ctx.fillText("system solved", cx, sy);
+      cx += ctx.measureText("system solved").width + 18;
+      ctx.font="italic 22px Helvetica,Arial,sans-serif";
+      ctx.fillText("T", cx, sy);
+      cx += ctx.measureText("T").width;
+      ctx.font="15.5px Helvetica,Arial,sans-serif";
+      ctx.fillText("0", cx, sy+7);
+      cx += ctx.measureText("0").width;
+      ctx.font="22px Helvetica,Arial,sans-serif";
+      ctx.fillText(" = "+To+" K", cx, sy);
+    }
+
+    // legend across top (centered)
+    var ly=26, sw=31, gapTL=8, gapItem=34;
+    ctx.font="19.5px Helvetica,Arial,sans-serif";
+    ctx.textBaseline="middle"; ctx.textAlign="left";
+    var w1=ctx.measureText("reactor temperature").width;
+    var w2=ctx.measureText("annular temperature").width;
+    var total = sw+gapTL+w1 + gapItem + sw+gapTL+w2;
+    var lx = mL + (pw-total)/2;
+    ctx.lineWidth=3.25;
+    // blue
+    ctx.strokeStyle="#0000ff";
+    ctx.beginPath(); ctx.moveTo(lx,ly); ctx.lineTo(lx+sw,ly); ctx.stroke();
+    ctx.fillStyle="#000"; ctx.fillText("reactor temperature", lx+sw+gapTL, ly);
+    // red
+    var lx2 = lx+sw+gapTL+w1+gapItem;
+    ctx.strokeStyle="#ff0000";
+    ctx.beginPath(); ctx.moveTo(lx2,ly); ctx.lineTo(lx2+sw,ly); ctx.stroke();
+    ctx.fillStyle="#000"; ctx.fillText("annular temperature", lx2+sw+gapTL, ly);
+  }
+
+  // draw an italic "T" with a subscript at a given left/baseline anchor
+  function tLabel(x, y, sub, size){
+    var sz = size || 20.8;
+    var subSz = sz*0.68;
+    ctx.fillStyle="#000";
+    ctx.textAlign="left"; ctx.textBaseline="alphabetic";
+    ctx.font="italic "+sz+"px Helvetica,Arial,sans-serif";
+    ctx.fillText("T", x, y);
+    var w=ctx.measureText("T").width;
+    ctx.font=subSz+"px Helvetica,Arial,sans-serif";
+    ctx.fillText(sub, x+w, y+sz*0.28);
+  }
+
+  // ---- slider wiring ----
+  function fmt(id,val){
+    if(id==="L") return (+val).toFixed(1);
+    return String(Math.round(+val));
+  }
+  ["Tf","Fao","L","To"].forEach(function(id){
+    var el=document.getElementById(id);
+    var out=document.getElementById(id+"_v");
+    el.addEventListener("input",function(){
+      out.textContent=fmt(id, el.value);
+      draw();
+    });
+  });
+
+  // ---- toggle panels ----
+  var panels = {b_dir:"p_dir", b_det:"p_det", b_abt:"p_abt"};
+
+  function closeAllPanels(){
+    Object.keys(panels).forEach(function(b){
+      document.getElementById(panels[b]).classList.add("hidden");
+      document.getElementById(b).classList.add("off");
+    });
+  }
+
+  // add a close "x" in the upper-right corner of each panel
+  Object.keys(panels).forEach(function(bid){
+    var pnl=document.getElementById(panels[bid]);
+    var x=document.createElement("span");
+    x.className="closex";
+    x.setAttribute("role","button");
+    x.setAttribute("aria-label","Close");
+    x.textContent="\u00D7";
+    x.addEventListener("click",function(e){ e.stopPropagation(); closeAllPanels(); });
+    pnl.insertBefore(x, pnl.firstChild);
+  });
+
+  Object.keys(panels).forEach(function(bid){
+    var btn=document.getElementById(bid);
+    btn.addEventListener("click",function(){
+      var wasOn = !document.getElementById(panels[bid]).classList.contains("hidden");
+      closeAllPanels();
+      if(!wasOn){
+        var pnl=document.getElementById(panels[bid]);
+        // position the panel over the figure: left edge at the graph's left edge,
+        // spanning the graph width, top a few pixels below this button
+        var left = canvas.offsetLeft;
+        var wide = canvas.offsetWidth;
+        var top  = btn.offsetTop + 4;
+        pnl.style.left = left + "px";
+        pnl.style.width = wide + "px";
+        pnl.style.top = top + "px";
+        pnl.style.maxHeight = (canvas.offsetHeight - top - 6) + "px";
+        pnl.classList.remove("hidden");
+        btn.classList.remove("off");
+        if(window.MathJax && MathJax.typesetPromise){
+          MathJax.typesetPromise([pnl]);
+        }
+      }
+    });
+  });
+
+  draw();
+})();
+</script>
+</body>
+</html>
