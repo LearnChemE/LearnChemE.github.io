@@ -1,3 +1,5 @@
+import { calculateViscosity } from "./fluids";
+
 export function switchLogic(elts) {
   const switchX = elts.switchElt.getAttribute("x");
   const switchY = elts.switchElt.getAttribute("y");
@@ -14,7 +16,7 @@ export function switchLogic(elts) {
       state.switchOn = true;
       let currentLength = 0;
       const interval = setInterval(() => {
-        if (state.switchTilt) {
+        if (state.switchFluid) {
           clearInterval(interval);
           return;
         }
@@ -42,7 +44,7 @@ export function switchLogic(elts) {
       let currentLength = elts.intakeLiquidMaxLength;
       if (Number(elts.sourceLiquid.getAttribute("height")) > 0) {
         const interval = setInterval(() => {
-          if (state.switchTilt) {
+          if (state.switchFluid) {
             clearInterval(interval);
             return;
           }
@@ -137,33 +139,65 @@ export function valveLogic(elts) {
 
 function calculateState() {
   const V = state.pinching ? Math.min(state.flowRate / 2, 4) : state.flowRate; // flow rate (mL/s)
+  console.log(`Flow rate (V): ${V} mL/s`);
   const tubeArea = Math.PI * Math.pow(state.r, 2);
   state.v = V / tubeArea; // cm/s
-  const nu = 0.0089; // kinematic viscosity (cm^2/s)
-  state.Re = (state.r * 2 * state.v) / nu; // Reynolds number
-  state.laminar = state.Re < 2800;
+  const fl = state.selectedFluid;
+  const d = state.r * 2; // tube diameter (cm)
+
+  const n = fl.viscosity.flowBehaviorIndex || 1; // flow behavior index
+  const K = fl.viscosity.consistencyIndex || fl.viscosity.value; // Pa·s^n
+  const t0 = fl.viscosity.yieldStress || 0; // Pa
+
+  console.log(`Flow behavior index (n): ${n}`);
+  console.log(`Consistency index (K): ${K}`);
+
+  state.rho = fl.density;
+  state.Re = fl.density * state.v ** (2 - n) * d ** n / K / ((3 * n + 1) / 4 / n) ** n / 8 ** (n - 1); // Reynolds number
+  const Re_crit = 2200 * n ** -0.15 + 100 * n ** -2; // critical Reynolds number for transition to turbulence
+
+  state.laminar = state.Re < Re_crit;
+  console.log(`Reynolds number (Re): ${state.Re}\nCritical: ${Re_crit}\nLaminar: ${state.laminar}`);
+
+  let dPdL; // pressure drop per unit length (Pa/cm)
   if (state.laminar) {
-    state.f = 64 / state.Re; // Darcy friction factor
+    const shearRate = (3 * n + 1) / 4 / n * (8 * state.v) / d; // s^-1
+    const shearStress = t0 + K * Math.pow(shearRate, n); // Pa
+    dPdL = 4 * shearStress / d; // Pa/cm
   } else {
-    state.f = 0.25 / Math.log10(5.74 / Math.pow(state.Re, 0.9)) ** 2;
+    let num = 42 * n ** 1.4 * (n ** 1.4 + 2) + 0.33;
+    let den = n ** 1.4 + 0.211;
+    const a = num / den;
+    const b = (1 + 413.6 * n) ** -0.23;
+    const f = (a * state.Re) ** -b; // friction factor
+    const Pdyn = 0.5 * state.rho * state.v ** 2 / 10; // dynamic pressure (Pa)
+    dPdL = f * Pdyn / d; // Pa/cm
   }
+
+  console.log("dPdL: ", dPdL);
 
   const L4 = 10 / 3; // characteristic length (cm)
   const L3 = L4 + 7.62;
   const L2 = L3 + 7.62;
   const L1 = L2 + 7.62;
 
-  const P1 = (state.rho * state.v ** 2 * state.f * L1) / (4 * state.r) || 0; // pressure drop (dyne/cm^2)
-  const P2 = (state.rho * state.v ** 2 * state.f * L2) / (4 * state.r) || 0;
-  const P3 = (state.rho * state.v ** 2 * state.f * L3) / (4 * state.r) || 0;
-  const P4 = (state.rho * state.v ** 2 * state.f * L4) / (4 * state.r) || 0;
+  const P1 = dPdL * L1; // pressure drop (Pa)
+  const P2 = dPdL * L2;
+  const P3 = dPdL * L3;
+  const P4 = dPdL * L4;
 
-  const cmPerDyneCm2 = 0.00102; // conversion factor for dyne/cm^2 to cm of water
+  // Convert pressure drop from Pa to cm of head
+  const rho = state.rho * 1000; // convert g/cm^3 to kg/m^3
+  const g = 9.81; // m/s^2
+  state.P1 = P1 / (rho * g) * 100; // cm of head
+  state.P2 = P2 / (rho * g) * 100;
+  state.P3 = P3 / (rho * g) * 100;
+  state.P4 = P4 / (rho * g) * 100;
 
-  state.P1 = P1 * cmPerDyneCm2; // cm of head
-  state.P2 = P2 * cmPerDyneCm2;
-  state.P3 = P3 * cmPerDyneCm2;
-  state.P4 = P4 * cmPerDyneCm2;
+  console.log(`P1: ${state.P1} cm of head`);
+  console.log(`P2: ${state.P2} cm of head`);
+  console.log(`P3: ${state.P3} cm of head`);
+  console.log(`P4: ${state.P4} cm of head`);
 }
 
 function flowThroughApparatus(elts) {
@@ -282,7 +316,7 @@ function flowThroughApparatus(elts) {
   let m4Height = 0;
 
   const interval = setInterval(() => {
-    if (state.switchTilt) {
+    if (state.switchFluid) {
       clearInterval(interval);
       return;
     }
@@ -302,7 +336,7 @@ function flowThroughApparatus(elts) {
     } else {
       clearInterval(interval);
       const beakerInterval = setInterval(() => {
-        if (state.switchTilt) {
+        if (state.switchFluid) {
           clearInterval(interval);
           clearInterval(beakerInterval);
           return;
@@ -315,7 +349,7 @@ function flowThroughApparatus(elts) {
           if (!beakerFilling) {
             elts.wasteBeakerStream.style.strokeDashoffset = 26.25;
             const fillingInterval = setInterval(() => {
-              if (state.switchTilt) {
+              if (state.switchFluid) {
                 clearInterval(interval);
                 clearInterval(beakerInterval);
                 clearInterval(fillingInterval);
@@ -364,7 +398,7 @@ function emptyApparatus(elts) {
   elts.bubbleStream.style.opacity = "0";
 
   const interval = setInterval(() => {
-    if (state.switchTilt) {
+    if (state.switchFluid) {
       clearInterval(interval);
       return;
     }
@@ -406,7 +440,7 @@ function emptyApparatus(elts) {
         elts.bubbleCover.style.strokeDashoffset = 2 * bubbleCoverMaxLength;
 
         const clearWasteStreamInterval = setInterval(() => {
-          if (state.switchTilt) {
+          if (state.switchFluid) {
             clearInterval(interval);
             clearInterval(clearWasteStreamInterval);
             return;

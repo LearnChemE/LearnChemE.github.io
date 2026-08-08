@@ -1,6 +1,6 @@
 import "./animations.js";
 import { pinchLogic, switchLogic, valveLogic } from "./animations.js";
-import { tiltApparatus } from "./populate.js";
+import { changeFluid } from "./populate.js";
 
 function setDefaults(elts) {
   elts.intakeLiquid.style.strokeDasharray = elts.intakeLiquidMaxLength;
@@ -271,63 +271,27 @@ function handleReset(elts) {
   });
 }
 
-function handleTilt() {
+function handleFluid(elts) {
+  const fluidSelect = document.getElementById("fluid");
+  fluidSelect.addEventListener("change", (e) => {
+    changeFluid(e.target.value);
+    state.switchFluid = true;
+    setTimeout(() => { state.switchFluid = false }, 500);
+    setDefaults(elts);
+  });
+
   state.flowRate = 0;
   state.valveOpen = false;
-  let tiltElt = document.getElementById("tilt");
-  tiltElt.addEventListener("click", () => {
-    tiltElt.classList.add("clicked");
-    setTimeout(() => {
-      tiltElt.classList.remove("clicked");
-    }, 100);
-    state.tilted = !state.tilted;
-    state.switchTilt = true;
-    setTimeout(() => { state.switchTilt = false }, 100);
-    tiltApparatus();
-    tiltElt = document.getElementById("tilt");
-    if (state.tilted) {
-      tiltElt.innerHTML = "untilt";
-    } else {
-      tiltElt.innerHTML = "tilt";
-    }
-    const newElts = {
-      intakeLiquid: document.getElementById("intake-liquid"),
-      tubeLiquid: document.getElementById("tube-liquid"),
-      wasteBeakerStream: document.getElementById("waste-beaker-stream"),
-      manometerLiquids: [
-        document.getElementById("manometer-liquid-1"),
-        document.getElementById("manometer-liquid-2"),
-        document.getElementById("manometer-liquid-3"),
-        document.getElementById("manometer-liquid-4"),
-      ],
-      switchElt: document.getElementById("switch"),
-      switchG: document.getElementById("power-switch"),
-      valve: document.getElementById("valve"),
-      valveCircle: document.getElementById("valve-circle"),
-      valveRect: document.getElementById("valve-rect"),
-      sourceLiquid: document.getElementById("source-liquid"),
-      wasteLiquid: document.getElementById("waste-liquid"),
-      ruler: document.getElementById("ruler"),
-      outletHose: document.getElementById("pump-outlet-hose"),
-    };
-
-    newElts.intakeLiquidMaxLength = newElts.intakeLiquid.getTotalLength();
-    newElts.tubeLiquidMaxLength = newElts.tubeLiquid.getTotalLength();
-    newElts.wasteBeakerStreamMaxLength = newElts.wasteBeakerStream.getTotalLength();
-    newElts.pinchGroup = document.getElementById("pinch-group");
-    newElts.bubbleStream = document.getElementById("bubble-path");
-    newElts.bubbleCover = document.getElementById("bubble-cover-path");
-
-    setDefaults(newElts);
-    switchLogic(newElts);
-    valveLogic(newElts);
-    handleTilt();
-    handleReset(newElts);
-    handleHamburger();
-    enableSvgDrag(newElts);
-    enableSvgZoom();
-    handlePinch(newElts);
-  });
+  
+  //   switchLogic(newElts);
+  //   valveLogic(newElts);
+  //   handleTilt();
+  //   handleReset(newElts);
+  //   handleHamburger();
+  //   enableSvgDrag(newElts);
+  //   enableSvgZoom();
+  //   handlePinch(newElts);
+  // });
 }
 
 function handlePinch(elts) {
@@ -371,5 +335,5 @@ export default function addEvents() {
   handleHamburger();
   handleReset(elts);
   handlePinch(elts);
-  handleTilt();
+  handleFluid(elts);
 }
