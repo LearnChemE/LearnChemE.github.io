@@ -4,6 +4,7 @@ import "./assets/headloss_worksheet.pdf";
 import addEvents from "./js/events.js";
 import populate from "./js/populate.js";
 import "./style/style.scss";
+import { getFluidProperties } from "./js/fluids.js";
 
 window.state = {
   switchOn: false,
@@ -23,8 +24,8 @@ window.state = {
   viewBox: [0, 0, 0, 0],
   showButtons: false,
   initialized: false,
-  tilted: false,
-  switchTilt: false,
+  selectedFluid: getFluidProperties("water"),
+  switchFluid: false,
   pinching: false,
 };
 

@@ -56,7 +56,7 @@
        sodipodi:nodetypes="cccccc"
        id="tube-liquid"
        d="m 69.751781,119.07402 10.763826,-0.0461 119.415143,0.0155 c 0,0 1.93257,-0.074 5.77228,0.25144 5.4444,0.88192 7.95658,4.9168 9.6572,9.00239 0.86636,2.68283 1.05505,6.77228 1.05505,6.77228"
-       style="fill:none;fill-opacity:0.6;stroke:#ff5050;stroke-width:1.8;stroke-dasharray:none;stroke-opacity:0.6" />
+       style="fill:none;fill-opacity:0.6;stroke:#ff5050;stroke-width:1.8;stroke-dasharray:none;stroke-opacity:0.9" />
     <path
        sodipodi:nodetypes="cc"
        id="bubble-path"
@@ -70,27 +70,27 @@
     <path
        id="intake-liquid"
        d="m 56.440232,160.03424 v -33.9863"
-       style="fill:#cdcdcd;fill-opacity:0.6;stroke:#ff5050;stroke-width:2.65486;stroke-dasharray:none;stroke-opacity:0.6" />
+       style="fill:#cdcdcd;stroke:#ff5050;stroke-width:2.65486;stroke-dasharray:none;stroke-opacity:0." />
     <path
        id="waste-beaker-stream"
        d="M 216.39563,161.1833 V 134.97943"
-       style="fill:#c8c8c8;fill-opacity:1;stroke:#ff5050;stroke-width:1.8063;stroke-dasharray:none;stroke-opacity:0.6" />
+       style="fill:#c8c8c8;stroke:#ff5050;stroke-width:1.8063;stroke-dasharray:none;stroke-opacity:0.9" />
     <path
        id="manometer-liquid-1"
        d="M 121.42,118.15 V 88.095"
-       style="fill:#ff5050;fill-opacity:0.6;stroke:#ff5050;stroke-width:1.80194;stroke-dasharray:none;stroke-opacity:0.6" />
+       style="fill:#ff5050;stroke:#ff5050;stroke-width:1.80194;stroke-dasharray:none;stroke-opacity:0.9" />
     <path
        id="manometer-liquid-2"
        d="m 144.28,118.15 v -30"
-       style="fill:#ff5050;fill-opacity:0.6;stroke:#ff5050;stroke-width:1.80194;stroke-dasharray:none;stroke-opacity:0.6" />
+       style="fill:#ff5050;stroke:#ff5050;stroke-width:1.80194;stroke-dasharray:none;stroke-opacity:0.9" />
     <path
        id="manometer-liquid-3"
        d="m 167.14,118.15 v -30"
-       style="fill:#ff5050;fill-opacity:0.6;stroke:#ff5050;stroke-width:1.80194;stroke-dasharray:none;stroke-opacity:0.6" />
+       style="fill:#ff5050;stroke:#ff5050;stroke-width:1.80194;stroke-dasharray:none;stroke-opacity:0.9" />
     <path
        id="manometer-liquid-4"
        d="m 190,118.15 v -30"
-       style="fill:#ff5050;fill-opacity:0.6;stroke:#ff5050;stroke-width:1.80194;stroke-dasharray:none;stroke-opacity:0.6" />
+       style="fill:#ff5050;stroke:#ff5050;stroke-width:1.80194;stroke-dasharray:none;stroke-opacity:0.9" />
     <path
        id="manometer-wall-1"
        d="m 120.42,118.095 v -30"
@@ -422,7 +422,7 @@
        height="26.25"
        width="22.75"
        id="source-liquid"
-       style="fill:#ff5050;fill-opacity:0.6;stroke:#000000;stroke-width:0.0909606;stroke-opacity:0" />
+       style="fill:#ff5050;stroke:#000000;stroke-width:0.0909606;stroke-opacity:0" />
     <path
        id="source-beaker-path"
        d="m 81.786093,161.71502 h 5 v 30 l 3,3 h 19.999997 l 3,-3 v -30 h 5 v -2 h -7 v 31.5 l -1.75,1.75 H 90.286093 l -1.75,-1.75 v -31.5 h -6.75 z"
@@ -545,7 +545,7 @@
        height="26.25"
        width="22.75"
        id="waste-liquid"
-       style="fill:#ff9696;fill-opacity:1;stroke:#000000;stroke-width:0.0909606;stroke-opacity:0" />
+       style="fill:#ff9696;;stroke:#000000;stroke-width:0.0909606;stroke-opacity:0" />
     <path
        id="waste-beaker-path"
        d="m 242.16963,161.76861 h 5 v 30 l 3,3 h 20 l 3,-3 v -30 h 5 v -2 h -7 v 31.5 l -1.75,1.75 h -18.75 l -1.75,-1.75 v -31.5 h -6.75 z"
