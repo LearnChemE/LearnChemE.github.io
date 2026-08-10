@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Diffusion in Solids</title>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.js" id="MathJax-script" async></script>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: Helvetica, Arial, sans-serif;
+    background: #ffffff;
+    color: #000000;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+  }
+  #sim {
+    width: 784px;
+    position: relative;
+  }
+  h1.title {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 22px;
+    font-weight: bold;
+    text-align: left;
+    margin: 0 0 14px 0;
+    color: #000000;
+  }
+  .controls {
+    border: 1px solid #d9d9d9;
+    background: #fafafa;
+    padding: 14px 16px 8px 16px;
+    margin-bottom: 14px;
+  }
+  .row {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .slider-block {
+    display: flex;
+    align-items: center;
+    margin-right: 26px;
+    flex: 1 1 0;
+    min-width: 0;
+  }
+  .slider-block:last-child {
+    margin-right: 0;
+  }
+  .slider-block label {
+    font-size: 16.5px;
+    white-space: nowrap;
+    margin-right: 8px;
+    width: 200px;
+    flex: 0 0 auto;
+  }
+  .slider-block input[type=range] {
+    flex: 1 1 auto;
+    min-width: 0;
+    accent-color: #98000D;
+    margin-right: 8px;
+  }
+  .slider-block .val {
+    font-size: 16.5px;
+    min-width: 46px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .row.time .slider-block {
+    min-width: 100%;
+  }
+  .checkboxes {
+    display: flex;
+    align-items: center;
+    gap: 26px;
+    margin-top: 4px;
+    margin-bottom: 6px;
+    flex-wrap: nowrap;
+  }
+  .checkboxes label {
+    display: flex;
+    align-items: center;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .checkboxes input[type=checkbox] {
+    margin-right: 6px;
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+  }
+  .cb-Fe { color: #000000; }
+  .cb-Al { color: #0000FF; }
+  .cb-Ni { color: #009900; }
+
+  #plotWrap {
+    position: relative;
+    width: 100%;
+  }
+  canvas#plot {
+    width: 100%;
+    display: block;
+    border: 1px solid #333;
+  }
+
+  .btnRow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto;
+  }
+  .toggleBtn {
+    background: #98000D;
+    color: #ffffff;
+    border: none;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 15.6px;
+    font-weight: normal;
+    padding: 9.6px 21.6px;
+    cursor: pointer;
+    border-radius: 3px;
+  }
+  .toggleBtn:hover {
+    background: #7a000b;
+  }
+  .toggleBtn.active {
+    background: #5c0008;
+  }
+  .panel {
+    display: none;
+    position: absolute;
+    z-index: 10;
+    border: 1px solid #b9b9b9;
+    background: #fcfcfc;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.18);
+    padding: 16.8px 19.2px;
+    font-size: 16.2px;
+    line-height: 1.55;
+    box-sizing: border-box;
+  }
+  .panel.open { display: block; }
+  .panelClose {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    background: none;
+    border: none;
+    font-size: 22px;
+    line-height: 1;
+    color: #98000D;
+    cursor: pointer;
+    padding: 4px 6px;
+  }
+  .panelClose:hover {
+    color: #5c0008;
+  }
+  .panel h2 {
+    font-size: 15.6px;
+    letter-spacing: 0.5px;
+    color: #98000D;
+    margin: 0 0 10px 0;
+  }
+  .panel p { margin: 0 0 10px 0; }
+  .panel a { color: #98000D; }
+  .eq {
+    text-align: center;
+    margin: 14px 0;
+    font-size: 18px;
+  }
+  .paramTitle { font-weight: bold; margin-top: 10px; }
+  sub, sup { font-size: 72%; }
+</style>
+</head>
+<body>
+<div id="sim">
+  <!-- <h1 class="title">Diffusion in Solids</h1> -->
+
+  <div class="controls">
+    <div class="row">
+      <div class="slider-block">
+        <label for="csSlider">diffusing species mole %</label>
+        <input type="range" id="csSlider" min="0.5" max="2" step="0.1" value="1.5">
+        <span class="val" id="csVal">1.5</span>
+      </div>
+      <div class="slider-block">
+        <label for="tempSlider">temperature (K)</label>
+        <input type="range" id="tempSlider" min="800" max="2000" step="1" value="1850">
+        <span class="val" id="tempVal">1850</span>
+      </div>
+    </div>
+    <div class="row time">
+      <div class="slider-block">
+        <label for="tSlider">time (hr)</label>
+        <input type="range" id="tSlider" min="0.1" max="12" step="0.1" value="7.5">
+        <span class="val" id="tVal">7.5</span>
+      </div>
+    </div>
+    <div class="checkboxes">
+      <label class="cb-Fe"><input type="checkbox" id="cbFe" checked> C into Fe</label>
+      <label class="cb-Al"><input type="checkbox" id="cbAl" checked> Cu into Al</label>
+      <label class="cb-Ni"><input type="checkbox" id="cbNi" checked> Cu into Ni</label>
+      <div class="btnRow">
+        <button class="toggleBtn" id="btnDirections">Directions</button>
+        <button class="toggleBtn" id="btnDetails">Details</button>
+        <button class="toggleBtn" id="btnAbout">About</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="plotWrap">
+    <canvas id="plot"></canvas>
+  </div>
+
+  <div class="panel" id="panelDirections">
+    <button class="panelClose" type="button" aria-label="Close">&times;</button>
+    <h2>DIRECTIONS</h2>
+    <p>The mole percentage of a solute in a semi-infinite solid block is calculated as a function of distance from the surface. Carbon and copper are the diffusing species and their surface concentrations are fixed using a slider. Display the diffusing systems by checking the boxes for carbon into iron (C into Fe), copper into aluminum (Cu into Al) and copper into nickel (Cu into Ni). Use sliders to vary the temperature of the block and the diffusion time.</p>
+  </div>
+
+  <div class="panel" id="panelDetails">
+    <button class="panelClose" type="button" aria-label="Close">&times;</button>
+    <h2>DETAILS</h2>
+    <p>The concentration \(C_x\) is:</p>
+    <div class="eq">
+      \[ C_x = C_0 + (C_S - C_0)\left(1 - \operatorname{erf}\left(\frac{x}{2}\sqrt{D\,t\,e^{-E_a/RT}}\right)\right) \]
+    </div>
+    <p>where \(C_0\) is the initial concentration of the diffusing molecule in the bulk solid, \(C_S\) is the external surface concentration of the diffusing molecule, \(x\) is the distance into the bulk solid, \(D\) is the diffusion coefficient characteristic of the diffusing molecule and the solid, \(E_a\) is activation energy for diffusion in the specific system, \(R\) is the gas constant, \(T\) is temperature and \(t\) is time.</p>
+    <p>\(C_0 = 0\) for this Demonstration. That is, at time zero, the concentration of the diffusing species is zero everywhere except at the surface.</p>
+    <p>The following parameters are used:</p>
+    <p class="paramTitle">carbon diffusing into iron (C into Fe):</p>
+    <p>\(E_a = 80\) kJ/mol, \(D = 6.2\times10^{-7}\) mm\(^2\)/s</p>
+    <p class="paramTitle">copper diffusing into aluminum (Cu into Al):</p>
+    <p>\(E_a = 136\) kJ/mol, \(D = 6.5\times10^{-5}\) mm\(^2\)/s</p>
+    <p class="paramTitle">copper diffusing into nickel (Cu into Ni):</p>
+    <p>\(E_a = 256\) kJ/mol, \(D = 2.7\times10^{-5}\) mm\(^2\)/s.</p>
+  </div>
+
+  <div class="panel" id="panelAbout">
+    <button class="panelClose" type="button" aria-label="Close">&times;</button>
+    <h2>ABOUT</h2>
+    <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/DiffusionInSolids/" target="_blank">Mathematica simulation</a> by Nathan S. Nelson. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988) in collaboration with Washington State University. Address any questions or comments to LearnChemE@gmail.com.</p>
+  </div>
+</div>
+
+<script>
+(function() {
+  // ---------- physics ----------
+  const R = 0.008314; // kJ/(mol K)
+  const systems = {
+    Fe: { Ea: 80,  D: 6.2e-7,  color: '#000000', label: 'C into Fe'   },
+    Al: { Ea: 136, D: 0.000065, color: '#0000FF', label: 'Cu into Al' },
+    Ni: { Ea: 256, D: 0.000027, color: '#009900', label: 'Cu into Ni' }
+  };
+
+  function erf(x) {
+    // Abramowitz & Stegun 7.1.26, max error ~1.5e-7
+    const sign = x < 0 ? -1 : 1;
+    x = Math.abs(x);
+    const a1 =  0.254829592, a2 = -0.284496736, a3 = 1.421413741,
+          a4 = -1.453152027, a5 = 1.061405429, p = 0.3275911;
+    const t = 1 / (1 + p * x);
+    const y = 1 - (((((a5*t + a4)*t) + a3)*t + a2)*t + a1) * t * Math.exp(-x*x);
+    return sign * y;
+  }
+
+  function Cx(xmm, Cs, Ea, D, tempK, tHr) {
+    const tSec = tHr * 3600;
+    const denom = 2 * Math.sqrt(D * Math.exp(-Ea / (R * tempK)) * tSec);
+    return Cs * (1 - erf((xmm / 1000) / denom));
+  }
+
+  // ---------- controls ----------
+  const csSlider = document.getElementById('csSlider');
+  const tempSlider = document.getElementById('tempSlider');
+  const tSlider = document.getElementById('tSlider');
+  const csVal = document.getElementById('csVal');
+  const tempVal = document.getElementById('tempVal');
+  const tVal = document.getElementById('tVal');
+  const cbFe = document.getElementById('cbFe');
+  const cbAl = document.getElementById('cbAl');
+  const cbNi = document.getElementById('cbNi');
+
+  // ---------- plot ----------
+  const canvas = document.getElementById('plot');
+  const ctx = canvas.getContext('2d');
+  const CSS_W = 744, CSS_H = 474;
+
+  const X_MIN = 0, X_MAX = 30;
+  const Y_MIN = 0, Y_MAX = 2;
+  const MARGIN = { left: 82, right: 24, top: 22, bottom: 70 };
+
+  function resizeCanvas() {
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = CSS_W * dpr;
+    canvas.height = CSS_H * dpr;
+    canvas.style.width = CSS_W + 'px';
+    canvas.style.height = CSS_H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function plotX(xVal) {
+    const w = CSS_W - MARGIN.left - MARGIN.right;
+    return MARGIN.left + (xVal - X_MIN) / (X_MAX - X_MIN) * w;
+  }
+  function plotY(yVal) {
+    const h = CSS_H - MARGIN.top - MARGIN.bottom;
+    return MARGIN.top + h - (yVal - Y_MIN) / (Y_MAX - Y_MIN) * h;
+  }
+
+  function draw() {
+    const Cs = parseFloat(csSlider.value);
+    const tempK = parseFloat(tempSlider.value);
+    const tHr = parseFloat(tSlider.value);
+
+    csVal.textContent = Cs.toFixed(1);
+    tempVal.textContent = tempK.toFixed(0);
+    tVal.textContent = tHr.toFixed(1);
+
+    ctx.clearRect(0, 0, CSS_W, CSS_H);
+
+    const plotW = CSS_W - MARGIN.left - MARGIN.right;
+    const plotH = CSS_H - MARGIN.top - MARGIN.bottom;
+
+    // frame background
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(MARGIN.left, MARGIN.top, plotW, plotH);
+
+    // gridlines + ticks
+    ctx.strokeStyle = '#d8d8d8';
+    ctx.lineWidth = 1;
+    ctx.fillStyle = '#000000';
+    ctx.font = '17px Helvetica, Arial, sans-serif';
+
+    // x ticks: every 5 mm
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    for (let xv = X_MIN; xv <= X_MAX; xv += 5) {
+      const px = plotX(xv);
+      ctx.beginPath();
+      ctx.moveTo(px, MARGIN.top);
+      ctx.lineTo(px, MARGIN.top + plotH);
+      ctx.stroke();
+      ctx.fillText(xv.toString(), px, MARGIN.top + plotH + 6);
+    }
+    // y ticks: every 0.5
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    for (let yv = Y_MIN; yv <= Y_MAX + 1e-9; yv += 0.5) {
+      const py = plotY(yv);
+      ctx.beginPath();
+      ctx.moveTo(MARGIN.left, py);
+      ctx.lineTo(MARGIN.left + plotW, py);
+      ctx.stroke();
+      ctx.fillText(yv.toFixed(1), MARGIN.left - 8, py);
+    }
+
+    // frame border
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 1.3;
+    ctx.strokeRect(MARGIN.left, MARGIN.top, plotW, plotH);
+
+    // axis labels
+    ctx.fillStyle = '#000000';
+    ctx.font = '20px Helvetica, Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText('distance (mm)', MARGIN.left + plotW / 2, MARGIN.top + plotH + 40);
+
+    ctx.save();
+    ctx.translate(30, MARGIN.top + plotH / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText('mole %', 0, 0);
+    ctx.restore();
+
+    // clip to plot area for curves
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(MARGIN.left, MARGIN.top, plotW, plotH);
+    ctx.clip();
+
+    const active = [];
+    if (cbFe.checked) active.push(systems.Fe);
+    if (cbAl.checked) active.push(systems.Al);
+    if (cbNi.checked) active.push(systems.Ni);
+
+    const N = 300;
+    const labelAnchors = [];
+
+    // target fraction of Cs (remaining concentration) at which each curve's
+    // label is anchored; chosen to be distinct per system so labels spread
+    // out along x instead of overlapping, regardless of how steep the
+    // curves are for the current temperature/time.
+    const targetFraction = { Fe: 0.42, Al: 0.68, Ni: 0.16 };
+
+    active.forEach(sys => {
+      ctx.beginPath();
+      ctx.strokeStyle = sys.color;
+      ctx.lineWidth = 2.6;
+      const samples = [];
+      for (let i = 0; i <= N; i++) {
+        const xmm = X_MIN + (X_MAX - X_MIN) * i / N;
+        const y = Cx(xmm, Cs, sys.Ea, sys.D, tempK, tHr);
+        const px = plotX(xmm);
+        const py = plotY(Math.max(Y_MIN, Math.min(Y_MAX, y)));
+        if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+        samples.push({ x: xmm, y: y });
+      }
+      ctx.stroke();
+
+      // find where this curve crosses its target fraction of Cs
+      const target = targetFraction[
+        sys === systems.Fe ? 'Fe' : (sys === systems.Al ? 'Al' : 'Ni')
+      ] * Cs;
+      let anchor = null;
+      for (let i = 1; i < samples.length; i++) {
+        const a = samples[i - 1], b = samples[i];
+        if (a.y >= target && b.y <= target) {
+          const frac = (a.y - target) / (a.y - b.y || 1e-12);
+          anchor = { x: a.x + (b.x - a.x) * frac, y: target };
+          break;
+        }
+      }
+      if (!anchor) {
+        // curve never decays to the target within the domain: label near
+        // the right edge at its actual value there
+        const last = samples[samples.length - 1];
+        anchor = { x: Math.max(X_MIN, last.x - 1), y: last.y };
+      }
+      anchor.y = Math.max(Y_MIN, Math.min(Y_MAX, anchor.y));
+      labelAnchors.push({ sys: sys, anchor: anchor });
+    });
+
+    ctx.restore();
+
+    // labels directly on the curves
+    ctx.font = '20px Helvetica, Arial, sans-serif';
+    ctx.textBaseline = 'bottom';
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+    labelAnchors.forEach(item => {
+      const px = plotX(item.anchor.x);
+      const py = plotY(item.anchor.y);
+      const label = item.sys.label;
+      ctx.textAlign = px > MARGIN.left + plotW - 90 ? 'right' : 'left';
+      const tx = ctx.textAlign === 'right' ? px - 6 : px + 6;
+      const ty = py - 6;
+      ctx.strokeText(label, tx, ty);
+      ctx.fillStyle = item.sys.color;
+      ctx.fillText(label, tx, ty);
+    });
+  }
+
+  [csSlider, tempSlider, tSlider, cbFe, cbAl, cbNi].forEach(el => {
+    el.addEventListener('input', draw);
+  });
+
+  window.addEventListener('resize', () => { resizeCanvas(); draw(); });
+
+  resizeCanvas();
+  draw();
+
+  // ---------- toggle panels ----------
+  const sim = document.getElementById('sim');
+  let currentOpen = null; // { btn, panel }
+
+  function positionPanel(btn, panel) {
+    const simRect = sim.getBoundingClientRect();
+    const btnRect = btn.getBoundingClientRect();
+    const controlsRect = document.querySelector('.controls').getBoundingClientRect();
+    const minWidth = 560;
+    const rightPad = 6;
+
+    let left = btnRect.left - simRect.left + 4;
+    let width = simRect.width - left - rightPad;
+
+    if (width < minWidth) {
+      width = Math.min(minWidth, simRect.width - 8);
+      left = Math.max(4, simRect.width - width - rightPad);
+    }
+
+    const bottomEdge = Math.max(btnRect.bottom, controlsRect.bottom);
+    const top = bottomEdge - simRect.top + 8;
+
+    panel.style.left = left + 'px';
+    panel.style.top = top + 'px';
+    panel.style.width = width + 'px';
+  }
+
+  function setupToggle(btnId, panelId) {
+    const btn = document.getElementById(btnId);
+    const panel = document.getElementById(panelId);
+    btn.addEventListener('click', () => {
+      const isOpen = panel.classList.contains('open');
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('open'));
+      document.querySelectorAll('.toggleBtn').forEach(b => b.classList.remove('active'));
+      if (!isOpen) {
+        positionPanel(btn, panel);
+        panel.classList.add('open');
+        btn.classList.add('active');
+        currentOpen = { btn: btn, panel: panel };
+      } else {
+        currentOpen = null;
+      }
+    });
+    const closeBtn = panel.querySelector('.panelClose');
+    closeBtn.addEventListener('click', () => {
+      panel.classList.remove('open');
+      btn.classList.remove('active');
+      currentOpen = null;
+    });
+  }
+  setupToggle('btnDirections', 'panelDirections');
+  setupToggle('btnDetails', 'panelDetails');
+  setupToggle('btnAbout', 'panelAbout');
+
+  window.addEventListener('resize', () => {
+    if (currentOpen) positionPanel(currentOpen.btn, currentOpen.panel);
+  });
+})();
+</script>
+</body>
+</html>
