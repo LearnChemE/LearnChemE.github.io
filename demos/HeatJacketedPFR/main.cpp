@@ -1,3 +1,4 @@
+#include "rk45.h"
 #include <iostream>
 
 // 1. Define your class
@@ -11,6 +12,7 @@ public:
     
 private:
     int base;
+    RK45Solver* solver_;
 };
 
 // 2. WebAssembly Bindings (Only compiles when using emcc)

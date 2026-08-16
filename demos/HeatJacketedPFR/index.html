@@ -631,22 +631,26 @@
   // ---------- Initial render ----------
   render();
 })();
-</script>
-<script src="main.js"></script>
-<script>
-  Module.onRuntimeInitialized = () => {
-    // Instantiate the C++ class
-    // Equivalent to: Calculator calc(10);
-    const calc = new Module.Calculator(10);
 
-    // Call the class method
-    const result = calc.add(32);
-    console.log("[JS] Result from C++ Class:", result);
+// 1. Spawn the Web Worker
+const worker = new Worker('worker.js');
 
-    // IMPORTANT: C++ classes instantiated in JS must be manually deleted 
-    // to free the memory in the WebAssembly heap.
-    calc.delete();
-  };
+// 2. Listen for messages from the Worker
+worker.onmessage = (event) => {
+  const { type, payload } = event.data;
+
+  if (type === 'READY') {
+    // 3. Send a task to the Wasm module running in the background
+    worker.postMessage({
+      command: 'CALCULATE',
+      data: { baseValue: 10, addValue: 32 }
+    });
+  } 
+  else if (type === 'RESULT') {
+    console.log("[Main Thread] Received Wasm result:", payload);
+  }
+};
+
 </script>
 </body>
 </html>
