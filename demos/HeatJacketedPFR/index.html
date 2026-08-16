@@ -279,7 +279,6 @@ function makeRequest(state) {
     payload: state
   };
   pendingRequest = request; // Store the request for later
-  console.log("[MAIN] Current request with state:", state);
   attemptPostingRequest(); // Try to post the request immediately. This will only succeed if the worker is ready.
 }
 
@@ -300,29 +299,13 @@ worker.onmessage = (event) => {
   if (type === 'READY') {
     ready = true;
     attemptPostingRequest(); // If there is a pending request, send it now
-    console.log("[MAIN] Received worker ready message.")
   } 
   else if (type === 'RESULT') {
     ready = true;
     attemptPostingRequest(); // If there is a pending request, send it now
-    console.log("[MAIN] Received Wasm result:", payload);
     render(payload); // Call the render function with the payload from the worker
   }
 };
-
-// ---------- Physical constants (fixed) ----------
-const Cpc = 4.185;      // kJ/(kg K), coolant heat capacity
-const U = 300.0;        // kJ/(m^2 hr K)
-const Cao = 15.0;       // kmol/m^3
-const Cpo = 159.0;      // kJ/(kmol K)
-const rhoC = 1000.0;    // kg/m^3
-const Vc = 800.0;       // m/hr
-const Vr = 3.4;         // m/s (reactant velocity)
-const rhoA = 600.0;     // kg/m^3
-const MWa = 58.12;      // kg/kmol
-const Ef = 40000.0;     // J/mol
-const Rgas = 8.314;     // J/(mol K)
-const A1 = 1.0e6;       // 1/hr
 
 const Vmax = 5.0;       // m^3, reactor volume span
 
@@ -332,34 +315,6 @@ let TTA = 290;
 let rRad = 0.6;
 let deltaH = -10;
 let counterFlow = false;
-
-// // Adaptive fixed-step RK4: doubles step count until stable across [0, Vmax]
-// function solve(r, dH, TTAin, counter) {
-//   let n = 4000;
-//   const maxN = 320000;
-//   while (n <= maxN) {
-//     const h = Vmax / n;
-//     let y = [TTAin, 0.0, 305.0];
-//     const Vs = new Float64Array(n + 1);
-//     const Tas = new Float64Array(n + 1);
-//     const Xs = new Float64Array(n + 1);
-//     const Ts = new Float64Array(n + 1);
-//     Vs[0] = 0; Tas[0] = y[0]; Xs[0] = y[1]; Ts[0] = y[2];
-//     let ok = true;
-//     for (let i = 0; i < n; i++) {
-//       y = rk4Step(y, r, dH, h);
-//       if (!isFinite3(y)) { ok = false; break; }
-//       Vs[i + 1] = (i + 1) * h;
-//       Tas[i + 1] = y[0];
-//       Xs[i + 1] = y[1];
-//       Ts[i + 1] = y[2];
-//     }
-//     if (ok) return { Vs, Tas, Xs, Ts };
-//     n *= 2;
-//   }
-//   // fallback: return whatever last attempt (may contain NaNs, clipped by caller)
-//   return null;
-// }
 
 // ---------- Sampling for plotting (subsample solved arrays to ~400 pts) ----------
 function subsample(arr, n, targetPts) {
@@ -539,15 +494,6 @@ function interpAt(Vs, Ys, vTarget) {
 
 let cachedSolution = null;
 let cachedKey = null;
-
-// function ensureSolution() {
-//   const key = rRad.toFixed(2) + '_' + deltaH.toFixed(1) + '_' + TTA.toFixed(1);
-//   if (cachedKey === key && cachedSolution) return cachedSolution;
-//   const sol = solve(rRad, deltaH, TTA);
-//   cachedSolution = sol;
-//   cachedKey = key;
-//   return sol;
-// }
 
 function render(sol) {
   if (!sol) {

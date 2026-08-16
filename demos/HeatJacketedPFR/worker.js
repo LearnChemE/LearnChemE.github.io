@@ -27,19 +27,23 @@ const A1 = 1.0e6;       // 1/hr
 const Vmax = 5.0;       // m^3, reactor volume span
 
 // ---------- ODE right-hand side ----------
-function rhs(y, r, dH) {
-    const Ta = y[0], X = y[1], T = y[2];
-    const kf = A1 * Math.exp(-Ef / (Rgas * T));
-    const kr = A1 * Math.exp(-((Ef - dH * 1000) / (Rgas * T)));
-    const rate = -(kf * Cao * (1 - X) - kr * Cao * X);
-    const areaFactor = Math.PI * r * r / 10000;
-    const jacketFactor = (Math.PI * 4 - Math.PI * r * r) / 10000;
-    const dTa = U * (2 / r) * ((T - Ta) / (Vc * jacketFactor * rhoC)) / Cpc;
-    const dX = (-rate) / (Vr * 3600 * areaFactor * (rhoA / MWa));
-    const dT = (rate * dH * 1000 - U * (2 / r) * (T - Ta)) / (Cpo * Vr * 3600 * areaFactor * (rhoA / MWa));
-    return [dTa, dX, dT];
+function create_rhs(r, dH) {
+    return (t, y) => {
+        const Ta = y[0], X = y[1], T = y[2];
+        const kf = A1 * Math.exp(-Ef / (Rgas * T));
+        const kr = A1 * Math.exp(-((Ef - dH * 1000) / (Rgas * T)));
+        const rate = -(kf * Cao * (1 - X) - kr * Cao * X);
+        const areaFactor = Math.PI * r * r / 10000;
+        const jacketFactor = (Math.PI * 4 - Math.PI * r * r) / 10000;
+        const dTa = U * (2 / r) * ((T - Ta) / (Vc * jacketFactor * rhoC)) / Cpc;
+        const dX = (-rate) / (Vr * 3600 * areaFactor * (rhoA / MWa));
+        const dT = (rate * dH * 1000 - U * (2 / r) * (T - Ta)) / (Cpo * Vr * 3600 * areaFactor * (rhoA / MWa));
+        return [dTa, dX, dT];
+    }
 }
 
+// ---------- RK4 solver ----------
+// Helper function to add scaled vectors
 function addScaled(y, k, h) {
     return [y[0] + h * k[0], y[1] + h * k[1], y[2] + h * k[2]];
 }
@@ -50,10 +54,11 @@ function isFinite3(y) {
 
 
 function rk4Step(y, r, dH, h) {
-    const k1 = rhs(y, r, dH);
-    const k2 = rhs(addScaled(y, k1, h / 2), r, dH);
-    const k3 = rhs(addScaled(y, k2, h / 2), r, dH);
-    const k4 = rhs(addScaled(y, k3, h), r, dH);
+    const rhs = create_rhs(r, dH);
+    const k1 = rhs(0, y);
+    const k2 = rhs(0, addScaled(y, k1, h / 2));
+    const k3 = rhs(0, addScaled(y, k2, h / 2));
+    const k4 = rhs(0, addScaled(y, k3, h));
     return [
         y[0] + (h / 6) * (k1[0] + 2 * k2[0] + 2 * k3[0] + k4[0]),
         y[1] + (h / 6) * (k1[1] + 2 * k2[1] + 2 * k3[1] + k4[1]),
@@ -121,14 +126,6 @@ self.onmessage = (event) => {
                 payload: { message: error.message }
             });
         }
-
-        console.log(`[WORKER] Calculation complete. Result:`, result);
-        
-        // Send the result back to the main UI thread
-        postMessage({ 
-            type: 'RESULT', 
-            payload: result 
-        });
     }
 };
 
