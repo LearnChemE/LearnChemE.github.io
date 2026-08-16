@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Plug Flow Reactor with Heat Transfer Jacket</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: Helvetica, Arial, sans-serif;
+    background: #ffffff;
+    margin: 0;
+    padding: 16px;
+    color: #222;
+  }
+  #app {
+    max-width: 760px;
+    margin: 0 auto;
+  }
+  h1.title {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 22px;
+    font-weight: bold;
+    color: #98000D;
+    text-align: center;
+    margin: 4px 0 14px 0;
+  }
+  .plot-wrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
+  }
+  canvas#plot {
+    border: 1px solid #222;
+    background: #fff;
+  }
+  .controls {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 10px auto 6px auto;
+    max-width: 640px;
+  }
+  .control-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .setter-group {
+    display: flex;
+    border: 1px solid #888;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .setter-btn {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    padding: 5px 14px;
+    background: #eeeeee;
+    border: none;
+    border-right: 1px solid #888;
+    cursor: pointer;
+    color: #222;
+  }
+  .setter-btn:last-child { border-right: none; }
+  .setter-btn.active {
+    background: #98000D;
+    color: #fff;
+  }
+  .setter-btn:hover:not(.active) {
+    background: #ddd;
+  }
+  .slider-block {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    min-width: 260px;
+  }
+  .slider-label {
+    font-size: 17px;
+    color: #222;
+    white-space: nowrap;
+    margin-right: 8px;
+  }
+  .slider-value {
+    font-size: 17px;
+    color: #222;
+    min-width: unset;
+    margin-left: 0.4em;
+    text-align: left;
+    font-variant-numeric: tabular-nums;
+  }
+  input[type=range] {
+    flex: 1;
+    accent-color: #98000D;
+  }
+  .panels-wrap {
+    position: relative;
+  }
+  .panel-buttons {
+    display: flex;
+    gap: 8px;
+    margin: 6px 0 16px 0;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .panel-btn {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 17px;
+    font-weight: normal;
+    color: #fff;
+    background: #98000D;
+    border: none;
+    border-radius: 4px;
+    padding: 7px 18px;
+    cursor: pointer;
+  }
+  .panel-btn:hover {
+    background: #7a000b;
+  }
+  .panel-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 6px;
+    width: 92%;
+    max-width: 700px;
+    border: 1px solid #98000D;
+    border-radius: 4px;
+    padding: 16px 40px 16px 20px;
+    font-size: 14px;
+    line-height: 1.55;
+    color: #222;
+    background: #fffafa;
+    box-shadow: 2px 3px 10px rgba(0,0,0,0.18);
+    z-index: 30;
+  }
+  .panel-content.open { display: block; }
+  .panel-close {
+    position: absolute;
+    top: 6px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 22px;
+    line-height: 1;
+    color: #98000D;
+    cursor: pointer;
+    padding: 2px 6px;
+  }
+  .panel-close:hover {
+    color: #7a000b;
+  }
+  .panel-content h3 {
+    margin-top: 0;
+    color: #98000D;
+    font-size: 15px;
+  }
+  .panel-content p { margin: 8px 0; }
+  .panel-content a { color: #98000D; }
+  .eq { font-style: italic; margin: 6px 0 6px 12px; }
+  .about-links a { color: #98000D; text-decoration: underline; }
+</style>
+</head>
+<body>
+<div id="app">
+  <h1 class="title">Plug Flow Reactor with Heat Transfer Jacket</h1>
+
+  <div class="panels-wrap">
+    <div class="panel-buttons">
+      <button class="panel-btn" id="btnDirections">Directions</button>
+      <button class="panel-btn" id="btnDetails">Details</button>
+      <button class="panel-btn" id="btnAbout">About</button>
+    </div>
+
+    <div class="panel-content" id="panelDirections">
+      <button class="panel-close" aria-label="Close">&times;</button>
+      <p>The temperature in a plug flow reactor and the temperature of the heat transfer fluid in the annular region around the reactor (a jacket) are plotted as functions of the cumulative reactor volume. Select &ldquo;conversion&rdquo; to plot fractional conversion of <i>A</i> (for the reaction <i>A</i>&nbsp;&rarr;&nbsp;<i>B</i>) versus reactor volume. The reactor contents and the heat transfer fluid flow co-currently. A cross-section representation of the reactor (green circle) and the annular region (blue circle, which has a 2 m radius) is shown on each plot. Use sliders to vary the heat transfer fluid feed temperature, reactor radius and heat of reaction. The reactant feed temperature is 305 K. The velocities of the heat transfer fluid and the reactant are fixed, so when the reactor radius increases, the inlet molar flow rate of <i>A</i> increases, and the volumetric flow rate of the heat transfer fluid decreases.</p>
+    </div>
+
+    <div class="panel-content" id="panelDetails">
+      <button class="panel-close" aria-label="Close">&times;</button>
+      <h3>Mass balance:</h3>
+      <p class="eq">dx/dV = r<sub>A</sub> / F<sub>A,0</sub>,</p>
+      <p class="eq">F<sub>A,0</sub> = 3600&nbsp;V<sub>A</sub>&nbsp;(&pi;r&sup2;/10000)&nbsp;(&rho;<sub>A</sub>/MW<sub>A</sub>),</p>
+      <p>where <i>x</i> is conversion, <i>V</i> is volume (m&sup3;), r<sub>A</sub> is the reaction rate (kmol/(m&sup3;&nbsp;hr)), F<sub>A,0</sub> is the molar flow rate of component <i>A</i> (kmol/hr) that converts velocity of feed to molar flow rate of feed, V<sub>A</sub> is the velocity of component <i>A</i> (m/s), <i>r</i> is the radius of the inner tube (cm), &rho;<sub>A</sub> and &rho;<sub>C</sub> are the densities of the reactant and coolant (kg/m&sup3;), and MW<sub>A</sub> is the molar mass of <i>A</i> (kg/kmol).</p>
+
+      <h3>Rate law:</h3>
+      <p class="eq">k<sub>f</sub> = A&nbsp;e<sup>&minus;E<sub>f</sub>/(RT)</sup>,</p>
+      <p class="eq">k<sub>r</sub> = A&nbsp;e<sup>&minus;(E<sub>r</sub>&minus;&Delta;H)/(RT)</sup>,</p>
+      <p class="eq">r<sub>A</sub> = &minus;C<sub>A,0</sub>&nbsp;(k<sub>f</sub>(1&minus;x) &minus; k<sub>r</sub>x),</p>
+      <p>where k<sub>f</sub> and k<sub>r</sub> are the forward and reverse rate constants (1/hr), <i>A</i> is a pre-exponential factor (1/hr), E<sub>f</sub> and E<sub>r</sub> are the activation energies for the forward and reverse reactions (J/mol), <i>R</i> is the ideal gas constant (J/[mol&nbsp;K]), <i>T</i> is temperature (K), &Delta;H is the heat of reaction (kJ/mol), and C<sub>A,0</sub> is the inlet concentration of <i>A</i> (kmol/m&sup3;).</p>
+
+      <h3>Energy balances:</h3>
+      <p class="eq">dT/dV = (r<sub>A</sub>&Delta;H &minus; U&middot;a&middot;(T&minus;T<sub>a</sub>)) / (F<sub>A,0</sub>Cp<sub>o</sub>),</p>
+      <p class="eq">dT<sub>a</sub>/dV = U&middot;a&middot;(T&minus;T<sub>a</sub>) / (m&middot;Cp<sub>C</sub>),</p>
+      <p class="eq">m = V<sub>C</sub>&nbsp;((4&pi; &minus; &pi;r&sup2;)/10000)&nbsp;&rho;<sub>C</sub>,</p>
+      <p>where <i>U</i> is the heat transfer coefficient (kJ/[m&sup2;&nbsp;hr&nbsp;K]), <i>a</i>&nbsp;=&nbsp;2/<i>r</i> is the heat exchange area per unit volume of reactor (1/m), T<sub>a</sub> is the temperature of the heat transfer fluid (K), Cp<sub>o</sub> is the average molar heat capacity of reacting mixture (kJ/[kmol&nbsp;K]), Cp<sub>C</sub> is the coolant heat capacity (kJ/[kg&nbsp;K]), <i>m</i> is the mass flow rate of coolant (kg/hr) which converts velocity of heat transfer fluid to mass flow rate, and V<sub>C</sub> is the coolant velocity (m/hr).</p>
+    </div>
+
+    <div class="panel-content" id="panelAbout">
+      <button class="panel-close" aria-label="Close">&times;</button>
+      <p class="about-links">This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/PlugFlowReactorWithHeatTransferJacket/" target="_blank" rel="noopener">Mathematica simulation</a> by Simon M. Lane. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988) in collaboration with Washington State University. Address any questions or comments to LearnChemE@gmail.com.</p>
+    </div>
+  </div>
+
+  <div class="plot-wrap">
+    <canvas id="plot" width="600" height="410"></canvas>
+  </div>
+
+  <div class="controls">
+    <div class="control-row">
+      <div class="setter-group" id="wSetter">
+        <button class="setter-btn active" data-val="1"> temperature </button>
+        <button class="setter-btn" data-val="2"> conversion </button>
+      </div>
+      <div class="slider-block">
+        <span class="slider-label">heat transfer fluid feed temperature (K)</span>
+        <input type="range" id="ttaSlider" min="250" max="300" step="1" value="290">
+        <span class="slider-value" id="ttaVal">290</span>
+      </div>
+    </div>
+    <div class="control-row">
+      <div class="slider-block">
+        <span class="slider-label">reactor radius (m)</span>
+        <input type="range" id="rSlider" min="0.4" max="1.3" step="0.1" value="0.6">
+        <span class="slider-value" id="rVal">0.6</span>
+      </div>
+      <div class="slider-block">
+        <span class="slider-label">heat of reaction (kJ/mol)</span>
+        <input type="range" id="dhSlider" min="-50" max="30" step="1" value="-10">
+        <span class="slider-value" id="dhVal">-10</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+(function() {
+  // ---------- Physical constants (fixed) ----------
+  const Cpc = 4.185;      // kJ/(kg K), coolant heat capacity
+  const U = 300.0;        // kJ/(m^2 hr K)
+  const Cao = 15.0;       // kmol/m^3
+  const Cpo = 159.0;      // kJ/(kmol K)
+  const rhoC = 1000.0;    // kg/m^3
+  const Vc = 800.0;       // m/hr
+  const Vr = 3.4;         // m/s (reactant velocity)
+  const rhoA = 600.0;     // kg/m^3
+  const MWa = 58.12;      // kg/kmol
+  const Ef = 40000.0;     // J/mol
+  const Rgas = 8.314;     // J/(mol K)
+  const A1 = 1.0e6;       // 1/hr
+
+  const Vmax = 5.0;       // m^3, reactor volume span
+
+  // ---------- State ----------
+  let W = 1;          // 1 = temperature, 2 = conversion
+  let TTA = 290;
+  let rRad = 0.6;
+  let deltaH = -10;
+
+  // ---------- ODE right-hand side ----------
+  function rhs(y, r, dH) {
+    const Ta = y[0], X = y[1], T = y[2];
+    const kf = A1 * Math.exp(-Ef / (Rgas * T));
+    const kr = A1 * Math.exp(-((Ef - dH * 1000) / (Rgas * T)));
+    const rate = -(kf * Cao * (1 - X) - kr * Cao * X);
+    const areaFactor = Math.PI * r * r / 10000;
+    const jacketFactor = (Math.PI * 4 - Math.PI * r * r) / 10000;
+    const dTa = U * (2 / r) * ((T - Ta) / (Vc * jacketFactor * rhoC)) / Cpc;
+    const dX = (-rate) / (Vr * 3600 * areaFactor * (rhoA / MWa));
+    const dT = (rate * dH * 1000 - U * (2 / r) * (T - Ta)) / (Cpo * Vr * 3600 * areaFactor * (rhoA / MWa));
+    return [dTa, dX, dT];
+  }
+
+  function addScaled(y, k, h) {
+    return [y[0] + h * k[0], y[1] + h * k[1], y[2] + h * k[2]];
+  }
+
+  function rk4Step(y, r, dH, h) {
+    const k1 = rhs(y, r, dH);
+    const k2 = rhs(addScaled(y, k1, h / 2), r, dH);
+    const k3 = rhs(addScaled(y, k2, h / 2), r, dH);
+    const k4 = rhs(addScaled(y, k3, h), r, dH);
+    return [
+      y[0] + (h / 6) * (k1[0] + 2 * k2[0] + 2 * k3[0] + k4[0]),
+      y[1] + (h / 6) * (k1[1] + 2 * k2[1] + 2 * k3[1] + k4[1]),
+      y[2] + (h / 6) * (k1[2] + 2 * k2[2] + 2 * k3[2] + k4[2])
+    ];
+  }
+
+  function isFinite3(y) {
+    return isFinite(y[0]) && isFinite(y[1]) && isFinite(y[2]);
+  }
+
+  // Adaptive fixed-step RK4: doubles step count until stable across [0, Vmax]
+  function solve(r, dH, TTAin) {
+    let n = 4000;
+    const maxN = 320000;
+    while (n <= maxN) {
+      const h = Vmax / n;
+      let y = [TTAin, 0.0, 305.0];
+      const Vs = new Float64Array(n + 1);
+      const Tas = new Float64Array(n + 1);
+      const Xs = new Float64Array(n + 1);
+      const Ts = new Float64Array(n + 1);
+      Vs[0] = 0; Tas[0] = y[0]; Xs[0] = y[1]; Ts[0] = y[2];
+      let ok = true;
+      for (let i = 0; i < n; i++) {
+        y = rk4Step(y, r, dH, h);
+        if (!isFinite3(y)) { ok = false; break; }
+        Vs[i + 1] = (i + 1) * h;
+        Tas[i + 1] = y[0];
+        Xs[i + 1] = y[1];
+        Ts[i + 1] = y[2];
+      }
+      if (ok) return { Vs, Tas, Xs, Ts };
+      n *= 2;
+    }
+    // fallback: return whatever last attempt (may contain NaNs, clipped by caller)
+    return null;
+  }
+
+  // ---------- Sampling for plotting (subsample solved arrays to ~400 pts) ----------
+  function subsample(arr, n, targetPts) {
+    const step = Math.max(1, Math.floor(n / targetPts));
+    const out = [];
+    for (let i = 0; i <= n; i += step) out.push(arr[i]);
+    if ((n) % step !== 0) out.push(arr[n]);
+    return out;
+  }
+
+  // ---------- Canvas setup (hi-DPI) ----------
+  const canvas = document.getElementById('plot');
+  const ctx = canvas.getContext('2d');
+  const CSS_W = 600, CSS_H = 410;
+  function setupHiDPI() {
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = CSS_W * dpr;
+    canvas.height = CSS_H * dpr;
+    canvas.style.width = CSS_W + 'px';
+    canvas.style.height = CSS_H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  setupHiDPI();
+
+  // Plot margins (in CSS px)
+  const M = { left: 76, right: 24, top: 18, bottom: 64 };
+  const plotW = CSS_W - M.left - M.right;
+  const plotH = CSS_H - M.top - M.bottom;
+
+  function niceTicks(min, max, count) {
+    if (min === max) { min -= 1; max += 1; }
+    const range = max - min;
+    const rawStep = range / count;
+    const mag = Math.pow(10, Math.floor(Math.log10(rawStep)));
+    const norm = rawStep / mag;
+    let step;
+    if (norm < 1.5) step = 1 * mag;
+    else if (norm < 3) step = 2 * mag;
+    else if (norm < 7) step = 5 * mag;
+    else step = 10 * mag;
+    const niceMin = Math.floor(min / step) * step;
+    const niceMax = Math.ceil(max / step) * step;
+    const ticks = [];
+    for (let t = niceMin; t <= niceMax + step * 1e-9; t += step) {
+      ticks.push(Math.round(t / step) * step);
+    }
+    return { ticks, niceMin, niceMax, step };
+  }
+
+  function fmtNum(v, step) {
+    if (Math.abs(step) >= 1) return Math.round(v).toString();
+    const decimals = Math.max(0, -Math.floor(Math.log10(step)));
+    return v.toFixed(decimals);
+  }
+
+  function xToPx(v, xmin, xmax) {
+    return M.left + (v - xmin) / (xmax - xmin) * plotW;
+  }
+  function yToPx(v, ymin, ymax) {
+    return M.top + (1 - (v - ymin) / (ymax - ymin)) * plotH;
+  }
+
+  function drawFrame(xmin, xmax, xticks, ymin, ymax, yticks, xStep, yStep, xLabel, yLabel) {
+    ctx.clearRect(0, 0, CSS_W, CSS_H);
+    ctx.save();
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(M.left, M.top, plotW, plotH);
+
+    ctx.fillStyle = '#000';
+    ctx.font = '16px Helvetica, Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    // x ticks
+    xticks.forEach(t => {
+      if (t < xmin - 1e-9 || t > xmax + 1e-9) return;
+      const px = xToPx(t, xmin, xmax);
+      ctx.beginPath();
+      ctx.moveTo(px, M.top + plotH);
+      ctx.lineTo(px, M.top + plotH + 5);
+      ctx.stroke();
+      ctx.fillText(fmtNum(t, xStep), px, M.top + plotH + 8);
+    });
+    // y ticks
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    yticks.forEach(t => {
+      if (t < ymin - 1e-9 || t > ymax + 1e-9) return;
+      const py = yToPx(t, ymin, ymax);
+      ctx.beginPath();
+      ctx.moveTo(M.left - 5, py);
+      ctx.lineTo(M.left, py);
+      ctx.stroke();
+      ctx.fillText(fmtNum(t, yStep), M.left - 8, py);
+    });
+
+    // axis labels
+    ctx.font = '19px Helvetica, Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText(xLabel, M.left + plotW / 2, CSS_H - 10);
+
+    ctx.save();
+    ctx.translate(18, M.top + plotH / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.textAlign = 'center';
+    ctx.fillText(yLabel, 0, 0);
+    ctx.restore();
+
+    ctx.restore();
+  }
+
+  function plotCurve(xs, ys, xmin, xmax, ymin, ymax, color, lw) {
+    ctx.save();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = lw;
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    for (let i = 0; i < xs.length; i++) {
+      const px = xToPx(xs[i], xmin, xmax);
+      const py = yToPx(clampFinite(ys[i], ymin, ymax), ymin, ymax);
+      if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function clampFinite(v, lo, hi) {
+    if (!isFinite(v)) return lo;
+    return v;
+  }
+
+  function drawLabel(text, xData, yData, xmin, xmax, ymin, ymax, color) {
+    const px = xToPx(xData, xmin, xmax);
+    const py = yToPx(yData, ymin, ymax);
+    ctx.save();
+    ctx.font = '18px Helvetica, Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const padding = 3;
+    const w = ctx.measureText(text).width + padding * 2;
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(px - w / 2, py - 11, w, 22);
+    ctx.fillStyle = color;
+    ctx.fillText(text, px, py);
+    ctx.restore();
+  }
+
+  // Cross-section inset: blue disk radius 2 (fixed), green disk radius r inside
+  function drawInset(cx, cy, scalePxPerM, r) {
+    ctx.save();
+    const R_outer = 2 * scalePxPerM;
+    const R_inner = r * scalePxPerM;
+    ctx.beginPath();
+    ctx.arc(cx, cy, R_outer, 0, 2 * Math.PI);
+    ctx.fillStyle = '#1414CC';
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(cx, cy, R_inner, 0, 2 * Math.PI);
+    ctx.fillStyle = '#009900';
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function interpAt(Vs, Ys, vTarget) {
+    // Vs assumed uniformly spaced ascending
+    const n = Vs.length - 1;
+    const h = Vs[n] / n;
+    let idx = Math.floor(vTarget / h);
+    if (idx >= n) idx = n - 1;
+    if (idx < 0) idx = 0;
+    const v0 = Vs[idx], v1 = Vs[idx + 1];
+    const y0 = Ys[idx], y1 = Ys[idx + 1];
+    const frac = (vTarget - v0) / (v1 - v0);
+    return y0 + frac * (y1 - y0);
+  }
+
+  let cachedSolution = null;
+  let cachedKey = null;
+
+  function ensureSolution() {
+    const key = rRad.toFixed(2) + '_' + deltaH.toFixed(1) + '_' + TTA.toFixed(1);
+    if (cachedKey === key && cachedSolution) return cachedSolution;
+    const sol = solve(rRad, deltaH, TTA);
+    cachedSolution = sol;
+    cachedKey = key;
+    return sol;
+  }
+
+  function render() {
+    const sol = ensureSolution();
+    if (!sol) {
+      ctx.clearRect(0, 0, CSS_W, CSS_H);
+      ctx.fillStyle = '#000';
+      ctx.font = '14px Helvetica';
+      ctx.fillText('Numerical solution did not converge for these settings.', 40, 200);
+      return;
+    }
+    const n = sol.Vs.length - 1;
+    const targetPts = 500;
+    const Vs = subsample(sol.Vs, n, targetPts);
+    const Tas = subsample(sol.Tas, n, targetPts);
+    const Xs = subsample(sol.Xs, n, targetPts);
+    const Ts = subsample(sol.Ts, n, targetPts);
+
+    const xmin = 0, xmax = Vmax;
+    const xt = niceTicks(xmin, xmax, 5);
+
+    if (W === 1) {
+      // Temperature plot: Ta (blue) and T (green)
+      let ymin = Infinity, ymax = -Infinity;
+      for (let i = 0; i < Vs.length; i++) {
+        if (isFinite(Tas[i])) { ymin = Math.min(ymin, Tas[i]); ymax = Math.max(ymax, Tas[i]); }
+        if (isFinite(Ts[i])) { ymin = Math.min(ymin, Ts[i]); ymax = Math.max(ymax, Ts[i]); }
+      }
+      if (!isFinite(ymin) || !isFinite(ymax) || ymin === ymax) { ymin = 290; ymax = 320; }
+      const pad = (ymax - ymin) * 0.08 || 5;
+      ymin -= pad; ymax += pad;
+      const yt = niceTicks(ymin, ymax, 6);
+
+      drawFrame(xmin, xmax, xt.ticks, yt.niceMin, yt.niceMax, yt.ticks, xt.step, yt.step,
+        'volume (m\u00B3)', 'temperature (K)');
+
+      plotCurve(Vs, Tas, xmin, xmax, yt.niceMin, yt.niceMax, '#1414CC', 2.5);
+      plotCurve(Vs, Ts, xmin, xmax, yt.niceMin, yt.niceMax, '#009900', 2.5);
+
+      // direct curve labels
+      const TaAt3 = interpAt(sol.Vs, sol.Tas, 3);
+      const TAt1p2 = interpAt(sol.Vs, sol.Ts, 1.2);
+      if (isFinite(TaAt3)) drawLabel('heat transfer', 3, Math.min(Math.max(TaAt3, yt.niceMin), yt.niceMax), xmin, xmax, yt.niceMin, yt.niceMax, '#1414CC');
+      if (isFinite(TAt1p2)) drawLabel('reactor', 1.2, Math.min(Math.max(TAt1p2, yt.niceMin), yt.niceMax), xmin, xmax, yt.niceMin, yt.niceMax, '#009900');
+
+      // inset near upper-right (Scaled 0.75,0.75)
+      const cx = M.left + 0.75 * plotW;
+      const cy = M.top + (1 - 0.75) * plotH;
+      drawInset(cx, cy, 13, rRad);
+    } else {
+      // Conversion plot
+      const ymin = 0, ymax = 1.1;
+      const yt = niceTicks(ymin, ymax, 6);
+      drawFrame(xmin, xmax, xt.ticks, ymin, ymax, yt.ticks, xt.step, yt.step,
+        'volume (m\u00B3)', 'conversion');
+      plotCurve(Vs, Xs, xmin, xmax, ymin, ymax, '#1414CC', 2.5);
+
+      // inset near (0.75, 0.3)
+      const cx = M.left + 0.75 * plotW;
+      const cy = M.top + (1 - 0.3) * plotH;
+      drawInset(cx, cy, 13, rRad);
+    }
+  }
+
+  // ---------- Controls wiring ----------
+  const wSetter = document.getElementById('wSetter');
+  wSetter.addEventListener('click', (e) => {
+    const btn = e.target.closest('.setter-btn');
+    if (!btn) return;
+    W = parseInt(btn.dataset.val, 10);
+    [...wSetter.querySelectorAll('.setter-btn')].forEach(b => b.classList.toggle('active', b === btn));
+    render();
+  });
+
+  const ttaSlider = document.getElementById('ttaSlider');
+  const ttaVal = document.getElementById('ttaVal');
+  ttaSlider.addEventListener('input', () => {
+    TTA = parseFloat(ttaSlider.value);
+    ttaVal.textContent = Math.round(TTA).toString();
+    render();
+  });
+
+  const rSlider = document.getElementById('rSlider');
+  const rVal = document.getElementById('rVal');
+  rSlider.addEventListener('input', () => {
+    rRad = parseFloat(rSlider.value);
+    rVal.textContent = rRad.toFixed(1);
+    render();
+  });
+
+  const dhSlider = document.getElementById('dhSlider');
+  const dhVal = document.getElementById('dhVal');
+  dhSlider.addEventListener('input', () => {
+    deltaH = parseFloat(dhSlider.value);
+    dhVal.textContent = Math.round(deltaH).toString();
+    render();
+  });
+
+  // ---------- Panels ----------
+  function wirePanel(btnId, panelId) {
+    const btn = document.getElementById(btnId);
+    const panel = document.getElementById(panelId);
+    btn.addEventListener('click', () => {
+      const isOpen = panel.classList.contains('open');
+      document.querySelectorAll('.panel-content').forEach(p => p.classList.remove('open'));
+      if (!isOpen) panel.classList.add('open');
+    });
+  }
+  wirePanel('btnDirections', 'panelDirections');
+  wirePanel('btnDetails', 'panelDetails');
+  wirePanel('btnAbout', 'panelAbout');
+
+  document.querySelectorAll('.panel-close').forEach(btn => {
+    btn.addEventListener('click', () => {
+      btn.closest('.panel-content').classList.remove('open');
+    });
+  });
+
+  // ---------- Initial render ----------
+  render();
+})();
+</script>
+<script src="main.js"></script>
+<script>
+  Module.onRuntimeInitialized = () => {
+    // Instantiate the C++ class
+    // Equivalent to: Calculator calc(10);
+    const calc = new Module.Calculator(10);
+
+    // Call the class method
+    const result = calc.add(32);
+    console.log("[JS] Result from C++ Class:", result);
+
+    // IMPORTANT: C++ classes instantiated in JS must be manually deleted 
+    // to free the memory in the WebAssembly heap.
+    calc.delete();
+  };
+</script>
+</body>
+</html>
