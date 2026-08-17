@@ -1,14 +1,13 @@
 // worker.js
+import createJacketedPFRModule from "./wasm/calcs.js";
 
-// Load the Emscripten-generated JS glue code
-// In a worker, importScripts brings the Emscripten Module into scope
-importScripts('main.js');
+// Load the Emscripten-generated JS glue code as an ES module.
+createJacketedPFRModule().then((module) => {
 
-// Wait for the module to initialize before accepting tasks
-Module.onRuntimeInitialized = () => {
-    // Notify the main thread that the worker is ready
-    postMessage({ type: 'READY' });
-};
+// Notify the main thread that the worker is ready
+const { CoCurrentCalc } = module;
+console.log(module)
+postMessage({ type: 'READY' });
 
 // ---------- Physical constants (fixed) ----------
 const Cpc = 4.185;      // kJ/(kg K), coolant heat capacity
@@ -100,19 +99,26 @@ self.onmessage = (event) => {
     console.log(`[WORKER] Worker received command:`, type, payload);
 
     if (type === 'SOLVE') {
-        // // Instantiate the C++ class
-        // const calc = new Module.Calculator(data.baseValue);
-        
-        // // Execute the heavy Wasm function
-        // const result = calc.add(data.addValue);
-        
-        // // Delete the C++ instance to free WebAssembly memory
-        // calc.delete();
 
         try {
             // Perform the calculation using the provided payload
-            const result = solve(payload.r, payload.dH, payload.TTAin, payload.counter);
+            const calc = new CoCurrentCalc(payload.r, payload.dH, payload.TTAin, 0.0, Vmax, 100);
+            calc.solve();
+
+            const Tas = calc.getResultView(0); // Get the X values (conversion)
+            const Xs = calc.getResultView(1); // Get the X values (conversion)
+            const Ts = calc.getResultView(2); // Get the X values (conversion)
+            const Vs = calc.getTEval(); // Get the time evaluation array
+            
+            const result = {
+                Vs: Vs,
+                Tas: Tas,
+                Xs: Xs,
+                Ts: Ts
+            };
+
             console.log(`[WORKER] Calculation complete. Result:`, result);
+            calc.delete();
             
             // Send the result back to the main UI thread
             postMessage({ 
@@ -129,3 +135,4 @@ self.onmessage = (event) => {
     }
 };
 
+});

@@ -28,10 +28,10 @@ TARGET_NATIVE = app_native
 TARGET_WASM = main.js
 
 # Emscripten flags
-CFLG = -O3 -Wall --emit-tsd sediment.d.ts
+CFLG = -O3 -Wall
 SFLG = --bind \
 	-s EXPORT_ES6=1 \
-	-s EXPORT_NAME=createSedimentModule \
+	-s EXPORT_NAME=createJacketedPFRModule \
 	-s MODULARIZE=1 \
 	-s ERROR_ON_UNDEFINED_SYMBOLS=1 \
 	-s ASSERTIONS=1
