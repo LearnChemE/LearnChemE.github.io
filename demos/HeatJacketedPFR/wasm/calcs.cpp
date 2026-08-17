@@ -70,7 +70,8 @@ void CoCurrentCalc::solve() {
 
 double* CoCurrentCalc::getResultArray(int index) {
     if (index < 0 || index > 2) {
-        throw std::out_of_range("Index must be 0, 1, or 2.");
+        // throw std::out_of_range("Index must be 0, 1, or 2.");
+        index = 0;
     }
     return this->result[index];
 }
@@ -105,6 +106,8 @@ EMSCRIPTEN_BINDINGS(my_class_example) {
 
 // Native Entry Point (Ignored by WebAssembly)
 #ifndef __EMSCRIPTEN__
+#include <iostream>
+
 int main() {
     std::cout << "[Native C++] Starting native execution..." << std::endl;
     uint n = 5; // Number of steps for results storage

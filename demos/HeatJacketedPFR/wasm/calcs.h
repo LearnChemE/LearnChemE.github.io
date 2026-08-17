@@ -2,7 +2,7 @@
 #define CALCS
 
 #include "rk45.h"
-#include <iostream> // Debug only
+// #include <iostream> // Debug only
 
 // ---------- Physical constants (fixed) ----------
 double Cpc = 4.185;      // kJ/(kg K), coolant heat capacity
