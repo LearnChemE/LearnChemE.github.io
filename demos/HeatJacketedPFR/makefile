@@ -28,7 +28,7 @@ TARGET_NATIVE = app_native
 TARGET_WASM = main.js
 
 # Emscripten flags
-CFLG = -g -Wall
+CFLG = -O3 -Wall
 SFLG = --bind \
 	-s EXPORT_ES6=1 \
 	-s EXPORT_NAME=createJacketedPFRModule \
