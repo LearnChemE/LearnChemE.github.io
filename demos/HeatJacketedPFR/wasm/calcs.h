@@ -30,7 +30,6 @@ public:
     void solve();
 
     // Native only
-    RK45Result getLatestResult();
     double* getResultArray(int index); // 0: Ta, 1: X, 2: T
 
 #ifdef __EMSCRIPTEN__
@@ -39,7 +38,6 @@ public:
 #endif
     
 private:
-    double TTAin; // inlet temperature of the coolant
     ODEFunc rhs;
     RK45Solver* solver_;
     

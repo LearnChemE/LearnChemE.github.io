@@ -19,14 +19,14 @@ ODEFunc create_rhs_cocurrent(double r, double dH) {
 }
 
 // Co-current
-CoCurrentCalc::CoCurrentCalc(double r, double dH, double TTAin, double tStart, double tEnd, unsigned int nSteps) : TTAin(TTAin), nSteps(nSteps) {
+CoCurrentCalc::CoCurrentCalc(double r, double dH, double TTAin, double tStart, double tEnd, unsigned int nSteps) : nSteps(nSteps) {
     this->rhs = create_rhs_cocurrent(r, dH);
     this->solver_ = new RK45Solver();
 
     // Allocate results arrays
-    this->result[0] = (double*)malloc(sizeof(double) * nSteps);
-    this->result[1] = (double*)malloc(sizeof(double) * nSteps);
-    this->result[2] = (double*)malloc(sizeof(double) * nSteps);
+    this->result[0] = new double[nSteps];
+    this->result[1] = new double[nSteps];
+    this->result[2] = new double[nSteps];
 
     // Save initial conditions
     this->result[0][0] = TTAin; // Initial condition for Ta
@@ -109,7 +109,7 @@ int main() {
     std::cout << "[Native C++] Starting native execution..." << std::endl;
     uint n = 5; // Number of steps for results storage
     
-    CoCurrentCalc calc(1.0, -50.0, 280.0, 0.0, 10.0, n);
+    CoCurrentCalc calc(0.6, -10.0, 290.0, 0.0, 10.0, n);
     calc.solve();
     
     // Print results
