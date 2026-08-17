@@ -36,6 +36,21 @@ struct RK45Options {
 
 void swapPointers(double*& a, double*& b);
 
+/**
+ * RK45Solver - Adaptive step-size Runge-Kutta 4th/5th order solver (Dormand-Prince method)
+ * 
+ * Solves systems of ordinary differential equations using the Dormand-Prince RK(4,5) 
+ * method with adaptive step-size control. The solver automatically adjusts the time step
+ * based on local error estimates to meet specified tolerance requirements.
+ * 
+ * Usage:
+ *   ODEFunc f = [](double t, const double* y, double* dydt) { ... };
+ *   double y0[] = { ... };
+ *   RK45Result result = RK45Solver::solve(f, y0, n, t0, tEnd);
+ * 
+ * The ODE function signature is: void f(double t, const double* y, double* dydt)
+ *   where y is the state vector and dydt is the time derivative.
+ */
 class RK45Solver {
     private:
         // Dormand-Prince coefficients

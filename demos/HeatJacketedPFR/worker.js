@@ -94,7 +94,7 @@ function solve(r, dH, TTAin, counter) {
     return null;
 }
 
-// 3. Listen for commands from the main thread
+// Listen for commands from the main thread
 self.onmessage = (event) => {
     const { type, payload } = event.data;
     console.log(`[WORKER] Worker received command:`, type, payload);
