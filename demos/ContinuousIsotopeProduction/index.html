@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Continuous Isotope Production</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] },
+  chtml: { displayAlign: 'left' },
+  svg:   { displayAlign: 'left' }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.min.js" async></script>
+<style>
+  html, body { margin: 0; padding: 0; }
+  body { font-family: Helvetica, Arial, sans-serif; color: #222; padding: 16px; }
+  #app { position: relative; width: 100%; max-width: 880px; margin: 0 auto; }
+  .title { font-size: 21px; font-weight: bold; margin-bottom: 3px; }
+  .subtitle { font-size: 15.6px; color: #555; margin-bottom: 12px; }
+  .btnrow { margin-bottom: 14px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .infobtn {
+    background: #98000D; color: #fff; border: none; padding: 7px 14px;
+    margin-right: 0; font-family: Helvetica, Arial, sans-serif; font-size: 14.95px;
+    cursor: pointer; border-radius: 3px; -webkit-appearance: none; appearance: none;
+    touch-action: manipulation;
+  }
+  .infobtn:hover { background: #7a000a; }
+  .infobtn.active { background: #5f0008; box-shadow: inset 0 0 0 2px rgba(255,255,255,0.55); }
+  .infobtn sup { font-size: 9px; }
+  .ck4-label {
+    display: inline-flex; align-items: center; gap: 6px; padding: 7px 8px;
+    font-size: 14.95px; color: #222; cursor: pointer; user-select: none;
+  }
+  .ck4-label input[type=checkbox] { width: 16px; height: 16px; accent-color: #98000D; cursor: pointer; margin: 0; }
+  .layout { display: flex; gap: 22px; align-items: flex-start; flex-wrap: wrap; }
+  .controls { width: 250px; padding-top: 6px; }
+  .slider-group { margin-bottom: 22px; }
+  .slider-label { font-size: 15px; margin-bottom: 6px; }
+  .slider-label .nm { font-weight: normal; }
+  .slider-val { color: #98000D; font-weight: normal; }
+  input[type=range] { width: 100%; accent-color: #98000D; margin: 0; }
+  .rangerow { display: flex; justify-content: space-between; font-size: 12.65px; color: #888; margin-top: 2px; }
+  canvas { display: block; max-width: 100%; height: auto; }
+  .panel {
+    position: relative; width: 100%; max-width: 620px;
+    box-sizing: border-box; background: #fff;
+    border: 1px solid #999; box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+    padding: 18px 22px 20px 22px; font-size: 13.5px; line-height: 1.55;
+    display: none; border-radius: 5px; margin-bottom: 16px;
+  }
+  .panel h3 { margin: 0 0 10px 0; font-size: 16px; }
+  .closebtn {
+    position: absolute; top: 8px; right: 12px; cursor: pointer; font-size: 20px;
+    color: #666; border: none; background: none; line-height: 1;
+  }
+  .closebtn:hover { color: #98000D; }
+  .panel a { color: #98000D; }
+  mjx-container[display="true"] { margin: 0.35em 0 !important; text-align: left !important; }
+  #chainEq mjx-container[display="true"] { margin: 0 !important; text-align: center !important; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="subtitle">&rarr; Isotope&nbsp;1 &rarr; Isotope&nbsp;2 &rarr; Isotope&nbsp;3 &rarr; Isotope&nbsp;4 (stable)</div>
+
+  <div class="btnrow">
+    <button class="infobtn" onclick="togglePanel('directions')">Directions</button>
+    <button class="infobtn" onclick="togglePanel('details')">Details</button>
+    <button class="infobtn" onclick="togglePanel('about')">About</button>
+    <button class="infobtn" id="exampleBtn" onclick="showExample()">Example: <sup>211</sup>Pb chain</button>
+    <label class="ck4-label"><input type="checkbox" id="ck4"> Isotope 4</label>
+    <button class="infobtn" id="backBtn" onclick="goBack()" style="display:none;">Go back</button>
+  </div>
+
+  <!-- Directions -->
+  <div id="panel-directions" class="panel">
+    <button class="closebtn" onclick="togglePanel('directions')">&times;</button>
+    <h3>Directions</h3>
+    <p>Isotope&nbsp;1 is continuously produced and it then undergoes radioactive decay.
+    The decay products build up and, if radioactive, later decay with time. In this
+    simulation isotope&nbsp;1 decays to isotope&nbsp;2, which decays to isotope&nbsp;3,
+    which decays to the stable isotope&nbsp;4. The half-lives of the three decay processes
+    are selected with the sliders. The production rate of isotope&nbsp;1 is selected with
+    a slider. For a given production rate, a steady state concentration of isotopes&nbsp;1,
+    2 and&nbsp;3 is reached. Because isotope&nbsp;4 is stable, the number of isotope&nbsp;4
+    particles continuously increases with time; by default it is not shown in the graph so
+    that the behavior of the other isotopes can be more readily observed, but it can be
+    added to the plot with the Isotope&nbsp;4 checkbox.</p>
+    <p>Select the Example button to see the decay chain for <sup>211</sup>Pb, continuously
+    produced at 20 particles per minute.</p>
+  </div>
+
+  <!-- Details -->
+  <div id="panel-details" class="panel">
+    <button class="closebtn" onclick="togglePanel('details')">&times;</button>
+    <h3>Details</h3>
+    <p>The number of particles of each isotope is found by numerically integrating the
+    coupled first-order rate equations (RK4), starting from zero particles of isotope&nbsp;1:</p>
+    $$\frac{dN_1}{dt} = P - \lambda_1 N_1$$
+    <p style="margin:2px 0 10px 0;">\(P\) = production rate of isotope&nbsp;1</p>
+    $$\frac{dN_2}{dt} = \lambda_1 N_1 - \lambda_2 N_2$$
+    $$\frac{dN_3}{dt} = \lambda_2 N_2 - \lambda_3 N_3$$
+    $$\frac{dN_4}{dt} = \lambda_3 N_3$$
+    <p>The decay constant of each step is obtained from its half-life:</p>
+    $$\lambda_i = \frac{\ln 2}{(t_{1/2})_i}$$
+    <p style="margin-bottom:0;">Here \(N_i\) is the number of particles of isotope&nbsp;\(i\),
+    \(\lambda_i\) is the decay constant (min<sup>&minus;1</sup>), \((t_{1/2})_i\) is the
+    half-life (min), and \(P\) is the production rate of isotope&nbsp;1 (particles/min).
+    Because isotope&nbsp;1 is continuously produced and isotope&nbsp;4 is stable, the total
+    \(N_1+N_2+N_3+N_4\) increases with time.</p>
+  </div>
+
+  <!-- About -->
+  <div id="panel-about" class="panel">
+    <button class="closebtn" onclick="togglePanel('about')">&times;</button>
+    <h3>About</h3>
+    <p>This simulation was created in the
+    <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and
+    Biological Engineering</a> at University of Colorado Boulder for
+    <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by
+    John&nbsp;L.&nbsp;Falconer using Claude AI. It was prepared with financial support from
+    the National Science Foundation (DUE 2336987 and 2336988). Address any questions or
+    comments to
+    <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.</p>
+  </div>
+
+  <div class="layout">
+    <div class="controls">
+      <div class="slider-group">
+        <div class="slider-label"><span class="nm">Production rate of isotope 1:</span>
+          <span class="slider-val" id="vP">30</span> /min</div>
+        <input type="range" id="sP" min="10" max="50" step="1" value="30">
+        <div class="rangerow"><span>10</span><span>50</span></div>
+      </div>
+      <div class="slider-group">
+        <div class="slider-label"><span class="nm">Isotope 1 half-life:</span>
+          <span class="slider-val" id="v1">30</span> min</div>
+        <input type="range" id="s1" min="10" max="50" step="1" value="30">
+        <div class="rangerow"><span>10</span><span>50</span></div>
+      </div>
+      <div class="slider-group">
+        <div class="slider-label"><span class="nm">Isotope 2 half-life:</span>
+          <span class="slider-val" id="v2">5</span> min</div>
+        <input type="range" id="s2" min="1" max="10" step="0.5" value="5">
+        <div class="rangerow"><span>1</span><span>10</span></div>
+      </div>
+      <div class="slider-group">
+        <div class="slider-label"><span class="nm">Isotope 3 half-life:</span>
+          <span class="slider-val" id="v3">10</span> min</div>
+        <input type="range" id="s3" min="2" max="20" step="0.5" value="10">
+        <div class="rangerow"><span>2</span><span>20</span></div>
+      </div>
+      <div style="font-size:15px; color:#555; line-height:1.5; margin-top:4px;">
+        At&nbsp;<i>t</i>&nbsp;=&nbsp;0 there are no particles of isotopes&nbsp;1, 2, 3,
+        and&nbsp;4.
+      </div>
+    </div>
+
+    <div>
+      <div id="chainEq" style="display:none; max-width:560px; width:100%; text-align:center;
+                  overflow-x:auto; overflow-y:hidden; margin:0 0 8px 0; font-size:20px;">
+        \[ {}^{211}_{82}\text{Pb}\ \xrightarrow{\;\beta^-\;}\ {}^{211}_{83}\text{Bi}\ \xrightarrow{\;\alpha\;}\ {}^{207}_{81}\text{Tl}\ \xrightarrow{\;\beta^-\;}\ {}^{207}_{82}\text{Pb} \]
+      </div>
+      <canvas id="plot" width="560" height="430"></canvas>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- Canvas / hi-DPI ----------
+  const canvas = document.getElementById('plot');
+  const ctx = canvas.getContext('2d');
+  const CSS_W = 560, CSS_H = 430;
+  function setupHiDPI(){
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width  = Math.round(CSS_W * dpr);
+    canvas.height = Math.round(CSS_H * dpr);
+    canvas.style.width  = CSS_W + 'px';
+    canvas.style.height = CSS_H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  setupHiDPI();
+
+  // Plot geometry (CSS px) - margins widen slightly in the larger-font example view
+  const M = { l: 66, r: 18, t: 18, b: 54 };
+  let PW = CSS_W - M.l - M.r;   // plot width
+  let PH = CSS_H - M.t - M.b;   // plot height
+  // Y-axis max is no longer fixed at 1000: with continuous production the
+  // steady-state levels of isotopes 1-3 and the ever-growing isotope 4 can
+  // exceed 1000, so the axis is rescaled each draw to fit the current curves.
+  let YMAX = 1000;
+  let YSTEP = 200;
+
+  // The axis max scales continuously with the data (a fixed 15% headroom
+  // above the tallest curve) instead of snapping to the next "nice" round
+  // number - that snapping was what made the axis appear to jump in sudden
+  // steps as the sliders moved. Gridline spacing is still restricted to a
+  // fixed set (100/200/500) chosen by how large the curves currently are,
+  // so the tick labels stay tidy even though the axis top does not.
+  function niceYAxis(maxVal){
+    if (!(maxVal > 0)) return { ymax: 1000, step: 200 };
+    const ymax = maxVal * 1.15;
+    let step;
+    if (ymax <= 800) step = 100;
+    else if (ymax <= 2000) step = 200;
+    else step = 500;
+    return { ymax: ymax, step: step };
+  }
+
+  function relayout(fs){
+    M.l = (fs > 1) ? 78 : 66;
+    M.b = (fs > 1) ? 62 : 54;
+    PW = CSS_W - M.l - M.r;
+    PH = CSS_H - M.t - M.b;
+  }
+
+  const colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#9467bd'];
+
+  // ---------- Physics: RK4 integration of the Bateman chain ----------
+  // Isotope 1 is now continuously produced at rate P (particles/min) in
+  // addition to decaying, so its rate equation gains a +P source term.
+  function deriv(N, l, P){
+    return [
+      P - l[0]*N[0],
+       l[0]*N[0] - l[1]*N[1],
+       l[1]*N[1] - l[2]*N[2],
+       l[2]*N[2]
+    ];
+  }
+  function integrate(hl1, hl2, hl3, P, N1_0, tmax){
+    const l = [Math.LN2/hl1, Math.LN2/hl2, Math.LN2/hl3];
+    const nsteps = 2000;
+    const dt = tmax / nsteps;
+    let N = [N1_0, 0, 0, 0];
+    const T = new Float64Array(nsteps+1);
+    const Y = [new Float64Array(nsteps+1), new Float64Array(nsteps+1),
+               new Float64Array(nsteps+1), new Float64Array(nsteps+1)];
+    for (let s=0; s<4; s++) Y[s][0] = N[s];
+    for (let i=0; i<nsteps; i++){
+      const k1 = deriv(N, l, P);
+      const a  = [N[0]+0.5*dt*k1[0], N[1]+0.5*dt*k1[1], N[2]+0.5*dt*k1[2], N[3]+0.5*dt*k1[3]];
+      const k2 = deriv(a, l, P);
+      const b  = [N[0]+0.5*dt*k2[0], N[1]+0.5*dt*k2[1], N[2]+0.5*dt*k2[2], N[3]+0.5*dt*k2[3]];
+      const k3 = deriv(b, l, P);
+      const c  = [N[0]+dt*k3[0], N[1]+dt*k3[1], N[2]+dt*k3[2], N[3]+dt*k3[3]];
+      const k4 = deriv(c, l, P);
+      N = [
+        N[0] + dt/6*(k1[0]+2*k2[0]+2*k3[0]+k4[0]),
+        N[1] + dt/6*(k1[1]+2*k2[1]+2*k3[1]+k4[1]),
+        N[2] + dt/6*(k1[2]+2*k2[2]+2*k3[2]+k4[2]),
+        N[3] + dt/6*(k1[3]+2*k2[3]+2*k3[3]+k4[3])
+      ];
+      T[i+1] = (i+1)*dt;
+      for (let s=0; s<4; s++) Y[s][i+1] = Math.max(0, N[s]);
+    }
+    return { T, Y, tmax };
+  }
+
+  // ---------- Rotated y-axis label ----------
+  // Primary: render horizontally to an offscreen canvas, then rotate the bitmap
+  // (keeps font weight uniform). Fallback: direct rotated text - used if the
+  // offscreen drawImage path fails on a given browser (e.g. some iOS Safari builds).
+  var _offLabel = null;
+  function drawYAxisLabel(text, cx, cy, fontPx){
+    const font = fontPx + 'px Helvetica, Arial, sans-serif';
+    try {
+      const dpr = window.devicePixelRatio || 1;
+      if (!_offLabel) _offLabel = document.createElement('canvas');
+      const off = _offLabel;
+      const octx = off.getContext('2d');
+      octx.font = font;
+      const w = Math.ceil(octx.measureText(text).width) + 4;
+      const h = Math.ceil(fontPx * 1.5);
+      off.width = Math.max(1, Math.round(w * dpr));
+      off.height = Math.max(1, Math.round(h * dpr));
+      octx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      octx.clearRect(0, 0, w, h);
+      octx.font = font;
+      octx.fillStyle = '#222';
+      octx.textBaseline = 'middle';
+      octx.textAlign = 'center';
+      octx.fillText(text, w/2, h/2);
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(-Math.PI/2);
+      ctx.drawImage(off, -w/2, -h/2, w, h);
+      ctx.restore();
+    } catch (e) {
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(-Math.PI/2);
+      ctx.font = font;
+      ctx.fillStyle = '#222';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(text, 0, 0);
+      ctx.restore();
+    }
+  }
+
+  // ---------- Drawing ----------
+  function xpix(t, tmax){ return M.l + (t / tmax) * PW; }
+  function ypix(n){ return M.t + (1 - n / YMAX) * PH; }
+
+  function draw(sol, step, labels, fs){
+    fs = fs || 1;
+    relayout(fs);
+    const tmax = sol.tmax;
+    ctx.clearRect(0, 0, CSS_W, CSS_H);
+
+    // Isotope 4 is only plotted (and only counted toward the y-axis range)
+    // when the "Isotope 4" checkbox is checked - by default its unbounded
+    // growth is excluded so it doesn't stretch the axis and squeeze the
+    // other curves toward the bottom.
+    const showIso4 = !!(ck4 && ck4.checked);
+    const nCurves = showIso4 ? 4 : 3;
+    let maxVal = 0;
+    for (let s=0; s<nCurves; s++){
+      const arr = sol.Y[s];
+      for (let i=0; i<arr.length; i++) if (arr[i] > maxVal) maxVal = arr[i];
+    }
+    const yInfo = niceYAxis(maxVal);
+    YMAX = yInfo.ymax;
+    YSTEP = yInfo.step;
+
+    // Grid + y ticks
+    ctx.strokeStyle = '#e6e6e6';
+    ctx.lineWidth = 1;
+    ctx.fillStyle = '#444';
+    ctx.font = (14.4 * fs) + 'px Helvetica, Arial, sans-serif';
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    for (let n=0; n<=YMAX; n+=YSTEP){
+      const y = ypix(n);
+      ctx.beginPath(); ctx.moveTo(M.l, y); ctx.lineTo(M.l+PW, y); ctx.stroke();
+      ctx.fillText(n, M.l-8, y);
+    }
+
+    // x ticks at multiples of the chosen spacing (10/20/30/40/50 min).
+    // tmax is continuous, so the last tick may fall short of the right edge.
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    const nt = Math.floor(tmax / step);
+    for (let k=0; k<=nt; k++){
+      const t = k * step;
+      const x = xpix(t, tmax);
+      ctx.strokeStyle = '#e6e6e6';
+      ctx.beginPath(); ctx.moveTo(x, M.t); ctx.lineTo(x, M.t+PH); ctx.stroke();
+      ctx.fillStyle = '#444';
+      ctx.fillText(t, x, M.t+PH+6);
+    }
+
+    // Axis box
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 1.2;
+    ctx.strokeRect(M.l, M.t, PW, PH);
+
+    // Curves (isotope 4 drawn only when its checkbox is checked)
+    ctx.lineWidth = 2.2;
+    for (let s=0; s<nCurves; s++){
+      ctx.strokeStyle = colors[s];
+      ctx.beginPath();
+      const Ys = sol.Y[s];
+      for (let i=0; i<sol.T.length; i++){
+        const x = xpix(sol.T[i], tmax);
+        const y = ypix(Ys[i]);
+        if (i===0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    }
+
+    // Axis titles
+    ctx.fillStyle = '#222';
+    ctx.font = (16.8 * fs) + 'px Helvetica, Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillText('time (min)', M.l + PW/2, M.t + PH + 30 * fs);
+    drawYAxisLabel('number of particles', 15, M.t + PH/2, 16.8 * fs);
+
+    // Labels placed directly on the curves (no separate legend)
+    const len = sol.T.length;
+    const clampX = function(x){ return Math.max(M.l+2, Math.min(M.l+PW-2, x)); };
+    // Center-aligned labels need extra margin so the full text (not just its
+    // anchor point) stays inside the plot instead of running off the edge.
+    const clampXC = function(x){ return Math.max(M.l+48, Math.min(M.l+PW-48, x)); };
+    const clampY = function(y){ return Math.max(M.t+10, Math.min(M.t+PH-8, y)); };
+    function argmax(arr){ let m=0; for (let i=1;i<arr.length;i++) if (arr[i]>arr[m]) m=i; return m; }
+    // With continuous production, isotopes 2 and 3 no longer peak and decay
+    // away - they rise monotonically toward a steady state, so their true
+    // max sits at (or right next to) the last time point. Placing a label
+    // there runs it off the right edge, so fall back to a fixed interior
+    // position whenever the "peak" is really just the end of the window.
+    function peakOrFallback(arr, fallbackFrac){
+      const m = argmax(arr);
+      if (m > 0.9*(len-1)) return Math.round(fallbackFrac*(len-1));
+      return m;
+    }
+
+    // Curve-label font: scales with fs, plus a net extra 3.5% in the example (211Pb)
+    // view (15% up for the larger example plot, then reduced 10% per request).
+    const labelFs = 16.8 * fs * (fs > 1 ? 1.035 : 1);
+
+    // Curve 1 (blue): on the descending curve, upper-left region
+    let iA = Math.round(0.12*(len-1));
+    drawCurveLabel(labels[0], clampX(xpix(sol.T[iA],tmax)+6),
+                   clampY(ypix(sol.Y[0][iA]) - 12*fs), colors[0], 'left', labelFs);
+
+    // Curve 4 (purple): below the rising curve, right region - only when shown
+    if (showIso4){
+      let iD = Math.round(0.66*(len-1));
+      drawCurveLabel(labels[3], clampXC(xpix(sol.T[iD],tmax)),
+                     clampY(ypix(sol.Y[3][iD]) + 16*fs), colors[3], 'center', labelFs);
+    }
+
+    // Curve 3 (green): above its peak (or, if it only plateaus, an interior point)
+    let iC = peakOrFallback(sol.Y[2], 0.58);
+    drawCurveLabel(labels[2], clampXC(xpix(sol.T[iC],tmax)),
+                   clampY(ypix(sol.Y[2][iC]) - 13*fs), colors[2], 'center', labelFs);
+
+    // Curve 2 (orange): above its peak (or, if it only plateaus, an interior point)
+    let iB = peakOrFallback(sol.Y[1], 0.38);
+    drawCurveLabel(labels[1], clampXC(xpix(sol.T[iB],tmax)),
+                   clampY(ypix(sol.Y[1][iB]) - 13*fs), colors[1], 'center', labelFs);
+  }
+
+  // ---------- On-curve label with white halo for legibility ----------
+  // `label` is either a plain string, or an isotope object {mass, sym} whose mass
+  // number is drawn as a smaller, raised superscript (uniform size on all browsers).
+  function drawCurveLabel(label, x, y, color, align, fontPx){
+    fontPx = fontPx || 14;
+    const halo = 'rgba(255,255,255,0.92)';
+    ctx.textBaseline = 'middle';
+    ctx.lineJoin = 'round';
+    ctx.lineWidth = 3.5;
+
+    if (typeof label === 'string'){
+      ctx.font = 'bold ' + fontPx + 'px Helvetica, Arial, sans-serif';
+      ctx.textAlign = align;
+      ctx.strokeStyle = halo; ctx.strokeText(label, x, y);
+      ctx.fillStyle = color;  ctx.fillText(label, x, y);
+      return;
+    }
+
+    // Isotope: superscript mass number followed by element symbol
+    const mainFont = 'bold ' + fontPx + 'px Helvetica, Arial, sans-serif';
+    const supFont  = 'bold ' + (fontPx * 0.66) + 'px Helvetica, Arial, sans-serif';
+    ctx.font = supFont;  const wMass = ctx.measureText(label.mass).width;
+    ctx.font = mainFont; const wSym  = ctx.measureText(label.sym).width;
+    const gap = 1;
+    const total = wMass + gap + wSym;
+    let sx = (align === 'left') ? x : (align === 'right') ? x - total : x - total/2;
+    const supY = y - fontPx * 0.30;
+
+    ctx.textAlign = 'left';
+    ctx.font = supFont;
+    ctx.strokeStyle = halo; ctx.strokeText(label.mass, sx, supY);
+    ctx.fillStyle = color;  ctx.fillText(label.mass, sx, supY);
+    ctx.font = mainFont;
+    ctx.strokeStyle = halo; ctx.strokeText(label.sym, sx + wMass + gap, y);
+    ctx.fillStyle = color;  ctx.fillText(label.sym, sx + wMass + gap, y);
+  }
+
+  // ---------- State + wiring ----------
+  const sP = document.getElementById('sP');
+  const s1 = document.getElementById('s1');
+  const s2 = document.getElementById('s2');
+  const s3 = document.getElementById('s3');
+  const vP = document.getElementById('vP');
+  const v1 = document.getElementById('v1');
+  const v2 = document.getElementById('v2');
+  const v3 = document.getElementById('v3');
+  const ck4 = document.getElementById('ck4');
+
+  function fmt(x){ return Number.isInteger(x) ? String(x) : x.toFixed(1); }
+
+  // Fixed time axis: 0-175 min for every slider combination (and the pictured
+  // example), so the x-axis no longer zooms in/out as the half-life sliders move.
+  const TMAX = 175;
+  const XSTEP = 25;
+
+  // Generic labels (slider mode) and the specific isotopes of the pictured chain.
+  // Isotope labels are structured so the mass number can be drawn as a proper
+  // superscript on the canvas (Unicode superscript glyphs render inconsistently
+  // across fonts/browsers, e.g. iOS Safari sizes them unevenly).
+  const GENERIC_LABELS = ['Isotope 1', 'Isotope 2', 'Isotope 3', 'Isotope 4'];
+  const EXAMPLE_LABELS = [
+    { mass: '211', sym: 'Pb' },
+    { mass: '211', sym: 'Bi' },
+    { mass: '207', sym: 'Tl' },
+    { mass: '207', sym: 'Pb' }
+  ];
+  const EXAMPLE_HL = { hl1: 36.1, hl2: 2.15, hl3: 4.79 };
+  const EXAMPLE_P = 20; // 211Pb production rate for the pictured example (particles/min)
+
+  const chainEq    = document.getElementById('chainEq');
+  const controls   = document.querySelector('.controls');
+  const exampleBtn = document.getElementById('exampleBtn');
+  const backBtn    = document.getElementById('backBtn');
+  let exampleMode = false;
+
+  function render(hl1, hl2, hl3, P, N1_0, labels, fs){
+    const sol = integrate(hl1, hl2, hl3, P, N1_0, TMAX);
+    draw(sol, XSTEP, labels, fs);
+  }
+
+  // Slider-driven exploration (generic labels, sliders shown, chain hidden).
+  // Isotope 1 starts at zero - all four isotopes build up from nothing as
+  // isotope 1 is continuously produced.
+  function update(){
+    exampleMode = false;
+    controls.style.display = '';
+    chainEq.style.display = 'none';
+    exampleBtn.classList.remove('active');
+    backBtn.style.display = 'none';
+    const P   = parseFloat(sP.value);
+    const hl1 = parseFloat(s1.value);
+    const hl2 = parseFloat(s2.value);
+    const hl3 = parseFloat(s3.value);
+    vP.textContent = fmt(P);
+    v1.textContent = fmt(hl1);
+    v2.textContent = fmt(hl2);
+    v3.textContent = fmt(hl3);
+    render(hl1, hl2, hl3, P, 0, GENERIC_LABELS, 1);
+  }
+
+  // Pictured example: fixed real half-lives, isotope labels, chain shown, sliders hidden,
+  // and the whole graph rendered 20% larger. 211Pb starts at zero and is continuously
+  // produced at EXAMPLE_P particles/min, matching the general production model.
+  window.showExample = function(){
+    exampleMode = true;
+    controls.style.display = 'none';
+    chainEq.style.display = 'block';
+    exampleBtn.classList.add('active');
+    backBtn.style.display = '';
+    render(EXAMPLE_HL.hl1, EXAMPLE_HL.hl2, EXAMPLE_HL.hl3, EXAMPLE_P, 0, EXAMPLE_LABELS, 1.2);
+    if (window.MathJax && window.MathJax.typesetPromise){
+      window.MathJax.typesetPromise([chainEq]);
+    }
+  };
+
+  // Return to the slider case
+  window.goBack = function(){ update(); };
+
+  function redraw(){
+    if (exampleMode){
+      render(EXAMPLE_HL.hl1, EXAMPLE_HL.hl2, EXAMPLE_HL.hl3, EXAMPLE_P, 0, EXAMPLE_LABELS, 1.2);
+    } else {
+      render(parseFloat(s1.value), parseFloat(s2.value), parseFloat(s3.value),
+             parseFloat(sP.value), 0, GENERIC_LABELS, 1);
+    }
+  }
+
+  // ---------- Panels (defined before the first draw so buttons always work) ----------
+  window.togglePanel = function(name){
+    const ids = ['directions','details','about'];
+    ids.forEach(function(id){
+      const el = document.getElementById('panel-'+id);
+      if (id === name){
+        el.style.display = (el.style.display === 'block') ? 'none' : 'block';
+      } else {
+        el.style.display = 'none';
+      }
+    });
+    if (window.MathJax && window.MathJax.typesetPromise){
+      window.MathJax.typesetPromise();
+    }
+  };
+
+  sP.addEventListener('input', update);
+  s1.addEventListener('input', update);
+  s2.addEventListener('input', update);
+  s3.addEventListener('input', update);
+  ck4.addEventListener('change', redraw);
+  window.addEventListener('resize', function(){
+    try { setupHiDPI(); redraw(); } catch (e) {}
+  });
+
+  try { update(); } catch (e) {}
+})();
+</script>
+</body>
+</html>
