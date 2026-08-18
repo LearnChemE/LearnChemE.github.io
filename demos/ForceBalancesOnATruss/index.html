@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Force Balances on a Truss</title>
+<style>
+  :root{
+    --accent:#98000D;
+    --accent-hover:#7a0009;
+  }
+  *{box-sizing:border-box;}
+  body{
+    font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;
+    margin:0;
+    padding:18px 14px 30px;
+    background:#ffffff;
+    color:#1a1a1a;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+  h1{
+    font-size:20px;
+    font-weight:700;
+    margin:0 0 14px;
+    text-align:center;
+    color:#111;
+  }
+  .sim-wrap{
+    width:100%;
+    max-width:700px;
+    position:relative;
+  }
+  .canvas-frame{
+    width:100%;
+    border:1px solid #d9d9d9;
+    border-radius:4px;
+    background:#ffffff;
+    padding:6px 6px 2px;
+    position:relative;
+  }
+  canvas{
+    display:block;
+    width:100%;
+    height:auto;
+    cursor:default;
+  }
+  .controls{
+    margin-top:14px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .checkbox-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:22px;
+    align-items:flex-start;
+  }
+  .checkbox-item{
+    display:flex;
+    align-items:flex-start;
+    gap:7px;
+    font-size:14px;
+    line-height:1.35;
+    cursor:pointer;
+    user-select:none;
+  }
+  .checkbox-item input{
+    margin-top:2px;
+    width:15px;
+    height:15px;
+    accent-color:var(--accent);
+    cursor:pointer;
+    flex-shrink:0;
+  }
+  .tension-word{ color:#ff0040; }
+  .compression-word{ color:#009900; }
+  .slider-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:26px;
+  }
+  .slider-item{
+    flex:1 1 260px;
+    min-width:220px;
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+  }
+  .slider-label{
+    font-size:14px;
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+  }
+  .slider-label .name{
+    color:#1a1a1a;
+  }
+  .slider-label .val{
+    font-weight:700;
+    color:var(--accent);
+    font-variant-numeric:tabular-nums;
+  }
+  input[type=range]{
+    width:100%;
+    accent-color:var(--accent);
+    height:20px;
+    cursor:pointer;
+  }
+  .panel-buttons{
+    margin-bottom:14px;
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    justify-content:flex-start;
+    position:relative;
+    z-index:25;
+  }
+  .panel-btn{
+    background:var(--accent);
+    color:#fff;
+    border:none;
+    border-radius:4px;
+    padding:9.6px 21.6px;
+    font-size:16.2px;
+    font-family:inherit;
+    font-weight:400;
+    letter-spacing:.2px;
+    cursor:pointer;
+    transition:background .15s ease;
+  }
+  .panel-btn:hover{ background:var(--accent-hover); }
+  .panel-btn.active{ background:#5a0008; }
+  .panel{
+    display:none;
+    position:absolute;
+    padding:16px 18px;
+    border:1px solid #d9d9d9;
+    border-radius:4px;
+    background:#fafafa;
+    box-shadow:0 6px 18px rgba(0,0,0,0.16);
+    font-size:16.2px;
+    line-height:1.55;
+    width:560px;
+    max-width:90vw;
+    z-index:20;
+    overflow-y: auto;
+    max-height: 100%;
+  }
+  .panel.open{ display:block; }
+  .panel-stacked{
+    position:relative !important;
+    width:100% !important;
+    max-width:700px !important;
+    box-shadow:none;
+    margin-top:14px;
+  }
+  .panel-close{
+    position:absolute;
+    top:8px;
+    right:10px;
+    width:28px;
+    height:28px;
+    border:none;
+    background:none;
+    color:#999;
+    font-size:22px;
+    line-height:1;
+    font-family:Helvetica, Arial, sans-serif;
+    cursor:pointer;
+    border-radius:4px;
+    padding:0;
+  }
+  .panel-close:hover{ color:#fff; background:var(--accent); }
+  .panel h2{
+    margin:0 0 10px;
+    padding-right:30px;
+    font-size:15px;
+    letter-spacing:.6px;
+    color:var(--accent);
+    text-transform:uppercase;
+  }
+  .panel p{ margin:0 0 10px; }
+  .panel p:last-child{ margin-bottom:0; }
+  .eqn{
+    display:block;
+    margin:10px 0;
+    font-style:italic;
+    font-size:16.7px;
+  }
+  sub{ font-size:70%; }
+  .joint-name{ font-weight:600; margin-top:14px; }
+  .fig-wrap{ text-align:center; margin:14px 0; }
+  .fig-wrap svg{ max-width:100%; height:auto; }
+  .fig-caption{ text-align:center; font-size:15px; color:#555; margin-top:4px; }
+  .panel a{ color:var(--accent); }
+  .ref{ font-size:15px; color:#333; margin-top:14px; }
+</style>
+</head>
+<body>
+
+<noscript>
+  <div style="max-width:640px;margin:40px auto;padding:16px 20px;border:1px solid #e2b3b3;background:#fff5f5;border-radius:4px;font-family:Helvetica,Arial,sans-serif;color:#7a0009;">
+    <strong>JavaScript is required for this simulation, but it isn't running.</strong><br><br>
+    If you're viewing this as a preview (for example, a Quick Look preview opened from Files, Mail, or a download tray on an iPad or iPhone), Apple disables JavaScript in that preview mode. To fix this, open the file directly in Safari instead: after downloading, tap the downward-arrow (downloads) icon in Safari's toolbar and select the file from that list, or use &ldquo;Share&rdquo; &rarr; &ldquo;Open in Safari&rdquo; rather than the Files app preview.
+  </div>
+</noscript>
+
+<div id="jsErrorBanner" style="display:none;max-width:640px;margin:20px auto 0;padding:14px 18px;border:1px solid #e2b3b3;background:#fff5f5;border-radius:4px;font-family:Helvetica,Arial,sans-serif;color:#7a0009;font-size:14px;"></div>
+
+
+<div class="sim-wrap" id="simWrap">
+  <div class="panel-buttons">
+    <button class="panel-btn" id="btnDirections">Directions</button>
+    <button class="panel-btn" id="btnDetails">Details</button>
+    <button class="panel-btn" id="btnAbout">About</button>
+  </div>
+
+  <div class="canvas-frame">
+    <canvas id="trussCanvas"></canvas>
+  </div>
+
+  <div class="controls">
+    <div class="checkbox-row">
+      <label class="checkbox-item">
+        <input type="checkbox" id="forcesChk" checked>
+        <span>make members under <span class="tension-word">tension red</span> and under <span class="compression-word">compression green</span></span>
+      </label>
+      <label class="checkbox-item">
+        <input type="checkbox" id="labelsChk" checked>
+        <span>show member forces</span>
+      </label>
+    </div>
+
+    <div class="slider-row">
+      <div class="slider-item">
+        <div class="slider-label"><span class="name">center point load (kN)</span><span class="val" id="fdVal">10.</span></div>
+        <input type="range" id="fdSlider" min="0" max="15" step="1" value="10">
+      </div>
+      <div class="slider-item">
+        <div class="slider-label"><span class="name">right point load (kN)</span><span class="val" id="ffVal">15.</span></div>
+        <input type="range" id="ffSlider" min="0" max="25" step="1" value="15">
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="panelDirections">
+    <button class="panel-close" data-close="Directions" aria-label="Close Directions">&times;</button>
+    <h2>Directions</h2>
+    <p>This Demonstration calculates the forces on the members of a planar truss.</p>
+    <p>Use the sliders to set the two point loads at the center and the right (forces in negative <i>y</i> direction), <i>F</i><sub>D</sub> and <i>F</i><sub>F</sub>. Check &ldquo;show member forces&rdquo; to show the truss member forces. Check &ldquo;make members under tension red and under compression green&rdquo; to show the red and green arrows.</p>
+    <p>Arrows that point outward (green) represent the member response to compression forces, and arrows that point inward (red) represent the member response to tension forces. Compression acts to shorten the member and tension acts to lengthen the member.</p>
+    <p>The black members are zero members; that is, these members are neither in tension nor in compression, so the force is 0 kN. The purpose of zero members is to provide stability and extra support to the structure in the event of another member failing.</p>
+    <p>When the boxes &ldquo;make members under tension red and under compression green&rdquo; and &ldquo;show member forces&rdquo; are checked, move the mouse over a pivot point to show arrows that represent forces (and the values of the forces) in the <i>x</i> and <i>y</i> directions at that point. This breaks the forces in the diagonal members into their <i>x</i> and <i>y</i> components.</p>
+  </div>
+
+  <div class="panel" id="panelDetails">
+    <button class="panel-close" data-close="Details" aria-label="Close Details">&times;</button>
+    <h2>Details</h2>
+    <p>The method of joints is used to calculate the forces on each member of the truss. This is done by solving force balances around individual joints. First, calculate the reactions at the supports. Taking the sum of the moments at the left support:</p>
+    <span class="eqn">&Sigma;<i>M</i><sub>A</sub> = 0 = 3<i>wF</i><sub>D</sub> + 5<i>wF</i><sub>F</sub> &minus; 6<i>wR</i><sub>G</sub>,</span>
+    <p>where <i>M</i><sub>A</sub> is the moment around support A (left support), <i>w</i> is the width of one member, <i>F<sub>i</sub></i> &lt; 0 is the force applied to the joints at <i>i</i> = (D, F), and <i>R</i><sub>G</sub> is the reaction at support G (right). The first two terms (3<i>wF</i><sub>D</sub> and 5<i>wF</i><sub>F</sub>) in the moment balance are positive because they would cause a clockwise rotation, and the third term (&minus;6<i>wR</i><sub>G</sub>) is negative because it would cause a counterclockwise rotation.</p>
+    <p>Next, take the sum of the forces in the <i>y</i> direction to get <i>R</i><sub>A</sub>:</p>
+    <span class="eqn">&Sigma;<i>F</i><sub>y</sub> = 0 = <i>R</i><sub>A</sub> + <i>R</i><sub>G</sub> &minus; <i>F</i><sub>D</sub> &minus; <i>F</i><sub>F</sub>.</span>
+    <p>Begin solving for the forces of the members by doing force balances at the joints. The order of the balances around the joints listed here is the order in which they should be solved. Force balances are done assuming we can use logic to figure out which members are under tension and which are under compression. Starting at joint A, there is a reaction force pushing up, so <i>F</i><sub>0</sub> must be pushing down (under compression). A labeled truss is shown in Figure 1.</p>
+
+    <p class="joint-name">Joint A</p>
+    <span class="eqn">&Sigma;<i>F</i><sub>y</sub> = 0 = &minus;<i>F</i><sub>0</sub> sin&theta; + <i>R</i><sub>A</sub>,</span>
+    <span class="eqn">&Sigma;<i>F</i><sub>x</sub> = 0 = &minus;<i>F</i><sub>0</sub> cos&theta; + <i>F</i><sub>2</sub>.</span>
+
+    <p class="joint-name">Joint L</p>
+    <span class="eqn">&Sigma;<i>F</i><sub>y</sub> = 0 = <i>F</i><sub>1</sub>,</span>
+    <span class="eqn">&Sigma;<i>F</i><sub>x</sub> = 0 = &minus;<i>F</i><sub>2</sub> + <i>F</i><sub>3</sub>.</span>
+
+    <p class="joint-name">Joint B</p>
+    <span class="eqn">&Sigma;<i>F</i><sub>y</sub> = 0 = <i>F</i><sub>0</sub> sin&theta; &minus; <i>F</i><sub>1</sub> &minus; <i>F</i><sub>7</sub> sin&theta;,</span>
+    <span class="eqn">&Sigma;<i>F</i><sub>x</sub> = 0 = <i>F</i><sub>0</sub> cos&theta; &minus; <i>F</i><sub>5</sub> + <i>F</i><sub>7</sub> cos&theta;.</span>
+
+    <p class="joint-name">Joint C</p>
+    <span class="eqn">&Sigma;<i>F</i><sub>y</sub> = 0 = <i>F</i><sub>6</sub>,</span>
+    <span class="eqn">&Sigma;<i>F</i><sub>x</sub> = 0 = <i>F</i><sub>5</sub> &minus; <i>F</i><sub>8</sub>.</span>
+
+    <p class="joint-name">Joint K</p>
+    <span class="eqn">&Sigma;<i>F</i><sub>y</sub> = 0 = <i>F</i><sub>6</sub> + <i>F</i><sub>7</sub> sin&theta; &minus; <i>F</i><sub>12</sub> sin&theta;,</span>
+    <span class="eqn">&Sigma;<i>F</i><sub>x</sub> = 0 = &minus;<i>F</i><sub>3</sub> &minus; <i>F</i><sub>7</sub> cos&theta; &minus; <i>F</i><sub>12</sub> cos&theta; + <i>F</i><sub>4</sub>.</span>
+
+    <p class="joint-name">Joint J</p>
+    <span class="eqn">&Sigma;<i>F</i><sub>y</sub> = 0 = <i>F</i><sub>9</sub>,</span>
+    <span class="eqn">&Sigma;<i>F</i><sub>x</sub> = 0 = &minus;<i>F</i><sub>4</sub> + <i>F</i><sub>11</sub>.</span>
+
+    <p class="joint-name">Joint D</p>
+    <span class="eqn">&Sigma;<i>F</i><sub>y</sub> = 0 = <i>F</i><sub>9</sub> + <i>F</i><sub>10</sub> sin&theta; + <i>F</i><sub>12</sub> sin&theta; &minus; <i>F</i><sub>D</sub>,</span>
+    <span class="eqn">&Sigma;<i>F</i><sub>x</sub> = 0 = <i>F</i><sub>8</sub> &minus; <i>F</i><sub>10</sub> cos&theta; + <i>F</i><sub>12</sub> cos&theta; &minus; <i>F</i><sub>13</sub>.</span>
+
+    <p class="joint-name">Joint E</p>
+    <span class="eqn">&Sigma;<i>F</i><sub>y</sub> = 0 = <i>F</i><sub>14</sub>,</span>
+    <span class="eqn">&Sigma;<i>F</i><sub>x</sub> = 0 = <i>F</i><sub>13</sub> &minus; <i>F</i><sub>15</sub>.</span>
+
+    <p class="joint-name">Joint I</p>
+    <span class="eqn">&Sigma;<i>F</i><sub>y</sub> = 0 = &minus;<i>F</i><sub>10</sub> sin&theta; + <i>F</i><sub>14</sub> + <i>F</i><sub>16</sub> sin&theta;,</span>
+    <span class="eqn">&Sigma;<i>F</i><sub>x</sub> = 0 = <i>F</i><sub>10</sub> cos&theta; &minus; <i>F</i><sub>11</sub> + <i>F</i><sub>16</sub> cos&theta; + <i>F</i><sub>17</sub>.</span>
+
+    <p class="joint-name">Joint H</p>
+    <span class="eqn">&Sigma;<i>F</i><sub>y</sub> = 0 = <i>F</i><sub>18</sub>,</span>
+    <span class="eqn">&Sigma;<i>F</i><sub>x</sub> = 0 = &minus;<i>F</i><sub>17</sub> + <i>F</i><sub>20</sub>.</span>
+
+    <p class="joint-name">Joint G</p>
+    <span class="eqn">&Sigma;<i>F</i><sub>y</sub> = 0 = &minus;<i>F</i><sub>19</sub> sin&theta; + <i>R</i><sub>G</sub>.</span>
+
+    <p>Note that all the vertical members are zero members, which means they are neither under tension nor under compression (force is 0 kN).</p>
+
+    <div class="fig-wrap" id="figureWrap"></div>
+    <p class="fig-caption">Figure 1.</p>
+    <p class="fig-caption">All forces are in kN.</p>
+
+    <p class="ref"><b>Reference</b><br>
+    [1] SkyCiv Cloud Engineering Software. &ldquo;Tutorial to Solve Truss by Method of Sections.&rdquo; (Aug 29, 2017) <a href="https://skyciv.com/tutorials/tutorial-to-solve-truss-by-method-of-sections/" target="_blank" rel="noopener">skyciv.com/tutorials/tutorial-to-solve-truss-by-method-of-sections</a>.</p>
+  </div>
+
+  <div class="panel" id="panelAbout">
+    <button class="panel-close" data-close="About" aria-label="Close About">&times;</button>
+    <h2>About</h2>
+    <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/ForceBalancesOnATruss/" target="_blank" rel="noopener">Mathematica simulation</a> by Rachael L. Baumann. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988) in collaboration with Washington State University. Address any questions or comments to LearnChemE@gmail.com</p>
+  </div>
+</div>
+
+<script>
+window.onerror = function(msg, url, line, col, err){
+  var banner = document.getElementById('jsErrorBanner');
+  if(banner){
+    banner.style.display = 'block';
+    banner.innerHTML = '<strong>This simulation hit an error.</strong><br>' +
+      'Details: ' + msg + ' (line ' + line + ')' +
+      '<br><br>If you are on an iPad or iPhone, try opening this file directly in Safari (Safari\u2019s Downloads list, or Share &rarr; Open in Safari) rather than a Files/Mail preview.';
+  }
+  return false;
+};
+(function(){
+  "use strict";
+  try {
+
+  // ---------- Geometry ----------
+  // Truss unit spacing
+  const w = 5, h = 5;
+  const theta = Math.atan2(h, w);
+  const sinT = Math.sin(theta), cosT = Math.cos(theta);
+
+  // Joint coordinates in truss units
+  const joints = {
+    A:[0,0],  L:[5,0],  K:[10,0], J:[15,0], I:[20,0], H:[25,0], G:[30,0],
+    B:[5,5],  C:[10,5], D:[15,5], E:[20,5], F:[25,5]
+  };
+
+  // Members: id, endpoints, type
+  const members = [
+    {id:'F0',  a:'A', b:'B', type:'diag'},
+    {id:'F1',  a:'B', b:'L', type:'vert'},
+    {id:'F2',  a:'A', b:'L', type:'bottom'},
+    {id:'F3',  a:'L', b:'K', type:'bottom'},
+    {id:'F4',  a:'K', b:'J', type:'bottom'},
+    {id:'F5',  a:'B', b:'C', type:'top'},
+    {id:'F6',  a:'C', b:'K', type:'vert'},
+    {id:'F7',  a:'B', b:'K', type:'diag'},
+    {id:'F8',  a:'C', b:'D', type:'top'},
+    {id:'F9',  a:'D', b:'J', type:'vert'},
+    {id:'F10', a:'D', b:'I', type:'diag'},
+    {id:'F11', a:'J', b:'I', type:'bottom'},
+    {id:'F12', a:'K', b:'D', type:'diag'},
+    {id:'F13', a:'D', b:'E', type:'top'},
+    {id:'F14', a:'E', b:'I', type:'vert'},
+    {id:'F15', a:'E', b:'F', type:'top'},
+    {id:'F16', a:'I', b:'F', type:'diag'},
+    {id:'F17', a:'I', b:'H', type:'bottom'},
+    {id:'F18', a:'F', b:'H', type:'vert'},
+    {id:'F19', a:'F', b:'G', type:'diag'},
+    {id:'F20', a:'H', b:'G', type:'bottom'}
+  ];
+
+  // Label anchor positions in truss units (matches original CDF InsetBox positions)
+  const labelPos = {
+    F0:[2.5,2.5], F1:[5,2.5], F2:[2.5,0], F3:[7.5,0], F4:[12.5,0],
+    F5:[7.5,5], F6:[10,2.5], F7:[7.5,2.5], F8:[12.5,5], F9:[15,2.5],
+    F10:[17.5,2.5], F11:[17.5,0], F12:[12.5,2.5], F13:[17.5,5],
+    F14:[20,2.5], F15:[22.5,5], F16:[22.5,2.5], F17:[22.5,0],
+    F18:[25,2.5], F19:[27.5,2.5], F20:[27.5,0]
+  };
+
+  // Joints that have diagonal members meeting at them (for hover x/y breakdown)
+  // joint -> list of member ids that are diagonal at that joint
+  const jointDiagonals = {
+    A:['F0'], B:['F0','F7'], K:['F7','F12'], D:['F12','F10'],
+    I:['F10','F16'], F:['F16','F19'], G:['F19']
+  };
+
+  // ---------- Physics ----------
+  function solveTruss(FD, FF){
+    const RG = (3*w*FD + 5*w*FF) / (6*w);
+    const RA = FD + FF - RG;
+
+    const F0 = -RA / sinT;
+    const F2 = -F0 * cosT;
+
+    const F1 = 0.0;
+    const F3 = F2;
+
+    const F7 = -F0 - F1/sinT;
+    const F5 = (F0 - F7) * cosT;
+
+    const F6 = 0.0;
+    const F8 = F5;
+
+    const F12 = -F7 - F6/sinT;
+    const F4 = F3 + F7*cosT - F12*cosT;
+
+    const F9 = 0.0;
+    const F11 = F4;
+
+    const F10 = -F12 - F9/sinT - FD/sinT;
+    const F13 = F8 + F12*cosT - F10*cosT;
+
+    const F14 = 0.0;
+    const F15 = F13;
+
+    const F16 = -F10 - F14/sinT;
+    const F17 = F11 + F10*cosT - F16*cosT;
+
+    const F18 = 0.0;
+    const F20 = F17;
+
+    const F19 = -RG / sinT;
+
+    return {RA:RA, RG:RG, F0:F0, F1:F1, F2:F2, F3:F3, F4:F4, F5:F5, F6:F6, F7:F7,
+            F8:F8, F9:F9, F10:F10, F11:F11, F12:F12, F13:F13, F14:F14, F15:F15,
+            F16:F16, F17:F17, F18:F18, F19:F19, F20:F20};
+  }
+
+  // ---------- Canvas setup ----------
+  const canvas = document.getElementById('trussCanvas');
+  const ctx = canvas.getContext('2d');
+
+  // Layout constants (in CSS px, before DPR scaling) — recomputed responsively
+  let CSS_W, CSS_H, marginL, marginR, marginT, marginB, drawW, drawH, scale, originX, originY;
+  const REF_W = 660, REF_H = 330; // reference aspect ratio / proportions
+
+  function computeLayout(){
+    const frame = document.querySelector('.canvas-frame');
+    const available = Math.max(300, frame.clientWidth - 12);
+    CSS_W = Math.min(700, available);
+    CSS_H = CSS_W * (REF_H / REF_W);
+    marginL = CSS_W * (70/REF_W);
+    marginR = CSS_W * (70/REF_W);
+    marginT = CSS_H * (95/REF_H);
+    marginB = CSS_H * (95/REF_H);
+    drawW = CSS_W - marginL - marginR;
+    drawH = CSS_H - marginT - marginB;
+    scale = Math.min(drawW/30, drawH/5);
+    originX = marginL + (drawW - 30*scale)/2;
+    originY = CSS_H - marginB - (drawH - 5*scale)/2; // y=0 baseline
+  }
+
+  function toPx(pt){
+    return [originX + pt[0]*scale, originY - pt[1]*scale];
+  }
+
+  function setupCanvas(){
+    computeLayout();
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = CSS_W * dpr;
+    canvas.height = CSS_H * dpr;
+    canvas.style.width = CSS_W + 'px';
+    canvas.style.height = CSS_H + 'px';
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  setupCanvas();
+
+  // ---------- Colors ----------
+  const colTension = '#ff0040';
+  const colCompression = '#009900';
+  const colZero = '#000000';
+  const colBlue = '#1a4fd6';
+
+  function fmt1(x){
+    // one decimal place, matches NumberForm[x,{4,1}]
+    let v = Math.abs(x) < 0.05 ? 0 : x;
+    return v.toFixed(1);
+  }
+
+  // ---------- State ----------
+  const forcesChk = document.getElementById('forcesChk');
+  const labelsChk = document.getElementById('labelsChk');
+  const fdSlider = document.getElementById('fdSlider');
+  const ffSlider = document.getElementById('ffSlider');
+  const fdVal = document.getElementById('fdVal');
+  const ffVal = document.getElementById('ffVal');
+
+  let hoverJoint = null;
+
+  function currentState(){
+    return {
+      FD: parseFloat(fdSlider.value),
+      FF: parseFloat(ffSlider.value),
+      showForces: forcesChk.checked,
+      showLabels: labelsChk.checked
+    };
+  }
+
+  // ---------- Drawing ----------
+  function drawArrowHead(ctx, x, y, angle, size, color){
+    ctx.save();
+    ctx.translate(x,y);
+    ctx.rotate(angle);
+    ctx.beginPath();
+    ctx.moveTo(0,0);
+    ctx.lineTo(-size, size*0.5);
+    ctx.lineTo(-size, -size*0.5);
+    ctx.closePath();
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawStraightArrow(x1,y1,x2,y2,color,lw,headSize){
+    ctx.strokeStyle = color;
+    ctx.lineWidth = lw;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(x1,y1);
+    ctx.lineTo(x2,y2);
+    ctx.stroke();
+    const angle = Math.atan2(y2-y1, x2-x1);
+    drawArrowHead(ctx, x2, y2, angle, headSize, color);
+  }
+
+  function draw(){
+    const st = currentState();
+    const sol = solveTruss(st.FD, st.FF);
+    const k = CSS_W / REF_W; // responsive scale factor for fonts/arrows/offsets
+
+    ctx.clearRect(0,0,CSS_W,CSS_H);
+    ctx.font = (13*k)+'px Helvetica, Arial, sans-serif';
+    ctx.textBaseline = 'middle';
+    ctx.textAlign = 'center';
+
+    // background support ground hatching
+    function drawGround(px, py){
+      ctx.strokeStyle = '#999';
+      ctx.lineWidth = 1;
+      const s = 9*k;
+      ctx.beginPath();
+      for(let i=-2;i<=2;i++){
+        ctx.moveTo(px + i*s - s*0.6, py + 8*k);
+        ctx.lineTo(px + i*s + s*0.6, py + 8*k + s*0.9);
+      }
+      ctx.stroke();
+    }
+
+    // pin/roller triangle support symbol
+    function drawSupport(px, py, roller){
+      ctx.fillStyle = '#e8e8e8';
+      ctx.strokeStyle = '#333';
+      ctx.lineWidth = 1.4;
+      const s = 11*k;
+      ctx.beginPath();
+      ctx.moveTo(px, py);
+      ctx.lineTo(px - s, py + s*1.6);
+      ctx.lineTo(px + s, py + s*1.6);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      if(roller){
+        ctx.beginPath();
+        ctx.arc(px - s*0.55, py + s*1.85, 3.2*k, 0, Math.PI*2);
+        ctx.arc(px, py + s*1.85, 3.2*k, 0, Math.PI*2);
+        ctx.arc(px + s*0.55, py + s*1.85, 3.2*k, 0, Math.PI*2);
+        ctx.fill();
+        drawGround(px, py + s*2.1);
+      } else {
+        drawGround(px, py + s*1.6);
+      }
+    }
+
+    const pA = toPx(joints.A);
+    const pG = toPx(joints.G);
+    drawSupport(pA[0], pA[1], false);
+    drawSupport(pG[0], pG[1], true);
+
+    // --- member lines/arrows ---
+    members.forEach(function(m){
+      const p1 = toPx(joints[m.a]);
+      const p2 = toPx(joints[m.b]);
+      const F = sol[m.id];
+      const isZero = Math.abs(F) < 0.05;
+
+      let color = colZero;
+      if(st.showForces && !isZero){
+        color = F < 0 ? colCompression : colTension;
+      }
+
+      if(!st.showForces || isZero){
+        ctx.strokeStyle = isZero ? '#333' : '#333';
+        ctx.lineWidth = 2.4*k;
+        ctx.beginPath();
+        ctx.moveTo(p1[0],p1[1]);
+        ctx.lineTo(p2[0],p2[1]);
+        ctx.stroke();
+      } else {
+        // colored member: draw as a line, plus arrowheads indicating tension(inward)/compression(outward)
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 3.2*k;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(p1[0],p1[1]);
+        ctx.lineTo(p2[0],p2[1]);
+        ctx.stroke();
+
+        const mx = (p1[0]+p2[0])/2, my=(p1[1]+p2[1])/2;
+        const angle1 = Math.atan2(p1[1]-my, p1[0]-mx); // toward p1
+        const angle2 = Math.atan2(p2[1]-my, p2[0]-mx); // toward p2
+        const headSize = 8*k;
+        if(F < 0){
+          // compression: arrows point outward, away from center, at each end
+          drawArrowHead(ctx, p1[0], p1[1], angle1, headSize, color);
+          drawArrowHead(ctx, p2[0], p2[1], angle2, headSize, color);
+        } else {
+          // tension: arrows point inward, toward center, placed a bit off from ends
+          const t = 0.28;
+          const q1x = p1[0] + (mx-p1[0])*t, q1y = p1[1] + (my-p1[1])*t;
+          const q2x = p2[0] + (mx-p2[0])*t, q2y = p2[1] + (my-p2[1])*t;
+          drawArrowHead(ctx, q1x, q1y, angle2, headSize, color);
+          drawArrowHead(ctx, q2x, q2y, angle1, headSize, color);
+        }
+      }
+    });
+
+    // --- joint pins ---
+    Object.keys(joints).forEach(function(key){
+      const p = toPx(joints[key]);
+      ctx.beginPath();
+      ctx.arc(p[0],p[1],4.2*k,0,Math.PI*2);
+      ctx.fillStyle = '#fff';
+      ctx.fill();
+      ctx.lineWidth = 1.6;
+      ctx.strokeStyle = '#333';
+      ctx.stroke();
+    });
+
+    // --- member force labels ---
+    if(st.showLabels || st.showForces){
+      members.forEach(function(m){
+        const F = sol[m.id];
+        const isZero = Math.abs(F) < 0.05;
+        const lp = toPx(labelPos[m.id]);
+        let text, color;
+
+        if(st.showLabels){
+          text = fmt1(Math.abs(F));
+          color = st.showForces ? (isZero ? '#000' : (F<0?colCompression:colTension)) : '#000';
+        } else if(st.showForces){
+          text = isZero ? '0 member' : (F<0 ? '(c)' : '(t)');
+          color = isZero ? '#000' : (F<0?colCompression:colTension);
+        } else {
+          return;
+        }
+
+        ctx.font = '600 '+(12*k)+'px Helvetica, Arial, sans-serif';
+        const padX = 4*k, padY = 2*k;
+        const tw = ctx.measureText(text).width;
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(lp[0]-tw/2-padX, lp[1]-7*k-padY, tw+2*padX, 14*k+2*padY);
+        ctx.fillStyle = color;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(text, lp[0], lp[1]);
+      });
+    }
+
+    // --- load arrows (FD at D, FF at F), pointing down onto the joint ---
+    function drawLoad(jointKey, val){
+      if(Math.abs(val) < 0.05) return;
+      const p = toPx(joints[jointKey]);
+      const len = 46*k;
+      drawStraightArrow(p[0], p[1]-len-6*k, p[0], p[1]-6*k, colBlue, 2.6*k, 9*k);
+      ctx.font = '600 '+(13*k)+'px Helvetica, Arial, sans-serif';
+      ctx.fillStyle = colBlue;
+      ctx.textAlign = 'center';
+      ctx.fillText(fmt1(val) + ' kN', p[0], p[1]-len-16*k);
+    }
+    drawLoad('D', st.FD);
+    drawLoad('F', st.FF);
+
+    // --- reaction arrows (RA at A, RG at G), pointing up ---
+    function drawReaction(jointKey, val, label){
+      const p = toPx(joints[jointKey]);
+      const len = 40*k;
+      drawStraightArrow(p[0], p[1]+len+18*k, p[0], p[1]+18*k, colBlue, 2.6*k, 9*k);
+      ctx.font = '600 '+(13*k)+'px Helvetica, Arial, sans-serif';
+      ctx.fillStyle = colBlue;
+      ctx.textAlign = 'center';
+      ctx.fillText(label + ' = ' + fmt1(val) + ' kN', p[0], p[1]+len+32*k);
+    }
+    drawReaction('A', sol.RA, 'RA');
+    drawReaction('G', sol.RG, 'RG');
+
+    // --- joint labels (letters) ---
+    ctx.font = '600 '+(12*k)+'px Helvetica, Arial, sans-serif';
+    Object.keys(joints).forEach(function(key){
+      const p = toPx(joints[key]);
+      const above = (joints[key][1] === 5);
+      const dy = above ? -14*k : 14*k;
+      ctx.fillStyle = '#555';
+      ctx.textAlign = 'center';
+      ctx.fillText(key, p[0], p[1]+dy);
+    });
+
+    // --- hover: x/y component breakdown at diagonal joints ---
+    if(st.showForces && st.showLabels && hoverJoint && jointDiagonals[hoverJoint]){
+      const jp = toPx(joints[hoverJoint]);
+      ctx.beginPath();
+      ctx.arc(jp[0], jp[1], 8*k, 0, Math.PI*2);
+      ctx.strokeStyle = '#333';
+      ctx.lineWidth = 1.4;
+      ctx.stroke();
+
+      jointDiagonals[hoverJoint].forEach(function(mid, idx){
+        const F = sol[mid];
+        const absF = Math.abs(F);
+        if(absF < 0.05) return;
+        const color = F < 0 ? colCompression : colTension;
+        const fx = absF * cosT;
+        const fy = absF * sinT;
+        const dir = (idx % 2 === 0) ? -1 : 1;
+
+        function labelWithBg(text, x, y, align){
+          ctx.font = (11*k)+'px Helvetica, Arial, sans-serif';
+          ctx.textAlign = align;
+          ctx.textBaseline = 'middle';
+          const tw = ctx.measureText(text).width;
+          const padX = 3*k, padY = 2*k;
+          let boxX = x;
+          if(align === 'left') boxX = x - padX;
+          else if(align === 'right') boxX = x - tw - padX;
+          else boxX = x - tw/2 - padX;
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(boxX, y - 6.5*k - padY, tw + 2*padX, 13*k + 2*padY);
+          ctx.fillStyle = color;
+          ctx.fillText(text, x, y);
+        }
+
+        // x component arrow (horizontal), offset vertically so multiple members don't overlap
+        const xArrowLen = 32*k;
+        const yBase = jp[1] + dir*24*k;
+        const xSign = (F<0?-1:1);
+        drawStraightArrow(jp[0], yBase, jp[0] + xArrowLen*xSign, yBase, color, 2.2*k, 7*k);
+        labelWithBg(fmt1(fx)+' kN', jp[0] + xArrowLen*xSign + 4*k*xSign, yBase - 8*k, xSign>0 ? 'left' : 'right');
+
+        // y component arrow (vertical), offset horizontally
+        const yArrowLen = 32*k;
+        const xBase = jp[0] + dir*40*k;
+        const ySign = (F<0?-1:1);
+        drawStraightArrow(xBase, jp[1], xBase, jp[1] - yArrowLen*ySign, color, 2.2*k, 7*k);
+        labelWithBg(fmt1(fy)+' kN', xBase, jp[1] - yArrowLen*ySign - ySign*10*k, 'center');
+      });
+    }
+  }
+
+  // ---------- Hover hit-testing ----------
+  function jointAtMouse(mx, my){
+    let best = null, bestD = 14 * (CSS_W/REF_W);
+    Object.keys(jointDiagonals).forEach(function(key){
+      const p = toPx(joints[key]);
+      const d = Math.hypot(p[0]-mx, p[1]-my);
+      if(d < bestD){ bestD = d; best = key; }
+    });
+    return best;
+  }
+
+  canvas.addEventListener('mousemove', function(e){
+    const rect = canvas.getBoundingClientRect();
+    const mx = (e.clientX - rect.left);
+    const my = (e.clientY - rect.top);
+    const j = jointAtMouse(mx, my);
+    if(j !== hoverJoint){
+      hoverJoint = j;
+      canvas.style.cursor = j ? 'pointer' : 'default';
+      draw();
+    }
+  });
+  canvas.addEventListener('mouseleave', function(){
+    if(hoverJoint){ hoverJoint = null; draw(); }
+  });
+
+  // Touch support (iPad/tablets/phones): tapping a joint shows the same x/y
+  // component breakdown that mousemove shows on desktop. It stays visible
+  // until the person taps a different joint or taps elsewhere on the canvas.
+  function handleTouch(e){
+    if(!e.touches || e.touches.length === 0) return;
+    const rect = canvas.getBoundingClientRect();
+    const touch = e.touches[0];
+    const mx = touch.clientX - rect.left;
+    const my = touch.clientY - rect.top;
+    const j = jointAtMouse(mx, my);
+    if(j){
+      e.preventDefault(); // only block scroll/zoom when actually hitting a joint
+    }
+    if(j !== hoverJoint){
+      hoverJoint = j;
+      draw();
+    }
+  }
+  canvas.addEventListener('touchstart', handleTouch, {passive:false});
+  canvas.addEventListener('touchmove', handleTouch, {passive:false});
+
+  document.addEventListener('touchstart', function(e){
+    if(hoverJoint && !canvas.contains(e.target)){
+      hoverJoint = null;
+      draw();
+    }
+  }, {passive:true});
+
+  // ---------- Controls wiring ----------
+  fdSlider.addEventListener('input', function(){
+    fdVal.textContent = parseFloat(fdSlider.value).toFixed(0) + '.';
+    draw();
+  });
+  ffSlider.addEventListener('input', function(){
+    ffVal.textContent = parseFloat(ffSlider.value).toFixed(0) + '.';
+    draw();
+  });
+  forcesChk.addEventListener('change', draw);
+  labelsChk.addEventListener('change', draw);
+
+  window.addEventListener('resize', function(){
+    setupCanvas();
+    draw();
+  });
+
+  draw();
+
+  // ---------- Panel toggles ----------
+  const panels = {
+    Directions: document.getElementById('panelDirections'),
+    Details: document.getElementById('panelDetails'),
+    About: document.getElementById('panelAbout')
+  };
+  const buttons = {
+    Directions: document.getElementById('btnDirections'),
+    Details: document.getElementById('btnDetails'),
+    About: document.getElementById('btnAbout')
+  };
+  const simWrapEl = document.getElementById('simWrap');
+  let openKey = null;
+
+  function positionPanel(key){
+    const panel = panels[key];
+    const btn = buttons[key];
+    const wrapRect = simWrapEl.getBoundingClientRect();
+    const btnRect = btn.getBoundingClientRect();
+
+    const gap = 10;
+    const topOffset = 10; // "a few pixels below" the button
+    const viewportMargin = 14;
+    const availableWidth = window.innerWidth - btnRect.right - gap - viewportMargin;
+
+    if(availableWidth < 260){
+      // Not enough room to the right (narrow viewport) — fall back to a
+      // full-width panel stacked below the button row.
+      panel.classList.add('panel-stacked');
+      panel.style.left = '';
+      panel.style.top = '';
+      panel.style.width = '';
+    } else {
+      panel.classList.remove('panel-stacked');
+      const left = (btnRect.right - wrapRect.left) + gap;
+      const top = (btnRect.bottom - wrapRect.top) + topOffset;
+      const desiredWidth = Math.min(560, availableWidth);
+      panel.style.left = left + 'px';
+      panel.style.top = top + 'px';
+      panel.style.width = desiredWidth + 'px';
+    }
+  }
+
+  function closePanel(){
+    Object.keys(panels).forEach(function(k){
+      panels[k].classList.remove('open');
+      buttons[k].classList.remove('active');
+    });
+    openKey = null;
+  }
+
+  Object.keys(panels).forEach(function(key){
+    buttons[key].addEventListener('click', function(){
+      const isOpen = panels[key].classList.contains('open');
+      closePanel();
+      if(!isOpen){
+        positionPanel(key);
+        panels[key].classList.add('open');
+        buttons[key].classList.add('active');
+        openKey = key;
+      }
+    });
+  });
+
+  document.querySelectorAll('.panel-close').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      closePanel();
+    });
+  });
+
+  window.addEventListener('resize', function(){
+    if(openKey) positionPanel(openKey);
+  });
+
+  // ---------- Figure 1 (static labeled truss diagram, SVG) ----------
+  (function buildFigure(){
+    const fw = 780, fh = 338;
+    const fmL = 91, fmR = 91, fmT = 52, fmB = 78;
+    const fdrawW = fw - fmL - fmR, fdrawH = fh - fmT - fmB;
+    const fscale = Math.min(fdrawW/30, fdrawH/5);
+    const fOx = fmL + (fdrawW - 30*fscale)/2;
+    const fOy = fh - fmB - (fdrawH - 5*fscale)/2;
+    function fpx(pt){ return [fOx+pt[0]*fscale, fOy-pt[1]*fscale]; }
+
+    let svg = '<svg viewBox="0 0 '+fw+' '+fh+'" xmlns="http://www.w3.org/2000/svg" font-family="Helvetica, Arial, sans-serif">';
+
+    members.forEach(function(m){
+      const p1 = fpx(joints[m.a]), p2 = fpx(joints[m.b]);
+      svg += '<line x1="'+p1[0]+'" y1="'+p1[1]+'" x2="'+p2[0]+'" y2="'+p2[1]+'" stroke="#222" stroke-width="2.6"/>';
+    });
+
+    Object.keys(joints).forEach(function(key){
+      const p = fpx(joints[key]);
+      svg += '<circle cx="'+p[0]+'" cy="'+p[1]+'" r="13" fill="#fff" stroke="#222" stroke-width="1.8"/>';
+      svg += '<text x="'+p[0]+'" y="'+(p[1]+5)+'" text-anchor="middle" font-size="15.6" font-weight="600" fill="#222">'+key+'</text>';
+    });
+
+    members.forEach(function(m){
+      const lp = fpx(labelPos[m.id]);
+      const num = m.id.replace('F','');
+      svg += '<rect x="'+(lp[0]-14)+'" y="'+(lp[1]-12)+'" width="28" height="21" fill="#fff" stroke="none"/>';
+      svg += '<text x="'+lp[0]+'" y="'+(lp[1]+5)+'" text-anchor="middle" font-size="15.6" font-style="italic" fill="#333">F<tspan baseline-shift="sub" font-size="11.7">'+num+'</tspan></text>';
+    });
+
+    // load arrows at D and F
+    function loadArrow(jointKey, label){
+      const p = fpx(joints[jointKey]);
+      const y1 = p[1]-52, y2 = p[1]-13;
+      svg += '<line x1="'+p[0]+'" y1="'+y1+'" x2="'+p[0]+'" y2="'+y2+'" stroke="#1a4fd6" stroke-width="2.6" marker-end="url(#arrowB)"/>';
+      svg += '<text x="'+p[0]+'" y="'+(y1-8)+'" text-anchor="middle" font-size="15.6" font-style="italic" fill="#1a4fd6">F<tspan baseline-shift="sub" font-size="11.7">'+label+'</tspan></text>';
+    }
+    loadArrow('D','D');
+    loadArrow('F','F');
+
+    // reaction arrows at A and G
+    function reactionArrow(jointKey, label){
+      const p = fpx(joints[jointKey]);
+      const y1 = p[1]+52, y2 = p[1]+13;
+      svg += '<line x1="'+p[0]+'" y1="'+y1+'" x2="'+p[0]+'" y2="'+y2+'" stroke="#1a4fd6" stroke-width="2.6" marker-end="url(#arrowB)"/>';
+      svg += '<text x="'+p[0]+'" y="'+(y1+20)+'" text-anchor="middle" font-size="15.6" font-style="italic" fill="#1a4fd6">R<tspan baseline-shift="sub" font-size="11.7">'+label+'</tspan></text>';
+    }
+    reactionArrow('A','A');
+    reactionArrow('G','G');
+
+    svg = '<defs><marker id="arrowB" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#1a4fd6"/></marker></defs>' + svg;
+    svg += '</svg>';
+    document.getElementById('figureWrap').innerHTML = svg;
+  })();
+
+  } catch(err){
+    var banner = document.getElementById('jsErrorBanner');
+    if(banner){
+      banner.style.display = 'block';
+      banner.innerHTML = '<strong>This simulation hit an error and could not finish loading.</strong><br>' +
+        'Details: ' + (err && err.message ? err.message : String(err)) +
+        '<br><br>If you are on an iPad or iPhone, try opening this file directly in Safari (Safari\u2019s Downloads list, or Share &rarr; Open in Safari) rather than a Files/Mail preview.';
+    }
+    if(window.console && console.error) console.error('Truss simulation error:', err);
+  }
+})();
+</script>
+</body>
+</html>
