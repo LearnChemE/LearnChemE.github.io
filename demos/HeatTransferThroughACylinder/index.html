@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Heat Transfer through a Cylinder</title>
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)']],
+      displayMath: [['\\[', '\\]']]
+    },
+    svg: { fontCache: 'global', displayAlign: 'left', displayIndent: '0' }
+  };
+</script>
+<style>
+  mjx-container[display="true"]{
+    text-align:left !important;
+    margin-left:0 !important;
+  }
+</style>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+  :root{
+    --accent:#98000D;
+    --accent-dark:#7a000b;
+    --panel-bg:#f4f4f4;
+    --border:#cfcfcf;
+  }
+  *{box-sizing:border-box;}
+  body{
+    font-family:Helvetica, Arial, sans-serif;
+    margin:0;
+    padding:16px;
+    background:#ffffff;
+    color:#1a1a1a;
+    display:flex;
+    justify-content:center;
+  }
+  #wrap{
+    width:100%;
+    max-width:900px;
+  }
+  #topBar{
+    display:flex;
+    flex-direction:row;
+    gap:8px;
+    margin:0 0 18px 0;
+  }
+  .button-wrap{
+    position:relative;
+  }
+  #main{
+    display:flex;
+    flex-wrap:wrap;
+    gap:18px;
+    justify-content:flex-start;
+    align-items:flex-start;
+  }
+  #controls{
+    width:250px;
+    flex-shrink:0;
+  }
+  .setterbar{
+    display:flex;
+    border:1px solid var(--accent);
+    border-radius:4px;
+    overflow:hidden;
+    margin-bottom:16px;
+  }
+  .setterbar button{
+    flex:1;
+    padding:9px 5px;
+    font-family:Helvetica, Arial, sans-serif;
+    font-size:15px;
+    font-weight:bold;
+    border:none;
+    background:#fff;
+    color:var(--accent);
+    cursor:pointer;
+  }
+  .setterbar button + button{
+    border-left:1px solid var(--accent);
+  }
+  .setterbar button.active{
+    background:var(--accent);
+    color:#fff;
+  }
+  .slider-block{
+    margin-bottom:16px;
+  }
+  .slider-title{
+    font-weight:normal;
+    font-size:16px;
+    margin-bottom:1px;
+  }
+  .slider-units{
+    font-weight:normal;
+    font-size:15px;
+    margin-bottom:4px;
+    color:#333;
+  }
+  .slider-row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .slider-row input[type=range]{
+    flex:1;
+    accent-color:var(--accent);
+  }
+  .slider-value{
+    font-size:16px;
+    min-width:60px;
+    text-align:right;
+    font-variant-numeric:tabular-nums;
+  }
+  .thickness-readout{
+    font-size:16px;
+    margin-left:4px;
+    font-variant-numeric:tabular-nums;
+  }
+  #graphic{
+    background:#ffffff;
+    border:1px solid var(--border);
+    border-radius:4px;
+  }
+  canvas{
+    display:block;
+  }
+  .panel-btn{
+    font-family:Helvetica, Arial, sans-serif;
+    background:var(--accent);
+    color:#fff;
+    border:none;
+    padding:10px 22px;
+    font-size:15.6px;
+    font-weight:normal;
+    border-radius:4px;
+    cursor:pointer;
+  }
+  .panel-btn:hover{
+    background:var(--accent-dark);
+  }
+  .panel-btn.active{
+    background:var(--accent-dark);
+  }
+  .panel-content{
+    display:none;
+    position:absolute;
+    top:6px;
+    left:100%;
+    margin-left:10px;
+    width:520px;
+    max-width:70vw;
+    max-height:75vh;
+    overflow-y:auto;
+    background:#ffffff;
+    border:1px solid var(--border);
+    border-radius:4px;
+    box-shadow:0 6px 18px rgba(0,0,0,0.18);
+    padding:16px 34px 16px 20px;
+    font-size:14.5px;
+    line-height:1.5;
+    text-align:left;
+    z-index:50;
+  }
+  .panel-close{
+    position:absolute;
+    top:6px;
+    right:8px;
+    background:none;
+    border:none;
+    font-family:Helvetica, Arial, sans-serif;
+    font-size:20px;
+    line-height:1;
+    color:#888;
+    cursor:pointer;
+    padding:4px 7px;
+    border-radius:3px;
+  }
+  .panel-close:hover{
+    color:#fff;
+    background:var(--accent);
+  }
+  #panelDetails{
+    font-size:14.5px;
+  }
+  .panel-content.show{
+    display:block;
+  }
+  .panel-content p{
+    margin:0 0 10px 0;
+  }
+  .panel-content p:last-child{
+    margin-bottom:0;
+  }
+  .panel-content ol{
+    margin:0 0 10px 22px;
+    padding:0;
+  }
+  .panel-content li{
+    margin-bottom:4px;
+  }
+  .eq{
+    display:block;
+    margin:10px 0;
+    font-style:italic;
+    text-align:center;
+  }
+  a{
+    color:var(--accent);
+  }
+  .italic{ font-style:italic; }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div id="topBar">
+    <div class="button-wrap">
+      <button id="btnDirections" class="panel-btn">Directions</button>
+      <div class="panel-content" id="panelDirections">
+        <button class="panel-close" aria-label="Close">&times;</button>
+        <p>A long tube with a uniform heat source is insulated at its outer radius <i>r</i><sub>o</sub> and cooled at its inner radius <i>r</i><sub>i</sub>, and the one-dimensional, radial, steady-state heat transfer is calculated. Use buttons to view a cross section of the tube or plot the temperature as a function of the radius. The heat transfer rate, temperature at position <i>r</i> and the outer surface temperature <i>T</i><sub>o</sub> are shown on the cross section diagram. Use sliders to set the coolant temperature, tube thickness <i>r</i><sub>o</sub> &#8722; <i>r</i><sub>i</sub>, radial position, heat generation, convection coefficient and thermal conductivity.</p>
+      </div>
+    </div>
+
+    <div class="button-wrap">
+      <button id="btnDetails" class="panel-btn">Details</button>
+      <div class="panel-content" id="panelDetails">
+        <button class="panel-close" aria-label="Close">&times;</button>
+        <p>For conduction through a cylinder with heat generation, the following assumptions are made:</p>
+        <ol>
+          <li>steady-state conduction</li>
+          <li>one-dimensional radial conduction</li>
+          <li>constant thermodynamic properties</li>
+          <li>uniform volumetric heat generation</li>
+          <li>outer surface is adiabatic</li>
+        </ol>
+        <p>The heat diffusion equation is solved to determine the radial temperature distribution \(T(r)\):</p>
+        <p>\[ \rho C_p \frac{\partial T}{\partial t} = \frac{1}{r}\frac{\partial}{\partial r}\left(k r \frac{\partial T}{\partial r}\right) + \frac{1}{r^2}\frac{\partial}{\partial \phi}\left(k \frac{\partial T}{\partial \phi}\right) + \frac{\partial}{\partial z}\left(k \frac{\partial T}{\partial z}\right) + q. \]</p>
+        <p>The above assumptions reduce this equation to:</p>
+        <p>\[ 0 = \frac{1}{r}\frac{d}{dr}\left(r \frac{dT}{dr}\right) + \frac{q}{k}. \]</p>
+        <p>Separating and integrating yields:</p>
+        <p>\[ (1) \quad r\frac{dT}{dr} = -\frac{q}{2k}r^2 + C_1, \]</p>
+        <p>\[ (2) \quad T(r) = -\frac{q}{4k}r^2 + C_1 \ln r + C_2. \]</p>
+        <p>Two boundary conditions are needed to determine constants \(C_1\) and \(C_2\); both conditions are evaluated at the outer radius \(r_o\):</p>
+        <p>\[ (4) \quad T(r_o) = T_o, \]</p>
+        <p>\[ (5) \quad \left.\frac{dT}{dr}\right|_{r_o} = 0. \]</p>
+        <p>Evaluating equation (1) at boundary condition (5), evaluating equation (2) at boundary condition (4), and solving for \(C_1\) and \(C_2\) yields:</p>
+        <p>\[ C_1 = \frac{q}{2k}r_o^2, \]</p>
+        <p>\[ C_2 = T_o + \frac{q}{4k}\left(r_o^2 - r^2\right) - \frac{q}{2k}r_o^2 \ln\left(\frac{r_o}{r}\right). \]</p>
+        <p>The general solution for the temperature distribution is then:</p>
+        <p>\[ T(r) = T_o + \frac{q}{4k}\left(r_o^2 - r^2\right) - \frac{q}{2k}r_o^2 \ln\left(\frac{r_o}{r}\right), \]</p>
+        <p>where \(T\) is temperature, \(r\) is radius, the subscript o refers to the outer surface, \(q\) is heat generation, and \(k\) is thermal conductivity.</p>
+        <p>From Fourier's law, the heat removal rate is:</p>
+        <p>\[ q' = -k \, 2\pi r \frac{dT}{dr}. \]</p>
+        <p>Substituting from \(T(r)\) and evaluating at the inner radius \(r_i\):</p>
+        <p>\[ q'(r_i) = -k \, 2\pi r_i \left(-\frac{q}{2k}r_i + \frac{q}{2k}\frac{r_o^2}{r_i}\right). \]</p>
+        <p>Because the tube is insulated at \(r_o\), the rate of heat generated in the tube must equal the rate of removal at \(r_i\). Simplifying yields:</p>
+        <p>\[ q' = -\pi q \left(r_o^2 - r_i^2\right). \]</p>
+        <p>The inner surface temperature \(T_i\) is calculated using the conservation of energy, since \(q'_{cond} = q'_{conv}\):</p>
+        <p>\[ \pi q \left(r_o^2 - r_i^2\right) = h \, 2\pi r_i \left(T_i - T_\infty\right), \]</p>
+        <p>\[ T_i = \frac{q}{2 h r_i}\left(r_o^2 - r_i^2\right) + T_\infty. \]</p>
+        <p>The outer surface temperature is found by evaluating \(T(r)\) at \(r_i\):</p>
+        <p>\[ T_o = T_i - \frac{q}{4k}\left(r_o^2 - r_i^2\right) + \frac{q}{2k}r_o^2 \ln\left(\frac{r_o}{r_i}\right), \]</p>
+        <p>where \(T_\infty\) is the coolant temperature, and the subscript i refers to the inner surface.</p>
+      </div>
+    </div>
+
+    <div class="button-wrap">
+      <button id="btnAbout" class="panel-btn">About</button>
+      <div class="panel-content" id="panelAbout">
+        <button class="panel-close" aria-label="Close">&times;</button>
+        <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/HeatTransferThroughACylinder/" target="_blank" rel="noopener">Mathematica simulation</a> by Rachael L. Baumann. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988) in collaboration with Washington State University. Address any questions or comments to LearnChemE@gmail.com.</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="main">
+    <div id="controls">
+      <div class="setterbar" id="viewToggle">
+        <button data-view="1" class="active">diagram</button>
+        <button data-view="2">temperature plot</button>
+      </div>
+
+      <div class="slider-block">
+        <div class="slider-title"><i>r</i><sub>o</sub> &#8722; <i>r</i><sub>i</sub></div>
+        <div class="slider-row">
+          <input type="range" id="roSlider" min="2.5" max="3" step="0.1" value="3">
+          <span class="thickness-readout" id="thicknessReadout">1.0</span>
+        </div>
+      </div>
+
+      <div class="slider-block">
+        <div class="slider-title">radius (cm)</div>
+        <div class="slider-title" style="font-weight:normal;"><i>r</i></div>
+        <div class="slider-row">
+          <input type="range" id="rSlider" min="2" max="3" step="0.1" value="2.2">
+          <span class="slider-value" id="rReadout">2.2</span>
+        </div>
+      </div>
+
+      <div class="slider-block">
+        <div class="slider-title">coolant temperature (K)</div>
+        <div class="slider-title" style="font-weight:normal;"><i>T</i><sub>&#8734;</sub></div>
+        <div class="slider-row">
+          <input type="range" id="TinfSlider" min="300" max="420" step="10" value="320">
+          <span class="slider-value" id="TinfReadout">320</span>
+        </div>
+      </div>
+
+      <div class="slider-block">
+        <div class="slider-title">heat generation (MW/m<sup>3</sup>)</div>
+        <div class="slider-title" style="font-weight:normal;"><i>q</i></div>
+        <div class="slider-row">
+          <input type="range" id="qSlider" min="0.5" max="2.5" step="0.5" value="2">
+          <span class="slider-value" id="qReadout">2</span>
+        </div>
+      </div>
+
+      <div class="slider-block">
+        <div class="slider-title">convection coefficient (W/(m<sup>2</sup> K))</div>
+        <div class="slider-title" style="font-weight:normal;"><i>h</i></div>
+        <div class="slider-row">
+          <input type="range" id="hSlider" min="150" max="200" step="10" value="180">
+          <span class="slider-value" id="hReadout">180</span>
+        </div>
+      </div>
+
+      <div class="slider-block">
+        <div class="slider-title">thermal conductivity (W/(m K))</div>
+        <div class="slider-title" style="font-weight:normal;"><i>k</i></div>
+        <div class="slider-row">
+          <input type="range" id="kSlider" min="3.5" max="7.5" step="0.5" value="3.5">
+          <span class="slider-value" id="kReadout">3.5</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="graphic">
+      <canvas id="canvas" width="445" height="490"></canvas>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  // ---- state ----
+  var state = {
+    view: 1,      // 1 = diagram, 2 = temperature plot
+    ri_cm: 2,     // fixed inner radius (cm)
+    ro_cm: 3,     // outer radius (cm), slider "ro - ri"
+    r_cm: 2.2,    // radial position (cm)
+    Tinf: 320,    // coolant temperature (K)
+    q: 2,         // heat generation (MW/m^3)
+    h: 180,       // convection coefficient (W/(m^2 K))
+    k: 3.5        // thermal conductivity (W/(m K))
+  };
+
+  // ---- physics ----
+  function compute(s){
+    var qgen = s.q * 1e6;         // W/m^3
+    var ri = s.ri_cm / 100;       // m
+    var ro = s.ro_cm / 100;       // m
+    var Ti = (qgen / (2 * s.h * ri)) * (ro*ro - ri*ri) + s.Tinf;
+    var To = Ti - (qgen / (4 * s.k)) * (ro*ro - ri*ri) +
+              (qgen / (2 * s.k)) * ro*ro * Math.log(ro / ri);
+    function Tx(x){
+      return To + (qgen / (4 * s.k)) * (ro*ro - x*x) -
+             (qgen / (2 * s.k)) * ro*ro * Math.log(ro / x);
+    }
+    var qprime = -Math.PI * qgen * (ro*ro - ri*ri); // W/m
+    return { Ti: Ti, To: To, Tx: Tx, qprime: qprime, ri: ri, ro: ro };
+  }
+
+  // ---- DOM refs ----
+  var canvas = document.getElementById('canvas');
+  var ctx = canvas.getContext('2d');
+  var CW = 445, CH = 490;
+
+  var roSlider = document.getElementById('roSlider');
+  var rSlider = document.getElementById('rSlider');
+  var TinfSlider = document.getElementById('TinfSlider');
+  var qSlider = document.getElementById('qSlider');
+  var hSlider = document.getElementById('hSlider');
+  var kSlider = document.getElementById('kSlider');
+
+  var thicknessReadout = document.getElementById('thicknessReadout');
+  var rReadout = document.getElementById('rReadout');
+  var TinfReadout = document.getElementById('TinfReadout');
+  var qReadout = document.getElementById('qReadout');
+  var hReadout = document.getElementById('hReadout');
+  var kReadout = document.getElementById('kReadout');
+
+  function setupHiDPI(){
+    var dpr = window.devicePixelRatio || 1;
+    canvas.width = CW * dpr;
+    canvas.height = CH * dpr;
+    canvas.style.width = CW + 'px';
+    canvas.style.height = CH + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  setupHiDPI();
+
+  // ---- helpers ----
+  function fmt1(x){ return x.toFixed(1); }
+  function truncK(x){ return Math.trunc(x) + ' K'; }
+  function fmtKW(x){ return (x/1000).toFixed(2) + ' kW/m'; }
+
+  // Draws italic "base" followed by a smaller subscript "sub" on the canvas.
+  // align: 'left' -> x is the left edge of the whole label
+  //        'right' -> x is the right edge of the whole label
+  //        'center' -> x is the horizontal center of the whole label
+  // Returns the total width drawn (useful for chaining, e.g. within a larger string).
+  function drawSub(base, sub, x, y, mainSize, align, italic){
+    align = align || 'left';
+    if (italic === undefined) italic = true;
+    var style = italic ? 'italic ' : '';
+    var subSize = Math.round(mainSize * 0.68);
+    var subDrop = Math.round(mainSize * 0.28);
+    ctx.font = style + mainSize + 'px Helvetica, Arial, sans-serif';
+    var baseWidth = ctx.measureText(base).width;
+    ctx.font = style + subSize + 'px Helvetica, Arial, sans-serif';
+    var subWidth = ctx.measureText(sub).width;
+    var totalWidth = baseWidth + subWidth;
+    var startX;
+    if (align === 'left') startX = x;
+    else if (align === 'right') startX = x - totalWidth;
+    else startX = x - totalWidth / 2;
+    var savedAlign = ctx.textAlign;
+    ctx.textAlign = 'left';
+    ctx.font = style + mainSize + 'px Helvetica, Arial, sans-serif';
+    ctx.fillText(base, startX, y);
+    ctx.font = style + subSize + 'px Helvetica, Arial, sans-serif';
+    ctx.fillText(sub, startX + baseWidth, y + subDrop);
+    ctx.font = style + mainSize + 'px Helvetica, Arial, sans-serif';
+    ctx.textAlign = savedAlign;
+    return totalWidth;
+  }
+
+  // Draws a horizontally-centered line of plain text with one subscripted
+  // term (base+sub) embedded between a prefix and suffix string.
+  function drawCenteredLineWithSub(prefix, base, sub, suffix, cx, y, mainSize, italic){
+    var style = italic ? 'italic ' : '';
+    var subSize = Math.round(mainSize * 0.68);
+    var subDrop = Math.round(mainSize * 0.28);
+    ctx.font = style + mainSize + 'px Helvetica, Arial, sans-serif';
+    var prefixW = ctx.measureText(prefix).width;
+    var baseW = ctx.measureText(base).width;
+    var suffixW = ctx.measureText(suffix).width;
+    ctx.font = style + subSize + 'px Helvetica, Arial, sans-serif';
+    var subW = ctx.measureText(sub).width;
+    var totalW = prefixW + baseW + subW + suffixW;
+    var x = cx - totalW / 2;
+    var savedAlign = ctx.textAlign;
+    ctx.textAlign = 'left';
+    ctx.font = style + mainSize + 'px Helvetica, Arial, sans-serif';
+    ctx.fillText(prefix, x, y);
+    x += prefixW;
+    ctx.fillText(base, x, y);
+    x += baseW;
+    ctx.font = style + subSize + 'px Helvetica, Arial, sans-serif';
+    ctx.fillText(sub, x, y + subDrop);
+    x += subW;
+    ctx.font = style + mainSize + 'px Helvetica, Arial, sans-serif';
+    ctx.fillText(suffix, x, y);
+    ctx.textAlign = savedAlign;
+  }
+
+  function updateReadouts(){
+    thicknessReadout.textContent = fmt1(state.ro_cm - state.ri_cm);
+    rReadout.textContent = fmt1(state.r_cm);
+    TinfReadout.textContent = state.Tinf;
+    qReadout.textContent = state.q;
+    hReadout.textContent = state.h;
+    kReadout.textContent = state.k;
+  }
+
+  // ---- drawing: diagram ----
+  function drawDiagram(){
+    ctx.clearRect(0,0,CW,CH);
+    var res = compute(state);
+
+    // data range: -3.4 to 3.4 cm, square, centered below the info text block
+    var topMargin = 90; // room for the 3-line info text at top, clear of the circle
+    var side = Math.min(CW, CH - topMargin);
+    var scale = side / 6.8; // 6.8 = 3.4*2
+    var cx = CW/2;
+    var cy = topMargin + side/2;
+
+    function px(x){ return cx + x*scale; }
+    function py(y){ return cy - y*scale; }
+
+    // info text block (80% of the previous size)
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#000';
+    ctx.font = '21px Helvetica, Arial, sans-serif';
+    var line1 = "heat transfer q'(r) = " + fmtKW(res.qprime);
+    var line2 = 'temperature T(r) = ' + truncK(res.Tx(state.r_cm/100));
+    ctx.fillText(line1, cx, 22);
+    ctx.fillText(line2, cx, 46);
+    drawCenteredLineWithSub('outer surface temperature T', '', 'o', ' = ' + truncK(res.To), cx, 70, 21, false);
+
+    // insulation background circle with diagonal hatch
+    var insR = Math.sqrt(1.3) * state.ro_cm;
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(px(0), py(0), insR*scale, 0, Math.PI*2);
+    ctx.fillStyle = '#f2f2f2';
+    ctx.fill();
+    ctx.clip();
+    ctx.strokeStyle = '#b3b3b3';
+    ctx.lineWidth = 1;
+    var step = 10;
+    for (var d = -insR*scale*2; d < insR*scale*2; d += step){
+      ctx.beginPath();
+      ctx.moveTo(px(0) - insR*scale*2 + d, py(0) - insR*scale*2);
+      ctx.lineTo(px(0) - insR*scale*2 + d + insR*scale*4, py(0) + insR*scale*2);
+      ctx.stroke();
+    }
+    ctx.restore();
+    ctx.beginPath();
+    ctx.arc(px(0), py(0), insR*scale, 0, Math.PI*2);
+    ctx.strokeStyle = '#999';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // tube (yellow) disk, radius ro
+    ctx.beginPath();
+    ctx.arc(px(0), py(0), state.ro_cm*scale, 0, Math.PI*2);
+    ctx.fillStyle = '#ffe000';
+    ctx.fill();
+
+    // coolant (blue) disk, radius ri
+    ctx.beginPath();
+    ctx.arc(px(0), py(0), state.ri_cm*scale, 0, Math.PI*2);
+    ctx.fillStyle = '#a6bfff';
+    ctx.fill();
+
+    // arrows (20% bigger than before)
+    function arrow(x0,y0,x1,y1){
+      ctx.beginPath();
+      ctx.moveTo(px(x0), py(y0));
+      ctx.lineTo(px(x1), py(y1));
+      ctx.strokeStyle = '#000';
+      ctx.lineWidth = 1.56;
+      ctx.stroke();
+      var ang = Math.atan2(py(y1)-py(y0), px(x1)-px(x0));
+      var ah = 8.4;
+      ctx.beginPath();
+      ctx.moveTo(px(x1), py(y1));
+      ctx.lineTo(px(x1) - ah*Math.cos(ang - Math.PI/7), py(y1) - ah*Math.sin(ang - Math.PI/7));
+      ctx.lineTo(px(x1) - ah*Math.cos(ang + Math.PI/7), py(y1) - ah*Math.sin(ang + Math.PI/7));
+      ctx.closePath();
+      ctx.fillStyle = '#000';
+      ctx.fill();
+    }
+
+    var roPtX = state.ro_cm * Math.cos(60*Math.PI/180) * -1;
+    var roPtY = state.ro_cm * Math.sin(60*Math.PI/180);
+    arrow(0,0, roPtX, roPtY);           // to r_o point (upper-left)
+    arrow(0,0, -state.r_cm, 0);         // to r position (left)
+    arrow(0,0, 0, state.ri_cm);         // to r_i point (up)
+
+    // point markers
+    function dot(x,y){
+      ctx.beginPath();
+      ctx.arc(px(x), py(y), 3.2, 0, Math.PI*2);
+      ctx.fillStyle = '#000';
+      ctx.fill();
+    }
+    var toPtX = state.ro_cm * Math.cos(15*Math.PI/180);
+    var toPtY = -state.ro_cm * Math.sin(15*Math.PI/180);
+    dot(0,0);
+    dot(state.ri_cm, 0);
+    dot(toPtX, toPtY);
+
+    // text labels (all diagram fonts are 50% bigger than the original)
+    ctx.font = 'italic 27px Helvetica, Arial, sans-serif';
+    ctx.fillStyle = '#000';
+
+    drawSub('T', '\u221E', px(0)-10, py(0)+22, 27, 'right');
+
+    drawSub('T', 'i', px(state.ri_cm)+8, py(0)+22, 27, 'left');
+
+    drawSub('T', 'o', px(toPtX)+8, py(toPtY)+22, 27, 'left');
+
+    ctx.font = 'italic 23px Helvetica, Arial, sans-serif';
+    ctx.textAlign = 'left';
+    drawSub('r', 'i', px(0) + 12, py(state.ri_cm) + 6, 23, 'left');
+
+    drawSub('r', 'o', px(roPtX)+5, py(roPtY)-5, 23, 'left');
+
+    ctx.font = 'italic 23px Helvetica, Arial, sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText('r', px(-state.r_cm)-8, py(0)-8);
+
+    ctx.font = '20px Helvetica, Arial, sans-serif';
+    ctx.textAlign = 'center';
+    var insTxtX = insR * Math.cos(240*Math.PI/180);
+    var insTxtY = insR * Math.sin(240*Math.PI/180);
+    ctx.fillText('insulation', px(insTxtX), py(insTxtY));
+    ctx.fillText('coolant', px(0), py(-state.ri_cm/2));
+  }
+
+  // ---- drawing: temperature plot ----
+  function drawPlot(){
+    ctx.clearRect(0,0,CW,CH);
+    var res = compute(state);
+
+    var padL = 84, padR = 18, padT = 50, padB = 62;
+    var plotW = CW - padL - padR;
+    var plotH = CH - padT - padB;
+
+    var xMin = state.ri_cm, xMax = state.ro_cm;
+    var yMin = 314, yMax = 670;
+
+    function px(x){ return padL + (x - xMin)/(xMax - xMin) * plotW; }
+    function py(y){ return padT + plotH - (y - yMin)/(yMax - yMin) * plotH; }
+
+    // frame
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 1.2;
+    ctx.strokeRect(padL, padT, plotW, plotH);
+
+    // ticks/labels x (font +30%)
+    ctx.font = '16px Helvetica, Arial, sans-serif';
+    ctx.fillStyle = '#000';
+    ctx.textAlign = 'center';
+    var xTicks = 6;
+    for (var i=0;i<=xTicks;i++){
+      var xv = xMin + (xMax-xMin)*i/xTicks;
+      var xp = px(xv);
+      ctx.beginPath();
+      ctx.moveTo(xp, padT+plotH);
+      ctx.lineTo(xp, padT+plotH+5);
+      ctx.stroke();
+      ctx.fillText(xv.toFixed(1), xp, padT+plotH+22);
+    }
+    // ticks/labels y - round values (350, 400, 450, ...)
+    ctx.textAlign = 'right';
+    var yTickVals = [350, 400, 450, 500, 550, 600, 650];
+    for (var j=0;j<yTickVals.length;j++){
+      var yv = yTickVals[j];
+      if (yv < yMin || yv > yMax) continue;
+      var yp = py(yv);
+      ctx.beginPath();
+      ctx.moveTo(padL-5, yp);
+      ctx.lineTo(padL, yp);
+      ctx.stroke();
+      ctx.fillText(yv, padL-8, yp+5);
+    }
+
+    // axis labels (not bold, font +30%, y-axis label moved closer to the axis)
+    ctx.font = '18px Helvetica, Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('radius (cm)', padL + plotW/2, CH - 10);
+    ctx.save();
+    ctx.translate(44, padT + plotH/2);
+    ctx.rotate(-Math.PI/2);
+    ctx.fillText('temperature (K)', 0, 0);
+    ctx.restore();
+
+    // title (moved closer to the frame, font +20%)
+    ctx.font = '18px Helvetica, Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('T(r) = ' + truncK(res.Tx(state.r_cm/100)), padL + plotW/2, padT - 10);
+
+    // curve
+    ctx.beginPath();
+    var n = 120;
+    for (var m=0;m<=n;m++){
+      var xv2 = xMin + (xMax-xMin)*m/n;
+      var Tv = res.Tx(xv2/100);
+      var xp2 = px(xv2), yp2 = py(Tv);
+      if (m===0) ctx.moveTo(xp2,yp2); else ctx.lineTo(xp2,yp2);
+    }
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 2.2;
+    ctx.stroke();
+
+    // current point
+    var curT = res.Tx(state.r_cm/100);
+    ctx.beginPath();
+    ctx.arc(px(state.r_cm), py(curT), 4.5, 0, Math.PI*2);
+    ctx.fillStyle = '#000';
+    ctx.fill();
+  }
+
+  function draw(){
+    if (state.view === 1) drawDiagram(); else drawPlot();
+  }
+
+  // ---- events ----
+  var viewButtons = document.querySelectorAll('#viewToggle button');
+  viewButtons.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      viewButtons.forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      state.view = parseInt(btn.getAttribute('data-view'), 10);
+      draw();
+    });
+  });
+
+  roSlider.addEventListener('input', function(){
+    state.ro_cm = parseFloat(roSlider.value);
+    // recenter r slider, matching original tracking behavior
+    state.r_cm = (state.ri_cm + state.ro_cm) / 2;
+    rSlider.min = state.ri_cm;
+    rSlider.max = state.ro_cm;
+    rSlider.value = state.r_cm;
+    updateReadouts();
+    draw();
+  });
+
+  rSlider.addEventListener('input', function(){
+    state.r_cm = parseFloat(rSlider.value);
+    updateReadouts();
+    draw();
+  });
+
+  TinfSlider.addEventListener('input', function(){
+    state.Tinf = parseFloat(TinfSlider.value);
+    updateReadouts();
+    draw();
+  });
+
+  qSlider.addEventListener('input', function(){
+    state.q = parseFloat(qSlider.value);
+    updateReadouts();
+    draw();
+  });
+
+  hSlider.addEventListener('input', function(){
+    state.h = parseFloat(hSlider.value);
+    updateReadouts();
+    draw();
+  });
+
+  kSlider.addEventListener('input', function(){
+    state.k = parseFloat(kSlider.value);
+    updateReadouts();
+    draw();
+  });
+
+  window.addEventListener('resize', function(){
+    setupHiDPI();
+    draw();
+  });
+
+  // panel buttons
+  var panelBtns = {
+    Directions: document.getElementById('btnDirections'),
+    Details: document.getElementById('btnDetails'),
+    About: document.getElementById('btnAbout')
+  };
+  var panels = {
+    Directions: document.getElementById('panelDirections'),
+    Details: document.getElementById('panelDetails'),
+    About: document.getElementById('panelAbout')
+  };
+  var mathTypeset = false;
+  Object.keys(panelBtns).forEach(function(key){
+    panelBtns[key].addEventListener('click', function(){
+      var isShown = panels[key].classList.contains('show');
+      Object.keys(panels).forEach(function(k){
+        panels[k].classList.remove('show');
+        panelBtns[k].classList.remove('active');
+      });
+      if (!isShown){
+        panels[key].classList.add('show');
+        panelBtns[key].classList.add('active');
+        if (key === 'Details' && window.MathJax && window.MathJax.typesetPromise){
+          window.MathJax.typesetPromise([panels.Details]);
+        }
+      }
+    });
+  });
+
+  // close (x) buttons in the upper right of each panel
+  document.querySelectorAll('.panel-close').forEach(function(closeBtn){
+    closeBtn.addEventListener('click', function(e){
+      e.stopPropagation();
+      var panel = closeBtn.closest('.panel-content');
+      if (!panel) return;
+      panel.classList.remove('show');
+      var key = panel.id.replace('panel', '');
+      if (panelBtns[key]) panelBtns[key].classList.remove('active');
+    });
+  });
+
+  updateReadouts();
+  draw();
+})();
+</script>
+</body>
+</html>

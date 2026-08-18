@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Multistage Batch Distillation with Azeotrope</title>
+<style>
+  html,body{margin:0;padding:0;background:#fff;}
+  #app{
+    font-family:Helvetica,Arial,sans-serif;
+    color:#000;
+    width:660px;
+    margin:12px auto;
+    padding:6px 10px 14px 10px;
+    -webkit-font-smoothing:antialiased;
+    position:relative;
+  }
+  .title{font-size:19px;font-weight:bold;margin:2px 0 10px 2px;}
+  .controls{border:1px solid #c8c8c8;background:#fafafa;padding:10px 12px;border-radius:2px;margin-bottom:8px;}
+  .ctrlgrid{display:grid;grid-template-columns:auto auto;gap:6px 16px;align-items:center;}
+  .ctrl{display:flex;align-items:center;gap:6px;font-size:15px;white-space:nowrap;}
+  .ctrl .lab{min-width:0;}
+  .ctrl input[type=range]{width:96px;vertical-align:middle;}
+  .valbox{
+    display:inline-block;min-width:28px;text-align:center;
+    border:1px solid #c8c8c8;background:#fff;border-radius:3px;
+    padding:1px 4px;font-size:14px;
+  }
+  select{font-family:Helvetica,Arial,sans-serif;font-size:15px;padding:3px 4px;
+    border:1px solid #b5b5b5;border-radius:3px;background:#fff;width:240px;}
+  input[type=range]{accent-color:#98000d;}
+  canvas{display:block;}
+  .btnrow{margin:8px 0;text-align:left;}
+  .lcbtn{
+    font-family:Helvetica,Arial,sans-serif;font-size:16.8px;font-weight:normal;
+    color:#fff;background:#98000d;border:none;border-radius:4px;
+    padding:7px 19px;margin:0 5px;cursor:pointer;
+  }
+  .lcbtn:hover{background:#b3101c;}
+  .lcbtn.active{background:#5f000a;}
+  .panel{
+    display:none;position:absolute;z-index:30;width:460px;
+    border:1px solid #b8b8b8;background:#fbfbfb;border-radius:3px;
+    box-shadow:0 3px 10px rgba(0,0,0,0.22);
+    padding:12px 16px;font-size:16.8px;line-height:1.5;color:#111;
+    overflow-y: auto;
+    max-height: 100%;
+  }
+  .closebtn{
+    position:absolute;top:5px;right:9px;cursor:pointer;
+    font-family:Helvetica,Arial,sans-serif;font-size:19px;line-height:1;
+    color:#777;font-weight:bold;user-select:none;
+  }
+  .closebtn:hover{color:#000;}
+  .panel p:first-of-type{margin-right:14px;}
+  .panel.show{display:block;}
+  .panel p{margin:0 0 9px 0;}
+  .panel .eq{margin:7px 0 7px 18px;font-style:italic;}
+  .panel a{color:#98000d;text-decoration:none;}
+  .panel a:hover{text-decoration:underline;}
+  i{font-style:italic;}
+  sub{font-size:0.78em;}
+  #tooltip{
+    position:absolute;pointer-events:none;display:none;z-index:20;
+    background:#fff;border:1px solid #888;border-radius:3px;
+    padding:5px 8px;font-family:Helvetica,Arial,sans-serif;font-size:13px;
+    box-shadow:0 1px 4px rgba(0,0,0,0.2);white-space:nowrap;text-align:center;
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div class="controls">
+    <div class="ctrlgrid">
+      <div class="ctrl">
+        <span class="lab">reflux ratio (<i>L</i>/<i>D</i>)</span>
+        <input id="R" type="range" min="3.1" max="10" step="0.1" value="6">
+        <span class="valbox" id="Rval">6.0</span>
+      </div>
+      <div class="ctrl">
+        <select id="az">
+          <option value="1" selected>no azeotrope</option>
+          <option value="2">minimum boiling azeotrope</option>
+          <option value="3">maximum boiling azeotrope</option>
+        </select>
+      </div>
+      <div class="ctrl">
+        <span class="lab">equilibrium stages</span>
+        <input id="stages" type="range" min="1" max="6" step="1" value="3">
+        <span class="valbox" id="stagesval">3</span>
+      </div>
+      <div class="ctrl">
+        <span class="lab">still composition (<i>x</i><sub>B,&thinsp;still</sub>)</span>
+        <input id="xb" type="range" min="0.1" max="0.9" step="0.01" value="0.2">
+        <span class="valbox" id="xbval">0.20</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="btnrow">
+    <button class="lcbtn" id="btnDir">Directions</button>
+    <button class="lcbtn" id="btnDet">Details</button>
+    <button class="lcbtn" id="btnAbt">About</button>
+  </div>
+
+  <canvas id="plot" width="1280" height="900" style="width:640px;height:450px;"></canvas>
+
+  <div class="panel" id="panelDir">
+    <span class="closebtn" title="close">&times;</span>
+    <p>This simulation simulates how the reflux ratio, reboiler (still) composition and number of
+    equilibrium stages (all of which can be changed with sliders) affect the distillate composition
+    (displayed above the graph) in a multistage batch distillation (or continuous rectification) for a
+    binary mixture. Each black dot on the <i>y</i>&ndash;<i>x</i> equilibrium curve denotes the composition
+    at that equilibrium stage. Hover the mouse over a composition stage label (still, 1, 2, etc.) to display
+    the composition at that stage. Select among a binary mixture with no azeotrope, a minimum-temperature
+    azeotrope or a maximum-temperature azeotrope. Stage 1 is defined as the first stage above the reboiler.
+    Constant molar overflow, 100% stage efficiency and a complete condenser are assumed.</p>
+  </div>
+
+  <div class="panel" id="panelDet">
+    <span class="closebtn" title="close">&times;</span>
+    <p>This model assumes a binary mixture with constant molar flow rates between stages in the column for
+    liquid and vapor. The mass balance forms an operating line:</p>
+    <p class="eq"><i>y</i><sub>n</sub> = (<i>L</i>/<i>V</i>) <i>x</i><sub>n+1</sub> + (1 &minus; <i>L</i>/<i>V</i>) <i>x</i><sub>D</sub> ,</p>
+    <p>where <i>L</i> is the liquid molar flow rate, <i>V</i> is the vapor molar flow rate,
+    <i>x</i><sub>D</sub> is the distillate mole fraction of the more volatile component ("component <i>B</i>"),
+    <i>y</i><sub>n</sub> is the vapor mole fraction of <i>B</i> at stage <i>n</i> and
+    <i>x</i><sub>n+1</sub> is the liquid mole fraction of <i>B</i> at stage <i>n</i>+1.</p>
+    <p>The reflux ratio <i>R</i> is:</p>
+    <p class="eq"><i>R</i> = <i>L</i>/<i>D</i> ,</p>
+    <p>where <i>D</i> is the distillate molar flow rate. The mass balance around the condenser is:</p>
+    <p class="eq"><i>V</i> = <i>D</i> + <i>L</i> .</p>
+    <p>The operating line can be rewritten in terms of reflux ratio:</p>
+    <p class="eq"><i>y</i><sub>n</sub> = (<i>R</i>/(<i>R</i>+1)) <i>x</i><sub>n+1</sub> + (1 &minus; <i>R</i>/(<i>R</i>+1)) <i>x</i><sub>D</sub> .</p>
+    <p>Given an equilibrium curve, with vapor composition as a function of the liquid composition for each
+    stage, i.e. <i>y</i><sub>n</sub> = <i>f</i>(<i>x</i><sub>n</sub>), a linear set of equations must be solved
+    to find distillate composition <i>x</i><sub>D</sub> or required reflux ratio <i>R</i>, assuming the mole
+    fraction of component <i>B</i> in the still (<i>x</i><sub>B,&thinsp;still</sub>) is known. This may be done
+    analytically, numerically or graphically (via the McCabe&ndash;Thiele method):</p>
+    <p class="eq">
+    <i>y</i><sub>B,&thinsp;still</sub> = <i>f</i>(<i>x</i><sub>B,&thinsp;still</sub>) ,<br>
+    <i>y</i><sub>B,&thinsp;still</sub> = (<i>R</i>/(<i>R</i>+1)) <i>x</i><sub>1</sub> + (1 &minus; <i>R</i>/(<i>R</i>+1)) <i>x</i><sub>D</sub> ,<br>
+    <i>y</i><sub>2</sub> = <i>f</i>(<i>x</i><sub>2</sub>) ,<br>
+    <i>y</i><sub>1</sub> = (<i>R</i>/(<i>R</i>+1)) <i>x</i><sub>2</sub> + (1 &minus; <i>R</i>/(<i>R</i>+1)) <i>x</i><sub>D</sub> ,<br>
+    <i>y</i><sub>3</sub> = <i>f</i>(<i>x</i><sub>3</sub>) ,<br>
+    <i>y</i><sub>2</sub> = (<i>R</i>/(<i>R</i>+1)) <i>x</i><sub>3</sub> + (1 &minus; <i>R</i>/(<i>R</i>+1)) <i>x</i><sub>D</sub> ,<br>
+    . &nbsp; . &nbsp; .<br>
+    <i>y</i><sub>n</sub> = <i>f</i>(<i>x</i><sub>n</sub>) ,<br>
+    <i>y</i><sub>n&minus;1</sub> = (<i>R</i>/(<i>R</i>+1)) <i>x</i><sub>n</sub> + (1 &minus; <i>R</i>/(<i>R</i>+1)) <i>x</i><sub>D</sub> ,<br>
+    <i>y</i><sub>n</sub> = <i>x</i><sub>D</sub> .</p>
+    <p>The mole fraction of component <i>B</i> in the still (<i>x</i><sub>B,&thinsp;still</sub>) changes
+    continuously during batch distillation, so process simulators and/or experimental data are commonly used
+    to avoid their calculation.</p>
+  </div>
+
+  <div class="panel" id="panelAbt">
+    <span class="closebtn" title="close">&times;</span>
+    <p>This simulation was created in the
+    <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a>
+    at University of Colorado Boulder for
+    <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a>
+    by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a
+    <a href="https://demonstrations.wolfram.com/MultistageBatchDistillationWithAzeotrope/" target="_blank">Mathematica simulation</a>
+    by Neil Hendren. It was prepared with financial support from the National Science Foundation
+    (DUE 2336987 and 2336988) in collaboration with Washington State University. Address any questions or
+    comments to LearnChemE@gmail.com.</p>
+  </div>
+</div>
+<div id="tooltip"></div>
+
+<script>
+(function(){
+  "use strict";
+  // ---------------- physics ----------------
+  function eqdata(x, az){
+    if(az===1) return 2.24*x - 2.06*x*x + 0.82*Math.pow(x,2.7);
+    if(az===2) return 2.56*x - 1.94*x*x - 6.26*x*x*x + 11.54*Math.pow(x,4) - 4.9*Math.pow(x,5);
+    return 0.51*x - 1.95*x*x + 11.33*Math.pow(x,3) - 7.4*Math.pow(x,4)
+           - 13.06*Math.pow(x,5) + 16.64*Math.pow(x,6) - 5.07*Math.pow(x,7);
+  }
+  var LVf = function(R){ return R/(1+R); };
+  var invOL = function(y, xd, R){ var lv=LVf(R); return ((lv-1)*xd + y)/lv; };
+  function expanded(xb, xd, az, R, stages){
+    var x=xb;
+    for(var k=0;k<stages+1;k++) x = invOL(eqdata(x,az), xd, R);
+    return x;
+  }
+  var AZEO = {2:0.60, 3:0.46};
+  function allRoots(xb, az, R, stages){
+    var F=function(xd){ return expanded(xb,xd,az,R,stages)-xd; };
+    var rs=[], N=4000, pv=0.0005, prev=F(pv);
+    for(var i=1;i<=N;i++){
+      var xd=0.0005+0.9990*i/N, f=F(xd);
+      if(prev*f<0){
+        var a=pv,b=xd,fa=prev,m,fm;
+        for(var j=0;j<100;j++){ m=(a+b)/2; fm=F(m); if(fa*fm<=0){b=m;}else{a=m;fa=fm;} }
+        rs.push((a+b)/2);
+      }
+      prev=f; pv=xd;
+    }
+    return rs;
+  }
+  // choose the physically correct fixed point (distillate approaches the azeotrope
+  // for az=2, and moves away from it toward a pure component for az=3)
+  function selectXD(xb, az, R, stages){
+    var rs=allRoots(xb,az,R,stages), xd, c, above;
+    if(az===1){
+      above=rs.filter(function(r){return r>xb;});
+      xd = above.length ? Math.min.apply(null,above) : (rs.length ? Math.max.apply(null,rs) : 0.999);
+      if(!rs.length) xd=0.999;
+    } else if(az===2){
+      var a=AZEO[2];
+      if(Math.abs(xb-a)<1e-9){ xd=a; }
+      else if(xb<a){ c=rs.filter(function(r){return r<a;}); xd=c.length?Math.max.apply(null,c):a; }
+      else { c=rs.filter(function(r){return r>a;}); xd=c.length?Math.min.apply(null,c):a; }
+    } else {
+      var a3=AZEO[3];
+      if(Math.abs(xb-a3)<1e-9){ xd=xb; }
+      else if(xb<a3){ c=rs.filter(function(r){return r<xb;}); xd=c.length?Math.min.apply(null,c):0.001; }
+      else { c=rs.filter(function(r){return r>xb;}); xd=c.length?Math.max.apply(null,c):0.999; }
+    }
+    return Math.max(0.001, Math.min(0.999, xd));
+  }
+  // build McCabe-Thiele staircase exactly as the original demonstration
+  function buildStaircase(xb, xd, az, R, stages){
+    var c=[[xb, eqdata(xb,az)]];   // 0-indexed; original is 1-indexed
+    var lim = stages*2+2;          // original loop bound (1-indexed i < lim)
+    var i=1;                       // 1-indexed counter
+    while(i<lim){
+      // horizontal step to operating line using point (i)
+      var pi=c[i-1];
+      c.push([ invOL(pi[1], xd, R), pi[1] ]);
+      i++;
+      if(i<lim){
+        var pv=c[i-1];
+        c.push([ pv[0], eqdata(pv[0], az) ]);
+      }
+      i++;
+    }
+    return c;
+  }
+
+  // ---------------- drawing setup ----------------
+  var cv=document.getElementById('plot'), ctx=cv.getContext('2d');
+  var DPR=2;                       // canvas is 1280x900 backing, 640x450 css
+  // plot geometry in css pixels
+  var CSSW=640, CSSH=450;
+  var M={l:74, r:22, t:46, b:66};
+  var PW=CSSW-M.l-M.r, PH=CSSH-M.t-M.b;
+  function X(x){ return M.l + x*PW; }
+  function Y(y){ return M.t + (1-y)*PH; }
+
+  var EQCOL='rgb(255,150,46)';     // 1,0.59,0.18
+  var OPCOL='rgb(0,0,255)';        // blue
+  var DIAGCOL='rgb(128,128,128)';  // 0.5 gray
+
+  var state={};   // holds last-drawn stage marker screen positions for hover
+
+  function fmtXD(xd){
+    var dec = (xd>0.99 || xd<0.01) ? 3 : 2;
+    return xd.toFixed(dec);
+  }
+
+  function draw(){
+    var R=parseFloat(document.getElementById('R').value);
+    var az=parseInt(document.getElementById('az').value,10);
+    var stages=parseInt(document.getElementById('stages').value,10);
+    var xb=parseFloat(document.getElementById('xb').value);
+
+    var xd=selectXD(xb,az,R,stages);
+    var coords=buildStaircase(xb,xd,az,R,stages);
+
+    ctx.save();
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+    ctx.clearRect(0,0,CSSW,CSSH);
+
+    // ---- frame ----
+    ctx.lineWidth=1.1; ctx.strokeStyle='#000';
+    ctx.strokeRect(X(0),Y(1),PW,PH);
+
+    // ticks
+    ctx.fillStyle='#000';
+    ctx.font='17.5px Helvetica,Arial,sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='top';
+    var t;
+    for(t=0;t<=1.0001;t+=0.2){
+      var xp=X(t);
+      ctx.beginPath(); ctx.moveTo(xp,Y(0)); ctx.lineTo(xp,Y(0)-6); ctx.stroke();
+      ctx.fillText(t.toFixed(1), xp, Y(0)+6);
+    }
+    ctx.textAlign='right'; ctx.textBaseline='middle';
+    for(t=0;t<=1.0001;t+=0.2){
+      var yp=Y(t);
+      ctx.beginPath(); ctx.moveTo(X(0),yp); ctx.lineTo(X(0)+6,yp); ctx.stroke();
+      ctx.fillText(t.toFixed(1), X(0)-8, yp);
+    }
+
+    // clip to plot box for curves
+    ctx.save();
+    ctx.beginPath(); ctx.rect(X(0),Y(1),PW,PH); ctx.clip();
+
+    // ---- diagonal y=x ----
+    ctx.strokeStyle=DIAGCOL; ctx.lineWidth=1.4;
+    ctx.beginPath(); ctx.moveTo(X(0),Y(0)); ctx.lineTo(X(1),Y(1)); ctx.stroke();
+
+    // ---- equilibrium curve ----
+    ctx.strokeStyle=EQCOL; ctx.lineWidth=2.4;
+    ctx.beginPath();
+    var first=true;
+    for(var xx=0;xx<=1.0001;xx+=0.004){
+      var yy=eqdata(xx,az);
+      var px=X(xx), py=Y(Math.max(-0.2,Math.min(1.2,yy)));
+      if(first){ctx.moveTo(px,py);first=false;} else ctx.lineTo(px,py);
+    }
+    ctx.stroke();
+
+    // ---- operating line (over graphicsHelpers range) ----
+    var opRange;
+    if(az===1) opRange=[0,xd];
+    else if(az===2){
+      if(Math.abs(xb-0.60)<1e-9) opRange=[0.599,0.601];
+      else if(xb<0.60) opRange=[0,xd]; else opRange=[xd,1];
+    } else {
+      if(Math.abs(xb-0.46)<1e-9) opRange=[0.459,0.461];
+      else if(xb<0.46) opRange=[xd,1]; else opRange=[0,xd];
+    }
+    var OL=function(x){ var lv=LVf(R); return lv*x + (1-lv)*xd; };
+    ctx.strokeStyle=OPCOL; ctx.lineWidth=2.0;
+    ctx.beginPath();
+    ctx.moveTo(X(opRange[0]),Y(OL(opRange[0])));
+    ctx.lineTo(X(opRange[1]),Y(OL(opRange[1])));
+    ctx.stroke();
+
+    // ---- staircase (dashed black) ----
+    ctx.strokeStyle='#000'; ctx.lineWidth=1.4;
+    ctx.setLineDash([5,4]);
+    ctx.beginPath();
+    for(var q=0;q<coords.length;q++){
+      var p=coords[q];
+      if(q===0) ctx.moveTo(X(p[0]),Y(p[1])); else ctx.lineTo(X(p[0]),Y(p[1]));
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // ---- black dots on equilibrium points (odd 1-indexed => even 0-indexed) ----
+    ctx.fillStyle='#000';
+    for(var d=0;d<coords.length;d+=2){
+      ctx.beginPath();
+      ctx.arc(X(coords[d][0]),Y(coords[d][1]),4.2,0,2*Math.PI);
+      ctx.fill();
+    }
+
+    // ---- blue distillate point on diagonal ----
+    ctx.fillStyle=OPCOL;
+    ctx.beginPath(); ctx.arc(X(xd),Y(xd),4.6,0,2*Math.PI); ctx.fill();
+
+    ctx.restore(); // remove clip
+
+    // ---- stage labels + build hover targets ----
+    // helper offsets: [labelOffset for still+stages, offset for condenser]
+    var h1,h2;
+    if(az===1){ h1=[1,-1]; h2=[-1,1]; }
+    else if(az===2){
+      if(xb<0.60){ h1=[1,-1]; h2=[-1,1]; } else { h1=[-1.2,1.2]; h2=[1,-1]; }
+    } else {
+      if(xb<0.46){ h1=[-1.2,1.2]; h2=[1,-1]; } else { h1=[1,-1]; h2=[-1,1]; }
+    }
+
+    var markers=[];   // {label, xB, yB, px, py}
+    // still + stages: label j at coords[2j-1] (1-indexed) => coords[2j-2] 0-indexed
+    // stage liquid comps: x_k = coords[2k] (0-indexed horizontal point).
+    var nLabels = stages+1; // still + N stages
+    for(var j=1;j<=nLabels;j++){
+      var cp=coords[2*j-2];
+      var lbl, xB, yB;
+      if(j===1){ lbl='still'; xB=xb; yB=eqdata(xb,az); }
+      else { var k=j-1; lbl=''+k; xB=coords[2*k][0]; yB=eqdata(xB,az); }
+      markers.push({label:lbl,xB:xB,yB:yB,px:X(cp[0]),py:Y(cp[1]),off:h1});
+    }
+    // condenser at last coord
+    var last=coords[coords.length-1];
+    markers.push({label:'xD', xB:xd, yB:xd, px:X(last[0]),py:Y(last[1]), off:h2, isD:true});
+
+    // render text labels
+    ctx.font='18px Helvetica,Arial,sans-serif';
+    for(var mi=0;mi<markers.length;mi++){
+      drawLabel(markers[mi]);
+    }
+    state.markers=markers;
+
+    // ---- axis labels ----
+    ctx.fillStyle='#000';
+    ctx.font='17px Helvetica,Arial,sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='alphabetic';
+    // x label with subscript
+    drawSubLabel(ctx, 'mole fraction B in liquid phase (x','B',')', M.l+PW/2, CSSH-16, 'center');
+    // y label rotated
+    ctx.save();
+    ctx.translate(20, M.t+PH/2);
+    ctx.rotate(-Math.PI/2);
+    drawSubLabel(ctx, 'mole fraction B in vapor phase (y','B',')', 0, 0, 'center');
+    ctx.restore();
+
+    // ---- plot label (distillate) ----
+    ctx.font='17px Helvetica,Arial,sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='alphabetic';
+    ctx.fillStyle='#000';
+    ctx.fillText('mole fraction B in distillate = '+fmtXD(xd), M.l+PW/2, 26);
+
+    ctx.restore();
+  }
+
+  // draw a text with a single italic subscript then a suffix, centered
+  function drawSubLabel(ctx, pre, sub, suf, cx, cy, align){
+    var fs=19.6, sfs=13.8;
+    ctx.font=fs+'px Helvetica,Arial,sans-serif';
+    var wpre=ctx.measureText(pre).width;
+    ctx.font='italic '+fs+'px Helvetica,Arial,sans-serif';
+    // no italic base needed; keep base upright
+    ctx.font=fs+'px Helvetica,Arial,sans-serif';
+    ctx.font=sfs+'px Helvetica,Arial,sans-serif';
+    var wsub=ctx.measureText(sub).width;
+    ctx.font=fs+'px Helvetica,Arial,sans-serif';
+    var wsuf=ctx.measureText(suf).width;
+    var total=wpre+wsub+wsuf;
+    var x0 = align==='center' ? cx-total/2 : cx;
+    ctx.textAlign='left';
+    ctx.font=fs+'px Helvetica,Arial,sans-serif';
+    ctx.fillText(pre, x0, cy);
+    ctx.font='italic '+sfs+'px Helvetica,Arial,sans-serif';
+    ctx.fillText(sub, x0+wpre, cy+4);
+    ctx.font=fs+'px Helvetica,Arial,sans-serif';
+    ctx.fillText(suf, x0+wpre+wsub, cy);
+    ctx.textAlign='center';
+  }
+
+  // draw a stage marker label honoring the Mathematica text offset
+  function drawLabel(m){
+    // Mathematica Text offset: {ox,oy} in [-1,1] with y pointing up.
+    //   ox=+1 -> point at text's right edge  -> text sits to the LEFT  (align right)
+    //   ox=-1 -> point at text's left edge   -> text sits to the RIGHT (align left)
+    //   oy=-1 -> point at text's bottom edge -> text sits ABOVE (screen: smaller y, baseline bottom)
+    //   oy=+1 -> point at text's top edge    -> text sits BELOW (baseline top)
+    var ox=m.off[0], oy=m.off[1];
+    ctx.textAlign   = ox>0 ? 'right' : (ox<0 ? 'left' : 'center');
+    ctx.textBaseline= oy<0 ? 'bottom': (oy>0 ? 'top'  : 'middle');
+    var padx = 6*Math.max(1,Math.abs(ox))*Math.sign(ox);   // gap grows with |offset|
+    var pady = 6*Math.max(1,Math.abs(oy));
+    var lx = m.px - padx;
+    var ly = m.py + (oy<0 ? -pady : pady);
+    ctx.font='18px Helvetica,Arial,sans-serif';
+    ctx.lineWidth=3; ctx.strokeStyle='#fff'; ctx.lineJoin='round';
+    if(m.isD){
+      // draw x_D (D as subscript)
+      drawXDlabel(m);
+    } else {
+      ctx.strokeText(m.label, lx, ly);
+      ctx.fillStyle='#000';
+      ctx.fillText(m.label, lx, ly);
+    }
+  }
+  function drawXDlabel(m){
+    var ox=m.off[0], oy=m.off[1];
+    var BF=19.2, SF=13.2;                  // base and subscript font sizes
+    var base='x', sub='D';
+    ctx.font='italic '+BF+'px Helvetica,Arial,sans-serif';
+    var wb=ctx.measureText(base).width;
+    ctx.font='italic '+SF+'px Helvetica,Arial,sans-serif';
+    var ws=ctx.measureText(sub).width;
+    var total=wb+1+ws;
+    var padx=6*Math.max(1,Math.abs(ox));
+    var pady=6*Math.max(1,Math.abs(oy));
+    // horizontal placement relative to the marker point
+    var sx = ox>0 ? (m.px-padx-total) : (ox<0 ? (m.px+padx) : (m.px-total/2));
+    // vertical placement: alphabetic baseline of the base letter
+    var byl = oy<0 ? (m.py-pady) : (oy>0 ? (m.py+pady+BF*0.78) : (m.py+BF*0.34));
+    ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+    ctx.lineJoin='round'; ctx.lineWidth=3; ctx.strokeStyle='#fff';
+    ctx.font='italic '+BF+'px Helvetica,Arial,sans-serif';
+    ctx.strokeText(base, sx, byl);
+    ctx.fillStyle='#000'; ctx.fillText(base, sx, byl);
+    ctx.font='italic '+SF+'px Helvetica,Arial,sans-serif';
+    var subY = byl + BF*0.18;               // drop the D below the baseline => subscript
+    ctx.strokeStyle='#fff'; ctx.strokeText(sub, sx+wb+1, subY);
+    ctx.fillStyle='#000'; ctx.fillText(sub, sx+wb+1, subY);
+  }
+
+  // ---------------- hover tooltip ----------------
+  var tip=document.getElementById('tooltip');
+  cv.addEventListener('mousemove', function(e){
+    if(!state.markers){ tip.style.display='none'; return; }
+    var rect=cv.getBoundingClientRect();
+    var mx=(e.clientX-rect.left), my=(e.clientY-rect.top);
+    var best=null,bd=1e9;
+    for(var i=0;i<state.markers.length;i++){
+      var mk=state.markers[i];
+      var dx=mx-mk.px, dy=my-mk.py, dd=dx*dx+dy*dy;
+      if(dd<bd){bd=dd;best=mk;}
+    }
+    if(best && bd<22*22){
+      var name = best.isD ? 'condenser' : (best.label==='still'?'still':'stage '+best.label);
+      var html;
+      if(best.isD){
+        html='<b>condenser</b><br><i>x</i><sub>B</sub> = '+best.xB.toFixed(2);
+      } else {
+        html='<b>'+name+'</b><br><i>x</i><sub>B</sub> = '+best.xB.toFixed(2)
+             +'<br><i>y</i><sub>B</sub> = '+best.yB.toFixed(2);
+      }
+      tip.innerHTML=html;
+      tip.style.display='block';
+      tip.style.left=(e.clientX+window.scrollX+12)+'px';
+      tip.style.top=(e.clientY+window.scrollY-10)+'px';
+    } else { tip.style.display='none'; }
+  });
+  cv.addEventListener('mouseleave', function(){ tip.style.display='none'; });
+
+  // ---------------- controls ----------------
+  function bind(id, valId, fmt){
+    var el=document.getElementById(id);
+    el.addEventListener('input', function(){
+      if(valId){ document.getElementById(valId).textContent = fmt(parseFloat(el.value)); }
+      draw();
+    });
+  }
+  bind('R','Rval',function(v){return v.toFixed(1);});
+  bind('stages','stagesval',function(v){return String(Math.round(v));});
+  bind('xb','xbval',function(v){return v.toFixed(2);});
+  document.getElementById('az').addEventListener('change', draw);
+
+  // ---------------- panels ----------------
+  function setupPanel(btnId, panelId){
+    var btn=document.getElementById(btnId), pan=document.getElementById(panelId);
+    var app=document.getElementById('app');
+    var all=[['btnDir','panelDir'],['btnDet','panelDet'],['btnAbt','panelAbt']];
+    btn.addEventListener('click', function(){
+      var isShown=pan.classList.contains('show');
+      all.forEach(function(pr){
+        document.getElementById(pr[1]).classList.remove('show');
+        document.getElementById(pr[0]).classList.remove('active');
+      });
+      if(!isShown){
+        // place the panel just to the right of its button, starting a few pixels below it
+        var left=btn.offsetLeft + btn.offsetWidth + 6;
+        var top =btn.offsetTop + 4;
+        var usableRight=app.clientWidth - 10;      // keep inside right padding
+        var w=460;
+        if(left + w > usableRight) w=Math.max(280, usableRight - left);
+        pan.style.left=left+'px';
+        pan.style.top =top+'px';
+        pan.style.width=w+'px';
+        pan.classList.add('show');
+        btn.classList.add('active');
+      }
+    });
+  }
+  setupPanel('btnDir','panelDir');
+  setupPanel('btnDet','panelDet');
+  setupPanel('btnAbt','panelAbt');
+
+  // close (x) buttons in the panel corners
+  Array.prototype.forEach.call(document.querySelectorAll('.closebtn'), function(x){
+    x.addEventListener('click', function(){
+      var pan=x.parentNode;
+      pan.classList.remove('show');
+      ['btnDir','btnDet','btnAbt'].forEach(function(b){
+        document.getElementById(b).classList.remove('active');
+      });
+    });
+  });
+
+  draw();
+})();
+</script>
+</body>
+</html>

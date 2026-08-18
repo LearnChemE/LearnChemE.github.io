@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Mass Balances in Absorption and Stripping Units</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: Helvetica, Arial, sans-serif;
+    background: #ffffff;
+    color: #222;
+    margin: 0;
+    padding: 18px 12px 30px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  h1 {
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    margin: 0 0 14px 0;
+    color: #222;
+  }
+  .sim-wrap {
+    width: 100%;
+    max-width: 1020px;
+  }
+  canvas {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+  }
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 10px 16px;
+    margin-top: 6px;
+    margin-bottom: 4px;
+  }
+  .controls-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 10px 16px;
+    width: 100%;
+    margin-top: 10px;
+  }
+  button.action-btn {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    padding: 6px 14px;
+    border: 1px solid #888;
+    border-radius: 4px;
+    background: #f2f2f2;
+    color: #222;
+    cursor: pointer;
+  }
+  button.action-btn:hover { background: #e6e6e6; }
+  button.action-btn:active { background: #d8d8d8; }
+
+  .setter-group {
+    display: inline-flex;
+    border: 1px solid #888;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .setter-btn {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    padding: 6px 14px;
+    border: none;
+    background: #f2f2f2;
+    color: #222;
+    cursor: pointer;
+    border-right: 1px solid #888;
+  }
+  .setter-btn:last-child { border-right: none; }
+  .setter-btn.active {
+    background: #4a4a4a;
+    color: #fff;
+  }
+
+  .solution-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 15px;
+    user-select: none;
+  }
+  .solution-toggle input { width: 17px; height: 17px; cursor: pointer; }
+  .solution-toggle.disabled { opacity: 0.55; }
+
+  .slider-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 210px;
+  }
+  .slider-block label {
+    font-size: 17px;
+    margin-bottom: 2px;
+    white-space: nowrap;
+  }
+  .slider-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .value-input {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 17px;
+    width: 100px;
+    padding: 5px 8px;
+    border: 1px solid #888;
+    border-radius: 4px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .unit-label {
+    font-size: 17px;
+    white-space: nowrap;
+  }
+  .correct-readout {
+    font-size: 17px;
+    color: #0000EE;
+    margin-top: 4px;
+    min-height: 22px;
+    white-space: nowrap;
+  }
+
+  .panel-buttons {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+    margin-bottom: 4px;
+    justify-content: center;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 5;
+  }
+  .panel-item {
+    position: relative;
+  }
+  .panel-btn {
+    position: relative;
+    z-index: 20;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    font-weight: normal;
+    padding: 8px 22px;
+    border: none;
+    border-radius: 4px;
+    background: #98000D;
+    color: #fff;
+    cursor: pointer;
+  }
+  .panel-btn:hover { background: #7a000a; }
+  .panel-btn.active { background: #55000a; }
+
+  .panel {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 8px;
+    width: 460px;
+    max-width: 90vw;
+    padding: 16px 18px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: #fafafa;
+    box-shadow: 2px 3px 10px rgba(0,0,0,0.15);
+    font-size: 14px;
+    line-height: 1.55;
+    text-align: left;
+    z-index: 10;
+  }
+  .panel.open { display: block; }
+  #panelAbout {
+    left: auto;
+    right: 0;
+    transform: none;
+  }
+  .panel-close {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    font-size: 20px;
+    line-height: 1;
+    color: #888;
+    cursor: pointer;
+    padding: 2px 4px;
+    user-select: none;
+  }
+  .panel-close:hover { color: #333; }
+  .panel h2 {
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    margin: 0 22px 8px 0;
+    color: #98000D;
+  }
+  .panel p { margin: 0 0 10px 0; }
+  .panel p:last-child { margin-bottom: 0; }
+  .panel a { color: #98000D; }
+  .eq { font-style: italic; }
+</style>
+</head>
+<body>
+
+<div class="sim-wrap">
+  <div class="panel-buttons">
+    <div class="panel-item">
+      <button class="panel-btn" id="btnDirections">Directions</button>
+      <div class="panel" id="panelDirections">
+        <span class="panel-close" data-close="panelDirections">&times;</span>
+        <h2>DIRECTIONS</h2>
+        <p>This simulation shows the implementation of mass balance in a single-stage "stripping" or "absorption" unit. Type in the boxes the correct values for the two unknowns. The unknowns are shown in green in the graphic. Then check "solution" to see the correct answers. Click "new problem" for a new set of conditions with different unknowns and/or different values for the unknowns.</p>
+      </div>
+    </div>
+    <div class="panel-item">
+      <button class="panel-btn" id="btnDetails">Details</button>
+      <div class="panel" id="panelDetails">
+        <span class="panel-close" data-close="panelDetails">&times;</span>
+        <h2>DETAILS</h2>
+        <p>Assuming that the impurity concentration is low so that the liquid and vapor flow rates are constant, a mass balance on a single-stage absorption or a stripping unit is given by</p>
+        <p class="eq">x<sub>0</sub> L + y<sub>2</sub> V = x<sub>1</sub> L + y<sub>1</sub> V,</p>
+        <p>where x<sub>0</sub> is the mole ratio of the impurity flow rate in the liquid feed to the total liquid flow rate (ppm), y<sub>2</sub> is the mole ratio of the impurity flow rate in the vapor feed to the vapor flow rate (ppm), x<sub>1</sub> is the mole ratio of the impurity flow rate in the exiting liquid stream to the liquid flow rate (ppm), y<sub>1</sub> is the mole ratio of the impurity flow rate in the exiting vapor stream to the vapor flow rate (ppm), L is the liquid flow rate (Mmol/h) and V is the vapor flow rate (Mmol/h).</p>
+        <p>The exiting streams are assumed to be in equilibrium, and since the impurity concentrations are low, Henry's law is used:</p>
+        <p class="eq">y<sub>1</sub> = m x<sub>1</sub>,</p>
+        <p>where m is a constant m = H/P, H is Henry's constant (bar) and P is pressure (bar).</p>
+      </div>
+    </div>
+    <div class="panel-item">
+      <button class="panel-btn" id="btnAbout">About</button>
+      <div class="panel" id="panelAbout">
+        <span class="panel-close" data-close="panelAbout">&times;</span>
+        <h2>ABOUT</h2>
+        <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/MassBalancesInAbsorptionAndStrippingUnits/" target="_blank">Mathematica simulation</a> by Rachael L. Baumann. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988) in collaboration with Washington State University. Address any questions or comments to LearnChemE@gmail.com.</p>
+      </div>
+    </div>
+  </div>
+
+  <canvas id="diagram" width="1000" height="460"></canvas>
+
+  <div class="controls">
+    <button class="action-btn" id="newProblemBtn">new problem</button>
+
+    <label class="solution-toggle" id="solutionLabel">
+      <input type="checkbox" id="solutionCheck"> solution
+    </label>
+
+    <div class="setter-group">
+      <button class="setter-btn" id="stripBtn">stripping</button>
+      <button class="setter-btn" id="absorbBtn">absorption</button>
+    </div>
+  </div>
+
+  <div class="controls-row" id="sliderRow">
+    <div class="slider-block">
+      <label id="flowLabel">flow</label>
+      <div class="slider-row">
+        <input type="number" id="flowInput" class="value-input">
+        <span class="unit-label" id="flowUnit">Mmol/h</span>
+      </div>
+      <div class="correct-readout" id="flowCorrect"></div>
+    </div>
+    <div class="slider-block">
+      <label id="compLabel">composition</label>
+      <div class="slider-row">
+        <input type="number" id="compInput" class="value-input">
+        <span class="unit-label" id="compUnit">ppm</span>
+      </div>
+      <div class="correct-readout" id="compCorrect"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  // ---------- canvas hi-DPI setup ----------
+  var canvas = document.getElementById('diagram');
+  var ctx = canvas.getContext('2d');
+  var CSS_W = 1000, CSS_H = 460;
+  function setupHiDPI() {
+    var dpr = window.devicePixelRatio || 1;
+    canvas.width = CSS_W * dpr;
+    canvas.height = CSS_H * dpr;
+    canvas.style.width = CSS_W + 'px';
+    canvas.style.height = CSS_H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  setupHiDPI();
+
+  // ---------- state ----------
+  var mode = 'stripping'; // or 'absorption'
+  var solutionShown = false;
+  var problem = {};       // {m, x0, y2, L, V, x1, y1}
+  var unknownFlow = 'L';  // 'L' or 'V'
+  var unknownComp = 'x1'; // 'x1' or 'y1'
+  var guessFlow = 0;
+  var guessComp = 0;
+
+  var GREEN = '#009900';
+  var BLUE = '#0000EE';
+  var BLACK = '#111111';
+
+  // ---------- random helpers ----------
+  function randInt(a, b) { return Math.floor(Math.random() * (b - a + 1)) + a; }
+  function randReal(a, b) { return a + Math.random() * (b - a); }
+
+  // ---------- physics / problem generation ----------
+  function generateProblem(m0) {
+    var m = randReal(3, 5);
+    var x0, y2, L, V, x1, y1;
+    if (m0 === 'stripping') {
+      x0 = randInt(30, 40);
+      y2 = randInt(0, 5);
+      x1 = randInt(60, 70) * (x0 / 100);
+      L = randInt(100, 150);
+      y1 = m * x1;
+      V = L * (x0 - x1) / (y1 - y2);
+    } else {
+      x0 = randInt(1, 10) / 100;
+      y2 = randInt(75, 125);
+      y1 = randInt(5, 15);
+      V = randInt(10, 20) / 10;
+      x1 = y1 / m;
+      L = V * (y1 - y2) / (x0 - x1);
+    }
+    return { m: m, x0: x0, y2: y2, L: L, V: V, x1: x1, y1: y1 };
+  }
+
+  function fmt(mode0, key, val) {
+    var dec;
+    if (mode0 === 'stripping') {
+      dec = { x0: 0, y2: 0, m: 1, L: 0, V: 1, x1: 1, y1: 0 }[key];
+    } else {
+      dec = { x0: 1, y2: 0, m: 1, L: 0, V: 0, x1: 1, y1: 0 }[key];
+    }
+    return Number(val).toFixed(dec);
+  }
+
+  var SLIDER_SPEC = {
+    stripping: {
+      L:  { min: 0, max: 200, step: 1 },
+      V:  { min: 0, max: 50,  step: 0.1 },
+      x1: { min: 0, max: 350, step: 1 },
+      y1: { min: 0, max: 1500, step: 1 }
+    },
+    absorption: {
+      L:  { min: 0, max: 350, step: 1 },
+      V:  { min: 0, max: 200, step: 1 },
+      x1: { min: 0, max: 100, step: 0.1 },
+      y1: { min: 0, max: 350, step: 1 }
+    }
+  };
+
+  var FLOW_LABEL = { L: 'liquid flow rate L', V: 'vapor flow rate V' };
+  var COMP_LABEL = { x1: 'outlet liquid mole ratio x\u2081', y1: 'outlet vapor mole ratio y\u2081' };
+  var UNIT = { L: 'Mmol/h', V: 'Mmol/h', x1: 'ppm', y1: 'ppm' };
+
+  // ---------- DOM references ----------
+  var newProblemBtn = document.getElementById('newProblemBtn');
+  var solutionCheck = document.getElementById('solutionCheck');
+  var solutionLabel = document.getElementById('solutionLabel');
+  var stripBtn = document.getElementById('stripBtn');
+  var absorbBtn = document.getElementById('absorbBtn');
+  var flowLabel = document.getElementById('flowLabel');
+  var compLabel = document.getElementById('compLabel');
+  var flowInput = document.getElementById('flowInput');
+  var compInput = document.getElementById('compInput');
+  var flowUnit = document.getElementById('flowUnit');
+  var compUnit = document.getElementById('compUnit');
+  var flowCorrect = document.getElementById('flowCorrect');
+  var compCorrect = document.getElementById('compCorrect');
+
+  // ---------- problem lifecycle ----------
+  function newProblem() {
+    problem = generateProblem(mode);
+    unknownFlow = Math.random() < 0.5 ? 'L' : 'V';
+    unknownComp = Math.random() < 0.5 ? 'x1' : 'y1';
+    guessFlow = 0;
+    guessComp = 0;
+    solutionShown = false;
+    solutionCheck.checked = false;
+    updateSolutionEnabled();
+    setupInputs();
+    draw();
+  }
+
+  function setupInputs() {
+    var fs = SLIDER_SPEC[mode][unknownFlow];
+    var cs = SLIDER_SPEC[mode][unknownComp];
+
+    flowInput.min = fs.min; flowInput.max = fs.max; flowInput.step = fs.step;
+    flowInput.value = 0;
+    compInput.min = cs.min; compInput.max = cs.max; compInput.step = cs.step;
+    compInput.value = 0;
+
+    flowLabel.textContent = FLOW_LABEL[unknownFlow];
+    compLabel.textContent = COMP_LABEL[unknownComp];
+
+    flowUnit.textContent = UNIT[unknownFlow];
+    compUnit.textContent = 'ppm';
+
+    updateCorrectReadouts();
+  }
+
+  function updateCorrectReadouts() {
+    if (solutionShown) {
+      flowCorrect.textContent = 'correct ' + unknownFlow + ' = ' + fmt(mode, unknownFlow, problem[unknownFlow]) + ' ' + UNIT[unknownFlow];
+      var compSym = unknownComp === 'x1' ? 'x\u2081' : 'y\u2081';
+      compCorrect.textContent = 'correct ' + compSym + ' = ' + fmt(mode, unknownComp, problem[unknownComp]) + ' ppm';
+    } else {
+      flowCorrect.textContent = '';
+      compCorrect.textContent = '';
+    }
+  }
+
+  function updateSolutionEnabled() {
+    solutionCheck.disabled = solutionShown;
+    solutionLabel.classList.toggle('disabled', solutionShown);
+  }
+
+  // ---------- event handlers ----------
+  newProblemBtn.addEventListener('click', newProblem);
+
+  solutionCheck.addEventListener('change', function () {
+    if (solutionCheck.checked) {
+      solutionShown = true;
+      updateSolutionEnabled();
+      updateCorrectReadouts();
+      draw();
+    }
+  });
+
+  stripBtn.addEventListener('click', function () {
+    if (mode !== 'stripping') { mode = 'stripping'; newProblem(); updateModeButtons(); }
+  });
+  absorbBtn.addEventListener('click', function () {
+    if (mode !== 'absorption') { mode = 'absorption'; newProblem(); updateModeButtons(); }
+  });
+
+  function updateModeButtons() {
+    stripBtn.classList.toggle('active', mode === 'stripping');
+    absorbBtn.classList.toggle('active', mode === 'absorption');
+  }
+
+  flowInput.addEventListener('input', function () {
+    var v = parseFloat(flowInput.value);
+    guessFlow = isNaN(v) ? 0 : v;
+    draw();
+  });
+  compInput.addEventListener('input', function () {
+    var v = parseFloat(compInput.value);
+    guessComp = isNaN(v) ? 0 : v;
+    draw();
+  });
+
+  window.addEventListener('resize', function () { setupHiDPI(); draw(); });
+
+  // ---------- drawing ----------
+  function drawArrow(fromX, fromY, toX, toY) {
+    ctx.beginPath();
+    ctx.moveTo(fromX, fromY);
+    ctx.lineTo(toX, toY);
+    ctx.stroke();
+    var dx = toX - fromX, dy = toY - fromY;
+    var len = Math.sqrt(dx * dx + dy * dy) || 1;
+    var ux = dx / len, uy = dy / len;
+    var ah = 11;
+    var leftX = toX - ux * ah - uy * ah * 0.55;
+    var leftY = toY - uy * ah + ux * ah * 0.55;
+    var rightX = toX - ux * ah + uy * ah * 0.55;
+    var rightY = toY - uy * ah - ux * ah * 0.55;
+    ctx.beginPath();
+    ctx.moveTo(toX, toY);
+    ctx.lineTo(leftX, leftY);
+    ctx.lineTo(rightX, rightY);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  // Two-segment "dogleg" arrow (matches the Mathematica figure): a long run at a
+  // fixed height, then a short run that touches the column's dome. The arrowhead
+  // sits only at the true endpoint.
+  function drawDogleg(x1, y1, x2, y2, x3, y3) {
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.lineTo(x3, y3);
+    ctx.stroke();
+    drawArrowhead(x2, y2, x3, y3);
+  }
+  function drawArrowhead(fromX, fromY, toX, toY) {
+    var dx = toX - fromX, dy = toY - fromY;
+    var len = Math.sqrt(dx * dx + dy * dy) || 1;
+    var ux = dx / len, uy = dy / len;
+    var ah = 11;
+    var leftX = toX - ux * ah - uy * ah * 0.55;
+    var leftY = toY - uy * ah + ux * ah * 0.55;
+    var rightX = toX - ux * ah + uy * ah * 0.55;
+    var rightY = toY - uy * ah - ux * ah * 0.55;
+    ctx.beginPath();
+    ctx.moveTo(toX, toY);
+    ctx.lineTo(leftX, leftY);
+    ctx.lineTo(rightX, rightY);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  var FONT_INSIDE = '20px Helvetica, Arial, sans-serif';
+  var FONT_LABEL = '20px Helvetica, Arial, sans-serif';
+  var LINE_H = 28;
+
+  // Draw a sequence of {text, color} segments in reading order.
+  // align 'left'  -> x is the left edge of the whole run.
+  // align 'right' -> x is the right edge of the whole run (segments still read left-to-right).
+  function drawSegments(x, y, align, segments) {
+    ctx.font = FONT_LABEL;
+    ctx.textAlign = 'left';
+    var startX = x;
+    if (align === 'right') {
+      var totalW = 0;
+      for (var i = 0; i < segments.length; i++) totalW += ctx.measureText(segments[i].text).width;
+      startX = x - totalW;
+    }
+    var cx0 = startX;
+    for (var j = 0; j < segments.length; j++) {
+      ctx.fillStyle = segments[j].color;
+      ctx.fillText(segments[j].text, cx0, y);
+      cx0 += ctx.measureText(segments[j].text).width;
+    }
+  }
+
+  // Build the segment list for one value: "sym = guess / correct unit" (correct part
+  // only appears once solution is shown), always in the same font size.
+  function valueSegments(sym, isUnknown, guessVal, correctVal, unit) {
+    if (!isUnknown) {
+      return [{ text: sym + ' = ' + guessVal + ' ' + unit, color: BLACK }];
+    }
+    var segs = [{ text: sym + ' = ', color: BLACK }, { text: guessVal, color: GREEN }];
+    if (solutionShown) {
+      segs.push({ text: ' / ', color: BLACK });
+      segs.push({ text: correctVal, color: BLUE });
+    }
+    segs.push({ text: ' ' + unit, color: BLACK });
+    return segs;
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, CSS_W, CSS_H);
+    ctx.textBaseline = 'middle';
+
+    // ----- column geometry -----
+    var cx = CSS_W / 2;
+    var rx = 64;
+    var ry = 20;
+    var colTop = 140;
+    var colBottom = 320;
+    var midY = (colTop + colBottom) / 2;
+
+    ctx.strokeStyle = BLACK;
+    ctx.lineWidth = 3;
+    ctx.fillStyle = '#ffffff';
+
+    ctx.beginPath();
+    ctx.moveTo(cx - rx, colTop);
+    ctx.lineTo(cx - rx, colBottom);
+    ctx.ellipse(cx, colBottom, rx, ry, 0, Math.PI, 0, true); // bottom cap
+    ctx.lineTo(cx + rx, colTop);
+    ctx.ellipse(cx, colTop, rx, ry, 0, 0, Math.PI, true); // top cap
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    // ----- title (two lines, so it fits inside the narrow column) + equilibrium equation -----
+    ctx.fillStyle = BLACK;
+    ctx.textAlign = 'center';
+    ctx.font = FONT_INSIDE;
+    var titleLine2 = mode === 'stripping' ? 'stripper' : 'absorber';
+    ctx.fillText('one-stage', cx, midY - LINE_H);
+    ctx.fillText(titleLine2, cx, midY);
+    ctx.fillText('y\u2081 = ' + fmt(mode, 'm', problem.m) + ' x\u2081', cx, midY + LINE_H);
+
+    // ----- dogleg arrows that touch the domes, matching the Mathematica figure -----
+    var armInset = 24;                    // how far the touch point sits from the column centerline
+    var armXRight = cx + armInset;
+    var armXLeft = cx - armInset;
+    var ratio = armInset / rx;
+    var domeDrop = ry * Math.sqrt(Math.max(0, 1 - ratio * ratio));
+    var topTouchY = colTop - domeDrop;    // point where the arrow just touches the top dome
+    var bottomTouchY = colBottom + domeDrop; // point where the arrow just touches the bottom dome
+    var jogGap = 55;                      // vertical run of the short dome-side segment
+    var jogYTop = topTouchY - jogGap;
+    var jogYBottom = bottomTouchY + jogGap;
+    var horizExtent = 140;                // length of the long horizontal run
+    var farXRight = armXRight + horizExtent;
+    var farXLeft = armXLeft - horizExtent;
+
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = BLACK;
+    ctx.fillStyle = BLACK;
+
+    // liquid feed IN: enters the TOP dome (right-of-center touch point)
+    drawDogleg(farXRight, jogYTop, armXRight, jogYTop, armXRight, topTouchY);
+    // liquid product OUT: leaves the BOTTOM dome (right-of-center touch point)
+    drawDogleg(armXRight, bottomTouchY, armXRight, jogYBottom, farXRight, jogYBottom);
+    // gas product OUT: leaves the TOP dome (left-of-center touch point)
+    drawDogleg(armXLeft, topTouchY, armXLeft, jogYTop, farXLeft, jogYTop);
+    // gas feed IN: enters the BOTTOM dome (left-of-center touch point)
+    drawDogleg(farXLeft, jogYBottom, armXLeft, jogYBottom, armXLeft, bottomTouchY);
+
+    // ----- labels: placed beyond the end of each horizontal run, so they never
+    // share horizontal space with the arrow lines -----
+    ctx.font = FONT_LABEL;
+    var textRightX = farXRight + 16;
+    var textLeftX = farXLeft - 16;
+
+    var lGuess = unknownFlow === 'L' ? guessFlow : problem.L;
+    var vGuess = unknownFlow === 'V' ? guessFlow : problem.V;
+    var x1Guess = unknownComp === 'x1' ? guessComp : problem.x1;
+    var y1Guess = unknownComp === 'y1' ? guessComp : problem.y1;
+
+    // Right / top: liquid feed title, L, x0 — centered on the top jog line
+    ctx.textAlign = 'left';
+    ctx.fillStyle = BLACK;
+    ctx.fillText('liquid feed', textRightX, jogYTop - LINE_H);
+    drawSegments(textRightX, jogYTop, 'left',
+      valueSegments('L', unknownFlow === 'L', fmt(mode, 'L', lGuess), fmt(mode, 'L', problem.L), UNIT.L));
+    drawSegments(textRightX, jogYTop + LINE_H, 'left',
+      valueSegments('x\u2080', false, fmt(mode, 'x0', problem.x0), '', 'ppm'));
+
+    // Right / bottom: exiting liquid x1 — centered on the bottom jog line
+    drawSegments(textRightX, jogYBottom, 'left',
+      valueSegments('x\u2081', unknownComp === 'x1', fmt(mode, 'x1', x1Guess), fmt(mode, 'x1', problem.x1), 'ppm'));
+
+    // Left / top: exiting gas y1 — centered on the top jog line, right-aligned
+    drawSegments(textLeftX, jogYTop, 'right',
+      valueSegments('y\u2081', unknownComp === 'y1', fmt(mode, 'y1', y1Guess), fmt(mode, 'y1', problem.y1), 'ppm'));
+
+    // Left / bottom: gas feed title, V, y2 — centered on the bottom jog line, right-aligned
+    ctx.textAlign = 'right';
+    ctx.fillStyle = BLACK;
+    ctx.fillText('gas feed', textLeftX, jogYBottom - LINE_H);
+    drawSegments(textLeftX, jogYBottom, 'right',
+      valueSegments('V', unknownFlow === 'V', fmt(mode, 'V', vGuess), fmt(mode, 'V', problem.V), UNIT.V));
+    drawSegments(textLeftX, jogYBottom + LINE_H, 'right',
+      valueSegments('y\u2082', false, fmt(mode, 'y2', problem.y2), '', 'ppm'));
+  }
+
+  // ---------- panel toggles ----------
+  function closeAllPanels() {
+    document.querySelectorAll('.panel').forEach(function (p) { p.classList.remove('open'); });
+    document.querySelectorAll('.panel-btn').forEach(function (b) { b.classList.remove('active'); });
+  }
+  function setupPanelToggle(btnId, panelId) {
+    var btn = document.getElementById(btnId);
+    var panel = document.getElementById(panelId);
+    btn.addEventListener('click', function () {
+      var isOpen = panel.classList.contains('open');
+      closeAllPanels();
+      if (!isOpen) {
+        panel.classList.add('open');
+        btn.classList.add('active');
+      }
+    });
+  }
+  setupPanelToggle('btnDirections', 'panelDirections');
+  setupPanelToggle('btnDetails', 'panelDetails');
+  setupPanelToggle('btnAbout', 'panelAbout');
+
+  document.querySelectorAll('.panel-close').forEach(function (x) {
+    x.addEventListener('click', function (e) {
+      e.stopPropagation();
+      closeAllPanels();
+    });
+  });
+
+  // ---------- init ----------
+  updateModeButtons();
+  newProblem();
+})();
+</script>
+
+</body>
+</html>
