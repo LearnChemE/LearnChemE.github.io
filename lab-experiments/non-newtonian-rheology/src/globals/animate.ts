@@ -1,8 +1,9 @@
+import { createSignal } from "solid-js";
 import { animate } from "./helpers";
 
 export type AnimationCallback = (dt: number, t: number) => void;
 
-abstract class AnimatorBase {
+export abstract class AnimatorBase {
     protected playTime: number = 0;
     protected playing = false;
     protected callbacks: Array<AnimationCallback>;
@@ -32,27 +33,34 @@ abstract class AnimatorBase {
         this.playTime = 0;
         this.callbacks.forEach(callback => callback(0, 0));
     }
+
+    public onFinish(_: () => void) {};
 }
 
 export class AnimationTimer extends AnimatorBase {
+    constructor(duration?: number) {
+        super();
+        this.duration = duration;
+    }
+
     protected frame(dt: number) {
         if (!this.playing) return false;
         this.playTime += dt;
         this.callbacks.forEach(fn => fn(dt, this.playTime));
         return this.playing;
     }
+
+    public readonly duration: number | undefined;
 }
 
 export class EasedAnimation extends AnimationTimer {
-    private duration: number;
     private delay: number;
     private easing: EasingFn;
     private prevS: number = 0;
     private finishCallbacks: Array<(() => void)>
 
     constructor(easing: EasingFn, duration: number, delay=0) {
-        super();
-        this.duration = duration;
+        super(duration);
         this.delay = delay;
         this.easing = easing;
         this.finishCallbacks = [];
@@ -61,7 +69,7 @@ export class EasedAnimation extends AnimationTimer {
     protected frame(dt: number) {
         if (!this.playing) return false;
         this.playTime += dt;
-        const t = delayDuration(this.playTime, this.delay, this.duration);
+        const t = delayDuration(this.playTime, this.delay, this.duration!);
         const s = this.easing(t);
         const ds = s - this.prevS;
         this.prevS = s;
@@ -83,6 +91,82 @@ export class EasedAnimation extends AnimationTimer {
     public onFinish(callback: () => void) {
         this.finishCallbacks.push(callback);
     }
+}
+
+// type AnimationSegment<T> = T extends AnimatorBase;
+type AnimationRecord = Record<string, AnimatorBase>;
+export type AnimationSegmentDescriptor = {
+    name: string;
+    duration: number;
+    easing: EasingFn | undefined;
+}
+
+export class AnimationSequence extends AnimatorBase {
+    private sequence: AnimationRecord = {};
+    private first!: AnimatorBase;
+    
+    constructor(descriptors: Array<AnimationSegmentDescriptor>) {
+        super();
+
+        let latest: AnimatorBase | null = null;
+        descriptors.forEach(desc => {
+            const easing = desc.easing ?? (t => t) as EasingFn;
+            const segment = new EasedAnimation(easing, desc.duration);
+
+            // Connect the latest to start the current
+            if (latest) latest.onFinish(() => segment.play());
+            else this.first = segment;
+            latest = segment;
+
+            // Insert into the record
+            this.sequence[desc.name] = segment;
+        });
+    }
+
+    // Stary
+    public play() {
+        if (this.playing) return;
+        this.playing = true;
+        
+        this.first.play();
+    }
+
+    // The holder doesn't need to play. Dummy protected function to uphold class
+    protected frame(_: number) {
+        return false;
+    }
+
+    public reset() {
+        this.playing = false;
+        this.playTime = 0;
+        for (const segment of Object.values(this.sequence)) {
+            segment.reset();
+        }
+    }
+
+    public subscribeTo(key: string, callback: AnimationCallback): void {
+        const seg = this.sequence[key];
+        if (!seg) {
+            console.error(`${key} not found in Animation Sequence`);
+            return;
+        }
+
+        seg.subscribe(callback);
+    }
+
+    public getSegment(name: string) {
+        return this.sequence[name];
+    }
+
+    public createSolidSignal(segName: string) {
+        const seg = this.sequence[segName];
+        if (!seg) console.error(`${segName} not found`);
+
+        const [sig, setSig] = createSignal(0);
+        seg.subscribe((_,t) => setSig(t));
+        return sig;
+    }
+
 }
 
 export type EasingFn = (t: number) => number;

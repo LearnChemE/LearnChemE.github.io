@@ -1,8 +1,23 @@
-import type { Component } from "solid-js";
+import type { Accessor, Component, Setter } from "solid-js";
+import { repeatClick, RPM_MAX, RPM_STEP } from "../../globals";
 
-type ControlPanelProps = {};
+type ControlPanelProps = {
+    disabled: Accessor<boolean>;
+    rpm: Accessor<number>;
+    setRpm: Setter<number>;
+};
 
 export const ControlPanel: Component<ControlPanelProps> = (props) => {
+
+    const increase = () => {
+        if (props.disabled()) return;
+        props.setRpm(rpm => Math.min(rpm + RPM_STEP, RPM_MAX));
+    }
+
+    const decrease = () => {
+        if (props.disabled()) return;
+        props.setRpm(rpm => Math.max(rpm - RPM_STEP, 0));
+    }
 
     return (<g transform="translate(90, 22)">
 
@@ -10,11 +25,36 @@ export const ControlPanel: Component<ControlPanelProps> = (props) => {
 <path d="M2 23.25H32C32.9665 23.25 33.75 24.0335 33.75 25V34C33.75 34.9665 32.9665 35.75 32 35.75H2C1.0335 35.75 0.25 34.9665 0.25 34V25C0.25 24.0335 1.0335 23.25 2 23.25Z" fill="#CECECE" stroke="black" stroke-width="0.5"/>
 <rect x="6.25" y="1.25" width="21.5" height="7.5" rx="1.75" fill="#CECECE" stroke="black" stroke-width="0.5"/>
 <path d="M8.70455 8V2.18182H10.6705C11.125 2.18182 11.4981 2.25947 11.7898 2.41477C12.0814 2.56818 12.2973 2.77936 12.4375 3.0483C12.5777 3.31723 12.6477 3.62311 12.6477 3.96591C12.6477 4.30871 12.5777 4.61269 12.4375 4.87784C12.2973 5.14299 12.0824 5.35133 11.7926 5.50284C11.5028 5.65246 11.1326 5.72727 10.6818 5.72727H9.09091V5.09091H10.6591C10.9697 5.09091 11.2197 5.04545 11.4091 4.95455C11.6004 4.86364 11.7386 4.73485 11.8239 4.56818C11.911 4.39962 11.9545 4.19886 11.9545 3.96591C11.9545 3.73295 11.911 3.52936 11.8239 3.35511C11.7367 3.18087 11.5975 3.0464 11.4062 2.9517C11.215 2.85511 10.9621 2.80682 10.6477 2.80682H9.40909V8H8.70455ZM11.4432 5.38636L12.875 8H12.0568L10.6477 5.38636H11.4432ZM13.8217 8V2.18182H15.7876C16.2441 2.18182 16.6172 2.2642 16.907 2.42898C17.1986 2.59186 17.4145 2.8125 17.5547 3.09091C17.6948 3.36932 17.7649 3.67992 17.7649 4.02273C17.7649 4.36553 17.6948 4.67708 17.5547 4.95739C17.4164 5.23769 17.2024 5.46117 16.9126 5.62784C16.6229 5.79261 16.2517 5.875 15.799 5.875H14.3899V5.25H15.7763C16.0888 5.25 16.3397 5.19602 16.5291 5.08807C16.7185 4.98011 16.8558 4.83428 16.9411 4.65057C17.0282 4.46496 17.0717 4.25568 17.0717 4.02273C17.0717 3.78977 17.0282 3.58144 16.9411 3.39773C16.8558 3.21402 16.7176 3.07008 16.5263 2.96591C16.335 2.85985 16.0812 2.80682 15.7649 2.80682H14.5263V8H13.8217ZM18.8999 2.18182H19.7408L21.718 7.01136H21.7862L23.7635 2.18182H24.6044V8H23.9453V3.57955H23.8885L22.0703 8H21.4339L19.6158 3.57955H19.5589V8H18.8999V2.18182Z" fill="black"/>
+
+{/* Screen */}
 <rect x="2.24998" y="10.25" width="29.5" height="11.5" rx="1.75" fill="#141414" stroke="black" stroke-width="0.5"/>
-<rect x="18.25" y="24.25" width="13.5" height="9.5" rx="0.75" fill="#D51F1F" stroke="black" stroke-width="0.5"/>
-<path d="M25.2149 30.6572C25.1177 30.8189 24.8823 30.8189 24.7852 30.6572L22.669 27.1289C22.569 26.9624 22.6887 26.7502 22.8828 26.75H27.1172C27.3114 26.7502 27.431 26.9624 27.3311 27.1289L25.2149 30.6572Z" fill="#590F0F" stroke="#310000" stroke-width="0.5"/>
-<rect x="2.25002" y="24.25" width="13.5" height="9.5" rx="0.75" fill="#D51F1F" stroke="black" stroke-width="0.5"/>
-<path d="M8.78517 26.8428C8.88229 26.6811 9.11774 26.6811 9.21486 26.8428L11.3311 30.3711C11.431 30.5376 11.3114 30.7498 11.1172 30.75H6.88283C6.68867 30.7498 6.56903 30.5376 6.66896 30.3711L8.78517 26.8428Z" fill="#590F0F" stroke="#310000" stroke-width="0.5"/>
+<text
+    id="gmVal"
+    class="digital-label"
+    x="27"
+    y="16.5"
+    dominant-baseline="middle"
+    text-anchor="end"
+    fill="#d7ce1bff"
+    font-family="'Digital-7 Mono', monospace"
+    font-size="14"
+>
+    {props.rpm()}
+</text>
+
+{/* Down button */}
+<g id="down-btn" class={props.disabled() ? "disabled" : "drag-exempt clickable"} onpointerdown={() => repeatClick(decrease)}>
+    <title>{props.disabled() ? "confirm fluid selection first" : "decrease RPM"}</title>
+    <rect x="18.25" y="24.25" width="13.5" height="9.5" rx="0.75" fill="#D51F1F" stroke="black" stroke-width="0.5"/>
+    <path d="M25.2149 30.6572C25.1177 30.8189 24.8823 30.8189 24.7852 30.6572L22.669 27.1289C22.569 26.9624 22.6887 26.7502 22.8828 26.75H27.1172C27.3114 26.7502 27.431 26.9624 27.3311 27.1289L25.2149 30.6572Z" fill="#590F0F" stroke="#310000" stroke-width="0.5"/>
+</g>
+
+{/* Up Button */}
+<g class={props.disabled() ? "disabled" : "drag-exempt clickable"} onpointerdown={() => repeatClick(increase)}>
+    <title>{props.disabled() ? "confirm fluid selection first" : "increase RPM"}</title>
+    <rect x="2.25002" y="24.25" width="13.5" height="9.5" rx="0.75" fill="#D51F1F" stroke="black" stroke-width="0.5"/>
+    <path d="M8.78517 26.8428C8.88229 26.6811 9.11774 26.6811 9.21486 26.8428L11.3311 30.3711C11.431 30.5376 11.3114 30.7498 11.1172 30.75H6.88283C6.68867 30.7498 6.56903 30.5376 6.66896 30.3711L8.78517 26.8428Z" fill="#590F0F" stroke="#310000" stroke-width="0.5"/>
+</g>
 
     </g>);
 }
