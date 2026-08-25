@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Chemical Potential Dependence on Temperature and Pressure</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: Helvetica, Arial, sans-serif;
+    background: #ffffff;
+    color: #222;
+    margin: 0;
+    padding: 16px;
+    display: flex;
+    justify-content: center;
+  }
+  #app {
+    width: 900px;
+    max-width: 100%;
+  }
+  h1 {
+    font-size: 17px;
+    font-weight: bold;
+    text-align: center;
+    margin: 0 0 14px 0;
+    color: #111;
+  }
+  .controls {
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    background: #fafafa;
+  }
+  .row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 26px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  .row:last-child { margin-bottom: 0; }
+  .slider-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .slider-label {
+    font-size: 16.1px;
+    white-space: nowrap;
+  }
+  .slider-value {
+    font-size: 16.1px;
+    width: 34px;
+    text-align: left;
+    font-variant-numeric: tabular-nums;
+  }
+  input[type=range] {
+    width: 150px;
+    accent-color: #98000D;
+  }
+  .checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 16.1px;
+  }
+  input[type=checkbox] {
+    accent-color: #98000D;
+    width: 15px;
+    height: 15px;
+  }
+  .dropdown-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .custom-select {
+    position: relative;
+    display: inline-block;
+  }
+  .select-button {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    padding: 4px 26px 4px 8px;
+    border: 1px solid #999;
+    border-radius: 3px;
+    background: #fff url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="6"><path d="M0 0l5 6 5-6z" fill="%23555"/></svg>') no-repeat right 8px center;
+    cursor: pointer;
+    text-align: left;
+    min-width: 260px;
+    max-width: 340px;
+  }
+  .select-button:hover { border-color: #777; }
+  .select-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 2px;
+    background: #fff;
+    border: 1px solid #999;
+    border-radius: 3px;
+    z-index: 20;
+    min-width: 260px;
+    max-width: 340px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  }
+  .select-menu.open { display: block; }
+  .select-option {
+    padding: 5px 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-family: Helvetica, Arial, sans-serif;
+  }
+  .select-option:hover { background: #f0d9db; }
+  .select-option.selected { background: #98000D; color: #fff; }
+  .select-button sub, .select-option sub {
+    font-size: 0.72em;
+  }
+  .disabled-text { color: #aaa; }
+  .main-area {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 16px;
+    margin-top: 8px;
+  }
+  .side-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-top: 34px; /* aligns roughly with tops of the plot canvases */
+    flex: 0 0 auto;
+  }
+  .panel-wrap { position: relative; }
+  .panel-btn {
+    display: block;
+    width: 118px;
+    text-align: center;
+    background: #98000D;
+    color: #fff;
+    border: none;
+    padding: 7px 12px;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 16.1px;
+    font-weight: normal;
+    cursor: pointer;
+    border-radius: 6px;
+  }
+  .panel-btn:hover { background: #7a000b; }
+  .plots {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
+  .plot-box { text-align: center; }
+  .plot-title {
+    font-size: 20.2px;
+    font-style: italic;
+    margin-bottom: 2px;
+  }
+  canvas {
+    border: 1px solid #888;
+    display: block;
+  }
+  .panel-content {
+    display: none;
+    position: absolute;
+    left: calc(100% + 10px);
+    top: 8px;
+    width: 660px;
+    max-width: 78vw;
+    border: 1px solid #ccc;
+    padding: 12px 16px;
+    font-size: 13.5px;
+    line-height: 1.5;
+    background: #fff;
+    border-radius: 4px;
+    box-shadow: 0 3px 14px rgba(0,0,0,0.22);
+    z-index: 30;
+  }
+  .panel-content.open { display: block; }
+  .panel-close {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    background: none;
+    border: none;
+    color: #98000D;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 2px 6px;
+  }
+  .panel-close:hover { color: #7a000b; font-weight: bold; }
+  .panel-content p { margin: 0 0 10px 0; padding-right: 16px; }
+  .panel-content p:last-child { margin-bottom: 0; }
+  .panel-content a { color: #98000D; }
+  .things-to-try {
+    font-size: 12.5px;
+    color: #555;
+    border-top: 1px solid #ddd;
+    margin-top: 10px;
+    padding-top: 8px;
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- <h1>Chemical Potential Dependence on Temperature and Pressure</h1> -->
+
+  <div class="controls">
+    <div class="row">
+      <div class="slider-group">
+        <span class="slider-label">pressure</span>
+        <input type="range" id="sliderP" min="0.5" max="1.3" step="0.1" value="1.0">
+        <span class="slider-value" id="valP">1.0</span>
+      </div>
+      <div class="slider-group">
+        <span class="slider-label">temperature</span>
+        <input type="range" id="sliderT" min="0.5" max="1.5" step="0.1" value="1.0">
+        <span class="slider-value" id="valT">1.0</span>
+      </div>
+    </div>
+    <div class="row">
+      <div class="checkbox-group">
+        <input type="checkbox" id="chkLabel" checked>
+        <label for="chkLabel">show triple point labels</label>
+      </div>
+      <div class="checkbox-group">
+        <input type="checkbox" id="chkSalt">
+        <label for="chkSalt" id="saltLabel">add salt</label>
+      </div>
+      <div class="slider-group" id="saltSliderGroup" style="visibility:hidden;">
+        <span class="slider-label" id="saltConcLabel">salt concentration</span>
+        <input type="range" id="sliderC" min="1" max="8" step="1" value="5">
+        <span class="slider-value" id="valC">5</span>
+      </div>
+    </div>
+    <div class="row">
+      <div class="dropdown-group">
+        <div class="custom-select" id="plot1Dropdown">
+          <button type="button" class="select-button" id="plot1Btn"></button>
+          <div class="select-menu" id="plot1Menu"></div>
+        </div>
+      </div>
+      <div class="dropdown-group">
+        <div class="custom-select" id="plot2Dropdown">
+          <button type="button" class="select-button" id="plot2Btn"></button>
+          <div class="select-menu" id="plot2Menu"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-area">
+    <div class="side-buttons">
+      <div class="panel-wrap">
+        <button class="panel-btn" id="btnDirections">Directions</button>
+        <div class="panel-content" id="panelDirections">
+          <button class="panel-close" aria-label="Close">&#10005;</button>
+          <p>Changes in the chemical potential &mu; of water as a function of pressure <i>P</i> (at constant temperature <i>T</i>) or temperature (at constant pressure <i>P</i>) determine vapor&#8211;liquid, vapor&#8211;solid, and liquid&#8211;solid phase changes. Chemical potential is given by d&mu; = d<i>G</i> = <i>V</i> d<i>P</i> &minus; <i>S</i> d<i>T</i>. Because the <i>x</i> axes cover narrow ranges of temperature and pressure, the chemical potential plots are linear. Since the objective of this simulation is to show the qualitative behavior, the temperature or pressure are shown on dimensionless relative scales. Note that the <i>y</i> axis scale is not the same for all plots so that the differences in chemical potential are easier to see. Chemical potential as a function of pressure is also shown for the solid&#8211;liquid phase change for ethanol, which has a different pressure dependence than water. Use the drop-down menus to select which two plots are displayed. The more stable phases (solid lines) have a lower chemical potential. Use sliders to set temperature for the &mu; versus <i>P</i> plots or to set pressure for the &mu; versus <i>T</i> plots. Note that the sliders change the temperature and pressure over narrow ranges. Check &quot;add salt&quot; to see the effect of adding salt to liquid water, and set the salt concentration with a slider. Adding salt leads to boiling point elevation and freezing point depression. The phase changes that occur depend on the pressure or temperature relative to the triple point; check &quot;show triple point labels&quot; to show these on the plots.</p>
+        </div>
+      </div>
+      <div class="panel-wrap">
+        <button class="panel-btn" id="btnDetails">Details</button>
+        <div class="panel-content" id="panelDetails">
+          <button class="panel-close" aria-label="Close">&#10005;</button>
+          <p>The chemical potential &mu; is equal to the Gibbs free energy <i>G</i> for a single component. The differential of the Gibbs free energy is:</p>
+          <p>d<i>G</i> = <i>V</i> d<i>P</i> &minus; <i>S</i> d<i>T</i>,</p>
+          <p>where <i>V</i> is volume, <i>P</i> is pressure, <i>S</i> is entropy, and <i>T</i> is temperature. For a single-component system, <i>G</i> = &mu;.</p>
+        </div>
+      </div>
+      <div class="panel-wrap">
+        <button class="panel-btn" id="btnAbout">About</button>
+        <div class="panel-content" id="panelAbout">
+          <button class="panel-close" aria-label="Close">&#10005;</button>
+          <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/ChemicalPotentialDependenceOnTemperatureAndPressure/" target="_blank">Mathematica simulation</a> by Majed N. Aldossary, Rachael Baumann, and John L. Falconer. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988) in collaboration with Washington State University. Address any questions or comments to LearnChemE@gmail.com.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="plots">
+      <div class="plot-box">
+        <div class="plot-title" id="title1">water</div>
+        <canvas id="canvas1" width="330" height="400"></canvas>
+      </div>
+      <div class="plot-box">
+        <div class="plot-title" id="title2">water</div>
+        <canvas id="canvas2" width="330" height="400"></canvas>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+
+  // ---------- Physical constants (from the Mathematica source) ----------
+  const C = {
+    Vwl:16.03,  Vwv:30000,   Vws:22.67,
+    Pwl:0.315,  Pwv:0.315,   Pws:0.315,
+    Swl:96.95,  Swv:188.84,  Sws:41,
+    Twl:1,      Twv:1,       Tws:1,
+    Vel:30,     Vev:62.3404, Ves:24,
+    Pel:1,      Pev:1,       Pes:1,
+    Sel:159.9,  Sev:283,     Ses:160.7,
+    Tel:1,      Tev:1,       Tes:1
+  };
+
+  const COLORS = {
+    liquid: '#0000FF',
+    solid:  '#FF6600',
+    vapor:  '#009900',
+    salt:   '#000000'
+  };
+
+  const plotOptions = [
+    { value: 1, html: 'solid\u2013liquid \u03BC<sub>H\u2082O</sub> versus temperature' },
+    { value: 2, html: 'solid\u2013liquid \u03BC<sub>H\u2082O</sub> versus pressure' },
+    { value: 3, html: 'liquid\u2013vapor \u03BC<sub>H\u2082O</sub> versus pressure' },
+    { value: 4, html: 'liquid\u2013vapor \u03BC<sub>H\u2082O</sub> versus temperature' },
+    { value: 5, html: 'solid\u2013vapor \u03BC<sub>H\u2082O</sub> versus pressure' },
+    { value: 6, html: 'solid\u2013vapor \u03BC<sub>H\u2082O</sub> versus temperature' },
+    { value: 7, html: 'solid\u2013liquid \u03BC<sub>ethanol</sub> versus pressure' }
+  ];
+
+  // Build a config for a given plot number and current control values.
+  // Each config: xMin,xMax,yMin,yMax,xLabel,yLabel,title,
+  //   lineA:{slope,intercept,color,name,stableSide:'left'|'right'},
+  //   lineB:{...}, transitionName, tripleText, tripleAnchor:{x,y} (fractions of box),
+  //   saltAllowed(bool), saltShift (function of c) applied to lineA (the liquid line) intercept
+  function getConfig(plotNum, P, T, c, saltOn) {
+    let cfg = { title: 'water', saltAllowed: false };
+
+    switch (plotNum) {
+      case 1: // solid-liquid H2O vs Temperature (const P)
+        cfg.xMin = -500; cfg.xMax = 500; cfg.yMin = -50000; cfg.yMax = 50000;
+        cfg.xLabel = 'temperature T'; cfg.yLabel = 'chemical potential \u03BC \u00D7 1500';
+        cfg.lineA = { slope: -C.Swl, intercept: C.Vwl*C.Pwl*(P*1500), color: COLORS.liquid, name:'liquid', stableSide:'right' };
+        cfg.lineB = { slope: -C.Sws, intercept: C.Vws*C.Pws*(P*1500), color: COLORS.solid,  name:'solid',  stableSide:'left' };
+        cfg.transitionName = 'melting point';
+        cfg.tripleText = 'P > P{triple point}';
+        cfg.tripleAnchor = {fx:0.36, fy:0.08};
+        cfg.saltAllowed = true;
+        cfg.saltShift = 1000; // subtracted from lineA intercept, scaled by c
+        break;
+      case 2: // solid-liquid H2O vs Pressure (const T)
+        cfg.xMin = -40000; cfg.xMax = 40000; cfg.yMin = -1000000; cfg.yMax = 1000000;
+        cfg.xLabel = 'pressure P'; cfg.yLabel = 'chemical potential \u03BC \u00D7 1500';
+        cfg.lineA = { slope: C.Vwl, intercept: -C.Swl*C.Twl*(T*500), color: COLORS.liquid, name:'liquid', stableSide:'right' };
+        cfg.lineB = { slope: C.Vws, intercept: -C.Sws*C.Tws*(T*500), color: COLORS.solid,  name:'solid',  stableSide:'left' };
+        cfg.transitionName = 'melting point';
+        cfg.tripleText = 'T < T{triple point}';
+        cfg.tripleAnchor = {fx:0.38, fy:0.08};
+        cfg.saltAllowed = true;
+        cfg.saltShift = 8000;
+        break;
+      case 3: // liquid-vapor H2O vs Pressure (const T)
+        cfg.xMin = -2; cfg.xMax = 2; cfg.yMin = -70000; cfg.yMax = 30000;
+        cfg.xLabel = 'pressure P'; cfg.yLabel = 'chemical potential \u03BC';
+        cfg.lineA = { slope: C.Vwl, intercept: -C.Swl*C.Twl*(T*100), color: COLORS.liquid, name:'liquid', stableSide:'right' };
+        cfg.lineB = { slope: C.Vwv, intercept: -C.Swv*C.Twv*(T*100), color: COLORS.vapor,  name:'vapor',  stableSide:'left' };
+        cfg.transitionName = 'boiling point';
+        cfg.tripleText = 'T > T{triple point}';
+        cfg.tripleAnchor = {fx:0.05, fy:0.08};
+        cfg.saltAllowed = true;
+        cfg.saltShift = 500;
+        break;
+      case 4: // liquid-vapor H2O vs Temperature (const P)
+        cfg.xMin = -20; cfg.xMax = 200; cfg.yMin = -50000; cfg.yMax = 25000;
+        cfg.xLabel = 'temperature T'; cfg.yLabel = 'chemical potential \u03BC';
+        cfg.lineA = { slope: -C.Swl, intercept: C.Vwl*C.Pwl*P, color: COLORS.liquid, name:'liquid', stableSide:'left' };
+        cfg.lineB = { slope: -C.Swv, intercept: C.Vwv*C.Pwv*P, color: COLORS.vapor,  name:'vapor',  stableSide:'right' };
+        cfg.transitionName = 'boiling point';
+        cfg.tripleText = 'P > P{triple point}';
+        cfg.tripleAnchor = {fx:0.05, fy:0.08};
+        cfg.saltAllowed = true;
+        cfg.saltShift = 300;
+        break;
+      case 5: // solid-vapor H2O vs Pressure (const T)
+        cfg.xMin = -2; cfg.xMax = 2; cfg.yMin = -70000; cfg.yMax = 30000;
+        cfg.xLabel = 'pressure P'; cfg.yLabel = 'chemical potential \u03BC';
+        cfg.lineA = { slope: C.Vws, intercept: -C.Sws*C.Tws*(T*100), color: COLORS.solid, name:'solid', stableSide:'right' };
+        cfg.lineB = { slope: C.Vwv, intercept: -C.Swv*C.Twv*(T*100), color: COLORS.vapor, name:'vapor', stableSide:'left' };
+        cfg.transitionName = 'sublimation point';
+        cfg.tripleText = 'T < T{triple point}';
+        cfg.tripleAnchor = {fx:0.38, fy:0.90};
+        cfg.saltAllowed = false;
+        break;
+      case 6: // solid-vapor H2O vs Temperature (const P)
+        cfg.xMin = -20; cfg.xMax = 200; cfg.yMin = -50000; cfg.yMax = 25000;
+        cfg.xLabel = 'temperature T'; cfg.yLabel = 'chemical potential \u03BC';
+        cfg.lineA = { slope: -C.Sws, intercept: C.Vws*C.Pws*P, color: COLORS.solid, name:'solid', stableSide:'left' };
+        cfg.lineB = { slope: -C.Swv, intercept: C.Vwv*C.Pwv*P, color: COLORS.vapor, name:'vapor', stableSide:'right' };
+        cfg.transitionName = 'sublimation point';
+        cfg.tripleText = 'P < P{triple point}';
+        cfg.tripleAnchor = {fx:0.05, fy:0.90};
+        cfg.saltAllowed = false;
+        break;
+      case 7: // solid-liquid ethanol vs Pressure (uses T slider, scaled (2-T)*1000)
+        cfg.title = 'ethanol';
+        cfg.xMin = -40000; cfg.xMax = 40000; cfg.yMin = -1300000; cfg.yMax = 1000000;
+        cfg.xLabel = 'pressure P'; cfg.yLabel = 'chemical potential \u03BC \u00D7 1500';
+        cfg.lineA = { slope: C.Vel, intercept: -C.Sel*C.Tel*((2-T)*1000), color: COLORS.liquid, name:'liquid', stableSide:'left' };
+        cfg.lineB = { slope: C.Ves, intercept: -C.Ses*C.Tes*((2-T)*1000), color: COLORS.solid,  name:'solid',  stableSide:'right' };
+        cfg.transitionName = 'melting point';
+        cfg.tripleText = 'T > T{triple point}';
+        cfg.tripleAnchor = {fx:0.38, fy:0.90};
+        cfg.saltAllowed = false;
+        break;
+    }
+
+    // intersection of lineA & lineB : slopeA*x+interceptA = slopeB*x+interceptB
+    const xi = (cfg.lineB.intercept - cfg.lineA.intercept) / (cfg.lineA.slope - cfg.lineB.slope);
+    const yi = cfg.lineA.slope * xi + cfg.lineA.intercept;
+    cfg.transitionPoint = { x: xi, y: yi };
+
+    // salt line (shifts lineA, the liquid line, down)
+    if (cfg.saltAllowed && saltOn) {
+      const saltIntercept = cfg.lineA.intercept - c * cfg.saltShift;
+      const xiSalt = (cfg.lineB.intercept - saltIntercept) / (cfg.lineA.slope - cfg.lineB.slope);
+      const yiSalt = cfg.lineA.slope * xiSalt + saltIntercept;
+      cfg.saltLine = { slope: cfg.lineA.slope, intercept: saltIntercept };
+      cfg.saltPoint = { x: xiSalt, y: yiSalt };
+    }
+
+    return cfg;
+  }
+
+  // ---------- Rendering ----------
+  function setupHiDPI(canvas) {
+    const dpr = window.devicePixelRatio || 1;
+    // Use a fixed logical CSS size (set once), never derive from clientWidth
+    // after the backing store has already been scaled -- avoids runaway growth.
+    if (!canvas.dataset.logicalW) {
+      canvas.dataset.logicalW = canvas.getAttribute('width');
+      canvas.dataset.logicalH = canvas.getAttribute('height');
+      canvas.style.width = canvas.dataset.logicalW + 'px';
+      canvas.style.height = canvas.dataset.logicalH + 'px';
+    }
+    const w = parseInt(canvas.dataset.logicalW, 10);
+    const h = parseInt(canvas.dataset.logicalH, 10);
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return { ctx, w, h };
+  }
+
+  function drawPlot(canvas, cfg, showTripleLabel) {
+    const { ctx, w, h } = setupHiDPI(canvas);
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, w, h);
+
+    const margin = { left: 62, right: 20, top: 14, bottom: 50 };
+    const plotW = w - margin.left - margin.right;
+    const plotH = h - margin.top - margin.bottom;
+
+    const xMin = cfg.xMin, xMax = cfg.xMax, yMin = cfg.yMin, yMax = cfg.yMax;
+    function X(x) { return margin.left + (x - xMin) / (xMax - xMin) * plotW; }
+    function Y(y) { return margin.top + (1 - (y - yMin) / (yMax - yMin)) * plotH; }
+
+    // frame
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 1.2;
+    ctx.strokeRect(margin.left, margin.top, plotW, plotH);
+
+    // axis labels (font size increased another 20% over the previous 16.8px)
+    ctx.fillStyle = '#000';
+    ctx.font = '20.2px Helvetica, Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText(cfg.xLabel, margin.left + plotW / 2, h - 14);
+
+    ctx.save();
+    ctx.translate(30, margin.top + plotH / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.textAlign = 'center';
+    ctx.fillText(cfg.yLabel, 0, 0);
+    ctx.restore();
+
+    // clip to plot box for line drawing
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(margin.left, margin.top, plotW, plotH);
+    ctx.clip();
+
+    function drawLine(line, xStart, xEnd, dashed, colorOverride) {
+      const y1 = line.slope * xStart + line.intercept;
+      const y2 = line.slope * xEnd + line.intercept;
+      ctx.beginPath();
+      ctx.moveTo(X(xStart), Y(y1));
+      ctx.lineTo(X(xEnd), Y(y2));
+      ctx.strokeStyle = colorOverride || line.color;
+      ctx.lineWidth = dashed ? 1.6 : 2.6;
+      if (dashed) { ctx.globalAlpha = 0.65; ctx.setLineDash([6, 5]); }
+      else { ctx.globalAlpha = 1; ctx.setLineDash([]); }
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.globalAlpha = 1;
+    }
+
+    const xi = cfg.transitionPoint.x;
+    // lineA stable on cfg.lineA.stableSide, lineB stable on the other side
+    const aStableRight = cfg.lineA.stableSide === 'right';
+    // draw lineA
+    if (aStableRight) {
+      drawLine(cfg.lineA, xi, xMax, false);
+      drawLine(cfg.lineA, xMin, xi, true);
+    } else {
+      drawLine(cfg.lineA, xMin, xi, false);
+      drawLine(cfg.lineA, xi, xMax, true);
+    }
+    // draw lineB
+    const bStableRight = cfg.lineB.stableSide === 'right';
+    if (bStableRight) {
+      drawLine(cfg.lineB, xi, xMax, false);
+      drawLine(cfg.lineB, xMin, xi, true);
+    } else {
+      drawLine(cfg.lineB, xMin, xi, false);
+      drawLine(cfg.lineB, xi, xMax, true);
+    }
+
+    // salt line
+    if (cfg.saltLine) {
+      const xiS = cfg.saltPoint.x;
+      if (aStableRight) {
+        drawLine(cfg.saltLine, xiS, xMax, false, COLORS.salt);
+        drawLine(cfg.saltLine, xMin, xiS, true, COLORS.salt);
+      } else {
+        drawLine(cfg.saltLine, xMin, xiS, false, COLORS.salt);
+        drawLine(cfg.saltLine, xiS, xMax, true, COLORS.salt);
+      }
+    }
+
+    ctx.restore(); // end clip
+
+    // transition point marker
+    function markPoint(pt) {
+      const px = X(Math.max(xMin, Math.min(xMax, pt.x)));
+      const py = Y(Math.max(yMin, Math.min(yMax, pt.y)));
+      if (pt.x >= xMin && pt.x <= xMax && pt.y >= yMin && pt.y <= yMax) {
+        ctx.beginPath();
+        ctx.arc(px, py, 3.5, 0, 2 * Math.PI);
+        ctx.fillStyle = '#000';
+        ctx.fill();
+      }
+      return { px, py };
+    }
+
+    // draws a line from (fromX,fromY) to (toX,toY) with an arrowhead at the destination
+    function drawArrow(fromX, fromY, toX, toY) {
+      ctx.strokeStyle = '#000';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(fromX, fromY);
+      ctx.lineTo(toX, toY);
+      ctx.stroke();
+      const angle = Math.atan2(toY - fromY, toX - fromX);
+      const headLen = 7;
+      ctx.beginPath();
+      ctx.moveTo(toX, toY);
+      ctx.lineTo(toX - headLen * Math.cos(angle - Math.PI / 6), toY - headLen * Math.sin(angle - Math.PI / 6));
+      ctx.lineTo(toX - headLen * Math.cos(angle + Math.PI / 6), toY - headLen * Math.sin(angle + Math.PI / 6));
+      ctx.closePath();
+      ctx.fillStyle = '#000';
+      ctx.fill();
+    }
+
+    const TRANSITION_FONT = 17.2; // 14.95px + 15%
+    const LINE_SPACING = 17;
+    ctx.font = TRANSITION_FONT + 'px Helvetica, Arial, sans-serif';
+    ctx.textAlign = 'center';
+
+    const mainPt = markPoint(cfg.transitionPoint);
+    if (cfg.transitionPoint.x >= xMin && cfg.transitionPoint.x <= xMax) {
+      // label placed significantly above the point, with an arrow pointing down to it
+      const desiredLabelY = mainPt.py - 60;
+      const labelY = Math.max(margin.top + LINE_SPACING + 4, desiredLabelY);
+      ctx.fillStyle = '#000';
+      wrapLabel(ctx, cfg.transitionName, mainPt.px, labelY, LINE_SPACING);
+      const arrowStartY = labelY + LINE_SPACING + 7;
+      if (arrowStartY < mainPt.py - 5) {
+        drawArrow(mainPt.px, arrowStartY, mainPt.px, mainPt.py - 6);
+      }
+    }
+
+    if (cfg.saltPoint) {
+      const sp = markPoint(cfg.saltPoint);
+      if (cfg.saltPoint.x >= xMin && cfg.saltPoint.x <= xMax) {
+        // label placed significantly below the point, with an arrow pointing up to it
+        const desiredLabelY = sp.py + 60;
+        const labelY = Math.min(margin.top + plotH - LINE_SPACING - 4, desiredLabelY);
+        ctx.fillStyle = '#000';
+        wrapLabel(ctx, cfg.transitionName, sp.px, labelY, LINE_SPACING);
+        const arrowStartY = labelY - 7;
+        if (arrowStartY > sp.py + 5) {
+          drawArrow(sp.px, arrowStartY, sp.px, sp.py + 6);
+        }
+      }
+    }
+
+    // phase name labels (solid/liquid/vapor) -- drawn parallel to their line's
+    // on-screen slope, offset perpendicular to the line so they never cross it:
+    // liquid sits above its line, solid/vapor sit below theirs.
+    const PHASE_FONT = 20.2; // 16.8px + 20%
+    function phaseLabel(line, stableRight, offsetPerp, color, text) {
+      const domainStart = stableRight ? xi : xMin;
+      const domainEnd = stableRight ? xMax : xi;
+      const frac = 0.55;
+      const xPos = domainStart + frac * (domainEnd - domainStart);
+      const xPos2 = xPos + (domainEnd - domainStart) * 0.03;
+      const yPos = line.slope * xPos + line.intercept;
+      const yPos2 = line.slope * xPos2 + line.intercept;
+      const sx = X(xPos), sy = Y(yPos);
+      const sx2 = X(xPos2), sy2 = Y(yPos2);
+      const angle = Math.atan2(sy2 - sy, sx2 - sx);
+      ctx.save();
+      ctx.font = 'italic ' + PHASE_FONT + 'px Helvetica, Arial, sans-serif';
+      ctx.translate(sx, sy);
+      ctx.rotate(angle);
+      ctx.fillStyle = color;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'alphabetic';
+      ctx.fillText(text, 0, offsetPerp);
+      ctx.restore();
+    }
+    const ABOVE_OFFSET = -14; // liquid: above its line
+    const BELOW_OFFSET = 22;  // solid / vapor: below their line
+    phaseLabel(cfg.lineA, aStableRight, cfg.lineA.name === 'liquid' ? ABOVE_OFFSET : BELOW_OFFSET, cfg.lineA.color, cfg.lineA.name);
+    phaseLabel(cfg.lineB, bStableRight, cfg.lineB.name === 'liquid' ? ABOVE_OFFSET : BELOW_OFFSET, cfg.lineB.color, cfg.lineB.name);
+    if (cfg.saltLine) {
+      // salt line shares lineA's stable side and slope
+      phaseLabel(cfg.saltLine, aStableRight, BELOW_OFFSET + 4, COLORS.salt, 'salt solution');
+    }
+
+    // triple point annotation text
+    if (showTripleLabel) {
+      const parts = cfg.tripleText.split('{');
+      const main = parts[0]; // e.g. "P > "
+      const sub = parts[1] ? parts[1].replace('}', '') : '';
+      const tx = margin.left + cfg.tripleAnchor.fx * plotW;
+      const ty = margin.top + cfg.tripleAnchor.fy * plotH;
+      ctx.font = 'italic 18.7px Helvetica, Arial, sans-serif';
+      ctx.fillStyle = '#000';
+      ctx.textAlign = 'left';
+      const mw = ctx.measureText(main).width;
+      ctx.fillText(main, tx, ty);
+      ctx.font = 'italic 14.4px Helvetica, Arial, sans-serif';
+      ctx.fillText(sub, tx + mw, ty + 3);
+    }
+  }
+
+  function wrapLabel(ctx, text, cx, cy, lineSpacing) {
+    const spacing = lineSpacing || 15;
+    const words = text.split(' ');
+    ctx.textAlign = 'center';
+    words.forEach((word, i) => {
+      ctx.fillText(word, cx, cy + i * spacing);
+    });
+  }
+
+  // ---------- UI wiring ----------
+  const sliderP = document.getElementById('sliderP');
+  const sliderT = document.getElementById('sliderT');
+  const sliderC = document.getElementById('sliderC');
+  const valP = document.getElementById('valP');
+  const valT = document.getElementById('valT');
+  const valC = document.getElementById('valC');
+  const chkLabel = document.getElementById('chkLabel');
+  const chkSalt = document.getElementById('chkSalt');
+  const saltSliderGroup = document.getElementById('saltSliderGroup');
+  const saltLabel = document.getElementById('saltLabel');
+  const saltConcLabel = document.getElementById('saltConcLabel');
+  const canvas1 = document.getElementById('canvas1');
+  const canvas2 = document.getElementById('canvas2');
+  const title1 = document.getElementById('title1');
+  const title2 = document.getElementById('title2');
+
+  // ---------- Custom dropdowns (support <sub> markup for H2O / ethanol) ----------
+  function buildDropdown(btnId, menuId, initialValue, onChange) {
+    const btn = document.getElementById(btnId);
+    const menu = document.getElementById(menuId);
+    let value = initialValue;
+
+    function renderMenu() {
+      menu.innerHTML = '';
+      plotOptions.forEach(o => {
+        const item = document.createElement('div');
+        item.className = 'select-option' + (o.value === value ? ' selected' : '');
+        item.innerHTML = o.html;
+        item.addEventListener('click', () => {
+          value = o.value;
+          btn.innerHTML = o.html;
+          menu.classList.remove('open');
+          renderMenu();
+          onChange();
+        });
+        menu.appendChild(item);
+      });
+    }
+
+    btn.innerHTML = plotOptions.find(o => o.value === value).html;
+    renderMenu();
+
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      // close any other open menus
+      document.querySelectorAll('.select-menu.open').forEach(m => {
+        if (m !== menu) m.classList.remove('open');
+      });
+      menu.classList.toggle('open');
+    });
+
+    return {
+      getValue: () => value,
+      setDisplay: (v) => { value = v; btn.innerHTML = plotOptions.find(o => o.value === v).html; renderMenu(); }
+    };
+  }
+
+  const plot1Dropdown = buildDropdown('plot1Btn', 'plot1Menu', 1, () => render());
+  const plot2Dropdown = buildDropdown('plot2Btn', 'plot2Menu', 2, () => render());
+
+  document.addEventListener('click', () => {
+    document.querySelectorAll('.select-menu.open').forEach(m => m.classList.remove('open'));
+  });
+
+  function saltApplicable() {
+    return !(plot1Dropdown.getValue() >= 5 && plot2Dropdown.getValue() >= 5);
+  }
+
+  function updateSaltEnabled() {
+    const applicable = saltApplicable();
+    chkSalt.disabled = !applicable;
+    sliderC.disabled = !applicable || !chkSalt.checked;
+    saltLabel.classList.toggle('disabled-text', !applicable);
+    saltConcLabel.classList.toggle('disabled-text', !applicable);
+    saltSliderGroup.style.visibility = chkSalt.checked ? 'visible' : 'hidden';
+    if (!applicable && chkSalt.checked) {
+      chkSalt.checked = false;
+    }
+  }
+
+  function render() {
+    const P = parseFloat(sliderP.value);
+    const T = parseFloat(sliderT.value);
+    const c = parseInt(sliderC.value);
+    const showLabel = chkLabel.checked;
+    const saltOn = chkSalt.checked && saltApplicable();
+
+    valP.textContent = P.toFixed(1);
+    valT.textContent = T.toFixed(1);
+    valC.textContent = c;
+
+    updateSaltEnabled();
+
+    const p1 = plot1Dropdown.getValue();
+    const p2 = plot2Dropdown.getValue();
+
+    const cfg1 = getConfig(p1, P, T, c, saltOn);
+    const cfg2 = getConfig(p2, P, T, c, saltOn);
+
+    title1.textContent = cfg1.title;
+    title2.textContent = cfg2.title;
+
+    drawPlot(canvas1, cfg1, showLabel);
+    drawPlot(canvas2, cfg2, showLabel);
+  }
+
+  [sliderP, sliderT, sliderC, chkLabel, chkSalt].forEach(el => {
+    el.addEventListener('input', render);
+    el.addEventListener('change', render);
+  });
+
+  // panels (flyouts open to the right of their button; only one open at a time)
+  function wirePanel(btnId, panelId) {
+    const btn = document.getElementById(btnId);
+    const panel = document.getElementById(panelId);
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const wasOpen = panel.classList.contains('open');
+      document.querySelectorAll('.panel-content.open').forEach(p => p.classList.remove('open'));
+      if (!wasOpen) panel.classList.add('open');
+    });
+    panel.addEventListener('click', (e) => e.stopPropagation());
+  }
+  wirePanel('btnDirections', 'panelDirections');
+  wirePanel('btnDetails', 'panelDetails');
+  wirePanel('btnAbout', 'panelAbout');
+
+  document.querySelectorAll('.panel-close').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      btn.closest('.panel-content').classList.remove('open');
+    });
+  });
+
+  document.addEventListener('click', () => {
+    document.querySelectorAll('.panel-content.open').forEach(p => p.classList.remove('open'));
+  });
+
+  window.addEventListener('resize', render);
+  render();
+})();
+</script>
+</body>
+</html>

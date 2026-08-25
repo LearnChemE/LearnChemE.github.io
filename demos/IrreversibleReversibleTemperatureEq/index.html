@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Irreversible and Reversible Temperature Equilibration</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+<style>
+  :root {
+    --maroon: #98000D;
+    --hot: #5E81B5;
+    --cold: #E19C24;
+    --third: #8FB032;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    font-family: Helvetica, Arial, sans-serif;
+    background: #ffffff;
+    color: #222;
+  }
+  #app {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 14px 16px 22px 16px;
+  }
+  h1 {
+    text-align: center;
+    font-size: 130%;
+    font-weight: bold;
+    margin: 6px 0 14px 0;
+    color: #222;
+  }
+  .controls-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 18px 28px;
+    margin-bottom: 14px;
+  }
+  .setter-group {
+    display: flex;
+    border: 1px solid #999;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .setter-btn {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 100%;
+    padding: 5px 12px;
+    background: #eee;
+    border: none;
+    border-right: 1px solid #999;
+    cursor: pointer;
+    color: #222;
+  }
+  .setter-btn:last-child { border-right: none; }
+  .setter-btn.active {
+    background: #444;
+    color: #fff;
+  }
+  .slider-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 109%;
+  }
+  .slider-group label {
+    white-space: nowrap;
+  }
+  .slider-group input[type=range] {
+    width: 150px;
+  }
+  .slider-value {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 109%;
+    min-width: 54px;
+    text-align: left;
+  }
+  #efficiencyBox {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
+  }
+  #effLine {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 100%;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+    text-align: center;
+  }
+  #effLine .effTitle {
+    font-weight: bold;
+  }
+  #effLine .effSep {
+    color: #999;
+  }
+  #effLine .effNum {
+    font-weight: bold;
+  }
+  .tabbar {
+    display: flex;
+    justify-content: center;
+    gap: 2px;
+    margin-top: 6px;
+  }
+  .tabbtn {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 106%;
+    padding: 5px 14px;
+    background: #e5e5e5;
+    border: 1px solid #bbb;
+    border-bottom: none;
+    border-radius: 6px 6px 0 0;
+    cursor: pointer;
+    color: #333;
+  }
+  .tabbtn.active {
+    background: #ffffff;
+    border-color: #999;
+    font-weight: bold;
+    color: #000;
+  }
+  #plotWrap {
+    border: 1px solid #999;
+    border-top: none;
+    padding: 8px 6px 4px 6px;
+  }
+  canvas#plotCanvas {
+    display: block;
+    margin: 0 auto;
+    width: 100%;
+    max-width: 700px;
+    height: 340px;
+  }
+  .buttonRow {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  .panelBtn {
+    font-family: Helvetica, Arial, sans-serif;
+    background: var(--maroon);
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 9px 22px;
+    font-size: 97%;
+    cursor: pointer;
+    text-align: center;
+  }
+  .panelBtn:hover { opacity: 0.9; }
+
+  .overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: transparent;
+    z-index: 50;
+  }
+  .overlay.show { display: block; }
+  .panel {
+    position: fixed;
+    background: #fff;
+    max-width: 640px;
+    width: min(640px, calc(100vw - 32px));
+    max-height: 70vh;
+    overflow-y: auto;
+    border-radius: 8px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+    visibility: hidden;
+  }
+  .panel.positioned { visibility: visible; }
+  .panelHeader {
+    background: var(--maroon);
+    color: #fff;
+    padding: 12px 18px;
+    font-weight: bold;
+    font-size: 105%;
+    border-radius: 8px 8px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .panelClose {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 130%;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0 4px;
+  }
+  .panelBody {
+    padding: 16px 20px 22px 20px;
+    font-size: 96%;
+    line-height: 1.5;
+  }
+  .panelBody p { margin: 0 0 12px 0; }
+  .panelBody a { color: var(--maroon); }
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- <h1>Irreversible and Reversible Temperature Equilibration</h1> -->
+
+  <div class="controls-row">
+    <div class="setter-group" id="methodSetter">
+      <button class="setter-btn active" data-method="contact">thermal contact</button>
+      <button class="setter-btn" data-method="engine">reversible heat engine</button>
+    </div>
+    <div class="slider-group">
+      <label for="th0Slider">initial temperature of hot object</label>
+      <input type="range" id="th0Slider" min="273" max="900" step="1" value="900">
+      <span class="slider-value" id="th0Value">900 K</span>
+    </div>
+  </div>
+  <div class="controls-row" style="margin-top:-6px;">
+    <div class="slider-group">
+      <label for="timeSlider">time</label>
+      <input type="range" id="timeSlider" min="0" max="1" step="0.001" value="0">
+      <span class="slider-value" id="timeValue">0</span>
+    </div>
+  </div>
+
+  <div id="efficiencyBox">
+    <div id="effLine">
+      <span class="effTitle">efficiency</span>
+      <span>(work / heat extracted)</span>
+      <span class="effSep">&middot;</span>
+      <span>actual <span class="effNum" id="effActual">0%</span></span>
+      <span class="effSep">&middot;</span>
+      <span>maximum <span class="effNum" id="effMax">70%</span></span>
+    </div>
+  </div>
+
+  <div class="tabbar" id="tabBar">
+    <button class="tabbtn active" data-tab="temperature">temperature</button>
+    <button class="tabbtn" data-tab="energy">energy</button>
+    <button class="tabbtn" data-tab="entropy">entropy</button>
+  </div>
+  <div id="plotWrap">
+    <canvas id="plotCanvas" width="1400" height="680"></canvas>
+  </div>
+
+  <div class="buttonRow">
+    <button class="panelBtn" id="btnDirections">Directions</button>
+    <button class="panelBtn" id="btnDetails">Details</button>
+    <button class="panelBtn" id="btnAbout">About</button>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="panel">
+    <div class="panelHeader">
+      <span id="panelTitle">Directions</span>
+      <button class="panelClose" id="panelClose">&times;</button>
+    </div>
+    <div class="panelBody" id="panelBody"></div>
+  </div>
+</div>
+
+<script>
+// ---------- Physics ----------
+const c = 900.0;
+const TC0 = 273.0;
+const Tmin = 273, Tmax = 900;
+
+const workMax = c*(Tmin+Tmax-2*Math.sqrt(Tmin*Tmax));
+const heatExtractedMax = c*(Tmax - Math.sqrt(Tmin*Tmax));
+const heatAddedMax = -0.5*c*(Tmin-Tmax);
+const entropyMaxDecrease = c*Math.log(Tmin/Math.sqrt(Tmin*Tmax));
+const entropyMaxIncrease = c*Math.log((Tmin+Tmax)/(2*Tmin));
+
+function heatExchange(method, TC, TH, cVal, t) {
+  if (method === "contact") {
+    const timeFactor = (1 - Math.exp(-4*t)) / (1 - Math.exp(-4));
+    const qTotal = 0.5*cVal*(TH-TC);
+    const q = qTotal*timeFactor;
+    return {
+      T_H: TH - q/cVal,
+      S_H: cVal*Math.log(1 - q/(cVal*TH)),
+      T_C: TC + q/cVal,
+      S_C: cVal*Math.log(1 + q/(cVal*TC)),
+      qH: q, qC: q, w: 0
+    };
+  } else {
+    const timeFactor = t;
+    const qTotal = cVal*(TH - Math.sqrt(TC*TH));
+    const q = qTotal*timeFactor;
+    const qC = (cVal*q*TC)/(cVal*TH - q);
+    const w = q - qC;
+    return {
+      T_H: TH - q/cVal,
+      S_H: cVal*Math.log(1 - q/(cVal*TH)),
+      T_C: (cVal*TC*TH)/(cVal*TH - q),
+      S_C: -cVal*Math.log(1 - q/(cVal*TH)),
+      qH: q, qC: qC, w: w
+    };
+  }
+}
+
+// ---------- State ----------
+let method = "contact";
+let TH0 = 900;
+let time = 0;
+let activeTab = "temperature";
+
+// ---------- DOM refs ----------
+const methodSetter = document.getElementById('methodSetter');
+const th0Slider = document.getElementById('th0Slider');
+const th0Value = document.getElementById('th0Value');
+const timeSlider = document.getElementById('timeSlider');
+const timeValue = document.getElementById('timeValue');
+const effActual = document.getElementById('effActual');
+const effMax = document.getElementById('effMax');
+const tabBar = document.getElementById('tabBar');
+const canvas = document.getElementById('plotCanvas');
+const ctx = canvas.getContext('2d');
+
+function round(v) { return Math.round(v); }
+
+function updateEfficiency() {
+  const h = heatExchange(method, TC0, TH0, c, time);
+  let actual;
+  if (h.qH > 0) {
+    actual = h.w / h.qH;
+  } else {
+    actual = (method === "engine") ? (1 - TC0/TH0) : 0;
+  }
+  const maxEff = 1 - TC0/TH0;
+  effActual.textContent = round(100*actual) + "%";
+  effMax.textContent = round(100*maxEff) + "%";
+}
+
+function updateLabels() {
+  th0Value.textContent = round(TH0) + " K";
+  timeValue.textContent = time.toFixed(2);
+}
+
+// ---------- Plot drawing ----------
+const DPR = window.devicePixelRatio || 1;
+function setupCanvas() {
+  const cssW = canvas.clientWidth || 700;
+  const cssH = 340;
+  canvas.width = cssW*DPR*2;
+  canvas.height = cssH*DPR*2;
+  canvas.style.height = cssH + "px";
+  ctx.setTransform(DPR*2, 0, 0, DPR*2, 0, 0);
+}
+
+const colors = { hot: "#5E81B5", cold: "#E19C24", third: "#8FB032" };
+
+const TICK_FONT_PX = 17.55;   // 19.5px * 0.9 (10% decrease)
+const AXIS_LABEL_FONT_PX = TICK_FONT_PX; // same size as tick numbers
+const LABEL_FONT_PX = 17.0775; // 15.525px * 1.10 (10% increase)
+
+function plotSeries(seriesList, yLabel, yRange, curveLabels, labelSide) {
+  const cssW = canvas.clientWidth || 700;
+  const cssH = 340;
+  ctx.clearRect(0,0,cssW,cssH);
+
+  const padL = 78, padR = 26, padT = 16, padB = 46;
+  const plotW = cssW - padL - padR;
+  const plotH = cssH - padT - padB;
+
+  ctx.fillStyle = "#222";
+  ctx.strokeStyle = "#333";
+  ctx.lineWidth = 1;
+
+  // axes box (frame: left+bottom true, top/right false, matches Mathematica Frame->{{True,False},{True,False}})
+  ctx.beginPath();
+  ctx.moveTo(padL, padT);
+  ctx.lineTo(padL, padT+plotH);
+  ctx.lineTo(padL+plotW, padT+plotH);
+  ctx.stroke();
+
+  const [yMin, yMax] = yRange;
+  function xPix(t) { return padL + t*plotW; }
+  function yPix(v) { return padT + plotH - ( (v-yMin)/(yMax-yMin) )*plotH; }
+
+  // y ticks
+  ctx.font = TICK_FONT_PX + "px Helvetica, Arial, sans-serif";
+  const yTicks = niceTicks(yMin, yMax, 5);
+  ctx.textAlign = "right";
+  ctx.textBaseline = "middle";
+  yTicks.forEach(tv => {
+    const yp = yPix(tv);
+    ctx.beginPath();
+    ctx.moveTo(padL-4, yp);
+    ctx.lineTo(padL, yp);
+    ctx.stroke();
+    ctx.fillText(formatTick(tv), padL-8, yp);
+  });
+
+  // x ticks
+  const xTicks = [0,0.2,0.4,0.6,0.8,1.0];
+  ctx.textAlign = "center";
+  ctx.textBaseline = "top";
+  xTicks.forEach(tv => {
+    const xp = xPix(tv);
+    ctx.beginPath();
+    ctx.moveTo(xp, padT+plotH);
+    ctx.lineTo(xp, padT+plotH+4);
+    ctx.stroke();
+    ctx.fillText(tv.toFixed(1), xp, padT+plotH+8);
+  });
+
+  // axis labels
+  ctx.textAlign = "center";
+  ctx.textBaseline = "alphabetic";
+  ctx.font = AXIS_LABEL_FONT_PX + "px Helvetica, Arial, sans-serif";
+  ctx.fillText("time (arbitary units)", padL+plotW/2, cssH-4);
+
+  ctx.save();
+  ctx.translate(16, padT+plotH/2);
+  ctx.rotate(-Math.PI/2);
+  ctx.textAlign = "center";
+  ctx.fillText(yLabel, 0, 0);
+  ctx.restore();
+
+  // current-time gridline
+  const xt = xPix(time);
+  ctx.save();
+  ctx.strokeStyle = "rgba(128,128,128,0.55)";
+  ctx.lineWidth = 2;
+  ctx.setLineDash([4,3]);
+  ctx.beginPath();
+  ctx.moveTo(xt, padT);
+  ctx.lineTo(xt, padT+plotH);
+  ctx.stroke();
+  ctx.restore();
+
+  // series curves
+  const N = 240;
+  seriesList.forEach(seriesColor => {
+    const [fn, color] = seriesColor;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2.07; // 1.8 * 1.15 (15% increase)
+    ctx.beginPath();
+    for (let i=0;i<=N;i++) {
+      const t = i/N;
+      const v = fn(t);
+      const xp = xPix(t), yp = yPix(v);
+      if (i===0) ctx.moveTo(xp,yp); else ctx.lineTo(xp,yp);
+    }
+    ctx.stroke();
+  });
+
+  // direct curve labels (no legend box) placed on the graph itself, near
+  // the edge where curves are most clearly separated: left edge for
+  // temperature, right edge for energy/entropy, with vertical decluttering.
+  // Some curves need a shifted anchor point (when they start right at a
+  // frame edge, leaving no room to push the label further out) and/or extra
+  // clearance (when the curve is moving toward the label fast enough to
+  // catch up within the label's own horizontal text span).
+  if (curveLabels) {
+    const defaultT = labelSide === "left" ? 0.03 : 0.99;
+    const CLEARANCE = 13;         // standard px gap pushed away from the curve
+    const CLEARANCE_HIGH = 24;    // larger gap for fast-approaching curves
+    const CLEARANCE_EXTREME = 30; // for curves that stay close to a fixed plot edge
+                                   // across a wide anchor range (needs a shifted anchor too)
+    const CLEARANCE_EXTREME2 = 48; // for curves whose value approaches the fixed plot
+                                    // extreme (set by Tmin/Tmax at TH0=900) most closely
+    const AXIS_MARGIN = 6;        // min px gap to keep from a frame edge before flipping
+
+    // per-series anchor override: (tab, method, label, TH0) -> t, or null for default
+    function anchorT(lab) {
+      if (activeTab === "temperature" && method === "engine" && lab === "hot object" && TH0 > 750) {
+        return 0.12; // gives the falling curve room to clear the top frame edge
+      }
+      if (activeTab === "temperature" && method === "contact" && lab === "cold object") {
+        return 0.30; // gives the slowly-rising curve room to clear the bottom (x-axis)
+      }
+      if (activeTab === "temperature" && method === "contact" && lab === "hot object") {
+        return 0.10; // gives the falling curve room to clear before the text's own width
+      }
+      return defaultT;
+    }
+
+    // per-series forced direction + clearance override, or null to use the
+    // generic mean/boundary-based fallback below
+    function forcedRule(lab) {
+      if (activeTab === "temperature" && method === "contact" && lab === "cold object") {
+        return { dir: -1, clearance: CLEARANCE_EXTREME };
+      }
+      if (activeTab === "temperature" && method === "contact" && lab === "hot object") {
+        return { dir: -1, clearance: CLEARANCE };
+      }
+      if (activeTab === "temperature" && method === "engine" && TH0 > 750) {
+        if (lab === "hot object") return { dir: -1, clearance: CLEARANCE };
+        if (lab === "cold object") return { dir: -1, clearance: CLEARANCE_HIGH };
+      }
+      if (activeTab === "energy" && method === "engine" && TH0 > 750) {
+        if (lab === "heat extracted") return { dir: -1, clearance: CLEARANCE_EXTREME2 };
+        if (lab === "work") return { dir: 1, clearance: CLEARANCE_HIGH };
+      }
+      if (activeTab === "entropy" && method === "engine" && TH0 > 650) {
+        if (lab === "hot object") return { dir: -1, clearance: CLEARANCE_EXTREME2 };
+      }
+      return null;
+    }
+
+    const rawItems = seriesList.map((sc, i) => {
+      const [fn, color] = sc;
+      const label = curveLabels[i];
+      const t = anchorT(label);
+      const v = fn(t);
+      return { label, color, t, yLine: yPix(v) };
+    });
+    const meanY = rawItems.reduce((s,it)=>s+it.yLine,0) / rawItems.length;
+    const plotBottom = padT+plotH;
+
+    const items = rawItems.map(it => {
+      const forced = forcedRule(it.label);
+      let dir, clearance;
+      if (forced) {
+        dir = forced.dir; clearance = forced.clearance;
+      } else {
+        clearance = CLEARANCE;
+        dir = it.yLine <= meanY ? -1 : 1; // naive: above-average pushes up, below pushes down
+        // flip if the naive direction would crowd a frame edge
+        if (dir === -1 && it.yLine - clearance < padT + AXIS_MARGIN) dir = 1;
+        else if (dir === 1 && it.yLine + clearance > plotBottom - AXIS_MARGIN) dir = -1;
+      }
+      return { label: it.label, color: it.color, t: it.t, y: it.yLine + dir*clearance };
+    });
+    items.sort((a,b) => a.y - b.y);
+    const minGap = LABEL_FONT_PX + 5;
+    if (items.length && items[0].y < padT+8) items[0].y = padT+8;
+    for (let i=1;i<items.length;i++) {
+      if (items[i].y - items[i-1].y < minGap) items[i].y = items[i-1].y + minGap;
+    }
+    // keep within plot vertical bounds
+    for (let i=items.length-1;i>0;i--) {
+      if (items[i].y > padT+plotH-4) {
+        items[i].y = padT+plotH-4;
+        if (items[i-1].y > items[i].y - minGap) items[i-1].y = items[i].y - minGap;
+      }
+    }
+    ctx.font = "bold " + LABEL_FONT_PX + "px Helvetica, Arial, sans-serif";
+    ctx.textBaseline = "middle";
+    if (labelSide === "left") {
+      ctx.textAlign = "left";
+      items.forEach(it => { ctx.fillStyle = it.color; ctx.fillText(it.label, xPix(it.t)+6, it.y); });
+    } else {
+      ctx.textAlign = "right";
+      items.forEach(it => { ctx.fillStyle = it.color; ctx.fillText(it.label, xPix(it.t)-6, it.y); });
+    }
+  }
+}
+
+function niceTicks(min, max, count) {
+  const range = max-min;
+  const rawStep = range/count;
+  const mag = Math.pow(10, Math.floor(Math.log10(rawStep)));
+  const norm = rawStep/mag;
+  let step;
+  if (norm < 1.5) step = 1*mag;
+  else if (norm < 3) step = 2*mag;
+  else if (norm < 7) step = 5*mag;
+  else step = 10*mag;
+  const start = Math.ceil(min/step)*step;
+  const ticks = [];
+  for (let v=start; v<=max+1e-9; v+=step) ticks.push(v);
+  return ticks;
+}
+function formatTick(v) {
+  const r = Math.round(v);
+  return (Math.abs(v-r) < 1e-6) ? String(r) : v.toFixed(1);
+}
+
+function drawActivePlot() {
+  if (activeTab === "temperature") {
+    plotSeries(
+      [
+        [t => heatExchange(method,TC0,TH0,c,t).T_H, colors.hot],
+        [t => heatExchange(method,TC0,TH0,c,t).T_C, colors.cold]
+      ],
+      "temperature (K)",
+      [Tmin, Tmax],
+      ["hot object","cold object"],
+      "left"
+    );
+  } else if (activeTab === "energy") {
+    plotSeries(
+      [
+        [t => -heatExchange(method,TC0,TH0,c,t).qH/1000, colors.hot],
+        [t => heatExchange(method,TC0,TH0,c,t).qC/1000, colors.cold],
+        [t => heatExchange(method,TC0,TH0,c,t).w/1000, colors.third]
+      ],
+      "energy change (kJ)",
+      [-heatExtractedMax/1000, Math.max(workMax,heatAddedMax)/1000],
+      ["heat extracted","heat added","work"],
+      "right"
+    );
+  } else {
+    plotSeries(
+      [
+        [t => heatExchange(method,TC0,TH0,c,t).S_H, colors.hot],
+        [t => heatExchange(method,TC0,TH0,c,t).S_C, colors.cold],
+        [t => { const h = heatExchange(method,TC0,TH0,c,t); return h.S_H+h.S_C; }, colors.third]
+      ],
+      "entropy change (J/K)",
+      [entropyMaxDecrease, entropyMaxIncrease],
+      ["hot object","cold object","total"],
+      "right"
+    );
+  }
+}
+
+function redraw() {
+  updateEfficiency();
+  updateLabels();
+  drawActivePlot();
+}
+
+// ---------- Event wiring ----------
+methodSetter.querySelectorAll('.setter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    methodSetter.querySelectorAll('.setter-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    method = btn.dataset.method;
+    redraw();
+  });
+});
+
+th0Slider.addEventListener('input', () => {
+  TH0 = parseFloat(th0Slider.value);
+  redraw();
+});
+
+timeSlider.addEventListener('input', () => {
+  time = parseFloat(timeSlider.value);
+  redraw();
+});
+
+tabBar.querySelectorAll('.tabbtn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    tabBar.querySelectorAll('.tabbtn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    activeTab = btn.dataset.tab;
+    redraw();
+  });
+});
+
+window.addEventListener('resize', () => { setupCanvas(); redraw(); });
+
+// ---------- Panels ----------
+const overlay = document.getElementById('overlay');
+const panelTitle = document.getElementById('panelTitle');
+const panelBody = document.getElementById('panelBody');
+const panelClose = document.getElementById('panelClose');
+
+const directionsHTML = `
+<p>This simulation compares two ways objects at different temperatures can thermally equilibrate: irreversibly through thermal contact and reversibly with an ideal heat engine, utilizing a Carnot cycle. The heat engine converts some of the heat into work and results in a lower final temperature for the two objects than thermal contact. The schematics at the top show the changing temperatures of the two objects, the amount of work performed, and the efficiency of the process. The plots at the bottom show how temperature, energy, and entropy of the objects change. Most of the entropy increase (for thermal contact) or work generation (for the heat engine) occurs near the start of the process, when the temperature difference between the objects is maximum. Efficiency is the ratio of work performed to heat extracted from the hot object.</p>
+`;
+
+const detailsHTML = `
+<p>In this simulation, both objects have heat capacity \\(c=900\\text{ J/K}\\), close to that of 1 kg of aluminum at room temperature. The cold object always starts at the freezing point of water, \\(T_{cold}^{initial}=273\\text{ K}\\), while the initial temperature of the hot object \\(T_{hot}^{initial}\\) ranges up to 900 K, close to the melting point of aluminum. The simulation assumes that: (1) the heat capacity of each object is independent of temperature; (2) the objects have constant volume (i.e. do not expand with temperature); and (3) each object has a uniform temperature.</p>
+
+<p>For thermal contact, the final equilibrium temperature is \\(T_{final}=\\frac{1}{2}(T_{hot}^{initial}+T_{cold}^{initial})\\), that is, the mean of the two initial temperatures. During this process, transferring a small amount of heat \\(\\delta Q\\) from the hot object, at temperature \\(T_{hot}\\), to the cold object, at temperature \\(T_{cold}\\), changes their temperatures by \\(-\\delta Q/c\\) and \\(+\\delta Q/c\\), respectively. Their entropies change by \\(-\\delta Q/T_{hot}\\) and \\(+\\delta Q/T_{cold}\\), respectively, and the total entropy increases because \\(T_{hot}>T_{cold}\\).</p>
+
+<p>Using a reversible heat engine, a small amount of heat \\(\\delta Q_{hot}\\) extracted from the hot object both produces a small amount of work \\(\\delta W\\) and adds heat \\(\\delta Q_{cold}\\) to the cold object. Energy conservation gives \\(\\delta Q_{hot}=\\delta W+\\delta Q_{cold}\\), and a reversible heat engine has \\(\\delta Q_{hot}/\\delta Q_{cold}=T_{hot}/T_{cold}\\). These relations determine the final temperature \\(T_{final}=\\sqrt{T_{hot}^{initial}\\,T_{cold}^{initial}}\\) and work produced \\(W=c\\left(T_{hot}^{initial}+T_{cold}^{initial}-2T_{final}\\right)\\). The entropy of the cold object increases just as much as the entropy of the hot object decreases, giving no net entropy change for this reversible process.</p>
+
+<p>Efficiency is the ratio of work performed to heat extracted from the hot object. The maximum value shown in the simulation is the efficiency of a heat engine operating between heat reservoirs with temperatures \\(T_{hot}^{initial}\\) and \\(T_{cold}^{initial}\\), \\(1-T_{cold}^{initial}/T_{hot}^{initial}\\), by Carnot's theorem. Heat reservoirs are ideal objects with infinite heat capacity, so their temperatures remain unchanged when adding or removing heat. When using a heat engine, the actual efficiency at a given time is the ratio of work to heat extracted up to that time in the process. Efficiency decreases as the objects' temperatures approach equilibrium. Thermal contact, on the other hand, produces no work, so its actual efficiency is zero.</p>
+
+<p>With thermal contact, the rate of heat exchange is proportional to temperature difference, giving an exponential decrease in the temperature difference with time. Furthermore, reversible heat engines operate arbitrarily slowly. Thus for both methods, the time to reach equilibrium is indefinitely long. The time range used in the simulation is an arbitrary finite interval, schematically representing the indefinitely long time required to reach equilibrium. Since most of the change occurs when the temperature difference is largest, in practice, the objects reach thermal equilibrium in a finite amount of time.</p>
+
+<p>Based on exercises in [1].</p>
+
+<p><strong>Reference</strong><br>
+[1] D. Lemons, <em>Mere Thermodynamics</em>, Baltimore: Johns Hopkins University Press, 2009.</p>
+`;
+
+const aboutHTML = `
+<p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/IrreversibleAndReversibleTemperatureEquilibration/" target="_blank" rel="noopener">Mathematica simulation</a> by Tad Hogg. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.</p>
+`;
+
+function openPanel(title, html, buttonEl) {
+  panelTitle.textContent = title;
+  panelBody.innerHTML = html;
+  const panel = document.querySelector('.panel');
+  panel.classList.remove('positioned');
+  overlay.classList.add('show');
+
+  function position() {
+    const btnRect = buttonEl.getBoundingClientRect();
+    const gap = 10;
+    const margin = 12;
+    // cap panel height to the space actually available above the button
+    const availableAbove = btnRect.top - gap - margin;
+    panel.style.maxHeight = Math.max(160, Math.min(window.innerHeight*0.7, availableAbove)) + 'px';
+
+    const panelW = panel.offsetWidth;
+    const panelH = panel.offsetHeight;
+
+    let left = btnRect.left + btnRect.width/2 - panelW/2;
+    left = Math.max(margin, Math.min(left, window.innerWidth - panelW - margin));
+
+    let top = btnRect.top - panelH - gap;
+    top = Math.max(margin, top);
+
+    panel.style.left = left + 'px';
+    panel.style.top = top + 'px';
+    panel.classList.add('positioned');
+  }
+
+  // measure after layout so offsetWidth/offsetHeight are accurate
+  requestAnimationFrame(position);
+
+  if (window.MathJax && window.MathJax.typesetPromise) {
+    window.MathJax.typesetPromise([panelBody]).then(() => requestAnimationFrame(position));
+  }
+}
+
+function closePanel() {
+  overlay.classList.remove('show');
+  document.querySelector('.panel').classList.remove('positioned');
+}
+
+document.getElementById('btnDirections').addEventListener('click', (e) => openPanel('Directions', directionsHTML, e.currentTarget));
+document.getElementById('btnDetails').addEventListener('click', (e) => openPanel('Details', detailsHTML, e.currentTarget));
+document.getElementById('btnAbout').addEventListener('click', (e) => openPanel('About', aboutHTML, e.currentTarget));
+panelClose.addEventListener('click', closePanel);
+overlay.addEventListener('click', (e) => { if (e.target === overlay) closePanel(); });
+window.addEventListener('resize', () => { if (overlay.classList.contains('show')) closePanel(); });
+
+// ---------- Init ----------
+setupCanvas();
+redraw();
+</script>
+</body>
+</html>

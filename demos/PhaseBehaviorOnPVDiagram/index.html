@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Phase Behavior on a Pressure-Volume Diagram</title>
+<style>
+  :root{
+    --accent:#98000D;
+    --accent-dark:#7a000b;
+  }
+  html,body{
+    margin:0; padding:0; background:#fff; color:#222;
+    font-family:Helvetica, Arial, sans-serif;
+  }
+  #app{
+    max-width:900px;
+    margin:0 auto;
+    padding:14px 16px 24px 16px;
+    box-sizing:border-box;
+  }
+  h1{
+    text-align:center;
+    font-size:20px;
+    font-weight:bold;
+    margin:4px 0 10px 0;
+    font-family:Helvetica, Arial, sans-serif;
+  }
+  #mainRow{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+  #controlsTop{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    justify-content:center;
+    gap:22px;
+    margin-bottom:6px;
+  }
+  .controlGroup{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:4px;
+  }
+  .controlLabel{
+    font-size:19px;
+    color:#333;
+  }
+  .setterBar{
+    display:flex;
+    border:1px solid #999;
+    border-radius:3px;
+    overflow:hidden;
+  }
+  .setterBtn{
+    font-family:Helvetica, Arial, sans-serif;
+    font-size:19.8px;
+    padding:4px 12px;
+    background:#eee;
+    border:none;
+    border-right:1px solid #999;
+    cursor:pointer;
+    color:#222;
+  }
+  .setterBtn:last-child{ border-right:none; }
+  .setterBtn.active{
+    background:var(--accent);
+    color:#fff;
+  }
+  select#pathwaySelect{
+    font-family:Helvetica, Arial, sans-serif;
+    font-size:19.8px;
+    padding:3px 6px;
+    border:1px solid #999;
+    border-radius:3px;
+    background:#fff;
+  }
+  #canvasWrap{
+    position:relative;
+    width:640px;
+    max-width:100%;
+  }
+  canvas#plotCanvas{
+    width:100%;
+    height:auto;
+    display:block;
+    touch-action:none;
+  }
+  #sliders{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:28px;
+    margin-top:10px;
+    width:100%;
+  }
+  .sliderBlock{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .sliderBlock label{
+    font-size:20.6px;
+    color:#222;
+    white-space:nowrap;
+  }
+  .sliderBlock input[type=range]{
+    width:170px;
+  }
+  .sliderVal{
+    font-size:20.6px;
+    min-width:52px;
+    text-align:left;
+    font-variant-numeric:tabular-nums;
+  }
+  /* Directions / Details / About panel buttons */
+  #panelArea{
+    position:relative;
+    margin-top:6px;
+  }
+  #panelButtons{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    position:relative;
+    z-index:40;
+  }
+  .panelBtn{
+    font-family:Helvetica, Arial, sans-serif;
+    font-size:15.6px;
+    font-weight:normal;
+    color:#fff;
+    background:var(--accent);
+    border:none;
+    border-radius:4px;
+    padding:7px 16px;
+    cursor:pointer;
+  }
+  .panelBtn:hover{ background:var(--accent-dark); }
+  .panelBtn.active{ background:var(--accent-dark); }
+  .panelContent{
+    display:none;
+    position:absolute;
+    width:300px;
+    max-width:78vw;
+    box-sizing:border-box;
+    padding:30px 16px 14px 16px;
+    border:1px solid #ccc;
+    border-radius:5px;
+    background:#fafafa;
+    font-size:13.5px;
+    line-height:1.5;
+    box-shadow:0 3px 10px rgba(0,0,0,0.18);
+    z-index:20;
+  }
+  .panelClose{
+    position:absolute;
+    top:4px;
+    right:6px;
+    width:26px;
+    height:26px;
+    border:none;
+    background:transparent;
+    color:#777;
+    font-size:22px;
+    line-height:1;
+    cursor:pointer;
+    border-radius:4px;
+  }
+  .panelClose:hover{
+    color:#fff;
+    background:var(--accent);
+  }
+  .panelContent.open{ display:block; }
+  #panel-directions{
+    width:560px;
+    max-width:88vw;
+  }
+  #panel-details{
+    width:460px;
+    max-width:88vw;
+  }
+  #panel-about{
+    width:560px;
+    max-width:88vw;
+  }
+  .panelContent h3{
+    margin-top:0;
+    font-size:14px;
+    color:var(--accent);
+  }
+  .panelContent a{ color:var(--accent); }
+  .eq{
+    font-style:italic;
+    display:block;
+    margin:6px 0;
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- <h1>Phase Behavior on a Pressure&ndash;Volume Diagram</h1> -->
+
+  <div id="mainRow">
+    <div id="controlsTop">
+      <div class="controlGroup">
+        <div class="controlLabel">volume representation</div>
+        <div class="setterBar" id="scaleSetter">
+          <button class="setterBtn active" data-scale="log">&nbsp;log&nbsp;</button>
+          <button class="setterBtn" data-scale="linear">&nbsp;linear&nbsp;</button>
+        </div>
+      </div>
+      <div class="controlGroup">
+        <div class="controlLabel">suggested pathways</div>
+        <select id="pathwaySelect">
+          <option value="1">around critical point</option>
+          <option value="2">through phase boundary</option>
+          <option value="3" selected>none</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="panelArea">
+      <div id="panelButtons">
+        <button class="panelBtn" data-panel="directions">Directions</button>
+        <button class="panelBtn" data-panel="details">Details</button>
+        <button class="panelBtn" data-panel="about">About</button>
+      </div>
+
+      <div class="panelContent" id="panel-directions">
+        <button class="panelClose" aria-label="Close">&times;</button>
+        <p>This log pressure versus log volume phase diagram illustrates phase behavior of a single component (water) and the concept of state functions. Move the black dot with a mouse or use sliders to move the black dot at constant pressure or constant volume. The piston&ndash;cylinder represents the volumes of liquid and vapor present, use buttons to view the volumes on a log or linear scale. When two phases are present and the linear scale is selected, a pop-out shows a magnified view of the liquid and vapor volumes. Liquid in the cylinder is blue and vapor is green, and the intensities of these colors increase as their densities increase. Note that the single-phase liquid, vapor, and supercritical regions are labeled, but no boundaries exist between them. The critical point, which is the highest temperature and pressure where two phases coexist, is at 647 K and 22.1 MPa for water. Use this diagram to illustrate circumnavigating the critical point by moving the black dot from the liquid phase to the supercritical region and then to the vapor phase without a phase change (i.e., without two phases coexisting). By contrast, observe two phases in equilibrium by moving the dot from a small to large volume below the critical pressure.</p>
+      </div>
+
+      <div class="panelContent" id="panel-details">
+        <button class="panelClose" aria-label="Close">&times;</button>
+        <p>At a given pressure and volume, the temperature is calculated from the Peng&ndash;Robinson equation of state:</p>
+        <span class="eq">P = RT/(V&minus;b) &minus; a/(V&sup2;+2Vb&minus;b&sup2;),</span>
+        <span class="eq">a = 0.457 (R&sup2;T<sub>c</sub>&sup2;/P<sub>c</sub>)(1+&kappa;(1&minus;&radic;(T/T<sub>c</sub>)))&sup2;,</span>
+        <span class="eq">b = 0.078 (RT<sub>c</sub>/P<sub>c</sub>),</span>
+        <span class="eq">&kappa; = 0.375 + 1.54&omega; &minus; 0.270&omega;&sup2;,</span>
+        <p>where P is pressure (MPa), R is the ideal gas constant (8.314 [cm&sup3;&middot;MPa]/[mol&middot;K]), T is temperature (K), V is the molar volume (cm&sup3;/mol), a and b are Peng&ndash;Robinson constants, P<sub>c</sub> is the critical pressure (MPa), T<sub>c</sub> is the critical temperature (K), and &omega; is the acentric factor (dimensionless). The parameter &kappa; is also dimensionless.</p>
+      </div>
+
+      <div class="panelContent" id="panel-about">
+        <button class="panelClose" aria-label="Close">&times;</button>
+        <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a Mathematica simulation by Rachael L. Baumann. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.</p>
+      </div>
+    </div>
+
+    <div id="canvasWrap">
+      <canvas id="plotCanvas" width="640" height="460"></canvas>
+    </div>
+
+    <div id="sliders">
+      <div class="sliderBlock">
+        <label for="vSlider">molar volume (cm&sup3;/mol)</label>
+        <input type="range" id="vSlider" min="2.995732273553991" max="9.392661928770137" step="0.0001" value="4.594964687358027">
+        <span class="sliderVal" id="vVal">99</span>
+      </div>
+      <div class="sliderBlock">
+        <label for="pSlider">pressure (MPa)</label>
+        <input type="range" id="pSlider" min="-1.2039728043259361" max="4.248495242049359" step="0.0001" value="3.812297798339336">
+        <span class="sliderVal" id="pVal">45.3</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------------- Physical data (water) ----------------
+  var R = 8.314, Tc = 647.096, Pc = 22.12;
+  var Vc = 0.359 * (R * Tc / Pc); // 87.3148...
+
+  // Saturation pressure grid (MPa) shared by VPL and VPG (liquid & vapor molar volumes, cm3/mol)
+  var Psat = [0.199,0.275,0.371,0.49,0.634,0.807,1.01,1.247,1.52,1.831,2.184,2.579,3.021,3.51,4.049,4.639,5.283,5.983,6.739,7.554,8.429,9.365,10.364,11.427,12.556,13.751,15.013,16.345,17.746,19.217,20.76,22.108];
+  var VPLt = [35.739,36.072,36.42,36.782,37.16,37.556,37.969,38.403,38.859,39.338,39.843,40.377,40.942,41.542,42.18,42.862,43.592,44.376,45.224,46.144,47.148,48.252,49.474,50.84,52.385,54.16,56.239,58.741,61.879,66.095,72.666,88.82];
+  var VPGt = [11388,8538.2,6549.1,5124.6,4080.6,3299.7,2704.9,2244.2,1882.1,1593.6,1360.9,1171.2,1014.8,884.7,775.53,683.18,604.45,536.85,478.41,427.57,383.05,343.83,309.06,278.04,250.17,224.94,201.89,180.56,160.48,140.96,120.53,92.591];
+
+  function interp(xs, ys, x){
+    if (x <= xs[0]) return ys[0];
+    if (x >= xs[xs.length-1]) return ys[ys.length-1];
+    for (var i=0;i<xs.length-1;i++){
+      if (x>=xs[i] && x<=xs[i+1]){
+        var t = (x-xs[i])/(xs[i+1]-xs[i]);
+        return ys[i] + t*(ys[i+1]-ys[i]);
+      }
+    }
+    return ys[ys.length-1];
+  }
+  function VPL(P){ return interp(Psat, VPLt, P); }
+  function VPG(P){ return interp(Psat, VPGt, P); }
+
+  // ---------------- State ----------------
+  var state = {
+    vLog: 4.594964687358027,   // ln(V)
+    pLog: 3.812297798339336,   // ln(P)
+    scaleMode: "log",          // "log" or "linear"
+    pathway: "3"               // "1","2","3"
+  };
+
+  // ---------------- DOM ----------------
+  var vSlider = document.getElementById("vSlider");
+  var pSlider = document.getElementById("pSlider");
+  var vValEl = document.getElementById("vVal");
+  var pValEl = document.getElementById("pVal");
+  var scaleSetter = document.getElementById("scaleSetter");
+  var pathwaySelect = document.getElementById("pathwaySelect");
+  var canvas = document.getElementById("plotCanvas");
+  var ctx = canvas.getContext("2d");
+
+  var CSS_W = 640, CSS_H = 460;
+  function setupHiDPI(){
+    var dpr = window.devicePixelRatio || 1;
+    canvas.width = CSS_W * dpr;
+    canvas.height = CSS_H * dpr;
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  setupHiDPI();
+  window.addEventListener("resize", function(){ setupHiDPI(); draw(); });
+
+  // ---------------- Plot geometry (log-log) ----------------
+  var plot = {
+    left: 66, right: 20, top: 18, bottom: 46,
+    vMin: 15, vMax: 1000000,
+    pMin: 0.2, pMax: 100
+  };
+  function plotW(){ return CSS_W - plot.left - plot.right; }
+  function plotH(){ return CSS_H - plot.top - plot.bottom; }
+
+  function xToPx(v){
+    var lo = Math.log10(plot.vMin), hi = Math.log10(plot.vMax);
+    var f = (Math.log10(v)-lo)/(hi-lo);
+    return plot.left + f*plotW();
+  }
+  function yToPx(p){
+    var lo = Math.log10(plot.pMin), hi = Math.log10(plot.pMax);
+    var f = (Math.log10(p)-lo)/(hi-lo);
+    return plot.top + (1-f)*plotH();
+  }
+  function pxToV(px){
+    var lo = Math.log10(plot.vMin), hi = Math.log10(plot.vMax);
+    var f = (px-plot.left)/plotW();
+    return Math.pow(10, lo + f*(hi-lo));
+  }
+  function pxToP(py){
+    var lo = Math.log10(plot.pMin), hi = Math.log10(plot.pMax);
+    var f = 1 - (py-plot.top)/plotH();
+    return Math.pow(10, lo + f*(hi-lo));
+  }
+
+  // ---------------- Color blend (density) ----------------
+  var colLiquid = {r:0.05,g:0.3495,b:1.0,a:1.0};
+  var colVapor  = {r:0.2746,g:1.0,b:0.2789,a:0.35};
+  function stepFrac(vol){
+    var lo = Math.log(20), hi = Math.log(12000);
+    var f = (Math.log(vol)-lo)/(hi-lo);
+    return Math.max(0, Math.min(1, f));
+  }
+  function blendColor(vol){
+    var t = stepFrac(vol);
+    var r = colLiquid.r + (colVapor.r-colLiquid.r)*t;
+    var g = colLiquid.g + (colVapor.g-colLiquid.g)*t;
+    var b = colLiquid.b + (colVapor.b-colLiquid.b)*t;
+    var a = colLiquid.a + (colVapor.a-colLiquid.a)*t;
+    return "rgba(" + Math.round(r*255) + "," + Math.round(g*255) + "," + Math.round(b*255) + "," + a.toFixed(3) + ")";
+  }
+
+  // ---------------- Drawing helpers ----------------
+  function niceTicks(){
+    // powers of 10 within range, with minor 2..9 marks
+    var ticks = [];
+    var minExp = Math.floor(Math.log10(plot.vMin));
+    var maxExp = Math.ceil(Math.log10(plot.vMax));
+    for (var e=minExp; e<=maxExp; e++){
+      for (var m=1; m<=9; m++){
+        var val = m*Math.pow(10,e);
+        if (val>=plot.vMin-1e-9 && val<=plot.vMax+1e-9){
+          ticks.push({val:val, major:(m===1)});
+        }
+      }
+    }
+    return ticks;
+  }
+  function niceTicksY(){
+    var ticks = [];
+    var minExp = Math.floor(Math.log10(plot.pMin));
+    var maxExp = Math.ceil(Math.log10(plot.pMax));
+    for (var e=minExp; e<=maxExp; e++){
+      for (var m=1; m<=9; m++){
+        var val = m*Math.pow(10,e);
+        if (val>=plot.pMin-1e-9 && val<=plot.pMax+1e-9){
+          ticks.push({val:val, major:(m===1)});
+        }
+      }
+    }
+    return ticks;
+  }
+  function fmtTick(v){
+    if (v>=1){
+      if (v>=1000000) return (v/1000000)+" M";
+      if (v>=1000) return (v/1000)+" k";
+      return ""+v;
+    }
+    return v.toString();
+  }
+  function drawExpTick(val, cx, y){
+    // draws "10" with a superscript exponent, e.g. 1000 -> 10^3
+    var n = Math.round(Math.log10(val));
+    var baseFont = "17.3px Helvetica, Arial, sans-serif";
+    var expFont = "12.5px Helvetica, Arial, sans-serif";
+    var baseText = "10";
+    var expText = String(n);
+    ctx.font = baseFont;
+    var baseW = ctx.measureText(baseText).width;
+    ctx.font = expFont;
+    var expW = ctx.measureText(expText).width;
+    var totalW = baseW + expW;
+    var startX = cx - totalW/2;
+    ctx.textAlign = "left";
+    ctx.textBaseline = "top";
+    ctx.font = baseFont;
+    ctx.fillText(baseText, startX, y);
+    ctx.font = expFont;
+    ctx.fillText(expText, startX+baseW, y-5);
+  }
+
+  function drawAxes(){
+    ctx.save();
+    ctx.font = "17.3px Helvetica, Arial, sans-serif";
+    ctx.fillStyle = "#000";
+    ctx.strokeStyle = "#000";
+    ctx.lineWidth = 1;
+
+    // frame box
+    ctx.strokeRect(plot.left, plot.top, plotW(), plotH());
+
+    // x ticks (bottom)
+    var xt = niceTicks();
+    xt.forEach(function(t){
+      var px = xToPx(t.val);
+      var len = t.major ? 6 : 3;
+      ctx.beginPath();
+      ctx.moveTo(px, plot.top+plotH());
+      ctx.lineTo(px, plot.top+plotH()-len);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(px, plot.top);
+      ctx.lineTo(px, plot.top+len);
+      ctx.stroke();
+      if (t.major){
+        ctx.save();
+        drawExpTick(t.val, px, plot.top+plotH()+8);
+        ctx.restore();
+      }
+    });
+
+    // y ticks (left)
+    var yt = niceTicksY();
+    yt.forEach(function(t){
+      var py = yToPx(t.val);
+      var len = t.major ? 6 : 3;
+      ctx.beginPath();
+      ctx.moveTo(plot.left, py);
+      ctx.lineTo(plot.left+len, py);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(plot.left+plotW(), py);
+      ctx.lineTo(plot.left+plotW()-len, py);
+      ctx.stroke();
+      if (t.major){
+        ctx.save();
+        ctx.textAlign = "right";
+        ctx.textBaseline = "middle";
+        ctx.fillText(fmtTick(t.val), plot.left-8, py);
+        ctx.restore();
+      }
+    });
+
+    // axis labels
+    ctx.save();
+    ctx.font = "normal 18.7px Helvetica, Arial, sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "alphabetic";
+    ctx.fillText("molar volume (cm\u00B3/mol)", plot.left+plotW()/2, CSS_H-6);
+    ctx.restore();
+
+    ctx.save();
+    ctx.font = "normal 18.7px Helvetica, Arial, sans-serif";
+    ctx.translate(20, plot.top+plotH()/2);
+    ctx.rotate(-Math.PI/2);
+    ctx.textAlign = "center";
+    ctx.textBaseline = "alphabetic";
+    ctx.fillText("pressure (MPa)", 0, 0);
+    ctx.restore();
+
+    ctx.restore();
+  }
+
+  function drawDome(){
+    ctx.save();
+    ctx.strokeStyle = "#000";
+    ctx.lineWidth = 1.6;
+    // liquid branch
+    ctx.beginPath();
+    for (var i=0;i<Psat.length;i++){
+      var x = xToPx(VPLt[i]), y = yToPx(Psat[i]);
+      if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+    // vapor branch
+    ctx.beginPath();
+    for (var j=0;j<Psat.length;j++){
+      var x2 = xToPx(VPGt[j]), y2 = yToPx(Psat[j]);
+      if (j===0) ctx.moveTo(x2,y2); else ctx.lineTo(x2,y2);
+    }
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawRegionLabels(){
+    ctx.save();
+    ctx.font = "italic 19.25px Helvetica, Arial, sans-serif";
+    ctx.fillStyle = "rgba(128,128,128,0.9)";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("liquid", xToPx(25), yToPx(2.5));
+    ctx.fillText("vapor", xToPx(4000), yToPx(2.5));
+    ctx.fillText("two phases", xToPx(250), yToPx(0.27));
+    ctx.fillText("supercritical", xToPx(85), yToPx(50));
+    ctx.restore();
+
+    // legend
+    ctx.save();
+    var lx = plot.left + 0.42*plotW();
+    var ly = plot.top + 0.10*plotH();
+    ctx.font = "18.7px Helvetica, Arial, sans-serif";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = "rgb(13,255,0)";
+    ctx.beginPath(); ctx.arc(lx, ly, 5, 0, 2*Math.PI); ctx.fill();
+    ctx.fillStyle = "#000";
+    ctx.textAlign = "left";
+    ctx.fillText(" = lower density", lx+8, ly);
+    var lx2 = lx + 158;
+    ctx.fillStyle = "rgb(38,102,255)";
+    ctx.beginPath(); ctx.arc(lx2, ly, 5, 0, 2*Math.PI); ctx.fill();
+    ctx.fillStyle = "#000";
+    ctx.fillText(" = higher density", lx2+8, ly);
+    ctx.restore();
+  }
+
+  function drawPathway(pathway){
+    if (pathway === "3") return;
+    ctx.save();
+    if (pathway === "1"){
+      ctx.strokeStyle = "rgb(179,51,255)";
+      ctx.setLineDash([6,4]);
+      ctx.lineWidth = 2;
+      var pts = [[22.65,6],[22.65,62],[302,86.5],[2592,3.6]].map(function(pr){
+        return [xToPx(pr[0]), yToPx(pr[1])];
+      });
+      ctx.beginPath();
+      ctx.moveTo(pts[0][0], pts[0][1]);
+      ctx.bezierCurveTo(pts[1][0],pts[1][1], pts[2][0],pts[2][1], pts[3][0],pts[3][1]);
+      ctx.stroke();
+      drawArrowhead(pts[2], pts[3], "rgb(179,51,255)");
+    } else if (pathway === "2"){
+      ctx.strokeStyle = "rgb(255,128,26)";
+      ctx.setLineDash([6,4]);
+      ctx.lineWidth = 2;
+      var a = [xToPx(22.65), yToPx(6)];
+      var b = [xToPx(2592), yToPx(3.6)];
+      ctx.beginPath();
+      ctx.moveTo(a[0],a[1]);
+      ctx.lineTo(b[0],b[1]);
+      ctx.stroke();
+      drawArrowhead(a, b, "rgb(255,128,26)");
+    }
+    ctx.restore();
+  }
+  function drawArrowhead(from, to, color){
+    var ang = Math.atan2(to[1]-from[1], to[0]-from[0]);
+    var size = 9;
+    ctx.save();
+    ctx.setLineDash([]);
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(to[0], to[1]);
+    ctx.lineTo(to[0]-size*Math.cos(ang-Math.PI/7), to[1]-size*Math.sin(ang-Math.PI/7));
+    ctx.lineTo(to[0]-size*Math.cos(ang+Math.PI/7), to[1]-size*Math.sin(ang+Math.PI/7));
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function computeStateInfo(V, P){
+    var vle = (P < Pc) && (VPL(P) <= V) && (V <= VPG(P));
+    var vL, vV, lever;
+    if (vle){
+      vL = VPL(P); vV = VPG(P);
+      lever = (vV - V)/(vV - vL);
+    } else {
+      vL = V; vV = V; lever = 1;
+    }
+    return {vle:vle, vL:vL, vV:vV, lever:lever};
+  }
+
+  function drawStatePoint(V, P, info){
+    ctx.save();
+    if (info.vle){
+      ctx.setLineDash([5,4]);
+      ctx.lineWidth = 1.6;
+      ctx.strokeStyle = "rgb(13,255,0)";
+      ctx.beginPath();
+      ctx.moveTo(xToPx(info.vV), yToPx(P));
+      ctx.lineTo(xToPx(V), yToPx(P));
+      ctx.stroke();
+      ctx.strokeStyle = "rgb(38,102,255)";
+      ctx.beginPath();
+      ctx.moveTo(xToPx(V), yToPx(P));
+      ctx.lineTo(xToPx(info.vL), yToPx(P));
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+    // critical point
+    ctx.fillStyle = "rgba(153,153,153,0.9)";
+    ctx.beginPath();
+    ctx.arc(xToPx(Vc), yToPx(Pc), 5, 0, 2*Math.PI);
+    ctx.fill();
+
+    // current state
+    ctx.fillStyle = "#000";
+    ctx.beginPath();
+    ctx.arc(xToPx(V), yToPx(P), 6, 0, 2*Math.PI);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // ---------------- Tank (piston-cylinder) ----------------
+  function drawTank(V, info){
+    var tw = 90, th = 220;
+    var tx = plot.left + plotW()*0.86 - tw/2;
+    var ty = plot.top + plotH()*0.46 - th/2;
+
+    var hLfrac, hVfrac; // fraction of th occupied by liquid/vapor (of total filled)
+    var filledFrac;     // fraction of th that is filled (rest is piston headspace)
+
+    if (state.scaleMode === "log"){
+      var lnV = Math.log(V);
+      var lnLo = Math.log(20), lnHi = Math.log(12000);
+      filledFrac = Math.max(0.04, Math.min(1, (lnV-lnLo)/(lnHi-lnLo)));
+      if (info.vle){
+        var lnVL = Math.log(info.vL), lnVV = Math.log(info.vV);
+        var wL = info.lever*lnVL, wV = (1-info.lever)*lnVV;
+        var hT = wL+wV;
+        hLfrac = hT>0 ? wL/hT : 0;
+        hVfrac = 1-hLfrac;
+      } else {
+        hLfrac = 0; hVfrac = 1;
+        // single phase: colored uniformly according to density
+      }
+    } else {
+      var capacity = 12500;
+      filledFrac = Math.max(0.01, Math.min(1, V/capacity));
+      if (info.vle){
+        var liqVol = info.lever*info.vL;
+        hLfrac = liqVol/V;
+        hVfrac = 1-hLfrac;
+      } else {
+        hLfrac = 0; hVfrac = 1;
+      }
+    }
+
+    var filledPx = th*filledFrac;
+    var liqPx = filledPx*hLfrac;
+    var vapPx = filledPx*hVfrac;
+
+    ctx.save();
+    // cylinder outline
+    ctx.strokeStyle = "#555";
+    ctx.lineWidth = 1.4;
+    ctx.strokeRect(tx, ty, tw, th);
+
+    // headspace (empty, above piston) - light gray
+    var headPx = th - filledPx;
+    ctx.fillStyle = "rgba(210,210,210,0.5)";
+    ctx.fillRect(tx, ty, tw, headPx);
+
+    // vapor region (top of filled portion)
+    var vapColor = info.vle ? blendColor(info.vV) : blendColor(V);
+    ctx.fillStyle = vapColor;
+    ctx.fillRect(tx, ty+headPx, tw, vapPx);
+
+    // liquid region (bottom)
+    var liqColor = info.vle ? blendColor(info.vL) : blendColor(V);
+    if (info.vle){
+      ctx.fillStyle = liqColor;
+      ctx.fillRect(tx, ty+headPx+vapPx, tw, liqPx);
+    }
+
+    // piston lid
+    ctx.fillStyle = "#444";
+    ctx.fillRect(tx, ty+headPx-3, tw, 6);
+    // piston rod
+    ctx.fillRect(tx+tw/2-3, ty, 6, Math.max(0,headPx-4));
+
+    ctx.strokeStyle = "#555";
+    ctx.strokeRect(tx, ty, tw, th);
+    ctx.restore();
+
+    // zoom inset when two-phase & linear mode (small liquid or vapor slice)
+    if (info.vle && state.scaleMode === "linear" && (hLfrac < 0.08 || hVfrac < 0.08)){
+      drawZoom(tx, ty, tw, info);
+    }
+  }
+
+  function drawZoom(tx, ty, tw, info){
+    var zx = tx - 118, zy = ty + 6, zw = 100, zh = 130;
+    ctx.save();
+    ctx.strokeStyle = "#999";
+    ctx.fillStyle = "#fff";
+    ctx.beginPath();
+    ctx.arc(zx+zw/2, zy+zh/2, 62, 0, 2*Math.PI);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(zx+zw/2, zy+zh/2, 58, 0, 2*Math.PI);
+    ctx.clip();
+    var hLfracZoom = info.lever; // magnified split by mole fraction of liquid
+    var innerH = 116;
+    var innerTop = zy+zh/2-innerH/2;
+    var liqH = innerH*hLfracZoom;
+    var vapH = innerH-liqH;
+    ctx.fillStyle = blendColor(info.vV);
+    ctx.fillRect(zx+zw/2-50, innerTop, 100, vapH);
+    ctx.fillStyle = blendColor(info.vL);
+    ctx.fillRect(zx+zw/2-50, innerTop+vapH, 100, liqH);
+    ctx.restore();
+
+    ctx.font = "11px Helvetica, Arial, sans-serif";
+    ctx.fillStyle = "#555";
+    ctx.textAlign = "center";
+    ctx.fillText("magnified", zx+zw/2, zy+zh+12);
+    ctx.restore();
+  }
+
+  // ---------------- Master draw ----------------
+  function draw(){
+    ctx.clearRect(0,0,CSS_W,CSS_H);
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(0,0,CSS_W,CSS_H);
+
+    drawAxes();
+    drawDome();
+    drawRegionLabels();
+    drawPathway(state.pathway);
+
+    var V = Math.exp(state.vLog);
+    var P = Math.exp(state.pLog);
+    var info = computeStateInfo(V,P);
+    drawStatePoint(V,P,info);
+    drawTank(V, info);
+  }
+
+  // ---------------- Value formatting ----------------
+  function updateValueLabels(){
+    var V = Math.exp(state.vLog);
+    var P = Math.exp(state.pLog);
+    vValEl.textContent = Math.round(V).toString();
+    pValEl.textContent = P.toFixed(1);
+  }
+
+  // ---------------- Event wiring ----------------
+  vSlider.addEventListener("input", function(){
+    state.vLog = parseFloat(vSlider.value);
+    updateValueLabels();
+    draw();
+  });
+  pSlider.addEventListener("input", function(){
+    state.pLog = parseFloat(pSlider.value);
+    updateValueLabels();
+    draw();
+  });
+  scaleSetter.addEventListener("click", function(e){
+    var btn = e.target.closest(".setterBtn");
+    if (!btn) return;
+    Array.prototype.forEach.call(scaleSetter.querySelectorAll(".setterBtn"), function(b){
+      b.classList.remove("active");
+    });
+    btn.classList.add("active");
+    state.scaleMode = btn.getAttribute("data-scale");
+    draw();
+  });
+  pathwaySelect.addEventListener("change", function(){
+    state.pathway = pathwaySelect.value;
+    draw();
+  });
+
+  // ---------------- Drag the black state point with mouse/touch ----------------
+  var vLogMin = parseFloat(vSlider.min), vLogMax = parseFloat(vSlider.max);
+  var pLogMin = parseFloat(pSlider.min), pLogMax = parseFloat(pSlider.max);
+  var isDragging = false;
+  var dotHitRadius = 14; // px, generous hit target around the 6px dot
+
+  function getCanvasPos(evt){
+    var rect = canvas.getBoundingClientRect();
+    var clientX = (evt.touches && evt.touches[0]) ? evt.touches[0].clientX : evt.clientX;
+    var clientY = (evt.touches && evt.touches[0]) ? evt.touches[0].clientY : evt.clientY;
+    return {
+      x: (clientX - rect.left) * (CSS_W / rect.width),
+      y: (clientY - rect.top) * (CSS_H / rect.height)
+    };
+  }
+
+  function setStateFromPx(x, y){
+    var V = pxToV(x);
+    var P = pxToP(y);
+    var vLog = Math.max(vLogMin, Math.min(vLogMax, Math.log(V)));
+    var pLog = Math.max(pLogMin, Math.min(pLogMax, Math.log(P)));
+    state.vLog = vLog;
+    state.pLog = pLog;
+    vSlider.value = vLog;
+    pSlider.value = pLog;
+    updateValueLabels();
+    draw();
+  }
+
+  function distToDot(pos){
+    var dotX = xToPx(Math.exp(state.vLog));
+    var dotY = yToPx(Math.exp(state.pLog));
+    var dx = pos.x-dotX, dy = pos.y-dotY;
+    return Math.sqrt(dx*dx+dy*dy);
+  }
+
+  canvas.addEventListener("pointerdown", function(evt){
+    var pos = getCanvasPos(evt);
+    if (distToDot(pos) <= dotHitRadius){
+      isDragging = true;
+      canvas.setPointerCapture(evt.pointerId);
+      canvas.style.cursor = "grabbing";
+      setStateFromPx(pos.x, pos.y);
+      evt.preventDefault();
+    }
+  });
+  canvas.addEventListener("pointermove", function(evt){
+    var pos = getCanvasPos(evt);
+    if (isDragging){
+      setStateFromPx(pos.x, pos.y);
+      evt.preventDefault();
+    } else {
+      canvas.style.cursor = (distToDot(pos) <= dotHitRadius) ? "grab" : "default";
+    }
+  });
+  function endDrag(evt){
+    if (isDragging){
+      isDragging = false;
+      canvas.style.cursor = "default";
+      if (evt && evt.pointerId !== undefined && canvas.releasePointerCapture){
+        try { canvas.releasePointerCapture(evt.pointerId); } catch(e){}
+      }
+    }
+  }
+  canvas.addEventListener("pointerup", endDrag);
+  canvas.addEventListener("pointercancel", endDrag);
+  canvas.addEventListener("pointerleave", function(evt){
+    if (!isDragging) canvas.style.cursor = "default";
+  });
+
+  // Directions/Details/About toggle panels (flyout, positioned below their buttons)
+  var panelArea = document.getElementById("panelArea");
+  var panelButtonsRow = document.getElementById("panelButtons");
+  var panelBtns = document.querySelectorAll(".panelBtn");
+  panelBtns.forEach(function(btn){
+    btn.addEventListener("click", function(){
+      var name = btn.getAttribute("data-panel");
+      var content = document.getElementById("panel-"+name);
+      var isOpen = content.classList.contains("open");
+      document.querySelectorAll(".panelContent").forEach(function(p){ p.classList.remove("open"); });
+      document.querySelectorAll(".panelBtn").forEach(function(b){ b.classList.remove("active"); });
+      if (!isOpen){
+        var areaRect = panelArea.getBoundingClientRect();
+        var btnRect = btn.getBoundingClientRect();
+        var gap = 10;
+        var left, top;
+
+        if (name === "about" || name === "details"){
+          // below the full row of three buttons
+          var rowRect = panelButtonsRow.getBoundingClientRect();
+          left = rowRect.left - areaRect.left;
+          top = (rowRect.bottom - areaRect.top) + gap;
+        } else {
+          // directly below its own button (Directions)
+          left = btnRect.left - areaRect.left;
+          top = (btnRect.bottom - areaRect.top) + gap;
+        }
+
+        content.classList.add("open");
+        content.style.left = left + "px";
+        content.style.top = top + "px";
+
+        // clamp so the panel stays within the page's viewport width
+        var panelRect = content.getBoundingClientRect();
+        var maxRight = window.innerWidth - 12;
+        if (panelRect.right > maxRight){
+          left -= (panelRect.right - maxRight);
+          content.style.left = Math.max(8, left) + "px";
+        }
+
+        btn.classList.add("active");
+      }
+    });
+  });
+
+  // Close (x) buttons inside each panel
+  document.querySelectorAll(".panelClose").forEach(function(closeBtn){
+    closeBtn.addEventListener("click", function(e){
+      e.stopPropagation();
+      var panel = closeBtn.closest(".panelContent");
+      panel.classList.remove("open");
+      var name = panel.id.replace("panel-", "");
+      var btn = document.querySelector('.panelBtn[data-panel="'+name+'"]');
+      if (btn) btn.classList.remove("active");
+    });
+  });
+
+  // ---------------- Init ----------------
+  updateValueLabels();
+  draw();
+})();
+</script>
+</body>
+</html>

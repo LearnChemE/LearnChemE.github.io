@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Osmotic Pressure</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 16px;
+    background: #ffffff;
+    color: #000000;
+  }
+  #sim-wrapper {
+    max-width: 860px;
+    margin: 0 auto;
+  }
+  h2.title {
+    text-align: center;
+    font-family: Helvetica, Arial, sans-serif;
+    font-weight: bold;
+    font-size: 22px;
+    margin: 0 0 14px 0;
+  }
+  .main-layout {
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+  }
+  .controls-col {
+    flex: 0 0 320px;
+    min-width: 280px;
+  }
+  .setter-row {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .setter-label {
+    font-size: 18px;
+    margin-right: 4px;
+  }
+  .setter-btn {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 16.1px;
+    padding: 5px 12px;
+    border: 1px solid #98000D;
+    background: #ffffff;
+    color: #98000D;
+    border-radius: 3px;
+    cursor: pointer;
+    outline: none;
+  }
+  .setter-btn.active {
+    background: #98000D;
+    color: #ffffff;
+  }
+  .slider-row {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+  .slider-group {
+    width: 100%;
+  }
+  .slider-label-line {
+    display: flex;
+    justify-content: space-between;
+    font-size: 16.1px;
+    margin-bottom: 2px;
+  }
+  .slider-value {
+    font-weight: normal;
+    font-size: 16.8px;
+  }
+  input[type="range"] {
+    width: 100%;
+    accent-color: #98000D;
+  }
+  .checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 18.5px;
+    margin-bottom: 12px;
+  }
+  input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+    accent-color: #98000D;
+  }
+  #canvasHolder {
+    display: flex;
+    justify-content: center;
+    margin: 0 0 10px 0;
+  }
+  canvas {
+    display: block;
+  }
+  .bottom-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+    margin-top: 4px;
+    flex-wrap: wrap;
+    position: relative;
+  }
+  .btn-wrap {
+    position: relative;
+  }
+  .panel-btn {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 16.8px;
+    padding: 7px 19px;
+    border: none;
+    background: #98000D;
+    color: #ffffff;
+    border-radius: 3px;
+    cursor: pointer;
+    outline: none;
+  }
+  .panel-btn:hover {
+    background: #7a000a;
+  }
+  .panel {
+    display: none;
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: auto;
+    width: 320px;
+    z-index: 20;
+    font-size: 14px;
+    line-height: 1.5;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    padding: 12px 14px;
+    background: #fafafa;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+  }
+  .panel.open {
+    display: block;
+  }
+  #panelDirections {
+    width: 45vw;
+    min-width: 260px;
+  }
+  .panel-close {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    font-size: 18px;
+    line-height: 1;
+    color: #666666;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 2px 4px;
+  }
+  .panel-close:hover {
+    color: #98000D;
+  }
+  .panel h3 {
+    margin: 0 0 8px 0;
+    font-size: 15px;
+  }
+  .panel a {
+    color: #98000D;
+  }
+</style>
+</head>
+<body>
+<div id="sim-wrapper">
+  <!-- <h2 class="title">Osmotic Pressure</h2> -->
+
+  <div class="main-layout">
+  <div class="controls-col">
+  <div class="setter-row" id="soluteRow">
+    <span class="setter-label">solute:</span>
+    <button class="setter-btn active" data-s="1">sucrose</button>
+    <button class="setter-btn" data-s="2">NaCl</button>
+    <button class="setter-btn" data-s="3">unknown</button>
+  </div>
+
+  <div class="slider-row">
+    <div class="slider-group">
+      <div class="slider-label-line">
+        <span>concentration (mg/L)</span>
+        <span class="slider-value" id="mgVal">20</span>
+      </div>
+      <input type="range" id="mgSlider" min="0" max="50" step="1" value="20">
+    </div>
+    <div class="slider-group">
+      <div class="slider-label-line">
+        <span>temperature (&deg;C)</span>
+        <span class="slider-value" id="tVal">25.0</span>
+      </div>
+      <input type="range" id="tSlider" min="10" max="50" step="0.1" value="25">
+    </div>
+  </div>
+
+  <div class="checkbox-row">
+      <input type="checkbox" id="mwCheck">
+      <label for="mwCheck">molecular weight</label>
+  </div>
+
+  <div class="bottom-row">
+    <div class="btn-wrap">
+      <button class="panel-btn" id="btnDirections">Directions</button>
+      <div class="panel" id="panelDirections">
+        <button class="panel-close" aria-label="Close">&times;</button>
+        <h3>Directions</h3>
+        <p>Osmosis involves the selective passage of certain components of a solution through a semipermeable membrane, with exclusion of other components. This membrane is permeable to water, but impermeable to the solute. The membrane at the bottom of the U-tube separates the pure water on the left from the aqueous solution on the right. Water will flow through the membrane into the solution, in an attempt to equalize the concentrations on the two sides. This gives rise to an osmotic pressure &Pi;. Osmotic pressure measurements provide a sensitive method for determining molecular weights M, particularly for polymers. For a solute concentration of c<sub>X</sub> (g/L), the molar concentration [X] is c<sub>X</sub>/M. An osmotic pressure of 10<sup>-3</sup> atm would cause a rise of 1.033 cm for the solution in the tube.</p>
+      </div>
+    </div>
+
+    <div class="btn-wrap">
+      <button class="panel-btn" id="btnDetails">Details</button>
+      <div class="panel" id="panelDetails">
+        <button class="panel-close" aria-label="Close">&times;</button>
+        <h3>Details</h3>
+        <p>For dilute solutions, the osmotic pressure, in atm, is well approximated by the van 't Hoff equation &Pi; = i[X]RT, where [X] is the solute concentration (mol/L), R = 0.8206 (L atm)/(K mol), T = temperature (K). The van 't Hoff factor i represents the number of ions per molecule for a dissociated solute. For NaCl, i = 2. The other solutes in this simulation are undissociated with i = 1.</p>
+      </div>
+    </div>
+
+    <div class="btn-wrap">
+      <button class="panel-btn" id="btnAbout">About</button>
+      <div class="panel" id="panelAbout">
+        <button class="panel-close" aria-label="Close">&times;</button>
+        <h3>About</h3>
+        <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/OsmoticPressure/" target="_blank">Mathematica simulation</a> by S.M. Blinder. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.</p>
+      </div>
+    </div>
+  </div>
+
+  </div>
+
+  <div id="canvasHolder">
+    <canvas id="sim" width="440" height="545"></canvas>
+  </div>
+  </div>
+
+</div>
+
+<script>
+(function() {
+  // ---- Model parameters ----
+  var M = {
+    1: 342.3,   // sucrose
+    2: 58.44,   // NaCl
+    3: [180.16, 131.13, 146.19, 62.07, 151.16, 285.34][Math.floor(Math.random() * 6)] // unknown, fixed for this session
+  };
+  var names = { 1: "sucrose", 2: "NaCl", 3: "unknown" };
+
+  var state = { s: 1, mg: 20, t: 25.0, showMW: false };
+
+  // ---- DOM references ----
+  var mgSlider = document.getElementById('mgSlider');
+  var tSlider = document.getElementById('tSlider');
+  var mgVal = document.getElementById('mgVal');
+  var tVal = document.getElementById('tVal');
+  var mwCheck = document.getElementById('mwCheck');
+  var soluteBtns = document.querySelectorAll('.setter-btn');
+  var canvas = document.getElementById('sim');
+  var ctx = canvas.getContext('2d');
+
+  // ---- Panels ----
+  function setupPanel(btnId, panelId) {
+    var btn = document.getElementById(btnId);
+    var panel = document.getElementById(panelId);
+    btn.addEventListener('click', function() {
+      var isOpen = panel.classList.contains('open');
+      document.querySelectorAll('.panel').forEach(function(p) { p.classList.remove('open'); });
+      if (!isOpen) panel.classList.add('open');
+    });
+  }
+  setupPanel('btnDirections', 'panelDirections');
+  setupPanel('btnDetails', 'panelDetails');
+  setupPanel('btnAbout', 'panelAbout');
+
+  document.querySelectorAll('.panel-close').forEach(function(cb) {
+    cb.addEventListener('click', function(e) {
+      e.stopPropagation();
+      cb.closest('.panel').classList.remove('open');
+    });
+  });
+
+  // ---- Controls ----
+  soluteBtns.forEach(function(b) {
+    b.addEventListener('click', function() {
+      soluteBtns.forEach(function(x) { x.classList.remove('active'); });
+      b.classList.add('active');
+      state.s = parseInt(b.getAttribute('data-s'), 10);
+      draw();
+    });
+  });
+
+  mgSlider.addEventListener('input', function() {
+    state.mg = parseFloat(mgSlider.value);
+    mgVal.textContent = state.mg.toFixed(0);
+    draw();
+  });
+
+  tSlider.addEventListener('input', function() {
+    state.t = parseFloat(tSlider.value);
+    tVal.textContent = state.t.toFixed(1);
+    draw();
+  });
+
+  mwCheck.addEventListener('change', function() {
+    state.showMW = mwCheck.checked;
+    draw();
+  });
+
+  // ---- Physics ----
+  var R = 0.082057;
+  function heightDiffCm(mg, s, t) {
+    var i = (s === 2) ? 2 : 1;
+    var m = M[s];
+    return i * 1033.26 * R * (273.15 + t) * 0.001 * (mg / m);
+  }
+
+  // ---- Hi-DPI canvas setup ----
+  var W = 440, H = 545;
+  var dpr = window.devicePixelRatio || 1;
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.width = W + "px";
+  canvas.style.height = H + "px";
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  // world -> pixel mapping
+  var scale = 34;
+  var originX = W / 2;
+  var originYWorld = 10.4; // world y that maps to pixel y = topPad
+  var topPad = 5;
+  function px(x) { return originX + scale * x; }
+  function py(y) { return topPad + scale * (originYWorld - y); }
+
+  function lerpColor(c1, c2, t) {
+    t = Math.max(0, Math.min(1, t));
+    var r = Math.round(c1[0] + (c2[0] - c1[0]) * t);
+    var g = Math.round(c1[1] + (c2[1] - c1[1]) * t);
+    var b = Math.round(c1[2] + (c2[2] - c1[2]) * t);
+    return "rgb(" + r + "," + g + "," + b + ")";
+  }
+  var LIGHTBLUE = [176, 224, 230];
+  var BLUE = [0, 0, 255];
+
+  function arcWorldPoints(r, a1, a2, steps) {
+    var pts = [];
+    for (var i = 0; i <= steps; i++) {
+      var a = a1 + (a2 - a1) * (i / steps);
+      pts.push([r * Math.cos(a), r * Math.sin(a)]);
+    }
+    return pts;
+  }
+
+  function pathFromWorldPoints(pts) {
+    ctx.moveTo(px(pts[0][0]), py(pts[0][1]));
+    for (var i = 1; i < pts.length; i++) {
+      ctx.lineTo(px(pts[i][0]), py(pts[i][1]));
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    var mg = state.mg, s = state.s, t = state.t;
+    var cm = heightDiffCm(mg, s, t);          // true physical height difference (cm)
+    var torr = 0.73554 * cm;                   // osmotic pressure (torr)
+    var h = 0.08 * (50 - cm);                  // schematic (compressed) left liquid level
+    var hRight = 8 - h;                        // schematic right liquid level
+
+    var concentColor = lerpColor(LIGHTBLUE, BLUE, mg / 120);
+
+    // ----- rounded bottom bulb: left quarter (water side), right quarter (solution side) -----
+    ctx.lineWidth = 1;
+
+    // left-bottom quarter annulus (angles -180 to -90), light blue (water wall)
+    ctx.beginPath();
+    var outerLeft = arcWorldPoints(5, -Math.PI, -Math.PI / 2, 40);
+    var innerLeftRev = arcWorldPoints(2.5, -Math.PI / 2, -Math.PI, 40);
+    pathFromWorldPoints(outerLeft.concat(innerLeftRev));
+    ctx.closePath();
+    ctx.fillStyle = "#b0e0e6";
+    ctx.fill();
+
+    // right-bottom quarter annulus (angles -90 to 0), concentration color (solution wall)
+    ctx.beginPath();
+    var outerRight = arcWorldPoints(5, -Math.PI / 2, 0, 40);
+    var innerRightRev = arcWorldPoints(2.5, 0, -Math.PI / 2, 40);
+    pathFromWorldPoints(outerRight.concat(innerRightRev));
+    ctx.closePath();
+    ctx.fillStyle = concentColor;
+    ctx.fill();
+
+    // white hollow center circle (radius 2.5) to punch out the middle bulb area
+    ctx.beginPath();
+    ctx.arc(px(0), py(0), 2.5 * scale, 0, Math.PI * 2);
+    ctx.fillStyle = "#ffffff";
+    ctx.fill();
+
+    // ----- vertical tube legs -----
+    // left leg (water): x from -5 to -2.5, y from 0 to h
+    ctx.fillStyle = "#b0e0e6";
+    ctx.fillRect(px(-5), py(Math.max(h, 0)), (2.5) * scale, py(0) - py(Math.max(h, 0)));
+    // fill white above liquid up to top of tube (air gap) - leave as background (white)
+
+    // right leg (solution): x from 2.5 to 5, y from 0 to hRight
+    ctx.fillStyle = concentColor;
+    ctx.fillRect(px(2.5), py(Math.max(hRight, 0)), (2.5) * scale, py(0) - py(Math.max(hRight, 0)));
+
+    // ----- outlines -----
+    ctx.strokeStyle = "#000000";
+    ctx.lineWidth = 2;
+
+    // outer bottom arc (radius 5, -180 to 0)
+    ctx.beginPath();
+    pathFromWorldPoints(arcWorldPoints(5, -Math.PI, 0, 60));
+    ctx.stroke();
+
+    // inner bottom arc (radius 2.5, -180 to 0)
+    ctx.beginPath();
+    pathFromWorldPoints(arcWorldPoints(2.5, -Math.PI, 0, 60));
+    ctx.stroke();
+
+    // vertical wall lines
+    function vline(x) {
+      ctx.beginPath();
+      ctx.moveTo(px(x), py(0));
+      ctx.lineTo(px(x), py(10));
+      ctx.stroke();
+    }
+    vline(-5); vline(-2.5); vline(2.5); vline(5);
+
+    // top rim ellipses
+    function topEllipse(cx) {
+      ctx.beginPath();
+      ctx.ellipse(px(cx), py(10), 1.25 * scale, 0.25 * scale, 0, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    topEllipse(-3.75);
+    topEllipse(3.75);
+
+    // ----- membrane (blue oval at bottom center) -----
+    ctx.beginPath();
+    ctx.ellipse(px(0), py(-3.75), 0.25 * scale, 1.25 * scale, 0, 0, Math.PI * 2);
+    ctx.fillStyle = "#0000ff";
+    ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = "#000000";
+    ctx.stroke();
+
+    // membrane label
+    ctx.font = "15.6px Helvetica, Arial, sans-serif";
+    ctx.fillStyle = "#ffffff";
+    ctx.textAlign = "left";
+    ctx.textBaseline = "middle";
+    var labelX = px(0.6), labelY = py(-3.75);
+    ctx.beginPath();
+    ctx.moveTo(px(0.25), py(-3.75));
+    ctx.lineTo(labelX - 3, labelY);
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.fillText("membrane", labelX, labelY);
+
+    // ----- meniscus ellipses -----
+    ctx.beginPath();
+    ctx.ellipse(px(-3.75), py(h), 1.25 * scale, 0.25 * scale, 0, 0, Math.PI * 2);
+    ctx.fillStyle = "#b0e0e6";
+    ctx.fill();
+    ctx.strokeStyle = "#000000";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.ellipse(px(3.75), py(hRight), 1.25 * scale, 0.25 * scale, 0, 0, Math.PI * 2);
+    ctx.fillStyle = concentColor;
+    ctx.fill();
+    ctx.stroke();
+
+    // ----- red reference lines at center -----
+    ctx.strokeStyle = "#ff0000";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(px(-0.5), py(h));
+    ctx.lineTo(px(0.5), py(h));
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(px(-0.5), py(hRight));
+    ctx.lineTo(px(0.5), py(hRight));
+    ctx.stroke();
+
+    // ----- arrows + cm labels -----
+    ctx.fillStyle = "#000000";
+    ctx.font = "17.6px Helvetica, Arial, sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    function drawArrow(x0, y0, x1, y1) {
+      ctx.beginPath();
+      ctx.moveTo(px(x0), py(y0));
+      ctx.lineTo(px(x1), py(y1));
+      ctx.strokeStyle = "#000000";
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      var angle = Math.atan2(py(y1) - py(y0), px(x1) - px(x0));
+      var ah = 6;
+      ctx.beginPath();
+      ctx.moveTo(px(x1), py(y1));
+      ctx.lineTo(px(x1) - ah * Math.cos(angle - Math.PI / 6), py(y1) - ah * Math.sin(angle - Math.PI / 6));
+      ctx.lineTo(px(x1) - ah * Math.cos(angle + Math.PI / 6), py(y1) - ah * Math.sin(angle + Math.PI / 6));
+      ctx.closePath();
+      ctx.fillStyle = "#000000";
+      ctx.fill();
+    }
+
+    var cmLabel = Number(cm.toPrecision(3)) + " cm";
+    if (h <= 3.125) {
+      // arrows span outward from the center gap toward the (distant) menisci -
+      // the untouched space is the small gap between the arrow tails, so the
+      // label sits between the arrows.
+      drawArrow(0, 3.6, 0, h);
+      drawArrow(0, 4.4, 0, hRight);
+      ctx.fillText(cmLabel, px(0), py(4));
+    } else {
+      // arrows are short and sit right at the outer edge of each meniscus -
+      // the label is placed outside that arrow pair, above the top arrow.
+      drawArrow(0, h - 1, 0, h);
+      drawArrow(0, 9 - h, 0, hRight);
+      ctx.fillText(cmLabel, px(0), py(9 - h + 0.6));
+    }
+
+    // ----- Pi = ... torr -----
+    ctx.font = "18px Helvetica, Arial, sans-serif";
+    ctx.fillText("\u03A0 = " + Number(torr.toPrecision(3)) + " torr", px(0), py(-0.3));
+
+    // ----- M = ... Da (toggle) -----
+    if (state.showMW) {
+      ctx.font = "19.6px Helvetica, Arial, sans-serif";
+      var mwDisplay = (s === 3) ? Number(M[s]).toPrecision(3) : M[s];
+      ctx.fillText("M = " + mwDisplay + " Da", px(0), py(-1.3));
+    }
+  }
+
+  draw();
+})();
+</script>
+</body>
+</html>
