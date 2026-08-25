@@ -1,0 +1,3 @@
+.opacity-transition {
+    transition: opacity 1000ms ease-in;
+}
