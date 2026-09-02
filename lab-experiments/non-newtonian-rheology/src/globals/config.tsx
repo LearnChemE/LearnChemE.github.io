@@ -1,4 +1,4 @@
-import { easeInOutQuad, easeInQuad, easeOutQuad, linear, type AnimationSegmentDescriptor } from "./animate";
+import { easeInOutQuad, easeOutQuad, type AnimationSegmentDescriptor } from "./animate";
 
 export const RPM_MAX = 200;
 export const RPM_STEP = 10;
