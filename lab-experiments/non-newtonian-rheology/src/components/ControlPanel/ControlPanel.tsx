@@ -1,13 +1,15 @@
 import type { Accessor, Component, Setter } from "solid-js";
-import { repeatClick, RPM_MAX, RPM_STEP } from "../../globals";
+import { AnimationSequence, repeatClick, RPM_MAX, RPM_STEP } from "../../globals";
 
 type ControlPanelProps = {
     disabled: Accessor<boolean>;
     rpm: Accessor<number>;
     setRpm: Setter<number>;
+    transition: AnimationSequence;
 };
 
 export const ControlPanel: Component<ControlPanelProps> = (props) => {
+    const t = props.transition.createSolidSignal("rotate");
 
     const increase = () => {
         if (props.disabled()) return;
@@ -19,7 +21,7 @@ export const ControlPanel: Component<ControlPanelProps> = (props) => {
         props.setRpm(rpm => Math.max(rpm - RPM_STEP, 0));
     }
 
-    return (<g transform="translate(90, 22)">
+    return (<g transform={`translate(${90 + t() * 6}, ${22 - t() * 16})`}>
 
 <rect x="0.25" y="0.25" width="33.5" height="35.5" rx="1.75" fill="#888888" stroke="black" stroke-width="0.5"/>
 <path d="M2 23.25H32C32.9665 23.25 33.75 24.0335 33.75 25V34C33.75 34.9665 32.9665 35.75 32 35.75H2C1.0335 35.75 0.25 34.9665 0.25 34V25C0.25 24.0335 1.0335 23.25 2 23.25Z" fill="#CECECE" stroke="black" stroke-width="0.5"/>
