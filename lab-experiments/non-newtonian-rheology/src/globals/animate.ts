@@ -171,6 +171,11 @@ export class AnimationSequence extends AnimatorBase {
 
 export type EasingFn = (t: number) => number;
 
+export const linear: EasingFn = (t: number) => t;
+export const easeInQuad: EasingFn = (t: number) => t * t;
+export const easeOutQuad: EasingFn = (t: number) => t * (2 - t);
+export const easeInOutQuad: EasingFn = (t: number) => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+
 // export const createEaseIn = (easing: EasingFn, min = 0, max = 1): EasingFn => {
 //     return (t: number) => {
 //         const clamped = clamp(t);
