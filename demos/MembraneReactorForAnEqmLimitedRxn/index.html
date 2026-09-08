@@ -29,20 +29,31 @@
   .plotWrap{margin-top:12px;display:flex;justify-content:center;}
   canvas{display:block;}
   /* ---- action buttons ---- */
-  .actions{margin-top:14px;display:flex;gap:8px;}
+  .actionsWrap{margin-top:14px;position:relative;}
+  .actions{display:flex;gap:8px;position:relative;z-index:1;}
   .abtn{
-    font-family:var(--ui);font-size:13px;font-weight:bold;color:#7a0a0a;
-    background:linear-gradient(#ffffff,#efefef);border:1px solid #b9b9b9;border-radius:3px;
+    font-family:var(--ui);font-size:13px;font-weight:bold;color:#ffffff;
+    background:#b32020;border:1px solid #7a0a0a;border-radius:3px;
     padding:5px 14px;cursor:pointer;
   }
-  .abtn.active{background:linear-gradient(#f1d9d9,#e7c4c4);border-color:#a06b6b;}
+  .abtn.active{background:#8a1717;border-color:#5c0e0e;}
   .panel{
-    display:none;margin-top:10px;border:1px solid var(--line);background:#fff;
-    padding:14px 16px;border-radius:2px;line-height:1.5;font-size:14px;color:#111;
+    display:none;position:absolute;left:0;right:0;bottom:calc(100% + 8px);
+    border:1px solid var(--line);background:#fff;
+    padding:16px 34px 14px 16px;border-radius:2px;line-height:1.5;font-size:14px;color:#111;
+    box-shadow:0 4px 16px rgba(0,0,0,.2);
+    max-height:320px;overflow-y:auto;box-sizing:border-box;z-index:5;
   }
   .panel.show{display:block;}
   .panel a{color:#1463b8;text-decoration:none;}
   .panel a:hover{text-decoration:underline;}
+  .panel .closeX{
+    position:absolute;top:6px;right:8px;width:24px;height:24px;
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--ui);font-size:18px;line-height:1;color:#7a0a0a;
+    background:transparent;border:none;cursor:pointer;padding:0;
+  }
+  .panel .closeX:hover{color:#b32020;}
   /* math */
   .eq{font-family:var(--math);font-size:17px;margin:8px 0;}
   .eq .v{font-style:italic;}
@@ -95,13 +106,9 @@
     <canvas id="plot" width="550" height="375"></canvas>
   </div>
 
-  <div class="actions">
-    <div class="abtn" data-panel="pDir">Directions</div>
-    <div class="abtn" data-panel="pDet">Details</div>
-    <div class="abtn" data-panel="pAbo">About</div>
-  </div>
-
+  <div class="actionsWrap">
   <div class="panel" id="pDir">
+    <button class="closeX" type="button" aria-label="Close">&times;</button>
     The elementary reversible reaction <span class="imath">A</span>&thinsp;+&thinsp;<span class="imath">B</span>
     &#10231; <span class="imath">C</span>&thinsp;+&thinsp;<span class="imath">D</span> is carried out in a
     tubular membrane reactor, which combines reaction with separation. Higher conversions are obtained
@@ -118,6 +125,7 @@
   </div>
 
   <div class="panel" id="pDet">
+    <button class="closeX" type="button" aria-label="Close">&times;</button>
     <div>Material balances:</div>
 
     <div class="eq">
@@ -188,14 +196,22 @@
   </div>
 
   <div class="panel" id="pAbo">
+    <button class="closeX" type="button" aria-label="Close">&times;</button>
     This simulation was created in the
     <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a>
     at University of Colorado Boulder for
     <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a>
     by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a Mathematica
     simulation by Rachael L. Baumann. It was prepared with financial support from the National Science
-    Foundation (DUE 2336987 and 2336988) in collaboration with Washington State University. Address any
+    Foundation (DUE 2336987 and 2336988). Address any
     questions or comments to LearnChemE@gmail.com.
+  </div>
+
+  <div class="actions">
+    <div class="abtn" data-panel="pDir">Directions</div>
+    <div class="abtn" data-panel="pDet">Details</div>
+    <div class="abtn" data-panel="pAbo">About</div>
+  </div>
   </div>
 </div>
 
@@ -380,13 +396,22 @@ sKm.addEventListener('input',e=>{kmPerm=parseFloat(e.target.value);labels();rend
 sKeq.addEventListener('input',e=>{Keq=parseFloat(e.target.value);labels();render();});
 
 // action panels
+function closeAllPanels(){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('show'));
+  document.querySelectorAll('.abtn').forEach(a=>a.classList.remove('active'));
+}
 document.querySelectorAll('.abtn').forEach(b=>{
   b.addEventListener('click',()=>{
     const id=b.dataset.panel, panel=document.getElementById(id);
     const open=panel.classList.contains('show');
-    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('show'));
-    document.querySelectorAll('.abtn').forEach(a=>a.classList.remove('active'));
+    closeAllPanels();
     if(!open){ panel.classList.add('show'); b.classList.add('active'); }
+  });
+});
+document.querySelectorAll('.panel .closeX').forEach(x=>{
+  x.addEventListener('click',(e)=>{
+    e.stopPropagation();
+    closeAllPanels();
   });
 });
 
