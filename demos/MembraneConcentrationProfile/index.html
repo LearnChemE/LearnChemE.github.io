@@ -37,22 +37,21 @@
     -webkit-appearance:none; appearance:none;
     height:3px; background:#c8c8c8; border-radius:2px; outline:none;
     flex:0 0 300px;
+    margin-top: .8em;
   }
   .ctrl.half input[type=range]{ flex:0 0 150px; }
-  input[type=range]::-webkit-slider-thumb{
-    -webkit-appearance:none; appearance:none;
-    width:14px; height:14px; border-radius:50%;
-    background:#5a5a5a; cursor:pointer; border:none;
-  }
-  input[type=range]::-moz-range-thumb{
-    width:14px; height:14px; border-radius:50%;
-    background:#5a5a5a; cursor:pointer; border:none;
-  }
+input[type="range"]{
+  --accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+input[type="range"]::-moz-range-thumb{
+  width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+
 
   #canvasHolder{ text-align:center; }
   canvas{ display:block; margin:0 auto; }
 
-  #actions{ margin:-124px 0 0 465px; }
+  #actions{ position:relative; width:max-content; margin:-124px 0 0 465px; }
   .btnrow{ display:flex; gap:11px; }
   .btn{
     font-family:inherit; font-size:17px; color:#fff;
@@ -63,11 +62,22 @@
   .btn.active{ background:#650009; }
 
   .panel{
-    display:none; margin-top:6px; width:410px;
+    display:none; position:absolute; right:0; bottom:calc(100% + 6px); width:513px;
     border:1px solid var(--panelborder); border-radius:3px;
     padding:12px 16px; font-size:14px; line-height:1.5; background:#fff;
+    box-shadow:0 2px 8px rgba(0,0,0,0.15); z-index:20;
   }
   .panel.show{ display:block; }
+  .panel-close{
+    position:absolute; top:4px; right:8px; width:20px; height:20px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:19px; line-height:1; color:#666; background:#fff;
+    border:none; cursor:pointer; padding:0;
+  }
+  .panel-close:hover{ color:#000; }
+  .panel-body{ padding-right:14px; }
+  #det{ width:615px; }
+  #det .panel-body{ max-height:270px; overflow-y:auto; padding-right:10px; }
   .panel p{ margin:7px 0; }
   .panel a{ color:var(--darkred); text-decoration:none; }
   .panel a:hover{ text-decoration:underline; }
@@ -83,7 +93,6 @@
 <body>
 <div id="wrap">
   <div class="fig">
-  <!-- <div class="title">Membrane Concentration Profile</div> -->
 
   <div class="controls">
     <div class="ctrl full">
@@ -118,6 +127,8 @@
     </div>
 
   <div class="panel" id="dir">
+    <button class="panel-close" data-close="dir" aria-label="Close">&times;</button>
+    <div class="panel-body">
     <p>This simulation shows the concentration profiles on the feed and permeate sides
     of a membrane resulting from a diffusion boundary layer and the concentration profile
     inside the membrane. It also calculates the molar flux through the membrane. Use the
@@ -125,9 +136,12 @@
     membrane thickness. The feed concentration <i class="v">C</i><sub>1</sub> and the
     desired permeate concentration <i class="v">C</i><sub>2</sub> are set. Place your
     cursor over a black dot to see its concentration displayed on the right.</p>
+    </div>
   </div>
 
   <div class="panel" id="det">
+    <button class="panel-close" data-close="det" aria-label="Close">&times;</button>
+    <div class="panel-body">
     <p>The molar flux at steady state is calculated using the analog of series
     resistances. The flux through each layer is:</p>
 
@@ -197,9 +211,12 @@
       <span class="frac"><span class="num">1</span><span class="den"><i class="v">P</i></span></span> +
       <span class="frac"><span class="num">1</span><span class="den"><i class="v">k</i><sub>c,&#8202;2</sub></span></span>
       )<sup>&minus;1</sup></span>&thinsp;.</p>
+    </div>
   </div>
 
   <div class="panel" id="abt">
+    <button class="panel-close" data-close="abt" aria-label="Close">&times;</button>
+    <div class="panel-body">
     <p>This simulation was created in the
     <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a>
     at University of Colorado Boulder for
@@ -207,8 +224,9 @@
     by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a
     <a href="https://demonstrations.wolfram.com/MembraneConcentrationProfile/" target="_blank">Mathematica simulation</a>
     by Rachael L. Baumann. It was prepared with financial support from the National
-    Science Foundation (DUE 2336987 and 2336988) in collaboration with Washington State
-    University. Address any questions or comments to LearnChemE@gmail.com.</p>
+    Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to
+    LearnChemE@gmail.com.</p>
+    </div>
   </div>
   </div><!-- /#actions -->
 </div>
@@ -464,16 +482,20 @@
   });
   cv.addEventListener('mouseleave', ()=>{ if(hover!==-1){ hover=-1; render(); } });
 
-  // ---- panels (open just below the horizontal button row) ----
+  // ---- panels (open above the horizontal button row) ----
   const btns=document.querySelectorAll('.btn');
+  function closeAll(){
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('show'));
+    btns.forEach(x=>x.classList.remove('active'));
+  }
   btns.forEach(b=>b.addEventListener('click',()=>{
     const id=b.getAttribute('data-panel');
     const panel=document.getElementById(id);
     const isOpen=panel.classList.contains('show');
-    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('show'));
-    btns.forEach(x=>x.classList.remove('active'));
+    closeAll();
     if(!isOpen){ panel.classList.add('show'); b.classList.add('active'); }
   }));
+  document.querySelectorAll('.panel-close').forEach(x=>x.addEventListener('click',closeAll));
 
   refresh();
 })();

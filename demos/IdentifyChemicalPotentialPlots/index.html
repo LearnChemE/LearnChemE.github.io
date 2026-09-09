@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Identify Chemical Potential Plots</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(', '\\)']], displayMath: [['$$', '$$']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    font-family: Helvetica, Arial, sans-serif;
+    background-color: #ffffff;
+  }
+  #container {
+    width: 660px;
+    margin: 0 auto;
+    padding: 10px 0 30px 0;
+  }
+  h1.simTitle {
+    font-size: 22px;
+    font-weight: bold;
+    text-align: center;
+    margin: 6px 0 10px 0;
+    color: #000;
+  }
+  /* ---------- control rows ---------- */
+  .controlRow {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: nowrap;
+    gap: 8px;
+    margin: 4px 0;
+    position: relative;
+    font-size: 14px;
+  }
+  .mmaButton {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    font-weight: normal;
+    padding: 4px 12px;
+    border: 1px solid #999;
+    border-radius: 4px;
+    background: linear-gradient(#fdfdfd, #e8e8e8);
+    color: #000;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .mmaButton:hover:enabled { background: linear-gradient(#ffffff, #dddddd); }
+  .mmaButton:disabled { color: #aaa; cursor: default; }
+  #stepText {
+    font-size: 16.1px;
+    white-space: nowrap;
+  }
+  label.chk {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  label.chk input { cursor: pointer; }
+  #radioRow {
+    font-size: 16.1px;
+  }
+  #radioRow label {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    margin-right: 6px;
+    cursor: pointer;
+  }
+  input {  accent-color: #98000D; }
+  /* ---------- panel buttons (Directions / Details / About) ---------- */
+  .panelButtons {
+    display: flex;
+    gap: 6px;
+  }
+  #profileControls {
+    margin-left: auto;
+  }
+  .panelBtn {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    font-weight: normal;
+    padding: 5px 12px;
+    border: none;
+    border-radius: 4px;
+    background-color: #98000D;
+    color: #ffffff;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .panelBtn:hover { background-color: #b81020; }
+  /* ---------- flyout panels ---------- */
+  .flyout {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 6px;
+    box-sizing: border-box;
+    width: 620px;
+    background: #ffffff;
+    border: 1px solid #888;
+    border-radius: 6px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.30);
+    padding: 14px 18px;
+    z-index: 50;
+    font-size: 14.5px;
+    line-height: 1.45;
+    text-align: left;
+  }
+  .flyout.open { display: block; }
+  .flyout .closeX {
+    position: absolute;
+    top: 6px;
+    right: 10px;
+    border: none;
+    background: none;
+    font-size: 20px;
+    line-height: 1;
+    color: #555;
+    cursor: pointer;
+    font-family: Helvetica, Arial, sans-serif;
+  }
+  .flyout .closeX:hover { color: #98000D; }
+  .flyout h2 {
+    margin: 0 0 8px 0;
+    font-size: 16px;
+    color: #98000D;
+  }
+  .flyout p { margin: 8px 0; }
+  .flyout a { color: #0044cc; }
+  /* ---------- canvas ---------- */
+  #plotWrap {
+    position: relative;
+    margin-top: 6px;
+  }
+  canvas#plot {
+    display: block;
+    margin: 0 auto;
+    border: 0;
+  }
+</style>
+</head>
+<body>
+<div id="container">
+  <div class="controlRow" id="buttonRow">
+    <button class="mmaButton" id="newProblemBtn">new problem</button>
+    <span id="stepText"></span>
+    <label class="chk" id="solutionLabel"><input type="checkbox" id="solutionChk"> solution</label>
+    <button class="mmaButton" id="nextBtn" disabled>next</button>
+  </div>
+
+  <div class="controlRow" id="radioRow">
+    <div class="panelButtons">
+      <button class="panelBtn" id="btnDirections">Directions</button>
+      <button class="panelBtn" id="btnDetails">Details</button>
+      <button class="panelBtn" id="btnAbout">About</button>
+    </div>
+
+    <span id="profileControls">
+      <span id="profileLabel">select a profile:</span>
+      <span id="radioGroup"></span>
+    </span>
+    <div class="flyout" id="panelDirections">
+      <button class="closeX" aria-label="close">&times;</button>
+      <h2>Directions</h2>
+      <p>Use this simulation to practice identifying the relative slope of chemical potential versus temperature or pressure for various liquids, solids and vapors. The simulation randomizes what exactly you have to identify. After guessing, you can see the correct answer with the &ldquo;solution&rdquo; checkbox. You must select the solution box before moving to the next step. You can click &ldquo;new problem&rdquo; at any time. Test your knowledge of how chemical potential relates to temperature, pressure and phase. In combination with other learning methods, self-testing is an effective way of internalizing complex thermodynamic concepts.</p>
+    </div>
+
+    <div class="flyout" id="panelDetails">
+      <button class="closeX" aria-label="close">&times;</button>
+      <h2>Details</h2>
+      <p>The chemical potential \(\mu\) (J/(K-mol)) is equal to the Gibbs free energy \(G\) for a single component. The differential of the chemical potential and Gibbs free energy is:</p>
+      <p>$$d\mu = dG = V\,dP - S\,dT,$$</p>
+      <p>where \(V\) is volume, \(P\) is pressure, \(S\) is entropy and \(T\) is temperature.</p>
+      <p>The slope of \(\mu\) versus pressure is proportional to the specific volume \(V\) at constant temperature. The slope of \(\mu\) versus temperature is proportional to the negative of the entropy at constant pressure. Thus, the slope of the vapor chemical potential line versus pressure at constant temperature will be orders of magnitude steeper than the slope of the solid or liquid chemical potential lines versus pressure. Likewise, a chemical in its vapor state has a higher entropy than its liquid state, so the slope of the vapor line versus temperature at constant pressure will be steeper than the solid or liquid lines.</p>
+      <p>All compounds exist in the phase with the lowest chemical potential for that temperature and pressure. As such, the intersection of two chemical potential lines for different phases represents the boiling point, melting point, sublimation point or triple point [1].</p>
+      <p><b>Reference</b></p>
+      <p>[1] P. W. Atkins and J. de Paula, <i>Atkins' Physical Chemistry</i>, 8th ed., New York: Oxford University Press, 2006.</p>
+    </div>
+
+    <div class="flyout" id="panelAbout">
+      <button class="closeX" aria-label="close">&times;</button>
+      <h2>About</h2>
+      <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/IdentifyChemicalPotentialPlots/" target="_blank" rel="noopener">Mathematica simulation</a> by Neil Hendren. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.</p>
+    </div>
+  </div>
+
+  <div id="plotWrap">
+    <canvas id="plot"></canvas>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ============================== state ============================== */
+  var state = {
+    reset: 1,        // seed counter (incremented by "new problem")
+    steps: 1,        // 1..4
+    solution: false, // "solution" checkbox
+    ans: 'A',        // currently selected letter (initially none matches until set)
+    selected: null,  // letter selected by user, null = none
+    TP: 1,           // 1 = temperature plot, 2 = pressure plot
+    plot: 1,         // 1 = solid/liquid (melting), 2 = liquid/vapor (boiling)
+    fluid: 1         // 1 = water, 2 = ethanol
+  };
+
+  /* colors from the Mathematica source */
+  var colL = 'rgb(0,0,255)';        /* liquid  : Blue            */
+  var colV = 'rgb(0,153,0)';        /* vapor   : RGBColor[0,0.6,0] */
+  var colS = 'rgb(255,26,0)';       /* solid   : RGBColor[1,0.1,0] */
+  var colSalt = 'rgb(0,0,0)';       /* salt water : Black         */
+
+  /* ==================== seeded random (SeedRandom) ==================== */
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = a + 0x6D2B79F5 | 0;
+      var t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+  function shuffledLetters(n, seed) {
+    var rng = mulberry32(seed * 7919 + 13);
+    var arr = ['A', 'B', 'C'].slice(0, n);
+    for (var i = arr.length - 1; i > 0; i--) {
+      var j = Math.floor(rng() * (i + 1));
+      var tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+    }
+    return arr;
+  }
+  /* number of answer choices, mirroring the Which[] in the CDF */
+  function optionCount() {
+    if (state.TP === 1) return 3;
+    if (state.plot === 1) return (state.steps === 1) ? 2 : 3;
+    /* TP 2, plot 2 */
+    return (state.steps <= 2) ? 2 : 3;
+  }
+  function currentOptions() {
+    return shuffledLetters(optionCount(), state.reset);
+  }
+
+  /* ==================== candidate line definitions ==================== */
+  /* each line: {m: slope, b: intercept};  first entry is always correct  */
+  function lineSets() {
+    var t = state.TP, p = state.plot, f = state.fluid;
+    if (t === 1 && p === 1) return {
+      ans1: [{m:-0.4,b:0},{m:0.4,b:0},{m:0,b:0}],
+      ans2: [{m:-1.1,b:0},{m:-0.2,b:0},{m:0.3,b:0}],
+      ans3: [{m:-1.1,b:-0.2},{m:0.8,b:0},{m:-0.7,b:0}]
+    };
+    if (t === 1 && p === 2) return {
+      ans1: [{m:-0.25,b:0},{m:0.25,b:0},{m:0,b:0}],
+      ans2: [{m:-0.6,b:0},{m:-0.05,b:0},{m:0.6,b:0}],
+      ans3: [{m:-0.25,b:-0.2},{m:1.5,b:0},{m:-1.5,b:0}]
+    };
+    if (t === 2 && p === 1 && f === 1) return {
+      ans1: [{m:0.8,b:0},{m:-0.8,b:0}],
+      ans2: [{m:0.4,b:0},{m:1.2,b:0},{m:-0.4,b:0}],
+      ans3: [{m:0.4,b:-0.15},{m:-1.3,b:0},{m:1.3,b:0}]
+    };
+    if (t === 2 && p === 1 && f === 2) return {
+      ans1: [{m:0.7,b:0},{m:-0.7,b:0}],
+      ans2: [{m:1,b:0},{m:0.4,b:0},{m:-0.4,b:0}],
+      ans3: [{m:1,b:-0.15},{m:2.5,b:0},{m:0.2,b:0}]
+    };
+    /* t === 2 && p === 2 */
+    return {
+      ans1: [{m:0.1,b:0},{m:-0.1,b:0}],
+      ans2: [{m:1,b:0},{m:-1,b:0}],
+      ans3: [{m:0.1,b:-0.2},{m:2,b:0},{m:-0.3,b:0}]
+    };
+  }
+  function evalLine(L, x) { return L.m * x + L.b; }
+
+  /* ============ range[] : plotting segments + arrow endpoints ============ */
+  /* returns { seg: [[x0,x1] x4], a1: [[x,y],[x,y]], a2: [[x,y],[x,y]] }   */
+  function rangeFn() {
+    var t = state.TP, p = state.plot, st = state.steps, f = state.fluid;
+    var full = [-1, 1];
+    var def = {
+      seg: [full.slice(), full.slice(), full.slice(), full.slice()],
+      a1: [[0, -0.6], [0, 0]],
+      a2: [[0, 0.6], [0, 0]]
+    };
+    if (t === 1 && p === 1) {
+      if (st === 3) { def.seg[0] = [-1, 0]; def.seg[1] = [0, 1]; }
+      if (st === 4) {
+        def.seg[0] = [-1, 0]; def.seg[1] = [0, 1];
+        def.seg[2] = [-1, -0.286]; def.seg[3] = [-0.286, 1];
+        def.a1 = [[-0.286, -0.6], [-0.286, 0.1]];
+      }
+    } else if (t === 1 && p === 2) {
+      if (st === 3) { def.seg[0] = [-1, 0]; def.seg[1] = [0, 1]; }
+      if (st === 4) {
+        def.seg[0] = [-1, 0]; def.seg[1] = [0, 1];
+        def.seg[2] = [0.57, 1]; def.seg[3] = [-1, 0.57];
+        def.a1 = [[0.57, -0.8], [0.57, -0.35]];
+      }
+    } else if (t === 2 && p === 1 && f === 1) {
+      if (st === 3) { def.seg[0] = [-1, 0]; def.seg[1] = [0, 1]; }
+      if (st === 4) {
+        def.seg[0] = [-1, 0]; def.seg[1] = [0, 1];
+        def.seg[2] = [-1, -0.375]; def.seg[3] = [-0.375, 1];
+        def.a1 = [[-0.375, -0.8], [-0.375, -0.3]];
+      }
+    } else if (t === 2 && p === 1 && f === 2) {
+      if (st === 3) { def.seg[0] = [0, 1]; def.seg[1] = [-1, 0]; }
+      if (st === 4) {
+        def.seg[0] = [0, 1]; def.seg[1] = [-1, 0];
+        def.seg[2] = [0.5, 1]; def.seg[3] = [-1, 0.5];
+      }
+    } else { /* t === 2 && p === 2 */
+      if (st === 3) { def.seg[0] = [0, 1]; def.seg[1] = [-1, 0]; }
+      if (st === 4) {
+        def.seg[0] = [0, 1]; def.seg[1] = [-1, 0];
+        def.seg[2] = [-1, -0.22]; def.seg[3] = [-0.22, 1];
+        def.a1 = [[-0.22, -0.8], [-0.22, -0.24]];
+      }
+    }
+    return def;
+  }
+
+  /* color of the framed answer letters */
+  function circleColor() {
+    var p = state.plot, st = state.steps;
+    if (p === 1 && st === 1) return colS;
+    if ((p === 1 && st === 2) || (p === 2 && st === 1)) return colL;
+    if (p === 2 && st === 2) return colV;
+    return colSalt;
+  }
+
+  /* ============================== canvas ============================== */
+  var canvas = document.getElementById('plot');
+  var cssW = 660, cssH = 470;
+  var margin = { left: 55, right: 15, top: 15, bottom: 52 };
+  var dpr = window.devicePixelRatio || 1;
+  canvas.width = cssW * dpr;
+  canvas.height = cssH * dpr;
+  canvas.style.width = cssW + 'px';
+  canvas.style.height = cssH + 'px';
+  var ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  var pw = cssW - margin.left - margin.right;
+  var ph = cssH - margin.top - margin.bottom;
+  function X(x) { return margin.left + (x + 1) / 2 * pw; }
+  function Y(y) { return margin.top + (1 - y) / 2 * ph; }
+
+  function drawSeg(L, x0, x1, color, width, dashed, alpha) {
+    ctx.save();
+    ctx.globalAlpha = (alpha === undefined) ? 1 : alpha;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    ctx.setLineDash(dashed ? [10, 7] : []);
+    ctx.beginPath();
+    ctx.moveTo(X(x0), Y(evalLine(L, x0)));
+    ctx.lineTo(X(x1), Y(evalLine(L, x1)));
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawArrow(p0, p1) {
+    var x0 = X(p0[0]), y0 = Y(p0[1]), x1 = X(p1[0]), y1 = Y(p1[1]);
+    ctx.save();
+    ctx.strokeStyle = '#000';
+    ctx.fillStyle = '#000';
+    ctx.lineWidth = 1.4;
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    ctx.moveTo(x0, y0);
+    ctx.lineTo(x1, y1);
+    ctx.stroke();
+    var ang = Math.atan2(y1 - y0, x1 - x0);
+    var ah = 10;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x1 - ah * Math.cos(ang - 0.42), y1 - ah * Math.sin(ang - 0.42));
+    ctx.lineTo(x1 - ah * Math.cos(ang + 0.42), y1 - ah * Math.sin(ang + 0.42));
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  /* text (possibly multiline) with white background, centered on (x, y) world coords */
+  function bgText(lines, wx, wy, color, fontPx, bold) {
+    if (!(lines instanceof Array)) lines = [lines];
+    ctx.save();
+    ctx.font = (bold ? 'bold ' : '') + fontPx + 'px Helvetica, Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    var lh = fontPx * 1.15;
+    var w = 0;
+    for (var i = 0; i < lines.length; i++) w = Math.max(w, ctx.measureText(lines[i]).width);
+    var h = lh * lines.length;
+    var cx = X(wx), cy = Y(wy);
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(cx - w / 2 - 3, cy - h / 2 - 1, w + 6, h + 2);
+    ctx.fillStyle = color;
+    for (var k = 0; k < lines.length; k++) {
+      ctx.fillText(lines[k], cx, cy - h / 2 + lh * (k + 0.5));
+    }
+    ctx.restore();
+  }
+
+  /* framed rounded letter (answer option) centered on world coords */
+  function framedLetter(letter, wx, wy, color, selected) {
+    var fontPx = selected ? 24 : 17;
+    ctx.save();
+    ctx.font = (selected ? 'bold ' : '') + fontPx + 'px Helvetica, Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    var tw = ctx.measureText(letter).width;
+    var padX = 9, padY = 4;
+    var w = tw + 2 * padX, h = fontPx + 2 * padY;
+    var r = Math.min(15, h / 2);
+    var cx = X(wx), cy = Y(wy);
+    ctx.beginPath();
+    ctx.moveTo(cx - w / 2 + r, cy - h / 2);
+    ctx.arcTo(cx + w / 2, cy - h / 2, cx + w / 2, cy + h / 2, r);
+    ctx.arcTo(cx + w / 2, cy + h / 2, cx - w / 2, cy + h / 2, r);
+    ctx.arcTo(cx - w / 2, cy + h / 2, cx - w / 2, cy - h / 2, r);
+    ctx.arcTo(cx - w / 2, cy - h / 2, cx + w / 2, cy - h / 2, r);
+    ctx.closePath();
+    ctx.fillStyle = '#fff';
+    ctx.fill();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1.4;
+    ctx.setLineDash([]);
+    ctx.stroke();
+    ctx.fillStyle = color;
+    ctx.fillText(letter, cx, cy + 1);
+    ctx.restore();
+  }
+
+  function draw() {
+    var L = lineSets();
+    var R = rangeFn();
+    var st = state.steps, p = state.plot, t = state.TP, f = state.fluid;
+    var sol = state.solution;
+    var options = currentOptions();
+
+    ctx.clearRect(0, 0, cssW, cssH);
+
+    /* frame */
+    ctx.save();
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(margin.left, margin.top, pw, ph);
+    ctx.restore();
+
+    /* axis labels: 17 increased 15% -> 19.6, identical font for x and y */
+    ctx.save();
+    ctx.fillStyle = '#000';
+    ctx.font = '19.6px Helvetica, Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(t === 1 ? 'temperature' : 'pressure', margin.left + pw / 2, cssH - 22);
+    ctx.translate(20, margin.top + ph / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText('chemical potential', 0, 0);
+    ctx.restore();
+
+    /* clip everything else to the plot rectangle */
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(margin.left, margin.top, pw, ph);
+    ctx.clip();
+
+    /* ---- dashed candidate lines for the current step ---- */
+    if (st < 4) {
+      var cand = (st === 1) ? L.ans1 : (st === 2) ? L.ans2 : L.ans3;
+      var candCol = (st === 3) ? colSalt :
+        (st === 1 ? (p === 1 ? colS : colL) : (p === 1 ? colL : colV));
+      for (var i = 0; i < cand.length; i++) {
+        drawSeg(cand[i], -1, 1, candCol, 2.5, true);
+      }
+    }
+
+    /* ---- solution line for steps 1 and 2 ---- */
+    if (sol && (st === 1 || st === 2)) {
+      var solCol = (st === 1) ? (p === 1 ? colS : colL) : (p === 1 ? colL : colV);
+      drawSeg((st === 1 ? L.ans1 : L.ans2)[0], -1, 1, solCol, 3, false);
+    }
+
+    /* ---- previously-identified lines drawn on their stability ranges ---- */
+    var dash4 = (st === 4);
+    if (st >= 2) {
+      var c1 = (p === 1) ? colS : colL;
+      drawSeg(L.ans1[0], R.seg[0][0], R.seg[0][1], c1, 3, false);
+      drawSeg(L.ans1[0], R.seg[1][0], R.seg[1][1], c1, 3, dash4, 0.4);
+    }
+    if (st >= 3) {
+      var c2 = (p === 1) ? colL : colV;
+      drawSeg(L.ans2[0], R.seg[1][0], R.seg[1][1], c2, 3, false);
+      drawSeg(L.ans2[0], R.seg[0][0], R.seg[0][1], c2, 3, dash4, 0.4);
+    }
+    if (f === 1) {
+      if (st === 4) {
+        drawSeg(L.ans3[0], R.seg[2][0], R.seg[2][1], colSalt, 3, true, 0.4);
+      }
+      if ((sol && st === 3) || st === 4) {
+        drawSeg(L.ans3[0], R.seg[3][0], R.seg[3][1], colSalt, 3, false);
+      }
+    }
+
+    /* ---- vertical melting/boiling point line ---- */
+    if ((st > 1 && st <= 3) || (st === 4 && f === 2)) {
+      ctx.save();
+      ctx.strokeStyle = '#000';
+      ctx.lineWidth = 1.2;
+      ctx.setLineDash([]);
+      ctx.beginPath();
+      ctx.moveTo(X(0), Y(-1));
+      ctx.lineTo(X(0), Y(1));
+      ctx.stroke();
+      ctx.restore();
+      bgText(p === 1 ? 'melting point' : 'boiling point', 0, -0.85, '#000', 19.6);
+    }
+
+    /* ---- step 4 arrows and point labels (water / salt water) ---- */
+    if (st === 4 && f === 1) {
+      drawArrow(R.a1[0], R.a1[1]);
+      drawArrow(R.a2[0], R.a2[1]);
+      var base;
+      if (p === 1 && t === 1) base = ['melting point'];
+      else if (p === 2 && t === 1) base = ['boiling point'];
+      else if (p === 1 && t === 2) base = ['isothermal melting', 'pressure'];
+      else base = ['isothermal boiling', 'pressure'];
+      var waterLines = base.slice();
+      waterLines[waterLines.length - 1] += ' of water';
+      var saltLines = base.slice();
+      saltLines[saltLines.length - 1] += ' of salt water';
+      bgText(waterLines, 0, 0.6, '#000', 19.6);
+      bgText(saltLines, R.a1[0][0], R.a1[0][1], '#000', 19.6);
+    }
+
+    /* ---- framed answer letters ---- */
+    if (st < 4) {
+      var cc = circleColor();
+      var n = options.length;
+      for (var k = 1; k <= n; k++) {
+        var lx, ly;
+        if (st === 1) {
+          lx = 0.8;
+          ly = evalLine(L.ans1[k - 1], 0.8);
+        } else if (st === 2) {
+          lx = (p === 2 && t === 2 && k !== 3) ? 0.3 : 0.7;
+          ly = evalLine(L.ans2[k - 1], lx);
+        } else {
+          if (p === 1 && t === 1) lx = 0.6;
+          else if (p === 1 && t === 2 && f === 1) lx = 0.5 * Math.sin(0.6 * Math.PI * k) - 0.3;
+          else if (p === 1 && t === 2 && f === 2) lx = -0.8 + 0.5 * k;
+          else if (p === 2 && t === 1) lx = 1 - 0.4 * k;
+          else lx = 1.5 - 0.6 * k;
+          ly = evalLine(L.ans3[k - 1], lx);
+        }
+        var letter = options[k - 1];
+        framedLetter(letter, lx, ly, cc, letter === state.selected);
+      }
+    }
+
+    /* ---- phase labels ---- */
+    /* first identified line (solid for melting plots, liquid for boiling plots) */
+    if ((st === 1 && sol) || st > 1) {
+      if (p === 1 && t === 2 && f === 2) {
+        var sx = (st === 1) ? 0.55 : 0.75;
+        bgText((st < 4 || f === 2) ? 'solid' : 'ice', sx, evalLine(L.ans1[0], sx), colS, 19.6);
+      } else if (p === 1) {
+        bgText((st < 4 || f === 2) ? 'solid' : 'ice', -0.6, evalLine(L.ans1[0], -0.6), colS, 19.6);
+      } else if (t === 1 && p === 2) {
+        bgText((st < 4 || f === 2) ? 'liquid' : 'water', -0.6, evalLine(L.ans1[0], -0.6), colL, 19.6);
+      } else if (t === 2 && p === 2) {
+        bgText((st < 4 || f === 2) ? 'liquid' : 'water', 0.4, evalLine(L.ans1[0], 0.4), colL, 19.6);
+      }
+    }
+    /* second identified line (liquid for melting plots, vapor for boiling plots) */
+    if ((st === 2 && sol) || st >= 3) {
+      if (p === 1 && f === 2 && t === 2) {
+        bgText('liquid', -0.5, evalLine(L.ans2[0], -0.5), colL, 19.6);
+      } else if (p === 1) {
+        bgText((st < 4 || f === 2) ? 'liquid' : 'water', 0.5, evalLine(L.ans2[0], 0.5), colL, 19.6);
+      } else if (t === 1 && p === 2) {
+        bgText('vapor', 0.3, evalLine(L.ans2[0], 0.3), colV, 19.6);
+      } else if (t === 2 && p === 2) {
+        bgText('vapor', -0.6, evalLine(L.ans2[0], -0.6), colV, 19.6);
+      }
+    }
+    /* salt water line */
+    if ((st === 3 && sol) || (st === 4 && f === 1)) {
+      var qx, qy;
+      if (p === 1 && t === 1) { qx = 0.2; qy = 0.2; }
+      else if (p === 2 && t === 1) { qx = -0.7; qy = -0.7; }
+      else if (p === 1 && t === 2 && f === 1) { qx = 0.7; qy = 0.7; }
+      else if (p === 1 && t === 2 && f === 2) { qx = -0.5; qy = -0.6; }
+      else { qx = 0.4; qy = 0.4; }
+      bgText('salt water', qx, evalLine(L.ans3[0], qy), colSalt, 19.6);
+    }
+
+    ctx.restore(); /* end clip */
+  }
+
+  /* ============================== controls ============================== */
+  var stepTextEl = document.getElementById('stepText');
+  var solutionChk = document.getElementById('solutionChk');
+  var solutionLabel = document.getElementById('solutionLabel');
+  var nextBtn = document.getElementById('nextBtn');
+  var profileControls = document.getElementById('profileControls');
+  var radioGroup = document.getElementById('radioGroup');
+
+  function stepText() {
+    var st = state.steps, p = state.plot, f = state.fluid;
+    if (st === 4) return (f === 2 ? '3.' : '4.') + ' View the solution.';
+    if (st === 3) return '3. Select chemical potential line for salt water.';
+    if (p === 1) {
+      if (st === 1) return '1. Select chemical potential line for ' + (f === 1 ? 'ice.' : 'solid ethanol.');
+      return '2. Select chemical potential line for ' + (f === 1 ? 'liquid water.' : 'liquid ethanol.');
+    }
+    if (st === 1) return '1. Select chemical potential line for ' + (f === 1 ? 'liquid water.' : 'liquid ethanol.');
+    return '2. Select chemical potential line for ' + (f === 1 ? 'water vapor.' : 'ethanol vapor.');
+  }
+
+  function renderControls() {
+    stepTextEl.textContent = stepText();
+    var quiz = state.steps < 4;
+    solutionLabel.style.visibility = quiz ? 'visible' : 'hidden';
+    nextBtn.style.visibility = quiz ? 'visible' : 'hidden';
+    profileControls.style.visibility = quiz ? 'visible' : 'hidden';
+    solutionChk.checked = state.solution;
+    solutionChk.disabled = state.solution; /* disabled once checked, as in the CDF */
+    nextBtn.disabled = !state.solution;
+
+    /* rebuild radio buttons */
+    radioGroup.innerHTML = '';
+    var options = ['A', 'B', 'C', 'D', 'E'].slice(0, optionCount());
+    options.forEach(function (letter) {
+      var lab = document.createElement('label');
+      var rb = document.createElement('input');
+      rb.type = 'radio';
+      rb.name = 'profile';
+      rb.value = letter;
+      rb.checked = (state.selected === letter);
+      rb.disabled = state.solution;
+      rb.addEventListener('change', function () {
+        state.selected = letter;
+        draw();
+      });
+      lab.appendChild(rb);
+      lab.appendChild(document.createTextNode(letter));
+      radioGroup.appendChild(lab);
+    });
+  }
+
+  /* keep Directions button directly under the "new problem" button */
+  function positionPanelButtons() {
+    var containerRect = document.getElementById('container').getBoundingClientRect();
+    var npRect = document.getElementById('newProblemBtn').getBoundingClientRect();
+    var offset = Math.max(0, Math.round(npRect.left - containerRect.left));
+    var pb = document.querySelector('.panelButtons');
+    pb.style.marginLeft = offset + 'px';
+    var w = Math.round(containerRect.width - offset);
+    ['panelDirections', 'panelDetails', 'panelAbout'].forEach(function (id) {
+      var el = document.getElementById(id);
+      el.style.left = offset + 'px';
+      el.style.width = w + 'px';
+    });
+  }
+
+  function update() {
+    renderControls();
+    draw();
+    positionPanelButtons();
+  }
+  window.addEventListener('load', positionPanelButtons);
+  window.addEventListener('resize', positionPanelButtons);
+
+  document.getElementById('newProblemBtn').addEventListener('click', function () {
+    state.reset += 1;
+    state.steps = 1;
+    state.solution = false;
+    state.selected = 'A';
+    state.TP = Math.random() < 0.5 ? 1 : 2;
+    state.fluid = Math.random() < 0.5 ? 1 : 2;
+    state.plot = Math.random() < 0.5 ? 1 : 2;
+    update();
+  });
+
+  solutionChk.addEventListener('change', function () {
+    if (solutionChk.checked) {
+      state.solution = true;
+      update();
+    }
+  });
+
+  nextBtn.addEventListener('click', function () {
+    if ((state.steps >= 1 && state.steps < 4 && state.fluid === 1) ||
+        (state.steps !== 2 && state.fluid === 2)) {
+      state.steps += 1;
+    } else {
+      state.steps = 4;
+    }
+    state.solution = false;
+    state.selected = 'A';
+    update();
+  });
+
+  /* ====================== flyout panels ====================== */
+  var panels = {
+    btnDirections: 'panelDirections',
+    btnDetails: 'panelDetails',
+    btnAbout: 'panelAbout'
+  };
+  function closeAllPanels() {
+    Object.keys(panels).forEach(function (b) {
+      document.getElementById(panels[b]).classList.remove('open');
+    });
+  }
+  Object.keys(panels).forEach(function (btnId) {
+    var btn = document.getElementById(btnId);
+    var panel = document.getElementById(panels[btnId]);
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var isOpen = panel.classList.contains('open');
+      closeAllPanels();
+      if (!isOpen) {
+        panel.classList.add('open');
+        if (window.MathJax && window.MathJax.typesetPromise) {
+          window.MathJax.typesetPromise([panel]);
+        }
+      }
+    });
+    panel.querySelector('.closeX').addEventListener('click', function () {
+      panel.classList.remove('open');
+    });
+  });
+
+  /* initial render */
+  state.selected = null; /* nothing selected until "new problem" / user click */
+  update();
+})();
+</script>
+</body>
+</html>

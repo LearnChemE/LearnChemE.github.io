@@ -28,8 +28,13 @@
   }
   select{font-family:Helvetica,Arial,sans-serif;font-size:15px;padding:3px 4px;
     border:1px solid #b5b5b5;border-radius:3px;background:#fff;width:240px;}
-  input[type=range]{accent-color:#98000d;}
-  canvas{display:block;}
+input[type="range"]{
+  --accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+input[type="range"]::-moz-range-thumb{
+  width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+canvas{display:block;}
   .btnrow{margin:8px 0;text-align:left;}
   .lcbtn{
     font-family:Helvetica,Arial,sans-serif;font-size:16.8px;font-weight:normal;
@@ -43,8 +48,6 @@
     border:1px solid #b8b8b8;background:#fbfbfb;border-radius:3px;
     box-shadow:0 3px 10px rgba(0,0,0,0.22);
     padding:12px 16px;font-size:16.8px;line-height:1.5;color:#111;
-    overflow-y: auto;
-    max-height: 100%;
   }
   .closebtn{
     position:absolute;top:5px;right:9px;cursor:pointer;
@@ -54,6 +57,8 @@
   .closebtn:hover{color:#000;}
   .panel p:first-of-type{margin-right:14px;}
   .panel.show{display:block;}
+  #panelDet{max-height:420px;overflow-y:auto;}
+  #panelDet .closebtn{right:22px;top:6px;}
   .panel p{margin:0 0 9px 0;}
   .panel .eq{margin:7px 0 7px 18px;font-style:italic;}
   .panel a{color:#98000d;text-decoration:none;}
@@ -163,7 +168,7 @@
     by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a
     <a href="https://demonstrations.wolfram.com/MultistageBatchDistillationWithAzeotrope/" target="_blank">Mathematica simulation</a>
     by Neil Hendren. It was prepared with financial support from the National Science Foundation
-    (DUE 2336987 and 2336988) in collaboration with Washington State University. Address any questions or
+    (DUE 2336987 and 2336988). Address any questions or
     comments to LearnChemE@gmail.com.</p>
   </div>
 </div>
@@ -540,12 +545,20 @@
         document.getElementById(pr[0]).classList.remove('active');
       });
       if(!isShown){
-        // place the panel just to the right of its button, starting a few pixels below it
-        var left=btn.offsetLeft + btn.offsetWidth + 6;
-        var top =btn.offsetTop + 4;
-        var usableRight=app.clientWidth - 10;      // keep inside right padding
-        var w=460;
-        if(left + w > usableRight) w=Math.max(280, usableRight - left);
+        // open the panel directly below its button, a few pixels down
+        var left=btn.offsetLeft;
+        var top =btn.offsetTop + btn.offsetHeight + 4;
+        var w = (panelId==='panelDet') ? 598 : 460;   // Details panel 30% wider
+        // keep the panel within the browser window (it may extend past the app box)
+        var appRect=app.getBoundingClientRect();
+        var maxRightVp=window.innerWidth - 8;
+        var vpLeft=appRect.left + left;
+        if(vpLeft + w > maxRightVp){
+          var shift=(vpLeft + w) - maxRightVp;   // first slide the panel left
+          left=Math.max(4, left - shift);
+          vpLeft=appRect.left + left;
+          if(vpLeft + w > maxRightVp) w=Math.max(300, maxRightVp - vpLeft); // then shrink if needed
+        }
         pan.style.left=left+'px';
         pan.style.top =top+'px';
         pan.style.width=w+'px';

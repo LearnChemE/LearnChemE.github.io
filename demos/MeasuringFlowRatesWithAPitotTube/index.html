@@ -4,20 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Measuring Flow Rates with a Pitot Tube</title>
-<script>
-    MathJax = {
-        chtml: {
-            scale: 1.2,
-            mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
-            displayAlign: 'left', // default for indentalign when set to 'auto'
-        },
-        tex: {
-            inlineMath: [['$', '$'], ['\\(', '\\)']],
-            displayMath: [['$$', '$$'], ['\\[', '\\]']]
-        }
-    };
-</script>
-<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <style>
   :root{
     --ui: "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -64,38 +50,53 @@
   }
   .ctrl .lbl .u{font-style:normal;}
   .ctrl input[type=range]{
-    flex:1 1 auto;height:18px;cursor:pointer;
+    flex:1 1 auto;cursor:pointer;
     accent-color:#5a8bd6;
+    margin-top: .8em;
   }
   .ctrl .val{
-    flex:0 0 auto;width:54px;margin-left:10px;
+    width:54px;margin-left:10px;
     font-family:var(--ui);font-size:15px;text-align:center;
     background:#fff;border:1px solid #b6b6b6;border-radius:3px;
     padding:2px 0;color:#222;
-  }
+  }  
+  /* slider */
+  input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
   .hidden{display:none !important;}
   /* ---- plot ---- */
   .plotWrap{margin-top:12px;display:flex;justify-content:center;}
   canvas{display:block;}
   /* ---- action buttons ---- */
-  .actions{margin-top:14px;display:flex;justify-content:center;gap:8px;}
+  .footer{position:relative;margin-top:14px;}
+  .panelHost{position:absolute;bottom:100%;left:0;right:0;margin-bottom:8px;}
+  .actions{display:flex;justify-content:center;gap:8px;}
   .abtn{
-    font-family:var(--ui);font-size:13px;font-weight:bold;
-    color:#7a0a0a;background:linear-gradient(#ffffff,#efefef);
-    border:1px solid #b9b9b9;border-radius:3px;
-    padding:5px 14px;cursor:pointer;
+    font-family:var(--ui);font-size:15.6px;font-weight:normal;
+    color:#ffffff;background:#98000D;
+    border:1px solid #98000D;border-radius:3px;
+    padding:5px 15px;cursor:pointer;
   }
-  .abtn.active{background:linear-gradient(#f1d9d9,#e7c4c4);border-color:#a06b6b;}
+  .abtn.active{background:#6f000a;border-color:#6f000a;}
   .panel{
-    display:none;margin-top:10px;border:1px solid var(--line);
+    display:none;position:relative;border:1px solid #bcbcbc;
     background:#fff;padding:14px 16px;border-radius:2px;
     line-height:1.5;font-size:14px;color:#111;
+    max-height:358px;overflow-y:auto;
+    box-shadow:0 3px 12px rgba(0,0,0,.20);
   }
   .panel.show{display:block;}
   .panel a{color:#1463b8;text-decoration:none;}
   .panel a:hover{text-decoration:underline;}
+  .pclose{
+    position:sticky;top:0;float:right;margin:-4px -8px 6px 12px;
+    width:24px;height:24px;padding:0;line-height:20px;
+    font-family:var(--ui);font-size:19px;color:#7a0a0a;
+    background:#fff;border:1px solid #d3b1b1;border-radius:3px;
+    cursor:pointer;text-align:center;
+  }
+  .pclose:hover{background:#f2e2e2;}
   /* math */
-  .eq{font-family:var(--math);font-size:17px;text-align:center;margin:12px 0;}
+  .eq{font-family:var(--math);font-size:17px;text-align:left;margin:12px 0;}
   .eq .v{font-style:italic;}
   .eq .n{font-style:normal;}
   .frac{display:inline-flex;flex-direction:column;text-align:center;
@@ -103,9 +104,9 @@
   .frac .fn{border-bottom:1px solid #000;padding:0 .4em 1px;}
   .frac .fd{padding:1px .4em 0;}
   .sqrt{border-top:1px solid #000;padding:0 .25em;}
-  .radical{display:inline-flex;align-items:flex-start;vertical-align:middle;}
-  .radical > .rsign{font-family:var(--math);font-size:2.5em;line-height:.86;font-style:normal;}
-  .radical > .rcand{border-top:1.6px solid #000;padding:3px 5px 1px 2px;margin-top:.34em;}
+  .radical{display:inline-flex;align-items:stretch;vertical-align:middle;}
+  .radical .radsvg{width:13px;align-self:stretch;overflow:visible;color:#000;margin-right:-1px;}
+  .radical .rcand{border-top:1.5px solid #000;padding:3px 6px 2px 2px;display:flex;align-items:center;}
   sub,sup{font-style:normal;}
   .imath{font-family:var(--math);font-style:italic;}
   .imath .n{font-style:normal;}
@@ -142,13 +143,10 @@
     <canvas id="plot" width="540" height="375"></canvas>
   </div>
 
-  <div class="actions">
-    <div class="abtn" data-panel="pDir">Directions</div>
-    <div class="abtn" data-panel="pDet">Details</div>
-    <div class="abtn" data-panel="pAbo">About</div>
-  </div>
-
+  <div class="footer">
+   <div class="panelHost">
   <div class="panel" id="pDir">
+    <button class="pclose" aria-label="Close panel">&times;</button>
     A pitot tube determines the velocity of a fluid by measuring the fluid&rsquo;s
     stagnation pressure. The stagnation pressure is measured with a manometer.
     The manometer height differential is a function of the manometer fluid
@@ -160,6 +158,7 @@
   </div>
 
   <div class="panel" id="pDet">
+    <button class="pclose" aria-label="Close panel">&times;</button>
     <div>Pitot tubes are used to measure the velocity of a fluid moving through a
       pipe by taking advantage of the fact that the velocity at the height of the
       bend in the tube (stagnation point) is zero. Some kinetic energy density of
@@ -225,8 +224,9 @@
       <span class="n">&minus;</span> <span class="v">&rho;</span><span class="paren">)</span>
     </div>
 
-    <div>This equation can be rearranged and used to solve for fluid velocity or
-      difference in height of the fluids in the manometer:</div>
+    <div>This equation can be rearranged and used to solve for difference in height of the fluids
+      (<span class="n">&Delta;</span><span class="imath">h</span>) in the manometer or the fluid velocity
+      (<span class="imath">v<sub>2</sub></span>):</div>
 
     <div class="eq">
       <span class="n">&Delta;</span><span class="v">h</span>
@@ -240,28 +240,28 @@
     <div class="eq">
       <span class="v">v</span><sub>2</sub>
       <span class="n">=</span>
-      <span font-size="2em">\( \sqrt{ \frac{2g \Delta h (\rho_m - \rho)}{\rho} } \)</span>
-      <!-- <span class="radical">
-        <span class="rsign">&radic;</span>
+      <span class="radical">
+        <svg class="radsvg" viewBox="0 0 13 40" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M0.4,26 L4,39.2 L8.4,0.75 L13,0.75" fill="none" stroke="currentColor" stroke-width="1.5" vector-effect="non-scaling-stroke" stroke-linejoin="miter" stroke-linecap="round"/>
+        </svg>
         <span class="rcand">
           <span class="frac">
             <span class="fn">2&thinsp;<span class="v">g</span>&thinsp;<span class="n">&Delta;</span><span class="v">h</span>&thinsp;<span class="paren">(</span><span class="v">&rho;</span><sub>m</sub> <span class="n">&minus;</span> <span class="v">&rho;</span><span class="paren">)</span></span>
             <span class="fd"><span class="v">&rho;</span></span>
           </span>
         </span>
-      </span> -->
+      </span>
     </div>
 
-    <div>Where <span class="imath">P</span><sub>2</sub> is the static pressure of
-      fluid in the pipe, <span class="imath">&rho;</span> and
+    <div>Where <span class="imath">&rho;</span> and
       <span class="imath">&rho;</span><sub>m</sub> are the densities of the fluid
       in the pipe and manometer fluid, <span class="imath">&gamma;</span> is
-      specific gravity of fluid in the pipe, <span class="imath">g</span> is the
-      gravitational constant, and <span class="n">&Delta;</span><span class="imath">h</span>
-      is the difference in height of the manometer fluid.</div>
+      specific gravity of fluid in the pipe, and <span class="imath">g</span> is the
+      gravitational constant.</div>
   </div>
 
   <div class="panel" id="pAbo">
+    <button class="pclose" aria-label="Close panel">&times;</button>
     This simulation was created in the
     <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a>
     at University of Colorado Boulder for
@@ -269,9 +269,16 @@
     by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a
     <a href="https://demonstrations.wolfram.com/MeasuringFlowRatesWithAPitotTube/" target="_blank" rel="noopener">Mathematica simulation</a>
     by Jon Barbieri and Rachael L. Baumann. It was prepared with financial support
-    from the National Science Foundation (DUE 2336987 and 2336988) in collaboration
-    with Washington State University. Address any questions or comments to
+    from the National Science Foundation (DUE 2336987 and 2336988). Address any
+    questions or comments to
     LearnChemE@gmail.com.
+  </div>
+   </div>
+   <div class="actions">
+     <div class="abtn" data-panel="pDir">Directions</div>
+     <div class="abtn" data-panel="pDet">Details</div>
+     <div class="abtn" data-panel="pAbo">About</div>
+   </div>
   </div>
 </div>
 
@@ -505,6 +512,13 @@ document.querySelectorAll('.abtn').forEach(b=>{
     document.querySelectorAll('.panel').forEach(p=>p.classList.remove('show'));
     document.querySelectorAll('.abtn').forEach(a=>a.classList.remove('active'));
     if(!open){ panel.classList.add('show'); b.classList.add('active'); }
+  });
+});
+
+document.querySelectorAll('.pclose').forEach(x=>{
+  x.addEventListener('click',()=>{
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('show'));
+    document.querySelectorAll('.abtn').forEach(a=>a.classList.remove('active'));
   });
 });
 

@@ -79,33 +79,14 @@
   .slider-row.hidden{display:none;}
   .slider-label{font-size:17px;color:#111;min-width:300px;text-align:right;}
   .slider-wrap{flex:1;min-width:120px;display:flex;align-items:center;}
-  input[type=range]{
-    -webkit-appearance:none;appearance:none;width:100%;height:18px;background:transparent;
-    cursor:pointer;margin:0;
-  }
-  input[type=range]:focus{outline:none;}
-  input[type=range]:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 2px #4a90d9;}
-  /* track */
-  input[type=range]::-webkit-slider-runnable-track{
-    height:4px;border-radius:2px;
-    background:linear-gradient(#8f8f8f,#b9b9b9);
-    border:1px solid #7d7d7d;border-top-color:#6f6f6f;
-  }
-  input[type=range]::-moz-range-track{
-    height:4px;border-radius:2px;background:#a8a8a8;border:1px solid #7d7d7d;
-  }
-  /* thumb: small Mathematica "paddle" */
-  input[type=range]::-webkit-slider-thumb{
-    -webkit-appearance:none;appearance:none;
-    width:11px;height:17px;margin-top:-7.5px;border-radius:2px;
-    background:linear-gradient(var(--thumb-top),var(--thumb-bot));
-    border:1px solid #8a8a8a;box-shadow:0 1px 1px rgba(0,0,0,.15);
-  }
-  input[type=range]::-moz-range-thumb{
-    width:11px;height:17px;border-radius:2px;
-    background:linear-gradient(var(--thumb-top),var(--thumb-bot));
-    border:1px solid #8a8a8a;box-shadow:0 1px 1px rgba(0,0,0,.15);
-  }
+
+input[type="range"]{
+  --accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+input[type="range"]::-moz-range-thumb{
+  width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+
   .slider-val{
     font-size:17px;min-width:50px;text-align:left;color:#000;
     padding:1px 7px;border:1px solid #cfcfcf;border-radius:2px;background:#fff;
@@ -116,7 +97,8 @@
   canvas{width:100%;height:auto;display:block;}
 
   /* ---- Directions / Details / About ---- */
-  .actions{display:flex;justify-content:center;gap:14px;margin:18px 0 0;}
+  .disclosure{position:relative;margin:18px 0 0;}
+  .actions{display:flex;justify-content:center;gap:14px;margin:0;}
   .actions button{
     font-family:var(--sans);font-size:14px;color:#fff;
     padding:8px 20px;border:none;border-radius:4px;
@@ -131,15 +113,28 @@
   .actions button:focus-visible{outline:2px solid #4a90d9;outline-offset:2px;}
 
   .panel{
-    display:none;margin-top:12px;padding:14px 16px;
-    background:var(--panel-bg);border:1px solid var(--panel-border);border-radius:3px;
+    display:none;
+    position:absolute;left:0;right:0;bottom:calc(100% + 10px);z-index:10;
+    padding:30px 18px 16px;
+    background:var(--panel-bg);border:1px solid var(--panel-border);border-radius:4px;
+    box-shadow:0 6px 22px rgba(0,0,0,.20);
     font-family:var(--verdana);font-size:13px;line-height:1.5;color:#1c1c1c;
+    max-height:min(60vh,380px);overflow-y:auto;
   }
   .panel.show{display:block;}
+  .panel-close{
+    position:absolute;top:6px;right:8px;width:26px;height:26px;padding:0;
+    border:none;background:transparent;cursor:pointer;
+    font-size:22px;line-height:1;color:#8a2a2a;border-radius:4px;
+  }
+  .panel-close:hover{background:rgba(0,0,0,.07);color:#5a0000;}
+  .panel-close:focus-visible{outline:2px solid #4a90d9;outline-offset:1px;}
   .panel p{margin:0 0 9px;}
   .panel p:last-child{margin-bottom:0;}
   .panel .eq{font-family:var(--serif);font-style:italic;margin:6px 0;font-size:14px;}
-  .panel .eq .gk{font-family:var(--verdana);font-style:normal;} /* match the τ in body text */
+  .panel .gk{font-family:var(--serif);font-style:italic;} /* residence-time symbol τ, drawn as a proper tau */
+  .panel .d{font-style:normal;} /* upright numerals so 0 doesn't read as o */
+  .panel .mv{font-family:var(--serif);font-style:italic;} /* inline math variable in body text */
   .panel ul{margin:6px 0;padding-left:20px;}
   .panel li{margin:2px 0;}
   .panel a{color:#1a5fb4;}
@@ -153,7 +148,7 @@
 </style>
 
 <div class="demo">
-  
+
   <div class="controls">
     <div class="setter" role="group" aria-label="plot selector">
       <button data-view="1" class="sel">&nbsp;rate vs. concentration&nbsp;</button>
@@ -184,6 +179,7 @@
     <canvas id="plot" width="1040" height="740"></canvas>
   </div>
 
+  <div class="disclosure">
   <div class="actions">
     <button id="btn-dir">Directions</button>
     <button id="btn-det">Details</button>
@@ -191,6 +187,7 @@
   </div>
 
   <div class="panel" id="panel-dir">
+    <button class="panel-close" type="button" aria-label="Close" data-close="panel-dir">&times;</button>
     <p>An irreversible reaction <em>A&nbsp;&rarr;&nbsp;B</em> is carried out in an isothermal,
        continuous stirred-tank reactor (CSTR). Select a plot with the three buttons at the top.</p>
     <p>In <strong>rate vs. concentration</strong>, the green <em>generation</em> curve is the reaction
@@ -206,29 +203,28 @@
   </div>
 
   <div class="panel" id="panel-det">
+    <button class="panel-close" type="button" aria-label="Close" data-close="panel-det">&times;</button>
     <p>Rate equations:</p>
     <p class="eq"><span class="gk">&tau;</span> = V / v ,</p>
-    <p class="eq">r<sub>A</sub> = &minus;
+    <p class="eq">r<sub>A,&thinsp;g</sub> = &minus;
       <span class="frac"><span class="num">25&nbsp;C<sub>A</sub></span>
       <span class="den">2 + C<sub>A</sub> + 5&nbsp;C<sub>A</sub><sup>2</sup></span></span> ,</p>
-    <p class="eq">r<sub>A,&thinsp;r</sub> = ( C<sub>A,&thinsp;f</sub> &minus; C<sub>A,&thinsp;s</sub> ) / <span class="gk">&tau;</span> ,</p>
-    <p class="eq">r<sub>A,&thinsp;g</sub> = &minus;
-      <span class="frac"><span class="num">25&nbsp;C<sub>A,&thinsp;s</sub></span>
-      <span class="den">2 + C<sub>A,&thinsp;s</sub> + 5&nbsp;C<sub>A,&thinsp;s</sub><sup>2</sup></span></span> ,</p>
-    <p>where &tau; is residence time (min), <em>V</em> is reactor volume (L), <em>v</em> is the volumetric
-       flow rate (L/min), r<sub>A</sub> is reaction rate (mol/[L&nbsp;min]), r<sub>A,&thinsp;r</sub> is the
-       steady-state removal rate (mol/[L&nbsp;min]) from a mass balance, r<sub>A,&thinsp;g</sub> is the transient generation
-       rate (mol/[L&nbsp;min]), C<sub>A</sub> is the concentration of reactant <em>A</em> (mol/L), and
+    <p class="eq">r<sub>A,&thinsp;r</sub> = ( C<sub>A,&thinsp;f</sub> &minus; C<sub>A</sub> ) / <span class="gk">&tau;</span> ,</p>
+    <p>where <span class="gk">&tau;</span> is residence time (min), <em>V</em> is reactor volume (L), <em>v</em> is the volumetric
+       flow rate (L/min), r<sub>A,&thinsp;r</sub> is the
+       removal rate (mol/[L&nbsp;min]) from a mass balance, r<sub>A,&thinsp;g</sub> is the generation
+       rate (mol/[L&nbsp;min]) from the reaction kinetics, C<sub>A</sub> is the concentration of reactant <em>A</em> (mol/L), and
        C<sub>A,&thinsp;f</sub> is the feed concentration of <em>A</em> (mol/L).</p>
     <p>The transient mass balance solved for each plot is</p>
     <p class="eq">dC<sub>A</sub>/dt =
       ( C<sub>A,&thinsp;f</sub> &minus; C<sub>A</sub> ) / <span class="gk">&tau;</span> + r<sub>A</sub> ,&nbsp;&nbsp;
-      C<sub>A</sub>(0) = C<sub>A,&thinsp;0</sub> ,</p>
-    <p>where C<sub>A,&thinsp;0</sub> is the initial concentration of <em>A</em> in the reactor (mol/L).
+      C<sub>A</sub>(<span class="d">0</span>) = C<sub>A,&thinsp;<span class="d">0</span></sub> ,</p>
+    <p>where <span class="mv">C<sub>A,&thinsp;<span class="d">0</span></sub></span> is the initial concentration of <em>A</em> in the reactor (mol/L).
        Here <em>V</em>&nbsp;=&nbsp;5.5&nbsp;L and the feed concentration C<sub>A,&thinsp;f</sub>&nbsp;=&nbsp;6.0&nbsp;mol/L.</p>
   </div>
 
   <div class="panel" id="panel-abt">
+    <button class="panel-close" type="button" aria-label="Close" data-close="panel-abt">&times;</button>
     <p>This simulation was created in the
        <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and
        Biological Engineering</a> at University of Colorado Boulder for
@@ -236,9 +232,9 @@
        John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a
        <a href="https://demonstrations.wolfram.com/MultipleStatesInAnIsothermalContinuousStirredTankReactor/"
           target="_blank" rel="noopener">Mathematica simulation</a> by Rachael L. Baumann. It was prepared
-       with financial support from the National Science Foundation (DUE 2336987 and 2336988) in
-       collaboration with Washington State University. Address any questions or comments to
+       with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to
        <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.</p>
+  </div>
   </div>
 </div>
 
@@ -555,13 +551,20 @@
   // ---------- Directions / Details / About ----------
   function toggler(btn, panel){
     var all=[['btn-dir','panel-dir'],['btn-det','panel-det'],['btn-abt','panel-abt']];
-    btn.addEventListener('click',function(){
-      var willOpen=!panel.classList.contains('show');
+    function closeAll(){
       all.forEach(function(p){
         document.getElementById(p[0]).classList.remove('open');
         document.getElementById(p[1]).classList.remove('show');
       });
+    }
+    btn.addEventListener('click',function(){
+      var willOpen=!panel.classList.contains('show');
+      closeAll();
       if(willOpen){btn.classList.add('open');panel.classList.add('show');}
+    });
+    var close=panel.querySelector('.panel-close');
+    if(close) close.addEventListener('click',function(){
+      panel.classList.remove('show'); btn.classList.remove('open');
     });
   }
   toggler(document.getElementById('btn-dir'),document.getElementById('panel-dir'));

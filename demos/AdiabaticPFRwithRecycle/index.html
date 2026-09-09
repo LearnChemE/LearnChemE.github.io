@@ -18,11 +18,15 @@
   .ctrl{display:flex;align-items:center;margin:3px 0;font-size:15px;}
   .ctrl .lab{width:330px;text-align:right;padding-right:10px;white-space:nowrap;}
   .ctrl input[type=range]{flex:0 0 170px;margin:0 8px;}
+  /* slider */
+  input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  
   .ctrl .val{width:42px;text-align:left;font-variant-numeric:tabular-nums;}
   .instr{font-size:15px;font-weight:bold;text-align:center;margin:7px 0 4px;}
   #plots{display:flex;justify-content:center;align-items:flex-start;margin-top:4px;}
   canvas{display:block;}
-  #btns{display:flex;justify-content:center;gap:10px;margin:14px 0 6px;}
+  #btnwrap{position:relative;margin:14px 0 6px;}
+  #btns{display:flex;justify-content:center;gap:10px;}
   .lcbtn{
     font-family:Helvetica,Arial,sans-serif;font-size:17.25px;
     color:#fff;background:#8b1a1a;border:1px solid #5e1010;
@@ -31,14 +35,23 @@
   .lcbtn:hover{background:#a02020;}
   .lcbtn.on{background:#5e1010;}
   .panel{
-    display:none;border:1px solid #999;background:#fafafa;
-    padding:12px 16px;margin:6px 2px 0;font-size:16.7px;line-height:1.5;
-    text-align:left;
+    display:none;position:absolute;left:2px;right:2px;bottom:100%;
+    margin-bottom:8px;border:1px solid #999;background:#fafafa;
+    padding:12px 40px 12px 16px;font-size:16.7px;line-height:1.5;
+    text-align:left;box-sizing:border-box;
   }
   .panel.show{display:block;}
   .panel p{margin:0 0 9px;}
   .panel .eq{margin:3px 0;font-style:italic;}
   .panel a{color:#8b1a1a;}
+  .panelClose{
+    position:absolute;top:8px;right:10px;width:22px;height:22px;
+    line-height:19px;text-align:center;font-size:16px;font-weight:bold;
+    font-family:Helvetica,Arial,sans-serif;color:#8b1a1a;background:#fff;
+    border:1px solid #999;border-radius:3px;cursor:pointer;padding:0;
+  }
+  .panelClose:hover{background:#eee;}
+  #pDet{max-height:340px;overflow-y:auto;}
   sub{font-size:0.78em;}
   .deflist div{margin:1px 0;}
   i{font-style:italic;}
@@ -68,6 +81,7 @@
     <canvas id="cR" width="455" height="380"></canvas>
   </div>
 
+  <div id="btnwrap">
   <div id="btns">
     <button class="lcbtn" data-p="pDir">Directions</button>
     <button class="lcbtn" data-p="pDet">Details</button>
@@ -75,6 +89,7 @@
   </div>
 
   <div class="panel" id="pDir">
+    <button class="panelClose" data-close="pDir" aria-label="Close">&times;</button>
     <p>A first-order reaction is carried out in an adiabatic plug flow reactor (PFR) with
     recycle. The fresh feed concentration is known. Select the fresh feed temperature
     <i>T</i><sub>f</sub> and the recycle ratio with sliders. The correct exit temperature
@@ -93,6 +108,7 @@
   </div>
 
   <div class="panel" id="pDet">
+    <button class="panelClose" data-close="pDet" aria-label="Close">&times;</button>
     <p>Mass and energy balance:</p>
     <div class="eq">d<i>T</i>/d<i>z</i> = &minus;<i>k</i> <i>C</i><sub>A</sub> &Delta;<i>H</i> / (<i>u</i><sub>0</sub> <i>C</i><sub>A,0</sub> <i>C</i><sub>p</sub>) ,</div>
     <div class="eq">d<i>C</i><sub>A</sub>/d<i>z</i> = &minus;<i>k</i> <i>C</i><sub>A</sub> / <i>u</i><sub>0</sub> ,</div>
@@ -120,15 +136,17 @@
   </div>
 
   <div class="panel" id="pAbo">
+    <button class="panelClose" data-close="pAbo" aria-label="Close">&times;</button>
     <p>This simulation was created in the
     <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a>
     at University of Colorado Boulder for
     <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a>
     by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a
     Mathematica simulation by Rachael L. Baumann. It was prepared with financial support
-    from the National Science Foundation (DUE 2336987 and 2336988) in collaboration with
-    Washington State University. Address any questions or comments to
+    from the National Science Foundation (DUE 2336987 and 2336988). Address any questions
+    or comments to
     <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.</p>
+  </div>
   </div>
 </div>
 
@@ -370,6 +388,16 @@ document.querySelectorAll('.lcbtn').forEach(btn=>{
     document.querySelectorAll('.panel').forEach(p=>p.classList.remove('show'));
     document.querySelectorAll('.lcbtn').forEach(b=>b.classList.remove('on'));
     if(!open){ panel.classList.add('show'); btn.classList.add('on'); }
+  });
+});
+
+// ---- panel close buttons ----
+document.querySelectorAll('.panelClose').forEach(btn=>{
+  btn.addEventListener('click',(e)=>{
+    e.stopPropagation();
+    const panel=document.getElementById(btn.dataset.close);
+    panel.classList.remove('show');
+    document.querySelectorAll('.lcbtn').forEach(b=>b.classList.remove('on'));
   });
 });
 

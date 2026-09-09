@@ -26,11 +26,12 @@
     margin:10px auto;
     padding:0 6px;
     -webkit-font-smoothing:antialiased;
+    position:relative;
   }
   #plot-wrap{ width:100%; }
   canvas#plot{ display:block; width:660px; max-width:100%; height:440px; }
 
-  .control-wrap{ position:relative; margin-top:6px; }
+  .control-wrap{ margin-top:6px; }
   .controls{
     display:flex;
     justify-content:space-between;
@@ -43,9 +44,12 @@
   .slider-line{ display:flex; align-items:center; gap:10px; }
   .slider-line input[type=range]{
     width:180px;               /* shortened so buttons fit to the right */
-    accent-color:var(--red);
-    cursor:pointer;
+    /* accent-color:var(--red);
+    cursor:pointer; */
   }
+  /* slider */
+  input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  
   .slider-val{
     font-size:var(--sf);
     min-width:84px;
@@ -70,7 +74,7 @@
 
   .panel{
     position:absolute;
-    top:calc(100% + 8px);
+    top:0px;
     left:0;
     right:0;
     background:#fff;

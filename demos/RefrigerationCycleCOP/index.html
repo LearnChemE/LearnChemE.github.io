@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Refrigeration Cycle Coefficient of Performance</title>
+<style>
+  html,body{margin:0;padding:0;background:#fff;}
+  #app{
+    font-family:Helvetica,Arial,sans-serif;
+    color:#000;
+    max-width:720px;
+    margin:0 auto;
+    padding:14px 16px 18px;
+    position:relative;
+    -webkit-font-smoothing:antialiased;
+  }
+  .title{
+    font-size:20px;
+    font-weight:normal;
+    text-align:center;
+    margin:2px 0 12px;
+  }
+  /* ---- slider row (3 sliders on one line) ---- */
+  .sliders{
+    display:flex;
+    justify-content:center;
+    gap:26px;
+    flex-wrap:nowrap;
+    margin:0 0 10px;
+  }
+  .sl{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    flex:0 0 auto;
+  }
+  .sl .lab{font-size:13px;margin-bottom:3px;}
+  .sl .row{display:flex;align-items:center;gap:8px;}
+  .sl input[type=range]{
+    width:150px;
+  }
+  .sl input[type=range]:focus{outline:none;}
+
+input[type="range"]{
+  --accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+input[type="range"]::-moz-range-thumb{
+  width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+
+
+  .sl .val{
+    font-size:13px;min-width:34px;text-align:right;
+    font-variant-numeric:tabular-nums;
+  }
+  /* ---- COP readout ---- */
+  .cop{
+    text-align:center;
+    font-size:15px;
+    font-weight:normal;
+    margin:6px 0 2px;
+  }
+  /* ---- figures ---- */
+  .figs{display:flex;flex-direction:column;align-items:center;}
+  canvas{display:block;}
+  /* ---- main area: buttons at left, figures center ---- */
+  .main{
+    position:relative;
+    margin-top:4px;
+  }
+  .leftcol{
+    position:absolute;
+    left:0;
+    top:2px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    width:104px;
+  }
+  .centercol{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+  /* ---- buttons & panels ---- */
+  .leftcol button{
+    font-family:Helvetica,Arial,sans-serif;
+    font-size:15.6px;
+    color:#fff;
+    background:#8b1a1a;
+    border:1px solid #6e1313;
+    border-radius:3px;
+    padding:7px 10px;
+    cursor:pointer;
+    width:100%;
+  }
+  .leftcol button:hover{background:#7a1616;}
+  .leftcol button.active{background:#5e1010;border-color:#4d0d0d;}
+  .panel{
+    display:none;
+    position:absolute;
+    left:130px;
+    right:16px;
+    top:120px;
+    z-index:20;
+    border:1px solid #9a9a9a;
+    background:#ffffff;
+    border-radius:3px;
+    padding:12px 16px;
+    max-height:470px;
+    overflow-y:auto;
+    box-shadow:0 4px 14px rgba(0,0,0,0.22);
+    font-size:13.5px;
+    line-height:1.5;
+    text-align:left;
+    color:#1a1a1a;
+  }
+  .panel.show{display:block;}
+  .panel a{color:#1a4f8b;text-decoration:none;}
+  .panel a:hover{text-decoration:underline;}
+  .panel .eqwrap{text-align:center;margin:14px 0;font-size:16px;}
+  .panel .frac{display:inline-block;vertical-align:middle;text-align:center;margin:0 6px;}
+  .panel .frac .num{display:block;padding:0 8px 2px;}
+  .panel .frac .den{display:block;padding:2px 8px 0;border-top:1px solid #1a1a1a;}
+  .panel .defs{margin:10px 0 4px;}
+  .panel .defs div{margin:4px 0;padding-left:18px;text-indent:-18px;}
+  .panel .v{font-style:italic;}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div class="sliders">
+    <div class="sl">
+      <div class="lab">h<sub>A</sub> (kJ/kg)</div>
+      <div class="row"><input id="sA" type="range" min="600" max="1180" step="1" value="900"><span class="val" id="vA">900</span></div>
+    </div>
+    <div class="sl">
+      <div class="lab">h<sub>B</sub> (kJ/kg)</div>
+      <div class="row"><input id="sB" type="range" min="600" max="1200" step="1" value="1000"><span class="val" id="vB">1000</span></div>
+    </div>
+    <div class="sl">
+      <div class="lab">h<sub>C</sub> = h<sub>D</sub> (kJ/kg)</div>
+      <div class="row"><input id="sC" type="range" min="400" max="800" step="1" value="500"><span class="val" id="vC">500</span></div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="leftcol">
+      <button id="bDir">Directions</button>
+      <button id="bDet">Details</button>
+      <button id="bAbo">About</button>
+    </div>
+    <div class="centercol">
+      <div class="cop" id="cop"></div>
+      <div class="figs">
+        <canvas id="sys"></canvas>
+        <canvas id="ph"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="pDir">
+    This simulation illustrates how to calculate the coefficient of performance (COP) of an ideal
+    mechanical refrigeration system using a pressure&ndash;enthalpy diagram. Use the sliders to set the
+    enthalpies of the refrigerant at the four principal points in the cycle. The COP value is displayed
+    above a schematic drawing of the mechanical refrigeration system that shows where energy enters and
+    leaves and the refrigerant&rsquo;s flow direction. A plot of pressure versus enthalpy for the selected
+    cycle is shown below the drawing. The cold side of the cycle is shown in blue and the hot side in red.
+  </div>
+
+  <div class="panel" id="pDet">
+    The coefficient of performance (COP) is calculated from the enthalpies of the refrigerant at the
+    four principal points A, B, C, and D of the cycle:
+    <div class="eqwrap">
+      COP =
+      <span class="frac">
+        <span class="num"><span class="v">h</span><sub>A</sub> &minus; <span class="v">h</span><sub>D</sub></span>
+        <span class="den"><span class="v">h</span><sub>B</sub> &minus; <span class="v">h</span><sub>A</sub></span>
+      </span>
+    </div>
+    where
+    <div class="defs">
+      <div>COP = coefficient of performance (dimensionless)</div>
+      <div><span class="v">h</span><sub>A</sub> = enthalpy of the refrigerant leaving the evaporator and entering the compressor (kJ/kg)</div>
+      <div><span class="v">h</span><sub>B</sub> = enthalpy leaving the compressor and entering the condenser (kJ/kg)</div>
+      <div><span class="v">h</span><sub>C</sub> = enthalpy leaving the condenser and entering the expansion valve (kJ/kg)</div>
+      <div><span class="v">h</span><sub>D</sub> = enthalpy leaving the expansion valve and entering the evaporator (kJ/kg); <span class="v">h</span><sub>D</sub> = <span class="v">h</span><sub>C</sub> because expansion across the valve is isenthalpic</div>
+    </div>
+    The numerator (<span class="v">h</span><sub>A</sub> &minus; <span class="v">h</span><sub>D</sub>) is the heat absorbed by the
+    refrigerant in the evaporator (the useful cooling), and the denominator (<span class="v">h</span><sub>B</sub> &minus;
+    <span class="v">h</span><sub>A</sub>) is the work supplied to the compressor. The pressure does not enter into the
+    calculation and is presented on an arbitrary scale.
+  </div>
+
+  <div class="panel" id="pAbo">
+    This simulation was created in the
+    <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a>
+    at University of Colorado Boulder for
+    <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a>
+    by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a
+    <a href="http://demonstrations.wolfram.com/RefrigerationCycleCoefficientOfPerformance/" target="_blank" rel="noopener">Mathematica simulation</a>
+    by Mark D. Normand and Micha Peleg. It was prepared with financial support from the National Science
+    Foundation (DUE 2336987 and 2336988) in collaboration with Washington State University. Address any
+    questions or comments to LearnChemE@gmail.com.
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var state = { hA:900, hB:1000, hC:500 };
+
+  var sA=document.getElementById('sA'), sB=document.getElementById('sB'), sC=document.getElementById('sC');
+  var vA=document.getElementById('vA'), vB=document.getElementById('vB'), vC=document.getElementById('vC');
+  var copEl=document.getElementById('cop');
+
+  // ---------- canvas hi-DPI setup ----------
+  function setup(canvas, cssW, cssH){
+    var dpr = window.devicePixelRatio || 1;
+    canvas.style.width = cssW+'px';
+    canvas.style.height = cssH+'px';
+    canvas.width = Math.round(cssW*dpr);
+    canvas.height = Math.round(cssH*dpr);
+    var ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    return ctx;
+  }
+  var sysCanvas=document.getElementById('sys');
+  var phCanvas=document.getElementById('ph');
+  var SYS_W=460, SYS_H=300, PH_W=460, PH_H=300;
+  var sctx=setup(sysCanvas,SYS_W,SYS_H);
+  var pctx=setup(phCanvas,PH_W,PH_H);
+
+  // ---------- generic helpers ----------
+  function arrowHead(ctx,x,y,ang,size,color){
+    ctx.save();
+    ctx.fillStyle=color;
+    ctx.beginPath();
+    ctx.moveTo(x,y);
+    ctx.lineTo(x - size*Math.cos(ang - Math.PI/7), y - size*Math.sin(ang - Math.PI/7));
+    ctx.lineTo(x - size*Math.cos(ang + Math.PI/7), y - size*Math.sin(ang + Math.PI/7));
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+  function seg(ctx,x1,y1,x2,y2,color,w){
+    ctx.save();
+    ctx.strokeStyle=color; ctx.lineWidth=w||1.5;
+    ctx.lineCap='round';
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+    ctx.restore();
+  }
+  function arrowLine(ctx,x1,y1,x2,y2,color,w,head){
+    seg(ctx,x1,y1,x2,y2,color,w);
+    arrowHead(ctx,x2,y2,Math.atan2(y2-y1,x2-x1),head||7,color);
+  }
+
+  // ================= SCHEMATIC (top figure) =================
+  // world box -> screen, uniform scale, centered
+  var WXMIN=-0.34, WXMAX=1.62, WYMIN=-0.17, WYMAX=1.20, WPAD=8;
+  var aw=SYS_W-2*WPAD, ah=SYS_H-2*WPAD;
+  var sc=Math.min(aw/(WXMAX-WXMIN), ah/(WYMAX-WYMIN));
+  var oX=WPAD+(aw - sc*(WXMAX-WXMIN))/2;
+  var oY=WPAD+(ah - sc*(WYMAX-WYMIN))/2;
+  function WX(x){return oX+(x-WXMIN)*sc;}
+  function WY(y){return oY+(WYMAX-y)*sc;}
+
+  function wline(x1,y1,x2,y2,color,w){ seg(sctx,WX(x1),WY(y1),WX(x2),WY(y2),color,w); }
+  function wtext(t,x,y,color,size,align){
+    sctx.save();
+    sctx.fillStyle=color||'#000';
+    sctx.font=(size||12)+'px Helvetica,Arial,sans-serif';
+    sctx.textAlign=align||'center';
+    sctx.textBaseline='middle';
+    sctx.fillText(t,WX(x),WY(y));
+    sctx.restore();
+  }
+  // flow arrow in world coords (along a short segment)
+  function wflow(x1,y1,x2,y2,color){
+    arrowLine(sctx,WX(x1),WY(y1),WX(x2),WY(y2),color,1.8,8);
+  }
+  function warrowThick(x1,y1,x2,y2,color){
+    arrowLine(sctx,WX(x1),WY(y1),WX(x2),WY(y2),color,2.4,9);
+  }
+
+  function drawSystem(){
+    sctx.clearRect(0,0,SYS_W,SYS_H);
+    var BK='#000', RED='#d11', BLUE='#1133dd', PUR='#7a1ea3';
+    var LW=1.6;
+
+    // --- connector lines (the loop) ---
+    wline(1,0.10,1,0.40,BK,LW);     // right lower (A -> compressor)
+    wline(1,0.60,1,0.90,BK,LW);     // right upper (compressor -> B)
+    wline(0.70,0.90,1,0.90,BK,LW);  // top right
+    wline(0,0.90,0.30,0.90,BK,LW);  // top left
+    wline(0,0.60,0,0.90,BK,LW);     // left upper (C -> valve)
+    wline(0,0.40,0,0.10,BK,LW);     // left lower (valve -> D)
+    wline(0.70,0.10,1,0.10,BK,LW);  // bottom right
+    wline(0,0.10,0.30,0.10,BK,LW);  // bottom left
+
+    // --- compressor (trapezoid on right edge) ---
+    wline(0.9,0.55,1.1,0.65,BK,LW);
+    wline(0.9,0.45,1.1,0.35,BK,LW);
+    wline(0.9,0.45,0.9,0.55,BK,LW);
+    wline(1.1,0.35,1.1,0.65,BK,LW);
+
+    // --- expansion valve (circle + X on left edge) ---
+    sctx.save();
+    sctx.strokeStyle=BK; sctx.lineWidth=LW;
+    sctx.beginPath();
+    sctx.arc(WX(0),WY(0.5),0.1*sc,0,Math.PI*2);
+    sctx.stroke();
+    sctx.restore();
+    var k=0.1*Math.SQRT1_2;
+    wline(k,0.5+k,-k,0.5-k,BK,LW);
+    wline(-k,0.5+k,k,0.5-k,BK,LW);
+
+    // --- condenser zigzag (red, top) ---
+    var cz=[[0.30,0.90],[0.35,0.95],[0.40,0.85],[0.45,0.95],[0.50,0.85],
+            [0.55,0.95],[0.60,0.85],[0.65,0.95],[0.70,0.90]];
+    for(var i=0;i<cz.length-1;i++) wline(cz[i][0],cz[i][1],cz[i+1][0],cz[i+1][1],RED,LW);
+
+    // --- evaporator zigzag (blue, bottom) ---
+    var ez=[[0.30,0.10],[0.35,0.15],[0.40,0.05],[0.45,0.15],[0.50,0.05],
+            [0.55,0.15],[0.60,0.05],[0.65,0.15],[0.70,0.10]];
+    for(var j=0;j<ez.length-1;j++) wline(ez[j][0],ez[j][1],ez[j+1][0],ez[j+1][1],BLUE,LW);
+
+    // --- flow-direction arrows on each side (A->B->C->D->A) ---
+    wflow(1,0.20,1,0.34,BK);        // right side: upward (A -> B)
+    wflow(0.93,0.90,0.79,0.90,BK);  // top: leftward (B -> C)
+    wflow(0,0.34,0,0.20,BK);        // left side: downward (C -> D)
+    wflow(0.79,0.10,0.93,0.10,BK);  // bottom: rightward (D -> A)
+
+    // --- energy in (purple, into compressor) ---
+    warrowThick(1.45,0.5,1.13,0.5,PUR);
+    wtext('energy in',1.30,0.40,BK,18);
+
+    // --- heat out (red, up out of condenser) ---
+    warrowThick(0.65,0.99,0.65,1.13,RED);
+    wtext('heat out',0.40,1.05,BK,18);
+
+    // --- heat in (blue, up into evaporator) ---
+    warrowThick(0.35,-0.08,0.35,0.05,BLUE);
+    wtext('heat in',0.60,-0.06,BK,18);
+
+    // --- component labels (non-bold) ---
+    wtext('compressor',1.14,0.60,BK,18,'left');
+    wtext('condenser',0.50,0.785,BK,18);
+    wtext('expansion',0.13,0.555,BK,18,'left');
+    wtext('valve',0.13,0.455,BK,18,'left');
+    wtext('evaporator',0.50,0.225,BK,18);
+
+    // --- state-point labels ---
+    wtext('A',1.0,0.05,BK,18);
+    wtext('B',1.0,0.95,BK,18);
+    wtext('C',0.0,0.95,BK,18);
+    wtext('D',0.0,0.05,BK,18);
+  }
+
+  // ================= PRESSURE-ENTHALPY (bottom figure) =================
+  var PL=40, PR=24, PT=20, PB=58;
+  var pAreaW=PH_W-PL-PR, pAreaH=PH_H-PT-PB;
+  var HMIN=200, HMAX=1400, PMIN=0, PMAX=100;
+  function PX(h){return PL+(h-HMIN)/(HMAX-HMIN)*pAreaW;}
+  function PY(p){return PT+(PMAX-p)/(PMAX-PMIN)*pAreaH;}
+
+  function drawPH(){
+    var hA=state.hA, hB=state.hB, hC=state.hC, hD=state.hC;
+    var BK='#000', RED='#d11', BLUE='#1133dd';
+    pctx.clearRect(0,0,PH_W,PH_H);
+
+    // frame
+    pctx.save();
+    pctx.strokeStyle=BK; pctx.lineWidth=1;
+    pctx.strokeRect(PL+0.5,PT+0.5,pAreaW,pAreaH);
+    // x ticks + numbers (enthalpy)
+    pctx.fillStyle=BK;
+    pctx.font='16px Helvetica,Arial,sans-serif';
+    pctx.textAlign='center'; pctx.textBaseline='top';
+    var ticks=[200,400,600,800,1000,1200,1400];
+    for(var t=0;t<ticks.length;t++){
+      var xx=PX(ticks[t]);
+      pctx.beginPath(); pctx.moveTo(xx,PT+pAreaH); pctx.lineTo(xx,PT+pAreaH-6); pctx.stroke();
+      pctx.beginPath(); pctx.moveTo(xx,PT); pctx.lineTo(xx,PT+6); pctx.stroke();
+      pctx.fillText(String(ticks[t]),xx,PT+pAreaH+7);
+    }
+    pctx.restore();
+
+    // axis labels (non-bold)
+    pctx.save();
+    pctx.fillStyle=BK;
+    pctx.font='18px Helvetica,Arial,sans-serif';
+    pctx.textAlign='center'; pctx.textBaseline='alphabetic';
+    pctx.fillText('enthalpy (kJ/kg)', PL+pAreaW/2, PH_H-7);
+    pctx.translate(20, PT+pAreaH/2);
+    pctx.rotate(-Math.PI/2);
+    pctx.textBaseline='middle';
+    pctx.fillText('pressure (arbitrary units)',0,0);
+    pctx.restore();
+
+    // cycle points
+    var A=[PX(hA),PY(30)], B=[PX(hB),PY(70)], C=[PX(hC),PY(70)], D=[PX(hD),PY(30)];
+
+    // cycle lines
+    seg(pctx,D[0],D[1],A[0],A[1],BLUE,2);   // D->A bottom (cold)
+    seg(pctx,A[0],A[1],B[0],B[1],BK,2);     // A->B right (compression)
+    seg(pctx,B[0],B[1],C[0],C[1],RED,2);    // B->C top (hot)
+    seg(pctx,C[0],C[1],D[0],D[1],BK,2);     // C->D left (expansion)
+
+    // process-direction arrowheads at segment midpoints
+    function midArrow(p1,p2,color){
+      var mx=(p1[0]+p2[0])/2, my=(p1[1]+p2[1])/2;
+      arrowHead(pctx,mx,my,Math.atan2(p2[1]-p1[1],p2[0]-p1[0]),9,color);
+    }
+    midArrow(D,A,BLUE);
+    midArrow(A,B,BK);
+    midArrow(B,C,RED);
+    midArrow(C,D,BK);
+
+    // heat in arrow (blue, up into bottom line) + label
+    var hinx=PX(hD+0.30*(hA-hD));
+    arrowLine(pctx,hinx,PY(15),hinx,PY(27),BLUE,2,8);
+    pctx.save();
+    pctx.fillStyle=BLUE; pctx.font='18px Helvetica,Arial,sans-serif';
+    pctx.textAlign='center'; pctx.textBaseline='middle';
+    pctx.fillText('heat in',hinx,PY(8));
+    pctx.restore();
+
+    // heat out arrow (red, up out of top line) + label
+    var houtx=PX(hC+0.30*(hB-hC));
+    arrowLine(pctx,houtx,PY(73),houtx,PY(86),RED,2,8);
+    pctx.save();
+    pctx.fillStyle=RED; pctx.font='18px Helvetica,Arial,sans-serif';
+    pctx.textAlign='center'; pctx.textBaseline='middle';
+    pctx.fillText('heat out',houtx,PY(93));
+    pctx.restore();
+
+    // state-point markers
+    function dot(p,color){ pctx.save(); pctx.fillStyle=color; pctx.beginPath();
+      pctx.arc(p[0],p[1],4,0,Math.PI*2); pctx.fill(); pctx.restore(); }
+    dot(A,BLUE); dot(D,BLUE); dot(B,RED); dot(C,RED);
+
+    // state-point labels (non-bold, black)
+    pctx.save();
+    pctx.fillStyle=BK; pctx.font='18px Helvetica,Arial,sans-serif';
+    pctx.textAlign='center'; pctx.textBaseline='middle';
+    pctx.fillText('A',PX(hA+20),PY(22));
+    pctx.fillText('B',PX(hB+20),PY(75));
+    pctx.fillText('C',PX(hC-20),PY(75));
+    pctx.fillText('D',PX(hD-20),PY(22));
+    pctx.restore();
+  }
+
+  // ================= COP formatting =================
+  function formatCOP(cop){
+    if(cop < 1.0) return cop.toPrecision(2);   // 2 significant digits
+    return cop.toPrecision(3);                 // 3 significant digits
+  }
+
+  // ================= constraints + render =================
+  function applyConstraints(){
+    if(state.hA>1180) state.hA=1180; if(state.hA<600) state.hA=600;
+    // hB must exceed hA by at least 20 (compressor adds energy)
+    if(state.hB < state.hA+20) state.hB = state.hA+20;
+    if(state.hB>1200) state.hB=1200; if(state.hB<600) state.hB=600;
+    // hC ( = hD ) must not exceed hA
+    if(state.hC > state.hA) state.hC = state.hA;
+    if(state.hC>800) state.hC=800; if(state.hC<400) state.hC=400;
+  }
+
+  function render(){
+    applyConstraints();
+    sA.value=state.hA; sB.value=state.hB; sC.value=state.hC;
+    vA.textContent=state.hA; vB.textContent=state.hB; vC.textContent=state.hC;
+    var cop=(state.hA-state.hC)/(state.hB-state.hA);
+    copEl.textContent='coefficient of performance (COP) = '+formatCOP(cop);
+    drawSystem();
+    drawPH();
+  }
+
+  sA.addEventListener('input',function(){ state.hA=parseInt(sA.value,10); render(); });
+  sB.addEventListener('input',function(){ state.hB=parseInt(sB.value,10); render(); });
+  sC.addEventListener('input',function(){ state.hC=parseInt(sC.value,10); render(); });
+
+  // ================= panel buttons =================
+  var appEl=document.getElementById('app');
+  var panels={ bDir:'pDir', bDet:'pDet', bAbo:'pAbo' };
+  ['bDir','bDet','bAbo'].forEach(function(id){
+    var btn=document.getElementById(id);
+    btn.addEventListener('click',function(){
+      var pid=panels[id];
+      var pan=document.getElementById(pid);
+      var open=pan.classList.contains('show');
+      // close all
+      ['pDir','pDet','pAbo'].forEach(function(p){ document.getElementById(p).classList.remove('show'); });
+      ['bDir','bDet','bAbo'].forEach(function(b){ document.getElementById(b).classList.remove('active'); });
+      if(!open){
+        // place the panel just below the clicked button, overlaying the figures
+        var top = btn.getBoundingClientRect().bottom - appEl.getBoundingClientRect().top + 6;
+        pan.style.top = top + 'px';
+        pan.scrollTop = 0;
+        pan.classList.add('show');
+        btn.classList.add('active');
+      }
+    });
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
