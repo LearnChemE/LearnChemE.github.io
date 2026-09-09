@@ -1,283 +1,704 @@
+<!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Non-Ideal Vapor-Liquid Equilibrium (VLE) Modeled by the Margules Equation</title>
+<style>
+  html,body{margin:0;padding:0;background:#fff;}
+  #app{
+    font-family:Helvetica, Arial, sans-serif;
+    color:#000;
+    width:900px;
+    margin:8px auto;
+    -webkit-font-smoothing:antialiased;
+  }
+  .title{
+    font-size:15px;
+    font-weight:bold;
+    text-align:center;
+    line-height:1.25;
+    margin:4px 6px 10px 6px;
+  }
+  .controls{
+    border:1px solid #cfcfcf;
+    background:#fbfbfb;
+    padding:9px 10px 11px 10px;
+    margin-bottom:6px;
+  }
+  .ctrl-row{display:flex;align-items:center;flex-wrap:wrap;margin:3px 0;}
+  .ctrl-label{font-size:15px;color:#000;margin-right:8px;}
+  .ctrl-label i{font-style:italic;}
+  /* dark-red LearnChemE setter buttons */
+  .setter{display:inline-flex;border:1px solid #9a9a9a;border-radius:2px;overflow:hidden;}
+  .setter button{
+    font-family:Helvetica, Arial, sans-serif;
+    font-size:15px;
+    border:none;
+    background:#f0f0f0;
+    color:#444;
+    padding:3px 12px;
+    cursor:pointer;
+    border-left:1px solid #bcbcbc;
+    line-height:1.1;
+  }
+  .setter button:first-child{border-left:none;}
+  .setter button.active{
+    background:#8b1a1a;
+    color:#fff;
+  }
+  .setter button i{font-style:italic;}
+  .spacer{width:26px;}
+  .slider-row{display:flex;align-items:center;margin:5px 0 2px 0;}
+  .slider-row .sym{font-style:italic;font-size:16px;width:38px;text-align:right;margin-right:8px;}
+  .slider-row .sym sub{font-style:normal;font-size:12px;}
+  .slider-gap{display:inline-block;width:40px;}
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;
+    width:180px;background:#b9b9b9;border-radius:2px;outline:none;margin:0 10px 0 0;
+  }
+  input[type="range"]{
+  --accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+input[type="range"]::-moz-range-thumb{
+  width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
 
-  <!-- Update everything below THIS -->
-  <meta name="description" content="Non-Ideal Vapor-Liquid Equilibrium (VLE) Modeled by the Margules Equation">
-  <meta name="keywords" content="simulation, engineering, interactive">
-  <meta name="author" content="Jackson Dunlap">
-
-  <title>Non-Ideal Vapor-Liquid Equilibrium (VLE) Modeled by the Margules Equation</title>
-  <!-- and above THIS -->
-
-  <!-- MathJax Settings -->
-  <script>
-    MathJax = {
-      chtml: {
-        scale: 0.95,
-        mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
-        displayAlign: 'left', // default for indentalign when set to 'auto'
-      }
-    };
-  </script>
-  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-
-  <!-- p5.js -->
-  <script type="text/javascript" src="./js/p5.js"></script>
-
-  <!-- CSS -->
-  <link rel="stylesheet" href="./style/style.css">
-  <link rel="stylesheet" href="./style/slider.css">
-
-  <!-- bootstrap -->
-  <link rel="stylesheet" href="./style/bootstrap-custom.css">
-  <script src="./js/bootstrap.min.js"></script>
-
-  <!-- Global site tag (gtag.js) - Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-204988035-3"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-
-    function gtag() {
-      dataLayer.push(arguments);
-    }
-    gtag('js', new Date());
-
-    gtag('config', 'UA-204988035-3');
-  </script>
+  .slider-val{font-size:15px;width:38px;display:inline-block;}
+  .graphrow{position:relative;display:flex;align-items:flex-start;}
+  #plotCanvas{cursor:pointer;touch-action:none;}
+  .btncol{
+    display:flex;flex-direction:column;gap:12px;
+    width:140px;margin-right:14px;padding-top:40px;
+  }
+  .btncol button{
+    font-family:Helvetica, Arial, sans-serif;
+    font-size:17px;
+    background:#8b1a1a;
+    color:#fff;
+    border:none;
+    padding:7px 0;
+    width:100%;
+    cursor:pointer;
+    border-radius:2px;
+  }
+  .btncol button:hover{background:#751515;}
+  .panel{
+    display:none;
+    position:absolute;
+    left:154px;            /* just right of the button column */
+    width:725px;
+    box-sizing:border-box;
+    border:1px solid #bdbdbd;
+    background:#ffffff;
+    box-shadow:0 2px 9px rgba(0,0,0,0.18);
+    padding:30px 15px 12px 15px;
+    font-size:13.5px;
+    line-height:1.5;
+    color:#1a1a1a;
+    max-height:500px;
+    overflow-y:auto;
+    z-index:20;
+  }
+  .panel-close{
+    position:absolute;
+    top:5px;
+    right:8px;
+    width:24px;height:24px;
+    border:none;
+    background:transparent;
+    color:#8b1a1a;
+    font-family:Helvetica, Arial, sans-serif;
+    font-size:22px;
+    line-height:1;
+    cursor:pointer;
+    padding:0;
+  }
+  .panel-close:hover{color:#751515;}
+  /* each panel aligns a few px below the top of its button */
+  #directions{top:44px;}
+  #details{top:89px;}
+  #about{top:134px;}
+  .panel.show{display:block;}
+  .panel p{margin:0 0 9px 0;}
+  .panel p:last-child{margin-bottom:0;}
+  #directions p{margin-bottom:0;}
+  .panel .eq{font-style:italic;text-align:left;margin:7px 0 7px 12px;font-size:14px;}
+  .gam{font-family:"Cambria Math","STIX Two Math","Times New Roman",Georgia,serif;font-style:normal;font-size:1.06em;}
+  .panel a{color:#8b1a1a;text-decoration:none;}
+  .panel a:hover{text-decoration:underline;}
+  i sub, .panel sub{font-style:normal;}
+  sup{font-size:0.75em;}
+</style>
 </head>
-
 <body>
-  <!-- The controls-area is at the top of the simulation, and contains all buttons, sliders, and dropdowns -->
-  <div class="controls-area">
-    <div id="controls-wrapper">
-      <div id=top-row>
-        <div id="selection-row">
-          <div class="buttons-row-wrapper">
-            <div class="btn-group-label">diagram</div>
-            <div class="btn-group" role="group" id="plot-type">
-              <input type="radio" class="btn-check" name="plot" id="r-P-x-y" value="P-x-y" autocomplete="off" checked>
-              <label class="btn btn-outline-primary btn-sm" for="r-P-x-y"><i>P-x-y</i></label>
-
-              <input type="radio" class="btn-check" name="plot" id="r-T-x-y" value="T-x-y" autocomplete="off" />
-              <label class="btn btn-outline-primary btn-sm" for="r-T-x-y"><i>T-x-y</i></label>
-            </div>
-          </div>
-
-          <div class="buttons-row-wrapper">
-            <div class="btn-group-label">deviation from Raoult's law</div>
-            <div class="btn-group" role="group" id="plot-type">
-              <input type="radio" class="btn-check" name="deviation" id="r-positive" value="positive" autocomplete="off"
-                checked>
-              <label class="btn btn-outline-primary btn-sm" for="r-positive">positive</label>
-
-              <input type="radio" class="btn-check" name="deviation" id="r-negative" value="negative"
-                autocomplete="off" />
-              <label class="btn btn-outline-primary btn-sm" for="r-negative">negative</label>
-            </div>
-          </div>
-
-        </div>
-
-        <div class="modal-buttons-row">
-          <div id="directions-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directions-modal">
-            Directions</div>
-          <div id="details-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#details-modal">
-            Details
-          </div>
-          <div id="about-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#about-modal">About
-          </div>
-        </div>
-      </div>
-      <div id="bottom-row">
-        <div class="slider-wrapper" id="positive-slider-wrapper">
-          <div class="data-name" id="positive-A21-slider-name">A<sub>21</sub> </div>
-          <input type="range" id="positive-A21-slider" min="0" max="2" step="0.1" value="0.0">
-          <div class="data-value" id="positive-A21-value">0.0</div>
-          <div class="data-metric"></div>
-
-          <div class="data-name">A<sub>12</sub></div>
-          <input type="range" id="positive-A12-slider" min="0" max="2" step="0.1" value="0.0">
-          <div class="data-value" id="positive-A12-value">0.0</div>
-          <div class="data-metric"></div>
-        </div>
-        <div class="slider-wrapper" id="negative-slider-wrapper">
-          <div class="data-name" id="negative-A21-slider-name">A<sub>21</sub> </div>
-          <input type="range" id="negative-A21-slider" min="-2" max="0" step="0.1" value="0.0">
-          <div class="data-value" id="negative-A21-value">0.0</div>
-          <div class="data-metric"></div>
-
-          <div class="data-name">A<sub>12</sub></div>
-          <input type="range" id="negative-A12-slider" min="-2" max="0" step="0.1" value="0.0">
-          <div class="data-value" id="negative-A12-value">0.0</div>
-          <div class="data-metric"></div>
-        </div>
-      </div>
+<div id="app">
+  
+  <div class="controls">
+    <div class="ctrl-row">
+      <span class="ctrl-label">diagram:</span>
+      <span class="setter" id="setDiagram">
+        <button data-v="1" class="active"><i>&nbsp;P-x-y&nbsp;</i></button>
+        <button data-v="2"><i>&nbsp;T-x-y&nbsp;</i></button>
+      </span>
+      <span class="spacer"></span>
+      <span class="ctrl-label">deviation from Raoult's law:</span>
+      <span class="setter" id="setDev">
+        <button data-v="1" class="active">&nbsp;positive&nbsp;</button>
+        <button data-v="2">&nbsp;negative&nbsp;</button>
+      </span>
     </div>
-
-
-  </div>
-
-  <div id="p5-container">
-  </div>
-
-  <!--
-    Everything below here are modals, which are hidden by default. Any content
-    within the modals should be wrapped in a div with the class "modal-content".
-  -->
-  <div class="modal fade" id="directions-modal" tabindex="-1" role="dialog" aria-labelledby="directions-modal-label"
-    aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="directions-modal-label">Directions</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <p>
-            P-x-y and T-x-y diagrams are generated for one mole of a binary mixture in vapor-liquid equilibrium (VLE).
-            The P-x-y diagram is shown at a temperature of 110 °C, and the T-x-y diagram is shown at a pressure of 1.6
-            bar. The solid blue curve represents the liquid-phase boundary (bubble point) and the solid green curve
-            represents the vapor-phase boundary (dew point). The bar chart displays the moles of liquid (blue) and vapor
-            (green) in equilibrium and the mole fraction of component 1 in each phase (x1for liquid, y1 for vapor); the
-            relative amounts are calculated using the lever rule. Click and drag the black dot on the diagrams to change
-            the mole fraction of component 1 and the temperature (on T-x-y diagram) or pressure (on P-x-y diagram).
-            The non-ideal liquid mixture is modeled using the two-parameter Margules model. The interaction between the
-            two components can be attractive (where attractive interactions between components 1 and 2 are stronger than
-            the average of the pure-component interactions); this results in negative deviations from Raoult's law. The
-            interaction can be repulsive (where attractive interactions between components 1 and 2 are weaker than the
-            average of pure-component interactions); this results in positive deviations from Raoult's law. Use sliders
-            to change the degree of interaction by changing the Margules parameters (A12 and A21), which are used to
-            calculate the activity coefficients. When the Margules parameters are zero, the liquid solution is ideal and
-            the activity coefficients equal 1. When the activity coefficients deviate significantly from 1, the system
-            has an azeotrope. Zoom with the scroll wheel.
-          </p>
-        </div>
-      </div>
+    <div class="slider-row">
+      <span class="sym">A<sub>12</sub></span>
+      <input type="range" id="A12" min="0" max="2" step="0.1" value="0">
+      <span class="slider-val" id="A12v">0.0</span>
+      <span class="slider-gap"></span>
+      <span class="sym">A<sub>21</sub></span>
+      <input type="range" id="A21" min="0" max="2" step="0.1" value="0">
+      <span class="slider-val" id="A21v">0.0</span>
     </div>
   </div>
 
-  <div class="modal fade" id="details-modal" tabindex="-1" role="dialog" aria-labelledby="details-modal-label"
-    aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="details-modal-label">Details</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-
-        <div class="modal-body">
-          <p>
-            The saturation pressure of component \(i = (1, 2)\) is calculated using the Antoine eequation:
-          </p>
-
-          <p>
-            $$ P_i^{sat} = 10^{A_i - \frac{B_i}{T+C_i}}$$
-          </p>
-
-          <p>
-            where \(P_i^{sat}\) is saturation pressure of component \(i=1, 2 (bar)\), \(A_{i}\), \(B_{i}\), and
-            \(C_{i}\) are Antoine constants,
-            and \(T\) is temperature (°C).
-          </p>
-
-          <p>The two-parameter Margueles model is used to calculate the activity coefficients for a non-ideal liquid
-            mixture of components 1 and 2. This model fits the excess Gibbs free energy:</p>
-
-          <p>
-            $$ \frac{G^E}{RT} = x_{1}x_{2}(A_{21}x_{1} + A_{12}x_{2}),$$
-          </p>
-
-          <p>
-            where \(G^E\) is excess Gibbs energy, and \(R\) is the ideal gas constant.
-          </p>
-
-          <p>
-            the activity coefficients \(\gamma_1, \gamma_2\) are given by:
-          </p>
-
-          <p>
-            $$ln \gamma_1 = x_2^2(A_{12} + 2(A_{21} - A_{12})x_1),$$
-            $$ln \gamma_1 = x_1^2(A_{21} + 2(A_{12} - A_{21})x_1),$$
-          </p>
-
-          <p>
-            where \(x_1\) and \(x_2\) are the liquid mole fractions of components 1 and 2 and \(x_1 + x_2 = 1\), and
-            \(A_{21}\) and \(A_{12}\) are the Margules parameters.
-          </p>
-
-          <p>
-            The modified Raoult's law is used to calculate the bubble-point and dew point pressures using the \(K\)
-            factors:
-          </p>
-
-          <p>
-            $$ K_i = \frac{y_i}{x_i} = \gamma_i\frac{P_i^{sat}}{P}$$
-          </p>
-
-          <p>
-            where \(y_i\) is the vapor mole fraction and \(y_1 + y_2 = 1\), and \(P\) is the total pressure (bar)
-          </p>
-
-          <p>
-            Bubble-point pressure calculation:
-          </p>
-
-          <p>
-            $$P = x_1\gamma_1P_1^{sat} + x_2\gamma_2P_2^{sat}$$
-          </p>
-
-          <p>
-            Dew-point pressure calculation:
-          </p>
-
-          <p>
-            $$P = \left(\frac{y_1}{\gamma_1P_1^{sat}} + \frac{y_2}{\gamma_2P_2^{sat}}\right)^{-1}.$$
-          </p>
-
-          <p>
-            Reference
-          </p>
-          <p>
-          <ol class="references">
-            <li>
-              J. R. Elliott and C. T. Lira, Introductory Chemical Engineering Thermodynamics, New York: Prentice Hall,
-              2012 pp. 372-377, 430.
-            </li>
-          </ol>
-          </p>
-        </div>
-      </div>
+  <div class="graphrow">
+    <div class="btncol">
+      <button data-p="directions">Directions</button>
+      <button data-p="details">Details</button>
+      <button data-p="about">About</button>
     </div>
+    <canvas id="plotCanvas"></canvas>
+
+  <div class="panel" id="directions"><button class="panel-close" aria-label="Close">&times;</button>
+    <p><i>P-x-y</i> and <i>T-x-y</i> diagrams are generated for one mole of a binary mixture in vapor-liquid equilibrium (VLE). The <i>P-x-y</i> diagram is shown at a temperature of 110 &deg;C, and the <i>T-x-y</i> diagram is shown at a pressure of 1.6 bar. The solid blue curve represents the liquid-phase boundary (bubble point) and the solid green curve represents the vapor-phase boundary (dew point). The bar chart displays the moles of liquid (blue) and vapor (green) in equilibrium and the mole fraction of component 1 in each phase (<i>x</i><sub>1</sub> for liquid, <i>y</i><sub>1</sub> for vapor); the relative amounts are calculated using the lever rule. Click and drag the black dot on the diagrams to change the mole fraction of component 1 and the temperature (on <i>T-x-y</i> diagram) or pressure (on <i>P-x-y</i> diagram).</p>
+    <p>The non-ideal liquid mixture is modeled using the two-parameter Margules model. The interaction between the two components can be attractive (where attractive interactions between components 1 and 2 are stronger than the average of the pure-component interactions); this results in negative deviations from Raoult's law. The interaction can be repulsive (where attractive interactions between components 1 and 2 are weaker than the average of pure-component interactions); this results in positive deviations from Raoult's law. Use sliders to change the degree of interaction by changing the Margules parameters (<i>A</i><sub>12</sub> and <i>A</i><sub>21</sub>), which are used to calculate the activity coefficients. When the Margules parameters are zero, the liquid solution is ideal and the activity coefficients equal 1. When the activity coefficients deviate significantly from 1, the system has an azeotrope.</p>
   </div>
 
-  <div class="modal fade" id="about-modal" tabindex="-1" role="dialog" aria-labelledby="about-modal-label"
-    aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="about-modal-label">About</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <p>
-            This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of
-              Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a
-              href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Jackson Dunlap under the direction
-            of Professor John L. Falconer and Michelle Medlin. It is a JavaScript/HTML5 implementation of a <a
-              href="https://demonstrations.wolfram.com/NonIdealVaporLiquidEquilibriumVLEModeledByTheMargulesEquatio/">Mathematica
-              simulation</a> by Rachael L. Baumann. It was prepared with financial support from the National Science
-            Foundation (DUE 2336987 and 2336988) in collaboration with Washington State University. Address any
-            questions or comments to LearnChemE@gmail.com.
-          </p>
-        </div>
-      </div>
-    </div>
+  <div class="panel" id="details"><button class="panel-close" aria-label="Close">&times;</button>
+    <p>The saturation pressure of component <i>i</i> is calculated using the Antoine equation:</p>
+    <p class="eq"><i>P</i><sub><i>i</i></sub><sup>sat</sup> = 10<sup>(<i>A</i><sub><i>i</i></sub> &minus; <i>B</i><sub><i>i</i></sub>/(<i>T</i> + <i>C</i><sub><i>i</i></sub>))</sup>,</p>
+    <p>where <i>P</i><sub><i>i</i></sub><sup>sat</sup> is saturation pressure (bar) of component <i>i</i> (= 1, 2), <i>A</i><sub><i>i</i></sub>, <i>B</i><sub><i>i</i></sub>, and <i>C</i><sub><i>i</i></sub> are Antoine constants, and <i>T</i> is temperature (&deg;C).</p>
+    <p>The two-parameter Margules model is used to calculate the activity coefficients for a non-ideal liquid mixture of components 1 and 2. This model fits the excess Gibbs free energy:</p>
+    <p class="eq"><i>G</i><sup>E</sup>/(<i>R T</i>) = <i>x</i><sub>1</sub> <i>x</i><sub>2</sub> (<i>A</i><sub>21</sub> <i>x</i><sub>1</sub> + <i>A</i><sub>12</sub> <i>x</i><sub>2</sub>),</p>
+    <p>where <i>G</i><sup>E</sup> is excess Gibbs energy, and <i>R</i> is the ideal gas constant.</p>
+    <p>The activity coefficients <span class="gam">&gamma;</span><sub>1</sub>, <span class="gam">&gamma;</span><sub>2</sub> are given by:</p>
+    <p class="eq">ln <span class="gam">&gamma;</span><sub>1</sub> = <i>x</i><sub>2</sub><sup>2</sup> (<i>A</i><sub>12</sub> + 2 (<i>A</i><sub>21</sub> &minus; <i>A</i><sub>12</sub>) <i>x</i><sub>1</sub>),</p>
+    <p class="eq">ln <span class="gam">&gamma;</span><sub>2</sub> = <i>x</i><sub>1</sub><sup>2</sup> (<i>A</i><sub>21</sub> + 2 (<i>A</i><sub>12</sub> &minus; <i>A</i><sub>21</sub>) <i>x</i><sub>2</sub>),</p>
+    <p>where <i>x</i><sub>1</sub> and <i>x</i><sub>2</sub> are the liquid mole fractions of components 1 and 2 and <i>x</i><sub>1</sub> + <i>x</i><sub>2</sub> = 1, and <i>A</i><sub>21</sub> and <i>A</i><sub>12</sub> are the Margules parameters.</p>
+    <p>The modified Raoult's law is used to calculate the bubble-point and dew-point pressures using the <i>K</i> factors:</p>
+    <p class="eq"><i>K</i><sub><i>i</i></sub> = <i>y</i><sub><i>i</i></sub>/<i>x</i><sub><i>i</i></sub> = <span class="gam">&gamma;</span><sub><i>i</i></sub> <i>P</i><sub><i>i</i></sub><sup>sat</sup>/<i>P</i>,</p>
+    <p>where <i>y</i><sub><i>i</i></sub> is the vapor mole fraction and <i>y</i><sub>1</sub> + <i>y</i><sub>2</sub> = 1, and <i>P</i> is the total pressure (bar).</p>
+    <p>Bubble-point pressure calculation:</p>
+    <p class="eq"><i>P</i> = <i>x</i><sub>1</sub> <span class="gam">&gamma;</span><sub>1</sub> <i>P</i><sub>1</sub><sup>sat</sup> + <i>x</i><sub>2</sub> <span class="gam">&gamma;</span><sub>2</sub> <i>P</i><sub>2</sub><sup>sat</sup>.</p>
+    <p>Dew-point pressure calculation:</p>
+    <p class="eq"><i>P</i> = (<i>y</i><sub>1</sub>/(<span class="gam">&gamma;</span><sub>1</sub> <i>P</i><sub>1</sub><sup>sat</sup>) + <i>y</i><sub>2</sub>/(<span class="gam">&gamma;</span><sub>2</sub> <i>P</i><sub>2</sub><sup>sat</sup>))<sup>&minus;1</sup>.</p>
   </div>
 
-  <script type="module" src="./js/main.js"></script>
+  <div class="panel" id="about"><button class="panel-close" aria-label="Close">&times;</button>
+    <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/NonIdealVaporLiquidEquilibriumVLEModeledByTheMargulesEquatio/" target="_blank">Mathematica simulation</a> by Rachael L. Baumann. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.</p>
+  </div>
+  </div><!-- /graphrow -->
+</div>
+
+<script>
+"use strict";
+/* ===================== Physics ===================== */
+const T_FIX = 110;     // P-x-y diagram temperature (deg C)
+const P_FIX = 1.6;     // T-x-y diagram pressure (bar)
+
+function Psat1(T){ return (1/750)*Math.pow(10, 6.84    - 1196.76/(T+219.161)); }
+function Psat2(T){ return (1/750)*Math.pow(10, 6.95087 - 1342.31/(T+219.187)); }
+function g1(x,A12,A21){ const x2=1-x; return Math.exp(x2*x2*(A12 + 2*(A21-A12)*x)); }
+function g2(x,A12,A21){ return Math.exp(x*x*(A21 + 2*(A12-A21)*(1-x))); }
+function Pbub(x,T,A12,A21){ return g1(x,A12,A21)*x*Psat1(T) + g2(x,A12,A21)*(1-x)*Psat2(T); }
+function Pdew(x,T,A12,A21){ return 1/( x/(g1(x,A12,A21)*Psat1(T)) + (1-x)/(g2(x,A12,A21)*Psat2(T)) ); }
+
+// bubble temperature: solve Pbub(x,T)=P_FIX for T (Pbub increases monotonically with T)
+function bubbleT(x,A12,A21){
+  let lo=40, hi=220;
+  let flo=Pbub(x,lo,A12,A21)-P_FIX, fhi=Pbub(x,hi,A12,A21)-P_FIX;
+  if(flo*fhi>0){ return flo<0 ? hi : lo; }
+  for(let k=0;k<60;k++){
+    const mid=0.5*(lo+hi), fm=Pbub(x,mid,A12,A21)-P_FIX;
+    if(Math.abs(fm)<1e-9) return mid;
+    if(flo*fm<=0){ hi=mid; fhi=fm; } else { lo=mid; flo=fm; }
+  }
+  return 0.5*(lo+hi);
+}
+
+/* Build T-x-y tables for current parameters */
+function buildTxy(A12,A21){
+  const N=200, xe=[], Te=[], yie=[];
+  for(let i=0;i<=N;i++){
+    const x=i/N;
+    const T=bubbleT(x,A12,A21);
+    xe.push(x); Te.push(T);
+    yie.push( g1(x,A12,A21)*x*Psat1(T)/P_FIX );
+  }
+  return {xe,Te,yie};
+}
+
+/* linear interpolation of Te as a function of liquid frac (xe monotone 0..1) */
+function TxOf(tab,x){
+  const {xe,Te}=tab;
+  if(x<=0) return Te[0];
+  if(x>=1) return Te[Te.length-1];
+  const idx=Math.min(Te.length-2, Math.floor(x*(xe.length-1)));
+  const x0=xe[idx], x1=xe[idx+1];
+  const f=(x-x0)/(x1-x0);
+  return Te[idx]+f*(Te[idx+1]-Te[idx]);
+}
+/* dew temp at vapor frac x: interpolate over (yie,Te) polyline, first bracketing segment */
+function TyOf(tab,x){
+  const {yie,Te}=tab;
+  for(let i=0;i<yie.length-1;i++){
+    const a=yie[i], b=yie[i+1];
+    if((x-a)*(x-b)<=0 && a!==b){
+      const f=(x-a)/(b-a);
+      return Te[i]+f*(Te[i+1]-Te[i]);
+    }
+  }
+  return TxOf(tab,x);
+}
+
+/* generic: find x in [0,1] where f(x)=target, crossing nearest to ref */
+function nearestCrossing(f,target,ref){
+  const N=600; let best=ref, bestd=Infinity, prevx=0, prevv=f(0)-target;
+  for(let i=1;i<=N;i++){
+    const x=i/N, v=f(x)-target;
+    if(prevv===0){ const d=Math.abs(prevx-ref); if(d<bestd){bestd=d;best=prevx;} }
+    if(prevv*v<0){
+      let a=prevx,b=x,fa=prevv;
+      for(let k=0;k<40;k++){ const m=0.5*(a+b), fm=f(m)-target; if(fa*fm<=0){b=m;} else {a=m;fa=fm;} }
+      const root=0.5*(a+b), d=Math.abs(root-ref);
+      if(d<bestd){ bestd=d; best=root; }
+    }
+    prevx=x; prevv=v;
+  }
+  return best;
+}
+/* crossing nearest to ref on a (frac,val) polyline */
+function nearestCrossingPoly(fracArr,valArr,target,ref){
+  let best=ref,bestd=Infinity;
+  for(let i=0;i<valArr.length-1;i++){
+    const v0=valArr[i]-target, v1=valArr[i+1]-target;
+    if(v0===0){ const d=Math.abs(fracArr[i]-ref); if(d<bestd){bestd=d;best=fracArr[i];} }
+    if(v0*v1<0){
+      const f=v0/(v0-v1);
+      const root=fracArr[i]+f*(fracArr[i+1]-fracArr[i]);
+      const d=Math.abs(root-ref);
+      if(d<bestd){bestd=d;best=root;}
+    }
+  }
+  return best;
+}
+
+/* ===================== State ===================== */
+const state = {
+  FOB:1,           // 1 = P-x-y, 2 = T-x-y
+  OMM:1,           // 1 = positive deviation, 2 = negative
+  A12:0, A21:0,
+  A12p:0, A21p:0, A12n:0, A21n:0,
+  // locator positions {x, y}: y is pressure(bar) for P-x-y, temperature(C) for T-x-y
+  compPp:{x:0.65,y:1.6}, compPn:{x:0.65,y:1.6},
+  compTp:{x:0.65,y:110}, compTn:{x:0.6, y:110}
+};
+
+function ranges(){
+  // returns {xmin,xmax,ymin,ymax} for plot, and {cx0,cx1,cy0,cy1} for locator clip
+  if(state.FOB===1){ // P-x-y
+    if(state.OMM===1) return {ymin:0.93,ymax:2.67, cymin:0.93,cymax:2.67};
+    return {ymin:0.73,ymax:2.27, cymin:0.8,cymax:2.2};
+  } else { // T-x-y
+    if(state.OMM===1) return {ymin:90,ymax:130, cymin:90,cymax:130};
+    return {ymin:90,ymax:140, cymin:90,cymax:140};
+  }
+}
+function curLoc(){
+  if(state.FOB===1) return state.OMM===1?state.compPp:state.compPn;
+  return state.OMM===1?state.compTp:state.compTn;
+}
+
+/* ===================== Canvas / Rendering ===================== */
+const canvas=document.getElementById('plotCanvas');
+const ctx=canvas.getContext('2d');
+const dpr=window.devicePixelRatio||1;
+
+// layout (CSS px)
+const W=745, H=545;
+const PL={x0:72, y0:30, w:494, h:446};   // main plot frame (left)
+const BAR={x0:646, y0:30, w:74, h:446};  // bar chart rectangle
+canvas.style.width=W+'px'; canvas.style.height=H+'px';
+canvas.width=Math.round(W*dpr); canvas.height=Math.round(H*dpr);
+ctx.scale(dpr,dpr);
+
+const BLUE='rgb(0,0,255)';
+const GREEN='rgb(0,153,0)';            // RGBColor[0,0.6,0]
+const BAR_BLUE='rgb(120,160,235)';     // lighter blue
+const BAR_GREEN='rgb(120,200,120)';    // lighter green
+const GRAY='rgb(128,128,128)';
+
+function px(x){ return PL.x0 + x*PL.w; }                       // x in [0,1]
+function py(v,ymin,ymax){ return PL.y0 + (1-(v-ymin)/(ymax-ymin))*PL.h; }
+
+let txyTab=null;
+
+function compute(){
+  const A12=state.A12, A21=state.A21;
+  const loc=curLoc();
+  let z1=loc.x, opVal=loc.y;
+  let x1,y1,lever;
+  if(state.FOB===1){ // P-x-y at T_FIX
+    const PxZ=Pbub(z1,T_FIX,A12,A21), PyZ=Pdew(z1,T_FIX,A12,A21);
+    x1 = (opVal>PxZ) ? z1 : nearestCrossing(x=>Pbub(x,T_FIX,A12,A21),opVal,z1);
+    y1 = (opVal<PyZ) ? z1 : nearestCrossing(x=>Pdew(x,T_FIX,A12,A21),opVal,z1);
+    if(opVal<PyZ) lever=0; else if(opVal>PxZ) lever=1; else lever=(y1-z1)/(y1-x1);
+  } else {           // T-x-y at P_FIX
+    if(!txyTab) txyTab=buildTxy(A12,A21);
+    const TxZ=TxOf(txyTab,z1), TyZ=TyOf(txyTab,z1);
+    x1 = (opVal<TxZ) ? z1 : nearestCrossingPoly(txyTab.xe,txyTab.Te,opVal,z1);
+    y1 = (opVal>TyZ) ? z1 : nearestCrossingPoly(txyTab.yie,txyTab.Te,opVal,z1);
+    if(opVal>TyZ) lever=0; else if(opVal<TxZ) lever=1; else lever=(y1-z1)/(y1-x1);
+  }
+  lever=Math.max(0,Math.min(1,lever));
+  return {z1,opVal,x1,y1,lever};
+}
+
+function drawFrame(ymin,ymax,xlabel,ylabel){
+  // frame box
+  ctx.strokeStyle='#000'; ctx.lineWidth=1;
+  ctx.strokeRect(PL.x0+0.5,PL.y0+0.5,PL.w,PL.h);
+  ctx.fillStyle='#000';
+  // (title drawn separately with italic leading symbol)
+  // x ticks
+  ctx.font='21px Helvetica, Arial, sans-serif';
+  ctx.textBaseline='top'; ctx.textAlign='center';
+  for(let i=0;i<=5;i++){
+    const xv=i/5, X=px(xv);
+    ctx.beginPath();ctx.moveTo(X,PL.y0+PL.h);ctx.lineTo(X,PL.y0+PL.h-7);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(X,PL.y0);ctx.lineTo(X,PL.y0+7);ctx.stroke();
+    ctx.fillText(fmt1(xv), X, PL.y0+PL.h+7);
+  }
+  // y ticks
+  ctx.textAlign='right'; ctx.textBaseline='middle';
+  const yt=yTicks(ymin,ymax);
+  yt.forEach(v=>{
+    const Y=py(v,ymin,ymax);
+    ctx.beginPath();ctx.moveTo(PL.x0,Y);ctx.lineTo(PL.x0+7,Y);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(PL.x0+PL.w,Y);ctx.lineTo(PL.x0+PL.w-7,Y);ctx.stroke();
+    ctx.fillText(ytfmt(v,ymin,ymax), PL.x0-8, Y);
+  });
+  // axis labels
+  ctx.font='22px Helvetica, Arial, sans-serif';
+  ctx.textAlign='center'; ctx.textBaseline='top';
+  ctx.fillText(xlabel, PL.x0+PL.w/2, PL.y0+PL.h+34);
+  ctx.save();
+  ctx.translate(18, PL.y0+PL.h/2); ctx.rotate(-Math.PI/2);
+  ctx.textBaseline='middle';
+  ctx.fillText(ylabel,0,0);
+  ctx.restore();
+}
+function fmt1(v){ return (Math.round(v*10)/10).toFixed(1); }
+function yTicks(ymin,ymax){
+  const span=ymax-ymin;
+  let step = span<=2 ? 0.5 : (span<=12?2:10);
+  const out=[]; let start=Math.ceil(ymin/step)*step;
+  for(let v=start; v<=ymax+1e-9; v+=step) out.push(Math.round(v*1000)/1000);
+  return out;
+}
+function ytfmt(v,ymin,ymax){
+  return (ymax-ymin<=2)? v.toFixed(1) : String(Math.round(v));
+}
+
+function plotCurve(fn,ymin,ymax,color){
+  ctx.strokeStyle=color; ctx.lineWidth=2.2;
+  ctx.lineJoin='round';
+  ctx.beginPath();
+  let started=false;
+  for(let i=0;i<=300;i++){
+    const x=i/300, v=fn(x);
+    if(!isFinite(v)) {started=false;continue;}
+    const X=px(x), Y=py(v,ymin,ymax);
+    if(!started){ctx.moveTo(X,Y);started=true;} else ctx.lineTo(X,Y);
+  }
+  ctx.stroke();
+}
+function plotPoly(fracArr,valArr,ymin,ymax,color){
+  ctx.strokeStyle=color; ctx.lineWidth=2.2; ctx.lineJoin='round';
+  ctx.beginPath();
+  for(let i=0;i<fracArr.length;i++){
+    const X=px(fracArr[i]), Y=py(valArr[i],ymin,ymax);
+    if(i===0)ctx.moveTo(X,Y); else ctx.lineTo(X,Y);
+  }
+  ctx.stroke();
+}
+
+function clipToPlot(){ ctx.save(); ctx.beginPath(); ctx.rect(PL.x0,PL.y0,PL.w,PL.h); ctx.clip(); }
+
+function drawTieLines(r,ymin,ymax){
+  const {z1,opVal,x1,y1}=r;
+  ctx.save();
+  ctx.beginPath(); ctx.rect(PL.x0,PL.y0,PL.w,PL.h); ctx.clip();
+  const Yop=py(opVal,ymin,ymax), Ybot=PL.y0+PL.h;
+  if(z1===y1 || z1===x1){
+    // single dotted vertical at z1
+    ctx.setLineDash([2,4]); ctx.lineWidth=2.4;
+    ctx.strokeStyle = (z1===y1)?GREEN:BLUE;
+    ctx.beginPath(); ctx.moveTo(px(z1),Ybot); ctx.lineTo(px(z1),Yop); ctx.stroke();
+  } else {
+    // horizontal dashed tie lines
+    ctx.setLineDash([7,5]); ctx.lineWidth=2;
+    ctx.strokeStyle=BLUE;
+    ctx.beginPath(); ctx.moveTo(px(y1),Yop); ctx.lineTo(px(z1),Yop); ctx.stroke();
+    ctx.strokeStyle=GREEN;
+    ctx.beginPath(); ctx.moveTo(px(x1),Yop); ctx.lineTo(px(z1),Yop); ctx.stroke();
+    // vertical dotted drop lines
+    ctx.setLineDash([2,4]); ctx.lineWidth=2.4;
+    ctx.strokeStyle=BLUE;
+    ctx.beginPath(); ctx.moveTo(px(x1),Ybot); ctx.lineTo(px(x1),Yop); ctx.stroke();
+    ctx.strokeStyle=GREEN;
+    ctx.beginPath(); ctx.moveTo(px(y1),Ybot); ctx.lineTo(px(y1),Yop); ctx.stroke();
+  }
+  ctx.setLineDash([]);
+  ctx.restore();
+}
+
+function drawLabelsLV(ymin,ymax){
+  // "liquid" and "vapor" gray labels with white background
+  let lq,vp;
+  if(state.FOB===1){
+    lq={x:0.1,y: state.OMM===1?2.5:2.1}; vp={x:0.9,y: state.OMM===1?1.05:0.85};
+  } else {
+    lq={x:0.1,y: state.OMM===1?93:94}; vp={x:0.9,y: state.OMM===1?126:135};
+  }
+  ctx.font='22px Helvetica, Arial, sans-serif';
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  [['liquid',lq],['vapor',vp]].forEach(([t,p])=>{
+    const X=px(p.x), Y=py(p.y,ymin,ymax);
+    const w=ctx.measureText(t).width;
+    ctx.fillStyle='#fff'; ctx.fillRect(X-w/2-2,Y-12,w+4,24);
+    ctx.fillStyle=GRAY; ctx.fillText(t,X,Y);
+  });
+}
+
+function drawDot(r,ymin,ymax){
+  const X=px(r.z1), Y=py(r.opVal,ymin,ymax);
+  ctx.fillStyle='#000';
+  ctx.beginPath(); ctx.arc(X,Y,6,0,2*Math.PI); ctx.fill();
+}
+
+function drawBar(r){
+  const {x1,y1,lever,opVal}=r;
+  const x0=BAR.x0, y0=BAR.y0, w=BAR.w, h=BAR.h, ybot=y0+h;
+  // liquid (blue) from 0..lever, vapor (green) lever..1
+  const yLev=ybot - lever*h;
+  ctx.fillStyle=BAR_BLUE; ctx.fillRect(x0, yLev, w, ybot-yLev);
+  ctx.fillStyle=BAR_GREEN; ctx.fillRect(x0, y0, w, yLev-y0);
+  // labels x1 / y1
+  ctx.font='15px Helvetica, Arial, sans-serif';
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillStyle='#fff';
+  if(lever>0.001){
+    const yc=ybot-0.5*lever*h;
+    drawSubLabel('x',1,x1.toFixed(2), x0+w/2, yc);
+  }
+  if(1-lever>0.001){
+    const yc=ybot-(lever+0.5*(1-lever))*h;
+    drawSubLabel('y',1,y1.toFixed(2), x0+w/2, yc);
+  }
+  // axis line + ticks on left of bar
+  ctx.strokeStyle=GRAY; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(x0,y0); ctx.lineTo(x0,ybot); ctx.stroke();
+  for(let v=0; v<=1.0001; v+=0.05){
+    const Y=ybot-v*h;
+    ctx.beginPath(); ctx.moveTo(x0,Y); ctx.lineTo(x0-3,Y); ctx.stroke();
+  }
+  ctx.fillStyle='#000'; ctx.font='14px Helvetica, Arial, sans-serif';
+  ctx.textAlign='right'; ctx.textBaseline='middle';
+  for(let i=0;i<=5;i++){
+    const v=i*0.2, Y=ybot-v*h;
+    ctx.beginPath(); ctx.strokeStyle=GRAY; ctx.moveTo(x0,Y); ctx.lineTo(x0-6,Y); ctx.stroke();
+    ctx.fillText(i===5?'1.0':v.toFixed(1), x0-9, Y);
+  }
+  // rotated y axis label
+  ctx.save();
+  ctx.translate(x0-46, y0+h/2); ctx.rotate(-Math.PI/2);
+  ctx.fillStyle='#000'; ctx.font='20px Helvetica, Arial, sans-serif';
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText('liquid and vapor amounts (mol)',0,0);
+  ctx.restore();
+  // title above bar
+  ctx.font='15px Helvetica, Arial, sans-serif'; ctx.fillStyle='#000';
+  ctx.textAlign='center'; ctx.textBaseline='bottom';
+  let ttl = state.FOB===1
+    ? 'P = '+opVal.toFixed(2)+' bar'
+    : 'T = '+Math.round(opVal)+' \u00B0C';
+  ctx.save();
+  ctx.font='italic 15px Helvetica, Arial, sans-serif';
+  // draw with italic leading symbol
+  ctx.restore();
+  ctx.font='15px Helvetica, Arial, sans-serif';
+  drawTitleItalic(state.FOB===1?'P':'T',
+    state.FOB===1?(' = '+opVal.toFixed(2)+' bar'):(' = '+Math.round(opVal)+' \u00B0C'),
+    x0+w/2, y0-6);
+}
+function drawSubLabel(base,sub,val,cx,cy){
+  ctx.save();
+  ctx.font='italic 15px Helvetica, Arial, sans-serif';
+  const bW=ctx.measureText(base).width;
+  ctx.font='10px Helvetica, Arial, sans-serif';
+  const sW=ctx.measureText(String(sub)).width;
+  ctx.font='15px Helvetica, Arial, sans-serif';
+  const rest=' = '+val;
+  const rW=ctx.measureText(rest).width;
+  const total=bW+sW+rW;
+  let x=cx-total/2;
+  ctx.textAlign='left'; ctx.textBaseline='middle';
+  ctx.font='italic 15px Helvetica, Arial, sans-serif';
+  ctx.fillText(base,x,cy); x+=bW;
+  ctx.font='10px Helvetica, Arial, sans-serif';
+  ctx.fillText(String(sub),x,cy+4); x+=sW;
+  ctx.font='15px Helvetica, Arial, sans-serif';
+  ctx.fillText(rest,x,cy);
+  ctx.restore();
+}
+function drawTitleItalic(sym,rest,cx,cy){
+  ctx.save();
+  ctx.font='italic 15px Helvetica, Arial, sans-serif';
+  const sW=ctx.measureText(sym).width;
+  ctx.font='15px Helvetica, Arial, sans-serif';
+  const rW=ctx.measureText(rest).width;
+  let x=cx-(sW+rW)/2;
+  ctx.textAlign='left'; ctx.textBaseline='bottom';
+  ctx.fillStyle='#000';
+  ctx.font='italic 15px Helvetica, Arial, sans-serif';
+  ctx.fillText(sym,x,cy); x+=sW;
+  ctx.font='15px Helvetica, Arial, sans-serif';
+  ctx.fillText(rest,x,cy);
+  ctx.restore();
+}
+
+function render(){
+  ctx.clearRect(0,0,W,H);
+  const A12=state.A12,A21=state.A21;
+  const rg=ranges(); const ymin=rg.ymin, ymax=rg.ymax;
+  const r=compute();
+
+  if(state.FOB===1){
+    drawFrame(ymin,ymax,'mole fraction of component 1','pressure (bar)');
+    drawTitleItalic('T',' = 110 \u00B0C', PL.x0+PL.w/2, PL.y0-6);
+  } else {
+    drawFrame(ymin,ymax,'mole fraction of component 1','temperature (\u00B0C)');
+    drawTitleItalic('P',' = 1.6 bar', PL.x0+PL.w/2, PL.y0-6);
+  }
+
+  // curves
+  clipToPlot();
+  if(state.FOB===1){
+    plotCurve(x=>Pbub(x,T_FIX,A12,A21),ymin,ymax,BLUE);
+    plotCurve(x=>Pdew(x,T_FIX,A12,A21),ymin,ymax,GREEN);
+  } else {
+    if(!txyTab) txyTab=buildTxy(A12,A21);
+    plotPoly(txyTab.xe,txyTab.Te,ymin,ymax,BLUE);
+    plotPoly(txyTab.yie,txyTab.Te,ymin,ymax,GREEN);
+  }
+  ctx.restore();
+
+  drawTieLines(r,ymin,ymax);
+  drawLabelsLV(ymin,ymax);
+  drawDot(r,ymin,ymax);
+  drawBar(r);
+}
+
+/* ===================== Interaction ===================== */
+let dragging=false;
+function evtToData(e){
+  const rect=canvas.getBoundingClientRect();
+  const mx=(e.clientX-rect.left), my=(e.clientY-rect.top);
+  const rg=ranges();
+  let x=(mx-PL.x0)/PL.w;
+  let v=rg.ymin + (1-(my-PL.y0)/PL.h)*(rg.ymax-rg.ymin);
+  return {x,v,mx,my};
+}
+function setLoc(x,v){
+  const rg=ranges();
+  x=Math.max(0.001,Math.min(0.999,x));
+  v=Math.max(rg.cymin,Math.min(rg.cymax,v));
+  const loc=curLoc(); loc.x=x; loc.y=v;
+}
+function nearDot(mx,my){
+  const r=compute(); const rg=ranges();
+  const X=px(r.z1), Y=py(r.opVal,rg.ymin,rg.ymax);
+  return Math.hypot(mx-X,my-Y)<16;
+}
+canvas.addEventListener('pointerdown',e=>{
+  const d=evtToData(e);
+  if(d.mx>=PL.x0-10 && d.mx<=PL.x0+PL.w+10 && d.my>=PL.y0-10 && d.my<=PL.y0+PL.h+10){
+    dragging=true; canvas.setPointerCapture(e.pointerId);
+    setLoc(d.x,d.v); render();
+  }
+});
+canvas.addEventListener('pointermove',e=>{
+  if(!dragging)return;
+  const d=evtToData(e); setLoc(d.x,d.v); render();
+});
+canvas.addEventListener('pointerup',e=>{dragging=false;});
+canvas.addEventListener('pointercancel',e=>{dragging=false;});
+
+/* controls */
+function syncSliders(){
+  const a12=document.getElementById('A12'), a21=document.getElementById('A21');
+  if(state.OMM===1){ a12.min=0;a12.max=2; a21.min=0;a21.max=2; }
+  else { a12.min=-2;a12.max=0; a21.min=-2;a21.max=0; }
+  a12.value=state.A12; a21.value=state.A21;
+  document.getElementById('A12v').textContent=state.A12.toFixed(1);
+  document.getElementById('A21v').textContent=state.A21.toFixed(1);
+}
+document.getElementById('setDiagram').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b)return;
+  state.FOB=+b.dataset.v;
+  [...e.currentTarget.children].forEach(c=>c.classList.toggle('active',c===b));
+  render();
+});
+document.getElementById('setDev').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b)return;
+  const newOMM=+b.dataset.v;
+  if(newOMM!==state.OMM){
+    state.OMM=newOMM;
+    if(newOMM===1){ state.A12=state.A12p; state.A21=state.A21p; }
+    else { state.A12=state.A12n; state.A21=state.A21n; }
+    txyTab=null;
+    syncSliders();
+  }
+  [...e.currentTarget.children].forEach(c=>c.classList.toggle('active',c===b));
+  render();
+});
+document.getElementById('A12').addEventListener('input',e=>{
+  state.A12=parseFloat(e.target.value); document.getElementById('A12v').textContent=state.A12.toFixed(1);
+  if(state.OMM===1) state.A12p=state.A12; else state.A12n=state.A12;
+  txyTab=null; render();
+});
+document.getElementById('A21').addEventListener('input',e=>{
+  state.A21=parseFloat(e.target.value); document.getElementById('A21v').textContent=state.A21.toFixed(1);
+  if(state.OMM===1) state.A21p=state.A21; else state.A21n=state.A21;
+  txyTab=null; render();
+});
+
+/* panels */
+document.querySelector('.btncol').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b)return;
+  const id=b.dataset.p; const panel=document.getElementById(id);
+  const wasShown=panel.classList.contains('show');
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('show'));
+  if(!wasShown) panel.classList.add('show');
+});
+document.querySelectorAll('.panel-close').forEach(btn=>{
+  btn.addEventListener('click',e=>{
+    e.stopPropagation();
+    btn.closest('.panel').classList.remove('show');
+  });
+});
+
+syncSliders();
+render();
+</script>
 </body>
-
 </html>

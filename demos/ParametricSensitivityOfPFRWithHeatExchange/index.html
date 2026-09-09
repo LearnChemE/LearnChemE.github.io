@@ -82,38 +82,15 @@
     padding-left: 8px;
     font-variant-numeric: tabular-nums;
   }
-  input[type=range] {
-    -webkit-appearance: none;
-    appearance: none;
-    height: 4px;
-    width: 150px;
-    background: #c8c8c8;
-    border-radius: 2px;
-    outline: none;
-    margin: 0;
-    flex: 0 0 auto;
-  }
   #ftot { width: 200px; }
   #tf, #ea { width: 90px; }
-  input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 13px;
-    height: 13px;
-    border-radius: 50%;
-    background: #ffffff;
-    border: 1px solid #7a7a7a;
-    box-shadow: 0 1px 1px rgba(0,0,0,0.3);
-    cursor: pointer;
-  }
-  input[type=range]::-moz-range-thumb {
-    width: 13px;
-    height: 13px;
-    border-radius: 50%;
-    background: #ffffff;
-    border: 1px solid #7a7a7a;
-    cursor: pointer;
-  }
+input[type="range"]{
+  --accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+input[type="range"]::-moz-range-thumb{
+  width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+
   .row-twoup {
     display: flex;
     gap: 12px;
@@ -158,6 +135,33 @@
   }
   .panel.show { display: block; }
   .panel p { margin: 8px 0; }
+  #panelDir { width: 416px; }       /* 30% wider than base 320px */
+  #panelDet {
+    width: 614px;                    /* 512px + 20% */
+    max-height: 400px;
+    overflow-y: auto;
+  }
+  #panelAbout { width: 400px; }     /* 25% wider than base 320px */
+  #btnAbout { width: 105px; box-sizing: border-box; }  /* 25% wider */
+  #btnDet { width: 114px; box-sizing: border-box; }    /* 25% wider */
+  .panel-close {
+    position: absolute;
+    top: 4px;
+    right: 6px;
+    width: 20px;
+    height: 20px;
+    line-height: 18px;
+    text-align: center;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    font-weight: bold;
+    color: #666666;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+  }
+  .panel-close:hover { color: #000000; }
   .panel .eq {
     font-style: italic;
     margin: 6px 0 6px 18px;
@@ -208,10 +212,12 @@
   </div>
 
   <div class="panel" id="panelDir">
+    <button class="panel-close" type="button" aria-label="Close">&times;</button>
     <p>This Demonstration plots the temperature and molar flow rate of the reactant as a function of distance down a plug flow reactor for an exothermic, gas-phase reaction. The reactor has heat exchange through the walls. Vary the feed temperature, activation energy for the reaction, and total molar flow rate with the sliders. Conditions that lead to thermal runaway are highly sensitive to feed temperature and the activation energy of the reaction. Parametric sensitivity refers to the analysis of how these parameters affect the runaway behavior.</p>
   </div>
 
   <div class="panel" id="panelDet">
+    <button class="panel-close" type="button" aria-label="Close">&times;</button>
     <p>This is a model of the partial oxidation of o-xylene in a large excess of oxygen in a 1.5 m long plug flow reactor.</p>
     <p>The first-order rate expression:</p>
     <p class="eq">r = k e<sup>&minus;E<sub>a</sub>/(R<sub>2</sub>&nbsp;T)</sup> &middot; P/(R&nbsp;T) &middot; F<sub>x</sub>/F<sub>tot</sub> ,</p>
@@ -228,7 +234,8 @@
   </div>
 
   <div class="panel" id="panelAbout">
-    <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/SteadyStateBinaryFickianDiffusion/" target="_blank">Mathematica simulation</a> by Muqbil Alkhalaf, Rachael L. Baumann, Neil Hendren, and John L. Falconer. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988) in collaboration with Washington State University. Address any questions or comments to LearnChemE@gmail.com.</p>
+    <button class="panel-close" type="button" aria-label="Close">&times;</button>
+    <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/SteadyStateBinaryFickianDiffusion/" target="_blank">Mathematica simulation</a> by Muqbil Alkhalaf, Rachael L. Baumann, Neil Hendren, and John L. Falconer. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.</p>
   </div>
 </div>
 
@@ -468,21 +475,42 @@ el('setFlow').addEventListener('click', ()=>{
 // info panels
 const panels = {btnDir:'panelDir', btnDet:'panelDet', btnAbout:'panelAbout'};
 const appEl = el('app');
+const setterRowEl = document.querySelector('.setter-row');
+
+function closeAllPanels(){
+  Object.values(panels).forEach(p=>el(p).classList.remove('show'));
+  Object.keys(panels).forEach(b=>el(b).classList.remove('active'));
+}
+
 Object.keys(panels).forEach(bid=>{
   el(bid).addEventListener('click', ()=>{
     const pid=panels[bid];
     const showing = el(pid).classList.contains('show');
-    Object.values(panels).forEach(p=>el(p).classList.remove('show'));
-    Object.keys(panels).forEach(b=>el(b).classList.remove('active'));
+    closeAllPanels();
     if(!showing){
-      const btnRect = el(bid).getBoundingClientRect();
-      const appRect = appEl.getBoundingClientRect();
       const panel = el(pid);
-      panel.style.left = (btnRect.right - appRect.left + 8) + 'px';
-      panel.style.top  = (btnRect.top   - appRect.top  + 6) + 'px';
+      // Show first so the panel's own (per-panel) width can be measured,
+      // then position it below the row of buttons (which never move),
+      // aligned under the button that opened it but kept within the app's width.
       panel.classList.add('show');
       el(bid).classList.add('active');
+      const btnRect = el(bid).getBoundingClientRect();
+      const rowRect = setterRowEl.getBoundingClientRect();
+      const appRect = appEl.getBoundingClientRect();
+      const panelWidth = panel.getBoundingClientRect().width;
+      let left = btnRect.left - appRect.left;
+      const maxLeft = appRect.width - panelWidth - 8;
+      if (left > maxLeft) left = Math.max(8, maxLeft);
+      panel.style.left = left + 'px';
+      panel.style.top  = (rowRect.bottom - appRect.top + 8) + 'px';
     }
+  });
+});
+
+document.querySelectorAll('.panel-close').forEach(btn=>{
+  btn.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    closeAllPanels();
   });
 });
 

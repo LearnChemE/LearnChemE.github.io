@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fluidization of a Packed Bed</title>
+
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']]
+            },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: #ffffff;
+            color: #000000;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+        }
+        @media (min-width: 768px) {
+            body { padding: 2rem; }
+        }
+
+        header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        @media (min-width: 768px) {
+            header { text-align: left; }
+        }
+        h1 {
+            font-size: 1.875rem;
+            font-weight: 700;
+            margin: 0;
+            background: linear-gradient(to right, #60a5fa, #5eead4);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        @media (min-width: 768px) {
+            h1 { font-size: 2.25rem; }
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            flex: 1;
+        }
+        @media (min-width: 1024px) {
+            .layout { grid-template-columns: 285px auto 422px; max-width: 1120px; justify-content: start; }
+        }
+
+        .controls-col {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .data-card {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            padding: 1.25rem;
+            border-radius: 0.75rem;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 0 0 1rem 0;
+            color: #000000;
+            border-bottom: 1px solid #cbd5e1;
+            padding-bottom: 0.5rem;
+        }
+
+        .field { margin-bottom: 1rem; }
+        .field label {
+            display: block;
+            font-size: 1.01rem; /* +15% from 0.875rem */
+            font-weight: 400;
+            color: #1f2937;
+            margin-bottom: 0.25rem;
+        }
+        select {
+            width: auto;
+            max-width: 100%;
+            background: #ffffff;
+            border: 1px solid #94a3b8;
+            color: #000000;
+            border-radius: 0.375rem;
+            padding: 0.5rem;
+            outline: none;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: box-shadow 0.15s;
+        }
+        select:focus { box-shadow: 0 0 0 2px #3b82f6; }
+
+        .slider-block { margin-top: 1.5rem; margin-bottom: 0.5rem; }
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            font-size: 1.01rem; /* +15% from 0.875rem */
+            font-weight: 400;
+            color: #1f2937;
+            margin-bottom: 0.25rem;
+        }
+        .slider-label.tight {
+            justify-content: flex-start;
+            gap: 0.6rem;
+        }
+        .slider-value {
+            color: #000000;
+            font-size: 1.05rem; /* +20% from 0.875rem */
+        }
+        .slider-limits {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            font-size: 1.035rem; /* +15% from 0.9rem */
+            color: #475569;
+            margin-top: 0.25rem;
+        }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: #98000D;
+            cursor: pointer;
+            margin-top: -6px;
+            box-shadow: 0 0 5px #98000D88;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #cbd5e1;
+            border-radius: 2px;
+        }
+        input[type=range]::-moz-range-thumb {
+            height: 16px;
+            width: 16px;
+            border: none;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+            box-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
+        }
+        input[type=range]::-moz-range-track {
+            width: 100%;
+            height: 4px;
+            background: #cbd5e1;
+            border-radius: 2px;
+        }
+        input[type=range]:focus { outline: none; }
+
+        .state-indicator {
+            display: block;
+            width: fit-content;
+            margin: 0 auto;
+            text-align: center;
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.5rem;
+            font-weight: 400;
+            font-size: 1.125rem;
+            white-space: nowrap;
+            transition: all 0.3s;
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #cbd5e1;
+        }
+        .state-indicator.fluidized {
+            background: #ecfdf5;
+            color: #047857;
+            border-color: #6ee7b7;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.15);
+        }
+
+        /* Figure column */
+        .figure-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .button-row {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .info-btn {
+            background: #98000D;
+            color: #fff;
+            border: none;
+            padding: 0.63rem 1.44rem; /* +15% from 0.55rem/1.25rem */
+            border-radius: 0.5rem;
+            font-weight: 400;
+            font-size: 1.09rem; /* +15% from 0.95rem */
+            font-family: inherit;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .info-btn:hover { background: #7a000a; }
+
+        .figure-wrap { position: relative; }
+        .canvas-container { position: relative; }
+
+        .edge-decor {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 8px;
+            pointer-events: none;
+            z-index: 10;
+        }
+        .edge-decor.left { left: -2px; background: linear-gradient(to right, #94a3b8, transparent); border-radius: 0.5rem 0 0 0.5rem; }
+        .edge-decor.right { right: -2px; background: linear-gradient(to left, #94a3b8, transparent); border-radius: 0 0.5rem 0.5rem 0; }
+
+        canvas {
+            background: #ffffff;
+            border-radius: 0.5rem;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.15);
+            border: 2px solid #94a3b8;
+            display: block;
+        }
+
+        .flyout-panel {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 225%; /* 50% wider than the previous 150% */
+            max-width: calc(100vw - 2rem);
+            max-height: 90vh; /* shrink-wraps to content instead of the full figure height */
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            overflow-y: auto;
+            z-index: 20;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        .flyout-panel.hidden { display: none; }
+        #panelDetails {
+            overflow-y: scroll;
+            scrollbar-width: auto; /* Firefox */
+        }
+        #panelDetails::-webkit-scrollbar {
+            width: 10px;
+        }
+        #panelDetails::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 8px;
+        }
+        #panelDetails::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 8px;
+        }
+        #panelDetails::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+        .panel-close {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.75rem;
+            background: none;
+            border: none;
+            color: #475569;
+            font-size: 1.5rem;
+            line-height: 1;
+            cursor: pointer;
+            padding: 0.25rem;
+        }
+        .panel-close:hover { color: #000000; }
+        .panel-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin: 0 0 0.75rem 0;
+            color: #000000;
+        }
+        .panel-body { font-size: 0.95rem; color: #1f2937; line-height: 1.6; }
+        .panel-body p { margin: 0 0 0.75rem 0; }
+        .panel-body ol, .panel-body ul { margin: 0 0 0.75rem 1.25rem; padding: 0; }
+        .panel-body li { margin-bottom: 0.4rem; }
+        .eq-block {
+            background: #f1f5f9;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            margin: 0.5rem 0 1rem 0;
+            text-align: left;
+        }
+        .panel-subtitle {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #000000;
+            margin: 1rem 0 0.4rem 0;
+        }
+
+        /* Dashboard */
+        .dashboard-col {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+        .dashboard-col .data-card {
+            width: fit-content;
+        }
+        .calc-rows {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.2rem; /* tighter line spacing */
+            font-size: 1.01rem; /* +15% from 0.875rem */
+        }
+        .calc-row {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 0.5rem;
+            width: fit-content;
+            background: #f1f5f9;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+        }
+        .calc-row .label { color: #1f2937; min-width: 0; white-space: nowrap; }
+        .calc-row .equals { color: #1f2937; }
+        .calc-row .value {
+            font-weight: 400;
+            font-size: 1.16rem; /* +15% from 1.01rem */
+            color: #000000;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .value.emerald, .value.blue, .value.amber, .value.fuchsia, .value.indigo { color: #000000; }
+
+        sub { font-size: 0.7em; }
+    </style>
+</head>
+<body>
+
+    <div class="layout">
+
+        <!-- Controls Panel -->
+        <div class="controls-col">
+            <div class="data-card">
+                <h2 class="card-title">Parameters</h2>
+
+                <!-- Fluid Selection -->
+                <div class="field">
+                    <label for="fluidSelect">fluid at 25&deg;C</label>
+                    <select id="fluidSelect">
+                        <option value="water">water</option>
+                        <option value="air">air</option>
+                    </select>
+                </div>
+
+                <!-- Particle Diameter -->
+                <div class="field">
+                    <label for="dpSelect">effective sand diameter (D<sub>p</sub>)</label>
+                    <select id="dpSelect">
+                        <option value="10">10 mm</option>
+                        <option value="20">20 mm</option>
+                        <option value="40">40 mm</option>
+                    </select>
+                </div>
+
+                <!-- Sphericity -->
+                <div class="field">
+                    <div class="slider-label tight">
+                        <span>sphericity (&phi;<sub>s</sub>)</span>
+                        <span id="phiDisplay" class="slider-value">0.85</span>
+                    </div>
+                    <input type="range" id="phiSlider" min="0.70" max="1.00" step="0.01" value="0.85">
+                    <div class="slider-limits">
+                        <span>0.7 (angular)</span>
+                        <span>1.0 (perfect sphere)</span>
+                    </div>
+                </div>
+
+                <!-- Superficial Velocity -->
+                <div class="slider-block">
+                    <div class="slider-label">
+                        <span>superficial velocity (u<sub>0</sub>)</span>
+                        <span id="u0Display" class="slider-value">0.000 m/s</span>
+                    </div>
+                    <input type="range" id="u0Slider" min="0" max="0.5" step="0.001" value="0">
+                    <div class="slider-limits">
+                        <span>0 m/s</span>
+                        <span id="u0MaxDisplay">0.5 m/s</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Canvas / Visualization -->
+        <div class="figure-col">
+
+            <div class="button-row">
+                <button id="btnDirections" class="info-btn" type="button">Directions</button>
+                <button id="btnDetails" class="info-btn" type="button">Details</button>
+                <button id="btnAbout" class="info-btn" type="button">About</button>
+            </div>
+
+            <div class="figure-wrap">
+                <div class="canvas-container">
+                    <div class="edge-decor left"></div>
+                    <div class="edge-decor right"></div>
+                    <canvas id="simCanvas" width="300" height="500"></canvas>
+                </div>
+
+                <!-- Directions Panel -->
+                <div id="panelDirections" class="flyout-panel hidden">
+                    <button class="panel-close" type="button" aria-label="Close">&times;</button>
+                    <h3 class="panel-title">Directions</h3>
+                    <div class="panel-body">
+                        <p>Explore the hydrodynamics of a packed bed of sand. Adjust the fluid and particle properties to calculate the minimum fluidization velocity (u<sub>mf</sub>) using the Ergun equation and Wen and Yu approximations.</p>
+                        <ol>
+                            <li>Select the fluid (water or air) flowing upward through the bed.</li>
+                            <li>Choose the effective sand particle diameter.</li>
+                            <li>Adjust the sphericity slider to describe how close the particles are to a perfect sphere.</li>
+                            <li>Increase the superficial velocity slider to raise the upward fluid velocity through the bed.</li>
+                            <li>Watch the bed transition from a fixed (stationary) bed to a fluidized bed once the superficial velocity exceeds the minimum fluidization velocity.</li>
+                            <li>Read the calculated values in the calculations panel to the right, including the minimum fluidization velocity, porosity, bed expansion, and particle Reynolds number.</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <!-- Details Panel -->
+                <div id="panelDetails" class="flyout-panel hidden">
+                    <button class="panel-close" type="button" aria-label="Close">&times;</button>
+                    <h3 class="panel-title">Details</h3>
+                    <div class="panel-body">
+                        <p>The simulation calculates the minimum fluidization velocity by equating the pressure drop from the Ergun equation to the buoyant weight of the bed, then estimates the porosity at minimum fluidization with the Wen and Yu approximation.</p>
+
+                        <p class="panel-subtitle">Symbols</p>
+                        <ul>
+                            <li>\(\rho_p\) &mdash; particle density</li>
+                            <li>\(\rho_f\) &mdash; fluid density</li>
+                            <li>\(\mu\) &mdash; fluid viscosity</li>
+                            <li>\(g\) &mdash; gravitational acceleration</li>
+                            <li>\(D_p\) &mdash; effective particle diameter</li>
+                            <li>\(\phi_s\) &mdash; particle sphericity</li>
+                            <li>\(u_0\) &mdash; superficial velocity</li>
+                            <li>\(\epsilon\) &mdash; bed porosity</li>
+                            <li>\(\epsilon_{mf}\) &mdash; porosity at minimum fluidization</li>
+                            <li>\(u_{mf}\) &mdash; minimum fluidization velocity</li>
+                            <li>\(Re_p\) &mdash; particle Reynolds number</li>
+                        </ul>
+
+                        <p class="panel-subtitle">Ergun equation (equated to weight)</p>
+                        <div class="eq-block">
+                            \( (\rho_p - \rho_f)g = \dfrac{150\mu u_0(1-\epsilon)}{\phi_s^2 D_p^2 \epsilon^3} + \dfrac{1.75\rho_f u_0^2}{\phi_s D_p \epsilon^3} \)
+                        </div>
+
+                        <p class="panel-subtitle">Wen and Yu approximation</p>
+                        <div class="eq-block">
+                            \( \dfrac{1}{\phi_s \epsilon_{mf}^3} \approx 14 \implies \epsilon_{mf} = (14\phi_s)^{-1/3} \)
+                        </div>
+
+                        <p class="panel-subtitle">Particle Reynolds number</p>
+                        <div class="eq-block">
+                            \( Re_p = \dfrac{\rho_f u_0 D_p}{\mu} \)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- About Panel -->
+                <div id="panelAbout" class="flyout-panel hidden">
+                    <button class="panel-close" type="button" aria-label="Close">&times;</button>
+                    <h3 class="panel-title">About</h3>
+                    <div class="panel-body">
+                        <p>This simulation was generated by Professor David L. Silverstein and Dr. Loyal Murphy of the University of Mississippi using Google Gemini. It was modified for LearnChemE using Claude AI.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Panel -->
+        <div class="dashboard-col">
+            <div class="data-card">
+                <div id="stateIndicator" class="state-indicator">
+                    fixed bed (stationary)
+                </div>
+            </div>
+
+            <div class="data-card">
+                <h2 class="card-title">Calculations</h2>
+
+                <div class="calc-rows">
+                    <div class="calc-row">
+                        <span class="label">Min. fluidization velocity (u<sub>mf</sub>)</span>
+                        <span class="equals">=</span>
+                        <span id="calcUmf" class="value emerald">0.000 m/s</span>
+                    </div>
+
+                    <div class="calc-row">
+                        <span class="label">Wen and Yu porosity (&epsilon;<sub>mf</sub>)</span>
+                        <span class="equals">=</span>
+                        <span id="calcEpsMf" class="value blue">0.000</span>
+                    </div>
+
+                    <div class="calc-row">
+                        <span class="label">Current porosity (&epsilon;)</span>
+                        <span class="equals">=</span>
+                        <span id="calcEps" class="value amber">0.000</span>
+                    </div>
+
+                    <div class="calc-row">
+                        <span class="label">Bed expansion (H / H<sub>mf</sub>)</span>
+                        <span class="equals">=</span>
+                        <span id="calcHRatio" class="value fuchsia">1.00</span>
+                    </div>
+
+                    <div class="calc-row">
+                        <span class="label">Particle Reynolds no. (Re<sub>p</sub>)</span>
+                        <span class="equals">=</span>
+                        <span id="calcRe" class="value indigo">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Physical Constants
+        const g = 9.81; // m/s^2
+        const rho_p = 2650; // kg/m^3 (Sand)
+
+        const fluids = {
+            water: { rho: 997, mu: 8.9e-4, color: '#2563eb', bubbleCount: 40 }, // kg/m^3, Pa.s
+            air: { rho: 1.18, mu: 1.85e-5, color: '#64748b', bubbleCount: 100 }
+        };
+
+        // DOM Elements
+        const fluidSelect = document.getElementById('fluidSelect');
+        const dpSelect = document.getElementById('dpSelect');
+        const phiSlider = document.getElementById('phiSlider');
+        const u0Slider = document.getElementById('u0Slider');
+
+        const phiDisplay = document.getElementById('phiDisplay');
+        const u0Display = document.getElementById('u0Display');
+        const u0MaxDisplay = document.getElementById('u0MaxDisplay');
+        const stateIndicator = document.getElementById('stateIndicator');
+
+        const calcUmf = document.getElementById('calcUmf');
+        const calcEpsMf = document.getElementById('calcEpsMf');
+        const calcEps = document.getElementById('calcEps');
+        const calcHRatio = document.getElementById('calcHRatio');
+        const calcRe = document.getElementById('calcRe');
+
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // State variables
+        let params = {
+            fluid: 'water',
+            Dp: 0.01, // meters
+            phi: 0.85,
+            u0: 0.0
+        };
+
+        let results = {
+            u_mf: 0,
+            eps_mf: 0,
+            eps: 0,
+            h_ratio: 1,
+            Re: 0,
+            isFluidized: false
+        };
+
+        // Simulation Data
+        const H_mf_pixel = 200; // Base height of bed in pixels
+        const W_pixel = canvas.width;
+        let particles = [];
+        let fluidLines = [];
+
+        function formatU0(value) {
+            let decimals = (params.fluid === 'air' && value > 1) ? 2 : 3;
+            return value.toFixed(decimals);
+        }
+
+        function calculatePhysics() {
+            let rho_f = fluids[params.fluid].rho;
+            let mu_f = fluids[params.fluid].mu;
+
+            // 1. Wen and Yu approximation for porosity at minimum fluidization
+            results.eps_mf = Math.pow(1 / (14 * params.phi), 1/3);
+
+            // 2. Calculate u_mf by equating Ergun eq to buoyant weight
+            // A * u^2 + B * u + C = 0
+            let A = (1.75 * rho_f) / (params.phi * params.Dp * Math.pow(results.eps_mf, 3));
+            let B = (150 * mu_f * (1 - results.eps_mf)) / (Math.pow(params.phi, 2) * Math.pow(params.Dp, 2) * Math.pow(results.eps_mf, 3));
+            let C = -(rho_p - rho_f) * g;
+
+            results.u_mf = (-B + Math.sqrt(B * B - 4 * A * C)) / (2 * A);
+
+            // 3. Determine current state based on u0
+            results.isFluidized = params.u0 > results.u_mf;
+
+            if (!results.isFluidized || params.u0 === 0) {
+                results.eps = results.eps_mf;
+                results.h_ratio = 1.0;
+            } else {
+                // If fluidized, solve for new porosity eps using Newton-Raphson
+                // K * eps^3 + C1 * eps - (C1 + C2) = 0
+                let K = (rho_p - rho_f) * g;
+                let C1 = (150 * mu_f * params.u0) / (Math.pow(params.phi, 2) * Math.pow(params.Dp, 2));
+                let C2 = (1.75 * rho_f * Math.pow(params.u0, 2)) / (params.phi * params.Dp);
+
+                let eps = results.eps_mf;
+                for(let i=0; i<20; i++) {
+                    let f = K * Math.pow(eps, 3) + C1 * eps - (C1 + C2);
+                    let df = 3 * K * Math.pow(eps, 2) + C1;
+                    eps = eps - f / df;
+                }
+
+                // Cap porosity to realistic bounds
+                results.eps = Math.max(results.eps_mf, Math.min(eps, 0.95));
+                results.h_ratio = (1 - results.eps_mf) / (1 - results.eps);
+            }
+
+            // 4. Calculate Particle Reynolds Number
+            results.Re = (rho_f * params.u0 * params.Dp) / mu_f;
+
+            updateDashboard();
+        }
+
+        function updateDashboard() {
+            let umfDecimals = params.fluid === 'air' ? 2 : 4;
+            calcUmf.innerHTML = results.u_mf.toFixed(umfDecimals) + " m/s";
+            calcEpsMf.innerHTML = results.eps_mf.toFixed(3);
+            calcEps.innerHTML = results.eps.toFixed(3);
+            calcHRatio.innerHTML = results.h_ratio.toFixed(2);
+            calcRe.innerHTML = results.Re.toFixed(0);
+
+            if (results.isFluidized) {
+                stateIndicator.className = "state-indicator fluidized";
+                stateIndicator.innerHTML = "fluidized bed";
+            } else {
+                stateIndicator.className = "state-indicator";
+                stateIndicator.innerHTML = "fixed bed (stationary)";
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            // Map Dp to pixel radius for visual representation.
+            // Exaggerated slightly to ensure they fit in canvas nicely.
+            let pixelRadiusMap = { "0.01": 5, "0.02": 10, "0.04": 20 };
+            let r = pixelRadiusMap[params.Dp.toString()] || 10;
+
+            let cols = Math.floor(W_pixel / (r * 2));
+            // Calculate how many rows to reach H_mf_pixel
+            let rowSpacing = r * 1.732; // Hexagonal vertical spacing
+            let rows = Math.floor(H_mf_pixel / rowSpacing);
+
+            for(let i=0; i<rows; i++) {
+                for(let j=0; j<cols; j++) {
+                    let x = (j * 2 * r) + r + (i % 2 === 0 ? 0 : r);
+                    if (x > W_pixel - r) continue;
+                    let y = canvas.height - r - (i * rowSpacing);
+
+                    particles.push({
+                        baseX: x,
+                        baseY: y,
+                        x: x,
+                        y: y,
+                        radius: r,
+                        phaseX: Math.random() * Math.PI * 2,
+                        phaseY: Math.random() * Math.PI * 2,
+                        speedFactor: 0.5 + Math.random() * 0.5,
+                        color: `hsl(${35 + Math.random()*15}, ${70 + Math.random()*30}%, ${40 + Math.random()*20}%)`
+                    });
+                }
+            }
+        }
+
+        function initFluidVisuals() {
+            fluidLines = [];
+            let count = fluids[params.fluid].bubbleCount;
+            for(let i=0; i<count; i++) {
+                fluidLines.push({
+                    x: Math.random() * W_pixel,
+                    y: Math.random() * canvas.height,
+                    length: Math.random() * 15 + 5,
+                    speed: Math.random() * 0.5 + 0.5
+                });
+            }
+        }
+
+        function updateSliderBounds() {
+            // Recalculate umf briefly to set max slider sensibly
+            let tempParams = { ...params };
+            params.phi = 0.7; // use lowest phi to get highest typical umf for boundary
+            calculatePhysics();
+            let maxUmf = results.u_mf;
+
+            params.phi = tempParams.phi; // restore
+            calculatePhysics();
+
+            let maxSlider = (maxUmf * 2.4).toFixed(3);
+            if (maxSlider < 0.05) maxSlider = 0.05;
+
+            u0Slider.max = maxSlider;
+            u0MaxDisplay.innerHTML = maxSlider + " m/s";
+
+            // Adjust current value if it exceeds new max
+            if (params.u0 > maxSlider) {
+                params.u0 = parseFloat(maxSlider);
+                u0Slider.value = params.u0;
+                calculatePhysics();
+            }
+            // Refresh the display in case the fluid change alone should change decimal precision
+            u0Display.innerHTML = formatU0(params.u0) + " m/s";
+        }
+
+        // Render Loop
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            let time = performance.now() / 1000;
+
+            // 1. Draw Fluid Flow
+            if (params.u0 > 0) {
+                ctx.strokeStyle = fluids[params.fluid].color;
+                ctx.lineWidth = params.fluid === 'water' ? 2 : 1.5;
+                ctx.globalAlpha = Math.min(0.8, params.u0 / results.u_mf * 0.5);
+
+                let baseFlowSpeed = params.u0 * (params.fluid === 'water' ? 200 : 20);
+
+                fluidLines.forEach(fl => {
+                    fl.y -= fl.speed * baseFlowSpeed * 0.016; // Approx 60fps
+                    if (fl.y < -fl.length) {
+                        fl.y = canvas.height + fl.length;
+                        fl.x = Math.random() * W_pixel;
+                    }
+
+                    ctx.beginPath();
+                    if(params.fluid === 'air') {
+                        // Draw small bubbles for air
+                        ctx.arc(fl.x, fl.y, 1.5, 0, Math.PI*2);
+                        ctx.fillStyle = ctx.strokeStyle;
+                        ctx.fill();
+                    } else {
+                        // Draw streaks for water
+                        ctx.moveTo(fl.x, fl.y);
+                        ctx.lineTo(fl.x, fl.y + fl.length);
+                        ctx.stroke();
+                    }
+                });
+                ctx.globalAlpha = 1.0;
+            }
+
+            // 2. Update and Draw Particles
+            let intensity = 0;
+            if (results.isFluidized) {
+                intensity = Math.min((params.u0 - results.u_mf) / results.u_mf, 4.0);
+            }
+
+            particles.forEach(p => {
+                // Calculate expanded target Y based on H_ratio
+                // Bed expands from the bottom up.
+                let distFromBottom = canvas.height - p.baseY;
+                let targetY = canvas.height - (distFromBottom * results.h_ratio);
+
+                if (results.isFluidized) {
+                    // Procedural Jitter for fluidization
+                    let jx = Math.sin(time * 8 * p.speedFactor + p.phaseX) * p.radius * intensity * 0.6;
+                    let jy = Math.cos(time * 9 * p.speedFactor + p.phaseY) * p.radius * intensity * 0.6;
+
+                    // Smoothly interpolate to jittered position
+                    p.x += (p.baseX + jx - p.x) * 0.1;
+                    p.y += (targetY + jy - p.y) * 0.1;
+
+                    // Small chance to swap base positions to simulate bed mixing
+                    if (Math.random() < 0.005 * intensity) {
+                        let other = particles[Math.floor(Math.random() * particles.length)];
+                        let tempX = p.baseX; let tempY = p.baseY;
+                        p.baseX = other.baseX; p.baseY = other.baseY;
+                        other.baseX = tempX; other.baseY = tempY;
+                    }
+
+                } else {
+                    // Settle back to base position smoothly
+                    p.x += (p.baseX - p.x) * 0.1;
+                    p.y += (targetY - p.y) * 0.1;
+                }
+
+                // Draw Particle (Sand grain)
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius * 0.9, 0, Math.PI * 2);
+                ctx.fillStyle = p.color;
+                ctx.fill();
+
+                // Add a little highlight for 3D effect
+                ctx.beginPath();
+                ctx.arc(p.x - p.radius*0.3, p.y - p.radius*0.3, p.radius * 0.2, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255,255,255,0.5)';
+                ctx.fill();
+            });
+
+            // 3. Draw Bed Height Indicator
+            let currentBedHeightPx = H_mf_pixel * results.h_ratio;
+            let topY = canvas.height - currentBedHeightPx;
+
+            ctx.beginPath();
+            ctx.setLineDash([5, 5]);
+            ctx.moveTo(0, topY);
+            ctx.lineTo(W_pixel, topY);
+            ctx.strokeStyle = '#ef4444'; // Red dashed line
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Label
+            ctx.fillStyle = '#000000';
+            ctx.font = '18px Inter'; /* +20% from 15px */
+            ctx.fillText('Bed surface', 5, topY - 5);
+
+            requestAnimationFrame(draw);
+        }
+
+        // Event Listeners
+        fluidSelect.addEventListener('change', (e) => {
+            params.fluid = e.target.value;
+            initFluidVisuals();
+            updateSliderBounds();
+            calculatePhysics();
+        });
+
+        dpSelect.addEventListener('change', (e) => {
+            params.Dp = parseFloat(e.target.value) / 1000;
+            initParticles();
+            updateSliderBounds();
+            calculatePhysics();
+        });
+
+        phiSlider.addEventListener('input', (e) => {
+            params.phi = parseFloat(e.target.value);
+            phiDisplay.innerHTML = params.phi.toFixed(2);
+            calculatePhysics();
+        });
+
+        u0Slider.addEventListener('input', (e) => {
+            params.u0 = parseFloat(e.target.value);
+            u0Display.innerHTML = formatU0(params.u0) + " m/s";
+            calculatePhysics();
+        });
+
+        // Flyout panel logic
+        const panels = {
+            directions: document.getElementById('panelDirections'),
+            details: document.getElementById('panelDetails'),
+            about: document.getElementById('panelAbout')
+        };
+        const panelButtons = {
+            directions: document.getElementById('btnDirections'),
+            details: document.getElementById('btnDetails'),
+            about: document.getElementById('btnAbout')
+        };
+
+        function closeAllPanels() {
+            Object.values(panels).forEach(p => p.classList.add('hidden'));
+        }
+
+        function openPanel(key) {
+            const panel = panels[key];
+            const wasHidden = panel.classList.contains('hidden');
+            closeAllPanels();
+            if (wasHidden) {
+                panel.classList.remove('hidden');
+                if (window.MathJax && window.MathJax.typesetPromise) {
+                    window.MathJax.typesetPromise([panel]);
+                }
+            }
+        }
+
+        Object.keys(panelButtons).forEach(key => {
+            panelButtons[key].addEventListener('click', () => openPanel(key));
+        });
+
+        document.querySelectorAll('.panel-close').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.target.closest('.flyout-panel').classList.add('hidden');
+            });
+        });
+
+        // Initialization
+        initFluidVisuals();
+        initParticles();
+        updateSliderBounds();
+        calculatePhysics();
+        draw();
+
+    </script>
+</body>
+</html>

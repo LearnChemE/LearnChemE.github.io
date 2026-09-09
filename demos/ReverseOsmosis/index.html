@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Reverse Osmosis</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    font-family: Helvetica, Arial, sans-serif;
+    background: #ffffff;
+    color: #000000;
+    overflow-x: auto;
+  }
+  #container {
+    max-width: 1420px;
+    margin: 0 auto;
+    padding: 14px 18px 22px 18px;
+    box-sizing: border-box;
+  }
+  h1.title {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 22px;
+    font-weight: bold;
+    margin: 2px 0 12px 0;
+    color: #000000;
+  }
+  #mainRow {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 20px;
+    flex-wrap: nowrap;
+  }
+  #plotWrap {
+    position: relative;
+  }
+  #yAxisLabel {
+    position: absolute;
+    left: 16px;
+    top: 355px;
+    transform-origin: 0 0;
+    transform: rotate(-90deg);
+    white-space: nowrap;
+    font-family: Helvetica, Arial, sans-serif;
+    font-weight: normal;
+    color: #000000;
+    font-size: 21px;
+  }
+  #middleCol {
+    display: flex;
+    flex-direction: column;
+    width: 235px;
+    flex-shrink: 0;
+    position: relative;
+  }
+  canvas {
+    display: block;
+  }
+  #controlsGrid {
+    display: flex;
+    flex-direction: column;
+    row-gap: 14px;
+  }
+  .control-row {
+    display: flex;
+    flex-direction: column;
+  }
+  .control-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 16.5px;
+    font-family: Helvetica, Arial, sans-serif;
+    margin-bottom: 3px;
+  }
+  .control-label .name {
+    color: #000;
+  }
+  .control-label .value {
+    color: #000;
+    font-variant-numeric: tabular-nums;
+  }
+  input[type="range"] {
+    width: 100%;
+    height: 20px;
+  }
+input[type="range"]{
+  --accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+input[type="range"]::-moz-range-thumb{
+  width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+
+  .checkbox-row {
+    display: flex;
+    align-items: center;
+  }
+  .checkbox-row label {
+    display: flex;
+    align-items: center;
+    font-size: 16.5px;
+    font-family: Helvetica, Arial, sans-serif;
+    cursor: pointer;
+    gap: 8px;
+  }
+  .checkbox-row input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: #98000D;
+  }
+  /* Panel toggle buttons */
+  #panelButtons {
+    margin-top: 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 9px;
+  }
+  .panel-btn {
+    background-color: #98000D;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    padding: 7px 16px;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 15.4px;
+    font-weight: normal;
+    cursor: pointer;
+    letter-spacing: 0.3px;
+  }
+  .panel-btn:hover {
+    background-color: #7a0009;
+  }
+  .panel {
+    display: none;
+    position: absolute;
+    left: 0;
+    padding: 14px 34px 14px 18px;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    background: #fafafa;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 14.5px;
+    line-height: 1.5;
+    color: #222;
+    width: 460px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.18);
+    z-index: 20;
+  }
+  .panel.open {
+    display: block;
+  }
+  .panel-close {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: #666;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+  }
+  .panel-close:hover {
+    background: #e2e2e2;
+    color: #000;
+  }
+  .panel p {
+    margin: 0 0 10px 0;
+  }
+  .panel p:last-child {
+    margin-bottom: 0;
+  }
+  .panel h3 {
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    color: #98000D;
+    margin: 0 0 8px 0;
+  }
+  .panel a {
+    color: #98000D;
+  }
+  .eq {
+    font-style: italic;
+  }
+  .sub {
+    font-size: 0.75em;
+    vertical-align: sub;
+  }
+  .sup {
+    font-size: 0.75em;
+    vertical-align: super;
+  }
+</style>
+<script>
+  MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+    chtml: { displayAlign: 'left', displayIndent: '0' }
+  };
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+<div id="container">
+  <div id="mainRow">
+    <div id="plotWrap">
+      <canvas id="plotCanvas"></canvas>
+      <div id="yAxisLabel">water flux (kg/(m&sup2; s))</div>
+    </div>
+    <div id="middleCol">
+      <div id="controlsGrid">
+        <div class="control-row">
+          <div class="control-label"><span class="name">pressure drop (atm)</span><span class="value" id="pressureVal">40</span></div>
+          <input type="range" id="pressureSlider" min="15" max="99" step="1" value="40">
+        </div>
+        <div class="checkbox-row">
+          <label><input type="checkbox" id="diagramCheck" checked> show diagram</label>
+        </div>
+        <div class="control-row">
+          <div class="control-label"><span class="name">stirring bar speed (rad/s)</span><span class="value" id="omegaVal">53</span></div>
+          <input type="range" id="omegaSlider" min="20" max="80" step="10" value="53">
+        </div>
+        <div class="control-row">
+          <div class="control-label"><span class="name">inlet salt mass fraction</span><span class="value" id="xinVal">0.030</span></div>
+          <input type="range" id="xinSlider" min="0.005" max="0.05" step="0.001" value="0.03">
+        </div>
+      </div>
+
+      <div id="panelButtons">
+        <button class="panel-btn" id="btnDirections">Directions</button>
+        <button class="panel-btn" id="btnDetails">Details</button>
+        <button class="panel-btn" id="btnAbout">About</button>
+      </div>
+
+      <div class="panel" id="panelDirections">
+        <button class="panel-close" data-panel="panelDirections" aria-label="Close">&times;</button>
+        <p>This simulation models a reverse osmosis process in which salt water at high pressure is fed to a chamber with a membrane that is only permeable to water. The outlet permeate stream is pure water at low pressure, and the retentate stream is water enriched in salt.</p>
+        <p>Use the sliders to set the pressure drop across the membrane, the inlet salt mass fraction and the stirring bar speed. Increasing the stirring speed decreases concentration polarization on the feed side of the membrane and increases water flux through the membrane. The inlet mass flow rate is fixed and the process is isothermal.</p>
+        <p>The water flux through the membrane is plotted versus the pressure drop across the membrane. The blue line represents the water flux when pure water is fed to the system. The green line represents the water flux when salt water is fed to the system. The dashed black line indicates the maximum water flux through the membrane. The values in the diagram on the right correspond to the conditions represented by the black dot, whose location is selected by the pressure drop slider. If the pressure drop is less than the osmotic pressure (orange dot on the x axis), the system exhibits osmosis, and pure water permeates into the salt water feed.</p>
+        <p>Uncheck the "show diagram" box to remove the flow diagram on the right and display a larger graph of flux versus pressure drop.</p>
+      </div>
+
+      <div class="panel" id="panelDetails">
+        <button class="panel-close" data-panel="panelDetails" aria-label="Close">&times;</button>
+        <p>An empirical correction factor accounts for reduced mass transfer at high salt concentrations:</p>
+        <p>$$\text{correction} = 0.8\left(\frac{0.05}{x_{in}}\right)^{(0.05-x_{in})(20)}$$</p>
+        <p>The mass transfer coefficient is then found from:</p>
+        <p>$$k = \text{correction} \times 0.04433 \left(\frac{\omega d^2}{\nu}\right)^{0.75} Sc^{0.33} \frac{D_{AB}}{d},$$</p>
+        <p>where $k$ is the mass transfer coefficient, $\omega$ is the rotational speed of the stirring bar (rad/s), $d$ is the tank diameter (m), $\nu$ is kinematic viscosity (m$^2$/s), $Sc$ is the Schmidt number (dimensionless), and $D_{AB}$ is the diffusivity of the solute in water (m$^2$/s).</p>
+        <p>Then solve for the maximum solvent flux:</p>
+        <p>$$J_{max} = \ln(10)\, k\, \rho,$$</p>
+        <p>where $J_{max}$ is the maximum water flux through the membrane (g/(m$^2$ s)) and $\rho$ is the density of water (997 kg/m$^3$).</p>
+        <p>Solve for the solvent flux:</p>
+        <p>$$J' = J'_{max} \, \frac{\Delta P - \Delta \Pi}{(\Delta P - \Delta \Pi) + J'_{max}\,(t/K')},$$</p>
+        <p>where $\Delta P$ is mechanical pressure (atm), $\Delta \Pi$ is osmotic pressure (atm), and $K'/t$ is the permeability of the membrane to the solvent (g/(atm&middot;s&middot;m$^2$)).</p>
+        <p>A material balance is done for salt across the system to get the value for the mass fraction of salt in the outlet stream, which is the same as the retentate mass fraction inside the tank (given the tank is well mixed):</p>
+        <p>$$x_R = x_{out} = \frac{F'_{in}\, x_{in}}{F'_{in} - J'A},$$</p>
+        <p>where $F'_{in}$ is inlet feed (kg/s), $x_{in}$ is the mass fraction of salt in the inlet stream, and $A$ is the area of the membrane (m$^2$).</p>
+        <p>To find how much of the feed exits as the permeate, an overall mass balance is done:</p>
+        <p>$$\frac{\text{permeate}}{\text{feed}} = \theta = \frac{J'A}{F'_{in}},$$</p>
+        <p>where $\theta$ is the fraction of the feed that is purified and exits as the permeate, i.e., the cut $\theta$ (dimensionless).</p>
+      </div>
+
+      <div class="panel" id="panelAbout">
+        <button class="panel-close" data-panel="panelAbout" aria-label="Close">&times;</button>
+        <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/ReverseOsmosis/" target="_blank" rel="noopener">Mathematica simulation</a> by Mugbil Alkhalaf and Rachael L. Baumann. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988) in collaboration with Washington State University. Address any questions or comments to LearnChemE@gmail.com.</p>
+      </div>
+    </div>
+    <canvas id="diagramCanvas"></canvas>
+  </div>
+</div>
+
+<script>
+(function() {
+  "use strict";
+
+  // ---------- Physics ----------
+  var Sc = 873;
+  var d = 0.56419;
+  var Dab = 1.26e-9;
+  var visc = 1.1e-6;
+  var feedFlow = 1.5; // kg/s, fixed
+
+  function computeState(pressure, omega, xIn) {
+    var correct = 0.8 * Math.pow(0.05 / xIn, (0.05 - xIn) * 20);
+    var k = (correct * 0.04433) * Math.pow(omega * d * d / visc, 0.75) * Math.pow(Sc, 0.33) * (Dab / d);
+    var Jmax = Math.log(10) * k * 997000 / 1000;
+    var dPi = 706 * xIn; // osmotic pressure (atm)
+
+    function J(dP) {
+      var u = dP - dPi;
+      return Jmax * u / (u + Jmax * 100);
+    }
+    function g(dP) {
+      return 10 * dP / 1000;
+    }
+    var Jsol = dPi - 40 * Jmax / (Jmax + 0.4);
+    function J2(dP) {
+      if (dP <= Jsol) return -0.4;
+      return J(dP);
+    }
+    var z = dPi;
+    var x = pressure; // location of black dot (x-coordinate)
+    var Jp = J2(pressure); // clamped, matching the plot's black dot — avoids the singularity as dP-dPi approaches -Jmax*100
+    var xOut = feedFlow * xIn / (feedFlow - Jp);
+    var theta = Jp / feedFlow;
+
+    return {
+      Jmax: Jmax, dPi: dPi, z: z, x: x, Jp: Jp, xOut: xOut, theta: theta,
+      J: J, g: g, J2: J2,
+      permeate: theta * feedFlow,
+      retentate: feedFlow * (1 - theta)
+    };
+  }
+
+  // ---------- DOM ----------
+  var pressureSlider = document.getElementById('pressureSlider');
+  var omegaSlider = document.getElementById('omegaSlider');
+  var xinSlider = document.getElementById('xinSlider');
+  var diagramCheck = document.getElementById('diagramCheck');
+  var pressureVal = document.getElementById('pressureVal');
+  var omegaVal = document.getElementById('omegaVal');
+  var xinVal = document.getElementById('xinVal');
+
+  var plotCanvas = document.getElementById('plotCanvas');
+  var plotCtx = plotCanvas.getContext('2d');
+  var diagCanvas = document.getElementById('diagramCanvas');
+  var diagCtx = diagCanvas.getContext('2d');
+  var middleCol = document.getElementById('middleCol');
+
+  var DPR = window.devicePixelRatio || 1;
+
+  function setupCanvas(canvas, ctx, cssW, cssH) {
+    canvas.style.width = cssW + 'px';
+    canvas.style.height = cssH + 'px';
+    canvas.width = Math.round(cssW * DPR);
+    canvas.height = Math.round(cssH * DPR);
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  }
+
+  // ---------- Plot (p1): water flux vs pressure drop ----------
+  function drawPlot(cssW, cssH, state) {
+    setupCanvas(plotCanvas, plotCtx, cssW, cssH);
+    var ctx = plotCtx;
+    ctx.clearRect(0, 0, cssW, cssH);
+
+    // Scale factor relative to original base size (400px tall)
+    var S = cssH / 400;
+
+    // Margins for frame/labels
+    var marginLeft = 78 * S;
+    var marginRight = 14 * S;
+    var marginTop = 28 * S;
+    var marginBottom = 58 * S;
+    var plotW = cssW - marginLeft - marginRight;
+    var plotH = cssH - marginTop - marginBottom;
+
+    var xMin = 0, xMax = 100;
+    var yMin = -0.4, yMax = 0.8;
+
+    function px(xd) { return marginLeft + (xd - xMin) / (xMax - xMin) * plotW; }
+    function py(yd) { return marginTop + (yMax - yd) / (yMax - yMin) * plotH; }
+
+    // Frame
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 1.3 * S;
+    ctx.strokeRect(marginLeft, marginTop, plotW, plotH);
+
+    // Ticks
+    ctx.fillStyle = '#000000';
+    ctx.font = (13 * S).toFixed(1) + 'px Helvetica, Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    var xTicks = [0, 20, 40, 60, 80, 100];
+    for (var i = 0; i < xTicks.length; i++) {
+      var xt = xTicks[i];
+      var xp = px(xt);
+      ctx.beginPath();
+      ctx.moveTo(xp, marginTop + plotH);
+      ctx.lineTo(xp, marginTop + plotH + 5 * S);
+      ctx.stroke();
+      ctx.fillText(String(xt), xp, marginTop + plotH + 7 * S);
+    }
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    var yTicks = [-0.4, -0.2, 0, 0.2, 0.4, 0.6, 0.8];
+    for (var j = 0; j < yTicks.length; j++) {
+      var yt = yTicks[j];
+      var yp = py(yt);
+      ctx.beginPath();
+      ctx.moveTo(marginLeft - 5 * S, yp);
+      ctx.lineTo(marginLeft, yp);
+      ctx.stroke();
+      ctx.fillText(yt.toFixed(1), marginLeft - 8 * S, yp);
+    }
+
+    // Axis labels
+    var axisFont = (15 * S).toFixed(1) + 'px Helvetica, Arial, sans-serif';
+    ctx.fillStyle = '#000000';
+    ctx.font = axisFont;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText('pressure drop (atm)', marginLeft + plotW / 2, cssH - 8 * S);
+
+    // Clip to plot area for curves
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(marginLeft, marginTop, plotW, plotH);
+    ctx.clip();
+
+    // Blue curve: pure water feed, g(dP), dP 0..80
+    ctx.strokeStyle = '#0000FF';
+    ctx.lineWidth = 2.2 * S;
+    ctx.beginPath();
+    var nSeg = 160;
+    for (var s = 0; s <= nSeg; s++) {
+      var dP = 0 + (80 - 0) * s / nSeg;
+      var yv = state.g(dP);
+      var X = px(dP), Y = py(yv);
+      if (s === 0) ctx.moveTo(X, Y); else ctx.lineTo(X, Y);
+    }
+    ctx.stroke();
+
+    // Green dashed curve: J2(dP), dP 0..z
+    ctx.strokeStyle = '#009900';
+    ctx.lineWidth = 2.6 * S;
+    ctx.setLineDash([7 * S, 5 * S]);
+    ctx.beginPath();
+    var z = state.z;
+    if (z > 0) {
+      for (var s2 = 0; s2 <= nSeg; s2++) {
+        var dP2 = 0 + (z - 0) * s2 / nSeg;
+        var yv2 = state.J2(dP2);
+        var X2 = px(dP2), Y2 = py(yv2);
+        if (s2 === 0) ctx.moveTo(X2, Y2); else ctx.lineTo(X2, Y2);
+      }
+      ctx.stroke();
+    }
+    ctx.setLineDash([]);
+
+    // Green solid curve: J(dP), dP z..100
+    ctx.strokeStyle = '#009900';
+    ctx.lineWidth = 2.6 * S;
+    ctx.beginPath();
+    for (var s3 = 0; s3 <= nSeg; s3++) {
+      var dP3 = z + (100 - z) * s3 / nSeg;
+      var yv3 = state.J(dP3);
+      var X3 = px(dP3), Y3 = py(yv3);
+      if (s3 === 0) ctx.moveTo(X3, Y3); else ctx.lineTo(X3, Y3);
+    }
+    ctx.stroke();
+
+    // Dashed max flux line (only if Jmax < 0.75)
+    if (state.Jmax < 0.75) {
+      ctx.strokeStyle = '#000000';
+      ctx.lineWidth = 1.6 * S;
+      ctx.setLineDash([7 * S, 5 * S]);
+      ctx.beginPath();
+      ctx.moveTo(px(0), py(state.Jmax));
+      ctx.lineTo(px(100), py(state.Jmax));
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    // Dashed horizontal line marking osmotic pressure (flux = 0), orange
+    ctx.strokeStyle = '#FF6600';
+    ctx.lineWidth = 1.6 * S;
+    ctx.setLineDash([7 * S, 5 * S]);
+    ctx.beginPath();
+    ctx.moveTo(px(0), py(0));
+    ctx.lineTo(px(100), py(0));
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.restore(); // end clip
+
+    // Labels (with white background boxes, like Mathematica Background->White)
+    function labelWithBg(text, xd, yd, color, align) {
+      ctx.font = (14 * S).toFixed(1) + 'px Helvetica, Arial, sans-serif';
+      ctx.textAlign = align || 'center';
+      ctx.textBaseline = 'middle';
+      var X = px(xd), Y = py(yd);
+      var metrics = ctx.measureText(text);
+      var tw = metrics.width;
+      var pad = 3 * S;
+      var bx = align === 'left' ? X : X - tw / 2;
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(bx - pad, Y - 9 * S, tw + pad * 2, 18 * S);
+      ctx.fillStyle = color;
+      ctx.fillText(text, X, Y);
+    }
+
+    // maximum flux label
+    var clipY = Math.max(0, Math.min(state.Jmax, 0.75));
+    var maxFluxText = 'maximum flux';
+    if (state.Jmax >= 0.75) {
+      maxFluxText += ' = ' + state.Jmax.toFixed(1) + ' kg/(m\u00B2s)';
+    }
+    labelWithBg(maxFluxText, 55, clipY, '#000000');
+
+    // salt water feed label (green) at (77, J(77))
+    labelWithBg('salt water feed', 77, state.J(77), '#009900');
+
+    // pure water feed label (blue) at (30, g(30))
+    labelWithBg('pure water feed', 30, state.g(30), '#0000FF');
+
+    // osmotic pressure label (orange) at (z, 0), offset upward
+    ctx.font = (14 * S).toFixed(1) + 'px Helvetica, Arial, sans-serif';
+    var opText = 'osmotic pressure';
+    var opX = px(z), opY = py(0);
+    var opW = ctx.measureText(opText).width;
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(opX - opW / 2 - 3 * S, opY - 32 * S, opW + 6 * S, 18 * S);
+    ctx.fillStyle = '#FF6600';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(opText, opX, opY - 23 * S);
+
+    // Points
+    // black dot at operating point (x, J2(x))
+    var opDotY = state.J2(state.x);
+    ctx.fillStyle = '#000000';
+    ctx.beginPath();
+    ctx.arc(px(state.x), py(opDotY), 5 * S, 0, 2 * Math.PI);
+    ctx.fill();
+
+    // orange dot at (z, 0)
+    ctx.fillStyle = '#FF6600';
+    ctx.beginPath();
+    ctx.arc(px(z), py(0), 5 * S, 0, 2 * Math.PI);
+    ctx.fill();
+
+    // Plot label (only shown when diagram hidden)
+    if (!diagramCheck.checked) {
+      ctx.font = 'bold ' + (15 * S).toFixed(1) + 'px Helvetica, Arial, sans-serif';
+      ctx.fillStyle = '#000000';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      var line1, line2;
+      if (state.Jp < 0) {
+        line1 = 'osmosis';
+        line2 = 'osmotic pressure > pressure drop';
+      } else {
+        line1 = 'reverse osmosis';
+        line2 = 'osmotic pressure < pressure drop';
+      }
+      ctx.fillText(line1, marginLeft + plotW / 2, 2 * S);
+      ctx.font = (13 * S).toFixed(1) + 'px Helvetica, Arial, sans-serif';
+      ctx.fillText(line2, marginLeft + plotW / 2, 18 * S);
+    }
+  }
+
+  // ---------- Diagram (p2): flow schematic ----------
+  // Measures the widest line in a drawTextBlock-style lines array (strings or
+  // subscript-segment arrays), using the same font rules drawTextBlock uses.
+  function measureBlockWidth(ctx, lines, D, boldFirst) {
+    var maxW = 0;
+    for (var i = 0; i < lines.length; i++) {
+      var line = lines[i];
+      var font = (i === 0 && boldFirst ? 'bold ' : '') + (i === 0 ? (13 * D).toFixed(1) : (12 * D).toFixed(1)) + 'px Helvetica, Arial, sans-serif';
+      var subFont = (i === 0 && boldFirst ? 'bold ' : '') + (i === 0 ? (10 * D).toFixed(1) : (9.2 * D).toFixed(1)) + 'px Helvetica, Arial, sans-serif';
+      var w = 0;
+      if (typeof line === 'string') {
+        ctx.font = font;
+        w = ctx.measureText(line).width;
+      } else {
+        line.forEach(function(seg) {
+          ctx.font = seg.sub ? subFont : font;
+          w += ctx.measureText(seg.text).width;
+        });
+      }
+      if (w > maxW) maxW = w;
+    }
+    return maxW;
+  }
+
+  function drawDiagram(state, omega, xIn) {
+    var ctx = diagCtx;
+
+    // Geometry (tank drawing, line weights) stays a fixed visual size —
+    // only the reserved text margins grow/shrink with the font size, and the
+    // canvas grows to fit them. This guarantees nothing can ever overlap,
+    // no matter how large FONT_SCALE gets.
+    var GEOM_D = 1.394;
+    // The original Mathematica graphic renders a wide, short coordinate range
+    // into a tall image, which stretches the tank vertically (~3.4x). Use
+    // separate x/y scales to reproduce that tall, narrow look.
+    var SCALE_X = 34;   // px per world-unit, horizontal
+    var SCALE_Y = 115;  // px per world-unit, vertical
+
+    var FONT_SCALE = 1.152;
+    var FONT_D = GEOM_D * FONT_SCALE;
+    var pad = 8 * GEOM_D;
+
+    var w = 4, delta = 0.35, h1 = 1, h2 = 2.5;
+    var worldXmin = -0.85, worldXmax = 4.95;
+
+    // Build the feed/retentate text content first, then measure it, so the side
+    // columns are only as wide as the content actually needs.
+    var feedLines = [
+      'salt water feed',
+      feedFlow.toFixed(2) + ' kg/s',
+      [{ text: 'x' }, { text: 'in', sub: true }, { text: ' = ' + xIn.toFixed(4) }],
+      Math.round(state.x + 1).toString() + ' atm'
+    ];
+    var retLines = [
+      'retentate',
+      state.retentate.toFixed(2) + ' kg/s',
+      [{ text: 'x' }, { text: 'out', sub: true }, { text: ' = ' + state.xOut.toFixed(4) }],
+      Math.round(state.x + 1).toString() + ' atm'
+    ];
+    var feedMaxW = measureBlockWidth(ctx, feedLines, FONT_D, false);
+    var retMaxW = measureBlockWidth(ctx, retLines, FONT_D, true);
+
+    var leftMargin = pad + feedMaxW + 4 * GEOM_D;
+    var rightMargin = pad * 1.2 + retMaxW + 10 * GEOM_D;
+
+    // Title block height (two lines) sets the top margin
+    var titleL1Size = 13 * FONT_D, titleL2Size = 11 * FONT_D;
+    var titleLine1Y = 6 * GEOM_D;
+    var titleLine2Y = titleLine1Y + titleL1Size * 1.15;
+    var topMargin = titleLine2Y + titleL2Size * 1.15 + 10 * GEOM_D;
+
+    // World-coordinate extent above the tank: covers the stirrer loop (centered
+    // at 1.15*h2), its direction arrow (tip at y=3.1) and the omega label.
+    var omegaFontSize = 11 * FONT_D;
+    var worldYmax = 3.5;
+
+    // Room below the tank for the permeate text block (the permeate arrow
+    // itself ends at -0.45*h2 in world coordinates, as in the original).
+    var permFontSize = 13 * FONT_D;
+    var permBlockH = permFontSize * 3 * 1.15; // 3 lines
+    var worldYmin = -0.45 * h2 - 0.12;
+    var bottomMargin = permBlockH + 10 * GEOM_D;
+
+    var cssW = leftMargin + (worldXmax - worldXmin) * SCALE_X + rightMargin;
+    var cssH = topMargin + (worldYmax - worldYmin) * SCALE_Y + bottomMargin;
+
+    setupCanvas(diagCanvas, diagCtx, cssW, cssH);
+    ctx = diagCtx;
+    ctx.clearRect(0, 0, cssW, cssH);
+
+    function wx(x) { return leftMargin + (x - worldXmin) * SCALE_X; }
+    function wy(y) { return topMargin + (worldYmax - y) * SCALE_Y; } // y flipped
+
+    // Title (osmosis / reverse osmosis)
+    ctx.font = 'bold ' + titleL1Size.toFixed(1) + 'px Helvetica, Arial, sans-serif';
+    ctx.fillStyle = '#000000';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    var line1, line2;
+    if (state.Jp < 0) {
+      line1 = 'osmosis';
+      line2 = 'osmotic pressure > pressure drop';
+    } else {
+      line1 = 'reverse osmosis';
+      line2 = 'osmotic pressure < pressure drop';
+    }
+    ctx.fillText(line1, cssW / 2, titleLine1Y);
+    ctx.font = titleL2Size.toFixed(1) + 'px Helvetica, Arial, sans-serif';
+    ctx.fillText(line2, cssW / 2, titleLine2Y);
+
+    // Tank body (cyan fill) — full body from -delta to h2, matching Rectangle[{0,-delta},{w,h2}]
+    ctx.fillStyle = '#66FFFF';
+    ctx.beginPath();
+    ctx.rect(wx(0), wy(h2), wx(w) - wx(0), wy(-delta) - wy(h2));
+    ctx.fill();
+
+    // small inlet nub rectangle
+    ctx.beginPath();
+    ctx.rect(wx(-delta), wy(h1), wx(0) - wx(-delta), wy(h1 - delta) - wy(h1));
+    ctx.fill();
+
+    // small outlet nub rectangle (top right)
+    ctx.beginPath();
+    ctx.rect(wx(w), wy(h2), wx(w + delta) - wx(w), wy(h2 - delta) - wy(h2));
+    ctx.fill();
+
+    // bottom outlet nub (permeate)
+    ctx.beginPath();
+    ctx.rect(wx(0.5 * w - delta), wy(-delta), wx(0.5 * w + delta) - wx(0.5 * w - delta), wy(-2 * delta) - wy(-delta));
+    ctx.fill();
+
+    // Outline lines (tank walls) — three polyline segments matching the original
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 2 * GEOM_D;
+    ctx.beginPath();
+    ctx.moveTo(wx(-delta), wy(h1));
+    ctx.lineTo(wx(0), wy(h1));
+    ctx.lineTo(wx(0), wy(h2));
+    ctx.lineTo(wx(w), wy(h2));
+    ctx.lineTo(wx(w + delta), wy(h2));
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(wx(w + delta), wy(h2 - delta));
+    ctx.lineTo(wx(w), wy(h2 - delta));
+    ctx.lineTo(wx(w), wy(-delta));
+    ctx.lineTo(wx(0.5 * w + delta), wy(-delta));
+    ctx.lineTo(wx(0.5 * w + delta), wy(-2 * delta));
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(wx(0.5 * w - delta), wy(-2 * delta));
+    ctx.lineTo(wx(0.5 * w - delta), wy(-delta));
+    ctx.lineTo(wx(0), wy(-delta));
+    ctx.lineTo(wx(0), wy(h1 - delta));
+    ctx.lineTo(wx(-delta), wy(h1 - delta));
+    ctx.stroke();
+
+    // Stirrer shaft — Line[{0.4w, 1.2h2}, {0.6w, 0.25delta}] from the original
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 2 * GEOM_D;
+    ctx.beginPath();
+    ctx.moveTo(wx(0.4 * w), wy(1.2 * h2));
+    ctx.lineTo(wx(0.6 * w), wy(0.25 * delta));
+    ctx.stroke();
+
+    // Stirrer paddle (two triangular blades forming the bowtie stir-bar shape)
+    ctx.fillStyle = '#000000';
+    ctx.beginPath();
+    ctx.moveTo(wx(0.05 * w), wy(delta / 2));
+    ctx.lineTo(wx(0.05 * w), wy(0));
+    ctx.lineTo(wx(0.6 * w), wy(0.25 * delta));
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.moveTo(wx(0.6 * w), wy(0.25 * delta));
+    ctx.lineTo(wx(0.95 * w), wy(0.5 * delta));
+    ctx.lineTo(wx(0.95 * w), wy(0));
+    ctx.closePath();
+    ctx.fill();
+
+    // Membrane (blue dashed line)
+    ctx.strokeStyle = '#0000FF';
+    ctx.lineWidth = 1.6 * GEOM_D;
+    ctx.setLineDash([5 * GEOM_D, 4 * GEOM_D]);
+    ctx.beginPath();
+    ctx.moveTo(wx(0), wy(-0.1 * delta));
+    ctx.lineTo(wx(w), wy(-0.1 * delta));
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Membrane callout: label just to the right of the tank, a little above the
+    // membrane line, with a short arrow pointing at the membrane's right end
+    // (matching the reference figure). With the tall tank, the retentate
+    // numbers sit far above this, so there is no conflict.
+    ctx.font = (11 * FONT_D).toFixed(1) + 'px Helvetica, Arial, sans-serif';
+    ctx.fillStyle = '#000000';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    var membraneLabelX = wx(w) + 10 * GEOM_D;
+    var membraneLabelY = wy(0.55);
+    ctx.fillText('membrane', membraneLabelX, membraneLabelY);
+    drawArrow(ctx, membraneLabelX + 6 * GEOM_D, wy(0.4), wx(w) + 3 * GEOM_D, wy(-0.1 * delta) + 2 * GEOM_D, GEOM_D);
+
+    // Stirrer rotation indicator — Circle[{0.4w,1.15h2}, {1, 0.2}, {3π/4, 2π}]
+    // from the original: a small flat ellipse open at the top, drawn (in canvas
+    // y-down coordinates) clockwise from the right end around the bottom to the
+    // upper-left. A separate short arrow at the right end points up and out.
+    var stirCx = wx(0.4 * w), stirCy = wy(1.15 * h2);
+    var stirRx = 1.0 * SCALE_X, stirRy = 0.2 * SCALE_Y;
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 1.8 * GEOM_D;
+    ctx.beginPath();
+    ctx.ellipse(stirCx, stirCy, stirRx, stirRy, 0, 0, 1.25 * Math.PI, false);
+    ctx.stroke();
+    drawArrow(ctx, wx(2.5), wy(2.8), wx(2.75), wy(3.1), GEOM_D);
+    ctx.font = omegaFontSize.toFixed(1) + 'px Helvetica, Arial, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(omega + ' rad/s', wx(2.75) + 7 * GEOM_D, wy(3.05));
+
+    // "well mixed" label — plain text, placed just to the left of the stirrer
+    // shaft (whose x position at this height is computed from the shaft's
+    // endpoints) so the text never overlaps the line.
+    ctx.font = (12 * FONT_D).toFixed(1) + 'px Helvetica, Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    var wmText1 = 'well', wmText2 = 'mixed';
+    var wmYWorld = 0.5 * h2;
+    var wmY = wy(wmYWorld);
+    var wmLineH = 13 * FONT_D;
+    // shaft runs from (0.4w, 1.2h2) down to (0.6w, 0.25delta); find its x at the text's height
+    var shaftT = (1.2 * h2 - wmYWorld) / (1.2 * h2 - 0.25 * delta);
+    var shaftXWorld = 0.4 * w + shaftT * (0.6 * w - 0.4 * w);
+    var wmHalfW = Math.max(ctx.measureText(wmText1).width, ctx.measureText(wmText2).width) / 2;
+    var wmX = wx(shaftXWorld) - wmHalfW - 6 * GEOM_D;
+    var wmMinX = wx(0) + wmHalfW + 4 * GEOM_D; // keep inside the tank's left wall
+    if (wmX < wmMinX) wmX = wmMinX;
+    ctx.fillStyle = '#000000';
+    ctx.fillText(wmText1, wmX, wmY - wmLineH / 2);
+    ctx.fillText(wmText2, wmX, wmY + wmLineH / 2);
+
+    // Feed arrow (into left side) — spans exactly from the end of the feed text to the tank inlet
+    drawArrow(ctx, pad + feedMaxW + 2 * GEOM_D, wy(h1 - 0.5 * delta), wx(0), wy(h1 - 0.5 * delta), GEOM_D);
+
+    // Salt water feed text — single line, not bold, then flow data (x_in has a true subscript)
+    drawTextBlock(ctx, feedLines, pad, wy(h1 - 0.5 * delta), 13 * FONT_D, 'left', FONT_D, false);
+
+    // Retentate arrow (out top right) — spans from tank outlet to just before the retentate text
+    drawArrow(ctx, wx(w), wy(h2 - 0.5 * delta), cssW - rightMargin + pad * 0.4, wy(h2 - 0.5 * delta), GEOM_D);
+    drawTextBlock(ctx, retLines, cssW - rightMargin + pad * 1.2, wy(h2 - 0.5 * delta), 13 * FONT_D, 'left', FONT_D, true);
+
+    // Permeate: direction depends on flow sign, matching the original's two cases.
+    // The arrow's far end sits at y = -0.45*h2 in world coordinates, as in the CDF.
+    var permArrowEndPx = wy(-0.45 * h2);
+    var permTextCenterY = wy(worldYmin) + permBlockH / 2 + 4 * GEOM_D;
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 2 * GEOM_D;
+    if (state.Jp < 0) {
+      // Osmosis: water is drawn back INTO the tank — arrow points up, into the membrane.
+      ctx.beginPath();
+      ctx.moveTo(wx(0.9 * w), permArrowEndPx);
+      ctx.bezierCurveTo(
+        wx(0.5 * w), permArrowEndPx,
+        wx(0.5 * w), permArrowEndPx,
+        wx(0.5 * w), wy(-1.5 * delta)
+      );
+      ctx.stroke();
+      drawArrowHead(ctx, wx(0.505 * w), wy(-1.75 * delta), wx(0.5 * w), wy(-1.4 * delta), GEOM_D);
+    } else {
+      // Reverse osmosis: normal permeate flow — arrow points out and away.
+      ctx.beginPath();
+      ctx.moveTo(wx(0.5 * w), wy(-delta));
+      ctx.bezierCurveTo(
+        wx(0.5 * w), permArrowEndPx,
+        wx(0.5 * w), permArrowEndPx,
+        wx(0.9 * w), permArrowEndPx
+      );
+      ctx.stroke();
+      drawArrowHead(ctx, wx(0.85 * w), permArrowEndPx, wx(0.9 * w), permArrowEndPx, GEOM_D);
+    }
+
+    var permLines = [
+      'pure water permeate',
+      state.permeate.toFixed(2) + ' kg/s',
+      '1 atm'
+    ];
+    drawTextBlock(ctx, permLines, wx(0.5 * w), permTextCenterY, permFontSize * 1.15, null, FONT_D, false);
+  }
+
+  // Draws a block of lines. Each line is either a plain string, or an array of
+  // segments [{text, sub}] where sub:true renders that piece as a smaller,
+  // lowered subscript (e.g. the "in" in "x_in").
+  function drawTextBlock(ctx, lines, cx, cy, lineHeight, align, D, boldFirst) {
+    D = D || 1;
+    if (boldFirst === undefined) boldFirst = true;
+    align = align || 'center';
+    ctx.save();
+    var startY = cy - (lineHeight * (lines.length - 1)) / 2;
+
+    function lineWidth(line, font, subFont) {
+      if (typeof line === 'string') {
+        ctx.font = font;
+        return ctx.measureText(line).width;
+      }
+      var total = 0;
+      line.forEach(function(seg) {
+        ctx.font = seg.sub ? subFont : font;
+        total += ctx.measureText(seg.text).width;
+      });
+      return total;
+    }
+
+    for (var i = 0; i < lines.length; i++) {
+      var line = lines[i];
+      var font = (i === 0 && boldFirst ? 'bold ' : '') + (i === 0 ? (13 * D).toFixed(1) : (12 * D).toFixed(1)) + 'px Helvetica, Arial, sans-serif';
+      var subFont = (i === 0 && boldFirst ? 'bold ' : '') + (i === 0 ? (10 * D).toFixed(1) : (9.2 * D).toFixed(1)) + 'px Helvetica, Arial, sans-serif';
+      var y = startY + i * lineHeight;
+
+      if (typeof line === 'string') {
+        ctx.font = font;
+        ctx.fillStyle = '#000000';
+        ctx.textAlign = align;
+        ctx.textBaseline = 'middle';
+        ctx.fillText(line, cx, y);
+      } else {
+        var w = lineWidth(line, font, subFont);
+        var x = align === 'left' ? cx : (align === 'center' ? cx - w / 2 : cx - w);
+        line.forEach(function(seg) {
+          ctx.font = seg.sub ? subFont : font;
+          ctx.fillStyle = '#000000';
+          ctx.textAlign = 'left';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(seg.text, x, y + (seg.sub ? 2.2 * D : 0));
+          x += ctx.measureText(seg.text).width;
+        });
+      }
+    }
+    ctx.restore();
+  }
+
+  function drawArrow(ctx, x1, y1, x2, y2, D) {
+    D = D || 1;
+    ctx.save();
+    ctx.strokeStyle = '#000000';
+    ctx.fillStyle = '#000000';
+    ctx.lineWidth = 2 * D;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+    drawArrowHead(ctx, x1, y1, x2, y2, D);
+    ctx.restore();
+  }
+
+  function drawArrowHead(ctx, x1, y1, x2, y2, D) {
+    D = D || 1;
+    var angle = Math.atan2(y2 - y1, x2 - x1);
+    var headLen = 9 * D;
+    ctx.beginPath();
+    ctx.moveTo(x2, y2);
+    ctx.lineTo(x2 - headLen * Math.cos(angle - Math.PI / 7), y2 - headLen * Math.sin(angle - Math.PI / 7));
+    ctx.lineTo(x2 - headLen * Math.cos(angle + Math.PI / 7), y2 - headLen * Math.sin(angle + Math.PI / 7));
+    ctx.closePath();
+    ctx.fillStyle = '#000000';
+    ctx.fill();
+  }
+
+  // ---------- Render loop ----------
+  function render() {
+    var pressure = parseFloat(pressureSlider.value);
+    var omega = parseFloat(omegaSlider.value);
+    var xIn = parseFloat(xinSlider.value);
+    var showDiagram = diagramCheck.checked;
+
+    pressureVal.textContent = pressure.toFixed(0);
+    omegaVal.textContent = omega.toFixed(0);
+    xinVal.textContent = xIn.toFixed(3);
+
+    var state = computeState(pressure, omega, xIn);
+
+    // Graph is 40% bigger than the original base size (302/600 x 400)
+    var plotW = showDiagram ? 423 : 840;
+    var plotH = 560;
+    drawPlot(plotW, plotH, state);
+
+    diagCanvas.style.display = showDiagram ? 'block' : 'none';
+    if (showDiagram) {
+      // Sized to match the plot's height so the whole row (plot + sliders + diagram)
+      // fits comfortably in a normal browser window without needing to scroll.
+      drawDiagram(state, omega, xIn);
+    }
+
+    positionMiddleColumn();
+    positionPanels();
+  }
+
+  // Vertically align the sliders/buttons column with the osmotic-pressure
+  // (flux = 0) line in the plot. The plot's y-scale is fixed (560px tall,
+  // margins fixed), so this line's pixel offset from the plot's top is
+  // constant regardless of slider values.
+  function positionMiddleColumn() {
+    var plotH = 560;
+    var S = plotH / 400;
+    var marginTop = 28 * S;
+    var marginBottom = 58 * S;
+    var innerPlotH = plotH - marginTop - marginBottom;
+    var yMin = -0.4, yMax = 0.8;
+    var osmoticLineY = marginTop + (yMax - 0) / (yMax - yMin) * innerPlotH;
+
+    var blockH = middleCol.offsetHeight;
+    var topOffset = osmoticLineY - blockH / 2;
+    if (topOffset < 0) topOffset = 0;
+    middleCol.style.marginTop = topOffset.toFixed(1) + 'px';
+  }
+
+  // Position each flyout panel high up on the page (overlapping the figure),
+  // instead of at the clicked button's own vertical position, so the whole
+  // panel — even the long Details one — is visible without scrolling.
+  function positionPanels() {
+    var middleColMarginTop = parseFloat(middleCol.style.marginTop) || 0;
+    var topOffset = -middleColMarginTop + 8;
+    var pairs = [
+      ['btnDirections', 'panelDirections'],
+      ['btnDetails', 'panelDetails'],
+      ['btnAbout', 'panelAbout']
+    ];
+    pairs.forEach(function(pair) {
+      var btn = document.getElementById(pair[0]);
+      var panel = document.getElementById(pair[1]);
+      panel.style.top = topOffset + 'px';
+      panel.style.left = (btn.offsetLeft + btn.offsetWidth + 14) + 'px';
+    });
+  }
+
+  pressureSlider.addEventListener('input', render);
+  omegaSlider.addEventListener('input', render);
+  xinSlider.addEventListener('input', render);
+  diagramCheck.addEventListener('change', render);
+  window.addEventListener('resize', render);
+
+  // ---------- Panel toggles ----------
+  function setupPanelToggle(btnId, panelId) {
+    var btn = document.getElementById(btnId);
+    var panel = document.getElementById(panelId);
+    btn.addEventListener('click', function() {
+      var isOpen = panel.classList.contains('open');
+      ['panelDirections', 'panelDetails', 'panelAbout'].forEach(function(id) {
+        document.getElementById(id).classList.remove('open');
+      });
+      if (!isOpen) panel.classList.add('open');
+    });
+  }
+  setupPanelToggle('btnDirections', 'panelDirections');
+  setupPanelToggle('btnDetails', 'panelDetails');
+  setupPanelToggle('btnAbout', 'panelAbout');
+
+  // Close buttons (the "x" in each panel's upper-right corner)
+  document.querySelectorAll('.panel-close').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      document.getElementById(btn.getAttribute('data-panel')).classList.remove('open');
+    });
+  });
+
+  // Make Directions / Details / About all the same width (matching the widest)
+  (function equalizeButtonWidths() {
+    var btns = Array.prototype.slice.call(document.querySelectorAll('.panel-btn'));
+    var maxW = Math.max.apply(null, btns.map(function(b) { return b.getBoundingClientRect().width; }));
+    btns.forEach(function(b) { b.style.width = maxW + 'px'; });
+  })();
+
+  render();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,969 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Impinging Jet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Source+Serif+4:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']]
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.js" id="MathJax-script" async></script>
+
+<style>
+  :root{
+    --bg: #FFFFFF;
+    --surface: #FFFFFF;
+    --surface-2: #F8F8F8;
+    --ink: #142027;
+    --ink-dim: #52646c;
+    --line: #C7D1CD;
+    --grid-line: #c0c6c3;
+    --water: #1B6FB0;
+    --water-soft: #D3E9F8;
+    --force: #C6510A;
+    --force-soft: #F7DFCB;
+    --plate: #6D7B82;
+    --plate-dark: #47535a;
+    --focus: #1B6FB0;
+    --red: #C22A2E;
+    --red-active: #9E2226;
+    --shadow: 0 1px 2px rgba(20,32,39,0.06), 0 8px 24px -12px rgba(20,32,39,0.18);
+  }
+  /* @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg: #0B1316;
+      --surface: #101A1E;
+      --surface-2: #16232A;
+      --ink: #E7EEF0;
+      --ink-dim: #9AACB2;
+      --line: #263539;
+      --grid-line: #1D2B2F;
+      --water: #5DAAE8;
+      --water-soft: #17324A;
+      --force: #FF8F4D;
+      --force-soft: #3C2416;
+      --plate: #8A99A0;
+      --plate-dark: #5B6A70;
+      --focus: #5DAAE8;
+      --red: #E14449;
+      --red-active: #C22A2E;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.6);
+    }
+  } */
+  :root[data-theme="dark"]{
+    --bg: #0B1316;
+    --surface: #101A1E;
+    --surface-2: #16232A;
+    --ink: #E7EEF0;
+    --ink-dim: #9AACB2;
+    --line: #263539;
+    --grid-line: #1D2B2F;
+    --water: #5DAAE8;
+    --water-soft: #17324A;
+    --force: #FF8F4D;
+    --force-soft: #3C2416;
+    --plate: #8A99A0;
+    --plate-dark: #5B6A70;
+    --focus: #5DAAE8;
+    --red: #E14449;
+    --red-active: #C22A2E;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.6);
+  }
+
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Public Sans", -apple-system, "Segoe UI", Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection{ background: var(--water-soft); }
+  a{ color: var(--water); }
+
+  .mono{
+    font-family: "IBM Plex Mono", "SF Mono", Consolas, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .page{
+    max-width: 1456px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 4rem;
+  }
+
+  header.masthead{
+    margin-bottom: 1.6rem;
+    padding-bottom: 1.1rem;
+    border-bottom: 1px solid var(--line);
+  }
+  h1{
+    font-family: "Source Serif 4", Georgia, serif;
+    font-weight: 700;
+    font-size: clamp(1.6rem, 2.6vw, 2.1rem);
+    line-height: 1.1;
+    margin: 0;
+    color: var(--ink);
+  }
+
+  .layout{
+    display: grid;
+    grid-template-columns: 320px minmax(0, 1fr);
+    gap: 2rem;
+    align-items: start;
+  }
+  @media (max-width: 880px){
+    .layout{ grid-template-columns: 1fr; }
+  }
+
+  /* ---- Sidebar: tabs + controls ---- */
+  .sidebar{
+    display:flex;
+    flex-direction: column;
+    gap: 1.1rem;
+  }
+
+  /* Wraps the tab buttons + all three panels. Positioned so an open panel
+     can be placed absolutely relative to it — taken out of normal flow,
+     so opening/closing a panel never shifts the sliders below. */
+  .tabgroup{
+    position: relative;
+  }
+
+  .tabbar{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.4rem;
+  }
+  .tabbtn{
+    font-family: "Public Sans", sans-serif;
+    font-size: 1.012rem;
+    font-weight: 400;
+    color: #fff;
+    background: var(--red);
+    border: none;
+    border-radius: 4px;
+    padding: 0.6rem 0.3rem;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+  }
+  .tabbtn:hover{ filter: brightness(1.06); }
+  .tabbtn[aria-selected="true"]{
+    background: var(--red-active);
+    box-shadow: inset 0 0 0 2px rgba(255,255,255,0.55), var(--shadow);
+  }
+  .tabbtn:focus-visible{ outline: 2px solid var(--focus); outline-offset: 2px; }
+
+  .tabpanel{
+    display: none;
+    /* Floats above the sliders and the figure instead of pushing them down:
+       taken out of flow (absolute, relative to .tabgroup) and given twice
+       the sidebar's own width so it has room to cover both. */
+    position: absolute;
+    top: calc(100% + 0.7rem);
+    left: 0;
+    /* Half of the previous full-coverage width. */
+    width: min(704px, calc(100vw - 3rem));
+    max-height: calc(100vh - 6rem);
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 30;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    box-shadow: var(--shadow);
+    padding: 1.1rem 2.6rem 1.1rem 1.2rem;
+  }
+  .tabpanel.active{ display: flex; flex-direction: column; gap: 0.8rem; }
+
+  .panel-close{
+    position: absolute;
+    top: 0.6rem;
+    right: 0.6rem;
+    width: 1.6rem;
+    height: 1.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "Public Sans", sans-serif;
+    font-size: 1rem;
+    line-height: 1;
+    color: var(--ink-dim);
+    background: none;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  .panel-close:hover{ color: var(--ink); background: var(--surface-2); }
+  .panel-close:focus-visible{ outline: 2px solid var(--focus); outline-offset: 2px; }
+
+  .tabpanel h3{
+    font-family: "Public Sans", sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--red-active);
+    margin: 0 0 0.4rem;
+  }
+  .tabpanel p{ margin: 0; color: var(--ink); }
+  .tabpanel section{ display:flex; flex-direction:column; gap:0.3rem; }
+  .tabpanel .intro{ color: var(--ink-dim); }
+
+  details.prompt{
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  details.prompt summary{
+    list-style: none;
+    cursor: pointer;
+    position: relative;
+    padding: 0.75rem 0.9rem 0.75rem 2.15rem;
+    font-family: "Public Sans", sans-serif;
+    font-weight: 600;
+    font-size: 0.94rem;
+    color: var(--ink);
+  }
+  details.prompt summary::-webkit-details-marker{ display:none; }
+  details.prompt summary::before{
+    content: "+";
+    position: absolute;
+    left: 0.9rem;
+    top: 0.72rem;
+    color: var(--water);
+    font-weight: 700;
+  }
+  details.prompt[open] summary::before{ content: "\2013"; }
+  details.prompt .answer{
+    padding: 0.7rem 0.9rem 0.9rem 2.15rem;
+    color: var(--ink-dim);
+    font-size: 0.92rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .assumptions{
+    border-left: 2px solid var(--line);
+    padding-left: 0.85rem;
+  }
+  .assumptions .label{
+    font-weight: 600;
+    color: var(--ink);
+    display:block;
+    margin-bottom: 0.25rem;
+  }
+
+  .eqs mjx-container{ font-size: 108% !important; }
+  .eqs-block{ padding: 0.15rem 0; text-align: left; }
+  .eqs-block mjx-container[display="true"]{ margin: 0.35em 0 !important; text-align: left !important; }
+
+  .about a{ text-decoration: underline; }
+
+  /* ---- Controls ---- */
+  .controls-col{
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    box-shadow: var(--shadow);
+    padding: 1.1rem 1.2rem 1.3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+  .control{ display:flex; flex-direction: column; gap: 0.3rem; }
+  .control-head{
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.6rem;
+  }
+  .control label{
+    font-size: 1.08rem;
+    font-weight: 400;
+    color: var(--ink);
+    font-family: "Public Sans", sans-serif;
+  }
+  .control output{
+    font-family: "Public Sans", sans-serif;
+    font-size: 1.08rem;
+    font-weight: 400;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+
+  input[type="range"]{
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 22px;
+    background: transparent;
+    cursor: pointer;
+  }
+  input[type="range"]::-webkit-slider-runnable-track{
+    height: 5px;
+    background: var(--line);
+    border-radius: 3px;
+  }
+  input[type="range"]::-moz-range-track{
+    height: 5px;
+    background: var(--line);
+    border-radius: 3px;
+  }
+  input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    margin-top: -8px;
+    border-radius: 50%;
+    background: var(--red);
+    border: 2px solid var(--surface);
+    box-shadow: 0 0 0 1px var(--red);
+  }
+  input[type="range"]::-moz-range-thumb{
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--red);
+    border: 2px solid var(--surface);
+    box-shadow: 0 0 0 1px var(--red);
+  }
+  input[type="range"]:focus-visible{ outline: none; }
+  input[type="range"]:focus-visible::-webkit-slider-thumb{ box-shadow: 0 0 0 3px var(--focus); }
+  input[type="range"]:focus-visible::-moz-range-thumb{ box-shadow: 0 0 0 3px var(--focus); }
+
+  /* ---- Figure ---- */
+  .figure-col .scope{
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    box-shadow: var(--shadow);
+    padding: 0.75rem;
+    max-width: 90%;
+    margin: 0 auto;
+  }
+  .scope svg{ display:block; width:100%; height:auto; }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ transition: none !important; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+
+  <div class="layout">
+
+    <!-- SIDEBAR: tabs + controls -->
+    <div class="sidebar">
+      <div class="tabgroup">
+      <div class="tabbar" role="tablist">
+        <button class="tabbtn" type="button" data-tab="directions" aria-selected="false">Directions</button>
+        <button class="tabbtn" type="button" data-tab="details" aria-selected="false">Details</button>
+        <button class="tabbtn" type="button" data-tab="about" aria-selected="false">About</button>
+      </div>
+
+      <div class="tabpanel" id="tab-directions">
+        <button class="panel-close" type="button" aria-label="Close">✕</button>
+        <p class="intro">How hard does a plate have to push back on a jet of water it's deflecting? Drag the controls and watch the force change.</p>
+        <section>
+          <h3>The idea</h3>
+          <p>A moving stream of fluid carries momentum with it. When something in its path bends that stream — a turbine blade, a fire‑hose nozzle, the plate to the right — the fluid's momentum changes direction, and Newton's second law says that change has to show up somewhere as a force on whatever did the bending.</p>
+        </section>
+        <section>
+          <h3>This setup</h3>
+          <p>A jet of water in an inlet pipe splits into two pipes, and the flow distribution between the two outlet directions depends on the angle of the pipes. Force must be applied to the plate on which the two pipes rest to prevent the plate from moving. Drag the sliders to change the flow rate, the pipe diameters, and the tilt, and watch the split and the normal force <strong>F<sub>n</sub></strong> respond.</p>
+        </section>
+
+        <details class="prompt">
+          <summary>Sweep the outlet diameter end to end — does F<sub>n</sub> move?</summary>
+          <p class="answer">It doesn't. The normal force comes entirely from the inlet stream — the outlet flows run parallel to the plate, so they carry no momentum perpendicular to it, whatever their speed or pipe size. F<sub>n</sub> only cares about the mass flow rate, the <em>inlet</em> diameter, and θ — the outlet diameter you're dragging changes the outlet velocities and the flow split, not the force.</p>
+        </details>
+      </div>
+
+      <div class="tabpanel" id="tab-details">
+        <button class="panel-close" type="button" aria-label="Close">✕</button>
+        <div class="assumptions">
+          <span class="label">Model assumptions</span>
+          Steady, incompressible flow of water (ρ&nbsp;=&nbsp;1000&nbsp;kg/m³); atmospheric pressure and equal elevation at the inlet and both outlets; a frictionless plate, so it exerts no force along its own surface; gravity and viscous losses neglected.
+        </div>
+        <div class="eqs">
+          <p>Inlet area and velocity, from continuity, with water at ρ&nbsp;=&nbsp;1000&nbsp;kg/m³:</p>
+          <div class="eqs-block">\[ A_1=\frac{\pi}{4}D_{in}^{2} \qquad\qquad v_1=\frac{\dot m_1}{\rho A_1} \]</div>
+          <p>where $\dot m_1$ is the mass flow rate into the tube.</p>
+          <p>The continuity equation relates the outlet velocities to the inlet velocity,</p>
+          <div class="eqs-block">\[ A_1 v_1 = A_A v_A + A_B v_B = A_A\left(v_A+v_B\right) \]</div>
+          <p>since $A_A = A_B$.</p>
+          <p>The momentum balances used in the simulation — normal to the plate, giving the force needed to hold it stationary, and along the frictionless plate, which applies no tangential force to the jets:</p>
+          <div class="eqs-block">\[ F_n=\dot m_1 v_1\sin(\theta) \]</div>
+          <div class="eqs-block">\[ \dot m_1 v_1\cos(\theta)+\dot m_B v_B=\dot m_A v_A \]</div>
+          <p>Solving the continuity equation and the tangential momentum balance together gives the outlet velocities and the flow split shown in the figure:</p>
+          <div class="eqs-block">\[ v_A=\frac{v_1}{2}\left(\frac{A_1}{A_A}+\cos\theta\right) \qquad\qquad v_B=\frac{v_1}{2}\left(\frac{A_1}{A_A}-\cos\theta\right) \]</div>
+          <div class="eqs-block">\[ \dot m_A=\dot m_1\left(\frac{1+(A_A/A_1)\cos\theta}{2}\right) \qquad\qquad \dot m_B=\dot m_1\left(\frac{1-(A_A/A_1)\cos\theta}{2}\right) \]</div>
+          <p>The outlet pipe diameter is limited to the inlet pipe diameter, so that $\dot m_B\ge 0$.</p>
+        </div>
+      </div>
+
+      <div class="tabpanel about" id="tab-about">
+        <button class="panel-close" type="button" aria-label="Close">✕</button>
+        <p>This simulation was created in Python in the <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder by Ankur Gupta and modified for <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.</p>
+      </div>
+      </div>
+
+      <div class="controls-col">
+        <div class="control">
+          <div class="control-head">
+            <label for="mdot">Inlet mass flow rate</label>
+            <output class="mono" id="mdotOut"></output>
+          </div>
+          <input type="range" id="mdot" min="0.1" max="9.9" step="0.1" value="9.9">
+        </div>
+        <div class="control">
+          <div class="control-head">
+            <label for="theta">Impinging jet angle θ</label>
+            <output class="mono" id="thetaOut"></output>
+          </div>
+          <input type="range" id="theta" min="15" max="90" step="1" value="45">
+        </div>
+        <div class="control">
+          <div class="control-head">
+            <label for="din">Inlet pipe diameter</label>
+            <output class="mono" id="dinOut"></output>
+          </div>
+          <input type="range" id="din" min="1" max="5" step="0.05" value="1.5">
+        </div>
+        <div class="control">
+          <div class="control-head">
+            <label for="dout">Outlet pipe diameter</label>
+            <output class="mono" id="doutOut"></output>
+          </div>
+          <input type="range" id="dout" min="1" max="5" step="0.05" value="1">
+        </div>
+      </div>
+    </div>
+
+    <!-- FIGURE -->
+    <div class="figure-col">
+      <div class="scope">
+        <svg id="diagram" viewBox="11 61 747 643" role="img" aria-label="Schematic of the jet striking the inclined plate">
+          <defs>
+            <pattern id="gridpat" width="20" height="20" patternUnits="userSpaceOnUse">
+              <path d="M 20 0 L 0 0 0 20" class="grid-path" fill="none" stroke-width="1"/>
+            </pattern>
+            <marker id="mArrowWater" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="13" markerHeight="13" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" class="fill-water"/>
+            </marker>
+            <marker id="mArrowForce" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="22" markerHeight="22" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" class="fill-force"/>
+            </marker>
+          </defs>
+          <rect x="11" y="61" width="747" height="643" fill="url(#gridpat)"/>
+          <g id="sceneRoot"></g>
+        </svg>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var els = {
+    mdot: document.getElementById('mdot'),
+    theta: document.getElementById('theta'),
+    din: document.getElementById('din'),
+    dout: document.getElementById('dout'),
+    mdotOut: document.getElementById('mdotOut'),
+    thetaOut: document.getElementById('thetaOut'),
+    dinOut: document.getElementById('dinOut'),
+    doutOut: document.getElementById('doutOut'),
+    scene: document.getElementById('sceneRoot')
+  };
+
+  var RHO = 1000; // kg/m^3, water
+
+  // ---- tabs: panels start closed; a tab button opens its panel (closing any
+  // other), and clicking the already-open tab, or its own close (✕) button,
+  // closes it back down. ----
+  var tabBtns = Array.prototype.slice.call(document.querySelectorAll('.tabbtn'));
+  function closeAllPanels(){
+    tabBtns.forEach(function(b){ b.setAttribute('aria-selected', 'false'); });
+    document.querySelectorAll('.tabpanel').forEach(function(p){ p.classList.remove('active'); });
+  }
+  tabBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var alreadyOpen = btn.getAttribute('aria-selected') === 'true';
+      closeAllPanels();
+      if (!alreadyOpen){
+        btn.setAttribute('aria-selected', 'true');
+        document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+      }
+    });
+  });
+  Array.prototype.slice.call(document.querySelectorAll('.panel-close')).forEach(function(btn){
+    btn.addEventListener('click', closeAllPanels);
+  });
+
+  function fmt(n, digits){
+    return Number(n).toFixed(digits === undefined ? 2 : digits);
+  }
+
+  // Continuity + momentum model: v1 from continuity at the inlet;
+  // the outlet velocities from solving the continuity equation
+  // A1·v1 = A_out·(vA + vB) together with the tangential momentum balance
+  // m1·v1·cosθ + mB·vB = mA·vA (which reduces to vA − vB = v1·cosθ),
+  // giving a flow split that depends on the outlet/inlet area ratio.
+  // The outlet slider is limited to dout ≤ din, so ratio ≤ 1 and mB ≥ 0.
+  function compute(mdot, thetaDeg, dinCm, doutCm){
+    var theta = thetaDeg * Math.PI / 180;
+    var dinM = dinCm / 100, doutM = doutCm / 100;
+    var Ain = Math.PI / 4 * dinM * dinM;
+    var Aout = Math.PI / 4 * doutM * doutM;  // each outlet pipe
+    var Vin = mdot / (RHO * Ain);
+    var Fn = mdot * Vin * Math.sin(theta);
+    var ratio = Aout / Ain;
+    var mdotA = mdot * (1 + ratio * Math.cos(theta)) / 2;
+    var mdotB = mdot * (1 - ratio * Math.cos(theta)) / 2;
+    return { theta: theta, Vin: Vin, Fn: Fn, mdotA: mdotA, mdotB: mdotB };
+  }
+
+  function widthPx(dCm){ return 10 + dCm * 10; }
+
+  var NS = 'http://www.w3.org/2000/svg';
+  function svgEl(tag, attrs, cls){
+    var e = document.createElementNS(NS, tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    if (cls) e.setAttribute('class', cls);
+    return e;
+  }
+  function P(x, y){ return x.toFixed(2) + ',' + y.toFixed(2); }
+
+  // model space: origin = impact point, math-style y-up.
+  // pixel space: <g id="sceneRoot"> is transformed to flip + place origin.
+  var ORIGIN_X = 390, ORIGIN_Y = 390;
+  els.scene.setAttribute('transform', 'translate(' + ORIGIN_X + ',' + ORIGIN_Y + ') scale(1,-1)');
+
+  function render(){
+    var mdot = parseFloat(els.mdot.value);
+    var thetaDeg = parseFloat(els.theta.value);
+    var din = parseFloat(els.din.value);
+    // The outlet pipe can never be wider than the inlet pipe (a larger
+    // outlet area would demand backflow in outlet B at small angles): the
+    // outlet slider's range follows the inlet diameter, and its value is
+    // pulled down whenever the inlet shrinks below it.
+    els.dout.max = els.din.value;
+    if (parseFloat(els.dout.value) > din) els.dout.value = els.din.value;
+    var dout = parseFloat(els.dout.value);
+
+    els.mdotOut.textContent = fmt(mdot, 1) + ' kg/s';
+    els.thetaOut.textContent = fmt(thetaDeg, 0) + '°';
+    els.dinOut.textContent = fmt(din, 2) + ' cm';
+    els.doutOut.textContent = fmt(dout, 2) + ' cm';
+
+    var r = compute(mdot, thetaDeg, din, dout);
+
+    // ---- geometry ----
+    var theta = r.theta;
+    var c = Math.cos(theta), s = Math.sin(theta);
+    var dirx = c, diry = s;          // outlet "A" direction
+    var perpx = -s, perpy = c;       // points away from the plate, toward the fluid
+
+    var inletLen = 100, outletLen = 150;
+    var halfIn = widthPx(din) / 2, halfOut = widthPx(dout) / 2;
+    var plateHalf = 230, plateThk = 14, plateGap = 3;
+    var arrowGap = 16, arrowLen = 54;
+
+    while (els.scene.firstChild) els.scene.removeChild(els.scene.firstChild);
+
+    function add(tag, attrs, cls){ els.scene.appendChild(svgEl(tag, attrs, cls)); return els.scene.lastChild; }
+
+    // text label — (x,y) given in the same model space as every other shape.
+    function label(x, y, text, cls){
+      var t = svgEl('text', { x: x, y: -y, 'text-anchor': 'middle' }, cls);
+      t.textContent = text;
+      t.setAttribute('transform', 'scale(1,-1)');
+      els.scene.appendChild(t);
+      return t;
+    }
+
+    // text label with a true SVG subscript spliced into the middle — mirrors
+    // label()'s y-flip convention, but builds the text from three runs
+    // (main, subscript, tail) as separate tspans instead of one string,
+    // since no subscript-A/B glyphs exist in Unicode.
+    function labelSub(x, y, mainText, subText, tailText, cls){
+      var t = svgEl('text', { x: x, y: -y, 'text-anchor': 'middle' }, cls);
+      t.appendChild(document.createTextNode(mainText));
+      var sub = svgEl('tspan', { dy: '0.35em', 'font-size': '70%' });
+      sub.textContent = subText;
+      t.appendChild(sub);
+      var tail = svgEl('tspan', { dy: '-0.35em' });
+      tail.textContent = tailText;
+      t.appendChild(tail);
+      t.setAttribute('transform', 'scale(1,-1)');
+      els.scene.appendChild(t);
+      return t;
+    }
+
+    // text label with an opaque backing chip so it stays legible over the figure.
+    function labelChip(x, y, text, cls){
+      var t = label(x, y, text, cls);
+      var bb = t.getBBox();
+      var pad = 5;
+      var r2 = svgEl('rect', {
+        x: bb.x - pad, y: bb.y - pad,
+        width: bb.width + pad * 2, height: bb.height + pad * 2,
+        rx: 4
+      }, 'label-chip');
+      r2.setAttribute('transform', 'scale(1,-1)');
+      els.scene.insertBefore(r2, t);
+      return t;
+    }
+
+    // ---- plate (drawn first, behind the pipes) ----
+    var pcx = perpx * -(halfOut + plateThk / 2 + plateGap);
+    var pcy = perpy * -(halfOut + plateThk / 2 + plateGap);
+    var pPts = [
+      [pcx + dirx * plateHalf + perpx * plateThk / 2, pcy + diry * plateHalf + perpy * plateThk / 2],
+      [pcx + dirx * plateHalf - perpx * plateThk / 2, pcy + diry * plateHalf - perpy * plateThk / 2],
+      [pcx - dirx * plateHalf - perpx * plateThk / 2, pcy - diry * plateHalf - perpy * plateThk / 2],
+      [pcx - dirx * plateHalf + perpx * plateThk / 2, pcy - diry * plateHalf + perpy * plateThk / 2]
+    ];
+    var pPtsStr = pPts.map(function(p){ return P(p[0], p[1]); }).join(' ');
+    add('polygon', { points: pPtsStr }, 'plate-fill');
+
+    // ---- pipes: fill only, no stroke, so there is no seam line where the
+    // inlet meets the outlets and no cap line at the open ends. ----
+    // The inlet's junction end lies along the outlets' shared plate-side
+    // edge line (perpendicular coordinate −halfOut), not at a fixed
+    // vertical line: a wide inlet then mates flush with narrower outlet
+    // pipes and the plate — no uncovered notch beside the plate, and each
+    // wall line ends exactly where it crosses a neighboring pipe's edge,
+    // so the black lines meet in clean corners at every diameter combination.
+    var xTopEnd = (halfIn * c + halfOut) / s;
+    var xBotEnd = (-halfIn * c + halfOut) / s;
+    // At small angles with wide pipes the top corner could poke past
+    // outlet A's open end; pull it back inside (pipe A's own fill covers
+    // the junction there, so this leaves no hole).
+    if (xTopEnd * c + halfIn * s > outletLen - 10 && c > 0.01){
+      xTopEnd = (outletLen - 10 - halfIn * s) / c;
+    }
+    var inPts = [ [-inletLen, -halfIn], [xBotEnd, -halfIn], [xTopEnd, halfIn], [-inletLen, halfIn] ];
+    var outPtsList = [ [dirx, diry], [-dirx, -diry] ].map(function(spec){
+      var dx = spec[0], dy = spec[1];
+      var pxp = -dy, pyp = dx;
+      return [
+        [pxp * halfOut, pyp * halfOut],
+        [dx * outletLen + pxp * halfOut, dy * outletLen + pyp * halfOut],
+        [dx * outletLen - pxp * halfOut, dy * outletLen - pyp * halfOut],
+        [-pxp * halfOut, -pyp * halfOut]
+      ];
+    });
+    var allPipePts = [inPts, outPtsList[0], outPtsList[1]];
+    allPipePts.forEach(function(pts){
+      add('polygon', { points: pts.map(function(p){ return P(p[0], p[1]); }).join(' ') }, 'pipe-fill');
+    });
+
+    // Each pipe gets straight ruled lines along its two long sides (its
+    // walls) so the tube reads as a drawn pipe rather than a soft blob of
+    // color. Two places are deliberately left unstroked: the open end (so
+    // there's still no cap line there) and, at the Y-junction, whatever
+    // portion of a wall would fall inside one of the OTHER two pipes' fill
+    // — since the three fills overlap right at the junction (that's what
+    // makes it blend with no seam line), a wall drawn the full way to the
+    // vertex can end up as a stray line sitting inside a neighboring pipe.
+    function insidePoly(x, y, poly){
+      var inside = false;
+      for (var i = 0, j = poly.length - 1; i < poly.length; j = i++){
+        var xi = poly[i][0], yi = poly[i][1], xj = poly[j][0], yj = poly[j][1];
+        var hit = ((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+        if (hit) inside = !inside;
+      }
+      return inside;
+    }
+    // p0 is the junction (near) end, p1 is the open (far) end. Trims p0
+    // forward along the segment until it clears every polygon in others —
+    // coarse sampling to find the last covered point, then bisection to
+    // land exactly on the fill boundary, so the wall meets the neighboring
+    // pipe's edge with no gap. "Covered" means strictly INTERIOR: the
+    // point is tested nudged to both sides of the wall's own line, so a
+    // wall that merely runs along another fill's boundary line (the
+    // plate-side walls are collinear with the inlet's junction edge) is
+    // left alone rather than being chopped by boundary-sampling noise.
+    function trimNearJunction(p0, p1, others){
+      var ux = p1[0] - p0[0], uy = p1[1] - p0[1];
+      var ulen = Math.hypot(ux, uy) || 1;
+      var nx = -uy / ulen * 0.75, ny = ux / ulen * 0.75;
+      function covered(tt){
+        var x = p0[0] + (p1[0] - p0[0]) * tt, y = p0[1] + (p1[1] - p0[1]) * tt;
+        for (var k = 0; k < others.length; k++){
+          if (insidePoly(x + nx, y + ny, others[k]) && insidePoly(x - nx, y - ny, others[k])) return true;
+        }
+        return false;
+      }
+      var steps = 80, t = -1;
+      for (var i = 0; i <= steps; i++){
+        if (covered(i / steps)) t = i / steps;
+      }
+      if (t < 0) return [p0[0], p0[1]];
+      var lo = t, hi = Math.min(1, t + 1 / steps);
+      for (var j = 0; j < 20; j++){
+        var mid = (lo + hi) / 2;
+        if (covered(mid)) lo = mid; else hi = mid;
+      }
+      return [p0[0] + (p1[0] - p0[0]) * hi, p0[1] + (p1[1] - p0[1]) * hi];
+    }
+    // Each wall is given explicitly as a [near, far] pair — near is the end
+    // at the Y-junction (where it may need trimming), far is the open end
+    // (drawn in full). The inlet's own corner order in inPts runs the
+    // opposite way from the outlets', so pairs are built explicitly here
+    // rather than assumed from a shared corner-index convention.
+    function pipeWalls(wallPairs, otherPolys){
+      wallPairs.forEach(function(pair){
+        var near = pair[0], far = pair[1];
+        var a = trimNearJunction(near, far, otherPolys);
+        add('line', { x1: a[0], y1: a[1], x2: far[0], y2: far[1] }, 'pipe-wall');
+      });
+    }
+    pipeWalls([
+      [inPts[1], inPts[0]],
+      [inPts[2], inPts[3]]
+    ], [outPtsList[0], outPtsList[1]]);
+    pipeWalls([
+      [outPtsList[0][0], outPtsList[0][1]],
+      [outPtsList[0][3], outPtsList[0][2]]
+    ], [inPts, outPtsList[1]]);
+    pipeWalls([
+      [outPtsList[1][0], outPtsList[1][1]],
+      [outPtsList[1][3], outPtsList[1][2]]
+    ], [inPts, outPtsList[0]]);
+
+    // plate outline drawn again on top so its edge reads clearly against the pipes
+    add('polygon', { points: pPtsStr }, 'plate-outline');
+
+    // ---- angle arc: theta, from the inlet direction to the outlet-A direction.
+    // Drawn on top of the pipes/plate (not before) so it stays fully visible
+    // over its whole sweep instead of being covered by the outlet pipe fill. ----
+    var arcR = 100;
+    var arcPts = [];
+    var steps = 24;
+    for (var i = 0; i <= steps; i++){
+      var a = theta * i / steps;
+      arcPts.push(P(arcR * Math.cos(a), arcR * Math.sin(a)));
+    }
+    var arcPtsStr = arcPts.join(' ');
+    add('polyline', { points: arcPtsStr, fill: 'none' }, 'angle-arc-halo');
+    add('polyline', { points: arcPtsStr, fill: 'none' }, 'angle-arc');
+    // Label sits just below the flow-direction ray (angle 0), OUTSIDE the
+    // wedge the arc sweeps through — a fixed angle/radius regardless of
+    // theta. Anywhere INSIDE that wedge (near the bisector) is a poor
+    // choice at any radius: too small and the label sits on the dashed
+    // arc itself; too large and — because the plate runs the full length
+    // of the outlet-A axis just beyond the arc — it clips the plate's
+    // edge instead. Just outside the wedge, below the flow line, is clear
+    // of both at every angle and every pipe diameter.
+    // The Fn arrow now lies entirely behind the plate, along the ray at
+    // angle θ−90°. For θ ≳ 60° that ray sweeps through (or grazes) this
+    // fixed chip position, so in that range the chip mirrors to +16° — the
+    // matching spot just past the plate on the other side of the flow axis,
+    // clear of the shaft, the pipes, and the plate itself at every diameter
+    // (its opaque backing simply sits over a short stretch of the dashed arc).
+    var chipDeg = thetaDeg >= 60 ? 16 : -16;
+    var labelAngle = chipDeg * Math.PI / 180;
+    var labelR = 118;
+    labelChip(labelR * Math.cos(labelAngle), labelR * Math.sin(labelAngle), 'θ = ' + fmt(thetaDeg, 0) + '°', 'theta-label');
+
+    // ---- external flow arrows: inlet (pointing in) and two outlets (pointing out) ----
+    var vinTxt = 'v₁ = ' + fmt(r.Vin, r.Vin >= 100 ? 0 : 1) + ' m/s';
+
+    // inlet arrow: outside the pipe's far (left) end, pointing toward the plate
+    (function(){
+      var tailX = -(inletLen + arrowGap + arrowLen), tipX = -(inletLen + arrowGap);
+      add('line', { x1: tailX, y1: 0, x2: tipX, y2: 0, 'marker-end': 'url(#mArrowWater)' }, 'flow-line');
+      var midX = (tailX + tipX) / 2;
+      var vOff = halfIn * 0.5 + 18;
+      label(midX, vOff, 'inlet', 'flow-label');
+      // The value label sits below the arrow with a shallow, FIXED drop
+      // (not scaled to pipe width): outlet B's own arrow shares almost the
+      // same axis as the inlet at small theta, sweeping through the band
+      // roughly [166·sinθ, 220·sinθ] below the centerline. At θ=10° that
+      // band starts around y=-29, so keeping the drop well under that
+      // (rather than growing it with pipe diameter, which used to push it
+      // to y≈-35 — squarely inside the band) keeps the two apart at every
+      // angle/diameter combination, while still clearing the arrow itself.
+      // Nudged left so the value never reaches the pipe's own footprint
+      // (x ≥ −inletLen) when a wide inlet drops the pipe wall down to the
+      // label's height.
+      label(midX - 22, -24, vinTxt, 'flow-value');
+    })();
+
+    // outlet arrows: outside each pipe's far end, pointing further away (with the flow).
+    // Labels sit beyond the arrow TIP (not straddling its middle) and offset along the
+    // shared global perpendicular — same absolute side for both A and B — so neither
+    // label ever drifts back toward the plate or the arrow shaft.
+    [ [dirx, diry, r.mdotA, 'A'], [-dirx, -diry, r.mdotB, 'B'] ].forEach(function(spec){
+      var dx = spec[0], dy = spec[1], mflow = spec[2], subLetter = spec[3];
+      var baseR = outletLen + arrowGap;
+      var tailX = dx * baseR, tailY = dy * baseR;
+      var tipX = dx * (baseR + arrowLen), tipY = dy * (baseR + arrowLen);
+      add('line', { x1: tailX, y1: tailY, x2: tipX, y2: tipY, 'marker-end': 'url(#mArrowWater)' }, 'flow-line');
+      // Stack the two labels one past the other ALONG the arrow's own axis
+      // (not by perpendicular distance alone) so they never land side-by-side
+      // and overlap each other when that axis happens to run near-horizontal.
+      // A small, equal perpendicular nudge (away from the plate) just clears
+      // the shaft itself.
+      // Stack along the arrow's own axis AND add a small vertical nudge that
+      // always REINFORCES that stacking (signed to match dy) rather than a
+      // fixed +/-, which would fight the radial ordering whenever dy < 0.
+      // Axis-only stacking degenerates to almost no separation when the
+      // axis is nearly horizontal (small theta); the signed nudge guarantees
+      // the two lines never merge regardless of arrow direction.
+      var shaftClear = halfOut * 0.3 + 12;
+      // Floor r1 well past the plate's own end cap (radius ~plateHalf) —
+      // otherwise, for small pipe diameters, the pipe-diameter-based reach
+      // above lands short of the plate's tip and the (wide, monospace)
+      // value label clips the plate's corner.
+      var r1 = Math.max(baseR + arrowLen + halfOut * 0.4 + 30, plateHalf + 40);
+      // Past 30°, pull the mdot value back toward "outlet" — the gap
+      // between them shrinks steadily up to 90° (down to 40% of its
+      // original size) instead of staying fixed regardless of angle.
+      var gapBase = halfOut * 0.35 + 26;
+      var gapScale = thetaDeg > 30 ? Math.max(0.4, 1 - (thetaDeg - 30) * 0.01) : 1;
+      var r2 = r1 + gapBase * gapScale;
+      var vSign = dy >= 0 ? 1 : -1;
+      label(dx * r1 + perpx * shaftClear, dy * r1 + perpy * shaftClear - 9 * vSign, 'outlet', 'flow-label');
+      labelSub(dx * r2 + perpx * shaftClear, dy * r2 + perpy * shaftClear + 9 * vSign, 'ṁ', subLetter, ' = ' + fmt(mflow, 2) + ' kg/s', 'flow-value outlet-value');
+    });
+
+    // ---- Fn arrow: bold, always perpendicular to the plate, anchored at
+    // the plate's own midpoint (the origin projects onto the exact middle
+    // of the plate rectangle, since the plate is built symmetric ±plateHalf
+    // about it). Same direction as before — pointing toward the plate and
+    // the fluid, the direction of the force applied to hold the plate
+    // against the jet — but the whole arrow is slid along its own axis so
+    // it lies entirely BEHIND the plate, with the arrowhead's TIP touching
+    // the plate's far face (the side opposite the tubing).
+    var faceR = halfOut + plateGap + plateThk;  // distance to the plate's far face
+    var tipClear = 5;                           // the marker's tip extends ~this far past the line's end
+    var headEndR = faceR + tipClear;
+    var arrowL = halfOut + plateGap + 6 + 80;   // same overall length as before
+    var tailR = headEndR + arrowL;
+    add('line', {
+      x1: -perpx * tailR, y1: -perpy * tailR,
+      x2: -perpx * headEndR, y2: -perpy * headEndR,
+      'marker-end': 'url(#mArrowForce)'
+    }, 'force-line');
+    // The label sits on the blunt (non-arrowhead) side of the arrow, past
+    // where it touches the plate's far face — the open area directly
+    // behind the plate, clear of the pipes/arc/other labels at every theta
+    // and pipe width without needing a separate clearance pocket.
+
+    // Force reads as a plain decimal across the three middle decades
+    // (0.1–1, 1–10, 10–100) — e.g. 0.199, 7.16, 86.3 — and only drops to
+    // ×10ⁿ scientific notation outside that range, where a plain decimal
+    // would run to too many digits (or too many leading zeros) to read at
+    // a glance.
+    var absFn = Math.abs(r.Fn);
+    var exp = 0, mant = 0, plain = false, plainDigits = 2;
+    if (absFn !== 0){
+      exp = Math.floor(Math.log10(absFn));
+      if (exp >= -1 && exp <= 1){
+        plain = true;
+        plainDigits = 2 - exp;
+      } else {
+        mant = r.Fn / Math.pow(10, exp);
+      }
+    } else {
+      plain = true;
+    }
+    // Behind the plate, just past the arrow's tail on the same axis, so it
+    // travels with the arrow. The gap is not fixed: the label is measured
+    // after it renders, and its center is pushed out only far enough that
+    // its own box clears the tail — so when the arrow is steep (small θ)
+    // and the text's projection along the arrow's axis is short, the label
+    // sits right at the tail instead of floating far below it. Clear of
+    // the pipes, arc, and every other label at every theta and pipe width
+    // (the θ chip, the only other thing that ever visits this region, has
+    // already dodged to the far side of the flow axis for the θ range
+    // where it would matter).
+    var ft = svgEl('text', { x: 0, y: 0, 'text-anchor': 'middle' }, 'force-label');
+    if (plain){
+      ft.appendChild(document.createTextNode('Fₙ = ' + r.Fn.toFixed(plainDigits) + ' N'));
+    } else {
+      ft.appendChild(document.createTextNode('Fₙ = ' + mant.toFixed(2) + ' × 10'));
+      var sup = svgEl('tspan', { dy: '-0.5em', 'font-size': '70%' });
+      sup.textContent = String(exp);
+      ft.appendChild(sup);
+      var tailSpan = svgEl('tspan', { dy: '0.5em' });
+      tailSpan.textContent = ' N';
+      ft.appendChild(tailSpan);
+    }
+    ft.setAttribute('transform', 'scale(1,-1)');
+    els.scene.appendChild(ft);
+    // Measure the rendered label, then place its center past the tail by
+    // its own half-extent projected onto the arrow's axis, plus a small
+    // constant gap — the closest it can sit without its box touching the
+    // shaft's end.
+    var fb0 = ft.getBBox();
+    var proj = Math.abs(perpx) * fb0.width / 2 + Math.abs(perpy) * fb0.height / 2;
+    var labelPerpR = tailR + 14 + proj;
+    var flx = -perpx * labelPerpR, fly = -perpy * labelPerpR;
+    ft.setAttribute('x', flx);
+    ft.setAttribute('y', -fly);
+    // With the label on the arrow's extended axis, a long scientific-
+    // notation reading at θ near 90° can poke past the canvas's right
+    // edge. Pull it back inside and drop it just below the axis (which is
+    // near-horizontal exactly when the clamp can trigger) so it never
+    // clips or sits on the arrow's tail.
+    var fb = ft.getBBox();
+    var xEdge = 360;
+    if (fb.x + fb.width > xEdge){
+      ft.setAttribute('x', flx - (fb.x + fb.width - xEdge));
+      ft.setAttribute('y', -(fly - 34));
+    } else if (fb.x < -xEdge){
+      ft.setAttribute('x', flx + (-xEdge - fb.x));
+      ft.setAttribute('y', -(fly - 34));
+    }
+  }
+
+  ['input'].forEach(function(evt){
+    [els.mdot, els.theta, els.din, els.dout].forEach(function(el){
+      el.addEventListener(evt, render);
+    });
+  });
+
+  render();
+})();
+</script>
+
+<style>
+  .grid-path{ stroke: var(--grid-line); }
+  .fill-water{ fill: var(--water); }
+  .fill-force{ fill: var(--force); }
+  .plate-fill{ fill: var(--plate); }
+  .plate-outline{ fill: none; stroke: var(--plate-dark); stroke-width: 1.5; }
+  .pipe-fill{ fill: var(--water-soft); }
+  .pipe-wall{ stroke: var(--ink); stroke-width: 1.75; }
+  .angle-arc-halo{ stroke: var(--surface); stroke-width: 10.4; stroke-linecap: round; }
+  .angle-arc{ stroke: var(--ink-dim); stroke-width: 2.8; stroke-dasharray: 11 8; stroke-linecap: round; }
+  .theta-label{ fill: var(--ink); font: 400 21.25px "Public Sans", sans-serif; }
+  .label-chip{ fill: var(--surface); opacity: 0.92; }
+  .flow-label{ fill: var(--ink-dim); font: 600 17.5px "Public Sans", sans-serif; letter-spacing: 0.02em; }
+  .flow-value{ fill: var(--ink); font: 400 17.5px "Public Sans", sans-serif; }
+  .outlet-value{ font-size: 20.1px; }
+  .flow-line{ stroke: var(--water); stroke-width: 5; stroke-linecap: round; }
+  .force-line{ stroke: var(--force); stroke-width: 7; stroke-linecap: round; }
+  .force-label{ fill: var(--force); font: 400 17.5px "Public Sans", sans-serif; }
+</style>
+</body>
+</html>

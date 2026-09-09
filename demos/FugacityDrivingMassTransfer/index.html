@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Fugacity as a Driving Force for Mass Transfer</title>
+<script id="MathJax-script" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+  svg: { fontCache: 'global' },
+  chtml: { displayAlign: 'left', displayIndent: '2em' }
+};
+</script>
+<style>
+  :root{
+    --dark-red:#98000D;
+  }
+  html,body{
+    margin:0; padding:0;
+    font-family: Helvetica, Arial, sans-serif;
+    background:#ffffff;
+    color:#1a1a1a;
+  }
+  #app{
+    max-width:900px;
+    margin:0 auto;
+    padding:14px 16px 20px 16px;
+    box-sizing:border-box;
+  }
+  h1{
+    text-align:center;
+    font-size:20px;
+    font-weight:bold;
+    margin:4px 0 14px 0;
+  }
+  #stage{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:6px;
+  }
+  #canvasWrap{
+    position:relative;
+    width:100%;
+    max-width:660px;
+  }
+  canvas{
+    width:100%;
+    height:auto;
+    display:block;
+  }
+  #controls{
+    width:100%;
+    max-width:660px;
+    margin-top:6px;
+    border:1px solid #ddd;
+    border-radius:6px;
+    padding:12px 16px 14px 16px;
+    box-sizing:border-box;
+    background:#fafafa;
+  }
+  .row1{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:28px;
+    margin-bottom:10px;
+    flex-wrap:wrap;
+  }
+  .condLabel{
+    text-align:center;
+    font-weight:bold;
+    font-size:16px;
+    margin:2px 0 10px 0;
+  }
+  .row3{
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    gap:34px;
+    flex-wrap:wrap;
+  }
+  .sliderBlock{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    min-width:230px;
+  }
+  .sliderLabel{
+    font-size:16px;
+    margin-bottom:4px;
+    white-space:nowrap;
+    height: 20px;
+  }
+  .sliderRow{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    width:100%;
+  }
+  input[type=range]{
+    flex:1;
+    accent-color:#98000D;
+  }
+  input[type="range"]{
+  --accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+input[type="range"]::-moz-range-thumb{
+  width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+
+  .sliderVal{
+    font-size:16px;
+    min-width:44px;
+    text-align:right;
+  }
+  #playBtn{
+    background:#98000D;
+    color:#fff;
+    border:none;
+    border-radius:5px;
+    padding:8px 18px;
+    font-family:Helvetica, Arial, sans-serif;
+    font-size:14px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:7px;
+  }
+  #playBtn:hover{ background:#7a000a; }
+  #playBtn:disabled{ opacity:0.55; cursor:default; }
+  #resetBtn{
+    background:#98000D;
+    color:#fff;
+    border:none;
+    border-radius:5px;
+    padding:8px 18px;
+    font-family:Helvetica, Arial, sans-serif;
+    font-size:14px;
+    cursor:pointer;
+  }
+  #resetBtn:hover{ background:#7a000a; }
+  #resetBtn:disabled{ opacity:0.55; cursor:default; }
+  .checkboxRow{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:16px;
+  }
+  input[type=checkbox]{
+    width:16px; height:16px;
+    accent-color:#98000D;
+  }
+  #btnRow{
+    display:flex;
+    justify-content:center;
+    gap:12px;
+    margin-top:16px;
+  }
+  .navBtn{
+    background:#98000D;
+    color:#ffffff;
+    border:none;
+    border-radius:6px;
+    padding:9px 23px;
+    font-family:Helvetica, Arial, sans-serif;
+    font-size:16px;
+    text-align:center;
+    cursor:pointer;
+  }
+  .navBtn:hover{ background:#7a000a; }
+
+  #btnArea{
+    position:relative;
+    width:100%;
+    max-width:660px;
+    margin:0 auto;
+  }
+  .overlay{
+    display:none;
+    position:absolute;
+    bottom:100%;            /* sit just above the button row */
+    left:50%;
+    transform:translateX(-50%);
+    margin-bottom:8px;
+    z-index:50;
+    width:100%;
+    pointer-events:none;    /* wrapper never blocks clicks on the buttons */
+  }
+  .overlay.show{ display:block; }
+  .panel{
+    background:#fff;
+    border:1px solid #bbb;
+    border-radius:8px;
+    width:100%;
+    max-height:70vh;
+    overflow-y:auto;
+    padding:20px 24px 22px 24px;
+    box-sizing:border-box;
+    box-shadow:0 8px 30px rgba(0,0,0,0.3);
+    position:relative;
+    pointer-events:auto;    /* the panel itself remains interactive */
+  }
+  .panel h2{
+    margin-top:0;
+    font-size:17px;
+    color:#98000D;
+  }
+  .panel p{
+    font-size:14.5px;
+    line-height:1.55;
+    margin:0 0 12px 0;
+  }
+  .panel p:last-child{ margin-bottom:0; }
+  .panel a{ color:#98000D; }
+  .closeX{
+    position:absolute;
+    top:10px; right:14px;
+    font-size:20px;
+    cursor:pointer;
+    color:#666;
+    background:none;
+    border:none;
+  }
+  .closeX:hover{ color:#000; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="stage">
+    <div id="canvasWrap">
+      <canvas id="canvas"></canvas>
+    </div>
+
+    <div id="controls">
+      <div class="row1">
+        <button id="resetBtn">Reset</button>
+        <button id="playBtn">&#9654; go to equilibrium</button>
+        <label class="checkboxRow"><input type="checkbox" id="showFug"> show fugacities</label>
+      </div>
+
+      <div class="condLabel">conditions for left flask</div>
+
+      <div class="row3">
+        <div class="sliderBlock">
+          <div class="sliderLabel">temperature <i>T</i><sub>1</sub> (&deg;C)</div>
+          <div class="sliderRow">
+            <input type="range" id="T1" min="22.1" max="25.5" step="0.1" value="24">
+            <span class="sliderVal" id="T1val">24.0</span>
+          </div>
+        </div>
+        <div class="sliderBlock">
+          <div class="sliderLabel">add grams of NaCl</div>
+          <div class="sliderRow">
+            <input type="range" id="mN" min="5" max="25" step="1" value="15">
+            <span class="sliderVal" id="mNval">15</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="btnArea">
+      <!-- Directions -->
+      <div class="overlay" id="ovDirections">
+        <div class="panel">
+          <button class="closeX" data-close>&times;</button>
+          <h2>Directions</h2>
+          <p>Two 1-liter flasks are at different temperatures; initially the left flask contains 500 mL of water with dissolved salt and the right flask contains 200 mL of pure water. You can control the temperature of the left flask and the amount of salt dissolved with sliders. Click the play button &ldquo;go to equilibrium&rdquo; to remove the caps on each flask. Water transfers from one flask to the other to try to make water fugacities equal in each flask. For some conditions, all the water transfers to the left or right flask. Note that water transfers much faster in the simulation than in the physical process. Check &ldquo;show fugacities&rdquo; to display the water fugacities in each flask.</p>
+        </div>
+      </div>
+
+      <!-- Details -->
+      <div class="overlay" id="ovDetails">
+        <div class="panel">
+          <button class="closeX" data-close>&times;</button>
+          <h2>Details</h2>
+          <p>The saturation pressure of water $P^{sat}$ is calculated using the Antoine equation:</p>
+          <p>$$P^{sat} = 10^{A - \frac{B}{T+C}},$$</p>
+          <p>where $A$, $B$ and $C$ are Antoine constants, $T$ is temperature (&deg;C) and $P^{sat}$ is in units of kPa.</p>
+          <p>The fugacity $f$ of pure water is equal to its saturation pressure:</p>
+          <p>$$f = P^{sat}(T).$$</p>
+          <p>For water with dissolved salt, the fugacity of the solution $\hat{f}$ (kPa) is given by:</p>
+          <p>$$\hat{f} = x f = x P^{sat}(T),$$</p>
+          <p>where $x$ is the mole fraction of water.</p>
+        </div>
+      </div>
+
+      <!-- About -->
+      <div class="overlay" id="ovAbout">
+        <div class="panel">
+          <button class="closeX" data-close>&times;</button>
+          <h2>About</h2>
+          <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/FugacityAsADrivingForceForMassTransfer/" target="_blank" rel="noopener">Mathematica simulation</a> by Rachael L. Baumann. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.</p>
+        </div>
+      </div>
+
+      <div id="btnRow">
+        <button class="navBtn" id="btnDirections">Directions</button>
+        <button class="navBtn" id="btnDetails">Details</button>
+        <button class="navBtn" id="btnAbout">About</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- Physical constants ----------
+  const r = 6.204;          // flask bulb radius (model units) -> sphere volume = 1000 mL
+  const a = 4*r;             // horizontal separation between flask centers (24.816)
+
+  function Psat(T){ // kPa, T in deg C, Antoine
+    return 100*Math.pow(10, 5.40221 - 1838.675/(T+241.263));
+  }
+
+  // Solve V = (pi/3) Hc^2 (3r - Hc) for Hc in [0,2r] via bisection (monotonic)
+  function capHeight(V){
+    V = Math.max(0, Math.min(V, (4/3)*Math.PI*r*r*r));
+    let lo = 0, hi = 2*r;
+    function f(Hc){ return (Math.PI/3)*Hc*Hc*(3*r-Hc) - V; }
+    for(let i=0;i<60;i++){
+      const mid = 0.5*(lo+hi);
+      if (f(mid) < 0) lo = mid; else hi = mid;
+    }
+    return 0.5*(lo+hi);
+  }
+
+  // ---------- State ----------
+  const state = {
+    T1: 24,
+    mN: 15,
+    BN: false,
+    eq: 0,       // 0..1.5 "go to equilibrium" progress
+    playing: false,
+    playStart: 0
+  };
+
+  const els = {
+    T1: document.getElementById('T1'),
+    T1val: document.getElementById('T1val'),
+    mN: document.getElementById('mN'),
+    mNval: document.getElementById('mNval'),
+    showFug: document.getElementById('showFug'),
+    playBtn: document.getElementById('playBtn'),
+    resetBtn: document.getElementById('resetBtn'),
+    canvas: document.getElementById('canvas'),
+  };
+
+  const ctx = els.canvas.getContext('2d');
+
+  // ---------- world <-> canvas mapping ----------
+  const worldXmin=-7.5, worldXmax=32, worldYmin=-7, worldYmax=17;
+  const worldW = worldXmax-worldXmin, worldH = worldYmax-worldYmin;
+  let scale, cw, ch;
+
+  function fitCanvas(){
+    const cssW = els.canvas.parentElement.clientWidth;
+    scale = cssW / worldW;
+    cw = cssW;
+    ch = worldH*scale;
+    const dpr = window.devicePixelRatio || 1;
+    els.canvas.width = Math.round(cw*dpr);
+    els.canvas.height = Math.round(ch*dpr);
+    els.canvas.style.width = cw+'px';
+    els.canvas.style.height = ch+'px';
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  window.addEventListener('resize', ()=>{ fitCanvas(); draw(); });
+
+  function X(wx){ return (wx-worldXmin)*scale; }
+  function Y(wy){ return ch - (wy-worldYmin)*scale; }
+
+  // ---------- physics per-frame ----------
+  function compute(){
+    const T1 = state.T1, mN = state.mN, eq = state.eq;
+    const go1 = eq<=0.5 ? 2*eq : 1;
+    const go2 = eq<0.5 ? 0 : (eq-0.5);
+
+    const fW2 = Psat(22);
+    const nWi = 500/18.02;
+    const nN = 2*(mN/58.44);
+    const PsatT1 = Psat(T1);
+    // Solve fW2 = PsatT1 * w/(w+nN) for w
+    let nWfcalc;
+    if (PsatT1 - fW2 <= 1e-12){
+      nWfcalc = 1e9; // no finite solution -> effectively capped
+    } else {
+      nWfcalc = fW2*nN/(PsatT1-fW2);
+    }
+    const nWf = Math.min(nWfcalc, 38.8457);
+
+    const xWi = nWi/(nWi+nN);
+    const xWf = nWf/(nWf+nN);
+    const xW = xWi + (xWf-xWi)*go2;
+    const xN = 1-xW;
+    const fW1 = xW*PsatT1;
+
+    const mWf = xW < 0.818 ? 0 : nWf*18.02;
+    const V1 = 500*(1-go2) + mWf*go2;
+    const V2 = 200 + (500-mWf)*go2;
+
+    const h1 = capHeight(V1);
+    const h2 = capHeight(V2);
+
+    return {T1,mN,eq,go1,go2,fW1,fW2,nWfcalc,nWf,xW,xN,mWf,V1,V2,h1,h2,PsatT1};
+  }
+
+  // ---------- drawing helpers ----------
+  function circlePath(cx,cy,rad){
+    ctx.beginPath();
+    ctx.arc(X(cx),Y(cy),rad*scale,0,Math.PI*2);
+  }
+
+  function drawFlaskFluid(cx, h){
+    // Fill the portion of the bulb circle below height h (cap of height h measured
+    // from bottom of sphere, i.e. water sits in bottom cap of height h)
+    // Circle center (cx, r), radius r. Bottom of sphere at y=0. Liquid fills 0..h.
+    ctx.save();
+    circlePath(cx, r, r);
+    ctx.clip();
+    const yTop = h; // world y of liquid surface
+    ctx.fillStyle = 'rgba(0,140,220,0.55)';
+    ctx.fillRect(X(cx-r-1), Y(yTop), (r+1)*2*scale, Y(0)-Y(yTop)+2);
+    ctx.restore();
+  }
+
+  // Math angles (degrees) where the tube walls intersect each flask circle:
+  // these arcs are the permanent openings (tube mouths) in the glass.
+  const MOUTH1 = [80.78, 99.32];   // flask 1 opening, math degrees ccw from +x
+  const MOUTH2 = [80.74, 99.22];   // flask 2 opening
+
+  function drawFlaskBody(cx, mouth){
+    // Glass bulb outline with a permanent gap at the tube mouth, so the
+    // tubing is open into the flask once the valve slides out of the way.
+    const a0 = mouth[0]*Math.PI/180, a1 = mouth[1]*Math.PI/180;
+    ctx.beginPath();
+    ctx.lineWidth = 2.2;
+    ctx.strokeStyle = '#333333';
+    // stroke everything EXCEPT the mouth arc. Canvas angles: math t -> -t,
+    // sweeping clockwise from -a0 all the way around to -a1.
+    ctx.arc(X(cx), Y(r), r*scale, -a0, -a1, false);
+    ctx.stroke();
+  }
+
+  function drawValve(cx, go1, dir){
+    // Sliding valve: a full-length thick dark-gray arc (90 deg span, as in
+    // the Mathematica original's closed state, GrayLevel[0.3]) that keeps
+    // its size and SLIDES around the rim - out of the way of the tube
+    // mouth - instead of shrinking. dir=+1 slides ccw (left flask, toward
+    // its outer shoulder), dir=-1 slides cw (right flask, outward).
+    const g = Math.min(Math.max(go1||0, 0), 1);
+    const slide = dir * g * (62*Math.PI/180); // 62 deg fully clears the mouth
+    const startMath = Math.PI/4 + slide;      // closed: 45..135 deg
+    const endMath   = 3*Math.PI/4 + slide;
+    ctx.beginPath();
+    ctx.lineWidth = 0.01*cw;                  // Thickness[0.01] of plot width
+    ctx.strokeStyle = '#4D4D4D';              // GrayLevel[0.3]
+    ctx.arc(X(cx), Y(r), r*scale, -endMath, -startMath, false);
+    ctx.stroke();
+  }
+
+  function drawNeck(){
+    // The connecting glass tube between the two flasks: a closed shape
+    // bounded above/below by the two parabolic curves, filled white and
+    // outlined black. It is clipped to the OUTSIDE of both flask circles,
+    // so the tube ends flush at each flask wall - nothing sticks into the
+    // flasks, and the tube mouth is genuinely open once the valve slides
+    // out of the way.
+    const upper = x => -0.0282*x*x + 0.6998*x + 11.66; // lower boundary of tube
+    const lower = x => -0.02598*x*x + 0.6446*x + 13;   // upper boundary of tube
+    ctx.save();
+    // clip region = whole canvas minus the two flask discs (even-odd rule).
+    // Each circle must be its own subpath (moveTo first), otherwise arc()
+    // draws stray connector lines that corrupt the even-odd regions.
+    ctx.beginPath();
+    ctx.rect(0, 0, cw, ch);
+    ctx.moveTo(X(0)+r*scale, Y(r));
+    ctx.arc(X(0), Y(r), r*scale, 0, 2*Math.PI);
+    ctx.closePath();
+    ctx.moveTo(X(a)+r*scale, Y(r));
+    ctx.arc(X(a), Y(r), r*scale, 0, 2*Math.PI);
+    ctx.closePath();
+    ctx.clip('evenodd');
+    ctx.beginPath();
+    for(let x=-1; x<=a+1; x+=0.3){
+      const y=lower(x);
+      if (x===-1) ctx.moveTo(X(x),Y(y)); else ctx.lineTo(X(x),Y(y));
+    }
+    for(let x=a+1; x>=-1; x-=0.3){
+      const y=upper(x);
+      ctx.lineTo(X(x),Y(y));
+    }
+    ctx.closePath();
+    ctx.fillStyle = '#ffffff';
+    ctx.fill();
+    ctx.lineWidth = 2.2;
+    ctx.strokeStyle = '#333333';
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function frame(text, wx, wy, opts){
+    opts = opts||{};
+    ctx.save();
+    ctx.font = (opts.bold?'bold ':'') + (opts.size||13) + 'px Helvetica, Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const lines = text.split('\n');
+    const pad = 4;
+    let maxW = 0;
+    lines.forEach(l=>{ maxW = Math.max(maxW, ctx.measureText(l).width); });
+    const lh = (opts.size||13)+4;
+    const boxW = maxW+2*pad, boxH = lines.length*lh+2*pad;
+    const px = X(wx), py = Y(wy);
+    if (opts.framed !== false){
+      ctx.fillStyle = opts.bg || '#ffffff';
+      ctx.strokeStyle = '#999999';
+      ctx.lineWidth = 1;
+      ctx.fillRect(px-boxW/2, py-boxH/2, boxW, boxH);
+      ctx.strokeRect(px-boxW/2, py-boxH/2, boxW, boxH);
+    }
+    ctx.fillStyle = opts.color || '#111111';
+    lines.forEach((l,i)=>{
+      ctx.fillText(l, px, py - boxH/2 + pad + lh*i + lh/2 - 2);
+    });
+    ctx.restore();
+  }
+
+  // Build drawable runs from a spec of {text, kind} parts, where kind is
+  // 'normal' | 'italic' | 'sub' (subscript, smaller & lowered baseline).
+  function buildRuns(parts, baseSize){
+    const baseFont = baseSize+'px Helvetica, Arial, sans-serif';
+    const italicFont = 'italic '+baseSize+'px Helvetica, Arial, sans-serif';
+    const subSize = Math.round(baseSize*0.68);
+    const subFont = subSize+'px Helvetica, Arial, sans-serif';
+    return parts.map(p=>{
+      let font, dy=0;
+      if (p.kind==='italic') font=italicFont;
+      else if (p.kind==='sub'){ font=subFont; dy=baseSize*0.30; }
+      else font=baseFont;
+      return {text:p.text, font, dy};
+    });
+  }
+
+  // Draw a (possibly multi-line, subscript-aware) framed label.
+  // `lines` is an array where each entry is either a plain string, or an
+  // array of run-specs [{text,kind}, ...] for mixed normal/italic/subscript text.
+  function richFrame(lines, wx, wy, opts){
+    opts = opts||{};
+    const size = opts.size||13;
+    ctx.save();
+    const lh = size+6;
+    const lineData = lines.map(line=>{
+      const runs = buildRuns(typeof line==='string' ? [{text:line,kind:'normal'}] : line, size);
+      let w=0;
+      runs.forEach(rn=>{ ctx.font=rn.font; w+=ctx.measureText(rn.text).width; });
+      return {runs,w};
+    });
+    const maxW = Math.max.apply(null, lineData.map(l=>l.w));
+    const pad=5;
+    const boxW = maxW+2*pad, boxH = lines.length*lh+2*pad;
+    const px = X(wx), py = Y(wy);
+    if (opts.framed !== false){
+      ctx.fillStyle = opts.bg || '#ffffff';
+      ctx.strokeStyle = '#999999';
+      ctx.lineWidth = 1;
+      ctx.fillRect(px-boxW/2, py-boxH/2, boxW, boxH);
+      ctx.strokeRect(px-boxW/2, py-boxH/2, boxW, boxH);
+    }
+    ctx.textAlign='left';
+    ctx.textBaseline='alphabetic';
+    lineData.forEach((ld,i)=>{
+      const lineY = py - boxH/2 + pad + lh*i + lh/2 + size*0.33;
+      let x = px - ld.w/2;
+      ld.runs.forEach(rn=>{
+        ctx.font=rn.font;
+        ctx.fillStyle = opts.color || '#111111';
+        ctx.fillText(rn.text, x, lineY+rn.dy);
+        x += ctx.measureText(rn.text).width;
+      });
+    });
+    ctx.restore();
+  }
+
+  function drawArrow(x1,y1,x2,y2){
+    ctx.save();
+    ctx.strokeStyle = '#98000D';
+    ctx.fillStyle = '#98000D';
+    ctx.lineWidth = 3.2*1.15;
+    const px1=X(x1),py1=Y(y1),px2=X(x2),py2=Y(y2);
+    ctx.beginPath();
+    ctx.moveTo(px1,py1);
+    ctx.lineTo(px2,py2);
+    ctx.stroke();
+    const ang = Math.atan2(py2-py1, px2-px1);
+    const headLen = 13*1.15;
+    ctx.beginPath();
+    ctx.moveTo(px2,py2);
+    ctx.lineTo(px2-headLen*Math.cos(ang-Math.PI/7), py2-headLen*Math.sin(ang-Math.PI/7));
+    ctx.lineTo(px2-headLen*Math.cos(ang+Math.PI/7), py2-headLen*Math.sin(ang+Math.PI/7));
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function fmtFixed(v,dec){ return v.toFixed(dec); }
+
+  let saltDots = null; // regenerate only occasionally so it doesn't flicker every frame
+  function makeSaltDots(hSalt){
+    const pts = [];
+    const levels = [hSalt, hSalt*2/3, hSalt/3];
+    levels.forEach(hh=>{
+      for(let i=0;i<25;i++){
+        const ang = Math.acos(Math.max(-1,Math.min(1,(r-hh)/r)));
+        const xa = -r*Math.sin(ang), xb = r*Math.sin(ang);
+        const xx = xa + Math.random()*(xb-xa);
+        pts.push([xx, hh, 0.7+Math.random()*1.1]);
+      }
+    });
+    return pts;
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,cw,ch);
+    const p = compute();
+
+    // fluid fills
+    drawFlaskFluid(0, p.h1);
+    drawFlaskFluid(a, p.h2);
+
+    // salt precipitate visualization
+    if (p.xW < 0.818){
+      if (!saltDots || saltDots._for !== Math.round(p.mN*10)) {
+        const hSalt = 1.25*((p.mN+1.25)/(25+1.25));
+        saltDots = makeSaltDots(hSalt);
+        saltDots._for = Math.round(p.mN*10);
+      }
+      ctx.save();
+      circlePath(0, r, r);
+      ctx.clip();
+      ctx.fillStyle = '#3BBD2E';
+      saltDots.forEach(pt=>{
+        ctx.beginPath();
+        ctx.arc(X(pt[0]), Y(pt[1]), pt[2]*scale*0.11, 0, Math.PI*2);
+        ctx.fill();
+      });
+      ctx.restore();
+    }
+
+    // flask outlines: glass bulbs with a permanent opening at the tube mouth
+    drawFlaskBody(0, MOUTH1);
+    drawFlaskBody(a, MOUTH2);
+
+    // connecting tube, clipped to end flush at each flask wall
+    drawNeck();
+
+    // sliding valves: closed over each tube mouth until "go to equilibrium"
+    // is clicked, then each slides around the rim out of the way (left
+    // flask's valve slides left, right flask's slides right)
+    drawValve(0, p.go1, +1);
+    drawValve(a, p.go1, -1);
+
+    // temperature labels (13px base, +25% then +20% more = 13*1.25*1.2)
+    const tempSize = 13*1.25*1.2;
+    frame('T\u2081 = '+fmtFixed(p.T1,1)+' \u00B0C', 0, r, {size:tempSize});
+    frame('T\u2082 = 22.0 \u00B0C', a, r, {size:tempSize});
+
+    // mole fraction / fugacity labels (font size +20% vs base 13px), with
+    // H2O / NaCl rendered as subscripts of x (or of f) as in the original.
+    const infoSize = 13*1.2;
+
+    // flask 1 info
+    if (p.xW >= 0.818){
+      if (state.BN){
+        richFrame([[
+          {text:'f\u0302', kind:'italic'}, {text:'1,H\u2082O', kind:'sub'},
+          {text:' = '+fmtFixed(p.fW1,2)+' kPa', kind:'normal'}
+        ]], 0, -1.5, {size:infoSize});
+      }
+      richFrame([
+        [{text:'x', kind:'italic'}, {text:'H\u2082O', kind:'sub'}, {text:' = '+fmtFixed(p.xW,3), kind:'normal'}],
+        [{text:'x', kind:'italic'}, {text:'NaCl', kind:'sub'}, {text:' = '+fmtFixed(p.xN,3), kind:'normal'}]
+      ], 0, -5.4, {size:infoSize});
+    } else {
+      frame('maximum solubility reached\nall water evaporates', 0, -3, {size:infoSize, framed:false, color:'#98000D'});
+    }
+
+    // flask 2 info
+    if (p.nWfcalc > 38.8457 && p.go2 >= 1){
+      frame('not enough H\u2082O in flask 2', a/2, 1.5, {size:infoSize, bg:'#ffd0d0'});
+    } else {
+      if (state.BN){
+        richFrame([[
+          {text:'f', kind:'italic'}, {text:'2,H\u2082O', kind:'sub'},
+          {text:' = '+fmtFixed(p.fW2,2)+' kPa', kind:'normal'}
+        ]], a, -1.75, {size:infoSize});
+      }
+      richFrame([[
+        {text:'x', kind:'italic'}, {text:'H\u2082O', kind:'sub'}, {text:' = 1', kind:'normal'}
+      ]], a, -4, {size:infoSize});
+    }
+
+    // transfer arrow + amount
+    if (p.go2 > 0){
+      const amt = Math.abs(500-p.mWf);
+      if (500-p.mWf > 0){
+        drawArrow(6.5,9,18.32,9);
+      } else {
+        drawArrow(18.32,5,6.5,5);
+      }
+      frame(Math.round(amt)+' mL H\u2082O', a/2, 7, {size:13*1.25*1.15, framed:false});
+    }
+
+    // equilibrium message - only when a true equilibrium is reached.
+    // If flask 2 runs out of water (nWfcalc exceeds the 700 mL total-water
+    // cap of 38.8457 mol), all its water evaporated trying to reach
+    // equilibrium, so there is no water on the right side to be in
+    // equilibrium and the message must not be shown.
+    if (Math.abs(p.fW1-p.fW2) < 0.01 && p.xW >= 0.818 && p.nWfcalc <= 38.8457){
+      frame('H\u2082O is in equilibrium', a/2, 1.5, {size:13*1.2*1.2, bg:'#fff6c2'});
+    }
+  }
+
+  // ---------- UI wiring ----------
+  function syncLabels(){
+    els.T1val.textContent = fmtFixed(state.T1,1);
+    els.mNval.textContent = String(Math.round(state.mN));
+  }
+
+  els.T1.addEventListener('input', ()=>{
+    state.T1 = parseFloat(els.T1.value);
+    syncLabels();
+    draw();
+  });
+  els.mN.addEventListener('input', ()=>{
+    state.mN = parseFloat(els.mN.value);
+    saltDots = null;
+    syncLabels();
+    draw();
+  });
+  els.showFug.addEventListener('change', ()=>{
+    state.BN = els.showFug.checked;
+    draw();
+  });
+
+  function stepPlay(ts){
+    if (!state.playing) return;
+    if (!state.playStart) state.playStart = ts;
+    const elapsed = (ts-state.playStart)/1000; // seconds
+    // Phase 1 (valves sliding open): eq 0..0.5 at original speed.
+    // Phase 2 (water transfer): eq 0.5..1.5 at HALF speed, so the transfer
+    // takes twice as long. Total animation: 0.5s + 2.0s = 2.5s.
+    state.eq = elapsed <= 0.5 ? elapsed : Math.min(1.5, 0.5 + (elapsed-0.5)/2);
+    draw();
+    if (state.eq >= 1.5){
+      state.playing = false;
+      els.playBtn.disabled = false;
+      els.playBtn.innerHTML = '&#9654; go to equilibrium';
+      return;
+    }
+    requestAnimationFrame(stepPlay);
+  }
+
+  els.playBtn.addEventListener('click', ()=>{
+    state.eq = 0;
+    state.playing = true;
+    state.playStart = 0;
+    els.playBtn.disabled = true;
+    els.playBtn.innerHTML = '&#9654; running\u2026';
+    requestAnimationFrame(stepPlay);
+  });
+
+  els.resetBtn.addEventListener('click', ()=>{
+    // Resets the flask conditions back to how they were before "go to
+    // equilibrium" was selected (i.e. undoes the equilibration animation).
+    // Slider settings (temperature, NaCl) are left as the user set them.
+    state.playing = false;
+    state.eq = 0;
+    state.playStart = 0;
+    els.playBtn.disabled = false;
+    els.playBtn.innerHTML = '&#9654; go to equilibrium';
+    draw();
+  });
+
+  // ---------- Directions / Details / About ----------
+  const panelPairs = [
+    ['btnDirections','ovDirections'],
+    ['btnDetails','ovDetails'],
+    ['btnAbout','ovAbout']
+  ];
+  function closeAllPanels(){
+    panelPairs.forEach(([,id])=> document.getElementById(id).classList.remove('show'));
+  }
+  panelPairs.forEach(([btnId, ovId])=>{
+    const ov = document.getElementById(ovId);
+    document.getElementById(btnId).addEventListener('click', ()=>{
+      const isOpen = ov.classList.contains('show');
+      closeAllPanels();                 // only one panel open at a time
+      if (!isOpen) ov.classList.add('show'); // clicking same button again toggles closed
+    });
+    ov.querySelector('[data-close]').addEventListener('click', ()=> ov.classList.remove('show'));
+  });
+
+  // ---------- init ----------
+  syncLabels();
+  fitCanvas();
+  draw();
+})();
+</script>
+</body>
+</html>

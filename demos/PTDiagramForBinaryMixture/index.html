@@ -18,13 +18,16 @@
   .controls{margin:0 0 4px;}
   .ctrlrow{display:flex;align-items:center;gap:10px;margin:3px 0;font-size:15px;}
   .ctrllabel{display:inline-block;text-align:right;width:165px;}
-  input[type=range]{-webkit-appearance:none;appearance:none;height:3px;
-    background:#bcbcbc;border-radius:2px;outline:none;flex:1;max-width:340px;}
-  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
-    width:13px;height:20px;border-radius:3px;background:var(--darkred);cursor:pointer;
-    border:1px solid #5e1010;}
-  input[type=range]::-moz-range-thumb{width:13px;height:20px;border-radius:3px;
-    background:var(--darkred);cursor:pointer;border:1px solid #5e1010;}
+  
+  input[type="range"]{
+    flex:1 1 auto;
+    --accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;max-width:340px;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+  input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  input[type="range"]::-moz-range-thumb{
+    width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+
+
   .valbox{display:inline-block;min-width:46px;padding:2px 7px;border:1px solid #c9c9c9;
     border-radius:3px;background:#f6f6f6;font-size:14px;text-align:center;}
   .chk{display:flex;align-items:center;gap:8px;}
@@ -38,14 +41,18 @@
   .tbtn:hover{background:var(--darkred-hi);}
   .tbtn.active{background:#5e1010;}
   .panel{border:1px solid var(--panelborder);border-radius:3px;background:#fff;
-    padding:12px 16px;margin:0;width:600px;max-width:calc(100% - 12px);
+    margin:0;width:600px;max-width:calc(100% - 12px);
     font-size:14.5px;line-height:1.5;box-sizing:border-box;display:none;
-    position:absolute;z-index:30;box-shadow:0 3px 10px rgba(0,0,0,0.18);
-    max-height:66vh;overflow:auto;}
+    position:absolute;z-index:30;box-shadow:0 3px 10px rgba(0,0,0,0.18);}
   .panel.show{display:block;}
+  .pbody{padding:22px 16px 14px;max-height:66vh;overflow:auto;}
+  .pclose{position:absolute;top:5px;right:7px;width:22px;height:22px;line-height:19px;
+    text-align:center;font-size:18px;color:#5e1010;background:#fff;border:1px solid #d8b3b3;
+    border-radius:3px;cursor:pointer;padding:0;font-family:Helvetica,Arial,sans-serif;z-index:2;}
+  .pclose:hover{background:#f3e4e4;}
   .panel p{margin:7px 0;}
   .eq{font-style:italic;font-family:"Times New Roman",Georgia,serif;margin:8px 0;
-    text-align:center;font-size:16px;}
+    text-align:left;font-size:16px;}
   .eq .nf{font-style:normal;}
   sub{font-size:0.72em;} sup{font-size:0.72em;}
   /* proper square roots rendered with MathML (connected radical + vinculum) */
@@ -54,19 +61,13 @@
   a{color:#1a4f8b;text-decoration:none;} a:hover{text-decoration:underline;}
 </style>
 <script>
-    MathJax = {
-        chtml: {
-            scale: 0.95,
-            mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
-            displayAlign: 'left', // default for indentalign when set to 'auto'
-        },
-        tex: {
-            inlineMath: [['$', '$'], ['\\(', '\\)']],
-            displayMath: [['$$', '$$'], ['\\[', '\\]']]
-        }
-    };
+window.MathJax = {
+  tex: { inlineMath: [['\\(','\\)']], displayMath: [['$$','$$'], ['\\[','\\]']] },
+  svg: { fontCache: 'global' },
+  options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] }
+};
 </script>
-<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
 </head>
 <body>
 <div id="app">
@@ -89,7 +90,7 @@
 
   <div id="canvasWrap"><canvas id="cv" width="1200" height="900"></canvas></div>
 
-  <div id="dir" class="panel">
+  <div id="dir" class="panel"><button class="pclose" aria-label="Close panel">&times;</button><div class="pbody">
     <p>This Demonstration shows a pressure&ndash;temperature (\(P\)&ndash;\(T\)) diagram
     for an ethane/heptane mixture in vapor&ndash;liquid equilibrium. For each ethane
     mole fraction \(x_1\), the liquid (bubble-point) curve is drawn in blue and the
@@ -102,57 +103,63 @@
     saturation pressure. The critical locus (black curve) connects the critical points
     \((T_c,\,P_c)\) of all ethane/heptane mixtures. Uncheck &ldquo;show all curves&rdquo;
     to display only the pure components and the selected mole fraction.</p>
-  </div>
+  </div></div>
 
-  <div id="det" class="panel">
+  <div id="det" class="panel"><button class="pclose" aria-label="Close panel">&times;</button><div class="pbody">
     <p>At equilibrium the partial pressures of each component in the vapor and
     liquid phases are equal, which for an ideal solution gives Raoult&rsquo;s law:</p>
-    <p class="eq">\(y_i P = x_i P_i^{\mathrm{sat}}\)</p>
-    <p class="eq">\(x_1 + x_2 = 1\)</p>
-    <p>where \(x_i\) and \(y_i\) are the liquid and vapor mole fractions
-    of component \(i\) (\(i = 1\) for ethane and \(i = 2\) for heptane) and \(P_i^{\mathrm{sat}}\)
+    <p class="eq">y<sub>i</sub> P = x<sub>i</sub> P<sub>i</sub><sup>sat</sup>,</p>
+    <p class="eq">x<sub>1</sub> + x<sub>2</sub> = 1,</p>
+    <p>where x<sub>i</sub> and y<sub>i</sub> are the liquid and vapor mole fractions
+    of component i (i = 1 for ethane and i = 2 for heptane) and P<sub>i</sub><sup>sat</sup>
     is the saturation pressure.</p>
     <p>The saturation pressures are calculated using the Antoine equations:</p>
-    <p class="eq">\(P_i^{\mathrm{sat}} = 10^{\,A_i - \frac{B_i}{T + C_i}}\)</p>
-    <p>where \(A_i\), \(B_i\) and \(C_i\) are Antoine constants and
-    \(T\) is temperature.</p>
+    <p class="eq">P<sub>i</sub><sup>sat</sup> = 10<sup>(A<sub>i</sub> &minus; B<sub>i</sub>/(T + C<sub>i</sub>))</sup>,</p>
+    <p>where A<sub>i</sub>, B<sub>i</sub> and C<sub>i</sub> are Antoine constants and
+    T is temperature.</p>
     <p>The Peng&ndash;Robinson equation of state for mixtures is used to determine the
     phase envelope and the critical locus. The critical point is where the bubble
     and dew curves meet; connecting these points is the critical locus. The
     K-values are calculated:</p>
-    <p class="eq">\(K_i = \frac{y_i}{x_i}\)</p>
-    <p class="eq">\(K_i = \frac{\phi_i^{\mathrm{L}}}{\phi_i^{\mathrm{V}}}\).</p>
-    <p>The fugacity coefficient \(\phi^{k}\) is calculated:</p>
-    <p class="eq">\(\ln\phi^{k} = \frac{B}{B^{k}}(Z^{k}-1) - \ln(Z^{k}-B^{k}) - \frac{A^{k}}{2\sqrt{2}B^{k}}\ln\!\left(\frac{Z^{k}+B^{k}(1+\sqrt{2})}{Z^{k}+B^{k}(1-\sqrt{2})}\right)\,(\frac{2\sum_j x_jA_j}{A^{k}} - \frac{B}{B^{k}})\)</p>
-    <p class="eq">\(A = \frac{a_{m}P}{R^{2}T^{2}},\qquad B = \frac{b_{m}P}{RT}\)</p>
-    <p>where \(Z\) is the compressibility factor, the superscript \(k=(L,V)\) is for liquid
-    and vapor, \(A\) and \(B\) are constants, and \(P\) is pressure.</p>
+    <p class="eq">K<sub>i</sub> = y<sub>i</sub>/x<sub>i</sub>,</p>
+    <p class="eq">K<sub>i</sub> = &phi;<sub>i</sub><sup class="nf">L</sup>/&phi;<sub>i</sub><sup class="nf">V</sup>.</p>
+    <p>The fugacity coefficient &phi;<sup>k</sup> is calculated:</p>
+    <p class="eq">ln &phi;<sup>k</sup> = (B/B<sup>k</sup>)(Z<sup>k</sup> &minus; 1) &minus; ln(Z<sup>k</sup> &minus; B<sup>k</sup>)
+    &minus; [A<sup>k</sup>/(2<math><msqrt><mn>2</mn></msqrt></math> B<sup>k</sup>)] ln[(Z<sup>k</sup> + B<sup>k</sup>(1+<math><msqrt><mn>2</mn></msqrt></math>))/(Z<sup>k</sup> + B<sup>k</sup>(1&minus;<math><msqrt><mn>2</mn></msqrt></math>))]
+    (2&Sigma;<sub>j</sub> x<sub>j</sub>A<sub>j</sub>/A<sup>k</sup> &minus; B/B<sub>k</sub>),</p>
+    <p class="eq">A = a<sub class="nf">m</sub> P/(R<sup>2</sup>T<sup>2</sup>),&nbsp;&nbsp;&nbsp;B = b<sub class="nf">m</sub> P/(RT),</p>
+    <p>where Z is the compressibility factor, the superscript k = (L, V) is for liquid
+    and vapor, A and B are constants, and P is pressure.</p>
     <p>For a mixture:</p>
-    <p class="eq">\(a_{m} = \sum_i\sum_j x_i x_j a_{ij},\qquad a_{ij} = \sqrt{a_i a_j}\,(1-k_{ij}),\qquad b_{m} = \sum_i x_i b_i\)</p>
-    <p class="eq">\(a_i = 0.457\frac{R^{2}T_{c,i}^{2}}{P_{c,i}}\left(1+\kappa_i\left(1-\sqrt{\frac{T}{T_{c,i}}}\right)\right)^{2}\)</p>
-    <p class="eq">\(b_i = 0.0778\frac{R T_{c,i}}{P_{c,i}},\qquad \kappa_i = 0.37464 + 1.54226\,\omega_i - 0.26992\,\omega_i^{2}\)</p>
-    <p>where \(a_{m}\) and \(b_{m}\) are the attraction and
-    repulsion factors for the mixture, \(a_i\) and \(b_i\) are the attraction
-    and repulsion parameters for the pure component, \(k_{ij}=0\) is the binary
-    interaction parameter, \(T_c\) and \(P_c\) are the critical temperature and pressure,
-    \(\kappa\) is a simplification term, and \(\omega\) is the acentric factor.</p>
-    <p>The equation \(Z^{3}+\alpha_2 Z^{2}+\alpha_1 Z+\alpha_0=0\)
+    <p class="eq">a<sub class="nf">m</sub> = &Sigma;<sub>i</sub>&Sigma;<sub>j</sub> x<sub>i</sub> x<sub>j</sub> a<sub>ij</sub>,&nbsp;&nbsp;
+    a<sub>ij</sub> = <math><msqrt><msub><mi>a</mi><mi>i</mi></msub><mspace width="0.12em"></mspace><msub><mi>a</mi><mi>j</mi></msub></msqrt></math> (1 &minus; k<sub>ij</sub>),&nbsp;&nbsp;
+    b<sub class="nf">m</sub> = &Sigma;<sub>i</sub> x<sub>i</sub> b<sub>i</sub>,</p>
+    <p class="eq">a<sub>i</sub> = 0.457 (R<sup>2</sup>Tc<sub>i</sub><sup>2</sup>/Pc<sub>i</sub>) (1 + &kappa;<sub>i</sub>(1 &minus; <math><msqrt><mrow><mi>T</mi><mo>/</mo><msub><mrow><mi>T</mi><mi>c</mi></mrow><mi>i</mi></msub></mrow></msqrt></math>))<sup>2</sup>,</p>
+    <p class="eq">b<sub>i</sub> = 0.0778 (R Tc<sub>i</sub>/Pc<sub>i</sub>),&nbsp;&nbsp;
+    &kappa; = 0.37464 + 1.54226 &omega;<sub>i</sub> &minus; 0.26992 &omega;<sub>i</sub><sup>2</sup>,</p>
+    <p>where a<sub class="nf">m</sub> and b<sub class="nf">m</sub> are the attraction and
+    repulsion factors for the mixture, a<sub>i</sub> and b<sub>i</sub> are the attraction
+    and repulsion parameters for the pure component, k<sub>ij</sub> = 0 is the binary
+    interaction parameter, Tc and Pc are the critical temperature and pressure,
+    &kappa; is a simplification term, and &omega; is the acentric factor.</p>
+    <p>The equation Z<sup>3</sup> + &alpha;<sub>2</sub>Z<sup>2</sup> + &alpha;<sub>1</sub>Z + &alpha;<sub>0</sub> = 0
     is solved for the compressibility factor,</p>
-    <p class="eq">\(\alpha_2 = B-1,\qquad \alpha_1 = A - 3B^{2} - 2B,\qquad \alpha_0 = -AB + B^{2} + B^{3}\)</p>
-    <p>where \(\alpha_2\), \(\alpha_1\) and \(\alpha_0\) are constants.</p>
-  </div>
+    <p class="eq">&alpha;<sub>2</sub> = B &minus; 1,&nbsp;&nbsp;
+    &alpha;<sub>1</sub> = A &minus; 3B<sup>2</sup> &minus; 2B,&nbsp;&nbsp;
+    &alpha;<sub>0</sub> = &minus;AB + B<sup>2</sup> + B<sup>3</sup>,</p>
+    <p>where &alpha;<sub>2</sub>, &alpha;<sub>1</sub> and &alpha;<sub>0</sub> are constants.</p>
+  </div></div>
 
-  <div id="abt" class="panel">
+  <div id="abt" class="panel"><button class="pclose" aria-label="Close panel">&times;</button><div class="pbody">
     <p>This simulation was created in the
     <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a>
     at University of Colorado Boulder for
     <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a>
     by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a
     Mathematica simulation by Adam J. Johnston and Rachael L. Baumann. It was prepared
-    with financial support from the National Science Foundation (DUE 2336987 and 2336988)
-    in collaboration with Washington State University. Address any questions or comments
+    with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments
     to LearnChemE@gmail.com.</p>
-  </div>
+  </div></div>
 </div>
 
 <script>
@@ -469,18 +476,27 @@ const DATA={"T0":[[451.0,0.658],[453.5,0.692],[456.0,0.725],[458.5,0.759],[461.0
       document.querySelectorAll('.panel').forEach(p=>p.classList.remove('show'));
       document.querySelectorAll('.tbtn').forEach(x=>x.classList.remove('active'));
       if(!open){
-        // place the panel just to the right of its button, starting a few px below it
+        // open the panel below its button (buttons stay fixed); widen certain panels
         const app=document.getElementById('app');
-        const pad=6, gap=6, drop=5, minW=260;
+        const pad=6, drop=5;
+        const scale={dir:1, det:1.5, abt:1.25}[id] || 1;   // Details +50%, About +25%
         const innerRight=app.clientWidth-pad;
-        let left=b.offsetLeft+b.offsetWidth+gap;     // just past the button's right edge
-        let width=Math.min(600, innerRight-left);
-        if(width<minW){ width=Math.min(600, innerRight-pad); left=innerRight-width; }
+        const natural=innerRight-b.offsetLeft;             // width if left-aligned under the button
+        let width=Math.min(innerRight-pad, natural*scale); // widen, but keep it on-screen
+        let left=Math.max(pad, innerRight-width);          // shift left so a wider panel still fits
+        if(left>b.offsetLeft) left=b.offsetLeft;           // never start to the right of the button
         panel.style.left=left+'px';
         panel.style.top=(b.offsetTop+b.offsetHeight+drop)+'px';
         panel.style.width=width+'px';
         panel.classList.add('show'); b.classList.add('active');
       }
+    });
+  });
+
+  document.querySelectorAll('.pclose').forEach(x=>{
+    x.addEventListener('click',()=>{
+      document.querySelectorAll('.panel').forEach(p=>p.classList.remove('show'));
+      document.querySelectorAll('.tbtn').forEach(t=>t.classList.remove('active'));
     });
   });
 

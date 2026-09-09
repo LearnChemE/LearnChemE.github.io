@@ -99,6 +99,7 @@
   }
   .panel-buttons {
     display: flex;
+    align-items: center;
     gap: 8px;
     margin: 6px 0 16px 0;
     justify-content: center;
@@ -173,6 +174,7 @@
       <button class="panel-btn" id="btnDirections">Directions</button>
       <button class="panel-btn" id="btnDetails">Details</button>
       <button class="panel-btn" id="btnAbout">About</button>
+      <canvas id="insetPlot" width="60" height="60" style="margin-left: 4px;"></canvas>
     </div>
 
     <div class="panel-content" id="panelDirections">
@@ -463,20 +465,40 @@ function drawLabel(text, xData, yData, xmin, xmax, ymin, ymax, color) {
   ctx.restore();
 }
 
+// ---------- Inset cross-section canvas (beside About button) ----------
+const insetCanvas = document.getElementById('insetPlot');
+const insetCtx = insetCanvas.getContext('2d');
+const INSET_CSS = 60;
+function setupInsetHiDPI() {
+  const dpr = window.devicePixelRatio || 1;
+  insetCanvas.width = INSET_CSS * dpr;
+  insetCanvas.height = INSET_CSS * dpr;
+  insetCanvas.style.width = INSET_CSS + 'px';
+  insetCanvas.style.height = INSET_CSS + 'px';
+  insetCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+setupInsetHiDPI();
+
+function renderInset() {
+  insetCtx.clearRect(0, 0, INSET_CSS, INSET_CSS);
+  drawInset(insetCtx, INSET_CSS / 2, INSET_CSS / 2, 13, rRad);
+}
+
 // Cross-section inset: blue disk radius 2 (fixed), green disk radius r inside
-function drawInset(cx, cy, scalePxPerM, r) {
-  ctx.save();
+function drawInset(targetCtx, cx, cy, scalePxPerM, r) {
+  console.log(targetCtx);
+  targetCtx.save();
   const R_outer = 2 * scalePxPerM;
   const R_inner = r * scalePxPerM;
-  ctx.beginPath();
-  ctx.arc(cx, cy, R_outer, 0, 2 * Math.PI);
-  ctx.fillStyle = '#1414CC';
-  ctx.fill();
-  ctx.beginPath();
-  ctx.arc(cx, cy, R_inner, 0, 2 * Math.PI);
-  ctx.fillStyle = '#009900';
-  ctx.fill();
-  ctx.restore();
+  targetCtx.beginPath();
+  targetCtx.arc(cx, cy, R_outer, 0, 2 * Math.PI);
+  targetCtx.fillStyle = '#1414CC';
+  targetCtx.fill();
+  targetCtx.beginPath();
+  targetCtx.arc(cx, cy, R_inner, 0, 2 * Math.PI);
+  targetCtx.fillStyle = '#009900';
+  targetCtx.fill();
+  targetCtx.restore();
 }
 
 function interpAt(Vs, Ys, vTarget) {
@@ -538,9 +560,7 @@ function render(sol) {
     if (isFinite(TAt1p2)) drawLabel('reactor', 1.2, Math.min(Math.max(TAt1p2, yt.niceMin), yt.niceMax), xmin, xmax, yt.niceMin, yt.niceMax, '#009900');
 
     // inset near upper-right (Scaled 0.75,0.75)
-    const cx = M.left + 0.75 * plotW;
-    const cy = M.top + (1 - 0.75) * plotH;
-    drawInset(cx, cy, 13, rRad);
+    renderInset();
   } else {
     // Conversion plot
     const ymin = 0, ymax = 1.1;
@@ -550,9 +570,7 @@ function render(sol) {
     plotCurve(Vs, Xs, xmin, xmax, ymin, ymax, '#1414CC', 2.5);
 
     // inset near (0.75, 0.3)
-    const cx = M.left + 0.75 * plotW;
-    const cy = M.top + (1 - 0.3) * plotH;
-    drawInset(cx, cy, 13, rRad);
+    renderInset();
   }
 }
 

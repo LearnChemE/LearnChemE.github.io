@@ -20,6 +20,7 @@
   *{box-sizing:border-box;}
   body{
     margin:0;
+    /* background:#efefef; */
     font-family:Verdana,Geneva,"Helvetica Neue",Helvetica,Arial,sans-serif;
     color:var(--ink);
     -webkit-font-smoothing:antialiased;
@@ -37,8 +38,7 @@
   .title{order:0;}
   .controls{order:1;}
   .plotwrap{order:2;}
-  .btnrow{order:3;}
-  .panel{order:4;}
+  .bottombar{order:3;}
   .title{
     font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
     font-size:21px;
@@ -47,13 +47,16 @@
     margin:2px 0 14px;
     letter-spacing:.2px;
   }
+  .bottombar{
+    position:relative;
+    margin-top:16px;
+    padding-top:14px;
+    border-top:1px solid #ededed;
+  }
   .btnrow{
     display:flex;
     gap:10px;
     justify-content:center;
-    margin-top:16px;
-    padding-top:14px;
-    border-top:1px solid #ededed;
   }
   .btnrow button{
     font-family:inherit;
@@ -72,24 +75,44 @@
   }
   .panel{
     display:none;
+    position:absolute;
+    left:0; right:0; bottom:100%;
+    margin-bottom:10px;
     background:var(--note);
-    border:1px solid #e2ddd0;
-    border-radius:4px;
-    padding:12px 15px;
-    margin:10px 0 4px;
+    border:1px solid #ccc;
+    border-radius:6px;
+    box-shadow:0 5px 16px rgba(0,0,0,.20);
+    z-index:20;
     font-size:12.5px;
     line-height:1.6;
   }
   .panel.show{display:block;}
   .panel a{color:#1257a8;}
+  .pbody{
+    max-height:340px;
+    overflow-y:auto;
+    padding:12px 16px 12px 15px;
+  }
+  .pclose{
+    position:absolute;
+    top:6px; right:8px;
+    width:24px; height:24px;
+    line-height:20px; text-align:center;
+    padding:0;
+    border:1px solid #bbb;
+    border-radius:4px;
+    background:#fff;
+    color:#444;
+    font-size:17px;
+    cursor:pointer;
+    z-index:2;
+  }
+  .pclose:hover{background:#f0e6e6;color:#98000D;border-color:#98000D;}
   .eq{
-    text-align:center;
+    text-align:left;
     font-family:Georgia,"Times New Roman",serif;
     font-size:15px;
     margin:8px 0;
-  }
-  .controls{
-    padding-top:12px;
   }
   .srow{
     display:flex;
@@ -119,8 +142,14 @@
     flex:1 1 auto;
     min-width:60px;
     accent-color:#5a5a5a;
-    height:18px;
   }
+  input[type="range"]{
+  --accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+input[type="range"]::-moz-range-thumb{
+  width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+
   .slider .val{
     font-size:18px;
     min-width:54px;
@@ -149,79 +178,6 @@
 </head>
 <body>
 <div class="demo">
-
-  <div class="btnrow">
-    <button id="b-dir">Directions</button>
-    <button id="b-det">Details</button>
-    <button id="b-abt">About</button>
-  </div>
-
-  <div class="panel" id="p-dir">
-    This simulation calculates the measured contact angle for a rough, heterogeneous
-    surface using the Wenzel and Cassie laws. The contact surface is a mixture of
-    materials <i>A</i> and <i>B</i>. Change the fraction of component <i>A</i> and the
-    surface contact angles of each material (&theta;<sub><i>A</i></sub> and
-    &theta;<sub><i>B</i></sub>) with sliders. Another slider changes the surface
-    roughness; for a completely smooth surface, the surface roughness ratio used in the
-    Wenzel equation is 1. The measured contact angle (&theta;<sub><i>W</i></sub>) is
-    calculated and displayed above the water droplet graphic; arrows on this plot show
-    where &theta;<sub><i>W</i></sub> is measured. Surfaces with water contact angles
-    &gt; 90&deg; have low wettability and are considered hydrophobic, whereas &lt; 90&deg;
-    means the surface has high wettability and is considered hydrophilic. When
-    &theta;<sub><i>W</i></sub> = 0&deg;, complete wetting occurs.
-  </div>
-
-  <div class="panel" id="p-det">
-    <p style="margin-top:0">The Cassie model is used to determine the apparent contact
-    angle for a heterogeneous surface &theta;<sub><i>C</i></sub>:</p>
-    <div class="eq">cos&nbsp;&theta;<sub><i>C</i></sub> =
-      <i>f</i><sub><i>A</i></sub>&nbsp;cos&nbsp;&theta;<sub><i>A</i></sub> +
-      <i>f</i><sub><i>B</i></sub>&nbsp;cos&nbsp;&theta;<sub><i>B</i></sub>,</div>
-    <p>where <i>f</i><sub><i>A</i></sub> and <i>f</i><sub><i>B</i></sub> are the fractions
-    of components <i>A</i> and <i>B</i> on the surface, and
-    <i>f</i><sub><i>B</i></sub> = 1 &minus; <i>f</i><sub><i>A</i></sub>;
-    &theta;<sub><i>A</i></sub> and &theta;<sub><i>B</i></sub> are the flat contact angles
-    for <i>A</i> and <i>B</i>.</p>
-
-    <p>The Wenzel apparent (or measured) contact angle &theta;<sub><i>W</i></sub> and
-    roughness ratio <i>r</i> is</p>
-    <div class="eq">cos&nbsp;&theta;<sub><i>W</i></sub> =
-      <i>r</i>&nbsp;cos&nbsp;&theta;<sub><i>C</i></sub>,</div>
-    <p>where <i>r</i> is the actual area divided by the apparent area; for a completely
-    smooth surface, <i>r</i> = 1, while for a rough surface, <i>r</i> &gt; 1.</p>
-
-    <p>The droplet represents a spherical cap; its volume <i>V</i> (&mu;L) based on the
-    volume of a sphere of radius <i>R</i> is</p>
-    <div class="eq"><i>V</i> = (&pi;/3)&nbsp;<i>R</i><sup>3</sup>
-      (2 &minus; 3&nbsp;cos&nbsp;&theta;<sub><i>W</i></sub> +
-      cos<sup>3</sup>&theta;<sub><i>W</i></sub>).</div>
-    <p>Solving for <i>R</i> (mm) and eliminating extraneous solutions gives</p>
-    <div class="eq"><i>R</i> = 3<sup>1/3</sup>&nbsp;<i>V</i><sup>1/3</sup> &frasl;
-      (2&pi; &minus; 3&pi;&nbsp;cos&nbsp;&theta;<sub><i>W</i></sub> +
-      &pi;&nbsp;cos<sup>3</sup>&theta;<sub><i>W</i></sub>)<sup>1/3</sup>.</div>
-    <p>The measured droplet height <i>h</i> (mm) is</p>
-    <div class="eq"><i>h</i> = <i>R</i> &minus;
-      <i>R</i>&nbsp;sin(&pi;/2 &minus; &theta;<sub><i>W</i></sub>).</div>
-    <p>Complete wetting occurs when &theta;<sub><i>W</i></sub> = 0&deg;, and no wetting
-    occurs when &theta;<sub><i>W</i></sub> = 180&deg;.</p>
-
-    <p style="margin-bottom:0"><b>Reference</b><br>
-    [1]&nbsp;Wikipedia. "Wetting." (Oct&nbsp;26,&nbsp;2015)
-    <a href="https://en.wikipedia.org/wiki/Wetting" target="_blank" rel="noopener">en.wikipedia.org/wiki/Wetting</a>.</p>
-  </div>
-
-  <div class="panel" id="p-abt">
-    This simulation was created in the
-    <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of
-    Chemical and Biological Engineering</a> at University of Colorado Boulder for
-    <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a>
-    by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a
-    <a href="https://demonstrations.wolfram.com/WaterContactAngleForHeterogeneousSurface/" target="_blank" rel="noopener">Mathematica
-    simulation</a> by Rachael L. Baumann. It was prepared with financial support from the
-    National Science Foundation (DUE 2336987 and 2336988) in collaboration with Washington
-    State University. Address any questions or comments to LearnChemE@gmail.com.
-  </div>
-
   <div class="controls">
     <div class="srow">
       <label class="slider" id="s-fA">
@@ -255,6 +211,86 @@
     <div class="angle-cap" id="angleCap"></div>
     <canvas id="plot" width="560" height="430"></canvas>
   </div>
+  <div class="bottombar">
+    <div class="panel" id="p-dir">
+      <button class="pclose" data-close aria-label="Close">×</button>
+      <div class="pbody">
+      This simulation calculates the measured contact angle for a rough, heterogeneous
+      surface using the Wenzel and Cassie laws. The contact surface is a mixture of
+      materials <i>A</i> and <i>B</i>. Change the fraction of component <i>A</i> and the
+      surface contact angles of each material (&theta;<sub><i>A</i></sub> and
+      &theta;<sub><i>B</i></sub>) with sliders. Another slider changes the surface
+      roughness; for a completely smooth surface, the surface roughness ratio used in the
+      Wenzel equation is 1. The measured contact angle (&theta;<sub><i>W</i></sub>) is
+      calculated and displayed above the water droplet graphic; arrows on this plot show
+      where &theta;<sub><i>W</i></sub> is measured. Surfaces with water contact angles
+      &gt; 90&deg; have low wettability and are considered hydrophobic, whereas &lt; 90&deg;
+      means the surface has high wettability and is considered hydrophilic. When
+      &theta;<sub><i>W</i></sub> = 0&deg;, complete wetting occurs.
+    </div>
+    </div>
+
+    <div class="panel" id="p-det">
+      <button class="pclose" data-close aria-label="Close">×</button>
+      <div class="pbody">
+      <p style="margin-top:0">The Cassie model is used to determine the apparent contact
+      angle for a heterogeneous surface &theta;<sub><i>C</i></sub>:</p>
+      <div class="eq">cos&nbsp;&theta;<sub><i>C</i></sub> =
+        <i>f</i><sub><i>A</i></sub>&nbsp;cos&nbsp;&theta;<sub><i>A</i></sub> +
+        <i>f</i><sub><i>B</i></sub>&nbsp;cos&nbsp;&theta;<sub><i>B</i></sub>,</div>
+      <p>where <i>f</i><sub><i>A</i></sub> and <i>f</i><sub><i>B</i></sub> are the fractions
+      of components <i>A</i> and <i>B</i> on the surface, and
+      <i>f</i><sub><i>B</i></sub> = 1 &minus; <i>f</i><sub><i>A</i></sub>;
+      &theta;<sub><i>A</i></sub> and &theta;<sub><i>B</i></sub> are the flat contact angles
+      for <i>A</i> and <i>B</i>.</p>
+
+      <p>The Wenzel apparent (or measured) contact angle &theta;<sub><i>W</i></sub> and
+      roughness ratio <i>r</i> is</p>
+      <div class="eq">cos&nbsp;&theta;<sub><i>W</i></sub> =
+        <i>r</i>&nbsp;cos&nbsp;&theta;<sub><i>C</i></sub>,</div>
+      <p>where <i>r</i> is the actual area divided by the apparent area; for a completely
+      smooth surface, <i>r</i> = 1, while for a rough surface, <i>r</i> &gt; 1.</p>
+
+      <p>The droplet represents a spherical cap; its volume <i>V</i> (&mu;L) based on the
+      volume of a sphere of radius <i>R</i> is</p>
+      <div class="eq"><i>V</i> = (&pi;/3)&nbsp;<i>R</i><sup>3</sup>
+        (2 &minus; 3&nbsp;cos&nbsp;&theta;<sub><i>W</i></sub> +
+        cos<sup>3</sup>&theta;<sub><i>W</i></sub>).</div>
+      <p>Solving for <i>R</i> (mm) and eliminating extraneous solutions gives</p>
+      <div class="eq"><i>R</i> = 3<sup>1/3</sup>&nbsp;<i>V</i><sup>1/3</sup> &frasl;
+        (2&pi; &minus; 3&pi;&nbsp;cos&nbsp;&theta;<sub><i>W</i></sub> +
+        &pi;&nbsp;cos<sup>3</sup>&theta;<sub><i>W</i></sub>)<sup>1/3</sup>.</div>
+      <p>The measured droplet height <i>h</i> (mm) is</p>
+      <div class="eq"><i>h</i> = <i>R</i> &minus;
+        <i>R</i>&nbsp;sin(&pi;/2 &minus; &theta;<sub><i>W</i></sub>).</div>
+      <p>Complete wetting occurs when &theta;<sub><i>W</i></sub> = 0&deg;, and no wetting
+      occurs when &theta;<sub><i>W</i></sub> = 180&deg;.</p>
+
+      <p style="margin-bottom:0"><b>Reference</b><br>
+      [1]&nbsp;Wikipedia. "Wetting." (Oct&nbsp;26,&nbsp;2015)
+      <a href="https://en.wikipedia.org/wiki/Wetting" target="_blank" rel="noopener">en.wikipedia.org/wiki/Wetting</a>.</p>
+    </div>
+    </div>
+
+    <div class="panel" id="p-abt">
+      <button class="pclose" data-close aria-label="Close">×</button>
+      <div class="pbody">
+      This simulation was created in the
+      <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of
+      Chemical and Biological Engineering</a> at University of Colorado Boulder for
+      <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a>
+      by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a
+      <a href="https://demonstrations.wolfram.com/WaterContactAngleForHeterogeneousSurface/" target="_blank" rel="noopener">Mathematica
+      simulation</a> by Rachael L. Baumann. It was prepared with financial support from the
+      National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.
+    </div>
+    </div>
+    <div class="btnrow">
+      <button id="b-dir">Directions</button>
+      <button id="b-det">Details</button>
+      <button id="b-abt">About</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -286,6 +322,16 @@
   document.getElementById('b-dir').onclick = function(){toggle('dir');};
   document.getElementById('b-det').onclick = function(){toggle('det');};
   document.getElementById('b-abt').onclick = function(){toggle('abt');};
+  function closeAll(){
+    Object.keys(pans).forEach(function(k){
+      document.getElementById(pans[k]).classList.remove('show');
+      document.getElementById(btns[k]).classList.remove('active');
+    });
+    open = null;
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('.pclose'), function(x){
+    x.addEventListener('click', function(e){ e.stopPropagation(); closeAll(); });
+  });
 
   // ---- deterministic jagged surface (regenerated only when r changes) ----
   var lastR = null, teeth = [];

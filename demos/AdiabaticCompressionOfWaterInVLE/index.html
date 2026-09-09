@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Adiabatic Compression of Water in Vapor-Liquid Equilibrium (VLE)</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    font-family: Helvetica, Arial, sans-serif;
+    background: #ffffff;
+    color: #111111;
+    -webkit-font-smoothing: antialiased;
+  }
+  #app {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 14px 16px 18px 16px;
+  }
+  h1 {
+    font-size: 19px;
+    font-weight: bold;
+    text-align: center;
+    margin: 4px 0 14px 0;
+  }
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 22px;
+    margin-bottom: 10px;
+    padding: 10px 8px;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    background: #fafafa;
+  }
+  .ctrl-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  .plot-label {
+    font-size: 18.2px;
+    white-space: nowrap;
+  }
+  .ctrl-label {
+    font-size: 15.6px;
+    white-space: nowrap;
+  }
+  .ctrl-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  select {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 15.6px;
+    padding: 2px 4px;
+  }
+  input[type=range] {
+    width: 190px;
+    margin-top: .8em;
+  }
+  input[type="range"]{
+    --accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+  input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  input[type="range"]::-moz-range-thumb{
+    width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+
+  .value-box {
+    font-size: 15.6px;
+    font-variant-numeric: tabular-nums;
+    min-width: 58px;
+    text-align: right;
+  }
+  #plots {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 6px;
+  }
+  .plot-wrap {
+    border: 1px solid #999999;
+    background: #ffffff;
+  }
+  .dot { width: 11px; height: 11px; border-radius: 50%; display: inline-block; }
+  .dot-green { background: #1a8a2f; }
+  .dot-blue { background: #1a5fd4; }
+
+  .state-readout {
+    text-align: center;
+    font-size: 18.2px;
+    margin-top: 10px;
+    line-height: 1.6;
+  }
+  .state-readout .state-block {
+    margin: 6px 0;
+  }
+  .state-readout .state-gap {
+    display: block;
+    height: 8px;
+  }
+
+  .bottom-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 18px;
+  }
+  .panel-btn {
+    background: #98000D;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    padding: 9.6px 24px;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 16.8px;
+    font-weight: normal;
+    text-align: center;
+    cursor: pointer;
+  }
+  .panel-btn:hover { background: #7a000a; }
+
+  .overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.28);
+    z-index: 50;
+  }
+  .overlay.show { display: block; }
+  .panel-box {
+    position: fixed;
+    background: #ffffff;
+    max-width: 680px;
+    width: 92%;
+    max-height: 60vh;
+    overflow-y: auto;
+    border-radius: 6px;
+    padding: 20px 24px;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.3);
+    font-size: 14px;
+    line-height: 1.55;
+    left: 50%;
+    bottom: 90px;
+    transform: translateX(-50%);
+  }
+  .panel-box h2 {
+    margin-top: 0;
+    font-size: 17px;
+    text-align: center;
+  }
+  .panel-x-close {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: transparent;
+    color: #666666;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    border-radius: 50%;
+  }
+  .panel-x-close:hover {
+    background: rgba(0,0,0,0.08);
+    color: #111111;
+  }
+  .panel-box a { color: #1a5fd4; }
+  .panel-box ul { padding-left: 22px; }
+  .panel-box mjx-container[display="true"] {
+    text-align: left !important;
+    margin-left: 0 !important;
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="controls">
+    <div class="ctrl-group">
+      <div class="plot-label">plot 1</div>
+      <select id="plotSel1">
+        <option value="PV">P-V</option>
+        <option value="PT">P-T</option>
+        <option value="TS">T-S</option>
+      </select>
+    </div>
+    <div class="ctrl-group">
+      <div class="plot-label">plot 2</div>
+      <select id="plotSel2">
+        <option value="PV">P-V</option>
+        <option value="PT">P-T</option>
+        <option value="TS" selected>T-S</option>
+      </select>
+    </div>
+    <div class="ctrl-group">
+      <div class="ctrl-row">
+        <span class="ctrl-label">initial vapor quality</span>
+        <span class="value-box" id="qualVal">0.400</span>
+      </div>
+      <input type="range" id="qualSlider" min="0.1" max="0.8" step="0.1" value="0.4">
+    </div>
+    <div class="ctrl-group">
+      <div class="ctrl-row">
+        <span class="ctrl-label">final pressure (MPa)</span>
+        <span class="value-box" id="pfVal">3.00</span>
+      </div>
+      <input type="range" id="pfSlider" min="1.0" max="20" step="0.1" value="3">
+    </div>
+  </div>
+
+  <div id="plots">
+    <div class="plot-wrap"><canvas id="canvas1" width="440" height="380"></canvas></div>
+    <div class="plot-wrap"><canvas id="canvas2" width="440" height="380"></canvas></div>
+  </div>
+
+  <div class="state-readout" id="readout"></div>
+
+  <div class="bottom-buttons">
+    <button class="panel-btn" id="btnDirections">Directions</button>
+    <button class="panel-btn" id="btnDetails">Details</button>
+    <button class="panel-btn" id="btnAbout">About</button>
+  </div>
+</div>
+
+<div class="overlay" id="overlayDirections">
+  <div class="panel-box">
+    <button class="panel-x-close" data-close="overlayDirections" aria-label="Close">&times;</button>
+    <h2>Directions</h2>
+    <p>A piston compresses a vapor-liquid equilibrium mixture of water adiabatically and reversibly. The initial temperature is 425 K, and the initial pressure is 0.5 MPa. Use the sliders to set the initial vapor quality (fraction of water that is vapor) and the final pressure. The initial state (green dot) and final state (blue dot) are shown on log pressure versus log volume (P-V), log pressure versus temperature (P-T), and temperature versus entropy (T-S) plots. Select two of these plots to display from the drop-down menus. The initial vapor quality determines whether the quality increases or decreases as the mixture is compressed.</p>
+  </div>
+</div>
+
+<div class="overlay" id="overlayDetails">
+  <div class="panel-box">
+    <button class="panel-x-close" data-close="overlayDetails" aria-label="Close">&times;</button>
+    <h2>Details</h2>
+    <p>For a reversible process, the change in entropy $\Delta S$ from the initial state 1 to the final state 2 is zero, so $S_2 = S_1$. The Peng&ndash;Robinson equation of state is used to calculate the entropy of state $i$:</p>
+    <p>$$S_i = \left(S_i^{ig} - S_R^{ig}\right) + \left(S_i - S_i^{ig}\right) + S_R^{ig},$$</p>
+    <p>where $S_i$ is entropy (J/[mol&nbsp;K]), the superscript $ig$ represents an ideal gas, the subscript $R$ refers to the reference state, $\left(S_i - S_i^{ig}\right)$ is the entropy departure function for a real gas, $S_R^{ig} = 123\ \text{J/[mol K]}$ is the ideal gas entropy at the reference state, and $i = (1,2)$.</p>
+    <p>$$S_i^{ig} - S_R^{ig} = C_{PA}\ln\frac{T_i}{T_R} + C_{PB}(T_i - T_R) + \tfrac{1}{2}C_{PC}\left(T_i^2 - T_R^2\right) + \tfrac{1}{3}C_{PD}\left(T_i^3 - T_R^3\right) - R\ln\frac{P_i}{P_R},$$</p>
+    <p>$$S_i - S_i^{ig} = R\ln(Z_i - B_i) - R\,\frac{A_i}{2\sqrt{2}\,B_i}\cdot\frac{\kappa\sqrt{T_i/T_c}}{\sqrt{\alpha_i}}\,\ln\!\left[\frac{Z_i + (\sqrt{2}+1)B_i}{Z_i - (\sqrt{2}-1)B_i}\right],$$</p>
+    <p>where $C_{PA}$, $C_{PB}$, $C_{PC}$ and $C_{PD}$ are heat capacity constants ($C_{P_i} = C_{PA} + C_{PB}T_i + C_{PC}T_i^2 + C_{PD}T_i^3$); $T_i$ is temperature (K); $P_i$ is pressure (MPa); $R$ is the ideal gas constant (J/[mol K]), not to be confused with the subscript $R$; $T_c$ is the critical temperature (K); $\alpha_i = \left[1+\kappa\left(1-\sqrt{T_i/T_c}\right)\right]^2$ is a constant, and $\kappa = 0.375+1.542\omega-0.270\omega^2$, with $\omega=0.344$ as the acentric factor.</p>
+    <p>$$A_i = 0.457\,\frac{P_i}{P_c}\left(\frac{T_c}{T_i}\right)^2\alpha_i,\qquad B_i = 0.078\,\frac{P_i}{P_c}\,\frac{T_c}{T_i},$$</p>
+    <p>where $A_i$ and $B_i$ are constants, and $P_c$ is the critical pressure (MPa).</p>
+    <p>The compressibility factor $Z_i$ is found by solving for the roots of:</p>
+    <p>$$Z_i^3 + (B_i-1)Z_i^2 + \left(A_i - 3B_i^2 - 2B_i\right)Z_i + \left(B_i^3+B_i^2-A_iB_i\right) = 0.$$</p>
+    <p>Volume (cm$^3$/mol) is calculated using the compressibility factor:</p>
+    <p>$$V_i = Z_iRT_i/P_i.$$</p>
+    <p>When in vapor-liquid equilibrium, the temperature is the saturation temperature. Antoine's equation is used to calculate the saturation temperature:</p>
+    <p style="font-size:1.2em;">$$P_i = 10^{\,A - \frac{B}{C+T_i}},$$</p>
+    <p>where $A$, $B$ and $C$ are Antoine constants.</p>
+  </div>
+</div>
+
+<div class="overlay" id="overlayAbout">
+  <div class="panel-box">
+    <button class="panel-x-close" data-close="overlayAbout" aria-label="Close">&times;</button>
+    <h2>About</h2>
+    <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/AdiabaticCompressionOfWaterInVaporLiquidEquilibriumVLE/" target="_blank" rel="noopener">Mathematica simulation</a> by Rachael L. Baumann. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.</p>
+  </div>
+</div>
+
+<script>
+/* ---------------- Thermodynamics: Peng-Robinson + Antoine for water ---------------- */
+const Tc = 647.1;         // K
+const Pc = 22.055;        // MPa
+const omega = 0.345;
+const R = 8.314;          // J/mol K
+
+const CPA = 32.24, CPB = 1.924e-3, CPC = 1.055e-5, CPD = -3.596e-9;
+const TR_ref = 298.15;    // K
+const PR_ref = 0.1;       // MPa
+const SR_ig = 123.0;      // J/mol K
+
+const kappa = 0.375 + 1.542*omega - 0.270*omega*omega;
+
+// Antoine constants fitted to IAPWS saturation curve (P in bar, T in K), valid ~300-640K
+const AA = 5.26531755, BB = 1817.59144091, CC = -27.12093531;
+
+function Tsat(P_MPa){ // invert Antoine
+  const Pbar = P_MPa*10;
+  return BB/(AA - Math.log10(Pbar)) - CC;
+}
+function Psat(T){ // MPa
+  return Math.pow(10, AA - BB/(T+CC)) / 10;
+}
+
+function alphaPR(T){
+  const Tr = T/Tc;
+  const s = 1 + kappa*(1-Math.sqrt(Tr));
+  return s*s;
+}
+function ABcoeff(T,P){
+  const al = alphaPR(T);
+  const A = 0.457*(P/Pc)*Math.pow(Tc/T,2)*al;
+  const B = 0.078*(P/Pc)*(Tc/T);
+  return [A,B];
+}
+
+// solve depressed cubic x^3 + b x^2 + c x + d = 0, return sorted array of real roots
+function solveCubic(b,c,d){
+  const p = c - b*b/3;
+  const q = 2*b*b*b/27 - b*c/3 + d;
+  const disc = (q/2)*(q/2) + (p/3)*(p/3)*(p/3);
+  let roots = [];
+  if (disc >= 0){
+    const sq = Math.sqrt(disc);
+    const u = Math.cbrt(-q/2 + sq);
+    const v = Math.cbrt(-q/2 - sq);
+    roots = [u+v - b/3];
+  } else {
+    const r = Math.sqrt(-(p/3)*(p/3)*(p/3));
+    const phi = Math.acos(Math.max(-1, Math.min(1, -q/(2*r))));
+    const t = 2*Math.sqrt(-p/3);
+    for (let k=0;k<3;k++){
+      roots.push(t*Math.cos((phi+2*Math.PI*k)/3) - b/3);
+    }
+  }
+  return roots.filter(x=>x>0).sort((a,bb)=>a-bb);
+}
+
+function ZphaseAB(T,P,phase){
+  const [A,B] = ABcoeff(T,P);
+  const b = B-1, c = A-3*B*B-2*B, d = B*B*B+B*B-A*B;
+  const roots = solveCubic(b,c,d);
+  let Z;
+  if (roots.length===1) Z = roots[0];
+  else Z = (phase==='liquid') ? roots[0] : roots[roots.length-1];
+  return [Z,A,B];
+}
+
+function Sdep(Z,A,B,T){
+  const al = alphaPR(T);
+  const term1 = R*Math.log(Z-B);
+  const coeff = R*(A/(2*Math.SQRT2*B)) * kappa*Math.sqrt(T/Tc)/Math.sqrt(al);
+  const term2 = coeff*Math.log((Z+(Math.SQRT2+1)*B)/(Z-(Math.SQRT2-1)*B));
+  return term1 - term2;
+}
+function Sig(T,P){
+  const dS = CPA*Math.log(T/TR_ref) + CPB*(T-TR_ref) + 0.5*CPC*(T*T-TR_ref*TR_ref) + (1/3)*CPD*(T*T*T-TR_ref*TR_ref*TR_ref) - R*Math.log(P/PR_ref);
+  return SR_ig + dS;
+}
+function Sphase(T,P,phase){
+  const [Z,A,B] = ZphaseAB(T,P,phase);
+  return Sig(T,P) + Sdep(Z,A,B,T);
+}
+function Vphase(T,P,phase){
+  const [Z] = ZphaseAB(T,P,phase);
+  return Z*R*T/P; // m3/mol  (since P in MPa, R in J/molK -> V = Z*R*T/P gives m3/mol when P in MPa*1e6... need consistent units)
+}
+// NOTE: to keep P in MPa while R in J/(mol K), convert P to Pa for volume calc
+function VphaseM3(T,P,phase){
+  const [Z] = ZphaseAB(T,P,phase);
+  const Ppa = P*1e6;
+  return Z*R*T/Ppa; // m3/mol
+}
+
+const T1 = 425.0, P1 = 0.5; // fixed initial condition
+
+function bisect(f, lo, hi, iters=60){
+  let flo = f(lo), fhi = f(hi);
+  if (flo===0) return lo;
+  if (fhi===0) return hi;
+  if (flo*fhi > 0){
+    return null;
+  }
+  for (let i=0;i<iters;i++){
+    const mid = 0.5*(lo+hi);
+    const fm = f(mid);
+    if (Math.abs(fm) < 1e-9) return mid;
+    if (flo*fm <= 0){ hi = mid; fhi = fm; } else { lo = mid; flo = fm; }
+  }
+  return 0.5*(lo+hi);
+}
+
+function computeState2(x1, P2){
+  const S1 = x1*Sphase(T1,P1,'vapor') + (1-x1)*Sphase(T1,P1,'liquid');
+  const Tsat2 = Tsat(P2);
+  const Sl2 = Sphase(Tsat2,P2,'liquid');
+  const Sv2 = Sphase(Tsat2,P2,'vapor');
+  let T2, x2, kind;
+  if (S1 >= Sl2 && S1 <= Sv2){
+    T2 = Tsat2;
+    x2 = (S1-Sl2)/(Sv2-Sl2);
+    kind = 'two-phase';
+  } else if (S1 > Sv2){
+    const f = (T)=>Sphase(T,P2,'vapor')-S1;
+    T2 = bisect(f, Tsat2, Tsat2+500);
+    if (T2===null) T2 = Tsat2;
+    x2 = 1.0;
+    kind = 'superheated';
+  } else {
+    const f = (T)=>Sphase(T,P2,'liquid')-S1;
+    T2 = bisect(f, Math.max(Tsat2-250,260), Tsat2);
+    if (T2===null) T2 = Tsat2;
+    x2 = 0.0;
+    kind = 'subcooled';
+  }
+  return {S1, T2, x2, kind, Tsat2};
+}
+
+function stateVolume(T,P,x,kind){
+  if (kind==='two-phase'){
+    const Vl = VphaseM3(T,P,'liquid');
+    const Vv = VphaseM3(T,P,'vapor');
+    return x*Vv + (1-x)*Vl;
+  } else if (kind==='superheated'){
+    return VphaseM3(T,P,'vapor');
+  } else {
+    return VphaseM3(T,P,'liquid');
+  }
+}
+
+/* ---------------- Saturation dome sampling (for plotting) ---------------- */
+// Below ~600 K the Antoine fit tracks the real saturation curve well (<2%
+// error), so it is used there. Near the critical point the Antoine fit is
+// not thermodynamically consistent with the Peng-Robinson EOS itself, which
+// causes the liquid/vapor branches to collapse into one before really
+// reaching Tc (an "early, flat" closure). To get a proper rounded maximum,
+// the region close to Tc is instead computed from the EOS's own coexistence
+// condition (equal fugacity of liquid and vapor), continued by the classical
+// mean-field sqrt(Tc-T) scaling law that the EOS obeys asymptotically, all
+// the way to the exact critical point.
+
+function fugCoeff(Z,A,B){
+  return Math.exp(Z-1-Math.log(Z-B) - (A/(2*Math.SQRT2*B))*Math.log((Z+(1+Math.SQRT2)*B)/(Z+(1-Math.SQRT2)*B)));
+}
+// Successive substitution (damped) for the EOS coexistence pressure at T.
+function PsatEOS(T, P0){
+  let P = P0;
+  for (let i=0;i<300;i++){
+    const [A,B] = ABcoeff(T,P);
+    const b=B-1, c=A-3*B*B-2*B, d=B*B*B+B*B-A*B;
+    const roots = solveCubic(b,c,d);
+    if (roots.length<2) return {P, ok:false};
+    const Zl=roots[0], Zv=roots[roots.length-1];
+    const phiL = fugCoeff(Zl,A,B), phiV = fugCoeff(Zv,A,B);
+    const Pnew = P + 0.5*(P*phiL/phiV - P);
+    if (Math.abs(Pnew-P)/P < 1e-10) return {P:Pnew, ok:true};
+    P = Pnew;
+  }
+  return {P, ok:false};
+}
+function domePoint(T,P){
+  const Vl = VphaseM3(T,P,'liquid');
+  const Vv = VphaseM3(T,P,'vapor');
+  const Sl = Sphase(T,P,'liquid');
+  const Sv = Sphase(T,P,'vapor');
+  return {T,P,Vl,Vv,Sl,Sv};
+}
+
+const domeData = [];
+for (let T=273.16; T<=600; T+=3){ domeData.push(domePoint(T, Psat(T))); }
+
+// EOS-consistent marching from 600 K toward Tc.
+(function(){
+  let Pguess = PsatEOS(600, Psat(600)).P;
+  domeData.push(domePoint(600, Pguess));
+  let T = 600, step = 0.25;
+  const Tcut = Tc - 1.6; // ~645.5 K: as close as the successive-substitution solver reliably converges
+  while (T < Tcut){
+    const Tn = Math.min(T+step, Tcut);
+    const r = PsatEOS(Tn, Pguess);
+    if (!r.ok) break;
+    domeData.push(domePoint(Tn, r.P));
+    Pguess = r.P;
+    T = Tn;
+  }
+
+  // Exact critical point (Peng-Robinson cubic has a single real root here).
+  const [Zc] = ZphaseAB(Tc, Pc, 'vapor');
+  const Vc = Zc*R*Tc/(Pc*1e6);
+  const Sc = Sphase(Tc, Pc, 'vapor');
+
+  // Close the last stretch using the mean-field sqrt(Tc-T) scaling that a
+  // cubic EOS obeys near its critical point, blended from the last
+  // successfully-converged point to (Tc, Pc) exactly.
+  const last = domeData[domeData.length-1];
+  const sCut = Math.sqrt(Math.max(Tc-last.T,1e-6));
+  const nBlend = 24;
+  for (let i=1;i<=nBlend;i++){
+    const frac = i/nBlend;
+    const s = sCut*(1-frac);
+    const Tb = Tc - s*s;
+    const w = sCut>0 ? s/sCut : 0;
+    domeData.push({
+      T:Tb,
+      P:  Pc + (last.P -Pc)*w,
+      Vl: Vc + (last.Vl-Vc)*w,
+      Vv: Vc + (last.Vv-Vc)*w,
+      Sl: Sc + (last.Sl-Sc)*w,
+      Sv: Sc + (last.Sv-Sc)*w
+    });
+  }
+  domeData.push({T:Tc, P:Pc, Vl:Vc, Vv:Vc, Sl:Sc, Sv:Sc});
+})();
+const criticalPt = domeData[domeData.length-1];
+
+/* ---------------- Solid phase boundaries (P-T plot only) ---------------- */
+const Ttriple = 273.16, Ptriple = 0.000611657; // MPa
+const SUB_LV_R = 6146; // K, ~ Lsub/R for ice sublimation (Clausius-Clapeyron approx)
+const MELT_SLOPE = 13.5; // MPa/K, approx |dP/dT| of the ice Ih melting curve
+function Psub(T){ return Ptriple*Math.exp(-SUB_LV_R*(1/T - 1/Ttriple)); }
+function Tmelt(P){ return Ttriple - (P-Ptriple)/MELT_SLOPE; }
+
+/* ---------------- UI wiring ---------------- */
+const qualSlider = document.getElementById('qualSlider');
+const pfSlider = document.getElementById('pfSlider');
+const qualVal = document.getElementById('qualVal');
+const pfVal = document.getElementById('pfVal');
+const plotSel1 = document.getElementById('plotSel1');
+const plotSel2 = document.getElementById('plotSel2');
+const readout = document.getElementById('readout');
+const canvas1 = document.getElementById('canvas1');
+const canvas2 = document.getElementById('canvas2');
+
+function setupHiDPI(canvas){
+  const dpr = window.devicePixelRatio || 1;
+  const w = canvas.width, h = canvas.height;
+  if (!canvas._hidpiDone){
+    canvas.style.width = w+'px';
+    canvas.style.height = h+'px';
+    canvas.width = w*dpr;
+    canvas.height = h*dpr;
+    canvas._hidpiDone = true;
+  }
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  return ctx;
+}
+
+function fmtSig(x, sig){
+  if (x===0) return '0';
+  if (!isFinite(x)) return 'NA';
+  const d = Math.ceil(Math.log10(Math.abs(x)));
+  const power = sig - d;
+  const factor = Math.pow(10,power);
+  let val = Math.round(x*factor)/factor;
+  if (Math.abs(val) >= 1e5 || Math.abs(val) < 1e-3){
+    return val.toExponential(sig-1);
+  }
+  return val.toPrecision(sig).replace(/\.?0+$/,(m)=> (val.toString().includes('.') ? m : ''));
+}
+
+function niceNum(x, sig){
+  if (!isFinite(x)) return 'NA';
+  return Number(x.toPrecision(sig)).toString();
+}
+
+/* --------------- Drawing helpers -------------- */
+const margin = {left:72, right:16, top:16, bottom:52};
+
+const TICK_FONT_PX = 16.5;     // 11px * 1.5
+const AXIS_LABEL_FONT_PX = 18; // 12px * 1.5
+
+function pow10LabelWidth(ctx, e){
+  const baseFont = TICK_FONT_PX;
+  const expFont = Math.round(TICK_FONT_PX*0.68);
+  ctx.font = baseFont+'px Helvetica, Arial, sans-serif';
+  const baseW = ctx.measureText('10').width;
+  ctx.font = expFont+'px Helvetica, Arial, sans-serif';
+  const expW = ctx.measureText(String(e)).width;
+  return baseW+expW+1;
+}
+
+// Draw "10^e" with a properly raised, smaller-font exponent instead of a caret.
+function drawPow10Label(ctx, cx, cy, e, align, baseline){
+  const baseFont = TICK_FONT_PX;
+  const expFont = Math.round(TICK_FONT_PX*0.68);
+  ctx.font = baseFont+'px Helvetica, Arial, sans-serif';
+  const baseText = '10';
+  const expText = String(e);
+  const baseW = ctx.measureText(baseText).width;
+  ctx.font = expFont+'px Helvetica, Arial, sans-serif';
+  const expW = ctx.measureText(expText).width;
+  const totalW = baseW + expW + 1;
+
+  let startX;
+  if (align==='center') startX = cx - totalW/2;
+  else if (align==='right') startX = cx - totalW;
+  else startX = cx;
+
+  const baseY = baseline==='middle' ? cy + baseFont*0.36 : cy;
+  const expY = baseY - baseFont*0.42;
+
+  ctx.textAlign = 'left';
+  ctx.font = baseFont+'px Helvetica, Arial, sans-serif';
+  ctx.fillText(baseText, startX, baseY);
+  ctx.font = expFont+'px Helvetica, Arial, sans-serif';
+  ctx.fillText(expText, startX+baseW+1, expY);
+}
+
+function drawAxes(ctx, W, H, xMin, xMax, yMin, yMax, xLog, yLog, xLabel, yLabel, opts){
+  opts = opts || {};
+  ctx.clearRect(0,0,W,H);
+  ctx.strokeStyle = '#333333';
+  ctx.fillStyle = '#111111';
+  ctx.font = TICK_FONT_PX+'px Helvetica, Arial, sans-serif';
+  ctx.lineWidth = 1;
+
+  const plotW = W - margin.left - margin.right;
+  const plotH = H - margin.top - margin.bottom;
+
+  ctx.strokeRect(margin.left, margin.top, plotW, plotH);
+
+  function xToPix(x){
+    const xv = xLog ? Math.log10(x) : x;
+    const xvMin = xLog ? Math.log10(xMin) : xMin;
+    const xvMax = xLog ? Math.log10(xMax) : xMax;
+    return margin.left + (xv-xvMin)/(xvMax-xvMin) * plotW;
+  }
+  function yToPix(y){
+    const yv = yLog ? Math.log10(y) : y;
+    const yvMin = yLog ? Math.log10(yMin) : yMin;
+    const yvMax = yLog ? Math.log10(yMax) : yMax;
+    return margin.top + plotH - (yv-yvMin)/(yvMax-yvMin) * plotH;
+  }
+
+  // ticks
+  ctx.fillStyle = '#111111';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  if (xLog){
+    const lo = Math.floor(Math.log10(xMin)), hi = Math.ceil(Math.log10(xMax));
+    for (let e=lo; e<=hi; e++){
+      const xv = Math.pow(10,e);
+      if (xv < xMin || xv > xMax) continue;
+      const px = xToPix(xv);
+      ctx.beginPath(); ctx.moveTo(px, margin.top+plotH); ctx.lineTo(px, margin.top+plotH+4); ctx.stroke();
+      drawPow10Label(ctx, px, margin.top+plotH+8, e, 'center', 'top');
+    }
+  } else {
+    const step = opts.xTickStep;
+    if (step){
+      const start = Math.ceil(xMin/step)*step;
+      for (let xv=start; xv<=xMax+1e-9; xv+=step){
+        const px = xToPix(xv);
+        ctx.beginPath(); ctx.moveTo(px, margin.top+plotH); ctx.lineTo(px, margin.top+plotH+4); ctx.stroke();
+        ctx.font = TICK_FONT_PX+'px Helvetica, Arial, sans-serif';
+        ctx.fillText(niceNum(xv,4), px, margin.top+plotH+6);
+      }
+    } else {
+      const nTicksX = 5;
+      for (let i=0;i<=nTicksX;i++){
+        const xv = xMin + (xMax-xMin)*i/nTicksX;
+        const px = xToPix(xv);
+        ctx.beginPath(); ctx.moveTo(px, margin.top+plotH); ctx.lineTo(px, margin.top+plotH+4); ctx.stroke();
+        ctx.font = TICK_FONT_PX+'px Helvetica, Arial, sans-serif';
+        ctx.fillText(niceNum(xv,3), px, margin.top+plotH+6);
+      }
+    }
+  }
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'middle';
+  let yTickLeftEdge = margin.left;
+  if (yLog){
+    const lo = Math.floor(Math.log10(yMin)), hi = Math.ceil(Math.log10(yMax));
+    for (let e=lo; e<=hi; e++){
+      const yv = Math.pow(10,e);
+      if (yv < yMin || yv > yMax) continue;
+      const py = yToPix(yv);
+      ctx.beginPath(); ctx.moveTo(margin.left-4, py); ctx.lineTo(margin.left, py); ctx.stroke();
+      drawPow10Label(ctx, margin.left-8, py, e, 'right', 'middle');
+      yTickLeftEdge = Math.min(yTickLeftEdge, margin.left-8-pow10LabelWidth(ctx,e));
+    }
+  } else {
+    const step = opts.yTickStep;
+    if (step){
+      const start = Math.ceil(yMin/step)*step;
+      for (let yv=start; yv<=yMax+1e-9; yv+=step){
+        const py = yToPix(yv);
+        ctx.beginPath(); ctx.moveTo(margin.left-4, py); ctx.lineTo(margin.left, py); ctx.stroke();
+        ctx.font = TICK_FONT_PX+'px Helvetica, Arial, sans-serif';
+        const label = niceNum(yv,4);
+        ctx.fillText(label, margin.left-6, py);
+        yTickLeftEdge = Math.min(yTickLeftEdge, margin.left-6-ctx.measureText(label).width);
+      }
+    } else {
+      const nTicksY = 5;
+      for (let i=0;i<=nTicksY;i++){
+        const yv = yMin + (yMax-yMin)*i/nTicksY;
+        const py = yToPix(yv);
+        ctx.beginPath(); ctx.moveTo(margin.left-4, py); ctx.lineTo(margin.left, py); ctx.stroke();
+        ctx.font = TICK_FONT_PX+'px Helvetica, Arial, sans-serif';
+        const label = niceNum(yv,3);
+        ctx.fillText(label, margin.left-6, py);
+        yTickLeftEdge = Math.min(yTickLeftEdge, margin.left-6-ctx.measureText(label).width);
+      }
+    }
+  }
+
+  // axis labels
+  ctx.fillStyle = '#111111';
+  ctx.font = AXIS_LABEL_FONT_PX+'px Helvetica, Arial, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillText(xLabel, margin.left+plotW/2, H-4);
+  ctx.save();
+  const yLabelX = yTickLeftEdge - 4 - AXIS_LABEL_FONT_PX*0.75;
+  ctx.translate(Math.max(yLabelX,10), margin.top+plotH/2);
+  ctx.rotate(-Math.PI/2);
+  ctx.fillText(yLabel, 0, 0);
+  ctx.restore();
+
+  return {xToPix, yToPix, plotW, plotH};
+}
+
+// Find the dome point whose pressure (or temperature) is closest to a target,
+// used to anchor region labels to the actual curve position so they can
+// never overlap it regardless of the exact envelope shape.
+function findDomeNear(field, target){
+  let best = domeData[0], bd = Infinity;
+  for (const d of domeData){
+    const diff = Math.abs(d[field]-target);
+    if (diff < bd){ bd = diff; best = d; }
+  }
+  return best;
+}
+
+function drawRegionLabel(ctx, x, y, text, opts){
+  opts = opts || {};
+  ctx.save();
+  ctx.font = (opts.italic ? 'italic ' : '') + (opts.size||13)+'px Helvetica, Arial, sans-serif';
+  ctx.fillStyle = opts.color || '#666666';
+  ctx.textAlign = opts.align || 'center';
+  ctx.textBaseline = 'middle';
+  const lines = String(text).split('\n');
+  const lh = (opts.size||13)*1.15;
+  const startY = y - (lines.length-1)*lh/2;
+  lines.forEach((line,i)=> ctx.fillText(line, x, startY+i*lh));
+  ctx.restore();
+}
+
+function drawDot(ctx, px, py, color){
+  ctx.beginPath();
+  ctx.arc(px,py,5,0,2*Math.PI);
+  ctx.fillStyle = color;
+  ctx.fill();
+  ctx.strokeStyle = '#000000';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+}
+
+function drawLine(ctx, pts, color, width=1.6, dash=null){
+  ctx.beginPath();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = width;
+  if (dash) ctx.setLineDash(dash); else ctx.setLineDash([]);
+  pts.forEach((p,i)=>{
+    if (i===0) ctx.moveTo(p[0],p[1]); else ctx.lineTo(p[0],p[1]);
+  });
+  ctx.stroke();
+  ctx.setLineDash([]);
+}
+
+function computeProcessPath(x1, P2, nsteps=40){
+  // sweep pressure between P1 and P2 and compute state along isentrope
+  const pts = [];
+  const S1 = x1*Sphase(T1,P1,'vapor') + (1-x1)*Sphase(T1,P1,'liquid');
+  const Plo = Math.min(P1,P2), Phi = Math.max(P1,P2);
+  for (let i=0;i<=nsteps;i++){
+    const P = Plo + (Phi-Plo)*i/nsteps;
+    const st = computeState2(x1,P); // reuse function generically for any P (S1 fixed internally uses x1,T1,P1 -> same S1 always, consistent)
+    const V = stateVolume(st.T2,P,st.x2,st.kind);
+    pts.push({P, T:st.T2, V, S:S1});
+  }
+  if (P1>P2) pts.reverse();
+  return pts;
+}
+
+function measureStateLabelBbox(ctx, px, py, text, dx, dy, align){
+  ctx.font = '13px Helvetica, Arial, sans-serif';
+  const tw = ctx.measureText(text).width;
+  const tx = px+dx, ty = py+dy;
+  const pad = 3;
+  let bx;
+  if (align==='center') bx = tx - tw/2 - pad;
+  else if (align==='right') bx = tx - tw - pad;
+  else bx = tx - pad;
+  const by = ty - 9 - pad;
+  return {left:bx, right:bx+tw+2*pad, top:by, bottom:by+16+pad};
+}
+function bboxesOverlap(a,b){
+  return !(a.right<b.left || a.left>b.right || a.bottom<b.top || a.top>b.bottom);
+}
+// Count how many saturation-curve sample points fall inside a label's box,
+// in the given plot's own pixel-mapping. Used to steer labels away from the
+// curve regardless of the point's position on it.
+function curveHitCount(ctx, bbox, xToPix, yToPixClamped){
+  let hits = 0;
+  for (const d of domeData){
+    const ax = xToPix(d.T), ay = yToPixClamped(d.P);
+    if (ax>=bbox.left && ax<=bbox.right && ay>=bbox.top && ay<=bbox.bottom) hits++;
+  }
+  return hits;
+}
+// Try a sequence of offsets around (px,py) and pick the first that clears
+// both the saturation curve and any previously-placed label boxes; falls
+// back to the least-bad candidate if nothing is perfectly clear.
+const STATE_LABEL_CANDIDATES = [
+  {dx:0,dy:18,align:'center'},
+  {dx:0,dy:-14,align:'center'},
+  {dx:16,dy:18,align:'left'},
+  {dx:-16,dy:18,align:'right'},
+  {dx:16,dy:-14,align:'left'},
+  {dx:-16,dy:-14,align:'right'},
+  {dx:0,dy:36,align:'center'},
+  {dx:0,dy:-32,align:'center'},
+  {dx:26,dy:34,align:'left'},
+  {dx:-26,dy:34,align:'right'}
+];
+function placeStateLabel(ctx, px, py, text, color, xToPix, yToPixClamped, plotBounds, avoidList){
+  let fallback=null, fallbackScore=Infinity;
+  for (const c of STATE_LABEL_CANDIDATES){
+    const bbox = measureStateLabelBbox(ctx, px, py, text, c.dx, c.dy, c.align);
+    const inBounds = bbox.left>=plotBounds.left && bbox.right<=plotBounds.right && bbox.top>=plotBounds.top && bbox.bottom<=plotBounds.bottom;
+    const hits = curveHitCount(ctx, bbox, xToPix, yToPixClamped);
+    let overlapCount = 0;
+    for (const ab of (avoidList||[])){ if (bboxesOverlap(bbox,ab)) overlapCount++; }
+    const score = hits*10 + overlapCount*10 + (inBounds?0:5);
+    if (score===0){
+      drawStateLabel(ctx, px, py, text, color, c.dx, c.dy, c.align);
+      return bbox;
+    }
+    if (score<fallbackScore){ fallbackScore=score; fallback={c,bbox}; }
+  }
+  drawStateLabel(ctx, px, py, text, color, fallback.c.dx, fallback.c.dy, fallback.c.align);
+  return fallback.bbox;
+}
+
+function drawStateLabel(ctx, px, py, text, color, dx, dy, align){
+  ctx.save();
+  ctx.font = '13px Helvetica, Arial, sans-serif';
+  const tw = ctx.measureText(text).width;
+  const tx = px+dx, ty = py+dy;
+  const pad = 3;
+  align = align || (dx<0 ? 'right' : 'left');
+  let bx;
+  if (align==='center') bx = tx - tw/2 - pad;
+  else if (align==='right') bx = tx - tw - pad;
+  else bx = tx - pad;
+  const by = ty - 9 - pad;
+  ctx.fillStyle = 'rgba(255,255,255,0.82)';
+  ctx.fillRect(bx, by, tw+2*pad, 16+pad);
+  ctx.fillStyle = color;
+  ctx.textAlign = align;
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, tx, ty);
+  ctx.restore();
+}
+
+function renderPlot(canvas, type, x1, P2, state2){
+  const ctx = setupHiDPI(canvas);
+  const W = canvas.width/(window.devicePixelRatio||1);
+  const H = canvas.height/(window.devicePixelRatio||1);
+
+  const S1 = x1*Sphase(T1,P1,'vapor') + (1-x1)*Sphase(T1,P1,'liquid');
+  const V1 = x1*VphaseM3(T1,P1,'vapor') + (1-x1)*VphaseM3(T1,P1,'liquid');
+  const V2 = stateVolume(state2.T2, P2, state2.x2, state2.kind);
+
+  const path = computeProcessPath(x1,P2,40);
+  const REGION_SIZE = 17, REGION_SIZE_SMALL = 15;
+
+  if (type==='PV'){
+    // volume axis in cm^3/mol (1 m^3/mol = 1e6 cm^3/mol)
+    const xMin=10, xMax=2e5, yMin=0.05, yMax=32;
+    const {xToPix,yToPix} = drawAxes(ctx,W,H,xMin,xMax,yMin,yMax,true,true,'V (cm\u00B3/mol)','P (MPa)');
+    const cvt = 1e6;
+    // dome
+    const liqPts = domeData.map(d=>[xToPix(Math.max(d.Vl*cvt,xMin)), yToPix(Math.min(Math.max(d.P,yMin),yMax))]);
+    const vapPts = domeData.map(d=>[xToPix(Math.min(Math.max(d.Vv*cvt,xMin),xMax)), yToPix(Math.min(Math.max(d.P,yMin),yMax))]);
+    drawLine(ctx, liqPts, '#000000', 1.4);
+    drawLine(ctx, vapPts, '#000000', 1.4);
+    // process path
+    const ppts = path.map(p=>[xToPix(Math.min(Math.max(p.V*cvt,xMin),xMax)), yToPix(Math.min(Math.max(p.P,yMin),yMax))]);
+    drawLine(ctx, ppts, '#7a7a7a', 1.6, [4,3]);
+    const px1 = xToPix(Math.min(Math.max(V1*cvt,xMin),xMax)), py1 = yToPix(Math.min(Math.max(P1,yMin),yMax));
+    const px2 = xToPix(Math.min(Math.max(V2*cvt,xMin),xMax)), py2 = yToPix(Math.min(Math.max(P2,yMin),yMax));
+    drawDot(ctx, px1, py1, '#1a8a2f');
+    drawDot(ctx, px2, py2, '#1a5fd4');
+    drawStateLabel(ctx, px1, py1, 'initial state', '#1a8a2f', 9, -10);
+    drawStateLabel(ctx, px2, py2, 'final state', '#1a5fd4', 9, 12);
+    // region labels
+    const critPx = xToPix(criticalPt.Vl*cvt), critPy = yToPix(criticalPt.P);
+    const liqAnchor = findDomeNear('P', 18);
+    drawRegionLabel(ctx, xToPix(liqAnchor.Vl*cvt)-8, yToPix(liqAnchor.P), 'liquid', {size:REGION_SIZE, align:'right'});
+    drawRegionLabel(ctx, xToPix(3e4), yToPix(0.3), 'vapor', {size:REGION_SIZE});
+    drawRegionLabel(ctx, xToPix(400), yToPix(1.4), 'liquid + vapor', {size:REGION_SIZE_SMALL, color:'#888888'});
+    drawRegionLabel(ctx, xToPix(2000), yToPix(25), 'supercritical fluid', {size:REGION_SIZE_SMALL});
+  } else if (type==='PT'){
+    const xMin=200, xMax=850, yMin=1e-6, yMax=100;
+    const {xToPix,yToPix} = drawAxes(ctx,W,H,xMin,xMax,yMin,yMax,false,true,'T (K)','P (MPa)',{xTickStep:100});
+    const satPts = domeData.map(d=>[xToPix(d.T), yToPix(Math.min(Math.max(d.P,yMin),yMax))]);
+    drawLine(ctx, satPts, '#000000', 1.4);
+    // solid-liquid (melting) and solid-vapor (sublimation) boundaries
+    const subPts = [];
+    for (let T=xMin; T<=Ttriple; T+=2){ subPts.push([xToPix(T), yToPix(Math.min(Math.max(Psub(T),yMin),yMax))]); }
+    drawLine(ctx, subPts, '#000000', 1.4);
+    const meltP0 = Ptriple, meltP1 = yMax;
+    {
+      const nSeg = 40;
+      const mpts = [];
+      for (let i=0;i<=nSeg;i++){
+        const frac = i/nSeg;
+        // sample densely in log space for a smooth log-scaled line
+        const P = meltP0*Math.pow(meltP1/meltP0, frac);
+        const T = Tmelt(P);
+        if (T>=xMin && T<=xMax) mpts.push([xToPix(T), yToPix(Math.min(Math.max(P,yMin),yMax))]);
+      }
+      drawLine(ctx, mpts, '#000000', 1.4);
+    }
+    const ppts = path.map(p=>[xToPix(Math.min(Math.max(p.T,xMin),xMax)), yToPix(Math.min(Math.max(p.P,yMin),yMax))]);
+    drawLine(ctx, ppts, '#7a7a7a', 1.6, [4,3]);
+    const px1 = xToPix(T1), py1 = yToPix(Math.min(Math.max(P1,yMin),yMax));
+    const px2 = xToPix(Math.min(Math.max(state2.T2,xMin),xMax)), py2 = yToPix(Math.min(Math.max(P2,yMin),yMax));
+    drawDot(ctx, px1, py1, '#1a8a2f');
+    drawDot(ctx, px2, py2, '#1a5fd4');
+    {
+      const plotBounds = {left:margin.left, right:margin.left+352, top:margin.top, bottom:margin.top+312};
+      const yToPixClamped = (P)=>yToPix(Math.min(Math.max(P,yMin),yMax));
+      const initBbox = placeStateLabel(ctx, px1, py1, 'initial state', '#1a8a2f', xToPix, yToPixClamped, plotBounds, []);
+      placeStateLabel(ctx, px2, py2, 'final state', '#1a5fd4', xToPix, yToPixClamped, plotBounds, [initBbox]);
+    }
+    // region labels: sat curve divides liquid (upper-left) from vapor (lower-right);
+    // supercritical is beyond both Tc and Pc; solid is left of the melting/sublimation curves
+    drawRegionLabel(ctx, xToPix(230), yToPix(0.01), 'solid', {size:REGION_SIZE});
+    drawRegionLabel(ctx, xToPix(340), yToPix(30), 'liquid', {size:REGION_SIZE});
+    drawRegionLabel(ctx, xToPix(500), yToPix(1e-4), 'vapor', {size:REGION_SIZE});
+    drawRegionLabel(ctx, xToPix(760), yToPix(5), 'supercritical\nfluid', {size:REGION_SIZE_SMALL});
+  } else if (type==='TS'){
+    const xMin=0, xMax=200, yMin=300, yMax=750;
+    const {xToPix,yToPix} = drawAxes(ctx,W,H,xMin,xMax,yMin,yMax,false,false,'S (J/[mol K])','T (K)',{yTickStep:75});
+    const domeInRange = domeData.filter(d=>d.T>=yMin);
+    const liqPts = domeInRange.map(d=>[xToPix(Math.min(Math.max(d.Sl,xMin),xMax)), yToPix(d.T)]);
+    const vapPts = domeInRange.map(d=>[xToPix(Math.min(Math.max(d.Sv,xMin),xMax)), yToPix(d.T)]);
+    drawLine(ctx, liqPts, '#000000', 1.4);
+    drawLine(ctx, vapPts, '#000000', 1.4);
+    const ppts = path.map(p=>[xToPix(Math.min(Math.max(p.S,xMin),xMax)), yToPix(Math.min(Math.max(p.T,yMin),yMax))]);
+    drawLine(ctx, ppts, '#7a7a7a', 1.6, [4,3]);
+    const px1 = xToPix(Math.min(Math.max(S1,xMin),xMax)), py1 = yToPix(T1);
+    const px2 = xToPix(Math.min(Math.max(S1,xMin),xMax)), py2 = yToPix(Math.min(Math.max(state2.T2,yMin),yMax));
+    drawDot(ctx, px1, py1, '#1a8a2f');
+    drawDot(ctx, px2, py2, '#1a5fd4');
+    drawStateLabel(ctx, px1, py1, 'initial state', '#1a8a2f', 9, -10);
+    drawStateLabel(ctx, px2, py2, 'final state', '#1a5fd4', 9, 12);
+    // region labels
+    const liqAnchorTS = findDomeNear('T', 580);
+    drawRegionLabel(ctx, xToPix(liqAnchorTS.Sl)-10, yToPix(liqAnchorTS.T), 'liquid', {size:REGION_SIZE, align:'right'});
+    drawRegionLabel(ctx, xToPix(178), yToPix(335), 'vapor', {size:REGION_SIZE});
+    drawRegionLabel(ctx, xToPix(100), yToPix(560), 'liquid + vapor', {size:REGION_SIZE_SMALL, color:'#888888'});
+    drawRegionLabel(ctx, xToPix(100), yToPix(715), 'supercritical fluid', {size:REGION_SIZE_SMALL});
+  }
+}
+
+function update(){
+  const x1 = parseFloat(qualSlider.value);
+  const P2 = parseFloat(pfSlider.value);
+  qualVal.textContent = x1.toFixed(1);
+  pfVal.textContent = P2.toFixed(1);
+
+  const state2 = computeState2(x1,P2);
+  renderPlot(canvas1, plotSel1.value, x1, P2, state2);
+  renderPlot(canvas2, plotSel2.value, x1, P2, state2);
+
+  const S1 = x1*Sphase(T1,P1,'vapor') + (1-x1)*Sphase(T1,P1,'liquid');
+  let kindLabel = state2.kind==='two-phase' ? 'vapor&ndash;liquid mixture' : (state2.kind==='superheated' ? 'superheated vapor' : 'compressed liquid');
+  readout.innerHTML =
+    '<div class="state-block">Initial state: T&#8321; = ' + niceNum(T1,4) + ' K, P&#8321; = ' + niceNum(P1,3) + ' MPa, quality x&#8321; = ' + x1.toFixed(3) + '</div>' +
+    '<span class="state-gap"></span>' +
+    '<div class="state-block">Final state: T&#8322; = ' + niceNum(state2.T2,4) + ' K, P&#8322; = ' + niceNum(P2,3) + ' MPa, ' +
+    (state2.kind==='two-phase' ? ('quality x&#8322; = ' + state2.x2.toFixed(3)) : kindLabel) + '</div>' +
+    '<div class="state-block">S = ' + niceNum(S1,4) + ' J/(mol K)</div>';
+}
+
+qualSlider.addEventListener('input', update);
+pfSlider.addEventListener('input', update);
+plotSel1.addEventListener('change', update);
+plotSel2.addEventListener('change', update);
+window.addEventListener('resize', update);
+
+update();
+
+/* ---------------- Panel buttons ---------------- */
+function openPanel(id, btn){
+  const ov = document.getElementById(id);
+  ov.classList.add('show');
+  const box = ov.querySelector('.panel-box');
+  if (btn){
+    const r = btn.getBoundingClientRect();
+    const gap = 10;
+    box.style.transform = 'none';
+    // Provisional centering under the button, then clamp horizontally to the viewport.
+    let boxWidth = box.getBoundingClientRect().width;
+    let left = r.left + r.width/2 - boxWidth/2;
+    left = Math.max(10, Math.min(left, window.innerWidth - boxWidth - 10));
+    box.style.left = left+'px';
+    box.style.bottom = (window.innerHeight - r.top + gap)+'px';
+    box.style.top = 'auto';
+  }
+}
+function closePanel(id){ document.getElementById(id).classList.remove('show'); }
+document.getElementById('btnDirections').addEventListener('click', function(){ openPanel('overlayDirections', this); });
+document.getElementById('btnDetails').addEventListener('click', function(){ openPanel('overlayDetails', this); if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise(); });
+document.getElementById('btnAbout').addEventListener('click', function(){ openPanel('overlayAbout', this); });
+document.querySelectorAll('[data-close]').forEach(btn=>{
+  btn.addEventListener('click', ()=>closePanel(btn.getAttribute('data-close')));
+});
+document.querySelectorAll('.overlay').forEach(ov=>{
+  ov.addEventListener('click', (e)=>{ if (e.target===ov) ov.classList.remove('show'); });
+});
+</script>
+</body>
+</html>

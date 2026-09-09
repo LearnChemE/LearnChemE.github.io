@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fugacities in a Can of Soda</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+  chtml: { displayAlign: 'left', displayIndent: '0' },
+  startup: { typeset: false }
+};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<style>
+  :root{
+    --accent:#98000D;
+    --ink:#1a1a1a;
+    --panel-bg:#fbf7f2;
+    --panel-border:#d8ccbf;
+  }
+  html,body{margin:0;padding:0;}
+  #app{
+    font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;
+    color:var(--ink);
+    max-width:720px;
+    margin:0 auto;
+    padding:14px 16px 26px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .demo-title{
+    color:var(--accent);
+    font-size:23px;
+    font-weight:700;
+    letter-spacing:.1px;
+    margin:2px 0 12px;
+  }
+  /* ---------- control row (Wolfram-style slider + buttons) ---------- */
+  .controls{
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:10px 14px;
+    padding-bottom:6px;
+  }
+  .slider-block{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    /* slider font increased 15% over 14px base => ~16.1px */
+    font-size:16.1px;
+  }
+  .slider-label{ color:var(--ink); white-space:nowrap; }
+  
+input[type="range"]{
+    --accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:210px;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+input[type="range"]::-moz-range-thumb{
+    width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+
+
+  .slider-value{
+    min-width:44px;
+    text-align:center;
+    padding:2px 8px;
+    border:1px solid #c7c7c7;
+    border-radius:3px;
+    background:#f4f4f4;
+    font-variant-numeric:tabular-nums;
+  }
+  .btns{ display:flex; gap:8px; }
+  .btns button{
+    font-family:inherit;
+    font-size:14.3px;
+    color:#fff;
+    background:var(--accent);
+    border:1px solid var(--accent);
+    border-radius:4px;
+    padding:4px 12px;
+    cursor:pointer;
+    transition:background .12s;
+  }
+  .btns button:hover{ background:#7a000a; }
+  .btns button.active{ background:#7a000a; }
+  /* ---------- info panels (overlay the figure) ---------- */
+  .panel-layer{ position:relative; }
+  .panel{
+    position:absolute;
+    left:0;
+    right:0;
+    top:4px;
+    z-index:30;
+    display:none;
+    margin:0;
+    padding:16px 40px 16px 18px;
+    background:var(--panel-bg);
+    border:1px solid var(--panel-border);
+    border-radius:6px;
+    box-shadow:0 6px 20px rgba(0,0,0,0.18);
+    font-size:14.5px;
+    line-height:1.5;
+  }
+  .panel.show{ display:block; }
+  .panel h3{ margin:0 0 8px; font-size:15px; color:var(--accent); text-transform:uppercase; letter-spacing:.4px; }
+  .panel p{ margin:0 0 9px; }
+  .panel .refs{ font-size:13px; color:#444; }
+  .panel a{ color:var(--accent); }
+  .panel .close{
+    position:absolute; top:8px; right:10px;
+    width:24px; height:24px; line-height:22px; text-align:center;
+    border:none; background:transparent; cursor:pointer;
+    font-size:19px; color:#8a8a8a; border-radius:4px;
+  }
+  .panel .close:hover{ color:#000; background:#00000010; }
+  .eq{ margin:6px 0 10px; }
+  /* ---------- figure ---------- */
+  .figure{
+    display:flex;
+    align-items:flex-start;
+    gap:8px;
+    margin-top:14px;
+  }
+  #canvasWrap{ flex:0 0 auto; }
+  canvas{ display:block; }
+  .results{ flex:1 1 auto; padding-top:26px; }
+  .pline{ font-size:17px; margin:0 0 12px 4px; }
+  .pline i{ font-style:italic; }
+  table.res{ border-collapse:collapse; font-size:16.94px; }
+  table.res td,table.res th{ padding:3px 12px; text-align:center; font-weight:400; white-space:nowrap; }
+  table.res .rowlab{ font-weight:400; }
+  table.res .divR{ border-right:1px solid #333; }
+  table.res .headline td,table.res .headline th{ border-bottom:1px solid #333; }
+  .sci sup{ font-size:.78em; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="controls">
+    <div class="slider-block">
+      <span class="slider-label">temperature (&deg;C)</span>
+      <input id="T" class="wolfram" type="range" min="0" max="30" step="0.5" value="0">
+      <span id="Tval" class="slider-value">0</span>
+    </div>
+    <div class="btns">
+      <button id="bDir">Directions</button>
+      <button id="bDet">Details</button>
+      <button id="bAbt">About</button>
+    </div>
+  </div>
+
+  <div class="panel-layer">
+  <!-- Directions -->
+  <div id="pDir" class="panel">
+    <button class="close" data-close="pDir" aria-label="Close">&times;</button>
+    <h3>Directions</h3>
+    <p>The fugacities of water and carbon dioxide are calculated as a function of temperature
+    for a closed container, which is a model of a can of soda. The concentrations of the two
+    components are calculated in both the liquid and gas phases. As temperature increases, the
+    pressure increases, and therefore the fugacities increase. Note that the CO<sub>2</sub>
+    concentration is much lower than the H<sub>2</sub>O concentration in the liquid phase, but
+    the CO<sub>2</sub> concentration is much higher than the H<sub>2</sub>O concentration in
+    the gas phase. Because the gas phase is assumed to be ideal, the fugacities of
+    CO<sub>2</sub> and H<sub>2</sub>O in both phases are equal to their gas-phase partial
+    pressures, and thus the CO<sub>2</sub> fugacity is much higher than the H<sub>2</sub>O
+    fugacity. As the temperature increases, the CO<sub>2</sub> concentration in liquid water
+    decreases. However, as the temperature increases the pressure increases, and a higher
+    CO<sub>2</sub> pressure increases the CO<sub>2</sub> concentration in water, so the net
+    effect is that CO<sub>2</sub> concentration in the liquid phase does not change much as the
+    temperature increases.</p>
+  </div>
+
+  <!-- Details -->
+  <div id="pDet" class="panel">
+    <button class="close" data-close="pDet" aria-label="Close">&times;</button>
+    <h3>Details</h3>
+    <p>The fugacity of CO<sub>2</sub> dissolved in water was calculated using Henry's law and
+    freezing point depression measurements:</p>
+    <div class="eq">\[ \Delta T_{fp} \equiv T_{\mathrm{H_2O}} - T_{sol} = k_{fp}\, m_{\mathrm{CO_2}}, \]</div>
+    <div class="eq">\[ k_{H} = k_{H}^{o}\,\exp\!\left[\dfrac{\delta\,\ln(k_{H})}{\delta\,T^{-1}}\right]\left(\dfrac{1}{T}-\dfrac{1}{273}\right), \]</div>
+    <div class="eq">\[ P_{\mathrm{CO_2}} = \dfrac{\Delta T_{fp}}{k_{H}\,k_{fp}}, \]</div>
+    <div class="eq">\[ f_{\mathrm{CO_2}} = P_{\mathrm{CO_2}}, \]</div>
+    <p>where \(\Delta T_{fp}\) is the difference between the freezing point of water and the
+    freezing point of carbon dioxide in water (\(T_{\mathrm{H_2O}}\) and \(T_{sol}\)) (K),
+    \(k_{fp}\) is the freezing point depression constant for water ([&deg;C kg]/mol),
+    \(m_{\mathrm{CO_2}}\) is the molality of CO<sub>2</sub>, \(k_{H}\) is Henry's law constant
+    (kg/[mol bar]), \(k_{H}^{o}\) is Henry's constant at 273 K,
+    \(\frac{\delta\,\ln(k_{H})}{\delta\,T^{-1}}=2400\) is a constant, \(T\) is temperature (K),
+    \(P_{\mathrm{CO_2}}\) is the partial pressure of CO<sub>2</sub> (bar), and
+    \(f_{\mathrm{CO_2}}\) is the fugacity of CO<sub>2</sub> (bar).</p>
+    <p>The fugacity of water was calculated from the saturation pressure of water
+    \(P_{\mathrm{H_2O}}^{\,sat}\) using the Antoine equation:</p>
+    <div class="eq">\[ f_{\mathrm{H_2O}} = P_{\mathrm{H_2O}}^{\,sat} = 10^{\,8.07-\frac{1731}{T+233}}, \]</div>
+    <p>where \(f_{\mathrm{H_2O}}\) is the fugacity of water (bar).</p>
+    <p class="refs"><b>Reference</b><br>
+    [1] T. S. Kuntzleman and C. Richards, "Another Method for Determining the Pressure inside
+    an Intact Carbonated Beverage Can (or Bottle)," <i>Journal of Chemical Education</i>,
+    <b>87</b>(9), 2010 p. 993.
+    <a href="https://doi.org/10.1021/ed100255g" target="_blank" rel="noopener">doi:10.1021/ed100255g</a>.</p>
+  </div>
+
+  <!-- About -->
+  <div id="pAbt" class="panel">
+    <button class="close" data-close="pAbt" aria-label="Close">&times;</button>
+    <h3>About</h3>
+    <p>This simulation was created in the
+    <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a>
+    at University of Colorado Boulder for
+    <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a>
+    by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a
+    <a href="https://demonstrations.wolfram.com/FugacitiesInACanOfSoda/" target="_blank" rel="noopener">Mathematica simulation</a>
+    by Rachael L. Baumann. It was prepared with financial support from the National Science
+    Foundation (DUE 2336987 and 2336988). Address any questions or comments to
+    <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.</p>
+  </div>
+  </div>
+
+  <!-- Figure -->
+  <div class="figure">
+    <div id="canvasWrap"><canvas id="cv"></canvas></div>
+    <div class="results">
+      <div class="pline"><i>P</i> = <span id="Pval">3.12</span> bar</div>
+      <table class="res">
+        <tr>
+          <td></td>
+          <td colspan="2">concentration (mol/L)</td>
+          <td></td>
+        </tr>
+        <tr class="headline">
+          <td class="divR"></td>
+          <td>liquid</td>
+          <td class="divR">vapor</td>
+          <td>fugacity (bar)</td>
+        </tr>
+        <tr>
+          <td class="rowlab divR">CO<sub>2</sub></td>
+          <td id="cLc"></td>
+          <td class="divR" id="cVc"></td>
+          <td id="fc"></td>
+        </tr>
+        <tr>
+          <td class="rowlab divR">H<sub>2</sub>O</td>
+          <td id="cLw"></td>
+          <td class="divR" id="cVw"></td>
+          <td id="fw"></td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------------- model ----------------
+  var V   = 0.355;          // can volume (L)
+  var vL  = 0.94 * V;       // liquid volume (L)
+  var R   = 0.08314;        // L bar / (mol K)
+  var dTfp = -0.42;         // freezing point depression (C)
+  var kfp  = -1.86;         // cryoscopic constant (C kg/mol)
+  var Pmax = 7.47;          // pressure at T = 30 C, for vapor color scaling
+
+  function model(T){
+    var kH   = 0.0726 * Math.exp(2400*(1/(T+273) - 1/273));
+    var fCO2 = dTfp/(kfp*kH);
+    var fH2O = (1/750.062) * Math.pow(10, 8.07131 - 1730.63/(T+233.426));
+    var P    = fCO2 + fH2O;
+    var nLw  = vL/0.01802;
+    return {
+      kH:kH, fCO2:fCO2, fH2O:fH2O, P:P,
+      cVc: fCO2/(R*(T+273)),
+      cVw: fH2O/(R*(T+273)),
+      cLc: kH*P,
+      cLw: nLw/vL
+    };
+  }
+
+  // ---------------- number formatting ----------------
+  // 3 significant figures (matches NumberForm[x,3])
+  function sig3(x){
+    if(x===0) return "0";
+    var s = Number(x).toPrecision(3);
+    if(s.indexOf('e')>=0 || s.indexOf('E')>=0) s = Number(s).toString();
+    return s;
+  }
+  // 2 significant figures, scientific (matches ScientificForm[x,2])
+  function sci2(x){
+    if(x===0) return "0";
+    var e = Math.floor(Math.log10(Math.abs(x)));
+    var m = x/Math.pow(10,e);
+    m = Number(m.toFixed(1));
+    if(Math.abs(m) >= 10){ m = m/10; e += 1; }
+    var mant = m.toFixed(1);
+    return '<span class="sci">'+mant+' &times; 10<sup>'+e+'</sup></span>';
+  }
+  // P: NumberForm[P,{3,2}]  -> 2 decimals for these single-digit values
+  function pfmt(x){ return x.toFixed(2); }
+  function tfmt(T){ return Number.isInteger(T) ? String(T) : T.toFixed(1); }
+
+  // ---------------- canvas / figure ----------------
+  var cv  = document.getElementById('cv');
+  var ctx = cv.getContext('2d');
+  var CW = 320, CH = 360;                 // css pixels
+  var dpr = window.devicePixelRatio || 1;
+  cv.style.width = CW+'px';
+  cv.style.height = CH+'px';
+  cv.width  = Math.round(CW*dpr);
+  cv.height = Math.round(CH*dpr);
+  ctx.scale(dpr,dpr);
+
+  // model-space -> pixel mapping (front view: x horizontal, z vertical)
+  var XR = [-1.35, 1.35], ZR = [-0.38, 3.26];
+  function sx(x){ return (x-XR[0])/(XR[1]-XR[0])*CW; }
+  function sz(z){ return CH - (z-ZR[0])/(ZR[1]-ZR[0])*CH; }
+
+  function draw(m){
+    ctx.clearRect(0,0,CW,CH);
+
+    var cx = sx(0);
+    var xl = sx(-1), xr = sx(1), wCan = xr - xl, rxC = wCan/2;
+    var rimRy = (sz(0) - sz(0.18));      // vertical radius of cap ellipses (px)
+    var yTop = sz(3.0), yLiq = sz(2.25), yBot = sz(0.0);
+
+    // ---- vapor fill (blue, intensity proportional to pressure) ----
+    var alpha = Math.max(0.06, Math.min(0.92, m.P/9));
+    ctx.fillStyle = 'rgba(20,92,232,'+alpha.toFixed(3)+')';
+    // upper half of the top oval (so the whole oval top reads blue)
+    ctx.beginPath();
+    ctx.ellipse(cx, yTop, rxC, rimRy, 0, Math.PI, 2*Math.PI, false);
+    ctx.closePath();
+    ctx.fill();
+    // vapor body: from top oval down to the liquid surface
+    ctx.fillRect(xl, yTop, wCan, yLiq - yTop);
+
+    // ---- liquid fill (lighter red, translucent) ----
+    ctx.fillStyle = 'rgba(206,124,101,0.55)';
+    // liquid body: from surface down to the base
+    ctx.fillRect(xl, yLiq, wCan, yBot - yLiq);
+    // rounded bottom: lower half of the bottom oval
+    ctx.beginPath();
+    ctx.ellipse(cx, yBot, rxC, rimRy, 0, 0, Math.PI, false);
+    ctx.closePath();
+    ctx.fill();
+    // liquid surface ellipse
+    ctx.beginPath();
+    ctx.ellipse(cx, yLiq, rxC, rimRy*0.92, 0, 0, 2*Math.PI);
+    ctx.fillStyle = 'rgba(196,112,90,0.65)';
+    ctx.fill();
+
+    // ---- can outline (translucent gray cylinder, front view) ----
+    ctx.lineWidth = 1.4;
+    ctx.strokeStyle = 'rgba(90,90,90,0.9)';
+    // sides
+    ctx.beginPath();
+    ctx.moveTo(xl, yBot); ctx.lineTo(xl, yTop);
+    ctx.moveTo(xr, yBot); ctx.lineTo(xr, yTop);
+    ctx.stroke();
+    // top oval (full outline)
+    ctx.beginPath();
+    ctx.ellipse(cx, yTop, rxC, rimRy, 0, 0, 2*Math.PI);
+    ctx.stroke();
+    // bottom front curve (lower half of the bottom oval)
+    ctx.beginPath();
+    ctx.ellipse(cx, yBot, rxC, rimRy, 0, 0, Math.PI, false);
+    ctx.stroke();
+
+    // ---- labels ----
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    // "vapor" in the vapor region
+    ctx.font = '18px "Helvetica Neue",Helvetica,Arial,sans-serif';
+    ctx.fillStyle = '#173a86';
+    ctx.fillText('vapor', cx, sz(2.62));
+
+    // "liquid" inside the container with a white background box
+    var lx = cx, ly = sz(1.15);
+    ctx.font = '18px "Helvetica Neue",Helvetica,Arial,sans-serif';
+    var tw = ctx.measureText('liquid').width;
+    var padX = 7, padY = 4, bh = 22;
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(lx - tw/2 - padX, ly - bh/2, tw + 2*padX, bh);
+    ctx.fillStyle = '#7a1a10';
+    ctx.fillText('liquid', lx, ly);
+  }
+
+  // ---------------- results table ----------------
+  function updateTable(m){
+    document.getElementById('Pval').textContent = pfmt(m.P);
+    document.getElementById('cLc').textContent  = sig3(m.cLc);
+    document.getElementById('cVc').textContent  = sig3(m.cVc);
+    document.getElementById('fc').textContent   = sig3(m.fCO2);
+    document.getElementById('cLw').textContent  = sig3(m.cLw);
+    document.getElementById('cVw').innerHTML     = sci2(m.cVw);
+    document.getElementById('fw').innerHTML      = sci2(m.fH2O);
+  }
+
+  // ---------------- wiring ----------------
+  var slider = document.getElementById('T');
+  var tval   = document.getElementById('Tval');
+
+  function refresh(){
+    var T = parseFloat(slider.value);
+    tval.textContent = tfmt(T);
+    var m = model(T);
+    draw(m);
+    updateTable(m);
+  }
+  slider.addEventListener('input', refresh);
+
+  // panel buttons
+  var map = { bDir:'pDir', bDet:'pDet', bAbt:'pAbt' };
+  function closeAll(){
+    ['pDir','pDet','pAbt'].forEach(function(id){
+      document.getElementById(id).classList.remove('show');
+    });
+    ['bDir','bDet','bAbt'].forEach(function(id){
+      document.getElementById(id).classList.remove('active');
+    });
+  }
+  Object.keys(map).forEach(function(bid){
+    document.getElementById(bid).addEventListener('click', function(){
+      var pid = map[bid];
+      var panel = document.getElementById(pid);
+      var isOpen = panel.classList.contains('show');
+      closeAll();
+      if(!isOpen){
+        panel.classList.add('show');
+        document.getElementById(bid).classList.add('active');
+        if(pid==='pDet' && window.MathJax && MathJax.typesetPromise){
+          MathJax.typesetPromise([panel]);
+        }
+      }
+    });
+  });
+  document.querySelectorAll('.panel .close').forEach(function(btn){
+    btn.addEventListener('click', function(){ closeAll(); });
+  });
+
+  refresh();
+})();
+</script>
+</body>
+</html>

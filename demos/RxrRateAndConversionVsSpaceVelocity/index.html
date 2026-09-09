@@ -19,7 +19,7 @@
     font-family:Helvetica, Arial, sans-serif;
     color:#1a1a1a;font-size:15px;-webkit-font-smoothing:antialiased;
   }
-  #app{max-width:980px;margin:12px auto;padding:0 12px;position:relative;}
+  #app{max-width:660px;margin:12px auto;padding:0 12px;position:relative;}
   .demo-title{
     text-align:center;font-family:Helvetica,Arial,sans-serif;font-weight:bold;
     font-size:22px;margin:2px 0 12px 0;color:#000;max-width:600px;
@@ -38,20 +38,16 @@
   .setter button:last-child{border-radius:0 3px 3px 0;}
   .setter button.active{background:var(--darkred);color:#fff;border-color:var(--darkred);}
   .setter button:not(.active):hover{background:#e2e2e2;}
-  input[type=range]{
-    -webkit-appearance:none;appearance:none;width:230px;height:4px;background:#cfcfcf;
-    border-radius:2px;outline:none;margin:0;cursor:pointer;
-  }
-  input[type=range]::-webkit-slider-thumb{
-    -webkit-appearance:none;appearance:none;width:14px;height:18px;border-radius:2px;
-    background:#5b5b5b;border:1px solid #3d3d3d;cursor:pointer;
-  }
-  input[type=range]::-moz-range-thumb{
-    width:14px;height:18px;border-radius:2px;background:#5b5b5b;border:1px solid #3d3d3d;cursor:pointer;
-  }
+input[type="range"]{
+  --accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:230px;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+input[type="range"]::-moz-range-thumb{
+  width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+
   .ctrl-value{flex:0 0 48px;text-align:left;padding-left:14px;font-variant-numeric:tabular-nums;font-size:15px;}
 
-  .plot-wrap{position:relative;border:1px solid var(--panel-border);background:#fff;margin:4px 0 12px 0;max-width:600px;}
+  .plot-wrap{position:relative;border:1px solid var(--panel-border);background:#fff;margin:4px 0 12px 0;}
   canvas{display:block;width:100%;}
   #overlay{position:absolute;top:0;left:0;pointer-events:none;}
   .olabel{position:absolute;font-family:Helvetica,Arial,sans-serif;white-space:nowrap;line-height:1;}
@@ -67,17 +63,23 @@
   }
   .info-buttons button:hover,.info-buttons button.active{background:#a52727;border-color:#a52727;}
   .info-panel{
-    position:absolute;width:320px;box-sizing:border-box;z-index:50;
-    border:1px solid var(--panel-border);background:#fff;padding:12px 16px;
+    position:absolute;width:480px;box-sizing:border-box;z-index:50;
+    border:1px solid var(--panel-border);background:#fff;padding:26px 16px 12px 16px;
     font-size:14px;line-height:1.55;display:none;
     box-shadow:0 3px 12px rgba(0,0,0,0.2);max-height:560px;overflow:auto;
   }
   .info-panel.show{display:block;}
+  .panel-close{
+    position:absolute;top:5px;right:7px;width:22px;height:22px;padding:0;
+    border:none;background:transparent;color:var(--darkred);
+    font:700 20px/1 Arial,sans-serif;cursor:pointer;
+  }
+  .panel-close:hover{color:#000;}
   .info-panel p{margin:8px 0;}
   .info-panel a{color:var(--darkred);}
   .eqn{margin:6px 0 6px 6px;}
   .info-panel .eqn{font-size:15px;line-height:1.75;}
-  .math-display{display:block;text-align:center;margin:10px 0;}
+  .math-display{display:block;text-align:left;margin:10px 0;}
   .math-display svg{vertical-align:middle;}
   .eqn i{font-family:"Times New Roman",Times,serif;font-style:italic;font-size:1.05em;}
   .ord{margin:10px 0 2px 0;font-weight:bold;}
@@ -178,7 +180,7 @@
     by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a
     <a href="https://demonstrations.wolfram.com/ReactorRateAndConversionVersusSpaceVelocity/" target="_blank" rel="noopener">Mathematica simulation</a>
     by Derek M. Machalek. It was prepared with financial support from the National Science
-    Foundation (DUE 2336987 and 2336988) in collaboration with Washington State University.
+    Foundation (DUE 2336987 and 2336988).
     Address any questions or comments to
     <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.</p>
   </div>
@@ -346,9 +348,23 @@
   var openBtn=null;
   function positionPanel(panel, btn){
     var a=appEl.getBoundingClientRect(), r=btn.getBoundingClientRect();
-    panel.style.left=(r.right - a.left + 8)+"px";
-    panel.style.top =(r.top  - a.top  + 4)+"px";
+    // open to the LEFT of the button: panel's right edge sits 8px left of the button
+    panel.style.left="auto";
+    panel.style.right=(a.right - r.left + 8)+"px";
+    panel.style.top  =(r.top  - a.top  + 4)+"px";
   }
+  function closePanel(){
+    document.querySelectorAll(".info-panel").forEach(function(p){p.classList.remove("show");});
+    Array.prototype.forEach.call(infoBtns,function(b){b.classList.remove("active");});
+    openBtn=null;
+  }
+  // add a close (x) button to the top-right of each panel
+  document.querySelectorAll(".info-panel").forEach(function(p){
+    var x=document.createElement("button");
+    x.className="panel-close"; x.innerHTML="\u00d7"; x.setAttribute("aria-label","Close");
+    x.addEventListener("click", closePanel);
+    p.appendChild(x);
+  });
   Array.prototype.forEach.call(infoBtns,function(btn){
     btn.addEventListener("click",function(){
       var key=btn.getAttribute("data-panel");
@@ -367,7 +383,6 @@
   }
   window.addEventListener("resize", resizeAndDraw);
   setupCanvas(); draw();
-  document.querySelector('.info-buttons button[data-panel="directions"]').click();
 })();
 </script>
 </body>

@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reversible and Irreversible Expansion and Compression Processes</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+  options: { renderActions: { addMenu: [] } }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    font-family: Helvetica, Arial, sans-serif;
+    background: #ffffff;
+  }
+  #app {
+    width: 678px;
+    margin: 10px auto;
+    border: 1px solid #c6c6c6;
+    border-radius: 6px;
+    background: #ffffff;
+    padding: 10px 12px 12px 12px;
+    box-sizing: border-box;
+  }
+  /* ---------- control rows ---------- */
+  #row1 {
+    display: flex;
+    align-items: center;
+    margin: 2px 0 6px 0;
+    min-height: 27px;
+  }
+  #prompt {
+    font-size: 15.6px;
+    color: #000;
+    width: 460px;
+    flex: 0 0 auto;
+  }
+  #row2 {
+    display: flex;
+    align-items: center;
+    margin: 0 0 8px 0;
+    min-height: 27px;
+  }
+  #radioBar {
+    margin-left: 60px;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 15px;
+    min-width: 190px;
+  }
+  #radioBar label {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    cursor: pointer;
+  }
+  #radioBar input { margin: 0; accent-color: #98000D; }
+  #radioBar.locked label { cursor: default; color: #888; }
+  .mbtn {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 13.8px;
+    color: #000;
+    background: linear-gradient(#fdfdfd, #e9e9e9);
+    border: 1px solid #9a9a9a;
+    border-radius: 3px;
+    cursor: pointer;
+    box-sizing: border-box;
+    height: 25px;
+    padding: 0;
+  }
+  .mbtn:hover:enabled { background: linear-gradient(#ffffff, #f0f0f0); }
+  .mbtn:active:enabled { background: #e0e0e0; }
+  .mbtn:disabled { color: #a0a0a0; cursor: default; }
+  #btnNew { width: 105px; margin-left: auto; }
+  #btnSolution { width: 135px; margin-left: 26px; }
+  #btnNext { width: 105px; margin-left: 8px; }
+  #btnHint { width: 65px; margin-left: 8px; }
+  /* ---------- Directions / Details / About buttons ---------- */
+  #panelButtons {
+    display: flex;
+    gap: 8px;
+    margin: 2px 0 6px 0;
+  }
+  .pbtn {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    font-weight: normal;
+    color: #ffffff;
+    background: #98000D;
+    border: 1px solid #7c000b;
+    border-radius: 4px;
+    padding: 6px 14px;
+    cursor: pointer;
+  }
+  .pbtn:hover { background: #b00010; }
+  /* ---------- figure and flyout panels ---------- */
+  #figureWrap {
+    position: relative;
+    width: 650px;
+    height: 430px;
+  }
+  #cv { display: block; }
+  .flyout {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 650px;
+    max-height: 430px;
+    overflow-y: auto;
+    box-sizing: border-box;
+    background: #ffffff;
+    border: 1px solid #98000D;
+    border-radius: 5px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+    padding: 14px 34px 14px 18px;
+    font-size: 14px;
+    line-height: 1.45;
+    z-index: 20;
+  }
+  .flyout.open { display: block; }
+  .flyout .closeX {
+    position: absolute;
+    top: 6px;
+    right: 10px;
+    font-size: 20px;
+    line-height: 1;
+    color: #98000D;
+    cursor: pointer;
+    font-weight: bold;
+    user-select: none;
+  }
+  .flyout .closeX:hover { color: #d0000f; }
+  .flyout p { margin: 7px 0; }
+  .flyout a { color: #98000D; }
+  .flyout .eq { margin: 7px 0 7px 24px; }
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- controls (top, as in the Mathematica Manipulate) -->
+  <div id="row1">
+    <span id="prompt"></span>
+    <button id="btnNew" class="mbtn">continue</button>
+  </div>
+  <div id="row2" style="visibility:hidden;">
+    <span id="radioBar"></span>
+    <button id="btnSolution" class="mbtn" disabled>show solution</button>
+    <button id="btnNext" class="mbtn" disabled>next step</button>
+    <button id="btnHint" class="mbtn">hint</button>
+  </div>
+
+  <!-- Directions / Details / About buttons just above the figure -->
+  <div id="panelButtons">
+    <button class="pbtn" data-panel="pDirections">Directions</button>
+    <button class="pbtn" data-panel="pDetails">Details</button>
+    <button class="pbtn" data-panel="pAbout">About</button>
+  </div>
+
+  <!-- figure with flyout panels that open below the buttons -->
+  <div id="figureWrap">
+    <canvas id="cv" width="650" height="430"></canvas>
+
+    <div class="flyout" id="pDirections">
+      <span class="closeX" data-close="pDirections">&times;</span>
+      <p>Use this simulation to identify isothermal, reversible-adiabatic and
+      irreversible-adiabatic processes of an ideal gas in a step-by-step procedure.
+      After starting and with &ldquo;new problem&rdquo; selected, the simulation shows either an
+      expansion or a compression process, and either a pressure-temperature or
+      pressure-volume diagram. Select your answer from the possible options
+      (a,&nbsp;b,&nbsp;c,&nbsp;d,&nbsp;e) and then select &ldquo;show solution&rdquo; to see the correct
+      answer. The &ldquo;hint&rdquo; button provides a hint for each step, and once
+      &ldquo;show solution&rdquo; is selected, you cannot go back.</p>
+    </div>
+
+    <div class="flyout" id="pDetails">
+      <span class="closeX" data-close="pDetails">&times;</span>
+      <p>The first law of thermodynamics, representing the conservation of energy, is:</p>
+      <p class="eq">$\Delta U = Q - W$,</p>
+      <p>where $\Delta U$ is the change to internal energy of the system, $Q$ is heat
+      added to the system and $W$ is the work done by the system. In adiabatic
+      processes, $Q = 0$, while $Q \neq 0$ in isothermal processes with external
+      pressure $P_{ext} \neq 0$. Expansion-compression work $W$ for all four processes
+      is calculated from:</p>
+      <p class="eq">$W = -\int P_{ext} \, dV$,</p>
+      <p>where $P_{ext}$ is the external pressure and $W$ is in units of kJ/mol. The
+      external pressure and the gas pressure are equal for a reversible process,
+      whereas for an irreversible process the external pressure is equal to the final
+      pressure. Change in internal energy is calculated from:</p>
+      <p class="eq">$\Delta U = C_V \, (T_2 - T_1)$.</p>
+      <p>Initial state:</p>
+      <p class="eq">$V_1 = \dfrac{R \, T_1}{P_1}$,</p>
+      <p>where the subscript $1$ refers to the initial state, $R$ is the ideal gas
+      constant (kJ/mol K), $V$ is volume ($\mathrm{m}^3$/mol), $T$ is temperature (K)
+      and $P$ is pressure (Pa).</p>
+      <p>For an isothermal process:</p>
+      <p class="eq">$V_2 = \dfrac{R \, T_1}{P_2}$,</p>
+      <p>where the subscript $2$ refers to the final condition.</p>
+      <p>Reversible work:</p>
+      <p class="eq">$W = -R \, T_1 \ln \left( \dfrac{V_2}{V_1} \right)$.</p>
+      <p>Irreversible work:</p>
+      <p class="eq">$W = -P_2 \, (V_2 - V_1)$.</p>
+      <p>For an adiabatic process on an ideal diatomic gas:</p>
+      <p class="eq">$\gamma = \dfrac{7}{5}$,</p>
+      <p class="eq">$C_V = \dfrac{5 R}{2}$,</p>
+      <p class="eq">$W = C_V \, (T_2 - T_1)$,</p>
+      <p>where $\gamma = C_p / C_V$, $C_V$ is the constant volume heat capacity and
+      $C_p$ is the constant pressure heat capacity (kJ/(mol K)).</p>
+      <p>Reversible process:</p>
+      <p class="eq">$V_2 = V_1 \left( \dfrac{P_1}{P_2} \right)^{1/\gamma}$,</p>
+      <p class="eq">$T_2 = T_1 \left( \dfrac{V_1}{V_2} \right)^{\gamma - 1}$.</p>
+      <p>Irreversible process:</p>
+      <p class="eq">$T_2 = T_1 - \dfrac{P_2 \, (V_2 - V_1)}{C_V}$,</p>
+      <p class="eq">$V_2 = \dfrac{R \, (C_V T_1 + P_2 V_1)}{P_2 \, (C_V + R)}$.</p>
+      <p>Reference</p>
+      <p>[1] J. R. Elliott and C. T. Lira, <i>Introductory Chemical Engineering
+      Thermodynamics</i>, 2nd ed., Upper Saddle River, NJ: Prentice Hall, 2012.</p>
+    </div>
+
+    <div class="flyout" id="pAbout">
+      <span class="closeX" data-close="pAbout">&times;</span>
+      <p>This simulation was created in the
+      <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department
+      of Chemical and Biological Engineering</a> at University of Colorado Boulder for
+      <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a>
+      by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a
+      <a href="https://demonstrations.wolfram.com/ReversibleAndIrreversibleExpansionAndCompressionProcesses/"
+      target="_blank" rel="noopener">Mathematica simulation</a> by Neil Hendren. It was
+      prepared with financial support from the National Science Foundation
+      (DUE&nbsp;2336987 and 2336988). Address any questions or comments to
+      LearnChemE@gmail.com.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ============ physical constants (as in the CDF) ============ */
+  var R = 8.314;
+  var Cv = 5 * R / 2;
+  var Cp = 7 * R / 2;
+  var gam = Cp / Cv;      /* 1.4 */
+  var T1 = 300;
+
+  var OLIVE = 'rgb(153,181,59)';   /* RGBColor[0.6, 0.71, 0.23] */
+  var BLUE = '#0000ff';
+  var BLACK = '#000000';
+
+  /* ============ scenario definitions ============ */
+  /* Each candidate-family f(param, x) reproduces the corresponding CDF
+     Plot expression; ans* are the correct (thick) answer curves.       */
+
+  var SCEN = {
+
+    /* ---- P-V expansion: 10 bar, 2.5 L -> 5 bar ---- */
+    pvexp: {
+      type: 'pv', proc: 'expansion',
+      xmin: 2.3, xmax: 5.5, ymin: 4.5, ymax: 10.5,
+      xlabel: 'volume (L)', ylabel: 'pressure (bar)',
+      xtick: { major: 0.5, minor: 0.1, dec: 1 },
+      iso: {
+        dom: function () { return [2.5, 6]; }, xreg: [2.5, 5.5],
+        f: function (i, V) {
+          if (i === -1) return 15 - 2 * V;
+          return i * 10 * (2.5 / V) - (i - 1) * 10;
+        }
+      },
+      rev: {
+        dom: function () { return [2.5, 6]; }, xreg: [2.5, 5.5],
+        f: function (g, V) {
+          if (g === -1) return 15 - 2 * V;
+          if (g === -2) return 0.94 * 10 * (2.5 / V) - (0.94 - 1) * 10;
+          return g * 10 * Math.pow(V / 2.5, -gam) - (g - 1) * 10;
+        }
+      },
+      irr: {
+        dom: function () { return [2.5, 6]; }, xreg: [2.5, 5.5],
+        f: function (h, V) {
+          if (h === -1) return 30 - 8 * V;
+          return h * 1000 * R * ((-100000 * 5 * (V / 1000 - 2.5 / 1000) + Cv * T1) /
+                 (100000 * Cv * V)) -
+                 (h - 1) * 1000 * R * (Cv * T1 / (100000 * Cv * 2.5));
+        }
+      },
+      ansIso: { dom: [2.5, 6], xreg: null,
+        f: function (V) { return 10 * (2.5 / V); } },
+      ansRev: { dom: [2.5, 6], xreg: null,
+        f: function (V) { return 10 * Math.pow(V / 2.5, -gam); } },
+      ansIrr: { dom: [2.5, 6], xreg: null,
+        f: function (V) {
+          return 1000 * R * ((-100000 * 5 * (V / 1000 - 2.5 / 1000) + Cv * T1) /
+                 (100000 * Cv * V));
+        } },
+      radios: {
+        iso: [[500, 'a'], [1.65, 'b'], [0.94, 'c'], [-1, 'd'], [1, 'e']],
+        rev: [[1, 'a'], [-2, 'b'], [0.81, 'c'], [500, 'd'], [-1, 'e']],
+        irr: [[-1, 'a'], [1.4, 'b'], [1, 'c'], [0.774, 'd'], [500, 'e']]
+      },
+      correct: { iso: 1, rev: 1, irr: 1 },
+      initLabel: { x: 3.3, y: 9.7, lines: [
+        ['V', 'initial', ' = 2.5 L'],
+        ['P', 'initial', ' = 10 bar'],
+        ['P', 'final', ' = 5 bar']] },
+      legend: 'rt',
+      finalLabels: [
+        ['reversible', 3.7, 5, 'rev'],
+        ['irreversible', 4.5, 5, 'irr'],
+        ['isothermal', 5.1, 5, 'iso']]
+    },
+
+    /* ---- P-V compression: 5 bar, 5.0 L -> 10 bar ---- */
+    pvcomp: {
+      type: 'pv', proc: 'compression',
+      xmin: 2.1, xmax: 5.2, ymin: 4.5, ymax: 10.5,
+      xlabel: 'volume (L)', ylabel: 'pressure (bar)',
+      xtick: { major: 0.5, minor: 0.1, dec: 1 },
+      iso: {
+        dom: function () { return [2, 5]; }, xreg: [2.5, 5],
+        f: function (i, V) {
+          if (i === -1) return 15 - 2 * V;
+          if (i === -2) return -0.32 * V * V + 0.4 * V + 11;
+          return i * 5 * (5 / V) - (i - 1) * 5;
+        }
+      },
+      rev: {
+        dom: function () { return [2, 5]; }, xreg: [2.2, 5.5],
+        f: function (g, V) {
+          if (g === -1) return -3.125 * V + 20.625;
+          if (g === -2) return 15 - 2 * V;
+          return g * 5 * Math.pow(V / 5, -gam) - (g - 1) * 5;
+        }
+      },
+      irr: {
+        dom: function () { return [2, 5]; }, xreg: [2.2, 5],
+        f: function (h, V) {
+          if (h === -1) return -2 * V + 15;
+          return h * 1000 * R * ((-100000 * 10 * (V / 1000 - 5 / 1000) + Cv * T1) /
+                 (100000 * Cv * V)) -
+                 (h - 1) * 1000 * R * (Cv * T1 / (100000 * Cv * 5));
+        }
+      },
+      ansIso: { dom: [2, 5], xreg: [2, 5],
+        f: function (V) { return 5 * (5 / V); } },
+      ansRev: { dom: [2, 5], xreg: [2, 5],
+        f: function (V) { return 5 * Math.pow(V / 5, -gam); } },
+      ansIrr: { dom: [2, 5], xreg: [2.2, 5],
+        f: function (V) {
+          return 1000 * R * ((-100000 * 10 * (V / 1000 - 5 / 1000) + Cv * T1) /
+                 (100000 * Cv * V));
+        } },
+      radios: {
+        iso: [[1.63, 'a'], [500, 'b'], [1, 'c'], [-1, 'd'], [-2, 'e']],
+        rev: [[0.55, 'a'], [-2, 'b'], [-1, 'c'], [500, 'd'], [1, 'e']],
+        irr: [[1, 'a'], [0.681, 'b'], [-1, 'c'], [500, 'd'], [0.5, 'e']]
+      },
+      correct: { iso: 1, rev: 1, irr: 1 },
+      initLabel: { x: 3.8, y: 5.2, lines: [
+        ['V', 'initial', ' = 5.0 L'],
+        ['P', 'initial', ' = 5 bar'],
+        ['P', 'final', ' = 10 bar']] },
+      legend: 'lb',
+      finalLabels: [
+        ['reversible', 2.85, 10, 'rev'],
+        ['irreversible', 3.5, 10, 'irr'],
+        ['isothermal', 2.35, 10, 'iso']]
+    },
+
+    /* ---- P-T expansion: 10 bar, 300 K -> 5 bar ---- */
+    ptexp: {
+      type: 'pt', proc: 'expansion',
+      xmin: 225, xmax: 375, ymin: 4.5, ymax: 10.5,
+      xlabel: 'temperature (K)', ylabel: 'pressure (bar)',
+      xtick: { major: 50, minor: 10, dec: 0 },
+      impossible: true,
+      iso: {
+        dom: function (l) {
+          return [200, (typeof l === 'number' && l > 0) ? 300 : 395];
+        },
+        xreg: null,
+        f: function (l, T) {
+          if (l === -1) return 10 * Math.pow(T / 300, -(gam + 2));
+          if (l === -2) return 0;
+          return l * 10 * Math.pow(T / 300, Cp / (R + 2)) - (l - 1) * 10;
+        }
+      },
+      rev: {
+        dom: function () { return [200, 375]; }, xreg: [205, 395],
+        f: function (j, T) {
+          if (j === 1) return 10 * Math.pow(T / 300, Cp / R);
+          if (j === -1) return 10 * Math.pow(T / 300, -(gam + 2));
+          if (j === -2) return T / 11 - 190 / 11;
+          if (j === -3) return -0.000576 * T * T + 0.4069 * T - 60.26;
+          if (j === -4) return -(5 / 68) * T + 545 / 17;
+          return NaN;
+        }
+      },
+      irr: {
+        dom: function () { return [200, 340]; }, xreg: [205, 340],
+        f: function (k, T) {
+          if (k === -1) return T / 13 - 170 / 13;
+          if (k === -2) return (7 / 3000) * T * T - (491 / 300) * T + 291;
+          if (k === -3) return 0.87 * 10 * Math.pow(T / 300, Cp / R) -
+                               (0.87 - 1) * 10;
+          if (k === -4) return -0.125 * T + 47.5;
+          return k * (-5 * R * T / (Cv * (T - 300) - 5 * 100000 * (2.5 / 1000))) -
+                 ((k - 1) / 100000) * (R * T1 / (2.5 / 1000));
+        }
+      },
+      ansIso: { dom: [200, 301], xreg: [205, 301],
+        f: function (T) {
+          return 500 * 10 * Math.pow(T / 300, Cp / (R + 2)) - (500 - 1) * 10;
+        } },
+      ansRev: { dom: [200, 300], xreg: [205, 300],
+        f: function (T) { return 10 * Math.pow(T / 300, Cp / R); } },
+      ansIrr: { dom: [200, 300], xreg: [205, 300],
+        f: function (T) {
+          return -5 * R * T / (Cv * (T - 300) - 5 * 100000 * (2.5 / 1000));
+        } },
+      radios: {
+        iso: [[1.414, 'a'], [500, 'b'], [1.166, 'c'], [-2, 'd'], [-1, 'e']],
+        rev: [[-4, 'a'], [1, 'b'], [-2, 'c'], [-3, 'd'], [-1, 'e']],
+        irr: [[-1, 'a'], [-2, 'b'], [-3, 'c'], [-4, 'd'], [1, 'e']]
+      },
+      correct: { iso: 500, rev: 1, irr: 1 },
+      initLabel: { x: 340, y: 9.7, lines: [
+        ['T', 'initial', ' = 300 K'],
+        ['P', 'initial', ' = 10 bar'],
+        ['P', 'final', ' = 5 bar']] },
+      legend: 'lt',
+      finalLabels: [
+        ['reversible', 247, 6, 'rev'],
+        ['irreversible', 285, 6, 'irr'],
+        ['isothermal', 315, 6, 'iso']]
+    },
+
+    /* ---- P-T compression: 5 bar, 300 K -> 10 bar ---- */
+    ptcomp: {
+      type: 'pt', proc: 'compression',
+      xmin: 200, xmax: 400, ymin: 4.5, ymax: 10.5,
+      xlabel: 'temperature (K)', ylabel: 'pressure (bar)',
+      xtick: { major: 50, minor: 10, dec: 0 },
+      iso: {
+        dom: function (l) {
+          var lo = (typeof l === 'number' && l > 0) ? 300 : 200;
+          var hi = (l === -2) ? 300 : 400;
+          return [lo, hi];
+        },
+        xreg: [200, 395],
+        f: function (l, T) {
+          if (l === -1) return (5 / 66) * T - 195 / 11;
+          if (l === -2) return 0.0017647058823529 * T * T -
+                               1.070588235294 * T + 167.353;
+          return l * 5 * Math.pow(T / 300, Cp / R) - (l - 1) * 5;
+        }
+      },
+      rev: {
+        dom: function (j) {
+          if (typeof j === 'number' && j > -3) return [300, 400];
+          return [200, 300];
+        },
+        xreg: [200, 400],
+        f: function (j, T) {
+          if (j === 1) return 5 * Math.pow(T / 300, Cp / R);
+          if (j === -1) return -0.0005898268398268388 * T * T +
+                               0.4685822510822504 * T - 82.49025974025962;
+          if (j === -2) return (5 / 66) * T - 195 / 11;
+          if (j === -3) return 2.727005537 * 5 * Math.pow(T / 300, -(7 / 5)) -
+                               1.727005537 * 5;
+          if (j === -4) return -(1 / 3000) * T * T + (29 / 300) * T + 6;
+          return NaN;
+        }
+      },
+      irr: {
+        dom: function () { return [200, 430]; }, xreg: [200, 430],
+        f: function (k, T) {
+          if (k === -1) return -(11 / 9000) * T * T + (1633 / 1800) * T - 943 / 6;
+          if (k === -2) return 5 * Math.pow((T + 295) / (T1 + 295),
+                               2.5 * (Cp / R));
+          if (k === -3) return T / 6 - 45;
+          if (k === -4) return -T / 8 + 85 / 2;
+          return k * (-10 * R * T / (Cv * (T - 300) - 10 * 100000 * (5 / 1000))) -
+                 ((k - 1) / 100000) * (R * T1 / (5 / 1000));
+        }
+      },
+      ansIso: { dom: [300, 400], xreg: [300, 400],
+        f: function (T) {
+          return 500 * 5 * Math.pow(T / 300, Cp / R) - (500 - 1) * 5;
+        } },
+      ansRev: { dom: [300, 400], xreg: [300, 400],
+        f: function (T) { return 5 * Math.pow(T / 300, Cp / R); } },
+      ansIrr: { dom: [300, 400], xreg: [300, 400],
+        f: function (T) {
+          return -10 * R * T / (Cv * (T - 300) - 10 * 100000 * (5 / 1000));
+        } },
+      radios: {
+        iso: [[500, 'a'], [1, 'b'], [2, 'c'], [-1, 'd'], [-2, 'e']],
+        rev: [[-4, 'a'], [-1, 'b'], [-2, 'c'], [1, 'd'], [-3, 'e']],
+        irr: [[-1, 'a'], [-3, 'b'], [-2, 'c'], [-4, 'd'], [1, 'e']]
+      },
+      correct: { iso: 500, rev: 1, irr: 1 },
+      initLabel: { x: 370, y: 5.2, lines: [
+        ['T', 'initial', ' = 300 K'],
+        ['P', 'initial', ' = 5 bar'],
+        ['P', 'final', ' = 10 bar']] },
+      legend: 'lb',
+      finalLabels: [
+        ['reversible', 327, 8, 'rev'],
+        ['irreversible', 380, 8, 'irr'],
+        ['isothermal', 283, 8, 'iso']]
+    }
+  };
+
+  var SCEN_KEYS = ['pvexp', 'pvcomp', 'ptexp', 'ptcomp'];
+
+  /* hints (PlotLabel), by diagram type and step */
+  var HINTS = {
+    pv: { 2: 'Use the ideal gas law.',
+          3: 'Is the final energy of gas higher or lower than the starting value?',
+          4: 'Is the final energy of gas higher or lower than the reversible value?' },
+    pt: { 2: 'Isothermal processes do not change temperature.',
+          3: 'Is the final energy of gas higher or lower than the starting value?',
+          4: 'Is the final energy of gas higher or lower than the reversible value?' }
+  };
+
+  /* ============ state ============ */
+  var state = {
+    started: false,       /* false = start screen (page 1) */
+    scen: 'pvexp',
+    step: 1,              /* 2,3,4 = question steps, 5 = final page */
+    params: { iso: null, rev: null, irr: null },
+    solShown: false,
+    hint: false,
+    dim: false            /* opacity 0.8 after "show solution" */
+  };
+
+  function famOfStep(step) {
+    return step === 2 ? 'iso' : step === 3 ? 'rev' : 'irr';
+  }
+
+  /* ============ DOM refs ============ */
+  var cv = document.getElementById('cv');
+  var ctx = cv.getContext('2d');
+  var promptEl = document.getElementById('prompt');
+  var row2 = document.getElementById('row2');
+  var radioBar = document.getElementById('radioBar');
+  var btnNew = document.getElementById('btnNew');
+  var btnSolution = document.getElementById('btnSolution');
+  var btnNext = document.getElementById('btnNext');
+  var btnHint = document.getElementById('btnHint');
+
+  /* hi-DPI canvas */
+  var CW = 650, CH = 430;
+  var dpr = window.devicePixelRatio || 1;
+  cv.width = CW * dpr;
+  cv.height = CH * dpr;
+  cv.style.width = CW + 'px';
+  cv.style.height = CH + 'px';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  /* plot geometry */
+  var mL = 64, mR = 14, mT = 34, mB = 52;
+  var pW = CW - mL - mR, pH = CH - mT - mB;
+
+  function px(sc, x) { return mL + (x - sc.xmin) / (sc.xmax - sc.xmin) * pW; }
+  function py(sc, y) { return mT + pH - (y - sc.ymin) / (sc.ymax - sc.ymin) * pH; }
+
+  /* ============ line styles (colR / colI / colIso from the CDF) ============ */
+  var DASHED = [10, 6];         /* Dashed */
+  var DASH02 = [12, 8];         /* Dashing[0.02] */
+  var DOTDASH = [2, 4, 10, 4];  /* DotDashed */
+
+  function styleRev() {
+    if (state.step === 2 || state.step === 3)
+      return { c: BLACK, w: 2, dash: DASHED };
+    if (state.step === 4 && state.solShown)
+      return { c: BLACK, w: 2, dash: DASHED };
+    return { c: BLACK, w: 4.5, dash: [] };
+  }
+  function styleIrr() {
+    if (state.step === 5) return { c: BLUE, w: 4.5, dash: [] };
+    return { c: BLUE, w: 2, dash: DASH02 };
+  }
+  function styleIso() {
+    if (state.step === 2) return { c: OLIVE, w: 2, dash: DOTDASH };
+    if (state.step === 4 && state.solShown)
+      return { c: OLIVE, w: 2, dash: DOTDASH };
+    return { c: OLIVE, w: 4.5, dash: [] };
+  }
+  function styleOf(fam) {
+    return fam === 'rev' ? styleRev() : fam === 'irr' ? styleIrr() : styleIso();
+  }
+
+  /* ============ drawing helpers ============ */
+  function clipRegion(sc, xreg) {
+    /* every curve region in the CDF includes 5 <= P <= 10 */
+    var x0 = Math.max(sc.xmin, xreg ? xreg[0] : sc.xmin);
+    var x1 = Math.min(sc.xmax, xreg ? xreg[1] : sc.xmax);
+    var yTop = py(sc, Math.min(10, sc.ymax));
+    var yBot = py(sc, Math.max(5, sc.ymin));
+    ctx.beginPath();
+    ctx.rect(px(sc, x0), yTop, px(sc, x1) - px(sc, x0), yBot - yTop);
+    ctx.clip();
+  }
+
+  function drawCurve(sc, fn, dom, xreg, style, alpha) {
+    ctx.save();
+    /* keep everything inside the frame, then apply the region */
+    ctx.beginPath();
+    ctx.rect(mL, mT, pW, pH);
+    ctx.clip();
+    clipRegion(sc, xreg);
+    ctx.globalAlpha = alpha;
+    ctx.strokeStyle = style.c;
+    ctx.lineWidth = style.w;
+    ctx.setLineDash(style.dash);
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    var N = 1500, started = false;
+    ctx.beginPath();
+    for (var n = 0; n <= N; n++) {
+      var x = dom[0] + (dom[1] - dom[0]) * n / N;
+      var y = fn(x);
+      if (!isFinite(y)) { started = false; continue; }
+      /* soft clamp so near-vertical curves draw cleanly to the clip edge */
+      var yc = Math.max(-1e4, Math.min(1e4, y));
+      var X = px(sc, x), Y = py(sc, yc);
+      if (!started) { ctx.moveTo(X, Y); started = true; }
+      else ctx.lineTo(X, Y);
+    }
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawFamily(sc, fam) {
+    var p = state.params[fam];
+    if (p === null || p === undefined) return;
+    var def = sc[fam];
+    drawCurve(sc, function (x) { return def.f(p, x); }, def.dom(p), def.xreg,
+              styleOf(fam), state.dim ? 0.8 : 1);
+  }
+
+  function drawAnswer(sc, fam) {
+    var key = fam === 'iso' ? 'ansIso' : fam === 'rev' ? 'ansRev' : 'ansIrr';
+    var col = fam === 'iso' ? OLIVE : fam === 'rev' ? BLACK : BLUE;
+    var def = sc[key];
+    drawCurve(sc, def.f, def.dom, def.xreg, { c: col, w: 4.5, dash: [] }, 1);
+  }
+
+  /* variable label with subscript, e.g. V_initial = 2.5 L */
+  function subLabelWidth(main, sub, rest) {
+    ctx.font = 'italic 17px Helvetica, Arial, sans-serif';
+    var w = ctx.measureText(main).width;
+    ctx.font = '12px Helvetica, Arial, sans-serif';
+    w += ctx.measureText(sub).width;
+    ctx.font = '17px Helvetica, Arial, sans-serif';
+    w += ctx.measureText(rest).width;
+    return w;
+  }
+  function drawSubLabelCentered(cx, cy, main, sub, rest) {
+    var w = subLabelWidth(main, sub, rest);
+    var x = cx - w / 2;
+    ctx.fillStyle = BLACK;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+    ctx.font = 'italic 17px Helvetica, Arial, sans-serif';
+    ctx.fillText(main, x, cy);
+    x += ctx.measureText(main).width;
+    ctx.font = '12px Helvetica, Arial, sans-serif';
+    ctx.fillText(sub, x, cy + 4);
+    x += ctx.measureText(sub).width;
+    ctx.font = '17px Helvetica, Arial, sans-serif';
+    ctx.fillText(rest, x, cy);
+  }
+
+  function drawInitLabel(sc) {
+    var lab = sc.initLabel;
+    var cx = px(sc, lab.x), cy = py(sc, lab.y);
+    var lh = 21;
+    var y0 = cy - lh * (lab.lines.length - 1) / 2 + 5;
+    for (var i = 0; i < lab.lines.length; i++) {
+      var L = lab.lines[i];
+      drawSubLabelCentered(cx, y0 + i * lh, L[0], L[1], L[2]);
+    }
+  }
+
+  function drawFinalLabels(sc) {
+    ctx.font = '17px Helvetica, Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    for (var i = 0; i < sc.finalLabels.length; i++) {
+      var L = sc.finalLabels[i];
+      var X = px(sc, L[1]), Y = py(sc, L[2]);
+      var w = ctx.measureText(L[0]).width;
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(X - w / 2 - 3, Y - 11, w + 6, 22);
+      ctx.fillStyle = L[3] === 'rev' ? BLACK : L[3] === 'irr' ? BLUE : OLIVE;
+      ctx.fillText(L[0], X, Y);
+    }
+  }
+
+  function drawLegend(sc) {
+    var entries = [
+      [styleRev(), 'adiabatic and reversible'],
+      [styleIrr(), 'adiabatic and irreversible'],
+      [styleIso(), 'isothermal']
+    ];
+    ctx.font = '15px Helvetica, Arial, sans-serif';
+    var maxW = 0;
+    for (var i = 0; i < entries.length; i++)
+      maxW = Math.max(maxW, ctx.measureText(entries[i][1]).width);
+    var lineLen = 40, gap = 7, rowH = 23;
+    var boxW = lineLen + gap + maxW, boxH = rowH * entries.length;
+    var x0, y0, pad = 10;
+    if (sc.legend === 'rt') { x0 = mL + pW - boxW - pad; y0 = mT + pad; }
+    else if (sc.legend === 'lt') { x0 = mL + pad; y0 = mT + pad; }
+    else { x0 = mL + pad; y0 = mT + pH - boxH - pad; }
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    for (var k = 0; k < entries.length; k++) {
+      var st = entries[k][0];
+      var yy = y0 + rowH * k + rowH / 2;
+      ctx.save();
+      ctx.strokeStyle = st.c;
+      ctx.lineWidth = Math.min(st.w, 4);
+      ctx.setLineDash(st.dash);
+      ctx.beginPath();
+      ctx.moveTo(x0, yy);
+      ctx.lineTo(x0 + lineLen, yy);
+      ctx.stroke();
+      ctx.restore();
+      ctx.fillStyle = BLACK;
+      ctx.fillText(entries[k][1], x0 + lineLen + gap, yy);
+    }
+  }
+
+  function drawFrame(sc) {
+    ctx.strokeStyle = BLACK;
+    ctx.lineWidth = 1;
+    ctx.setLineDash([]);
+    ctx.strokeRect(mL, mT, pW, pH);
+
+    ctx.fillStyle = BLACK;
+    ctx.font = '17px Helvetica, Arial, sans-serif';
+
+    /* x ticks */
+    var t = sc.xtick;
+    var start = Math.ceil(sc.xmin / t.minor - 1e-9) * t.minor;
+    for (var x = start; x <= sc.xmax + 1e-9; x += t.minor) {
+      var xr = Math.round(x / t.minor) * t.minor;
+      var isMajor = Math.abs(xr / t.major - Math.round(xr / t.major)) < 1e-6;
+      var len = isMajor ? 6 : 3;
+      var X = px(sc, xr);
+      ctx.beginPath();
+      ctx.moveTo(X, mT + pH); ctx.lineTo(X, mT + pH - len);
+      ctx.moveTo(X, mT); ctx.lineTo(X, mT + len);
+      ctx.stroke();
+      if (isMajor) {
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        ctx.fillText(xr.toFixed(t.dec), X, mT + pH + 6);
+      }
+    }
+    /* y ticks: major every 1 (labeled), minor every 0.25 */
+    var ystart = Math.ceil(sc.ymin / 0.25 - 1e-9) * 0.25;
+    for (var y = ystart; y <= sc.ymax + 1e-9; y += 0.25) {
+      var yr = Math.round(y * 4) / 4;
+      var isMaj = Math.abs(yr - Math.round(yr)) < 1e-6;
+      var l = isMaj ? 6 : 3;
+      var Y = py(sc, yr);
+      ctx.beginPath();
+      ctx.moveTo(mL, Y); ctx.lineTo(mL + l, Y);
+      ctx.moveTo(mL + pW, Y); ctx.lineTo(mL + pW - l, Y);
+      ctx.stroke();
+      if (isMaj) {
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(String(Math.round(yr)), mL - 7, Y);
+      }
+    }
+    /* axis labels */
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText(sc.xlabel, mL + pW / 2, CH - 12);
+    /* y label: render horizontally offscreen, then rotate the bitmap 90°
+       so the glyphs rasterize identically to the x-axis label */
+    var yl = sc.ylabel;
+    var tw = Math.ceil(ctx.measureText(yl).width) + 4;
+    var th = 24; /* enough for 17px ascenders/descenders */
+    var oc = document.createElement('canvas');
+    oc.width = tw * dpr;
+    oc.height = th * dpr;
+    var octx = oc.getContext('2d');
+    octx.scale(dpr, dpr);
+    octx.font = '17px Helvetica, Arial, sans-serif';
+    octx.fillStyle = BLACK;
+    octx.textAlign = 'center';
+    octx.textBaseline = 'alphabetic';
+    octx.fillText(yl, tw / 2, 17);
+    ctx.save();
+    ctx.translate(27, mT + pH / 2);
+    ctx.rotate(-Math.PI / 2);
+    /* baseline of offscreen text sits at y=17 within the bitmap; place the
+       bitmap so that baseline lands at local y=0 (matching fillText(...,0,0)) */
+    ctx.drawImage(oc, -tw / 2, -17, tw, th);
+    ctx.restore();
+  }
+
+  function drawTitle(sc) {
+    var msg = '';
+    if (state.hint && state.step >= 2 && state.step <= 4)
+      msg = HINTS[sc.type][state.step];
+    if (msg) {
+      ctx.fillStyle = BLACK;
+      ctx.font = '17px Helvetica, Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(msg, mL + pW / 2, mT / 2);
+    }
+  }
+
+  function drawStartScreen() {
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, CW, CH);
+    var lines = [
+      'In this simulation, a gas is either expanded from 10 bar and 300 K to 5 bar',
+      'or compressed from 5 bar and 300 K to 10 bar. Choose which curve is correct',
+      'from the options available, then check your solution.'
+    ];
+    ctx.fillStyle = BLACK;
+    ctx.font = '17px Helvetica, Arial, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+    var x0 = 0.05 * CW, y0 = 0.34 * CH;
+    for (var i = 0; i < lines.length; i++)
+      ctx.fillText(lines[i], x0, y0 + i * 25);
+  }
+
+  /* ============ main render ============ */
+  function render() {
+    ctx.clearRect(0, 0, CW, CH);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, CW, CH);
+
+    if (!state.started) {
+      drawStartScreen();
+      updateControls();
+      return;
+    }
+
+    var sc = SCEN[state.scen];
+    drawFrame(sc);
+    drawTitle(sc);
+
+    /* candidate / confirmed family curves */
+    drawFamily(sc, 'iso');
+    drawFamily(sc, 'irr');
+    drawFamily(sc, 'rev');
+
+    /* correct-answer overlay after "show solution" (steps 2-4) */
+    if (state.solShown && state.step >= 2 && state.step <= 4)
+      drawAnswer(sc, famOfStep(state.step));
+
+    /* "isothermal expansion is impossible" decoy text (P-T expansion) */
+    if (sc.impossible && state.step === 2 && state.params.iso === -2 &&
+        !state.solShown) {
+      ctx.fillStyle = BLACK;
+      ctx.font = '17px Helvetica, Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('isothermal expansion is impossible',
+                   px(sc, 300), py(sc, 7.5));
+    }
+
+    drawInitLabel(sc);
+    if (state.step === 5) drawFinalLabels(sc);
+    drawLegend(sc);
+    updateControls();
+  }
+
+  /* ============ controls ============ */
+  function stepPrompt() {
+    var proc = SCEN[state.scen].proc === 'expansion' ? 'expansion.' :
+               'compression.';
+    switch (state.step) {
+      case 2: return '1. Select the correct curve for isothermal ' + proc;
+      case 3: return '2. Select the correct curve for reversible adiabatic ' +
+                     proc;
+      case 4: return '3. Select the correct curve for irreversible adiabatic ' +
+                     proc;
+      case 5: return '4. The correct curves are shown below.';
+      default: return '';
+    }
+  }
+
+  function buildRadios() {
+    radioBar.innerHTML = '';
+    if (!state.started || state.step === 5) return;
+    var fam = famOfStep(state.step);
+    var opts = SCEN[state.scen].radios[fam];
+    var locked = state.solShown;
+    radioBar.classList.toggle('locked', locked);
+    for (var i = 0; i < opts.length; i++) {
+      (function (val, letter) {
+        var lab = document.createElement('label');
+        var inp = document.createElement('input');
+        inp.type = 'radio';
+        inp.name = 'ansRadio';
+        inp.disabled = locked;
+        inp.checked = (state.params[fam] === val);
+        inp.addEventListener('change', function () {
+          state.params[fam] = val;
+          render();
+        });
+        lab.appendChild(inp);
+        lab.appendChild(document.createTextNode(letter));
+        radioBar.appendChild(lab);
+      })(opts[i][0], opts[i][1]);
+    }
+  }
+
+  function updateControls() {
+    promptEl.textContent = stepPrompt();
+    btnNew.textContent = state.started ? 'new problem' : 'continue';
+    row2.style.visibility = state.started ? 'visible' : 'hidden';
+    buildRadios();
+    var fam = state.step <= 4 ? famOfStep(state.step) : null;
+    btnSolution.disabled = !(state.started && state.step <= 4 &&
+                             !state.solShown && fam &&
+                             state.params[fam] !== null);
+    btnNext.disabled = !(state.started && state.step <= 4 && state.solShown);
+    btnHint.disabled = !state.started || state.step === 5;
+  }
+
+  /* ============ button actions ============ */
+  btnNew.addEventListener('click', function () {
+    state.started = true;
+    state.scen = SCEN_KEYS[Math.floor(Math.random() * 4)];
+    state.step = 2;
+    state.params = { iso: null, rev: null, irr: null };
+    state.solShown = false;
+    state.hint = false;
+    state.dim = false;
+    render();
+  });
+
+  btnSolution.addEventListener('click', function () {
+    if (state.solShown || state.step > 4) return;
+    state.solShown = true;
+    state.dim = true;
+    render();
+  });
+
+  btnNext.addEventListener('click', function () {
+    if (!state.solShown || state.step > 4) return;
+    var sc = SCEN[state.scen];
+    if (state.step < 4) {
+      /* lock in the correct curve for the completed step */
+      state.params[famOfStep(state.step)] = sc.correct[famOfStep(state.step)];
+      state.step += 1;
+      state.params[famOfStep(state.step)] = null;
+      state.solShown = false;
+      state.dim = false;
+      state.hint = false;
+    } else {
+      /* final page: all correct curves with labels */
+      state.step = 5;
+      state.params = { iso: sc.correct.iso, rev: sc.correct.rev,
+                       irr: sc.correct.irr };
+      state.solShown = false;
+      state.hint = false;
+      /* opacity stays at 0.8, as in the original */
+    }
+    render();
+  });
+
+  btnHint.addEventListener('click', function () {
+    state.hint = !state.hint;
+    render();
+  });
+
+  /* ============ Directions / Details / About flyout panels ============ */
+  var panelBtns = document.querySelectorAll('.pbtn');
+  var panels = document.querySelectorAll('.flyout');
+
+  function closeAllPanels() {
+    panels.forEach(function (p) { p.classList.remove('open'); });
+  }
+  panelBtns.forEach(function (b) {
+    b.addEventListener('click', function () {
+      var id = b.getAttribute('data-panel');
+      var target = document.getElementById(id);
+      var wasOpen = target.classList.contains('open');
+      closeAllPanels();
+      if (!wasOpen) {
+        target.classList.add('open');
+        if (id === 'pDetails' && window.MathJax &&
+            window.MathJax.typesetPromise) {
+          window.MathJax.typesetPromise([target]);
+        }
+      }
+    });
+  });
+  document.querySelectorAll('.closeX').forEach(function (x) {
+    x.addEventListener('click', function () {
+      document.getElementById(x.getAttribute('data-close'))
+              .classList.remove('open');
+    });
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
