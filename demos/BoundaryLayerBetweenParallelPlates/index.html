@@ -1,0 +1,784 @@
+<title>Boundary Layer Flow</title>
+<style>
+  :root{
+    --bg:#fff;
+    --surface:#ffffff;
+    --surface-2:#faf8f2;
+    --border:#dcd7c9;
+    --border-strong:#c7c0ac;
+    --text:#1d1b16;
+    --text-muted:#6b6656;
+    --header-bg:#19170f;
+    --header-bg-2:#221f16;
+    --header-text:#f2ead4;
+    --accent:#cfb87c;
+    --accent-strong:#b89a52;
+    --fill-blue:#bfe0ef;
+    --fill-blue-line:#4a90b8;
+    --plate:#8f897c;
+    --plate-edge:#6d6858;
+    --track:#e4dfd0;
+    --thumb:#332f24;
+    --panel-shadow: 0 18px 40px -12px rgba(25,23,15,0.35), 0 2px 8px rgba(25,23,15,0.12);
+    --link:#8a6a1f;
+    --btn-red:#c0392b;
+    --btn-red-hover:#a5311f;
+    --btn-red-text:#ffffff;
+  }
+  /* @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#141310;
+      --surface:#1d1b16;
+      --surface-2:#211f19;
+      --border:#3a362a;
+      --border-strong:#4c4736;
+      --text:#f1ecdd;
+      --text-muted:#a89f89;
+      --header-bg:#0b0a07;
+      --header-bg-2:#151309;
+      --header-text:#e9c973;
+      --accent:#e9c973;
+      --accent-strong:#cfb87c;
+      --fill-blue:#264a5e;
+      --fill-blue-line:#6fb3d6;
+      --plate:#5b574a;
+      --plate-edge:#403d33;
+      --track:#3a362a;
+      --thumb:#e9c973;
+      --panel-shadow: 0 18px 40px -12px rgba(0,0,0,0.6), 0 2px 8px rgba(0,0,0,0.4);
+      --link:#e3c06a;
+    }
+  } */
+  :root[data-theme="dark"]{
+    --bg:#141310;
+    --surface:#1d1b16;
+    --surface-2:#211f19;
+    --border:#3a362a;
+    --border-strong:#4c4736;
+    --text:#f1ecdd;
+    --text-muted:#a89f89;
+    --header-bg:#0b0a07;
+    --header-bg-2:#151309;
+    --header-text:#e9c973;
+    --accent:#e9c973;
+    --accent-strong:#cfb87c;
+    --fill-blue:#264a5e;
+    --fill-blue-line:#6fb3d6;
+    --plate:#5b574a;
+    --plate-edge:#403d33;
+    --track:#3a362a;
+    --thumb:#e9c973;
+    --panel-shadow: 0 18px 40px -12px rgba(0,0,0,0.6), 0 2px 8px rgba(0,0,0,0.4);
+    --link:#e3c06a;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:"Source Sans 3", "Segoe UI", Arial, sans-serif;
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    padding:28px 14px 48px;
+  }
+
+  .app{
+    width:100%;
+    max-width:760px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:10px;
+    overflow:hidden;
+    box-shadow:0 1px 3px rgba(0,0,0,0.08);
+    position:relative;
+  }
+
+  /* ---------- Header ---------- */
+  header{
+    background:var(--surface);
+    border-bottom:1px solid var(--border);
+    display:flex;
+    align-items:center;
+    flex-wrap:nowrap;
+    gap:10px;
+    padding:12px 18px;
+    position:relative;
+    z-index:5;
+  }
+  .title-btn{
+    flex:1 1 auto;
+    min-width:0;
+    display:block;
+    color:var(--text);
+    font-family:"Barlow Semi Condensed","Archivo Narrow",sans-serif;
+    font-weight:700;
+    letter-spacing:0.01em;
+    font-size:clamp(0.82rem, 2.6vw, 1.18rem);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .nav-buttons{
+    display:flex;
+    gap:6px;
+    flex:0 0 auto;
+  }
+  .nav-buttons button{
+    font-family:"Barlow Semi Condensed","Archivo Narrow",sans-serif;
+    font-weight:400;
+    font-size:clamp(0.828rem, 2.185vw, 1.058rem);
+    letter-spacing:0.02em;
+    color:var(--btn-red-text);
+    background:var(--btn-red);
+    border:1px solid var(--btn-red);
+    border-radius:7px;
+    padding:0 12px;
+    height:38px;
+    cursor:pointer;
+    transition:background 0.15s ease, border-color 0.15s ease;
+    white-space:nowrap;
+  }
+  .nav-buttons button:hover{
+    background:var(--btn-red-hover);
+    border-color:var(--btn-red-hover);
+  }
+  .nav-buttons button:focus-visible,
+  .title-btn:focus-visible{
+    outline:2px solid var(--btn-red);
+    outline-offset:2px;
+  }
+  .nav-buttons button.active{
+    background:var(--btn-red-hover);
+    border-color:var(--btn-red-hover);
+    color:var(--btn-red-text);
+  }
+
+  /* ---------- Controls ---------- */
+  .controls{
+    background:var(--surface-2);
+    border-bottom:1px solid var(--border);
+    padding:16px 20px 18px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+  .slider-row{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:14px 16px;
+  }
+  .slider-row .control{
+    max-width:300px;
+    width:100%;
+  }
+  .fluid-row{
+    display:grid;
+    grid-template-columns:auto 1fr 1fr;
+    gap:18px;
+    align-items:center;
+  }
+  .fluid-row .row-label{
+    font-family:"Barlow Semi Condensed",sans-serif;
+    font-weight:400;
+    font-size:1.15rem;
+    color:var(--text);
+    white-space:nowrap;
+  }
+  .control{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+  }
+  .control-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    gap:10px;
+  }
+  .control-top label{
+    font-size:1.075rem;
+    color:var(--text);
+    font-weight:400;
+  }
+  .readout{
+    font-family:"Barlow Semi Condensed", "Archivo Narrow", sans-serif;
+    font-variant-numeric:tabular-nums;
+    font-size:1.075rem;
+    background:var(--surface);
+    border:1px solid var(--border-strong);
+    border-radius:4px;
+    padding:2px 8px;
+    min-width:3.6em;
+    text-align:right;
+    color:var(--text);
+  }
+
+input[type="range"]{
+  margin-top:0.7em;
+    --accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+input[type="range"]::-moz-range-thumb{
+    width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+
+  /* ---------- Plot ---------- */
+  .plot-wrap{
+    position:relative;
+    padding:14px 14px 18px;
+  }
+  svg.plot{
+    width:100%;
+    height:auto;
+    display:block;
+    font-family:"IBM Plex Mono", ui-monospace, monospace;
+  }
+  .plot-title{
+    font-family:"Source Sans 3",sans-serif;
+    font-weight:400;
+    font-size:20.28px;
+    fill:var(--text);
+  }
+  .axis-label{
+    font-family:"Source Sans 3",sans-serif;
+    font-weight:400;
+    font-size:20.28px;
+    fill:var(--text);
+  }
+  .tick-label{
+    font-family:"Barlow Semi Condensed","Archivo Narrow",sans-serif;
+    font-size:19.73px;
+    fill:var(--text);
+  }
+  .region-label{
+    font-family:"Source Sans 3",sans-serif;
+    font-weight:400;
+    font-size:16.25px;
+    fill:var(--text);
+    paint-order:stroke;
+    stroke:var(--surface);
+    stroke-width:2px;
+    stroke-linejoin:round;
+  }
+  .plate-label{
+    font-family:"Source Sans 3",sans-serif;
+    font-weight:600;
+    font-size:16.25px;
+    fill:#f4f1e6;
+  }
+  .fdev-label{
+    font-family:"Source Sans 3",sans-serif;
+    font-style:italic;
+    font-size:15.6px;
+    fill:var(--text);
+    paint-order:stroke;
+    stroke:var(--surface);
+    stroke-width:4px;
+    stroke-linejoin:round;
+  }
+
+  /* ---------- Floating info panels ---------- */
+  .panel{
+    position:absolute;
+    top:62px;
+    right:10px;
+    width:min(430px, calc(100% - 20px));
+    max-height:calc(100% - 80px);
+    overflow-y:auto;
+    background:var(--surface);
+    border:1px solid var(--border-strong);
+    border-radius:10px;
+    box-shadow:var(--panel-shadow);
+    z-index:15;
+    padding:16px 20px 20px;
+    display:none;
+  }
+  .panel.open{ display:block; }
+  #panelDirections{
+    width:min(559px, calc(100% - 20px));
+  }
+  #panelDetails{
+    width:min(671px, calc(100% - 20px));
+  }
+  .panel h2{
+    font-family:"Barlow Semi Condensed",sans-serif;
+    font-size:1.15rem;
+    font-weight:700;
+    margin:0 0 10px;
+    padding-right:24px;
+    color:var(--text);
+    border-bottom:1px solid var(--border);
+    padding-bottom:8px;
+  }
+  .panel p{
+    font-size:0.94rem;
+    line-height:1.55;
+    margin:0 0 12px;
+    color:var(--text);
+  }
+  .panel p:last-child{ margin-bottom:0; }
+  .panel .ref{
+    font-size:0.88rem;
+    color:var(--text-muted);
+  }
+  .panel a{ color:var(--link); }
+  .panel-close{
+    position:absolute;
+    top:12px;
+    right:12px;
+    width:26px;
+    height:26px;
+    border-radius:6px;
+    border:1px solid var(--border-strong);
+    background:var(--surface-2);
+    color:var(--text-muted);
+    font-size:15px;
+    line-height:1;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .panel-close:hover{
+    background:var(--border);
+    color:var(--text);
+  }
+  .details-note{
+    font-size:0.94rem;
+    margin:0 0 10px;
+  }
+  .eq{
+    text-align:left;
+    margin:6px 0 12px;
+  }
+  mjx-container[display="true"]{
+    text-align:left !important;
+    margin:0.4em 0 !important;
+  }
+  .var-def{
+    font-size:0.88rem;
+    color:var(--text-muted);
+    line-height:1.6;
+  }
+
+  @media (max-width:520px){
+    .fluid-row{
+      grid-template-columns:1fr;
+    }
+    .fluid-row .row-label{ margin-bottom:-4px; }
+    .panel{
+      left:10px;
+      right:10px;
+      width:auto;
+    }
+  }
+  @media (max-width:460px){
+    .title-btn{
+      white-space:normal;
+      line-height:1.25;
+    }
+    .nav-buttons{ flex:1 1 100%; }
+    .nav-buttons button{ flex:1 1 0; padding:0 6px; }
+  }
+</style>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@400;500;600;700&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<div class="app" id="app">
+
+  <!-- <header>
+    <div class="title-btn" id="titleBtn">Boundary Layer in Flow between Parallel Plates</div>
+  </header> -->
+
+  <div class="controls">
+    <div class="slider-row">
+      <div class="control">
+        <div class="control-top">
+          <label for="dSlider">distance between plates (cm)</label>
+          <span class="readout" id="dVal">10</span>
+        </div>
+        <input type="range" id="dSlider" min="5" max="50" step="1" value="10">
+      </div>
+      <div class="nav-buttons">
+        <button type="button" id="btnDirections" aria-expanded="false">Directions</button>
+        <button type="button" id="btnDetails" aria-expanded="false">Details</button>
+        <button type="button" id="btnAbout" aria-expanded="false">About</button>
+      </div>
+    </div>
+
+    <div class="fluid-row">
+      <div class="row-label">fluid properties:</div>
+      <div class="control">
+        <div class="control-top">
+          <label for="uSlider">velocity (cm/s)</label>
+          <span class="readout" id="uVal">25</span>
+        </div>
+        <input type="range" id="uSlider" min="1" max="100" step="1" value="25">
+      </div>
+      <div class="control">
+        <div class="control-top">
+          <label for="nuSlider">kinematic viscosity (cm&sup2;/s)</label>
+          <span class="readout" id="nuVal">0.10</span>
+        </div>
+        <input type="range" id="nuSlider" min="0.01" max="0.7" step="0.01" value="0.1">
+      </div>
+    </div>
+  </div>
+
+  <div class="plot-wrap">
+    <svg class="plot" id="plotSvg" viewBox="0 0 700 460" role="img" aria-label="Boundary layer development between parallel plates"></svg>
+
+    <!-- Directions panel -->
+    <div class="panel" id="panelDirections">
+      <button type="button" class="panel-close" data-close="panelDirections" aria-label="Close directions">&times;</button>
+      <h2>Directions</h2>
+      <p>This simulation calculates the thickness of a boundary layer for flow between stationary parallel plates as a function of distance down the plates. Use sliders to vary the distance between the plates, the fluid velocity and the kinematic viscosity of the fluid. The boundary layer (shaded light blue region) represents the region where viscous forces must be taken into account due to the no-slip condition. Outside of the boundary layer (white region), viscous forces are negligible. Once the two boundary layers meet midway between the plates, the fluid flow is fully developed.</p>
+    </div>
+
+    <!-- Details panel -->
+    <div class="panel" id="panelDetails">
+      <button type="button" class="panel-close" data-close="panelDetails" aria-label="Close details">&times;</button>
+      <h2>Details</h2>
+      <p class="details-note">The Prandtl&ndash;Blasius boundary layer solution is used:</p>
+      <div class="eq">\[ \delta_L = \dfrac{5x}{Re^{1/2}} \]</div>
+      <div class="eq">\[ \delta_T = \dfrac{0.37\,x}{Re^{1/5}} \]</div>
+      <div class="eq">\[ Re = \dfrac{u\,x}{\nu} \]</div>
+      <p class="var-def">where \(\delta_L\) and \(\delta_T\) are boundary layer thickness for laminar and turbulent flow (cm), \(x\) is length down the plates (cm), \(Re\) is the Reynolds number (dimensionless), \(u\) is fluid velocity (cm/s) and \(\nu\) is kinematic viscosity (cm&sup2;/s).</p>
+      <p class="details-note">Fluid flow is laminar for \(Re < 2\times10^{5}\) and turbulent for \(Re > 3\times10^{6}\). The boundary layer thickness for the transition region \(\delta_R\) (\(2\times10^{5} \le Re \le 3\times10^{6}\)) is calculated from:</p>
+      <div class="eq">\[ \delta_R = (1-f)\,\delta_L + f\,\delta_T \]</div>
+      <div class="eq">\[ f = \dfrac{x - x_L}{x_T - x_L} \]</div>
+      <div class="eq">\[ x_L = 2\times10^{5}\,\dfrac{\nu}{u} \]</div>
+      <div class="eq">\[ x_T = 3\times10^{6}\,\dfrac{\nu}{u} \]</div>
+      <p class="var-def">where \(f\) is the fraction of flow in the transition region that is turbulent, and \(x_L\) and \(x_T\) are the boundaries of the laminar and turbulent regions (cm).</p>
+      <p class="ref">[1]&nbsp;B.&nbsp;R. Munson, T.&nbsp;H. Okiishi, and W.&nbsp;W. Huebsch, <em>Fundamentals of Fluid Mechanics</em>, 6th ed., Hoboken, NJ: John Wiley &amp; Sons, 2010.</p>
+    </div>
+
+    <!-- About panel -->
+    <div class="panel" id="panelAbout">
+      <button type="button" class="panel-close" data-close="panelAbout" aria-label="Close about">&times;</button>
+      <h2>About</h2>
+      <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/BoundaryLayerInFlowBetweenParallelPlates/" target="_blank" rel="noopener">Mathematica simulation</a> by Jaeda C. Sichel and Rachael L. Baumann. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['\\(','\\)']],
+    displayMath: [['\\[','\\]']]
+  },
+  chtml: { displayAlign: 'left' }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js"></script>
+
+<script>
+(function(){
+  "use strict";
+
+  var dSlider = document.getElementById('dSlider');
+  var uSlider = document.getElementById('uSlider');
+  var nuSlider = document.getElementById('nuSlider');
+  var dVal = document.getElementById('dVal');
+  var uVal = document.getElementById('uVal');
+  var nuVal = document.getElementById('nuVal');
+  var svg = document.getElementById('plotSvg');
+  var SVGNS = "http://www.w3.org/2000/svg";
+
+  // ---------- physics ----------
+  function reynolds(x,u,nu){ return u*x/nu; }
+  function deltaL(x,u,nu){ if(x<=0) return 0; return 5*x/Math.sqrt(reynolds(x,u,nu)); }
+  function deltaT(x,u,nu){ if(x<=0) return 0; return 0.37*x/Math.pow(reynolds(x,u,nu), 1/5); }
+  function lamX(u,nu){ return 200000*nu/u; }
+  function turbX(u,nu){ return 3000000*nu/u; }
+  function fFrac(x,lam,turb){
+    var v=(x-lam)/(turb-lam);
+    if(v<0) return 0;
+    if(v>1) return 1;
+    return v;
+  }
+  function f1fn(x,u,nu,lam,turb){
+    var f=fFrac(x,lam,turb);
+    return (1-f)*deltaL(x,u,nu) + f*deltaT(x,u,nu);
+  }
+  function f2fn(x,d,u,nu,lam,turb){
+    return d - f1fn(x,u,nu,lam,turb);
+  }
+  function findCross(d,u,nu,lam,turb){
+    function g(x){ return 2*f1fn(x,u,nu,lam,turb) - d; }
+    var lo = 1e-6, hi = 1;
+    var iter = 0;
+    while(g(hi) < 0 && iter < 80){ hi *= 2; iter++; }
+    for(var i=0;i<90;i++){
+      var mid = (lo+hi)/2;
+      if(g(mid) < 0) lo = mid; else hi = mid;
+    }
+    return (lo+hi)/2;
+  }
+
+  // ---------- nice ticks ----------
+  function niceNum(range, round){
+    var exponent = Math.floor(Math.log10(range));
+    var fraction = range / Math.pow(10, exponent);
+    var niceFraction;
+    if(round){
+      if(fraction < 1.5) niceFraction = 1;
+      else if(fraction < 3) niceFraction = 2;
+      else if(fraction < 7) niceFraction = 5;
+      else niceFraction = 10;
+    } else {
+      if(fraction <= 1) niceFraction = 1;
+      else if(fraction <= 2) niceFraction = 2;
+      else if(fraction <= 5) niceFraction = 5;
+      else niceFraction = 10;
+    }
+    return niceFraction * Math.pow(10, exponent);
+  }
+  function niceTicks(min, max, count){
+    var range = niceNum(max-min, false);
+    var step = niceNum(range/(count-1), true);
+    var niceMin = Math.floor(min/step)*step;
+    var niceMax = Math.ceil(max/step)*step;
+    var ticks = [];
+    for(var v=niceMin; v<=niceMax+step*0.5; v+=step){
+      ticks.push(Math.round(v*1e6)/1e6);
+    }
+    return ticks.filter(function(t){ return t>=min-1e-9 && t<=max+1e-9; });
+  }
+
+  // ---------- SVG plot geometry ----------
+  var margin = {left:92, right:24, top:46, bottom:64};
+  var plotLeft = margin.left, plotRight = 700-margin.right;
+  var plotTop = margin.top, plotBottom = 460-margin.bottom;
+  var plotW = plotRight-plotLeft, plotH = plotBottom-plotTop;
+  var xMin=0, xMax=600;
+
+  function svgEl(tag, attrs){
+    var el = document.createElementNS(SVGNS, tag);
+    for(var k in attrs){ el.setAttribute(k, attrs[k]); }
+    return el;
+  }
+
+  function render(){
+    var d = parseFloat(dSlider.value);
+    var u = parseFloat(uSlider.value);
+    var nu = parseFloat(nuSlider.value);
+
+    dVal.textContent = d.toFixed(0);
+    uVal.textContent = u.toFixed(0);
+    nuVal.textContent = nu.toFixed(2);
+
+    var lam = lamX(u,nu);
+    var turb = turbX(u,nu);
+    var cross = findCross(d,u,nu,lam,turb);
+
+    var yMin = -0.07*d, yMax = 1.07*d;
+    var scaleX = function(x){ return plotLeft + (x-xMin)/(xMax-xMin)*plotW; };
+    var scaleY = function(y){ return plotBottom - (y-yMin)/(yMax-yMin)*plotH; };
+
+    // sample curves
+    var N = 240;
+    var xs = [];
+    for(var i=0;i<=N;i++){ xs.push(xMin + (xMax-xMin)*i/N); }
+    // Clamp the drawn/filled curves to the physical channel [0, d]. Past the
+    // point where the two boundary layers meet, the raw Blasius/turbulent
+    // formulas keep growing without bound (that's fine for locating the
+    // merge point via findCross), but drawing those unclamped values would
+    // push the shaded fill outside the plates. The visible curves and fills
+    // must stay within the channel, so clamp them here at the render step.
+    var f1pts = xs.map(function(x){ return Math.min(Math.max(f1fn(x,u,nu,lam,turb), 0), d); });
+    var f2pts = xs.map(function(x){ return Math.min(Math.max(f2fn(x,d,u,nu,lam,turb), 0), d); });
+
+    // clear svg
+    while(svg.firstChild) svg.removeChild(svg.firstChild);
+
+    // background plot rect
+    svg.appendChild(svgEl('rect', {
+      x:plotLeft, y:plotTop, width:plotW, height:plotH,
+      fill:'none'
+    }));
+
+    // ----- fill: lower boundary layer (axis to f1) -----
+    var lowerPath = 'M '+scaleX(xs[0])+' '+scaleY(0)+' ';
+    xs.forEach(function(x,i){ lowerPath += 'L '+scaleX(x)+' '+scaleY(f1pts[i])+' '; });
+    lowerPath += 'L '+scaleX(xs[xs.length-1])+' '+scaleY(0)+' Z';
+    svg.appendChild(svgEl('path', {d:lowerPath, style:'fill:var(--fill-blue);stroke:none'}));
+
+    // ----- fill: upper boundary layer (f2 to top d) -----
+    var upperPath = 'M '+scaleX(xs[0])+' '+scaleY(d)+' ';
+    xs.forEach(function(x,i){ upperPath += 'L '+scaleX(x)+' '+scaleY(f2pts[i])+' '; });
+    upperPath += 'L '+scaleX(xs[xs.length-1])+' '+scaleY(d)+' Z';
+    svg.appendChild(svgEl('path', {d:upperPath, style:'fill:var(--fill-blue);stroke:none'}));
+
+    // ----- thick outline of developing boundary layer up to cross -----
+    var xCap = Math.min(cross, xMax);
+    if(xCap > xMin){
+      var No = 140;
+      var outlineF1 = 'M ';
+      var outlineF2 = 'M ';
+      for(var j=0;j<=No;j++){
+        var xv = xMin + (xCap-xMin)*j/No;
+        var p1 = f1fn(xv,u,nu,lam,turb);
+        var p2 = f2fn(xv,d,u,nu,lam,turb);
+        outlineF1 += (j===0?'':'L ') + scaleX(xv)+' '+scaleY(p1)+' ';
+        outlineF2 += (j===0?'':'L ') + scaleX(xv)+' '+scaleY(p2)+' ';
+      }
+      svg.appendChild(svgEl('path', {d:outlineF1, style:'fill:none;stroke:var(--text)', 'stroke-width':2.4}));
+      svg.appendChild(svgEl('path', {d:outlineF2, style:'fill:none;stroke:var(--text)', 'stroke-width':2.4}));
+    }
+
+    // ----- regime boundary connector lines -----
+    function connector(xv){
+      if(xv<xMin || xv>xMax) return;
+      var p1 = f1fn(xv,u,nu,lam,turb);
+      var p2 = f2fn(xv,d,u,nu,lam,turb);
+      svg.appendChild(svgEl('line', {
+        x1:scaleX(xv), y1:scaleY(p1), x2:scaleX(xv), y2:scaleY(p2),
+        style:'stroke:var(--text-muted)', 'stroke-width':1
+      }));
+    }
+    var firstBoundary = Math.min(lam, cross);
+    connector(firstBoundary);
+    if(lam < cross){
+      var secondBoundary = (turb < cross) ? turb : (cross < xMax ? cross : xMax);
+      connector(secondBoundary);
+    }
+
+    // ----- frame border -----
+    svg.appendChild(svgEl('rect', {
+      x:plotLeft, y:plotTop, width:plotW, height:plotH,
+      style:'fill:none;stroke:var(--border-strong)', 'stroke-width':1.2
+    }));
+
+    // ----- plates -----
+    var topPlateY1 = scaleY(1.07*d), topPlateY2 = scaleY(d);
+    svg.appendChild(svgEl('rect', {
+      x:plotLeft, y:topPlateY1, width:plotW, height:(topPlateY2-topPlateY1),
+      style:'fill:var(--plate);stroke:var(--plate-edge)', 'stroke-width':0.75
+    }));
+    var botPlateY1 = scaleY(0), botPlateY2 = scaleY(-0.07*d);
+    svg.appendChild(svgEl('rect', {
+      x:plotLeft, y:botPlateY1, width:plotW, height:(botPlateY2-botPlateY1),
+      style:'fill:var(--plate);stroke:var(--plate-edge)', 'stroke-width':0.75
+    }));
+    var midX = (plotLeft+plotRight)/2;
+    var topLabel = svgEl('text', {x:midX, y:(topPlateY1+topPlateY2)/2+4, 'text-anchor':'middle', class:'plate-label'});
+    topLabel.textContent = 'top plate';
+    svg.appendChild(topLabel);
+    var botLabel = svgEl('text', {x:midX, y:(botPlateY1+botPlateY2)/2+4, 'text-anchor':'middle', class:'plate-label'});
+    botLabel.textContent = 'bottom plate';
+    svg.appendChild(botLabel);
+
+    // ----- fully developed flow marker -----
+    if(cross >= xMin && cross <= xMax){
+      var cx = scaleX(cross);
+      var dashLine = svgEl('line', {
+        x1:cx, y1:scaleY(0), x2:cx, y2:scaleY(d),
+        style:'stroke:var(--text)', 'stroke-width':1.3, 'stroke-dasharray':'5,4'
+      });
+      svg.appendChild(dashLine);
+      var fpx = cx + 18, fpy = scaleY(d/2);
+      var fdevText = svgEl('text', {
+        x:fpx, y:fpy, class:'fdev-label', 'text-anchor':'middle',
+        transform:'rotate(-90 '+fpx+' '+fpy+')'
+      });
+      fdevText.textContent = 'fully developed flow';
+      svg.appendChild(fdevText);
+    }
+
+    // ----- regime labels -----
+    function regimeLabel(xData, txt){
+      if(xData<xMin || xData>xMax) return;
+      var rpx = scaleX(xData) + 16, rpy = scaleY(d/2);
+      var t = svgEl('text', {
+        x:rpx, y:rpy, class:'region-label', 'text-anchor':'middle',
+        transform:'rotate(-90 '+rpx+' '+rpy+')'
+      });
+      t.textContent = txt;
+      svg.appendChild(t);
+    }
+    regimeLabel(0, 'laminar');
+    if(lam < cross && lam <= xMax){
+      regimeLabel(lam, 'transitional');
+    }
+    if(turb < cross && turb <= xMax){
+      regimeLabel(turb, 'turbulent');
+    }
+
+    // ----- axis ticks -----
+    var xticks = [0,100,200,300,400,500,600];
+    xticks.forEach(function(xt){
+      var xp = scaleX(xt);
+      svg.appendChild(svgEl('line', {x1:xp,y1:plotBottom,x2:xp,y2:plotBottom+5, stroke:'var(--text-muted)', 'stroke-width':1}));
+      var lbl = svgEl('text', {x:xp, y:plotBottom+26, class:'tick-label', 'text-anchor':'middle'});
+      lbl.textContent = xt;
+      svg.appendChild(lbl);
+    });
+    var yticks = niceTicks(0, d, 5);
+    yticks.forEach(function(yt){
+      var yp = scaleY(yt);
+      svg.appendChild(svgEl('line', {x1:plotLeft-5,y1:yp,x2:plotLeft,y2:yp, stroke:'var(--text-muted)', 'stroke-width':1}));
+      var lbl = svgEl('text', {x:plotLeft-16, y:yp+5, class:'tick-label', 'text-anchor':'end'});
+      lbl.textContent = (Math.round(yt*100)/100).toString();
+      svg.appendChild(lbl);
+    });
+
+    // ----- axis labels -----
+    var xAxisLabel = svgEl('text', {x:(plotLeft+plotRight)/2, y:460-4, class:'axis-label', 'text-anchor':'middle'});
+    xAxisLabel.textContent = 'length down plate (cm)';
+    svg.appendChild(xAxisLabel);
+
+    var yAxisLabel = svgEl('text', {
+      x:0, y:0, class:'axis-label', 'text-anchor':'middle',
+      transform:'translate(22,'+((plotTop+plotBottom)/2)+') rotate(-90)'
+    });
+    yAxisLabel.textContent = 'distance between plates (cm)';
+    svg.appendChild(yAxisLabel);
+
+    // ----- plot title -----
+    var crossDisplay = Math.round(cross).toLocaleString('en-US');
+    var titleEl = svgEl('text', {x:(plotLeft+plotRight)/2, y:24, class:'plot-title', 'text-anchor':'middle'});
+    titleEl.textContent = 'entry length = ' + crossDisplay + ' cm';
+    svg.appendChild(titleEl);
+  }
+
+  [dSlider,uSlider,nuSlider].forEach(function(s){
+    s.addEventListener('input', render);
+  });
+  render();
+
+  // ---------- panel toggling ----------
+  var panels = {
+    btnDirections: document.getElementById('panelDirections'),
+    btnDetails: document.getElementById('panelDetails'),
+    btnAbout: document.getElementById('panelAbout')
+  };
+  function closeAll(){
+    Object.keys(panels).forEach(function(id){
+      panels[id].classList.remove('open');
+      document.getElementById(id).classList.remove('active');
+      document.getElementById(id).setAttribute('aria-expanded','false');
+    });
+  }
+  Object.keys(panels).forEach(function(btnId){
+    document.getElementById(btnId).addEventListener('click', function(){
+      var isOpen = panels[btnId].classList.contains('open');
+      closeAll();
+      if(!isOpen){
+        panels[btnId].classList.add('open');
+        this.classList.add('active');
+        this.setAttribute('aria-expanded','true');
+      }
+    });
+  });
+  document.querySelectorAll('.panel-close').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      closeAll();
+    });
+  });
+})();
+</script>

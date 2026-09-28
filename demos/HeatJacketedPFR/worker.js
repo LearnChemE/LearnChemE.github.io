@@ -5,7 +5,7 @@ import createJacketedPFRModule from "./wasm/calcs.js";
 createJacketedPFRModule().then((module) => {
 
 // Notify the main thread that the worker is ready
-const { CoCurrentCalc } = module;
+const { CoCurrentCalc, CounterCurrentCalc } = module;
 postMessage({ type: 'READY' });
 
 // ---------- Physical constants (fixed) ----------
@@ -38,6 +38,7 @@ self.onmessage = (event) => {
 
             // Perform the calculation using the provided payload
             const calc = new CoCurrentCalc(payload.r, payload.dH, payload.TTAin, 0.0, Vmax, 401);
+            // const calc = new CounterCurrentCalc(payload.r, payload.dH, payload.TTAin, Vmax, 1001);
             calc.solve();
 
             const Tas= calc.getResultView(0).slice(); // Get the X values (conversion)

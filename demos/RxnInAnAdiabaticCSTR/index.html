@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reaction in an Adiabatic Continuous Stirred-Tank Reactor</title>
+<style>
+  html,body{margin:0;padding:0;background:#fff;}
+  #app{
+    position:relative;
+    font-family:Helvetica,Arial,sans-serif;
+    color:#000;
+    width:620px;
+    margin:0 auto;
+    padding:8px 10px 14px 10px;
+    box-sizing:border-box;
+  }
+  .title{
+    font-size:15px;
+    font-weight:bold;
+    text-align:center;
+    margin:2px 0 8px 0;
+    line-height:1.25;
+  }
+  /* Top area: sliders on the left, vertical buttons on the right */
+  .top-area{
+    display:flex;
+    align-items:flex-start;
+    gap:16px;
+  }
+  /* Controls panel */
+  .controls{
+    flex:1 1 auto;
+    border:1px solid #c8c8c8;
+    background:#fbfbfb;
+    padding:10px 12px 12px 12px;
+    box-sizing:border-box;
+  }
+  .ctrl-row{
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:6px 10px;
+  }
+  .ctrl-row + .ctrl-row{margin-top:9px;}
+  .ctrl-block{
+    display:flex;
+    align-items:center;
+    gap:7px;
+  }
+  .lbl{font-size:15px;white-space:nowrap;}
+  .val{font-size:15px;min-width:34px;display:inline-block;}
+
+input[type="range"]{
+    margin-top:.8em;
+    --accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:210px;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+input[type="range"]::-moz-range-thumb{
+    width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+
+  select{
+    font-family:Helvetica,Arial,sans-serif;
+    font-size:13px;
+    padding:1px 2px;
+  }
+  input[type=checkbox]{vertical-align:middle;}
+  /* Canvas */
+  #plot{
+    display:block;
+    margin:2px auto 0 auto;
+    width:580px;
+    height:430px;
+  }
+  /* Sub i */
+  sub{font-size:0.72em;}
+  /* Info buttons: vertical stack to the right of the sliders */
+  .info-buttons{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    flex:0 0 auto;
+    margin:0;
+  }
+  .info-btn{
+    font-family:Helvetica,Arial,sans-serif;
+    font-size:16.8px;
+    color:#fff;
+    background:#8b0000;
+    border:none;
+    border-radius:3px;
+    padding:7.2px 24px;
+    cursor:pointer;
+    width:100%;
+    text-align:center;
+    white-space:nowrap;
+  }
+  .info-btn:hover{background:#a00000;}
+  .info-btn.active{background:#5f0000;}
+  .panels{position:relative;}
+  .panel{
+    display:none;
+    position:absolute;
+    top:5px;
+    left:0;
+    right:0;
+    z-index:20;
+    border:1px solid #c8c8c8;
+    background:#fafafa;
+    padding:12px 16px;
+    font-size:13.5px;
+    line-height:1.5;
+    box-shadow:0 3px 12px rgba(0,0,0,0.18);
+  }
+  .panel.show{display:block;}
+  .panel-close{
+    position:absolute;
+    top:6px;
+    right:8px;
+    width:22px;
+    height:22px;
+    line-height:20px;
+    text-align:center;
+    font-size:18px;
+    font-family:Helvetica,Arial,sans-serif;
+    color:#8b0000;
+    background:transparent;
+    border:none;
+    border-radius:3px;
+    cursor:pointer;
+    padding:0;
+  }
+  .panel-close:hover{background:#eadada;}
+  .panel h3{
+    margin:0 0 8px 0;
+    font-size:14px;
+    color:#8b0000;
+  }
+  .panel p{margin:8px 0;}
+  .panel a{color:#8b0000;}
+  .eq{
+    font-family:"Cambria Math","Times New Roman",serif;
+    font-style:italic;
+    text-align:left;
+    margin:10px 0;
+    font-size:16px;
+  }
+  .eq .up{font-style:normal;}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div class="top-area">
+    <div class="controls">
+      <div class="ctrl-row">
+        <div class="ctrl-block">
+          <span class="lbl"><i>C</i><sub>A0</sub> (mol/L)</span>
+          <input type="range" id="sCA0" min="0.01" max="5" step="0.1" value="2.5" style="width:130px">
+          <span class="val" id="vCA0">2.50</span>
+        </div>
+      </div>
+      <div class="ctrl-row">
+        <div class="ctrl-block">
+          <span class="lbl">volumetric flow rate (L/s)</span>
+          <input type="range" id="sNu" min="0" max="1" step="0.01" value="0.5" style="width:140px">
+          <span class="val" id="vNu">52.5</span>
+        </div>
+      </div>
+      <div class="ctrl-row">
+        <div class="ctrl-block">
+          <span class="lbl">reaction</span>
+          <select id="sRxn">
+            <option value="1">saponification of ethyl acetate using sodium hydroxide</option>
+            <option value="2">hydrolysis of acetic anhydride to form acetic acid</option>
+            <option value="3">hydrolysis of propylene oxide to form propylene glycol</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-buttons">
+      <button class="info-btn" data-panel="directions">Directions</button>
+      <button class="info-btn" data-panel="details">Details</button>
+      <button class="info-btn" data-panel="about">About</button>
+    </div>
+  </div>
+
+  <div class="panels">
+  <div class="panel" id="directions">
+    <button class="panel-close" data-panel="directions" aria-label="Close">&times;</button>
+    <h3>Directions</h3>
+    <p>In this Demonstration, a liquid-phase reaction takes place in an adiabatic,
+    continuous stirred-tank reactor (CSTR). Select an exothermic reaction, and then
+    select the feed concentration of the limiting reactant <i>A</i>
+    (<i>C</i><sub>A0</sub>) and the volumetric flow rate. Mass and energy balances
+    are solved to determine the outlet reactant concentration and temperature. The
+    color of the fluid in the reactor is correlated with the reactor temperature:
+    lower temperature is blue, and as the temperature increases, the fluid becomes
+    purple and then red. The fractional conversion of reactant <i>A</i> is
+    represented by <i>X</i><sub>A</sub>.</p>
+    <p>Note that multiple steady states can exist in an adiabatic CSTR for certain
+    feed conditions for hydrolysis of propylene oxide. Because of this, the outlet
+    temperature can jump when the feed concentration increases above a certain value
+    (ignition) and then drop when the feed concentration decreases below a certain
+    value (not the same value for extinction). That is, the reactor exhibits
+    hysteresis.</p>
+  </div>
+
+  <div class="panel" id="details">
+    <button class="panel-close" data-panel="details" aria-label="Close">&times;</button>
+    <h3>Details</h3>
+    <p>At steady state, the rate of reaction is constant within the CSTR, so that
+    the total moles reacted per time equals reaction rate times volume:</p>
+    <div class="eq">(<i>F</i><sub>A0</sub> &minus; <i>F</i><sub>A</sub>) = &minus;<i>r</i><sub>A</sub><i>V</i></div>
+    <p>where <i>F</i><sub>A0</sub> and <i>F</i><sub>A</sub> are the inlet and outlet
+    molar flow rates of reactant <i>A</i>, <i>r</i><sub>A</sub> is rate of reaction
+    (mol/L s) of <i>A</i> and <i>V</i> is reactor volume. This equation may be
+    expressed in terms of residence time <i>&tau;</i>, conversion
+    <i>X</i><sub>A</sub> and inlet concentration of <i>A</i>,
+    <i>C</i><sub>A0</sub>:</p>
+    <div class="eq">&minus;<i>r</i><sub>A</sub><i>&tau;</i> = <i>C</i><sub>A0</sub><i>X</i><sub>A</sub></div>
+    <p>The rate expression <i>r</i><sub>A</sub> is a function of reactant
+    concentrations and the rate constant <i>k</i>:</p>
+    <div class="eq"><i>r</i><sub>A</sub> = <i>f</i>(<i>k</i>, <i>C</i><sub>A</sub>, <i>C</i><sub>B</sub>, &hellip;)</div>
+    <p>The rate constant <i>k</i> increases with temperature according to the
+    Arrhenius equation:</p>
+    <div class="eq"><i>k</i> = <i>A</i> <span class="up"><i>e</i></span><sup>&minus;<i>E</i><sub>A</sub>/(<i>RT</i>)</sup></div>
+    <p>where <i>A</i> is the pre-exponential factor, <i>E</i><sub>A</sub> is the
+    activation energy of the reaction, <i>R</i> is the gas constant and <i>T</i> is
+    absolute temperature. Energy released from exothermic reactions causes the
+    reactor contents (and the reactor effluent) to have a higher temperature than
+    the inlet:</p>
+    <div class="eq"><i>F</i><sub>tot</sub><i>C</i><sub>p</sub> (<i>T</i><sub>0</sub> &minus; <i>T</i>) = &Delta;<i>H</i><sub>R</sub><i>r</i><sub>A</sub><i>V</i></div>
+    <p>where <i>F</i><sub>tot</sub> is the total molar flow rate at the inlet or
+    outlet, <i>C</i><sub>p</sub> is the molar heat capacity of the mixture within
+    the reactor, <i>T</i><sub>0</sub> is temperature at the inlet and
+    &Delta;<i>H</i><sub>R</sub> is the heat of reaction.</p>
+  </div>
+
+  <div class="panel" id="about">
+    <button class="panel-close" data-panel="about" aria-label="Close">&times;</button>
+    <h3>About</h3>
+    <p>This simulation was created in the
+    <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a>
+    at University of Colorado Boulder for
+    <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a>
+    by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a
+    <a href="https://demonstrations.wolfram.com/ReactionInAnAdiabaticContinuousStirredTankReactor/" target="_blank">Mathematica simulation</a>
+    by Neil Hendren. It was prepared with financial support from the National Science
+    Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.</p>
+  </div>
+  </div>
+
+  <canvas id="plot" width="1160" height="860"></canvas>
+</div>
+
+<script>
+"use strict";
+(function(){
+  const R = 8.31446261815324;
+  const cp = 4187; // volumetric heat capacity used in energy balance (J/(L K))
+
+  // Persistent state for ignition/extinction hysteresis: the previously converged
+  // outlet temperature is used as the starting point for the next solve, so the
+  // reactor stays on its current branch until that branch physically disappears.
+  // Reset to the cold (low-temperature) branch when the reaction is changed.
+  let lastTeq = null;
+  let lastRxn = null;
+
+  // Reaction constant sets (from the original Mathematica Demonstration)
+  const reactions = {
+    1:{ea:43094, cB0:5,  A:4.28769e6, HR:-55870, CA0range:[0.01,5], vrange:[5,100], V:1000, T0:280, order:2},
+    2:{ea:50240, cB0:55, A:1.47485e6, HR:-56000, CA0range:[0.01,5], vrange:[0.5,10],V:1000, T0:300, order:1},
+    3:{ea:75358, cB0:55, A:4.71e9,    HR:-84664, CA0range:[0.01,5], vrange:[0.1,10],V:1000, T0:300, order:1}
+  };
+
+  // Reaction equations, as arrays of {t, sub} tokens for canvas rendering
+  const reactionEquations = {
+    1:[{t:"CH",sub:"3"},{t:"COOC",sub:"2"},{t:"H",sub:"5"},{t:" + NaOH \u2192 C"},
+       {t:"H",sub:"3"},{t:"COONa + "},{t:"C",sub:"2"},{t:"H",sub:"5"},{t:"OH"}],
+    2:[{t:"(CH",sub:"3"},{t:"CO)",sub:"2"},{t:"O + "},{t:"H",sub:"2"},{t:"O \u2192 2"},
+       {t:"CH",sub:"3"},{t:"COOH"}],
+    3:[{t:"C",sub:"3"},{t:"H",sub:"6"},{t:"O + "},{t:"H",sub:"2"},{t:"O"},
+       {t:" \u2192 ",over:"H\u2082SO\u2084"},{t:"C",sub:"3"},{t:"H",sub:"8"},{t:"O",sub:"2"}]
+  };
+
+  const cvs = document.getElementById("plot");
+  const ctx = cvs.getContext("2d");
+  const DPR = 2; // canvas is 1160x860 backing for 580x430 CSS
+
+  // ---- controls ----
+  const sCA0 = document.getElementById("sCA0");
+  const sNu  = document.getElementById("sNu");
+  const sRxn = document.getElementById("sRxn");
+  const vCA0 = document.getElementById("vCA0");
+  const vNu  = document.getElementById("vNu");
+
+  function rescale(x, from, to){ return to[0] + (x-from[0])*(to[1]-to[0])/(from[1]-from[0]); }
+
+  // clamp helper
+  function clip(x,a,b){ return x<a?a:(x>b?b:x); }
+
+  // color blend between two rgb arrays
+  function blend(c1,c2,f){
+    return [c1[0]+(c2[0]-c1[0])*f, c1[1]+(c2[1]-c1[1])*f, c1[2]+(c2[2]-c1[2])*f];
+  }
+  function rgb(c){ return "rgb("+Math.round(c[0]*255)+","+Math.round(c[1]*255)+","+Math.round(c[2]*255)+")"; }
+
+  function compute(){
+    const n = parseInt(sRxn.value,10);
+    const rc = reactions[n];
+    const CA0slider = parseFloat(sCA0.value);
+    const nu0slider = parseFloat(sNu.value);
+
+    let cA0 = rescale(CA0slider, [0.1,5], rc.CA0range);
+    if(cA0 >= 0.1) cA0 = Math.round(cA0/0.1)*0.1;
+    else cA0 = 0.01;
+
+    const nu = rescale(nu0slider, [0,1], rc.vrange);
+    const tau = rc.V/nu;
+    const k = (T)=> rc.A*Math.exp(-rc.ea/(R*T));
+
+    let cA, cB, r;
+    if(n===1){
+      cA = (T)=>{
+        const kt=k(T);
+        return (1/(2*kt*tau))*(-1 + cA0*kt*tau - rc.cB0*kt*tau +
+          Math.sqrt(4*cA0*kt*tau + Math.pow(1 - cA0*kt*tau + rc.cB0*kt*tau,2)));
+      };
+      cB = (T)=> rc.cB0 - (cA0 - cA(T));
+      r  = (T)=> -k(T)*cA(T)*cB(T);
+    } else {
+      cA = (T)=> cA0/(1 + tau*k(T));
+      cB = (T)=> rc.cB0 - (cA0 - cA(T));
+      r  = (T)=> -k(T)*cA(T);
+    }
+    const Xf = (T)=> (cA0 - cA(T))/cA0;
+
+    // Energy balance: f(T) = nu*cp*(T-T0) - HR*r(T)*V = 0.
+    // An adiabatic exothermic CSTR can have several steady states at once, so the
+    // reactor exhibits ignition/extinction hysteresis: which state it sits in
+    // depends on where it was. We track that history. Starting from the previously
+    // converged temperature (lastTeq) and solving with Newton's method keeps the
+    // reactor on its current branch until that branch disappears, at which point it
+    // jumps (ignites or extinguishes) to the remaining branch.
+    const f = (T)=> nu*cp*(T-rc.T0) - rc.HR*r(T)*rc.V;
+
+    // Cold-start / fallback: lowest steady state at or above the feed temperature.
+    function lowestRoot(){
+      let prevT = rc.T0, prevF = f(prevT);
+      for(let T = rc.T0 + 0.25; T <= 3000; T += 0.25){
+        const fc = f(T);
+        if(prevF === 0) return prevT;
+        if(prevF*fc < 0){
+          let lo=prevT, hi=T, flo=prevF;
+          for(let i=0;i<100;i++){ const m=(lo+hi)/2, fm=f(m); if(flo*fm<=0){hi=m;} else {lo=m;flo=fm;} }
+          return (lo+hi)/2;
+        }
+        prevT = T; prevF = fc;
+      }
+      return rc.T0;
+    }
+    // Continuation from a guess via damped Newton (numerical derivative).
+    function continueFrom(guess){
+      let T = guess;
+      for(let it=0; it<100; it++){
+        const fT = f(T);
+        const h = 1e-3;
+        const fp = (f(T+h) - f(T-h))/(2*h);
+        if(Math.abs(fp) < 1e-12) break;
+        let step = fT/fp;
+        if(Math.abs(step) > 200) step = 200*Math.sign(step); // damp big steps
+        T = T - step;
+        if(T < rc.T0 - 50) T = rc.T0 - 50;
+        if(Math.abs(step) < 1e-7) break;
+      }
+      // accept only a genuine, physical root (T at or above feed temperature)
+      const scale = Math.max(1, Math.abs(nu*cp));
+      if(isFinite(T) && T >= rc.T0 - 0.5 && Math.abs(f(T)) < 1e-3*scale) return T;
+      return null;
+    }
+
+    // Reset history when the reaction changes (fresh cold start on the low branch).
+    if(n !== lastRxn){ lastTeq = null; lastRxn = n; }
+
+    let Teq;
+    if(lastTeq == null){
+      Teq = lowestRoot();
+    } else {
+      const cont = continueFrom(lastTeq);
+      Teq = (cont != null) ? cont : lowestRoot();
+    }
+    if(!isFinite(Teq)) Teq = rc.T0;
+    lastTeq = Teq;
+
+    const deltaT = Teq - rc.T0;
+    const hotness = clip(deltaT/100, 0, 1);
+
+    // The energy line plotted: nu*cp*(T - T0)  (blue straight line)
+    // The curve plotted: HR*r(T)*V
+    return {
+      n, rc, cA0, nu, tau, Teq, deltaT, hotness,
+      X: Xf(Teq), cAout: cA(Teq), kAtTeq: k(Teq),
+      lineFn: (T)=> nu*cp*(T-rc.T0),
+      curveFn: (T)=> rc.HR*r(T)*rc.V
+    };
+  }
+
+  // ---------- Canvas drawing helpers ----------
+  // We work in a "world" coordinate system matching Mathematica's
+  // PlotRange {{-0.5,10.75},{-1,12.5}} mapped onto the 580x430 image.
+  const WX0=-0.5, WX1=10.75, WY0=-1, WY1=12.5;
+  const IMG_W=580, IMG_H=430;
+  function wx(x){ return (x-WX0)/(WX1-WX0)*IMG_W; }
+  function wy(y){ return IMG_H - (y-WY0)/(WY1-WY0)*IMG_H; }
+
+  function setFont(px, italic, bold){
+    ctx.font = (italic?"italic ":"")+(bold?"bold ":"")+px+"px Helvetica, Arial, sans-serif";
+  }
+
+  // draw text with subscripts: tokens [{t, sub}]
+  function drawTokens(tokens, x, y, px, color, align){
+    ctx.fillStyle = color||"#000";
+    ctx.textBaseline="alphabetic";
+    // measure total width
+    let total=0;
+    setFont(px,false,false);
+    for(const tk of tokens){
+      setFont(px,false,false); total += ctx.measureText(tk.t).width;
+      if(tk.sub){ setFont(px*0.7,false,false); total += ctx.measureText(tk.sub).width; }
+    }
+    let cx = x;
+    if(align==="center") cx = x-total/2;
+    for(const tk of tokens){
+      setFont(px,false,false);
+      ctx.textAlign="left";
+      ctx.fillText(tk.t, cx, y);
+      const w = ctx.measureText(tk.t).width;
+      if(tk.over){
+        setFont(px*0.55,false,false);
+        const ow=ctx.measureText(tk.over).width;
+        // center the catalyst label horizontally over this token
+        ctx.fillText(tk.over, cx+w/2-ow/2, y-px*0.85);
+        setFont(px,false,false);
+      }
+      cx += w;
+      if(tk.sub){
+        setFont(px*0.7,false,false);
+        ctx.fillText(tk.sub, cx, y+px*0.22);
+        cx += ctx.measureText(tk.sub).width;
+      }
+    }
+    return total;
+  }
+
+  // rich text with subscripts inline for annotations. Spec: array of parts,
+  // each {s:"text"} or {s:"text", sub:true} or {s:"text", ital:true}
+  function drawRich(parts, x, y, px, align){
+    ctx.textBaseline="alphabetic";
+    ctx.fillStyle="#000";
+    // measure
+    let total=0;
+    for(const p of parts){
+      const size = p.sub? px*0.72 : px;
+      setFont(size, !!p.ital, false);
+      total += ctx.measureText(p.s).width;
+    }
+    let cx = x;
+    if(align==="center") cx = x-total/2;
+    else if(align==="right") cx = x-total;
+    for(const p of parts){
+      const size = p.sub? px*0.72 : px;
+      setFont(size, !!p.ital, false);
+      ctx.textAlign="left";
+      const dy = p.sub? px*0.2 : 0;
+      ctx.fillText(p.s, cx, y+dy);
+      cx += ctx.measureText(p.s).width;
+    }
+    return total;
+  }
+
+  // Draw the CSTR schematic in world coords, colors cool/hot as rgb strings
+  function drawCSTR(coolColor, hotColor){
+    ctx.save();
+    ctx.lineJoin="round";
+    // helper to convert world rectangle
+    function rect(x0,y0,x1,y1,fill){
+      ctx.fillStyle=fill;
+      const X0=wx(x0), Y0=wy(y1), X1=wx(x1), Y1=wy(y0);
+      ctx.fillRect(X0,Y0,X1-X0,Y1-Y0);
+    }
+    function strokeRect(x0,y0,x1,y1){
+      const X0=wx(x0), Y0=wy(y1), X1=wx(x1), Y1=wy(y0);
+      ctx.strokeRect(X0,Y0,X1-X0,Y1-Y0);
+    }
+    // gray base blob: outer disk arc (bottom of vessel), drawn as ellipse arc
+    // Disk[{5,2},{2.25,1.1},{Pi,2Pi}] -> lower half ellipse cx5 cy2 rx2.25 ry1.1
+    function ellipseArc(cx,cy,rx,ry,a0,a1,fill){
+      ctx.beginPath();
+      const steps=60;
+      for(let i=0;i<=steps;i++){
+        const a=a0+(a1-a0)*i/steps;
+        const px=cx+rx*Math.cos(a), py=cy+ry*Math.sin(a);
+        const X=wx(px), Y=wy(py);
+        if(i===0)ctx.moveTo(X,Y); else ctx.lineTo(X,Y);
+      }
+      if(fill){ ctx.closePath(); ctx.fillStyle=fill; ctx.fill(); }
+    }
+
+    // gray outer shell bottom (behind)
+    ctx.fillStyle="#d9d9d9";
+    // outer disk {5,2},{2.25,1.1} lower half (angle pi..2pi -> in math y=sin negative => bottom)
+    ellipseArc(5,2,2.25,1.1,Math.PI,2*Math.PI,"#d9d9d9");
+    // small stub rectangle {2.75,2}-{3,7}
+    rect(2.75,2,3,7,"#d9d9d9");
+
+    // cool inlet pipe top {1.5,7}-{3,7.5}
+    rect(1.5,7,3,7.5,coolColor);
+    // hot outlet pipe {7,2}-{8.5,2.5}
+    rect(7,2,8.5,2.5,hotColor);
+
+    // cool spout filled curve (approx with bezier region) - fill a rough shape
+    (function(){
+      ctx.beginPath();
+      const pts=[[3,7.5],[3.5,7.5],[4,7.25],[4.5,5.5],[4,5.5],[3.75,5.5],[3.75,6.75],[3.1,7],[3,7],[2.5,7]];
+      for(let i=0;i<pts.length;i++){
+        const X=wx(pts[i][0]),Y=wy(pts[i][1]);
+        if(i===0)ctx.moveTo(X,Y);else ctx.lineTo(X,Y);
+      }
+      ctx.closePath();
+      ctx.fillStyle=coolColor; ctx.fill();
+    })();
+
+    // hot liquid pool bottom ellipse Disk[{5,2},{2,0.75}]
+    ellipseArc(5,2,2,0.75,0,2*Math.PI,hotColor);
+    // main vessel body (liquid) rectangle {3,2}-{7.25,6}
+    rect(3,2,7.25,6,hotColor);
+
+    // vessel walls line {3,2}->{3,7}->{2.75,7}->{2.75,2}
+    ctx.strokeStyle="#000"; ctx.lineWidth=1.2;
+    (function(){
+      const p=[[3,2],[3,7],[2.75,7],[2.75,2]];
+      ctx.beginPath();
+      for(let i=0;i<p.length;i++){const X=wx(p[i][0]),Y=wy(p[i][1]); if(i===0)ctx.moveTo(X,Y);else ctx.lineTo(X,Y);}
+      ctx.stroke();
+    })();
+    // top liquid surface arc Circle[{5,2},{2,0.75},{Pi,2Pi}] lower rim of liquid
+    ctx.beginPath();
+    (function(){
+      const steps=40, cx=5,cy=2,rx=2,ry=0.75;
+      for(let i=0;i<=steps;i++){const a=Math.PI+(Math.PI)*i/steps; const X=wx(cx+rx*Math.cos(a)),Y=wy(cy+ry*Math.sin(a)); if(i===0)ctx.moveTo(X,Y);else ctx.lineTo(X,Y);}
+    })();
+    ctx.stroke();
+
+    // outer shell rim circle {5,2},{2.25,1.1},{Pi,2Pi}
+    ctx.beginPath();
+    (function(){
+      const steps=40, cx=5,cy=2,rx=2.25,ry=1.1;
+      for(let i=0;i<=steps;i++){const a=Math.PI+(Math.PI)*i/steps; const X=wx(cx+rx*Math.cos(a)),Y=wy(cy+ry*Math.sin(a)); if(i===0)ctx.moveTo(X,Y);else ctx.lineTo(X,Y);}
+    })();
+    ctx.stroke();
+
+    // baffles (brown) {3.15,2.6}-{3.45,5.5} and {6.55,2.6}-{6.85,5.5}
+    rect(3.15,2.6,3.45,5.5,"rgb(184,156,143)");
+    rect(6.55,2.6,6.85,5.5,"rgb(184,156,143)");
+    ctx.strokeStyle="#000"; ctx.lineWidth=1;
+    strokeRect(3.15,2.6,3.45,5.5);
+    strokeRect(6.55,2.6,6.85,5.5);
+
+    // impeller shaft (gray) {4.95,3.5}-{5.05,8.5}
+    rect(4.95,3.5,5.05,8.5,"#999999");
+    // impeller blades: filled curve bowtie around {5,3.5}
+    (function(){
+      ctx.beginPath();
+      const cx=5,cy=3.5;
+      for(let i=0;i<=63;i++){
+        const a=i*0.1;
+        const px=cx+Math.cos(a), py=cy+0.8*Math.sin(a)*Math.cos(a);
+        const X=wx(px),Y=wy(py);
+        if(i===0)ctx.moveTo(X,Y);else ctx.lineTo(X,Y);
+      }
+      ctx.closePath();
+      ctx.fillStyle="#d9d9d9"; ctx.fill(); ctx.strokeStyle="#000"; ctx.lineWidth=1; ctx.stroke();
+    })();
+
+    // motor lid disk {5,7.75},{2.1,0.5},{0,Pi} (top cap upper half)
+    ellipseArc(5,7.75,2.1,0.5,0,Math.PI,"#d9d9d9");
+    ctx.strokeStyle="#000"; ctx.lineWidth=1;
+    ellipseArc(5,7.75,2.1,0.5,0,Math.PI,null); ctx.stroke();
+
+    // lid polygon (side walls up to lid)
+    (function(){
+      const p=[[2.75,7.5],[2.75,7.75],[7.25,7.75],[7.25,2.5],[7,2.5],[7,7.5]];
+      ctx.beginPath();
+      for(let i=0;i<p.length;i++){const X=wx(p[i][0]),Y=wy(p[i][1]); if(i===0)ctx.moveTo(X,Y);else ctx.lineTo(X,Y);}
+      ctx.closePath();
+      ctx.fillStyle="#d9d9d9"; ctx.fill(); ctx.strokeStyle="#000"; ctx.lineWidth=1; ctx.stroke();
+    })();
+
+    // motor box {4.75,8.5}-{5.25,9.75}
+    rect(4.75,8.5,5.25,9.75,"#d9d9d9");
+    strokeRect(4.75,8.5,5.25,9.75);
+    // motor lines
+    function line(x0,y0,x1,y1){ ctx.beginPath(); ctx.moveTo(wx(x0),wy(y0)); ctx.lineTo(wx(x1),wy(y1)); ctx.stroke(); }
+    line(4.75,8.9,5.25,8.9); line(4.75,9.3,5.25,9.3);
+    // inlet pipe lines
+    line(1.5,7,3,7); line(1.5,7.5,3,7.5);
+    // outlet pipe lines
+    line(7,2,8.5,2); line(7,2.5,8.5,2.5);
+
+    // arrows: outlet {7.75,2.25}->{9,2.25}; inlet {1,7.25}->{2,7.25}
+    function arrow(x0,y0,x1,y1){
+      ctx.beginPath(); ctx.moveTo(wx(x0),wy(y0)); ctx.lineTo(wx(x1),wy(y1)); ctx.stroke();
+      const ang=Math.atan2(wy(y1)-wy(y0), wx(x1)-wx(x0));
+      const hl=8;
+      ctx.beginPath();
+      ctx.moveTo(wx(x1),wy(y1));
+      ctx.lineTo(wx(x1)-hl*Math.cos(ang-0.4), wy(y1)-hl*Math.sin(ang-0.4));
+      ctx.lineTo(wx(x1)-hl*Math.cos(ang+0.4), wy(y1)-hl*Math.sin(ang+0.4));
+      ctx.closePath(); ctx.fillStyle="#000"; ctx.fill();
+    }
+    ctx.strokeStyle="#000"; ctx.lineWidth=1.4;
+    arrow(7.75,2.25,9,2.25);
+    arrow(1,7.25,2,7.25);
+
+    ctx.restore();
+  }
+
+  // ---------- draw the equation/reaction label at top ----------
+  function drawTopLabel(res){
+    const y = 34;
+    // Always show the symbolic chemical equation with proper subscripts.
+    drawTokens(reactionEquations[res.n], IMG_W/2, y, 20, "#000", "center");
+  }
+
+  // ---------- main render ----------
+  function render(){
+    const res = compute();
+
+    // update slider labels
+    vCA0.textContent = res.cA0.toFixed(2);
+    // volumetric flow: 2 sig depending on magnitude, per Mathematica dt2 formatting
+    let nuStr;
+    if(res.nu > 10) nuStr = res.nu.toFixed(0);
+    else if(res.nu >= 1) nuStr = res.nu.toFixed(1);
+    else nuStr = res.nu.toFixed(2);
+    vNu.textContent = nuStr;
+
+    // colors
+    const inletColor = rgb([0.6,0.6,1]);
+    const outletColor = rgb(blend([0.6,0.6,1],[1,0.3,0.2],res.hotness));
+
+    // clear (CSS 580x430, backing 1160x860)
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+    ctx.clearRect(0,0,IMG_W,IMG_H);
+    ctx.fillStyle="#fff"; ctx.fillRect(0,0,IMG_W,IMG_H);
+
+    // top reaction label
+    drawTopLabel(res);
+
+    // CSTR schematic
+    drawCSTR(inletColor, outletColor);
+
+    // ----- overlay annotation texts (world coords from p1b) -----
+    const TeqC = Math.trunc(res.Teq - 273.15);
+    const T0C  = Math.trunc(res.rc.T0 - 273.15);
+    const px = 18;
+
+    // reactor volume = V L  at world {5.1,0.2} center
+    drawRich([{s:"reactor volume = "},{s:res.rc.V.toFixed(0)+" L"}],
+             wx(5.1), wy(0.2), px, "center");
+    // residence time = tau s at {5.1,-0.6} center
+    drawRich([{s:"residence time = "},{s:Math.trunc(res.tau)+" s"}],
+             wx(5.1), wy(-0.6), px, "center");
+
+    // X_A = ... at {4.3,2.4} left
+    const xDigits = res.X>0.99?3:2;
+    drawRich([{s:"X",ital:true},{s:"A",sub:true},{s:" = "+res.X.toFixed(xDigits)}],
+             wx(4.3), wy(2.4), px, "left");
+
+    // C_A = ... mol/L at {7.6,3.5} left (above T)
+    const cDigits = res.cAout<0.03?3:2;
+    drawRich([{s:"C",ital:true},{s:"A",sub:true},{s:" = "+res.cAout.toFixed(cDigits)+" mol/L"}],
+             wx(7.6), wy(3.5), px, "left");
+
+    // C_A0 = ... mol/L at {0,6.5} left
+    drawRich([{s:"C",ital:true},{s:"A0",sub:true},{s:" = "+res.cA0.toFixed(2)+" mol/L"}],
+             wx(0), wy(6.5), px, "left");
+
+    // T = ..°C at {7.6,2.85} left (below C_A)
+    drawRich([{s:"T",ital:true},{s:" = "+TeqC+" \u00B0C"}],
+             wx(7.6), wy(2.85), px, "left");
+
+    // T0 = ..°C at {0,5.8} left
+    drawRich([{s:"T",ital:true},{s:"0",sub:true},{s:" = "+T0C+" \u00B0C"}],
+             wx(0), wy(5.8), px, "left");
+
+    // curved arrow (BezierCurve table) around {5,4.2} rx0.4 ry0.125, 0.6pi..2.45pi
+    ctx.strokeStyle="#000"; ctx.lineWidth=1.3;
+    ctx.beginPath();
+    let firstPt=null, lastA=0;
+    for(let a=0.6*Math.PI; a<=2.45*Math.PI; a+=0.1){
+      const pxw=5+0.4*Math.cos(a), pyw=4.2+0.125*Math.sin(a);
+      const X=wx(pxw),Y=wy(pyw);
+      if(a===0.6*Math.PI){ctx.moveTo(X,Y);firstPt=[X,Y];} else ctx.lineTo(X,Y);
+      lastA=a;
+    }
+    ctx.stroke();
+    // arrowhead at end
+    (function(){
+      const a=lastA;
+      const X=wx(5+0.4*Math.cos(a)), Y=wy(4.2+0.125*Math.sin(a));
+      const a2=a-0.1;
+      const Xp=wx(5+0.4*Math.cos(a2)), Yp=wy(4.2+0.125*Math.sin(a2));
+      const ang=Math.atan2(Y-Yp, X-Xp), hl=7;
+      ctx.beginPath();
+      ctx.moveTo(X,Y);
+      ctx.lineTo(X-hl*Math.cos(ang-0.5), Y-hl*Math.sin(ang-0.5));
+      ctx.lineTo(X-hl*Math.cos(ang+0.5), Y-hl*Math.sin(ang+0.5));
+      ctx.closePath(); ctx.fillStyle="#000"; ctx.fill();
+    })();
+  }
+
+  // ---------- events ----------
+  [sCA0,sNu,sRxn].forEach(el=> el.addEventListener("input", render));
+
+  // info buttons
+  document.querySelectorAll(".info-btn").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const id = btn.getAttribute("data-panel");
+      const panel = document.getElementById(id);
+      const isOpen = panel.classList.contains("show");
+      document.querySelectorAll(".panel").forEach(p=>p.classList.remove("show"));
+      document.querySelectorAll(".info-btn").forEach(b=>b.classList.remove("active"));
+      if(!isOpen){ panel.classList.add("show"); btn.classList.add("active"); }
+    });
+  });
+
+  // panel close (x) buttons
+  document.querySelectorAll(".panel-close").forEach(x=>{
+    x.addEventListener("click", ()=>{
+      const id = x.getAttribute("data-panel");
+      document.getElementById(id).classList.remove("show");
+      const btn = document.querySelector('.info-btn[data-panel="'+id+'"]');
+      if(btn) btn.classList.remove("active");
+    });
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gibbs Phase Rule</title>
+<style>
+  :root{
+    --red:#98000D;
+    --red-tint:#f6dcdd;
+    --text:#000;
+  }
+  *{ box-sizing:border-box; }
+  html,body{
+    margin:0;
+    padding:0;
+    background:#ffffff;
+    color:var(--text);
+    font-family:Helvetica, Arial, sans-serif;
+  }
+  .app{
+    max-width:560px;
+    margin:0 auto;
+    padding:20px 16px 40px 16px;
+  }
+  h1.title{
+    font-family:Helvetica, Arial, sans-serif;
+    font-size:28px;
+    font-weight:600;
+    text-align:center;
+    margin:0 0 16px 0;
+    color:#000;
+  }
+  .toolbar{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    justify-content:center;
+    gap:10px 14px;
+    margin-bottom:10px;
+  }
+  .ctrl-label{
+    font-size:19.55px;
+    font-weight:400;
+    color:#000;
+    font-family:Helvetica, Arial, sans-serif;
+  }
+  .btn-group{
+    display:flex;
+    gap:6px;
+  }
+  button.ui-btn{
+    font-family:Helvetica, Arial, sans-serif;
+    font-size:17px;
+    font-weight:400;
+    color:#000;
+    background:#ffffff;
+    border:2px solid var(--red);
+    border-radius:5px;
+    padding:5px 14px;
+    cursor:pointer;
+    line-height:1.3;
+  }
+  button.ui-btn:hover{
+    background:#fbeced;
+  }
+  button.ui-btn.active{
+    background:var(--red-tint);
+  }
+  button.ui-btn.info-btn{
+    background:var(--red);
+    color:#ffffff;
+    border:2px solid var(--red);
+  }
+  button.ui-btn.info-btn:hover{
+    background:#7a000a;
+  }
+  button.ui-btn.info-btn.active{
+    background:#ffffff;
+    color:var(--red);
+  }
+  .divider{
+    width:1px;
+    height:26px;
+    background:#ccc;
+  }
+  .stage{
+    position:relative;
+    margin:0 auto;
+    width:470px;
+    max-width:100%;
+  }
+  canvas#plot{
+    display:block;
+    width:100%;
+    height:auto;
+    touch-action:none;
+    cursor:crosshair;
+  }
+  .panel{
+    position:absolute;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+    background:#ffffff;
+    border:2px solid var(--red);
+    border-radius:4px;
+    z-index:20;
+    display:flex;
+    flex-direction:column;
+    box-shadow:0 4px 14px rgba(0,0,0,0.18);
+  }
+  .panel[hidden]{ display:none; }
+  .panel-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:8px 10px 4px 16px;
+    flex:0 0 auto;
+  }
+  .panel-header .panel-title{
+    font-size:17px;
+    font-weight:400;
+    color:#000;
+    font-family:Helvetica, Arial, sans-serif;
+  }
+  .close-btn{
+    font-family:Helvetica, Arial, sans-serif;
+    font-size:17px;
+    font-weight:400;
+    color:#000;
+    background:#ffffff;
+    border:1px solid #999;
+    border-radius:50%;
+    width:26px;
+    height:26px;
+    line-height:1;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:0;
+  }
+  .close-btn:hover{
+    background:#f0f0f0;
+  }
+  .panel-body{
+    flex:1 1 auto;
+    min-height:0;
+    overflow-y:auto;
+    padding:0 20px 18px 20px;
+    font-size:17px;
+    font-weight:400;
+    color:#000;
+    font-family:Helvetica, Arial, sans-serif;
+    line-height:1.5;
+  }
+  .panel-body p{
+    margin:0 0 14px 0;
+    text-align:left;
+  }
+  .panel-body a{
+    color:var(--red);
+  }
+  .eqn{
+    text-align:left;
+    margin:8px 0 16px 0;
+  }
+  .symbols{
+    margin-top:6px;
+  }
+  mjx-container{
+    margin:0 !important;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="toolbar">
+    <span class="ctrl-label">Number of components:</span>
+    <div class="btn-group" id="componentGroup">
+      <button class="ui-btn active" data-c="1" type="button">1</button>
+      <button class="ui-btn" data-c="2" type="button">2</button>
+    </div>
+    <div class="divider"></div>
+    <div class="btn-group">
+      <button class="ui-btn info-btn" data-panel="directions" type="button">Directions</button>
+      <button class="ui-btn info-btn" data-panel="details" type="button">Details</button>
+      <button class="ui-btn info-btn" data-panel="about" type="button">About</button>
+    </div>
+  </div>
+
+  <div class="stage" id="stage">
+    <canvas id="plot"></canvas>
+
+    <div class="panel" id="panel-directions" hidden>
+      <div class="panel-header">
+        <span class="panel-title">Directions</span>
+        <button class="close-btn" data-close="directions" type="button" aria-label="Close">&times;</button>
+      </div>
+      <div class="panel-body">
+        <p>If a system in thermodynamic equilibrium contains <em>P</em> phases and <em>C</em> components, then the phase rule states that the number of degrees of freedom is given by <em>F</em>&nbsp;=&nbsp;<em>C</em>&nbsp;&minus;&nbsp;<em>P</em>&nbsp;+&nbsp;2. Degrees of freedom <em>F</em> represents the number of intensive variables (such as pressure, temperature, and composition) that can be varied arbitrarily over some finite range without changing the number of phases. This simulation considers only the simplest cases of one- and two-component systems. Omitted are such phenomena as multiple crystal structures, solid solutions, partial miscibility of liquids, and azeotrope formation. You can drag the locator over various regions of the phase diagrams. For one-component systems, this selects values for the pressure and temperature. For two-component systems, this selects the temperature and composition. The two-component phase diagram should actually be three-dimensional, with pressure providing an additional degree of freedom.</p>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-details" hidden>
+      <div class="panel-header">
+        <span class="panel-title">Details</span>
+        <button class="close-btn" data-close="details" type="button" aria-label="Close">&times;</button>
+      </div>
+      <div class="panel-body">
+        <p>Following is a compact derivation of the phase rule. At equilibrium, the chemical potential of each component is equal across every phase boundary, as are the temperature and pressure (taking account of hydrostatic effects, if necessary):</p>
+        <div class="eqn">\[ \mu_1 = \mu_2 = \cdots = \mu_C \]</div>
+        <p>This gives a total of</p>
+        <div class="eqn">\[ C + 2 \]</div>
+        <p>variables &mdash; the <em>C</em> chemical potentials (or compositions) plus temperature and pressure. However, these variables must conform to an equation of state in each of the <em>P</em> phases, which removes one degree of freedom per phase. This leaves</p>
+        <div class="eqn">\[ F = C + 2 - P \]</div>
+        <p>arbitrary intensive variables &mdash; the Gibbs phase rule:</p>
+        <div class="eqn">\[ F = C - P + 2 \]</div>
+        <p>Remarkably, Gibbs' phase rule is isomorphic with Euler's formula, relating the number of vertices, edges, and faces of a simply-connected polyhedron:</p>
+        <div class="eqn">\[ V - E + F = 2 \]</div>
+        <p class="symbols"><em>C</em> = number of components&nbsp;&nbsp;|&nbsp;&nbsp;<em>P</em> = number of phases&nbsp;&nbsp;|&nbsp;&nbsp;<em>F</em> = degrees of freedom&nbsp;&nbsp;|&nbsp;&nbsp;\(\mu_i\) = chemical potential of component <em>i</em>&nbsp;&nbsp;|&nbsp;&nbsp;<em>V</em>, <em>E</em>, <em>F</em> (Euler) = vertices, edges, faces</p>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-about" hidden>
+      <div class="panel-header">
+        <span class="panel-title">About</span>
+        <button class="close-btn" data-close="about" type="button" aria-label="Close">&times;</button>
+      </div>
+      <div class="panel-body">
+        <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/GibbsPhaseRuleForOneAndTwoComponentSystems/" target="_blank" rel="noopener">Mathematica simulation</a> by S. M. Blinder. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['\\(', '\\)']],
+    displayMath: [['\\[', '\\]']]
+  },
+  chtml: {
+    displayAlign: 'left',
+    displayIndent: '0'
+  }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-chtml.js" defer></script>
+<script>
+(function(){
+  "use strict";
+
+  // ---------- Layout constants (CSS-pixel / data space) ----------
+  var PAD_LEFT = 72, PAD_RIGHT = 20, PAD_TOP = 56, PAD_BOTTOM = 56;
+  var PLOT = 380;
+  var CSS_W = PAD_LEFT + PLOT + PAD_RIGHT;   // 472
+  var CSS_H = PAD_TOP + PLOT + PAD_BOTTOM;   // 492
+  var SCALE = PLOT / 100;
+  var FONT = '17px Helvetica, Arial, sans-serif';
+  var FONT_AXIS = '20.4px Helvetica, Arial, sans-serif';      // axis labels, both figures: +20%
+  var FONT_REGION1 = '21.25px Helvetica, Arial, sans-serif';  // solid/liquid/gas labels, P-T figure: +25%
+  var FONT_LIQVAP2 = '19.55px Helvetica, Arial, sans-serif';  // "liquid (melt)"/"vapor" labels, T-x figure: +15%
+  var FONT_SAMELT = '14.5px Helvetica, Arial, sans-serif';    // "solid A + melt": slightly smaller so it clears the curve
+
+  var canvas = document.getElementById('plot');
+  var ctx = canvas.getContext('2d');
+
+  function setupCanvas(){
+    var dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.round(CSS_W * dpr);
+    canvas.height = Math.round(CSS_H * dpr);
+    // Intentionally no inline canvas.style.width/height: the stylesheet's
+    // width:100%/height:auto (with the canvas's intrinsic width/height
+    // attributes above) keeps the plot responsive on narrow screens.
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  setupCanvas();
+
+  function dataToPx(x, y){
+    return { x: PAD_LEFT + x * SCALE, y: PAD_TOP + (100 - y) * SCALE };
+  }
+  function pxToData(px, py){
+    return { x: (px - PAD_LEFT) / SCALE, y: 100 - (py - PAD_TOP) / SCALE };
+  }
+  function clamp(v, lo, hi){ return Math.max(lo, Math.min(hi, v)); }
+
+  // ---------- State ----------
+  var state = {
+    component: 1,
+    loc: { x: 50, y: 50 }
+  };
+
+  // ---------- Curve sampling helpers ----------
+  function samplePath(fn, t0, t1, n){
+    var pts = [];
+    for (var i = 0; i <= n; i++){
+      var t = t0 + (t1 - t0) * i / n;
+      pts.push({ x: t, y: fn(t) });
+    }
+    return pts;
+  }
+  function strokeDataPath(pts, opts){
+    opts = opts || {};
+    ctx.save();
+    ctx.strokeStyle = opts.color || '#000';
+    ctx.lineWidth = opts.width || 2;
+    ctx.beginPath();
+    for (var i = 0; i < pts.length; i++){
+      var p = dataToPx(pts[i].x, pts[i].y);
+      if (i === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y);
+    }
+    ctx.stroke();
+    ctx.restore();
+  }
+  function fillDotData(x, y, r, color){
+    var p = dataToPx(x, y);
+    ctx.save();
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+  function labelData(text, x, y, angleDeg, opts){
+    opts = opts || {};
+    var p = dataToPx(x, y);
+    ctx.save();
+    ctx.fillStyle = '#000';
+    ctx.font = opts.font || FONT;
+    ctx.textAlign = opts.align || 'center';
+    ctx.textBaseline = 'middle';
+    ctx.translate(p.x, p.y);
+    if (angleDeg) ctx.rotate(-angleDeg * Math.PI / 180);
+    ctx.fillText(text, 0, 0);
+    ctx.restore();
+  }
+
+  // ---------- Region classification (for area shading) ----------
+  function classify1(x, y){
+    if (x <= 30){
+      return (y > (10 + 0.02 * x * x)) ? 'solid' : 'gas';
+    } else if (x <= 70){
+      var boil = 28 + 0.01 * (x - 30) * (x - 30);
+      if (y <= boil) return 'gas';
+      if (y >= 28 && x <= (25.4 + 0.139 * y)) return 'solid';
+      return 'liquid';
+    } else {
+      return (y > 44) ? 'liquid' : 'gas';
+    }
+  }
+
+  function classify2(x, y){
+    if (y < 10) return 'ssB';
+    if (x < 40 && y <= (-0.00525 * x * x - 0.04 * x + 20)) return 'sAmelt';
+    if (x >= 40 && y <= (-0.005944 * x * x + 1.2489 * x - 30.44)) return 'sBmelt';
+    var upper = -0.003 * x * x + 0.7 * x + 50;
+    var lower = 0.003 * x * x + 0.1 * x + 50;
+    if (y <= upper && y >= lower) return 'liquidVapor';
+    if (y >= upper) return 'vapor';
+    return 'liquid';
+  }
+
+  function liquidColor1(y){
+    // Continuous gradient by pressure alone (no hard cutoff at the
+    // liquid/gas boundary curve): lightest at the bottom of the plot,
+    // fading into the gas region, deepening toward the top.
+    var t = clamp(y / 100, 0, 1);
+    var c0 = [254, 243, 242];
+    var c1 = [205, 60, 50];
+    return [
+      Math.round(c0[0] + (c1[0] - c0[0]) * t),
+      Math.round(c0[1] + (c1[1] - c0[1]) * t),
+      Math.round(c0[2] + (c1[2] - c0[2]) * t),
+      255
+    ];
+  }
+
+  function colorFn1(x, y){
+    var cat = classify1(x, y);
+    if (cat === 'solid') return [219, 233, 251, 255];
+    return liquidColor1(y); // liquid and gas share one continuous red gradient by pressure
+  }
+
+  function colorFn2(x, y){
+    switch (classify2(x, y)){
+      case 'ssB': return [224, 224, 224, 255];
+      case 'sAmelt': return [255, 242, 179, 255];
+      case 'sBmelt': return [255, 242, 179, 255];
+      case 'liquid': return [215, 245, 208, 255];
+      case 'liquidVapor': return null;
+      case 'vapor': return [207, 232, 251, 255];
+    }
+    return null;
+  }
+
+  function buildRegionMap(colorFn){
+    var off = document.createElement('canvas');
+    off.width = PLOT;
+    off.height = PLOT;
+    var octx = off.getContext('2d');
+    var img = octx.createImageData(PLOT, PLOT);
+    for (var j = 0; j < PLOT; j++){
+      var dataY = 100 - j / SCALE;
+      for (var i = 0; i < PLOT; i++){
+        var dataX = i / SCALE;
+        var rgba = colorFn(dataX, dataY);
+        var idx = (j * PLOT + i) * 4;
+        if (rgba){
+          img.data[idx] = rgba[0];
+          img.data[idx + 1] = rgba[1];
+          img.data[idx + 2] = rgba[2];
+          img.data[idx + 3] = rgba[3] == null ? 255 : rgba[3];
+        } else {
+          img.data[idx + 3] = 0;
+        }
+      }
+    }
+    octx.putImageData(img, 0, 0);
+    return off;
+  }
+
+  var regionMap1 = buildRegionMap(colorFn1);
+  var regionMap2 = buildRegionMap(colorFn2);
+
+  // ---------- Region logic (ported from the Mathematica source) ----------
+  function msg1(x, y){
+    if (Math.pow(x - 30, 2) + Math.pow(y - 28, 2) <= 2.25){
+      return ['C = 1, P = 3,     F = C − P + 2 = 0', 'triple point'];
+    }
+    if (Math.pow(x - 70, 2) + Math.pow(y - 44, 2) <= 2.25){
+      return ['C = 1, P = 3,     F = C − P + 2 = 0', 'critical point'];
+    }
+    if (x < 30 && y >= 9.5 + 0.02 * x * x && y <= 10.5 + 0.02 * x * x){
+      return ['C = 1, P = 2,     F = C − P + 2 = 1', 'sublimation curve'];
+    }
+    if (y > 28 && x >= 0.139 * y + 25.4 && x <= 0.139 * y + 26.8){
+      return ['C = 1, P = 2,     F = C − P + 2 = 1', 'freezing curve'];
+    }
+    if (x > 30 && x < 70 && y >= 27.5 + 0.01 * Math.pow(x - 30, 2) && y <= 28.5 + 0.01 * Math.pow(x - 30, 2)){
+      return ['C = 1, P = 2,     F = C − P + 2 = 1', 'boiling curve'];
+    }
+    if (x > 70 && y > 44){
+      return ['C = 1, P = 1,     F = C − P + 2 = 2', 'supercritical fluid'];
+    }
+    return ['C = 1, P = 1,     F = C − P + 2 = 2', 'one phase'];
+  }
+
+  function msg2(x, y){
+    if (y < 10){
+      return ['C = 2, P = 2,     F = C − P + 2 = 2', 'solid A + solid B'];
+    }
+    if (x < 40 && y >= 10 && y <= (-0.00525 * x * x - 0.04 * x + 20)){
+      return ['C = 2, P = 2,     F = C − P + 2 = 2', 'solid A + melt'];
+    }
+    if (x >= 40 && y >= 10 && y <= (-0.005944 * x * x + 1.2489 * x - 30.44)){
+      return ['C = 2, P = 2,     F = C − P + 2 = 2', 'solid B + melt'];
+    }
+    var upper = -0.003 * x * x + 0.7 * x + 50;
+    var lower = 0.003 * x * x + 0.1 * x + 50;
+    if (y <= upper && y >= lower){
+      return ['C = 2, P = 2,     F = C − P + 2 = 2', 'liquid + vapor A + B'];
+    }
+    if (y >= upper){
+      return ['C = 2, P = 1,     F = C − P + 2 = 3', 'vapor A + B'];
+    }
+    if (Math.pow(x - 40, 2) + Math.pow(y - 10, 2) < 2){
+      return ['C = 2, P = 3,     F = C − P + 2 = 1', 'eutectic'];
+    }
+    return ['C = 2, P = 1,     F = C − P + 2 = 3', 'liquid A + B'];
+  }
+
+  // ---------- Drawing ----------
+  function drawFrame(xLabel, yLabel){
+    ctx.save();
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(PAD_LEFT, PAD_TOP, PLOT, PLOT);
+    ctx.restore();
+
+    ctx.save();
+    ctx.fillStyle = '#000';
+    ctx.font = FONT_AXIS;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText(xLabel, PAD_LEFT + PLOT / 2, PAD_TOP + PLOT + 34);
+    ctx.restore();
+
+    ctx.save();
+    ctx.fillStyle = '#000';
+    ctx.font = FONT_AXIS;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.translate(PAD_LEFT - 48, PAD_TOP + PLOT / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText(yLabel, 0, 0);
+    ctx.restore();
+  }
+
+  function drawTopMessage(line1, line2){
+    ctx.save();
+    ctx.fillStyle = '#000';
+    ctx.font = FONT;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(line1, PAD_LEFT + PLOT / 2, 20);
+    ctx.fillText(line2, PAD_LEFT + PLOT / 2, 42);
+    ctx.restore();
+  }
+
+  function drawLocator(x, y){
+    var p = dataToPx(x, y);
+    ctx.save();
+    ctx.strokeStyle = '#000';
+    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 7, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(p.x - 10, p.y);
+    ctx.lineTo(p.x + 10, p.y);
+    ctx.moveTo(p.x, p.y - 10);
+    ctx.lineTo(p.x, p.y + 10);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawComponent1(){
+    ctx.drawImage(regionMap1, PAD_LEFT, PAD_TOP);
+
+    var sv = samplePath(function(t){ return 10 + 0.02 * t * t; }, 0, 30, 60);
+    var lv = samplePath(function(t){ return 28 + 0.01 * (t - 30) * (t - 30); }, 30, 70, 60);
+    var freeze = [{ x: 30, y: 28 }, { x: 40, y: 100 }];
+
+    strokeDataPath(sv, { color: '#000', width: 2 });
+    strokeDataPath(lv, { color: '#000', width: 2 });
+    strokeDataPath(freeze, { color: '#000', width: 2 });
+
+    fillDotData(30, 28, 5, '#1a4fd6');
+    fillDotData(70, 44, 5, '#d21f1f');
+
+    labelData('solid', 15, 50, 0, { font: FONT_REGION1 });
+    labelData('liquid', 45, 40, 0, { font: FONT_REGION1 });
+    labelData('gas', 60, 15, 0, { font: FONT_REGION1 });
+
+    drawFrame('temperature', 'pressure');
+
+    var m = msg1(state.loc.x, state.loc.y);
+    drawTopMessage(m[0], m[1]);
+  }
+
+  function drawComponent2(){
+    ctx.drawImage(regionMap2, PAD_LEFT, PAD_TOP);
+
+    var lv2Upper = samplePath(function(z){ return -0.003 * z * z + 0.7 * z + 50; }, 0, 100, 80);
+    var lv2Lower = samplePath(function(z){ return 0.003 * z * z + 0.1 * z + 50; }, 0, 100, 80);
+    var solidusFlat = [{ x: 0, y: 10 }, { x: 100, y: 10 }];
+    var liqLeft = samplePath(function(z){ return -0.00525 * z * z - 0.04 * z + 20; }, 0, 40, 40);
+    var liqRight = samplePath(function(z){ return -0.005944 * z * z + 1.2489 * z - 30.44; }, 40, 100, 60);
+
+    strokeDataPath(lv2Upper, { color: '#000', width: 2 });
+    strokeDataPath(lv2Lower, { color: '#000', width: 2 });
+    strokeDataPath(solidusFlat, { color: '#000', width: 2 });
+    strokeDataPath(liqLeft, { color: '#000', width: 2 });
+    strokeDataPath(liqRight, { color: '#000', width: 2 });
+
+    labelData('solid A + solid B', 50, 3.5, 0);
+    labelData('solid A + melt', 16, 12.5, 0, { font: FONT_SAMELT });
+    labelData('solid B + melt', 78, 20, 0);
+    labelData('liquid (melt)', 50, 44, 0, { font: FONT_LIQVAP2 });
+    labelData('vapor', 50, 90, 0, { font: FONT_LIQVAP2 });
+    labelData('liquid + vapor', 50, 70, 22.5);
+
+    drawFrame('mole fraction B', 'temperature');
+
+    var m = msg2(state.loc.x, state.loc.y);
+    drawTopMessage(m[0], m[1]);
+  }
+
+  function render(){
+    ctx.clearRect(0, 0, CSS_W, CSS_H);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, CSS_W, CSS_H);
+
+    if (state.component === 1) drawComponent1(); else drawComponent2();
+    drawLocator(state.loc.x, state.loc.y);
+  }
+
+  // ---------- Interaction: dragging the locator ----------
+  var dragging = false;
+
+  function eventToData(e){
+    var rect = canvas.getBoundingClientRect();
+    var cssScale = CSS_W / rect.width; // account for responsive scaling
+    var px = (e.clientX - rect.left) * cssScale;
+    var py = (e.clientY - rect.top) * cssScale;
+    var d = pxToData(px, py);
+    return { x: clamp(d.x, 0, 100), y: clamp(d.y, 0, 100) };
+  }
+
+  canvas.addEventListener('pointerdown', function(e){
+    dragging = true;
+    canvas.setPointerCapture(e.pointerId);
+    var d = eventToData(e);
+    state.loc = d;
+    render();
+  });
+  canvas.addEventListener('pointermove', function(e){
+    if (!dragging) return;
+    var d = eventToData(e);
+    state.loc = d;
+    render();
+  });
+  canvas.addEventListener('pointerup', function(e){
+    dragging = false;
+    try { canvas.releasePointerCapture(e.pointerId); } catch (err) {}
+  });
+  canvas.addEventListener('pointercancel', function(){ dragging = false; });
+
+  // ---------- Component setter buttons ----------
+  var componentGroup = document.getElementById('componentGroup');
+  componentGroup.addEventListener('click', function(e){
+    var btn = e.target.closest('button[data-c]');
+    if (!btn) return;
+    state.component = parseInt(btn.getAttribute('data-c'), 10);
+    var buttons = componentGroup.querySelectorAll('button');
+    buttons.forEach(function(b){ b.classList.toggle('active', b === btn); });
+    render();
+  });
+
+  // ---------- Info panels (Directions / Details / About) ----------
+  var panels = {
+    directions: document.getElementById('panel-directions'),
+    details: document.getElementById('panel-details'),
+    about: document.getElementById('panel-about')
+  };
+  var infoButtons = document.querySelectorAll('button[data-panel]');
+
+  function closeAllPanels(){
+    Object.keys(panels).forEach(function(key){
+      panels[key].hidden = true;
+    });
+    infoButtons.forEach(function(b){ b.classList.remove('active'); });
+  }
+
+  function openPanel(name){
+    var alreadyOpen = !panels[name].hidden;
+    closeAllPanels();
+    if (!alreadyOpen){
+      panels[name].hidden = false;
+      infoButtons.forEach(function(b){
+        if (b.getAttribute('data-panel') === name) b.classList.add('active');
+      });
+    }
+  }
+
+  infoButtons.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      openPanel(btn.getAttribute('data-panel'));
+    });
+  });
+
+  document.querySelectorAll('button[data-close]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      closeAllPanels();
+    });
+  });
+
+  // ---------- Init ----------
+  render();
+  window.addEventListener('resize', function(){
+    setupCanvas();
+    render();
+  });
+})();
+</script>
+</body>
+</html>

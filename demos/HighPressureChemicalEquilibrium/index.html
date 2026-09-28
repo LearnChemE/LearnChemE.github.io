@@ -1,0 +1,770 @@
+<title>High-Pressure Chemical Equilibrium</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js"></script>
+<style>
+  :root{
+    --bg:#ffffff;
+    --surface:#ffffff;
+    --panel:#f1f1ec;
+    --panel-2:#e7e6dd;
+    --border:#cfd3d2;
+    --border-strong:#b9bdba;
+    --text:#201f1d;
+    --text-muted:#63645f;
+    --accent:#b3261e;
+    --accent-soft:#eadfc4;
+    --accent-contrast:#ffffff;
+    --series-extent:#c1571c;
+    --series-extent-fill:#c1571c22;
+    --series-kv:#187a63;
+    --series-kv-fill:#187a6322;
+    --close:#8c2f2f;
+    --axis-stroke:#63645f;
+    --info-bg:#b3261e;
+    --info-bg-active:#8c1d17;
+    --info-fg:#ffffff;
+    --shadow: 0 1px 2px rgba(20,20,15,0.06), 0 6px 20px rgba(20,20,15,0.08);
+    --font-display:"Helvetica Neue",Helvetica,Arial,sans-serif;
+    --font-body:Verdana,Geneva,"DejaVu Sans",sans-serif;
+  }
+  /* @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#18181a;
+      --surface:#232326;
+      --panel:#28282b;
+      --panel-2:#313135;
+      --border:#3c3c40;
+      --border-strong:#4c4c50;
+      --text:#eceae4;
+      --text-muted:#a5a29a;
+      --accent:#d9b45c;
+      --accent-soft:#453a22;
+      --accent-contrast:#1c1a15;
+      --series-extent:#e8823f;
+      --series-extent-fill:#e8823f2a;
+      --series-kv:#4fbf9f;
+      --series-kv-fill:#4fbf9f2a;
+      --close:#e08585;
+      --axis-stroke:#a5a29a;
+      --info-bg:#c23b32;
+      --info-bg-active:#9c2d25;
+      --info-fg:#ffffff;
+      --shadow: 0 1px 2px rgba(0,0,0,0.35), 0 10px 30px rgba(0,0,0,0.45);
+    }
+  } */
+  :root[data-theme="dark"]{
+    --bg:#18181a;
+    --surface:#232326;
+    --panel:#28282b;
+    --panel-2:#313135;
+    --border:#3c3c40;
+    --border-strong:#4c4c50;
+    --text:#eceae4;
+    --text-muted:#a5a29a;
+    --accent:#d9b45c;
+    --accent-soft:#453a22;
+    --accent-contrast:#1c1a15;
+    --series-extent:#e8823f;
+    --series-extent-fill:#e8823f2a;
+    --series-kv:#4fbf9f;
+    --series-kv-fill:#4fbf9f2a;
+    --close:#e08585;
+    --axis-stroke:#a5a29a;
+    --info-bg:#c23b32;
+    --info-bg-active:#9c2d25;
+    --info-fg:#ffffff;
+    --shadow: 0 1px 2px rgba(0,0,0,0.35), 0 10px 30px rgba(0,0,0,0.45);
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--font-body);
+    margin:0;
+    padding:28px 16px 48px;
+    display:flex;
+    justify-content:center;
+  }
+  .app{
+    width:100%;
+    max-width:700px;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+  header.masthead{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    padding:2px 4px 4px;
+  }
+  header.masthead h1{
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:24px;
+    letter-spacing:0.005em;
+    margin:0;
+    color:var(--text);
+    text-wrap:balance;
+  }
+
+  .card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:10px;
+    box-shadow:var(--shadow);
+  }
+
+  .panel{
+    background:var(--panel);
+    border-bottom:1px solid var(--border);
+    padding:16px 18px 14px;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+
+  .temp-row{
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+  .temp-row .temp-label{
+    font-family:var(--font-display);
+    font-size:14.95px;
+    color:var(--text);
+    white-space:nowrap;
+  }
+  .temp-row input[type=range]{
+    flex:1;
+    -webkit-appearance:none;
+    appearance:none;
+    height:4px;
+    border-radius:2px;
+    background:linear-gradient(to right, var(--accent) 0%, var(--accent) var(--fill,50%), var(--border-strong) var(--fill,50%), var(--border-strong) 100%);
+    outline:none;
+    cursor:pointer;
+  }
+  .temp-row input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    width:16px;
+    height:16px;
+    border-radius:50%;
+    background:var(--surface);
+    border:2px solid var(--text-muted);
+    box-shadow:0 1px 2px rgba(0,0,0,0.25);
+    cursor:pointer;
+    transition:border-color .1s ease;
+  }
+  .temp-row input[type=range]:hover::-webkit-slider-thumb,
+  .temp-row input[type=range]:focus::-webkit-slider-thumb{
+    border-color:var(--accent);
+  }
+  .temp-row input[type=range]::-moz-range-thumb{
+    width:14px;
+    height:14px;
+    border-radius:50%;
+    background:var(--surface);
+    border:2px solid var(--text-muted);
+    box-shadow:0 1px 2px rgba(0,0,0,0.25);
+    cursor:pointer;
+  }
+  .temp-row input[type=range]::-moz-range-track{
+    height:4px;
+    border-radius:2px;
+    background:var(--border-strong);
+  }
+  .readout{
+    font-family:var(--font-display);
+    font-variant-numeric:tabular-nums;
+    font-size:13px;
+    background:var(--surface);
+    border:1px solid var(--border-strong);
+    border-radius:5px;
+    padding:4px 8px;
+    min-width:64px;
+    text-align:center;
+    white-space:nowrap;
+  }
+
+  .button-row{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  .toggle-group, .util-group{
+    display:inline-flex;
+    border:1px solid var(--border-strong);
+    border-radius:6px;
+    overflow:hidden;
+  }
+  button.seg{
+    font-family:var(--font-body);
+    font-size:12px;
+    color:var(--text);
+    background:var(--surface);
+    border:none;
+    border-right:1px solid var(--border-strong);
+    padding:7px 12px;
+    cursor:pointer;
+    transition:background .12s ease, color .12s ease;
+  }
+  .toggle-group button.seg:last-child, .util-group button.seg:last-child{
+    border-right:none;
+  }
+  button.seg:hover{
+    background:var(--panel-2);
+  }
+  button.seg.active{
+    background:var(--accent);
+    color:var(--accent-contrast);
+    font-weight:bold;
+  }
+  button.seg:focus-visible{
+    outline:2px solid var(--accent);
+    outline-offset:-2px;
+  }
+  .row-divider{
+    width:1px;
+    align-self:stretch;
+    background:var(--border-strong);
+  }
+  .util-group{
+    border-color:var(--info-bg);
+  }
+  .util-group button.seg{
+    font-size:13.8px;
+    background:var(--info-bg);
+    color:var(--info-fg);
+    border-right:1px solid rgba(255,255,255,0.35);
+  }
+  .util-group button.seg:hover{
+    background:var(--info-bg-active);
+  }
+  .util-group button.seg.active{
+    background:var(--info-bg-active);
+    color:var(--info-fg);
+    font-weight:bold;
+  }
+
+  .plot-wrap{
+    position:relative;
+    background:var(--surface);
+    padding:6px 6px 2px;
+  }
+  #chart{
+    display:block;
+    width:100%;
+    height:auto;
+  }
+  .axis-tick, .axis-title{
+    fill:var(--text);
+    font-family:var(--font-display);
+  }
+  .frame-box{
+    stroke:var(--axis-stroke);
+  }
+  .tick-mark{
+    stroke:var(--axis-stroke);
+    stroke-width:1.2;
+  }
+  .gridline{
+    stroke:var(--border);
+    stroke-dasharray:2,3;
+  }
+  .series-extent-stroke{stroke:var(--series-extent);}
+  .series-extent-fill{fill:var(--series-extent);}
+  .series-kv-stroke{stroke:var(--series-kv);}
+  .series-kv-fill{fill:var(--series-kv);}
+  .marker-ring{stroke:var(--surface);}
+
+  .overlay{
+    position:absolute;
+    left:6px;
+    right:6px;
+    top:6px;
+    background:var(--surface);
+    border:1px solid var(--border-strong);
+    border-radius:8px;
+    box-shadow:var(--shadow);
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+  .overlay[hidden]{display:none;}
+  .overlay-fill{
+    bottom:2px;
+  }
+  .overlay-auto{
+    height:auto;
+    max-height:calc(100% - 8px);
+  }
+  .overlay-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:10px 8px 10px 16px;
+    background:var(--panel);
+    border-bottom:1px solid var(--border);
+  }
+  .overlay-head h3{
+    font-family:var(--font-display);
+    font-size:15px;
+    margin:0;
+    color:var(--accent);
+    letter-spacing:0.01em;
+  }
+  .close-x{
+    font-family:var(--font-display);
+    font-size:16px;
+    line-height:1;
+    background:transparent;
+    border:none;
+    color:var(--text-muted);
+    width:28px;
+    height:28px;
+    border-radius:50%;
+    cursor:pointer;
+    transition:background .12s ease, color .12s ease;
+  }
+  .close-x:hover{
+    background:var(--panel-2);
+    color:var(--close);
+  }
+  .overlay-body{
+    padding:14px 20px 20px;
+    overflow-y:auto;
+    font-family:var(--font-body);
+    font-size:13.5px;
+    line-height:1.6;
+    color:var(--text);
+  }
+  .overlay-body p{margin:0 0 12px;}
+  .overlay-body mjx-container[display="true"]{
+    text-align:left !important;
+    margin-left:0 !important;
+    margin-right:0 !important;
+  }
+  .overlay-body h4{
+    font-family:var(--font-display);
+    font-size:12px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--text-muted);
+    margin:18px 0 8px;
+  }
+  .overlay-body h4:first-child{margin-top:0;}
+  .symbol-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:12.5px;
+    margin:10px 0 4px;
+  }
+  .symbol-table td{
+    padding:4px 8px 4px 0;
+    border-bottom:1px solid var(--border);
+    vertical-align:top;
+  }
+  .symbol-table td:first-child{
+    width:60px;
+    font-family:var(--font-display);
+    white-space:nowrap;
+  }
+  .prop-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:12.5px;
+    margin:8px 0 14px;
+    font-variant-numeric:tabular-nums;
+  }
+  .prop-table th, .prop-table td{
+    padding:5px 8px;
+    text-align:left;
+    border-bottom:1px solid var(--border);
+  }
+  .prop-table th{
+    font-family:var(--font-display);
+    font-weight:bold;
+    color:var(--text-muted);
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+  }
+  .overlay-body a{ color:var(--accent); }
+  .overlay-body code{
+    background:var(--panel-2);
+    padding:1px 5px;
+    border-radius:4px;
+    font-size:12px;
+  }
+  .tooltip{
+    position:absolute;
+    pointer-events:none;
+    background:var(--text);
+    color:var(--surface);
+    font-family:var(--font-display);
+    font-variant-numeric:tabular-nums;
+    font-size:12px;
+    padding:5px 8px;
+    border-radius:5px;
+    box-shadow:var(--shadow);
+    opacity:0;
+    transition:opacity .08s ease;
+    white-space:nowrap;
+    z-index:5;
+  }
+</style>
+
+<div class="app">
+  <!-- <header class="masthead">
+    <h1>High-Pressure Chemical Equilibrium</h1>
+  </header> -->
+
+  <div class="card">
+    <div class="panel">
+      <div class="temp-row">
+        <span class="temp-label">temperature</span>
+        <input type="range" id="tempSlider" min="550" max="850" step="1" value="700" aria-label="Temperature in kelvin">
+        <span class="readout"><span id="tempValue">700</span>&nbsp;K</span>
+      </div>
+      <div class="button-row">
+        <div class="toggle-group" role="group" aria-label="Quantity to plot">
+          <button class="seg active" data-plot="extent" type="button">extent of reaction</button>
+          <button class="seg" data-plot="kv" type="button">non-ideal gas correction factor</button>
+        </div>
+        <div class="row-divider"></div>
+        <div class="util-group" role="group" aria-label="Simulation information">
+          <button class="seg" data-panel="directions" type="button">Directions</button>
+          <button class="seg" data-panel="details" type="button">Details</button>
+          <button class="seg" data-panel="about" type="button">About</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="plot-wrap">
+      <svg id="chart" viewBox="0 0 620 500" xmlns="http://www.w3.org/2000/svg"></svg>
+      <div class="tooltip" id="tooltip"></div>
+
+      <div class="overlay overlay-auto" id="panel-directions" hidden>
+        <div class="overlay-head"><h3>Directions</h3><button class="close-x" data-close aria-label="Close directions">&times;</button></div>
+        <div class="overlay-body">
+          <p>The Peng&ndash;Robinson equation of state is used to compute the extent of reaction and the correction factor due to gas-phase nonideality, as a result of the high pressure applied in the synthesis of ammonia (3H&#8322; + N&#8322; &#8652; 2NH&#8323;). The simulation plots these two quantities versus pressure for temperatures ranging from 550&nbsp;K to 850&nbsp;K. The extent of reaction approaches one at high pressure and low temperature. The non-ideal gas correction factor is close to one at low pressure and considerably less than one at high pressure.</p>
+          <p>The correction factor due to gas-phase nonideality is given by \(\varphi_{\mathrm{NH_3}}\big/\big(\varphi_{\mathrm{H_2}}^{1.5}\,\varphi_{\mathrm{N_2}}^{0.5}\big)\), where \(\varphi_{\mathrm{NH_3}}\), \(\varphi_{\mathrm{N_2}}\), and \(\varphi_{\mathrm{H_2}}\) are the fugacity coefficients of the species involved; they are calculated using the Peng&ndash;Robinson equation of state.</p>
+        </div>
+      </div>
+
+      <div class="overlay overlay-fill" id="panel-details" hidden>
+        <div class="overlay-head"><h3>Details</h3><button class="close-x" data-close aria-label="Close details">&times;</button></div>
+        <div class="overlay-body">
+          <h4>Extent of reaction</h4>
+          <p>Starting from a stoichiometric feed of 1&nbsp;mol N&#8322; and 3&nbsp;mol H&#8322;, and letting \(\xi\) be the extent of reaction (0 to 1), the equilibrium mole fractions are</p>
+          <p>\[y_{\mathrm{H_2}}=\frac{1.5(1-\xi)}{2-\xi},\qquad y_{\mathrm{N_2}}=\frac{0.5(1-\xi)}{2-\xi},\qquad y_{\mathrm{NH_3}}=\frac{\xi}{2-\xi}\]</p>
+
+          <h4>Peng&ndash;Robinson equation of state</h4>
+          <p>The vapor-phase compressibility factor \(Z\) of the mixture solves</p>
+          <p>\[Z^3-(1-B)Z^2+(A-3B^2-2B)Z-(AB-B^2-B^3)=0\]</p>
+          <p>with mixing rules and pure-component parameters</p>
+          <p>\[A=\sum_i\sum_j y_iy_jA_{ij},\quad A_{ij}=\sqrt{A_iA_j}\,(1-k_{ij}),\quad B=\sum_i y_iB_i\]</p>
+          <p>\[A_i=\frac{a_i(T)\,P}{(RT)^2},\qquad B_i=\frac{b_i P}{RT},\qquad b_i=0.0778\,R\,\frac{T_{c,i}}{P_{c,i}}\]</p>
+          <p>\[a_i(T)=0.45724\,R^2\frac{T_{c,i}^2}{P_{c,i}}\Big[1+m_i\big(1-\sqrt{T/T_{c,i}}\,\big)\Big]^2,\qquad m_i=0.37464+1.54226\,\omega_i-0.26992\,\omega_i^2\]</p>
+
+          <h4>Fugacity coefficients</h4>
+          <p>\[\ln\varphi_i=(Z-1)\frac{B_i}{B}-\ln(Z-B)-\frac{A}{2\sqrt2\,B}\left(\frac{2\sum_j y_jA_{ij}}{A}-\frac{B_i}{B}\right)\ln\!\left(\frac{Z+(1+\sqrt2)B}{Z+(1-\sqrt2)B}\right)\]</p>
+          <p>\[K_v=\frac{\varphi_{\mathrm{NH_3}}}{\varphi_{\mathrm{H_2}}^{1.5}\,\varphi_{\mathrm{N_2}}^{0.5}}\]</p>
+
+          <h4>Chemical equilibrium</h4>
+          <p>The extent of reaction is found by solving the Peng&ndash;Robinson cubic together with the equilibrium relation</p>
+          <p>\[K(T)=\frac{y_{\mathrm{NH_3}}}{y_{\mathrm{H_2}}^{1.5}\,y_{\mathrm{N_2}}^{0.5}}\cdot\frac{P^{\circ}}{P}\cdot K_v,\qquad P^{\circ}=1\text{ atm}\]</p>
+          <p>where the standard-state equilibrium constant \(K(T)\), with \(T\) in kelvin, is</p>
+          <p>\[K(T)=\frac{3.3885364\times10^{12}}{(1.8\,T)^{3.5312124}}\exp\!\left[\begin{aligned}&4641.1884\Big(\tfrac1T-\tfrac1{298.15}\Big)+0.0016755\,(T-298.15)\\[-2pt] -{}&8.219068\times10^{-9}(T^2-298.15^2)+2.7468727\times10^{-11}(T^3-298.15^3)\end{aligned}\right]\]</p>
+
+          <h4>Symbols</h4>
+          <table class="symbol-table">
+            <tr><td>\(\xi\)</td><td>extent of reaction</td></tr>
+            <tr><td>\(y_i\)</td><td>mole fraction of species \(i\) in the vapor mixture</td></tr>
+            <tr><td>\(\varphi_i\)</td><td>fugacity coefficient of species \(i\)</td></tr>
+            <tr><td>\(Z\)</td><td>compressibility factor of the vapor mixture</td></tr>
+            <tr><td>\(A,B\)</td><td>mixture Peng&ndash;Robinson parameters; \(A_i,B_i\) are the pure-component values</td></tr>
+            <tr><td>\(k_{ij}\)</td><td>binary interaction parameter (\(k_{\mathrm{H_2,N_2}}=-0.036\), \(k_{\mathrm{N_2,NH_3}}=0.222\), \(k_{\mathrm{H_2,NH_3}}=0\))</td></tr>
+            <tr><td>\(T_{c,i},P_{c,i},\omega_i\)</td><td>critical temperature, critical pressure, and acentric factor of species \(i\)</td></tr>
+            <tr><td>\(R\)</td><td>gas constant</td></tr>
+            <tr><td>\(K(T)\)</td><td>standard-state equilibrium constant</td></tr>
+            <tr><td>\(K_v\)</td><td>non-ideal gas correction factor</td></tr>
+          </table>
+
+          <h4>Pure-component properties</h4>
+          <table class="prop-table">
+            <tr><th>Species</th><th>T<sub>c</sub> (&deg;R)</th><th>P<sub>c</sub> (psia)</th><th>&omega;</th></tr>
+            <tr><td>H&#8322;</td><td>59.7</td><td>190.8</td><td>0.000</td></tr>
+            <tr><td>N&#8322;</td><td>227.3</td><td>492.9</td><td>0.0206</td></tr>
+            <tr><td>NH&#8323;</td><td>730.2</td><td>1653.7</td><td>0.2582</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="overlay overlay-auto" id="panel-about" hidden>
+        <div class="overlay-head"><h3>About</h3><button class="close-x" data-close aria-label="Close about">&times;</button></div>
+        <div class="overlay-body">
+          <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/HighPressureChemicalEquilibrium/" target="_blank" rel="noopener">Mathematica simulation</a> by Housam Binous. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- Thermodynamic model (Peng-Robinson, ammonia synthesis) ----------
+  const R = 1.987; // engineering units consistent with Tc (deg R) and Pc (psia)
+  const Pc = {1:190.8, 2:492.9, 3:1653.7};   // 1=H2, 2=N2, 3=NH3
+  const Tc = {1:59.7, 2:227.3, 3:730.2};
+  const omega = {1:0.0, 2:0.0206, 3:0.2582};
+  const kij = {"1,1":0,"2,2":0,"3,3":0,"1,2":-0.036,"2,1":-0.036,"1,3":0,"3,1":0,"3,2":0.222,"2,3":0.222};
+  const PSI_PER_BAR = 14.5037738;
+  const PSI_PER_ATM = 14.69;
+
+  function mFac(i){ return 0.37464 + 1.54226*omega[i] - 0.26992*omega[i]*omega[i]; }
+  function aFac(i,T_R){ const Tre=T_R/Tc[i]; const m=mFac(i); return Math.pow(1+m*(1-Math.sqrt(Tre)),2); }
+  function apFac(i,T_R){ return 0.45724*aFac(i,T_R)*R*R*Tc[i]*Tc[i]/Pc[i]; }
+  function ApFac(i,T_R,P_psi){ return apFac(i,T_R)*P_psi/((R*T_R)*(R*T_R)); }
+  function bpFac(i){ return 0.0778*R*Tc[i]/Pc[i]; }
+  function BpFac(i,T_R,P_psi){ return P_psi*bpFac(i)/(R*T_R); }
+  function yFrac(i,Xs){
+    const y3 = Xs/(2-Xs);
+    const y2 = 0.5*(1-Xs)/(2-Xs);
+    const y1 = 1-y2-y3;
+    return i===1?y1:(i===2?y2:y3);
+  }
+  function AbFac(i,j,T_R,P_psi){ return Math.sqrt(ApFac(i,T_R,P_psi)*ApFac(j,T_R,P_psi))*(1-kij[i+","+j]); }
+  function AvFac(T_R,P_psi,Xs){
+    let s=0;
+    for(let i=1;i<=3;i++) for(let j=1;j<=3;j++) s += yFrac(i,Xs)*yFrac(j,Xs)*AbFac(i,j,T_R,P_psi);
+    return s;
+  }
+  function BvFac(T_R,P_psi,Xs){
+    let s=0;
+    for(let i=1;i<=3;i++) s += yFrac(i,Xs)*BpFac(i,T_R,P_psi);
+    return s;
+  }
+  function phiFac(i,T_R,P_psi,Xs,Zv){
+    const Av=AvFac(T_R,P_psi,Xs), Bv=BvFac(T_R,P_psi,Xs);
+    const Bp_i=BpFac(i,T_R,P_psi);
+    const sq2=Math.SQRT2;
+    let sumTerm=0;
+    for(let j=1;j<=3;j++) sumTerm += yFrac(j,Xs)*AbFac(i,j,T_R,P_psi)/Av;
+    const term=(Zv-1)*(Bp_i/Bv) - Math.log(Zv-Bv)
+      - (Av/(2*sq2*Bv))*(2*sumTerm-Bp_i/Bv)*Math.log((Zv+(1+sq2)*Bv)/(Zv+(1-sq2)*Bv));
+    return Math.exp(term);
+  }
+  // Standard-state equilibrium constant K(T), T in kelvin (derived exactly from the
+  // original van't Hoff correlation, which was expressed for T in degrees Rankine).
+  function Keq(T_K){
+    const Tref=298.15;
+    const t1=4641.188396784229*(1/T_K-1/Tref);
+    const t2=0.0016754871301419292*(T_K-Tref);
+    const t3=-8.219068238312888e-9*(T_K*T_K-Tref*Tref);
+    const t4=2.7468727447678615e-11*(Math.pow(T_K,3)-Math.pow(Tref,3));
+    const pre=3.3885363545102866e12*Math.exp(t1+t2+t3+t4);
+    return pre/Math.pow(1.8*T_K,3.5312124127976907);
+  }
+  function residuals(T_K,P_psi,Xs,Zv){
+    const T_R=1.8*T_K;
+    const phi1=phiFac(1,T_R,P_psi,Xs,Zv), phi2=phiFac(2,T_R,P_psi,Xs,Zv), phi3=phiFac(3,T_R,P_psi,Xs,Zv);
+    const keq=Keq(T_K);
+    const lhs=keq*Math.pow(0.5*(1-Xs),0.5)*Math.pow(1.5*(1-Xs),1.5)*Math.pow(phi1,1.5)*Math.pow(phi2,0.5);
+    const rhs=Xs*((2-Xs)/(P_psi/PSI_PER_ATM))*phi3;
+    const F1=lhs-rhs;
+    const Av=AvFac(T_R,P_psi,Xs), Bv=BvFac(T_R,P_psi,Xs);
+    const F2=Math.pow(Zv,3)+(-1+Bv)*Zv*Zv+Zv*(Av-3*Bv*Bv-2*Bv)-Av*Bv+Bv*Bv+Bv*Bv*Bv;
+    return [F1,F2];
+  }
+  // Damped 2D Newton-Raphson (mirrors Mathematica's FindRoot, seeded at Xs=Zv=0.9)
+  function solveEquilibrium(T_K,P_psi){
+    let Xs=0.9, Zv=0.9;
+    const h=1e-6;
+    for(let iter=0; iter<300; iter++){
+      const [F1,F2]=residuals(T_K,P_psi,Xs,Zv);
+      const [F1x,F2x]=residuals(T_K,P_psi,Xs+h,Zv);
+      const [F1z,F2z]=residuals(T_K,P_psi,Xs,Zv+h);
+      const J11=(F1x-F1)/h, J21=(F2x-F2)/h, J12=(F1z-F1)/h, J22=(F2z-F2)/h;
+      const det=J11*J22-J12*J21;
+      if(Math.abs(det)<1e-14) break;
+      const dXs=(F1*J22-F2*J12)/det;
+      const dZv=(F2*J11-F1*J21)/det;
+      let lambda=1;
+      let newXs=Xs-lambda*dXs, newZv=Zv-lambda*dZv;
+      while((newXs<=5e-4 || newXs>=1-5e-4 || newZv<=5e-3) && lambda>1e-4){
+        lambda/=2;
+        newXs=Xs-lambda*dXs; newZv=Zv-lambda*dZv;
+      }
+      if(newXs<=5e-4) newXs=5e-4;
+      if(newXs>=1-5e-4) newXs=1-5e-4;
+      if(newZv<=5e-3) newZv=5e-3;
+      const converged = Math.abs(newXs-Xs)<1e-11 && Math.abs(newZv-Zv)<1e-11;
+      Xs=newXs; Zv=newZv;
+      if(converged) break;
+    }
+    const phi1=phiFac(1,1.8*T_K,P_psi,Xs,Zv), phi2=phiFac(2,1.8*T_K,P_psi,Xs,Zv), phi3=phiFac(3,1.8*T_K,P_psi,Xs,Zv);
+    const Kv = phi3/(Math.pow(phi1,1.5)*Math.pow(phi2,0.5));
+    return {Xs, Kv};
+  }
+
+  // ---------- Data generation ----------
+  const P_MIN_PSI = 10, P_MAX_PSI = 10010, N_POINTS = 25;
+  function computeCurve(T_K){
+    const pts = [];
+    for(let n=0;n<N_POINTS;n++){
+      const P_psi = P_MIN_PSI + (P_MAX_PSI-P_MIN_PSI)*n/(N_POINTS-1);
+      const {Xs,Kv} = solveEquilibrium(T_K,P_psi);
+      pts.push({P_bar: P_psi/PSI_PER_BAR, Xs, Kv});
+    }
+    return pts;
+  }
+
+  // ---------- Chart rendering (inline SVG) ----------
+  const svg = document.getElementById("chart");
+  const SVGNS = "http://www.w3.org/2000/svg";
+  const W = 620, H = 500;
+  const margin = {top:22, right:22, bottom:74, left:78};
+  const plotW = W - margin.left - margin.right;
+  const plotH = H - margin.top - margin.bottom;
+  const BASE_TICK_FONT = 12, BASE_LABEL_FONT = 14; // baseline sizes: ticks +40%, axis titles +40% then -10%
+  const TICK_FONT = +(BASE_TICK_FONT*1.4).toFixed(1);
+  const LABEL_FONT = +(BASE_LABEL_FONT*1.4*0.9).toFixed(1);
+  const BASE_MARKER_R = 5;
+  const MARKER_R = BASE_MARKER_R*0.8; // 20% smaller
+
+  const xTicks = [0,100,200,300,400,500,600,700];
+  const yTicks = [0,0.2,0.4,0.6,0.8,1.0];
+  const xMax = 700, yMax = 1.0;
+
+  function sx(P_bar){ return margin.left + (P_bar/xMax)*plotW; }
+  function sy(v){ return margin.top + (1-(v/yMax))*plotH; }
+
+  function el(tag, attrs, parent){
+    const e = document.createElementNS(SVGNS, tag);
+    for(const k in attrs) e.setAttribute(k, attrs[k]);
+    if(parent) parent.appendChild(e);
+    return e;
+  }
+
+  let currentPlot = "extent";
+  let currentData = [];
+
+  function render(){
+    svg.innerHTML = "";
+    // frame box
+    el("rect",{x:margin.left,y:margin.top,width:plotW,height:plotH,fill:"none",class:"frame-box","stroke-width":1.2},svg);
+
+    // gridlines + x ticks
+    xTicks.forEach(t=>{
+      const x = sx(t);
+      el("line",{x1:x,y1:margin.top,x2:x,y2:margin.top+plotH,class:"gridline"},svg);
+      el("line",{x1:x,y1:margin.top+plotH,x2:x,y2:margin.top+plotH+6,class:"tick-mark"},svg);
+      el("text",{x:x,y:margin.top+plotH+22,"text-anchor":"middle","font-size":TICK_FONT,class:"axis-tick"},svg).textContent = t;
+    });
+    // y ticks
+    yTicks.forEach(t=>{
+      const y = sy(t);
+      el("line",{x1:margin.left,y1:y,x2:margin.left+plotW,y2:y,class:"gridline"},svg);
+      el("line",{x1:margin.left-6,y1:y,x2:margin.left,y2:y,class:"tick-mark"},svg);
+      el("text",{x:margin.left-12,y:y+TICK_FONT*0.35,"text-anchor":"end","font-size":TICK_FONT,class:"axis-tick"},svg).textContent = t.toFixed(1);
+    });
+
+    // axis titles
+    el("text",{x:margin.left+plotW/2,y:H-14,"text-anchor":"middle","font-size":LABEL_FONT,class:"axis-title"},svg).textContent = "Pressure (bar)";
+    const yLabel = currentPlot==="extent" ? "Extent of reaction" : "Non-ideal gas correction factor";
+    const yTitle = el("text",{x:28,y:margin.top+plotH/2,"text-anchor":"middle","font-size":LABEL_FONT,class:"axis-title",transform:`rotate(-90 28 ${margin.top+plotH/2})`},svg);
+    yTitle.textContent = yLabel;
+
+    // data
+    const strokeClass = currentPlot==="extent" ? "series-extent-stroke" : "series-kv-stroke";
+    const fillClass = currentPlot==="extent" ? "series-extent-fill" : "series-kv-fill";
+    const key = currentPlot==="extent" ? "Xs" : "Kv";
+    const pathPts = currentData.map(d=>`${sx(d.P_bar)},${sy(d[key])}`).join(" ");
+    el("polyline",{points:pathPts,fill:"none","stroke-width":2,class:strokeClass},svg);
+
+    currentData.forEach(d=>{
+      const c = el("circle",{cx:sx(d.P_bar),cy:sy(d[key]),r:MARKER_R,class:fillClass+" marker-ring","stroke-width":1,style:"cursor:pointer"},svg);
+      c.addEventListener("mousemove",(ev)=>showTooltip(ev,d,key));
+      c.addEventListener("mouseleave",hideTooltip);
+      c.addEventListener("mouseenter",(ev)=>showTooltip(ev,d,key));
+    });
+  }
+
+  function formatSig(v, sig){
+    if(v===0) return "0";
+    const digits = sig - Math.ceil(Math.log10(Math.abs(v)));
+    return v.toFixed(Math.max(0, Math.min(6, digits)));
+  }
+
+  const tooltip = document.getElementById("tooltip");
+  function showTooltip(ev,d,key){
+    const label = key==="Xs" ? "Extent of reaction" : "Correction factor";
+    tooltip.innerHTML = `P = ${formatSig(d.P_bar,3)} bar<br>${label} = ${d[key].toFixed(4)}`;
+    const wrapRect = svg.parentElement.getBoundingClientRect();
+    tooltip.style.left = (ev.clientX - wrapRect.left + 12) + "px";
+    tooltip.style.top = (ev.clientY - wrapRect.top - 34) + "px";
+    tooltip.style.opacity = "1";
+  }
+  function hideTooltip(){ tooltip.style.opacity = "0"; }
+
+  function recompute(T_K){
+    currentData = computeCurve(T_K);
+    render();
+  }
+
+  // ---------- Controls wiring ----------
+  const slider = document.getElementById("tempSlider");
+  const tempValue = document.getElementById("tempValue");
+  function updateSliderFill(){
+    const min = +slider.min, max = +slider.max, val = +slider.value;
+    const pct = ((val-min)/(max-min))*100;
+    slider.style.setProperty("--fill", pct+"%");
+  }
+  slider.addEventListener("input", ()=>{
+    tempValue.textContent = slider.value;
+    updateSliderFill();
+    recompute(+slider.value);
+  });
+  updateSliderFill();
+
+  document.querySelectorAll(".toggle-group button.seg").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      document.querySelectorAll(".toggle-group button.seg").forEach(b=>b.classList.remove("active"));
+      btn.classList.add("active");
+      currentPlot = btn.dataset.plot;
+      render();
+    });
+  });
+
+  const panelButtons = document.querySelectorAll(".util-group button.seg[data-panel]");
+  function closeAllPanels(){
+    panelButtons.forEach(b=>{
+      b.classList.remove("active");
+      document.getElementById("panel-"+b.dataset.panel).hidden = true;
+    });
+  }
+  panelButtons.forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const panel = document.getElementById("panel-"+btn.dataset.panel);
+      const isOpen = !panel.hidden;
+      closeAllPanels();
+      if(!isOpen){
+        panel.hidden = false;
+        btn.classList.add("active");
+      }
+    });
+  });
+  document.querySelectorAll("[data-close]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      closeAllPanels();
+    });
+  });
+
+  recompute(+slider.value);
+})();
+</script>

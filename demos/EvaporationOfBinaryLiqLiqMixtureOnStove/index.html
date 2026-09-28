@@ -1,0 +1,1007 @@
+<title>Binary Mixture Evaporation</title>
+<style>
+  :root{
+    --bg:#ffffff;
+    --surface:#f7f5f4;
+    --surface-2:#efece9;
+    --text:#1b1816;
+    --text-2:#5b534f;
+    --border:#ddd6d2;
+    --accent:#98000D;
+    --accent-hover:#7a000a;
+    --accent-text:#ffffff;
+    --canvas-bg:#fbfaf9;
+    --grid:#e4dfdc;
+    --axis:#8a8078;
+    --axis-text:#000000;
+    --plot-t:#98000D;
+    --plot-n:#2f5f8f;
+    --tube:#c9c2bd;
+    --pot:#8f97a0;
+    --pot-dark:#6a7178;
+    --stove:#3a3532;
+    --focus:#2f6fb0;
+  }
+  /* @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#171211;
+      --surface:#221b19;
+      --surface-2:#2b2321;
+      --text:#f1eae7;
+      --text-2:#c2b6b1;
+      --border:#3c332f;
+      --accent:#c8283a;
+      --accent-hover:#e04455;
+      --accent-text:#ffffff;
+      --canvas-bg:#1c1614;
+      --grid:#39302c;
+      --axis:#9b8f89;
+      --axis-text:#f5f0ee;
+      --plot-t:#e0576a;
+      --plot-n:#6fa8dc;
+      --tube:#4a3f3a;
+      --pot:#9aa2ab;
+      --pot-dark:#6a7178;
+      --stove:#0f0c0b;
+      --focus:#6fa8dc;
+    }
+  } */
+  :root[data-theme="dark"]{
+    --bg:#171211;
+    --surface:#221b19;
+    --surface-2:#2b2321;
+    --text:#f1eae7;
+    --text-2:#c2b6b1;
+    --border:#3c332f;
+    --accent:#c8283a;
+    --accent-hover:#e04455;
+    --accent-text:#ffffff;
+    --canvas-bg:#1c1614;
+    --grid:#39302c;
+    --axis:#9b8f89;
+    --plot-t:#e0576a;
+    --plot-n:#6fa8dc;
+    --tube:#4a3f3a;
+    --pot:#9aa2ab;
+    --pot-dark:#6a7178;
+    --stove:#0f0c0b;
+    --focus:#6fa8dc;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+  }
+  .app{
+    max-width:1040px;
+    margin:0 auto;
+    padding:18px 18px 28px;
+  }
+  h1{
+    font-size:22px;
+    font-weight:700;
+    margin:0 0 2px;
+    text-align:center;
+    letter-spacing:0.2px;
+  }
+  .btnrow{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    margin-bottom:0;
+  }
+  .btnrow button{
+    background:var(--accent);
+    color:var(--accent-text);
+    border:none;
+    padding:8px 22px;
+    font-size:16.94px;
+    font-weight:400;
+    border-radius:5px;
+    cursor:pointer;
+    font-family:inherit;
+    letter-spacing:0.2px;
+  }
+  .btnrow button:hover{background:var(--accent-hover);}
+  .btnrow button:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible{
+    outline:3px solid var(--focus);
+    outline-offset:2px;
+  }
+  .btnrow button[aria-pressed="true"]{
+    box-shadow:inset 0 0 0 2px var(--accent-text);
+  }
+
+  .stage{
+    position:relative;
+    margin-top:14px;
+  }
+
+  .panel{
+    display:none;
+    position:absolute;
+    top:0; left:0; right:0;
+    z-index:20;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:8px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.25);
+    padding:18px 22px 20px;
+    max-height:480px;
+    overflow-y:auto;
+  }
+  .panel.open{display:block;}
+  .panel h2{
+    margin:0 0 10px;
+    font-size:17px;
+    padding-right:30px;
+  }
+  .panel p, .panel li{
+    font-size:14.5px;
+    line-height:1.55;
+    color:var(--text);
+  }
+  .panel a{color:var(--accent);}
+  .panel-close{
+    position:sticky;
+    float:right;
+    top:0;
+    margin-left:12px;
+    margin-top:-6px;
+    background:transparent;
+    border:none;
+    color:var(--text-2);
+    font-size:22px;
+    line-height:1;
+    cursor:pointer;
+    padding:4px 6px;
+  }
+  .panel-close:hover{color:var(--accent);}
+
+  .eq{
+    text-align:left;
+    margin:10px 0;
+    overflow-x:auto;
+  }
+  mjx-container[display="true"]{
+    margin:8px 0 !important;
+  }
+
+  .content{
+    padding-top:16px;
+  }
+
+  .simRow{
+    display:flex;
+    flex-wrap:wrap;
+    gap:22px;
+    justify-content:center;
+  }
+
+  .sceneCol{
+    flex:0 0 auto;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:10px;
+  }
+  canvas#scene{
+    width:340px;
+    height:420px;
+    background:var(--canvas-bg);
+    border:1px solid var(--border);
+    border-radius:8px;
+  }
+  .readouts{
+    width:340px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:10px 14px;
+    font-size:16px;
+    font-variant-numeric:tabular-nums;
+    color:var(--axis-text);
+  }
+  .readouts .row{
+    display:flex;
+    justify-content:space-between;
+    padding:2px 0;
+  }
+  .readouts .row span:first-child{color:var(--axis-text);}
+  .status{
+    text-align:center;
+    font-weight:600;
+    font-size:13.5px;
+    min-height:18px;
+    color:var(--accent);
+  }
+
+  .plotCol{
+    flex:1 1 380px;
+    max-width:460px;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+  canvas.plot{
+    width:100%;
+    height:305px;
+    background:var(--canvas-bg);
+    border:1px solid var(--border);
+    border-radius:8px;
+  }
+
+  .controls{
+    margin-top:20px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:16px 20px 18px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:18px 28px;
+  }
+  .ctrlGroup{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+    min-width:190px;
+    flex:1 1 190px;
+  }
+  .ctrlGroup label{
+    font-size:16px;
+    font-weight:400;
+    color:var(--axis-text);
+    display:flex;
+    justify-content:space-between;
+  }
+  .ctrlGroup label .val{
+    color:var(--axis-text);
+    font-variant-numeric:tabular-nums;
+  }
+  select, input[type="range"]{
+    width:100%;
+  }
+  input[type="range"]{
+    accent-color: var(--accent);
+  }
+
+input[type="range"]{
+  margin-top:.7em;
+    --accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:210px;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+input[type="range"]::-moz-range-thumb{
+    width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+
+  select{
+    padding:6px 8px;
+    border-radius:5px;
+    border:1px solid var(--border);
+    background:var(--bg);
+    color:var(--axis-text);
+    font-family:inherit;
+    font-size:16px;
+  }
+  .btns{
+    display:flex;
+    align-items:flex-end;
+    gap:10px;
+    flex:0 0 auto;
+  }
+  .btns button{
+    background:var(--accent);
+    color:var(--accent-text);
+    border:none;
+    padding:10px 20px;
+    font-size:16.1px;
+    font-weight:400;
+    border-radius:5px;
+    cursor:pointer;
+    font-family:inherit;
+  }
+  .btns button:hover{background:var(--accent-hover);}
+  .btns button.secondary{
+    background:var(--surface-2);
+    color:var(--text);
+    border:1px solid var(--border);
+  }
+  .btns button.secondary:hover{background:var(--border);}
+  .speedGroup{
+    display:flex;
+    gap:6px;
+    align-items:flex-end;
+  }
+  .speedGroup button{
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    color:var(--axis-text);
+    padding:7px 12px;
+    border-radius:5px;
+    font-size:15px;
+    cursor:pointer;
+    font-family:inherit;
+  }
+  .speedGroup button[aria-pressed="true"]{
+    background:var(--accent);
+    color:var(--accent-text);
+    border-color:var(--accent);
+  }
+</style>
+
+<div class="app">
+  <div class="btnrow">
+    <button id="btnDirections" aria-pressed="false">Directions</button>
+    <button id="btnDetails" aria-pressed="false">Details</button>
+    <button id="btnAbout" aria-pressed="false">About</button>
+  </div>
+
+  <div class="stage" id="stage">
+
+    <div class="panel" id="panelDirections" role="dialog" aria-label="Directions">
+      <button class="panel-close" data-close aria-label="Close">&times;</button>
+      <h2>Directions</h2>
+      <p>A pot containing a binary liquid mixture sits on a burner that supplies heat at a constant rate. The pot is open to the atmosphere, so as the liquid is heated it eventually boils and vapor escapes &mdash; the amount of liquid remaining in the pot decreases with time.</p>
+      <ul>
+        <li>Choose a chemical pair from the dropdown menu.</li>
+        <li>Use the sliders to set the constant heat input rate, the initial amount of liquid, and the initial liquid composition (mole fraction of the more volatile component).</li>
+        <li>Click <b>Play</b> to start. <b>Reset</b> returns to the chosen initial conditions.</li>
+        <li>Watch the pot: the liquid level falls as it evaporates, and bubbles/steam appear once the liquid starts boiling. The thermometer shows the current liquid temperature.</li>
+        <li>The top graph plots liquid temperature vs. time; the bottom graph plots the amount of liquid remaining vs. time.</li>
+        <li>The heat input rate can be changed at any time while running. Changing the chemical pair, initial amount, or initial composition resets the simulation.</li>
+      </ul>
+      <p>Watch how the temperature first rises quickly (sensible heating), levels off in slope once boiling begins, and then keeps <i>slowly increasing</i> during boiling &mdash; even though the heat input never changes &mdash; because the more volatile component evaporates preferentially, leaving behind a liquid that is richer in the higher-boiling component.</p>
+    </div>
+
+    <div class="panel" id="panelDetails" role="dialog" aria-label="Details">
+      <button class="panel-close" data-close aria-label="Close">&times;</button>
+      <h2>Details</h2>
+      <p><b>Assumptions</b></p>
+      <ul>
+        <li>The liquid and vapor behave ideally (Raoult's law) at a total pressure of 1 atm.</li>
+        <li>The pot is well mixed: the liquid has a uniform temperature and composition at every instant.</li>
+        <li>Heat losses are neglected; all of the burner's heat input, <span class="eqInline">\(\dot Q\)</span>, enters the liquid.</li>
+        <li>Before boiling begins, all of <span class="eqInline">\(\dot Q\)</span> raises the sensible temperature of the liquid at constant composition.</li>
+        <li>Once the bubble point is reached, the liquid remains at its (slowly rising) bubble-point temperature, and essentially all of <span class="eqInline">\(\dot Q\)</span> vaporizes liquid &mdash; this is the differential (Rayleigh) distillation approximation. The much smaller amount of heat needed to raise the bubble-point temperature as the composition drifts is neglected.</li>
+        <li>Heats of vaporization and liquid heat capacities are treated as constants, evaluated near each pure component's normal boiling point.</li>
+      </ul>
+
+      <p><b>Vapor&ndash;liquid equilibrium</b></p>
+      <p>Each component's vapor pressure follows the Antoine equation (<span class="eqInline">\(T\)</span> in &deg;C, <span class="eqInline">\(P\)</span> in mmHg):</p>
+      <div class="eq">\[ \log_{10} P_i^{sat} = A_i - \frac{B_i}{T + C_i} \]</div>
+      <p>The liquid's bubble-point temperature at composition <span class="eqInline">\(x\)</span> (mole fraction of the more volatile component) satisfies</p>
+      <div class="eq">\[ x\,P_1^{sat}(T) + (1-x)\,P_2^{sat}(T) = P \]</div>
+      <p>and the vapor in equilibrium with it has composition</p>
+      <div class="eq">\[ y = \frac{x\,P_1^{sat}(T)}{P} \]</div>
+
+      <p><b>Sensible heating stage</b> (liquid amount <span class="eqInline">\(n\)</span> and composition <span class="eqInline">\(x\)</span> constant):</p>
+      <div class="eq">\[ \frac{dT}{dt} = \frac{\dot Q}{n\,C_p}, \qquad C_p = x\,C_{p,1} + (1-x)\,C_{p,2} \]</div>
+
+      <p><b>Boiling stage</b> &mdash; molar rate of vaporization and open-system material balances:</p>
+      <div class="eq">\[ V = \frac{\dot Q}{\lambda_{mix}}, \qquad \lambda_{mix} = y\,\lambda_1 + (1-y)\,\lambda_2 \]</div>
+      <div class="eq">\[ \frac{dn}{dt} = -V, \qquad \frac{dx}{dt} = \frac{V\,(x - y)}{n} \]</div>
+      <p>Because the more volatile component evaporates preferentially (<span class="eqInline">\(y > x\)</span>), <span class="eqInline">\(x\)</span> falls with time, so the bubble point &mdash; and hence <span class="eqInline">\(T(t)\)</span> &mdash; keeps rising during boiling even though <span class="eqInline">\(\dot Q\)</span> is held constant. Once essentially all of the more volatile component is gone, the remaining liquid boils at the normal boiling point of the less volatile component until the pot is empty.</p>
+    </div>
+
+    <div class="panel" id="panelAbout" role="dialog" aria-label="About">
+      <button class="panel-close" data-close aria-label="Close">&times;</button>
+      <h2>About</h2>
+      <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.</p>
+    </div>
+
+    <div class="content">
+      <div class="simRow">
+        <div class="sceneCol">
+          <canvas id="scene" width="340" height="420" role="img" aria-label="Animated pot of liquid on a stove burner"></canvas>
+          <div class="readouts">
+            <div class="row"><span>time, t</span><span id="rT_t">0.0 s</span></div>
+            <div class="row"><span>temperature, T</span><span id="rT_T">&mdash;</span></div>
+            <div class="row"><span>liquid mass</span><span id="rT_n">&mdash;</span></div>
+            <div class="row"><span>liquid moles</span><span id="rT_m">&mdash;</span></div>
+            <div class="row"><span>liquid comp., x<sub>1</sub></span><span id="rT_x">&mdash;</span></div>
+          </div>
+          <div class="status" id="statusMsg">&nbsp;</div>
+        </div>
+        <div class="plotCol">
+          <canvas class="plot" id="plotT" width="460" height="305"></canvas>
+          <canvas class="plot" id="plotN" width="460" height="305"></canvas>
+        </div>
+      </div>
+
+      <div class="controls">
+        <div class="ctrlGroup">
+          <label for="selChem">chemical pair</label>
+          <select id="selChem">
+            <option value="benzeneToluene">benzene / toluene</option>
+            <option value="hexaneHeptane">n-hexane / n-heptane</option>
+            <option value="pentaneHexane">n-pentane / n-hexane</option>
+          </select>
+        </div>
+        <div class="ctrlGroup">
+          <label for="sldQ">heat input rate, <span class="val" id="valQ">200 W</span></label>
+          <input type="range" id="sldQ" min="50" max="500" step="10" value="200">
+        </div>
+        <div class="ctrlGroup">
+          <label for="sldN0">initial liquid amount, <span class="val" id="valN0">170 g</span></label>
+          <input type="range" id="sldN0" min="50" max="400" step="5" value="170">
+        </div>
+        <div class="ctrlGroup">
+          <label for="sldX0">initial mole fraction, <span class="val" id="valX0">x<sub>1</sub> = 0.50</span></label>
+          <input type="range" id="sldX0" min="0.05" max="0.95" step="0.01" value="0.5">
+        </div>
+        <div class="ctrlGroup">
+          <label>simulation speed</label>
+          <div class="speedGroup" id="speedGroup">
+            <button data-speed="1" aria-pressed="true">1&times;</button>
+            <button data-speed="2" aria-pressed="false">2&times;</button>
+            <button data-speed="4" aria-pressed="false">4&times;</button>
+            <button data-speed="8" aria-pressed="false">8&times;</button>
+          </div>
+        </div>
+        <div class="btns">
+          <button id="btnPlay">Play</button>
+          <button id="btnReset" class="secondary">Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] },
+    chtml: { displayAlign: 'left', displayIndent: '0' },
+    svg: { displayAlign: 'left', displayIndent: '0' }
+  };
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-chtml.js" defer></script>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- Thermophysical data ----------
+  // Antoine: log10(Psat[mmHg]) = A - B/(T[C]+C).  1 = more volatile, 2 = less volatile.
+  var CHEMICALS = {
+    benzeneToluene: {
+      label: "Benzene / Toluene",
+      c1: { name:"Benzene",   A:6.90565, B:1211.033, C:220.790, Tb:80.1,  dHvap:30.72, Cp:136, MW:78.11 },
+      c2: { name:"Toluene",   A:6.95464, B:1344.800, C:219.482, Tb:110.6, dHvap:33.18, Cp:157, MW:92.14 }
+    },
+    hexaneHeptane: {
+      label: "n-Hexane / n-Heptane",
+      c1: { name:"n-Hexane",  A:6.87776, B:1171.530, C:224.366, Tb:68.7,  dHvap:28.85, Cp:195, MW:86.18 },
+      c2: { name:"n-Heptane", A:6.89677, B:1264.370, C:216.636, Tb:98.4,  dHvap:31.77, Cp:224, MW:100.20 }
+    },
+    pentaneHexane: {
+      label: "n-Pentane / n-Hexane",
+      c1: { name:"n-Pentane", A:6.85296, B:1064.840, C:232.014, Tb:36.1,  dHvap:25.79, Cp:173, MW:72.15 },
+      c2: { name:"n-Hexane",  A:6.87776, B:1171.530, C:224.366, Tb:68.7,  dHvap:28.85, Cp:195, MW:86.18 }
+    }
+  };
+  var P_TOTAL = 760; // mmHg, 1 atm
+  var T_ROOM = 22;   // deg C
+
+  function Psat(c, T){ return Math.pow(10, c.A - c.B/(T + c.C)); }
+
+  function bubbleT(x, c1, c2){
+    var lo = Math.min(c1.Tb, c2.Tb) - 2, hi = Math.max(c1.Tb, c2.Tb) + 2;
+    function f(T){ return x*Psat(c1,T) + (1-x)*Psat(c2,T) - P_TOTAL; }
+    var flo = f(lo), fhi = f(hi);
+    if (flo > 0) return lo;
+    if (fhi < 0) return hi;
+    for (var i=0;i<40;i++){
+      var mid = 0.5*(lo+hi), fm = f(mid);
+      if (fm > 0) hi = mid; else lo = mid;
+    }
+    return 0.5*(lo+hi);
+  }
+
+  function vaporY(x, T, c1){ return x*Psat(c1,T)/P_TOTAL; }
+
+  function avgMW(chem, x){ return x*chem.c1.MW + (1-x)*chem.c2.MW; }
+
+  // ---------- Simulation state ----------
+  var state = {};
+
+  function resetState(){
+    var key = document.getElementById('selChem').value;
+    var chem = CHEMICALS[key];
+    var Q = parseFloat(document.getElementById('sldQ').value);
+    var mass0 = parseFloat(document.getElementById('sldN0').value);
+    var x0 = parseFloat(document.getElementById('sldX0').value);
+    var n0 = mass0 / avgMW(chem, x0);
+    state.chem = chem;
+    state.Q = Q;
+    state.mass0 = mass0;
+    state.n0 = n0;
+    state.x0 = x0;
+    state.t = 0;
+    state.n = n0;
+    state.x = x0;
+    state.T = T_ROOM;
+    state.phase = 'heating';
+    state.running = false;
+    state.Tmax = Math.max(chem.c1.Tb, chem.c2.Tb) + 8;
+    state.history = [{t:0, T:T_ROOM, n:n0, mass:mass0}];
+    document.getElementById('btnPlay').textContent = 'Play';
+    document.getElementById('statusMsg').textContent = ' ';
+  }
+
+  function step(dt){
+    if (state.phase === 'done') return;
+    var c1 = state.chem.c1, c2 = state.chem.c2;
+
+    if (state.phase === 'heating'){
+      var Cp = state.x*c1.Cp + (1-state.x)*c2.Cp; // J/mol-K
+      state.T += (state.Q/(state.n*Cp)) * dt;
+      var Tbp = bubbleT(state.x, c1, c2);
+      if (state.T >= Tbp){ state.T = Tbp; state.phase = 'boiling'; }
+
+    } else if (state.phase === 'boiling'){
+      if (state.x <= 0.003 || state.n <= 0.015*state.n0){
+        state.phase = 'finalBoil';
+        state.x = 0;
+        state.T = bubbleT(0, c1, c2);
+      } else {
+        var T = bubbleT(state.x, c1, c2);
+        state.T = T;
+        var y = vaporY(state.x, T, c1);
+        var lambdaMix = (y*c1.dHvap + (1-y)*c2.dHvap) * 1000; // J/mol
+        var V = state.Q / lambdaMix; // mol/s
+        var nNew = state.n - V*dt;
+        var xNew = state.x + (V*(state.x - y)/state.n) * dt;
+        state.n = Math.max(0, nNew);
+        state.x = Math.min(1, Math.max(0, xNew));
+      }
+
+    } else if (state.phase === 'finalBoil'){
+      var lambda2 = c2.dHvap * 1000;
+      var V2 = state.Q / lambda2;
+      state.n = Math.max(0, state.n - V2*dt);
+      state.T = bubbleT(0, c1, c2);
+    }
+
+    state.t += dt;
+    if (state.n <= 1e-5){
+      state.n = 0;
+      state.phase = 'done';
+      state.running = false;
+      document.getElementById('btnPlay').textContent = 'Play';
+      document.getElementById('statusMsg').textContent = 'pot is empty';
+    }
+    var curMass = state.n*(state.x*c1.MW + (1-state.x)*c2.MW);
+    state.history.push({t: state.t, T: state.T, n: state.n, mass: curMass});
+    if (state.history.length > 6000) state.history.shift();
+  }
+
+  // ---------- Canvas setup (hi-DPI) ----------
+  function hiDPIContext(canvas){
+    var dpr = window.devicePixelRatio || 1;
+    var cssW = canvas.clientWidth || parseInt(canvas.getAttribute('width'),10);
+    var cssH = canvas.clientHeight || parseInt(canvas.getAttribute('height'),10);
+    canvas.width = Math.round(cssW*dpr);
+    canvas.height = Math.round(cssH*dpr);
+    var ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx._cssW = cssW; ctx._cssH = cssH;
+    return ctx;
+  }
+
+  var sceneCanvas = document.getElementById('scene');
+  var plotTCanvas = document.getElementById('plotT');
+  var plotNCanvas = document.getElementById('plotN');
+  var sceneCtx, plotTCtx, plotNCtx;
+
+  function setupCanvases(){
+    sceneCtx = hiDPIContext(sceneCanvas);
+    plotTCtx = hiDPIContext(plotTCanvas);
+    plotNCtx = hiDPIContext(plotNCanvas);
+  }
+
+  function cssVar(name){
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  }
+
+  function lerpColor(hex1, hex2, f){
+    function h2r(h){ h=h.replace('#',''); return [parseInt(h.substr(0,2),16),parseInt(h.substr(2,2),16),parseInt(h.substr(4,2),16)]; }
+    var a=h2r(hex1), b=h2r(hex2);
+    var r=Math.round(a[0]+(b[0]-a[0])*f), g=Math.round(a[1]+(b[1]-a[1])*f), bl=Math.round(a[2]+(b[2]-a[2])*f);
+    return 'rgb('+r+','+g+','+bl+')';
+  }
+
+  // ---------- Drawing: scene ----------
+  var bubbles = [];
+  var steams = [];
+
+  function initParticles(){
+    bubbles = [];
+    for (var i=0;i<10;i++){
+      bubbles.push({x:Math.random(), y:Math.random(), speed:0.15+Math.random()*0.15, r:2+Math.random()*2.5});
+    }
+    steams = [];
+    for (var j=0;j<5;j++){
+      steams.push({x:Math.random(), y:Math.random(), speed:0.10+Math.random()*0.08, phase:Math.random()*Math.PI*2});
+    }
+  }
+  initParticles();
+
+  function drawScene(dtReal){
+    var ctx = sceneCtx, W = ctx._cssW, H = ctx._cssH;
+    ctx.clearRect(0,0,W,H);
+
+    var running = state.running;
+    var boiling = (state.phase === 'boiling' || state.phase === 'finalBoil');
+
+    // geometry
+    var potW = 160, potH = 130;
+    var potX = W*0.5 - 85, potY = 195;
+    var stoveY = potY + potH + 6;
+
+    // stove base
+    ctx.fillStyle = cssVar('--stove');
+    ctx.fillRect(potX-40, stoveY, potW+80, 26);
+    ctx.beginPath();
+    ctx.ellipse(potX+potW/2, stoveY, potW/2+40, 8, 0, 0, Math.PI*2);
+    ctx.fill();
+
+    // burner rings + flame glow — size, brightness, and flicker speed scale with the heat input rate
+    var qMin = parseFloat(sldQ.min), qMax = parseFloat(sldQ.max);
+    var heatFrac = Math.max(0, Math.min(1, (state.Q - qMin) / (qMax - qMin)));
+    var sizeScale = 0.55 + 0.75*heatFrac;
+    var flickSpeed = 6 + 10*heatFrac;
+    var flick = sizeScale * (1 + 0.08*Math.sin(state.t*flickSpeed) + 0.05*Math.sin(state.t*(flickSpeed*1.9)+1));
+    var glowAlpha = 0.30 + 0.45*heatFrac;
+    var grad = ctx.createRadialGradient(potX+potW/2, stoveY+2, 4, potX+potW/2, stoveY+2, 70*flick);
+    grad.addColorStop(0, 'rgba(255,150,40,'+glowAlpha.toFixed(2)+')');
+    grad.addColorStop(1, 'rgba(255,150,40,0)');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.ellipse(potX+potW/2, stoveY+2, 75*flick, 16*flick, 0, 0, Math.PI*2);
+    ctx.fill();
+
+    ctx.strokeStyle = lerpColor('#c9631f', '#ffb23d', heatFrac);
+    ctx.lineWidth = 3 + 1.5*heatFrac;
+    for (var ring=0; ring<3; ring++){
+      ctx.beginPath();
+      ctx.ellipse(potX+potW/2, stoveY+1, (18+ring*13)*flick, (5+ring*3.4)*flick, 0, 0.15, Math.PI-0.15);
+      ctx.stroke();
+    }
+
+    // pot body
+    ctx.fillStyle = cssVar('--pot');
+    ctx.strokeStyle = cssVar('--pot-dark');
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(potX, potY);
+    ctx.lineTo(potX-6, potY+potH);
+    ctx.lineTo(potX+potW+6, potY+potH);
+    ctx.lineTo(potX+potW, potY);
+    ctx.closePath();
+    ctx.fill(); ctx.stroke();
+
+    // pot handles
+    ctx.beginPath();
+    ctx.moveTo(potX-6, potY+28); ctx.lineTo(potX-24, potY+28); ctx.lineTo(potX-24, potY+40); ctx.lineTo(potX-6, potY+40);
+    ctx.moveTo(potX+potW+6, potY+28); ctx.lineTo(potX+potW+24, potY+28); ctx.lineTo(potX+potW+24, potY+40); ctx.lineTo(potX+potW+6, potY+40);
+    ctx.stroke();
+
+    // liquid fill (clipped to pot interior)
+    var innerX0 = potX+4, innerX1 = potX+potW-4, innerTop = potY+6, innerBottom = potY+potH-4;
+    var frac = state.n0 > 0 ? Math.max(0, Math.min(1, state.n/state.n0)) : 0;
+    var liqTop = innerBottom - (innerBottom-innerTop)*frac;
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(potX, potY); ctx.lineTo(potX-6, potY+potH); ctx.lineTo(potX+potW+6, potY+potH); ctx.lineTo(potX+potW, potY);
+    ctx.closePath();
+    ctx.clip();
+
+    var liqColor = lerpColor('#2f5f8f', '#8fd0c8', state.x0 ? state.x/1 : 0.5);
+    if (state.n > 1e-6){
+      ctx.fillStyle = liqColor;
+      ctx.fillRect(innerX0-20, liqTop, innerX1-innerX0+40, innerBottom-liqTop+10);
+
+      // surface ripple
+      ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      for (var sx=innerX0-20; sx<=innerX1+20; sx+=6){
+        var yy = liqTop + Math.sin(sx*0.25 + state.t*3)*1.4;
+        if (sx===innerX0-20) ctx.moveTo(sx,yy); else ctx.lineTo(sx,yy);
+      }
+      ctx.stroke();
+
+      // bubbles
+      if (boiling){
+        ctx.fillStyle = 'rgba(255,255,255,0.65)';
+        for (var bi=0; bi<bubbles.length; bi++){
+          var b = bubbles[bi];
+          if (running) b.y -= b.speed*dtReal*0.06;
+          if (b.y < 0){ b.y = 1; b.x = Math.random(); }
+          var by = liqTop + b.y*(innerBottom-liqTop);
+          if (by < liqTop+2) continue;
+          var bx = innerX0 + b.x*(innerX1-innerX0);
+          ctx.beginPath();
+          ctx.arc(bx, by, b.r, 0, Math.PI*2);
+          ctx.fill();
+        }
+      }
+    }
+    ctx.restore();
+
+    // pot rim
+    ctx.strokeStyle = cssVar('--pot-dark');
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(potX-6, potY); ctx.lineTo(potX+potW+6, potY);
+    ctx.stroke();
+
+    // steam
+    if (boiling && state.n > 1e-6){
+      ctx.strokeStyle = 'rgba(160,160,160,0.55)';
+      ctx.lineWidth = 2;
+      for (var si=0; si<steams.length; si++){
+        var s = steams[si];
+        if (running) s.y -= s.speed*dtReal*0.05;
+        if (s.y < 0){ s.y = 1; s.x = 0.15+Math.random()*0.7; }
+        var baseX = potX + s.x*potW;
+        var baseY = potY - 4 - s.y*90;
+        ctx.globalAlpha = 0.7*(s.y);
+        ctx.beginPath();
+        for (var k=0;k<14;k++){
+          var yy2 = baseY - k*3;
+          var xx2 = baseX + Math.sin(k*0.6 + s.phase + state.t*2)*4;
+          if (k===0) ctx.moveTo(xx2,yy2); else ctx.lineTo(xx2,yy2);
+        }
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+      }
+    }
+
+    // thermometer
+    var thX = potX + potW + 55, thTop = 30, thBottom = potY + potH - 10;
+    var tubeW = 14;
+    ctx.fillStyle = cssVar('--tube');
+    ctx.strokeStyle = cssVar('--axis');
+    ctx.lineWidth = 1.5;
+    roundRect(ctx, thX-tubeW/2, thTop, tubeW, thBottom-thTop, 7); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.arc(thX, thBottom+10, 12, 0, Math.PI*2); ctx.fillStyle = cssVar('--tube'); ctx.fill(); ctx.stroke();
+
+    var tFrac = Math.max(0, Math.min(1, (state.T - 0) / state.Tmax));
+    var mercTop = thBottom - (thBottom-thTop)*tFrac;
+    ctx.fillStyle = cssVar('--accent');
+    roundRect(ctx, thX-4.5, mercTop, 9, thBottom-mercTop, 4); ctx.fill();
+    ctx.beginPath(); ctx.arc(thX, thBottom+10, 8, 0, Math.PI*2); ctx.fill();
+
+    ctx.fillStyle = cssVar('--text-2');
+    ctx.font = '16px Helvetica, Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(state.T.toFixed(0)+'°C', thX, thTop-8);
+  }
+
+  function roundRect(ctx,x,y,w,h,r){
+    ctx.beginPath();
+    ctx.moveTo(x+r,y);
+    ctx.arcTo(x+w,y,x+w,y+h,r);
+    ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r);
+    ctx.arcTo(x,y,x+w,y,r);
+    ctx.closePath();
+  }
+
+  // ---------- Drawing: plots ----------
+  function niceTimeStep(maxMin){
+    var steps = [0.5, 1, 2, 5, 10, 15, 20, 30, 60, 120];
+    for (var i=0;i<steps.length;i++){
+      if (maxMin/steps[i] <= 7) return steps[i];
+    }
+    return steps[steps.length-1];
+  }
+
+  function drawPlot(ctx, opts){
+    var W = ctx._cssW, H = ctx._cssH;
+    ctx.clearRect(0,0,W,H);
+    var padL = 66, padR = 14, padT = 22, padB = 48;
+    var plotW = W-padL-padR, plotH = H-padT-padB;
+
+    var rawMaxMin = Math.max((state.t/60)*1.05, 1);
+    var tStep = niceTimeStep(rawMaxMin);
+    var tMaxMin = Math.ceil(rawMaxMin/tStep)*tStep;
+    var yMin = opts.yMin, yMax = opts.yMax;
+
+    // grid + axes
+    ctx.strokeStyle = cssVar('--grid');
+    ctx.fillStyle = cssVar('--axis-text');
+    ctx.font = '15px Helvetica, Arial, sans-serif';
+    ctx.lineWidth = 1;
+    var nY = 4;
+    for (var i=0;i<=nY;i++){
+      var yv = yMin + (yMax-yMin)*i/nY;
+      var py = padT + plotH - plotH*i/nY;
+      ctx.strokeStyle = cssVar('--grid');
+      ctx.beginPath(); ctx.moveTo(padL,py); ctx.lineTo(padL+plotW,py); ctx.stroke();
+      ctx.strokeStyle = cssVar('--axis');
+      ctx.beginPath(); ctx.moveTo(padL-5,py); ctx.lineTo(padL,py); ctx.stroke();
+      ctx.textAlign = 'right'; ctx.textBaseline='middle';
+      ctx.fillText(opts.yFmt(yv), padL-10, py);
+    }
+    var tickDecimals = tStep < 1 ? 1 : 0;
+    for (var xv=0; xv<=tMaxMin+1e-9; xv+=tStep){
+      var px = padL + plotW*(xv/tMaxMin);
+      ctx.strokeStyle = cssVar('--axis');
+      ctx.beginPath(); ctx.moveTo(px,padT+plotH); ctx.lineTo(px,padT+plotH+5); ctx.stroke();
+      ctx.textAlign='center'; ctx.textBaseline='top';
+      ctx.fillText(xv.toFixed(tickDecimals), px, padT+plotH+8);
+    }
+    ctx.strokeStyle = cssVar('--axis');
+    ctx.beginPath(); ctx.moveTo(padL,padT); ctx.lineTo(padL,padT+plotH); ctx.lineTo(padL+plotW,padT+plotH); ctx.stroke();
+
+    ctx.fillStyle = cssVar('--axis-text');
+    ctx.save();
+    ctx.textAlign='center';
+    ctx.fillText('time (min)', padL+plotW/2, padT+plotH+34);
+    ctx.restore();
+
+    ctx.save();
+    ctx.translate(16, padT+plotH/2);
+    ctx.rotate(-Math.PI/2);
+    ctx.textAlign='center';
+    ctx.fillText(opts.ylabel, 0, 0);
+    ctx.restore();
+
+    // data line
+    var hist = state.history;
+    if (hist.length > 1){
+      ctx.strokeStyle = opts.color;
+      ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      for (var k=0;k<hist.length;k++){
+        var xp = padL + plotW*((hist[k].t/60)/tMaxMin);
+        var val = opts.getVal(hist[k]);
+        var yp = padT + plotH - plotH*(val-yMin)/(yMax-yMin);
+        if (k===0) ctx.moveTo(xp,yp); else ctx.lineTo(xp,yp);
+      }
+      ctx.stroke();
+
+      // current point
+      var last = hist[hist.length-1];
+      var lx = padL + plotW*((last.t/60)/tMaxMin);
+      var ly = padT + plotH - plotH*(opts.getVal(last)-yMin)/(yMax-yMin);
+      ctx.fillStyle = opts.color;
+      ctx.beginPath(); ctx.arc(lx,ly,3.2,0,Math.PI*2); ctx.fill();
+    }
+
+    ctx.fillStyle = cssVar('--text');
+    ctx.font = '15px Helvetica, Arial, sans-serif';
+    ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+    ctx.fillText(opts.title, padL, 16);
+  }
+
+  // ---------- Readouts ----------
+  function updateReadouts(){
+    document.getElementById('rT_t').textContent = state.t.toFixed(1)+' s';
+    document.getElementById('rT_T').textContent = state.T.toFixed(1)+' °C';
+    var mass = state.n*(state.x*state.chem.c1.MW + (1-state.x)*state.chem.c2.MW);
+    document.getElementById('rT_n').textContent = mass.toFixed(0)+' g';
+    document.getElementById('rT_m').textContent = state.n.toFixed(2)+' mol';
+    document.getElementById('rT_x').textContent = state.x.toFixed(3);
+  }
+
+  // ---------- Animation loop ----------
+  var speed = 1;
+  var lastFrame = null;
+
+  function frame(ts){
+    if (lastFrame === null) lastFrame = ts;
+    var dtReal = Math.min((ts-lastFrame)/1000, 0.15); // seconds of wall time, capped
+    lastFrame = ts;
+
+    if (state.running){
+      var simDt = dtReal*speed;
+      var subSteps = Math.max(1, Math.ceil(simDt/0.05));
+      var h = simDt/subSteps;
+      for (var i=0;i<subSteps;i++) step(h);
+    }
+
+    drawScene(dtReal*speed);
+    drawPlot(plotTCtx, {
+      title: 'temperature vs. time',
+      ylabel: 'T (°C)',
+      color: cssVar('--plot-t'),
+      yMin: 0, yMax: state.Tmax,
+      yFmt: function(v){return v.toFixed(0);},
+      getVal: function(p){return p.T;}
+    });
+    drawPlot(plotNCtx, {
+      title: 'liquid mass vs. time',
+      ylabel: 'mass (g)',
+      color: cssVar('--plot-n'),
+      yMin: 0, yMax: state.mass0*1.08,
+      yFmt: function(v){return v.toFixed(0);},
+      getVal: function(p){return p.mass;}
+    });
+    updateReadouts();
+
+    requestAnimationFrame(frame);
+  }
+
+  // ---------- Panels ----------
+  var panelIds = ['panelDirections','panelDetails','panelAbout'];
+  var btnIds = { panelDirections:'btnDirections', panelDetails:'btnDetails', panelAbout:'btnAbout' };
+
+  function closeAllPanels(){
+    panelIds.forEach(function(id){
+      document.getElementById(id).classList.remove('open');
+      document.getElementById(btnIds[id]).setAttribute('aria-pressed','false');
+    });
+  }
+  function togglePanel(id){
+    var isOpen = document.getElementById(id).classList.contains('open');
+    closeAllPanels();
+    if (!isOpen){
+      document.getElementById(id).classList.add('open');
+      document.getElementById(btnIds[id]).setAttribute('aria-pressed','true');
+    }
+  }
+
+  document.getElementById('btnDirections').addEventListener('click', function(){ togglePanel('panelDirections'); });
+  document.getElementById('btnDetails').addEventListener('click', function(){ togglePanel('panelDetails'); });
+  document.getElementById('btnAbout').addEventListener('click', function(){ togglePanel('panelAbout'); });
+  document.querySelectorAll('[data-close]').forEach(function(btn){
+    btn.addEventListener('click', function(){ closeAllPanels(); });
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape') closeAllPanels();
+  });
+
+  // ---------- Controls wiring ----------
+  var sldQ = document.getElementById('sldQ');
+  var sldN0 = document.getElementById('sldN0');
+  var sldX0 = document.getElementById('sldX0');
+  var selChem = document.getElementById('selChem');
+
+  sldQ.addEventListener('input', function(){
+    document.getElementById('valQ').textContent = sldQ.value+' W';
+    state.Q = parseFloat(sldQ.value);
+  });
+  sldN0.addEventListener('input', function(){
+    document.getElementById('valN0').textContent = parseFloat(sldN0.value).toFixed(0)+' g';
+    if (!state.running) resetState();
+  });
+  sldX0.addEventListener('input', function(){
+    document.getElementById('valX0').innerHTML = 'x<sub>1</sub> = '+parseFloat(sldX0.value).toFixed(2);
+    if (!state.running) resetState();
+  });
+  selChem.addEventListener('change', function(){
+    if (!state.running) resetState();
+  });
+
+  document.getElementById('btnPlay').addEventListener('click', function(){
+    if (state.phase === 'done') return;
+    state.running = !state.running;
+    this.textContent = state.running ? 'Pause' : 'Play';
+    lastFrame = null;
+  });
+  document.getElementById('btnReset').addEventListener('click', function(){
+    resetState();
+  });
+
+  document.querySelectorAll('#speedGroup button').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      speed = parseFloat(btn.getAttribute('data-speed'));
+      document.querySelectorAll('#speedGroup button').forEach(function(b){ b.setAttribute('aria-pressed', b===btn ? 'true':'false'); });
+    });
+  });
+
+  window.addEventListener('resize', function(){ setupCanvases(); });
+
+  // ---------- Init ----------
+  setupCanvases();
+  resetState();
+  requestAnimationFrame(frame);
+
+})();
+</script>

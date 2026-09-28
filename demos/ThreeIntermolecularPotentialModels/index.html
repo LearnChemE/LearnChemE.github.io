@@ -1,0 +1,757 @@
+<title>Three Intermolecular Potential Models</title>
+<style>
+  :root{
+    --ink:#16212c;
+    --ink-soft:#51606d;
+    --ink-faint:#8695a2;
+    --paper:#e9edf1;
+    --panel:#ffffff;
+    --line:#cad3db;
+    --line-soft:#e1e7ec;
+    --accent:#9e1f24;
+    --accent-ink:#ffffff;
+    --accent-soft:#e4eef5;
+    --accent-hover:#164a70;
+    --well-fill:#f3f5f7;
+    --curveA:#2455c9;
+    --curveB:#1a8f4c;
+    --curveAB:#d9720f;
+    --shadow:0 12px 32px -12px rgba(22,33,44,0.28);
+    --help-bg:#c0272d;
+    --help-bg-hover:#9e1f24;
+    --help-ink:#ffffff;
+  }
+  /* @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ink:#e8edf2;
+      --ink-soft:#a9b7c3;
+      --ink-faint:#72808c;
+      --paper:#121820;
+      --panel:#1a232d;
+      --line:#334150;
+      --line-soft:#28323d;
+      --accent:#5aa3d6;
+      --accent-ink:#0b1620;
+      --accent-soft:#233647;
+      --accent-hover:#7ab6e0;
+      --well-fill:#0f151b;
+      --curveA:#6a92ff;
+      --curveB:#3ed488;
+      --curveAB:#ffab52;
+      --shadow:0 12px 32px -12px rgba(0,0,0,0.6);
+    }
+  } */
+  :root[data-theme="dark"]{
+    --ink:#e8edf2;
+    --ink-soft:#a9b7c3;
+    --ink-faint:#72808c;
+    --paper:#121820;
+    --panel:#1a232d;
+    --line:#334150;
+    --line-soft:#28323d;
+    --accent:#5aa3d6;
+    --accent-ink:#0b1620;
+    --accent-soft:#233647;
+    --accent-hover:#7ab6e0;
+    --well-fill:#0f151b;
+    --curveA:#6a92ff;
+    --curveB:#3ed488;
+    --curveAB:#ffab52;
+    --shadow:0 12px 32px -12px rgba(0,0,0,0.6);
+  }
+
+  *{ box-sizing:border-box; }
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:Verdana, Geneva, Tahoma, sans-serif;
+    padding:28px 16px 48px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{
+    max-width:900px;
+    margin:0 auto;
+  }
+  .console{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:6px;
+    box-shadow:var(--shadow);
+    overflow:hidden;
+  }
+  .titlebar{
+    padding:16px 22px 14px;
+    border-bottom:1px solid var(--line);
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  .titlebar h1{
+    font-family:"Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size:20px;
+    font-weight:700;
+    letter-spacing:0.1px;
+    margin:0;
+    color:var(--ink);
+  }
+
+  /* ---- control row: setter buttons, checkbox, help buttons ---- */
+  .controlbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+    flex-wrap:wrap;
+    padding:14px 22px;
+    background:var(--well-fill);
+    border-bottom:1px solid var(--line);
+  }
+  .controlbar-left{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    flex-wrap:wrap;
+  }
+  .setter{
+    display:inline-flex;
+    border:1px solid var(--accent);
+    border-radius:4px;
+    overflow:hidden;
+  }
+  .setter button{
+    font-family:"Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size:12.5px;
+    font-weight:700;
+    letter-spacing:0.2px;
+    padding:7px 13px;
+    border:none;
+    background:var(--panel);
+    color:var(--accent);
+    cursor:pointer;
+    border-right:1px solid var(--accent);
+  }
+  .setter button:last-child{ border-right:none; }
+  .setter button:hover{ background:var(--accent-soft); }
+  .setter button.active{
+    background:var(--accent);
+    color:var(--accent-ink);
+  }
+  .checkline{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    font-family:"Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size:15.8px;
+    color:var(--ink);
+    cursor:pointer;
+    user-select:none;
+  }
+  .checkline input{
+    width:14px;
+    height:14px;
+    accent-color:var(--accent);
+    cursor:pointer;
+  }
+  .helpbtns{
+    display:inline-flex;
+    gap:8px;
+  }
+  .helpbtns button{
+    font-family:"Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size:13.8px;
+    font-weight:400;
+    padding:7px 13px;
+    border:1px solid var(--help-bg);
+    border-radius:4px;
+    background:var(--help-bg);
+    color:var(--help-ink);
+    cursor:pointer;
+  }
+  .helpbtns button:hover{
+    background:var(--help-bg-hover);
+    border-color:var(--help-bg-hover);
+  }
+  .helpbtns button.active{
+    box-shadow:inset 0 0 0 2px rgba(255,255,255,0.55);
+  }
+
+  /* ---- sliders ---- */
+  .sliderbank{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:4px 28px;
+    padding:16px 22px 4px;
+  }
+  .slider-field{
+    padding:8px 0 14px;
+  }
+  .slider-field.hidden{
+    visibility:hidden;
+    pointer-events:none;
+  }
+  .slider-label{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    font-family:"Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size:15.8px;
+    color:var(--ink);
+    margin-bottom:6px;
+  }
+  .slider-label .val{
+    font-family:"Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-variant-numeric:tabular-nums;
+    font-size:15.8px;
+    font-weight:700;
+    color:var(--accent);
+    background:var(--accent-soft);
+    border-radius:3px;
+    padding:1px 6px;
+    min-width:3.6em;
+    text-align:right;
+  }
+
+input[type="range"]{
+    --accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+input[type="range"]::-moz-range-thumb{
+    width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+
+  /* ---- plot pane ---- */
+  .platepane{
+    position:relative;
+    margin:6px 22px 22px;
+    border:1px solid var(--line);
+    border-radius:4px;
+    background:var(--panel);
+  }
+  svg.plot{ display:block; width:100%; height:auto; }
+  .plot text{ font-family:"Helvetica Neue", Helvetica, Arial, sans-serif; fill:var(--ink); }
+  .plot .framelabel{ font-size:14.4px; fill:var(--ink-soft); }
+  .plot .ticklabel{ font-size:13.3px; fill:var(--ink); }
+  .plot .curvelabel{ font-size:13px; font-weight:700; }
+  .plot .annot text{ font-size:12.7px; fill:var(--ink-soft); }
+
+  /* ---- overlay panels (Directions / Details / About) ---- */
+  .panel{
+    position:absolute;
+    top:0;
+    left:0;
+    right:0;
+    max-height:100%;
+    background:var(--panel);
+    border-radius:4px;
+    display:none;
+    flex-direction:column;
+    box-shadow:var(--shadow);
+    z-index:5;
+  }
+  .panel.open{ display:flex; }
+  .panel-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:10px 14px;
+    border-bottom:1px solid var(--line);
+    flex:0 0 auto;
+  }
+  .panel-head h2{
+    font-family:"Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size:14px;
+    font-weight:700;
+    color:var(--ink);
+    margin:0;
+  }
+  .panel-close{
+    width:24px;
+    height:24px;
+    border-radius:4px;
+    border:1px solid var(--line);
+    background:var(--well-fill);
+    color:var(--ink-soft);
+    font-size:14px;
+    line-height:1;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .panel-close:hover{ border-color:var(--accent); color:var(--accent); }
+  .panel-body{
+    padding:14px 20px 20px;
+    overflow-y:auto;
+    font-size:13px;
+    line-height:1.55;
+    color:var(--ink);
+  }
+  .panel-body p{ margin:0 0 12px; }
+  .panel-body .eq{ margin:14px 0; text-align:left; }
+  .panel-body .eq mjx-container[display="true"]{ margin:0.6em 0 !important; text-align:left !important; }
+  .panel-body .eqnote{ color:var(--ink); font-size:13px; }
+  .panel-body ul{ margin:0 0 12px; padding-left:20px; }
+  .panel-body li{ margin-bottom:6px; }
+  .panel-body a{ color:var(--accent); }
+  .panel-body h3{
+    font-family:"Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size:13.5px;
+    font-weight:700;
+    color:var(--ink-soft);
+    margin:18px 0 8px;
+  }
+  .panel-body h3:first-child{ margin-top:0; }
+  .symtable{
+    display:grid;
+    grid-template-columns:auto 1fr;
+    gap:6px 12px;
+    margin:10px 0 14px;
+    font-size:13px;
+    color:var(--ink);
+  }
+  .symtable div:nth-child(odd){ font-weight:400; text-align:center; }
+</style>
+
+<div class="wrap">
+  <div class="console">
+    <!-- <div class="titlebar">
+      <h1>Three Intermolecular Potential Models</h1>
+    </div> -->
+
+    <div class="controlbar">
+      <div class="controlbar-left">
+        <div class="setter" id="potentialSetter">
+          <button data-val="sw" class="active">square-well</button>
+          <button data-val="suth">Sutherland</button>
+          <button data-val="lj">Lennard-Jones</button>
+        </div>
+        <label class="checkline">
+          <input type="checkbox" id="labelToggle" />
+          show labels for B
+        </label>
+      </div>
+      <div class="helpbtns">
+        <button id="btnDirections">Directions</button>
+        <button id="btnDetails">Details</button>
+        <button id="btnAbout">About</button>
+      </div>
+    </div>
+
+    <div class="sliderbank">
+      <div class="slider-field">
+        <div class="slider-label"><span>binary interaction parameter <i>k</i></span><span class="val" id="kVal">&minus;1.50</span></div>
+        <input type="range" id="kSlider" min="-1.5" max="0.95" step="0.05" value="-1.5" />
+      </div>
+      <div class="slider-field" id="lambdaField">
+        <div class="slider-label"><span>relative width &lambda;</span><span class="val" id="lambdaVal">1.5</span></div>
+        <input type="range" id="lambdaSlider" min="1.3" max="1.7" step="0.1" value="1.5" />
+      </div>
+      <div class="slider-field">
+        <div class="slider-label"><span>attractive strength ratio &epsilon;<sub>B</sub> / &epsilon;<sub>A</sub></span><span class="val" id="epsVal">2.00</span></div>
+        <input type="range" id="epsSlider" min="0.05" max="3" step="0.05" value="2" />
+      </div>
+      <div class="slider-field">
+        <div class="slider-label"><span>diameter ratio &sigma;<sub>B</sub> / &sigma;<sub>A</sub></span><span class="val" id="sigVal">4.0</span></div>
+        <input type="range" id="sigSlider" min="1" max="5" step="0.1" value="4" />
+      </div>
+    </div>
+
+    <div class="platepane">
+      <svg class="plot" id="plotSvg" viewBox="0 0 660 430" xmlns="http://www.w3.org/2000/svg"></svg>
+
+      <div class="panel" id="panelDirections">
+        <div class="panel-head"><h2>Directions</h2><button class="panel-close" data-close="panelDirections">&times;</button></div>
+        <div class="panel-body">
+          <p>This simulation considers three models for intermolecular potentials: square-well, Sutherland, and Lennard-Jones. Potentials for molecule A (blue), molecule B (green), and an A&ndash;B mixture (orange) are shown.</p>
+          <p>Choose a potential model with the buttons at top left. Use the sliders to change the parameters:</p>
+          <ul>
+            <li>The binary interaction parameter <i>k</i> represents how non-ideal the mixture is (<i>k</i> = 0 is the ideal case).</li>
+            <li>The attractive-strength ratio &epsilon;<sub>B</sub>/&epsilon;<sub>A</sub> is the relative well depth of B to A.</li>
+            <li>The diameter ratio &sigma;<sub>B</sub>/&sigma;<sub>A</sub> is the relative size of the molecules.</li>
+            <li>The relative width &lambda; (square-well only) is the ratio of the attractive diameter to the repulsive diameter.</li>
+          </ul>
+          <p>Check &ldquo;show labels for B&rdquo; to mark &sigma;, &lambda;&sigma;, and &epsilon; directly on curve B. Click Details for the governing equations.</p>
+        </div>
+      </div>
+
+      <div class="panel" id="panelDetails">
+        <div class="panel-head"><h2>Details</h2><button class="panel-close" data-close="panelDetails">&times;</button></div>
+        <div class="panel-body">
+          <h3>Square-well potential</h3>
+          <div class="eq">\[ u(r)=\begin{cases} \infty & r \le \sigma \\ -\epsilon & \sigma < r \le \lambda\sigma \\ 0 & r > \lambda\sigma \end{cases} \]</div>
+
+          <h3>Sutherland potential</h3>
+          <div class="eq">\[ u(r)=\begin{cases} \infty & r \le \sigma \\[2pt] -\epsilon\left(\dfrac{\sigma}{r}\right)^{6} & r > \sigma \end{cases} \]</div>
+
+          <h3>Lennard&ndash;Jones potential</h3>
+          <div class="eq">\[ u(r)=4\epsilon\left[\left(\dfrac{\sigma}{r}\right)^{12}-\left(\dfrac{\sigma}{r}\right)^{6}\right] \]</div>
+
+          <div class="symtable">
+            <div>u</div><div>intermolecular potential energy</div>
+            <div>r</div><div>distance between molecular centers</div>
+            <div>&sigma;</div><div>molecular diameter</div>
+            <div>&epsilon;</div><div>depth of the potential well</div>
+            <div>&lambda;</div><div>well width for the square-well potential</div>
+          </div>
+
+          <h3>Mixture (A&ndash;B) parameters</h3>
+          <p class="eqnote">The attractive-strength parameter of the mixture is given by</p>
+          <div class="eq">\[ \epsilon_{AB} = (1-k)\sqrt{\epsilon_A \epsilon_B} \]</div>
+          <p class="eqnote">where <i>k</i> is the binary interaction parameter. A larger negative <i>k</i> represents stronger A&ndash;B interactions relative to A&ndash;A or B&ndash;B; a smaller positive <i>k</i> represents weaker interactions.</p>
+          <p class="eqnote">The molecular-diameter parameter of the mixture is given by</p>
+          <div class="eq">\[ \sigma_{AB} = \frac{\sigma_A+\sigma_B}{2} \]</div>
+          <p class="eqnote">Molecule A is the reference molecule, with &epsilon;<sub>A</sub> = 1 and &sigma;<sub>A</sub> = 1; all plotted quantities are scaled by these values.</p>
+        </div>
+      </div>
+
+      <div class="panel" id="panelAbout">
+        <div class="panel-head"><h2>About</h2><button class="panel-close" data-close="panelAbout">&times;</button></div>
+        <div class="panel-body">
+          <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John&nbsp;L.&nbsp;Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/ThreeIntermolecularPotentialModels/" target="_blank" rel="noopener">Mathematica simulation</a> by Megan E. Maguire and Rachael L. Baumann. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-chtml.js" id="MathJax-script" async></script>
+<script>
+(function(){
+  "use strict";
+
+  // ---------- state ----------
+  var state = {
+    potential: "sw",
+    labels: false,
+    k: -1.5,
+    lambda: 1.5,
+    epsB: 2,
+    sigB: 4
+  };
+  var epsA = 1, sigA = 1;
+
+  // ---------- DOM ----------
+  var setterBtns = document.querySelectorAll("#potentialSetter button");
+  var labelToggle = document.getElementById("labelToggle");
+  var kSlider = document.getElementById("kSlider");
+  var lambdaSlider = document.getElementById("lambdaSlider");
+  var epsSlider = document.getElementById("epsSlider");
+  var sigSlider = document.getElementById("sigSlider");
+  var kVal = document.getElementById("kVal");
+  var lambdaVal = document.getElementById("lambdaVal");
+  var epsVal = document.getElementById("epsVal");
+  var sigVal = document.getElementById("sigVal");
+  var lambdaField = document.getElementById("lambdaField");
+  var svg = document.getElementById("plotSvg");
+
+  function fmt(n, d){
+    var v = n.toFixed(d);
+    if (v === "-0." + "0".repeat(d)) v = v.slice(1);
+    return v.replace("-", "−");
+  }
+
+  // ---------- plot geometry ----------
+  var W = 660, H = 430;
+  var ML = 74, MR = 18, MT = 18, MB = 56;
+  var PW = W - ML - MR, PH = H - MT - MB;
+  var X0 = 0, X1 = 10, Y0 = -5, Y1 = 3;
+
+  function xPix(r){ return ML + (r - X0) / (X1 - X0) * PW; }
+  function yPix(u){ return MT + (Y1 - u) / (Y1 - Y0) * PH; }
+
+  var NS = "http://www.w3.org/2000/svg";
+  function el(tag, attrs){
+    var e = document.createElementNS(NS, tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+
+  // ---------- potential functions ----------
+  function sw_curve(eps, sig, lambda){
+    // returns array of {wall:[ [r,yBottom],[r,yTop] ], seg:[[r0,u0],[r1,u1], ...]}
+    var yTop = Y1;
+    var pts = [];
+    pts.push([sig, yTop]);
+    pts.push([sig, -eps]);
+    pts.push([lambda*sig, -eps]);
+    pts.push([lambda*sig, 0]);
+    pts.push([X1, 0]);
+    return pts;
+  }
+
+  function suth_curve(eps, sig){
+    var pts = [];
+    pts.push([sig, Y1]);
+    pts.push([sig, -eps]);
+    var N = 120;
+    for (var i=0;i<=N;i++){
+      var r = sig + (X1-sig)*i/N;
+      var u = -eps*Math.pow(sig/r,6);
+      pts.push([r,u]);
+    }
+    return pts;
+  }
+
+  function lj_curve(eps, sig){
+    var pts = [];
+    pts.push([sig, Y1]);
+    pts.push([sig, 0]);
+    var N = 160;
+    for (var i=0;i<=N;i++){
+      var r = sig + (X1-sig)*i/N;
+      var sr6 = Math.pow(sig/r,6);
+      var u = 4*eps*(sr6*sr6 - sr6);
+      pts.push([r,u]);
+    }
+    return pts;
+  }
+
+  function pathFor(pts){
+    var d = "";
+    for (var i=0;i<pts.length;i++){
+      var x = xPix(pts[i][0]), y = yPix(Math.max(Y0, Math.min(Y1, pts[i][1])));
+      d += (i===0? "M":"L") + x.toFixed(2) + " " + y.toFixed(2) + " ";
+    }
+    return d;
+  }
+
+  function curveFor(kind, eps, sig, lambda){
+    if (kind === "sw") return sw_curve(eps, sig, lambda);
+    if (kind === "suth") return suth_curve(eps, sig);
+    return lj_curve(eps, sig);
+  }
+
+  // ---------- annotation geometry (curve B only) ----------
+  function annotate(g, kind, eps, sig, lambda){
+    function arrow(x1,y1,x2,y2){
+      var line = el("line", {x1:xPix(x1),y1:yPix(y1),x2:xPix(x2),y2:yPix(y2),
+        stroke:"#8695a2","stroke-width":1,"marker-start":"url(#arrowStart)","marker-end":"url(#arrowEnd)"});
+      g.appendChild(line);
+    }
+    // text label with a subscripted "B", e.g. prefix="σ"/"λσ"/"ε" -> σ_B, λσ_B, ε_B
+    function label(x,y,prefix,anchor,dy,dxPx){
+      var t = el("text", {x:xPix(x)+(dxPx||0),y:yPix(y)+(dy||0),"text-anchor":anchor||"middle"});
+      t.style.fill = "#5b6b79";
+      t.style.fontSize = "12.7px";
+      var tMain = el("tspan", {});
+      tMain.textContent = prefix;
+      t.appendChild(tMain);
+      var tSub = el("tspan", {"baseline-shift":"-25%", "font-size":"0.75em"});
+      tSub.textContent = "B";
+      t.appendChild(tSub);
+      g.appendChild(t);
+    }
+    if (kind === "sw"){
+      arrow(0, 2, sig, 2); label(sig/2, 2, "σ", "middle", -6);
+      arrow(0, -0.5, lambda*sig, -0.5); label((lambda*sig)/2, -0.5, "λσ", "middle", 14);
+      var xa = 1.1*lambda*sig;
+      arrow(xa, 0, xa, -eps);
+      label(xa, -eps/2, "ε", "start", 4, 6);
+    } else if (kind === "suth"){
+      arrow(0, 2, sig, 2); label(sig/2, 2, "σ", "middle", -6);
+      var xb = 0.9*sig;
+      arrow(xb, 0, xb, -eps);
+      label(xb, -eps/2, "ε", "start", 4, 6);
+    } else {
+      arrow(0, 0.25, sig, 0.25); label(sig/2, 0.25, "σ", "middle", -6);
+      var rmin = Math.pow(2,1/6)*sig;
+      var umin = -eps; // LJ minimum value at r = 2^(1/6) sigma
+      arrow(rmin, 0, rmin, umin);
+      label(rmin, umin/2, "ε", "start", -4, 6);
+    }
+  }
+
+  // ---------- draw ----------
+  function draw(){
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+    svg.setAttribute("class","plot");
+
+    var defs = el("defs", {});
+    [["arrowStart",0],["arrowEnd",1]].forEach(function(a){
+      var m = el("marker", {id:a[0], markerWidth:8, markerHeight:8, refX:a[1]?6:2, refY:3, orient:"auto"});
+      var p = el("path", {d:"M0,0 L6,3 L0,6 Z", fill:"#8695a2"});
+      if (!a[1]) p.setAttribute("d","M6,0 L0,3 L6,6 Z");
+      m.appendChild(p);
+      defs.appendChild(m);
+    });
+    svg.appendChild(defs);
+
+    // plot background
+    svg.appendChild(el("rect", {x:ML, y:MT, width:PW, height:PH, fill:"var(--well-fill)"}));
+
+    // gridlines + ticks
+    var xticks = [0,2,4,6,8,10];
+    var yticks = [-5,-4,-3,-2,-1,0,1,2,3];
+    xticks.forEach(function(xv){
+      var x = xPix(xv);
+      svg.appendChild(el("line",{x1:x,y1:MT,x2:x,y2:MT+PH,stroke:"var(--line-soft)","stroke-width":1}));
+      var t = el("text",{x:x,y:MT+PH+18,"text-anchor":"middle"});
+      t.setAttribute("class","ticklabel"); t.textContent = xv;
+      svg.appendChild(t);
+    });
+    yticks.forEach(function(yv){
+      var y = yPix(yv);
+      svg.appendChild(el("line",{x1:ML,y1:y,x2:ML+PW,y2:y,stroke:"var(--line-soft)","stroke-width":1}));
+      var t = el("text",{x:ML-8,y:y+3,"text-anchor":"end"});
+      t.setAttribute("class","ticklabel"); t.textContent = yv;
+      svg.appendChild(t);
+    });
+
+    // frame: bottom/left carry the tick numbers, so draw them darker than the plain top/right border
+    svg.appendChild(el("line",{x1:ML,y1:MT,x2:ML+PW,y2:MT,stroke:"var(--line)","stroke-width":1.2}));
+    svg.appendChild(el("line",{x1:ML+PW,y1:MT,x2:ML+PW,y2:MT+PH,stroke:"var(--line)","stroke-width":1.2}));
+    svg.appendChild(el("line",{x1:ML,y1:MT+PH,x2:ML+PW,y2:MT+PH,stroke:"var(--ink-soft)","stroke-width":1.6}));
+    svg.appendChild(el("line",{x1:ML,y1:MT,x2:ML,y2:MT+PH,stroke:"var(--ink-soft)","stroke-width":1.6}));
+
+    // axis labels (with a subscripted trailing "A")
+    function subLabel(x, y, prefix, symbol, transform){
+      var t = el("text", {x:x, y:y, "text-anchor":"middle"});
+      t.setAttribute("class","framelabel");
+      if (transform) t.setAttribute("transform", transform);
+      var tPrefix = el("tspan", {});
+      tPrefix.textContent = prefix + symbol;
+      t.appendChild(tPrefix);
+      var tSub = el("tspan", {"baseline-shift":"-25%", "font-size":"0.75em"});
+      tSub.textContent = "A";
+      t.appendChild(tSub);
+      return t;
+    }
+    svg.appendChild(subLabel(ML+PW/2, H-10, "(distance between molecular centers) / ", "σ"));
+    svg.appendChild(subLabel(0, 0, "(intermolecular potential energy) / ", "ε", "translate(30," + (MT+PH/2) + ") rotate(-90)"));
+
+    // clip
+    var clipId = "plotclip";
+    var clip = el("clipPath",{id:clipId});
+    clip.appendChild(el("rect",{x:ML,y:MT,width:PW,height:PH}));
+    defs.appendChild(clip);
+
+    var plotG = el("g",{"clip-path":"url(#"+clipId+")"});
+    svg.appendChild(plotG);
+
+    var epsAB = (1 - state.k) * Math.sqrt(epsA * state.epsB);
+    var sigAB = (sigA + state.sigB) / 2;
+
+    var curves = [
+      { pts: curveFor(state.potential, epsA, sigA, state.lambda), color: "var(--curveA)", label:"A", sig: sigA },
+      { pts: curveFor(state.potential, state.epsB, state.sigB, state.lambda), color: "var(--curveB)", label:"B", sig: state.sigB },
+      { pts: curveFor(state.potential, epsAB, sigAB, state.lambda), color: "var(--curveAB)", label:"A+B", sig: sigAB }
+    ];
+
+    // A: solid. B and A+B: dashes that run parallel to the path (ordinary
+    // stroke-dasharray), same stroke weight; A+B uses a shorter dash so it
+    // stays visually distinct from B despite the shared style and thickness.
+    var dashArr = ["0", "7,4", "4,3"];
+    var strokeW = [2.4, 2.4, 2.4];
+
+    curves.forEach(function(c, idx){
+      var p = el("path", {d: pathFor(c.pts), fill:"none", stroke:c.color, "stroke-width":strokeW[idx]});
+      if (dashArr[idx] !== "0") p.setAttribute("stroke-dasharray", dashArr[idx]);
+      p.setAttribute("stroke-linejoin","round");
+      plotG.appendChild(p);
+    });
+
+    if (state.labels){
+      var annG = el("g", {});
+      annotate(annG, state.potential, state.epsB, state.sigB, state.lambda);
+      plotG.appendChild(annG);
+    }
+
+    // curve labels, placed directly beside each curve (next to its repulsive wall)
+    var lg = el("g", {class:"curvelabel"});
+    var placed = []; // track used [x,y] slots (px) to nudge apart near-coincident labels
+    curves.forEach(function(c, idx){
+      var lx = xPix(Math.min(c.sig, X1)) + 6;
+      var ly = MT + 16;
+      // stagger vertically if another label landed within ~16px horizontally
+      while (placed.some(function(p){ return Math.abs(p[0]-lx) < 30 && Math.abs(p[1]-ly) < 14; })){
+        ly += 16;
+      }
+      placed.push([lx,ly]);
+      var t = el("text",{x:lx,y:ly,"text-anchor":"start"});
+      t.style.fill = c.color;
+      t.textContent = c.label;
+      lg.appendChild(t);
+    });
+    svg.appendChild(lg);
+  }
+
+  // ---------- events ----------
+  setterBtns.forEach(function(b){
+    b.addEventListener("click", function(){
+      setterBtns.forEach(function(x){ x.classList.remove("active"); });
+      b.classList.add("active");
+      state.potential = b.getAttribute("data-val");
+      lambdaField.classList.toggle("hidden", state.potential !== "sw");
+      draw();
+    });
+  });
+
+  labelToggle.addEventListener("change", function(){
+    state.labels = labelToggle.checked;
+    draw();
+  });
+
+  kSlider.addEventListener("input", function(){
+    state.k = parseFloat(kSlider.value);
+    kVal.textContent = fmt(state.k, 2);
+    draw();
+  });
+  lambdaSlider.addEventListener("input", function(){
+    state.lambda = parseFloat(lambdaSlider.value);
+    lambdaVal.textContent = fmt(state.lambda, 1);
+    draw();
+  });
+  epsSlider.addEventListener("input", function(){
+    state.epsB = parseFloat(epsSlider.value);
+    epsVal.textContent = fmt(state.epsB, 2);
+    draw();
+  });
+  sigSlider.addEventListener("input", function(){
+    state.sigB = parseFloat(sigSlider.value);
+    sigVal.textContent = fmt(state.sigB, 1);
+    draw();
+  });
+
+  // ---------- panels ----------
+  var helpBtns = {
+    panelDirections: document.getElementById("btnDirections"),
+    panelDetails: document.getElementById("btnDetails"),
+    panelAbout: document.getElementById("btnAbout")
+  };
+
+  function closeAllPanels(){
+    document.querySelectorAll(".panel").forEach(function(p){ p.classList.remove("open"); });
+    Object.keys(helpBtns).forEach(function(k){ helpBtns[k].classList.remove("active"); });
+  }
+
+  function openPanel(id){
+    closeAllPanels();
+    document.getElementById(id).classList.add("open");
+    helpBtns[id].classList.add("active");
+    if (window.MathJax && window.MathJax.typesetPromise){
+      window.MathJax.typesetPromise([document.getElementById(id)]);
+    }
+  }
+
+  function togglePanel(id){
+    var isOpen = document.getElementById(id).classList.contains("open");
+    if (isOpen){ closeAllPanels(); } else { openPanel(id); }
+  }
+
+  Object.keys(helpBtns).forEach(function(id){
+    helpBtns[id].addEventListener("click", function(){ togglePanel(id); });
+  });
+  document.querySelectorAll(".panel-close").forEach(function(btn){
+    btn.addEventListener("click", function(){ closeAllPanels(); });
+  });
+
+  // ---------- init ----------
+  kVal.textContent = fmt(state.k,2);
+  lambdaVal.textContent = fmt(state.lambda,1);
+  epsVal.textContent = fmt(state.epsB,2);
+  sigVal.textContent = fmt(state.sigB,1);
+  draw();
+})();
+</script>
