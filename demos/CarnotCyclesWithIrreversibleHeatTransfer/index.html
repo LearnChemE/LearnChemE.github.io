@@ -1,0 +1,654 @@
+<title>Carnot Cycle Simulator</title>
+<style>
+  :root{
+    --bg:#fff;
+    --surface:#ffffff;
+    --surface-2:#f7f5f0;
+    --border:#dcd6c9;
+    --text:#26221c;
+    --text-muted:#6d6558;
+    --accent:#b7291f;
+    --accent-hover:#9c221a;
+    --accent-text:#ffffff;
+    --focus:#b7291f;
+    --link:#8a4a12;
+
+    /* Diagram tokens: the figure is presented as a fixed light "paper"
+       so its calibrated reservoir/arrow colors stay legible in both themes. */
+    --diag-bg:#ffffff;
+    --diag-border:#c9c4b8;
+    --diag-ink:#1a1a1a;
+    --diag-ink-soft:#4a4a4a;
+    --diag-hot:#ffcfc9;
+    --diag-hot-line:#c0392b;
+    --diag-cold:#cfe3fb;
+    --diag-cold-line:#1f5fa8;
+    --diag-blue:#1f4fd8;
+    --diag-green:#1c7a34;
+    --diag-circle:#111111;
+  }
+  /* @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#1b1916;
+      --surface:#242220;
+      --surface-2:#2b2925;
+      --border:#3d382f;
+      --text:#f1ede4;
+      --text-muted:#b6ad9d;
+      --accent:#c9382c;
+      --accent-hover:#e0453a;
+      --accent-text:#ffffff;
+      --focus:#5b9bd8;
+      --link:#e0a24c;
+    }
+  } */
+  :root[data-theme="dark"]{
+    --bg:#1b1916;
+    --surface:#242220;
+    --surface-2:#2b2925;
+    --border:#3d382f;
+    --text:#f1ede4;
+    --text-muted:#b6ad9d;
+    --accent:#c9382c;
+    --accent-hover:#e0453a;
+    --accent-text:#ffffff;
+    --focus:#5b9bd8;
+    --link:#e0a24c;
+  }
+
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:Arial, "Helvetica Neue", Helvetica, "Segoe UI", sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .page{
+    max-width:874px;
+    margin:0 auto;
+    padding:28px 20px 48px;
+  }
+  h1{
+    font-size:22px;
+    font-weight:700;
+    margin:0 0 3px;
+    text-wrap:balance;
+  }
+  /* ---- top buttons ---- */
+  .toolbar{
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-bottom:0;
+  }
+  .toolbtn{
+    background:var(--accent);
+    color:var(--accent-text);
+    border:none;
+    font-family:inherit;
+    font-weight:400;
+    font-size:15.4px;
+    padding:8px 18px;
+    border-radius:4px;
+    cursor:pointer;
+  }
+  .toolbtn:hover{ background:var(--accent-hover); }
+  .toolbtn:focus-visible{ outline:2px solid var(--focus); outline-offset:2px; }
+  .toolbtn[aria-pressed="true"]{ box-shadow:inset 0 0 0 2px rgba(0,0,0,0.25); }
+
+  /* ---- info panel: overlays the figure in place, the figure never moves ---- */
+  .stage{ position:relative; margin-top:14px; }
+  .panel{
+    position:absolute;
+    top:0;
+    left:0;
+    right:0;
+    height:auto;
+    z-index:5;
+    overflow-y:auto;
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    border-radius:8px;
+    margin:0;
+    padding:18px 40px 18px 18px;
+    font-size:14.5px;
+    line-height:1.55;
+    box-shadow:0 8px 24px rgba(0,0,0,0.18);
+  }
+  /* Details has enough content to fill the figure's footprint; the others
+     should only be as tall as their text requires. */
+  #panel-details{ bottom:0; }
+  .panel[hidden]{ display:none; }
+  .panel h2{
+    margin:0 0 8px;
+    font-size:13px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:var(--text-muted);
+  }
+  .panel p{ margin:0 0 10px; }
+  .panel p:last-child{ margin-bottom:0; }
+  .panel .eq{
+    text-align:left;
+    margin:8px 0;
+  }
+  .panel-close{
+    position:absolute;
+    top:8px;
+    right:8px;
+    width:26px;
+    height:26px;
+    border:none;
+    background:transparent;
+    color:var(--text-muted);
+    font-size:17px;
+    line-height:1;
+    cursor:pointer;
+    border-radius:4px;
+  }
+  .panel-close:hover{ background:var(--border); color:var(--text); }
+  .panel a{ color:var(--link); }
+  .panel-notes{
+    margin-top:14px;
+    padding-top:12px;
+    border-top:1px solid var(--border);
+    font-size:12.5px;
+    color:var(--text-muted);
+  }
+  .panel-notes ul{ margin:6px 0 0; padding-left:18px; }
+
+  mjx-container[display="true"]{
+    text-align:left !important;
+    margin:0.5em 0 !important;
+  }
+
+  /* ---- simulation card ---- */
+  .card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:14px;
+  }
+  .diagram-wrap{
+    background:var(--diag-bg);
+    border:1px solid var(--diag-border);
+    border-radius:6px;
+    padding:6px;
+  }
+  .diagram-wrap svg{ display:block; width:100%; height:auto; }
+
+  /* ---- controls: sliders + COP, below the toolbar ---- */
+  .control-bar{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:14px;
+    margin-top:14px;
+  }
+  .control-group{ display:flex; align-items:center; gap:6px; }
+  .control-label{
+    font-size:16.6px;
+    /* color:var(--text-muted); */
+    white-space:nowrap;
+  }
+  .control-label sub{ font-size:0.75em; }
+
+  .setter{
+    display:inline-flex;
+    border:1px solid var(--border);
+    border-radius:5px;
+    overflow:hidden;
+    margin-left:4px;
+  }
+  .setter button{
+    font-family:inherit;
+    font-size:14.85px;
+    padding:7px 14px;
+    border:none;
+    background:var(--surface-2);
+    color:var(--text);
+    cursor:pointer;
+  }
+  .setter button + button{ border-left:1px solid var(--border); }
+  .setter button[aria-pressed="true"]{
+    background:var(--focus);
+    color:#fff;
+  }
+
+  .slider-row{ display:flex; align-items:center; gap:0px; }
+  input[type="range"]{
+    width:195px;
+    accent-color:var(--focus);
+  }
+
+input[type="range"]{
+  margin-top:.7em;
+    --accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:210px;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+input[type="range"]::-moz-range-thumb{
+    width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+
+
+  .slider-value{
+    font-variant-numeric:tabular-nums;
+    font-size:15.5px;
+    text-align:left;
+  }
+
+  .readout-group{ display:flex; align-items:center; gap:14px; }
+  .readout{
+    font-size:16.1px;
+    font-variant-numeric:tabular-nums;
+    white-space:nowrap;
+  }
+  .readout sub{ font-size:0.75em; }
+  .readout b{ font-weight:700; }
+
+  svg text{ font-family:Arial, "Helvetica Neue", Helvetica, sans-serif; }
+</style>
+
+<div class="page">
+  <div class="toolbar">
+    <button type="button" class="toolbtn" id="btn-directions" aria-pressed="false">Directions</button>
+    <button type="button" class="toolbtn" id="btn-details" aria-pressed="false">Details</button>
+    <button type="button" class="toolbtn" id="btn-about" aria-pressed="false">About</button>
+    <div class="setter" role="group" aria-label="Heat engine or heat pump">
+      <button type="button" id="mode-engine" aria-pressed="true">heat engine</button>
+      <button type="button" id="mode-pump" aria-pressed="false">heat pump</button>
+    </div>
+  </div>
+
+  <div class="control-bar">
+    <div class="control-group">
+      <span class="control-label">|T<sub>h</sub> &minus; T<sub>H</sub>|</span>
+      <div class="slider-row">
+        <input type="range" id="slider-dt1" min="0" max="50" step="2" value="10">
+        <span class="slider-value" id="dt1-value">10</span>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <span class="control-label">|T<sub>c</sub> &minus; T<sub>C</sub>|</span>
+      <div class="slider-row">
+        <input type="range" id="slider-dt2" min="0" max="50" step="2" value="12">
+        <span class="slider-value" id="dt2-value">12</span>
+      </div>
+    </div>
+
+    <div class="readout-group">
+      <span class="readout" id="eff-cop-readout">&eta; = <b>0.41</b></span>
+      <span class="readout" id="dstotal-readout">&Delta;S<sub>total</sub> = <b>0.16</b> J/K</span>
+    </div>
+  </div>
+
+  <div class="stage">
+    <div class="card">
+      <div class="diagram-wrap">
+        <svg id="diagram" viewBox="-9 -6.325 18 12.65" role="img" aria-label="Carnot cycle diagram"></svg>
+      </div>
+    </div>
+
+    <div id="panel-directions" class="panel" hidden>
+      <button type="button" class="panel-close" data-close="panel-directions" aria-label="Close">&times;</button>
+      <h2>Directions</h2>
+      <p>
+        This simulation models a Carnot cycle as either a heat engine or a heat pump. Change the
+        temperature differences between the reservoirs and the Carnot cycle with the sliders. The
+        entropy changes for the reservoirs ($\Delta S_h$ and $\Delta S_c$) and the overall entropy
+        change ($\Delta S_{total}$) are calculated. When the temperature differences between the
+        reservoirs and the engine/pump are zero, the total entropy change is zero and the process is
+        reversible. The entropy change of the engine/pump, which is at steady state, is zero. All
+        energies and entropy changes are per unit time, since these are continuous processes, but the
+        time scale is arbitrary. The cycle efficiency $\eta$ is calculated for the heat engine, and
+        the coefficient of performance $COP$ is calculated for the heat pump. As the temperature
+        differences between the reservoirs and the engine/pump increase, the efficiency/coefficient of
+        performance decreases. For the heat engine, $Q_H$ is held constant at 1250 J, and for the heat
+        pump, $Q_C$ is held constant at 600 J.
+      </p>
+      <p>
+        Note that the $Q_H$ and $Q_C$ values in the figure are relative to the heat engine. That is, if
+        $Q_H$ is negative, it means heat is removed from the heat engine.
+      </p>
+    </div>
+
+    <div id="panel-details" class="panel" hidden>
+      <button type="button" class="panel-close" data-close="panel-details" aria-label="Close">&times;</button>
+      <h2>Details</h2>
+      <div class="eq">$$\Delta T_1 = |T_h - T_H|,$$</div>
+      <div class="eq">$$\Delta T_2 = |T_c - T_C|,$$</div>
+      <div class="eq">$$\Delta S_h = \dfrac{Q_h}{T_h},$$</div>
+      <div class="eq">$$\Delta S_c = \dfrac{Q_c}{T_c},$$</div>
+      <div class="eq">$$\Delta S_h + \Delta S_c = \Delta S_{total},$$</div>
+      <p>
+        where $\Delta T_1$ and $\Delta T_2$ are user-defined differences in reservoir and Carnot cycle
+        temperatures (K). The subscripts $h$ and $c$ refer to the hot or cold reservoirs, and the
+        subscripts $H$ and $C$ refer to the hot or cold temperatures of the Carnot cycle. $T$ is
+        temperature (K), $\Delta S$ is the change in entropy (J/K), and $Q$ is heat gained or lost (J).
+      </p>
+      <p>
+        For a Carnot heat engine, heat is transferred from a hot reservoir to a cold reservoir and the
+        engine does work ($W$). For a real process, $T_h \geq T_H$ and $T_c \leq T_C$. The efficiency
+        $\eta$ of a Carnot engine, in terms of the engine temperatures, is:
+      </p>
+      <div class="eq">$$\eta = \dfrac{T_H - T_C}{T_H},$$</div>
+      <div class="eq">$$Q_C = -Q_H\,\dfrac{T_C}{T_H},$$</div>
+      <div class="eq">$$|W| = \eta\, Q_H.$$</div>
+      <p>
+        For a Carnot heat pump, heat is transferred from the cold reservoir to the hot reservoir and
+        work is added. For a real process, $T_h \leq T_H$ and $T_c \geq T_C$ to have a reasonable rate
+        of heat transfer. The coefficient of performance $COP$ is
+      </p>
+      <div class="eq">$$COP = \dfrac{T_C}{T_H - T_C},$$</div>
+      <div class="eq">$$Q_H = -Q_C\,\dfrac{T_H}{T_C},$$</div>
+      <div class="eq">$$|W| = \dfrac{Q_C}{COP}.$$</div>
+    </div>
+
+    <div id="panel-about" class="panel" hidden>
+      <button type="button" class="panel-close" data-close="panel-about" aria-label="Close">&times;</button>
+      <h2>About</h2>
+      <p>
+        This simulation was created in the
+        <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a>
+        at University of Colorado Boulder for
+        <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a>
+        by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a
+        <a href="https://demonstrations.wolfram.com/CarnotCyclesWithIrreversibleHeatTransfer/" target="_blank" rel="noopener">Mathematica simulation</a>
+        by Rachael L. Baumann. It was prepared with financial support from the National Science
+        Foundation (DUE 2336987 and 2336988). Address any questions or comments to
+        <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']] },
+  options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js"></script>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- panel toggling ---------- */
+  var panels = {
+    directions: document.getElementById('panel-directions'),
+    details: document.getElementById('panel-details'),
+    about: document.getElementById('panel-about')
+  };
+  var buttons = {
+    directions: document.getElementById('btn-directions'),
+    details: document.getElementById('btn-details'),
+    about: document.getElementById('btn-about')
+  };
+  function closeAllPanels(){
+    Object.keys(panels).forEach(function(k){
+      panels[k].hidden = true;
+      buttons[k].setAttribute('aria-pressed','false');
+    });
+  }
+  Object.keys(buttons).forEach(function(k){
+    buttons[k].addEventListener('click', function(){
+      var isOpen = !panels[k].hidden;
+      closeAllPanels();
+      if(!isOpen){
+        panels[k].hidden = false;
+        buttons[k].setAttribute('aria-pressed','true');
+      }
+    });
+  });
+  document.querySelectorAll('.panel-close').forEach(function(btn){
+    btn.addEventListener('click', function(){ closeAllPanels(); });
+  });
+
+  /* ---------- thermodynamics ---------- */
+  function computeAll(mode, dT1, dT2){
+    var Th = (mode === 'engine') ? 500 : 325;
+    var Tc = 275;
+    var TH = (mode === 'engine') ? (Th - dT1) : (Th + dT1);
+    var TC = (mode === 'engine') ? (Tc + dT2) : (Tc - dT2);
+    var QH, QC;
+    if (mode === 'engine'){
+      QH = -1250;
+      QC = -QH * (TC / TH);
+    } else {
+      QC = -600;
+      QH = -QC * (TH / TC);
+    }
+    var eta = (TH - TC) / TH;
+    var COP = TC / (TH - TC);
+    var W = (mode === 'engine') ? (eta * QH) : (-QC / COP);
+    var dSh = QH / Th;
+    var dSc = QC / Tc;
+    var dStotal = dSh + dSc;
+    return {Th:Th, Tc:Tc, TH:TH, TC:TC, QH:QH, QC:QC, eta:eta, COP:COP, W:W,
+             dSh:dSh, dSc:dSc, dStotal:dStotal};
+  }
+
+  /* ---------- number formatting (matches original sig figs) ---------- */
+  function minus(s){ return s.replace('-', '−'); }
+  function fmtInt(x){                       // NumberForm[N[x],{4,0}]
+    var r = Math.round(x);
+    if (Object.is(r, -0)) r = 0;
+    return minus(r.toString());
+  }
+  function fmtSig2(x){                      // NumberForm[N[x],2]
+    if (x === 0) return '0.0';
+    var s = x.toPrecision(2);
+    if (s.indexOf('e') !== -1 || s.indexOf('E') !== -1) s = Number(s).toString();
+    return minus(s);
+  }
+  function fmtDS(x){                        // NumberForm[N[x],{3,2}]
+    var v = x;
+    if (Math.abs(v) < 0.005) v = 0;
+    return minus(v.toFixed(2));
+  }
+
+  /* ---------- SVG helpers ---------- */
+  var NS = 'http://www.w3.org/2000/svg';
+  function el(tag, attrs){
+    var e = document.createElementNS(NS, tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+  function textEl(x, y, attrs){
+    return el('text', Object.assign({x:x, y:y, 'text-anchor':'middle',
+      'dominant-baseline':'middle', fill:'var(--diag-ink)', 'font-size':0.46}, attrs || {}));
+  }
+  function tspan(str, attrs){
+    var t = el('tspan', attrs || {});
+    t.textContent = str;
+    return t;
+  }
+  // Builds "<main><sub>sub</sub><rest>" inside a <text> element
+  function subLabel(textNode, main, sub, rest){
+    textNode.appendChild(tspan(main));
+    textNode.appendChild(tspan(sub, {dy:'0.20em', 'font-size':'0.7em'}));
+    textNode.appendChild(tspan(rest, {dy:'-0.20em'}));
+    return textNode;
+  }
+
+  var ARROW_THICKEN = 1.25; // shafts are 25% thicker; the arrowhead (tip) is not scaled
+
+  function strokeForEnergy(absVal){
+    var minW = 0.06, maxW = 0.42, domainMax = 1500;
+    var t = Math.min(Math.abs(absVal) / domainMax, 1);
+    return minW + t * (maxW - minW);
+  }
+
+  // `sw` is the arrow's base (un-thickened) width: it sets the arrowhead size
+  // exactly as before, while the shaft itself is drawn 25% thicker.
+  // `cap` sets the shaft's tail-end style ('round' by default, 'butt' for a flat back edge).
+  function arrow(g, x1, y1, x2, y2, sw, color, cap){
+    var dx = x2 - x1, dy = y2 - y1;
+    var len = Math.hypot(dx, dy) || 1;
+    var ux = dx / len, uy = dy / len;
+    var headLen = Math.max(sw * 3.0, 0.22);
+    var headWidth = headLen * 0.8;
+    var lineEndX = x2 - ux * headLen * 0.55;
+    var lineEndY = y2 - uy * headLen * 0.55;
+    var baseX = x2 - ux * headLen, baseY = y2 - uy * headLen;
+    var px = -uy, py = ux;
+    g.appendChild(el('line', {x1:x1, y1:y1, x2:lineEndX, y2:lineEndY,
+      stroke:color, 'stroke-width':sw * ARROW_THICKEN, 'stroke-linecap':cap || 'round'}));
+    var p1 = x2 + ',' + y2;
+    var p2 = (baseX + px*headWidth/2) + ',' + (baseY + py*headWidth/2);
+    var p3 = (baseX - px*headWidth/2) + ',' + (baseY - py*headWidth/2);
+    g.appendChild(el('polygon', {points:p1+' '+p2+' '+p3, fill:color}));
+  }
+
+  var SQ3 = Math.sqrt(3);
+
+  function render(){
+    var mode = state.mode;
+    var v = computeAll(mode, state.dT1, state.dT2);
+    var dir = (mode === 'engine') ? 1 : -1;
+
+    var svg = document.getElementById('diagram');
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+
+    /* reservoir rectangles.
+       SVG y grows downward, so the hot reservoir (top of the figure) sits
+       at negative y and the cold reservoir (bottom) at positive y. Both are
+       taller now, with the reservoir name at the top of its rectangle and a
+       small gap before the combined T / deltaS line underneath. */
+    svg.appendChild(el('rect', {x:-4.5, y:-5.75, width:9, height:2.15, fill:'var(--diag-hot)',
+      stroke:'var(--diag-hot-line)', 'stroke-width':0.06}));
+    svg.appendChild(el('rect', {x:-4.5, y:3.6, width:9, height:2.15, fill:'var(--diag-cold)',
+      stroke:'var(--diag-cold-line)', 'stroke-width':0.06}));
+
+    /* hot reservoir: title at top, then a little space, then T_h and deltaS_h on one line */
+    var hotTitle = textEl(0, -5.32, {'font-size':0.483, 'font-weight':'700'});
+    hotTitle.textContent = 'hot reservoir';
+    svg.appendChild(hotTitle);
+    var hotLine = textEl(0, -4.32);
+    subLabel(hotLine, 'T', 'h', ' = ' + fmtInt(v.Th) + ' K,   ');
+    subLabel(hotLine, 'ΔS', 'h', ' = ' + fmtDS(v.dSh) + ' J/K');
+    svg.appendChild(hotLine);
+
+    /* cold reservoir: title at top (nearest the circle), then a little space,
+       then T_c and deltaS_c on one line */
+    var coldTitle = textEl(0, 4.18, {'font-size':0.483, 'font-weight':'700'});
+    coldTitle.textContent = 'cold reservoir';
+    svg.appendChild(coldTitle);
+    var coldLine = textEl(0, 5.18);
+    subLabel(coldLine, 'T', 'c', ' = ' + fmtInt(v.Tc) + ' K,   ');
+    subLabel(coldLine, 'ΔS', 'c', ' = ' + fmtDS(v.dSc) + ' J/K');
+    svg.appendChild(coldLine);
+
+    /* cycle circle */
+    svg.appendChild(el('circle', {cx:0, cy:0, r:2, fill:'none',
+      stroke:'var(--diag-circle)', 'stroke-width':0.09}));
+
+    /* isothermal (blue) legs: hot-side leg near the top (y=-1), cold-side near the bottom (y=1) */
+    var g1 = el('g', {});
+    if (dir === 1){
+      arrow(g1, -SQ3, -1, SQ3, -1, 0.13, 'var(--diag-blue)');
+      arrow(g1, SQ3, 1, -SQ3, 1, 0.13, 'var(--diag-blue)');
+    } else {
+      arrow(g1, SQ3, -1, -SQ3, -1, 0.13, 'var(--diag-blue)');
+      arrow(g1, -SQ3, 1, SQ3, 1, 0.13, 'var(--diag-blue)');
+    }
+    svg.appendChild(g1);
+
+    /* adiabatic (green) legs */
+    var g2 = el('g', {});
+    if (dir === 1){
+      arrow(g2, SQ3, -1, SQ3, 1, 0.13, 'var(--diag-green)');
+      arrow(g2, -SQ3, 1, -SQ3, -1, 0.13, 'var(--diag-green)');
+    } else {
+      arrow(g2, SQ3, 1, SQ3, -1, 0.13, 'var(--diag-green)');
+      arrow(g2, -SQ3, -1, -SQ3, 1, 0.13, 'var(--diag-green)');
+    }
+    svg.appendChild(g2);
+
+    /* Qh / Qc arrows between circle and reservoirs — thickness ~ |Q| */
+    var swQH = strokeForEnergy(v.QH);
+    var swQC = strokeForEnergy(v.QC);
+    var gQ = el('g', {});
+    if (dir === 1){
+      arrow(gQ, 0, -3.6, 0, -2.05, swQH, 'var(--diag-ink)', 'butt');
+      arrow(gQ, 0, 2.05, 0, 3.6, swQC, 'var(--diag-ink)', 'butt');
+    } else {
+      arrow(gQ, 0, -2.05, 0, -3.6, swQH, 'var(--diag-ink)', 'butt');
+      arrow(gQ, 0, 3.6, 0, 2.05, swQC, 'var(--diag-ink)', 'butt');
+    }
+    svg.appendChild(gQ);
+
+    /* Q_h / Q_c values, offset from the arrow so they don't overlap it */
+    var qh = textEl(0.5, -2.825, {'text-anchor':'start'}); subLabel(qh, 'Q', 'H', ' = ' + fmtInt(-v.QH) + ' J'); svg.appendChild(qh);
+    var qc = textEl(0.5, 2.825, {'text-anchor':'start'}); subLabel(qc, 'Q', 'C', ' = ' + fmtInt(-v.QC) + ' J'); svg.appendChild(qc);
+
+    /* T_H above the top blue arrow, T_C above the bottom blue arrow (both inside the circle) */
+    var THlab = textEl(0, -1.3, {'font-size':0.4301}); subLabel(THlab, 'T', 'H', ' = ' + fmtInt(v.TH) + ' K'); svg.appendChild(THlab);
+    var TClab = textEl(0, 0.7, {'font-size':0.4301}); subLabel(TClab, 'T', 'C', ' = ' + fmtInt(v.TC) + ' K'); svg.appendChild(TClab);
+
+    /* work arrow — thickness ~ |W|; label sits close to the tip */
+    var swW = strokeForEnergy(v.W);
+    var gW = el('g', {});
+    if (dir === 1) arrow(gW, 2.05, 0, 4.2, 0, swW, 'var(--diag-ink)', 'butt');
+    else arrow(gW, 4.2, 0, 2.05, 0, swW, 'var(--diag-ink)', 'butt');
+    svg.appendChild(gW);
+    var wLab = textEl(4.5, 0, {'text-anchor':'start'}); subLabel(wLab, 'W', 's', ' = ' + fmtInt(v.W) + ' J'); svg.appendChild(wLab);
+  }
+
+  /* ---------- state + wiring ---------- */
+  var state = { mode:'engine', dT1:10, dT2:12 };
+
+  function updateReadouts(){
+    var v = computeAll(state.mode, state.dT1, state.dT2);
+    var effCop = document.getElementById('eff-cop-readout');
+    if (state.mode === 'engine'){
+      effCop.innerHTML = 'η = <b>' + fmtSig2(v.eta) + '</b>';
+    } else {
+      effCop.innerHTML = 'COP = <b>' + fmtSig2(v.COP) + '</b>';
+    }
+    document.getElementById('dstotal-readout').innerHTML =
+      'ΔS<sub>total</sub> = <b>' + fmtDS(v.dStotal) + '</b> J/K';
+  }
+
+  function updateAll(){
+    render();
+    updateReadouts();
+  }
+
+  var engineBtn = document.getElementById('mode-engine');
+  var pumpBtn = document.getElementById('mode-pump');
+  engineBtn.addEventListener('click', function(){
+    state.mode = 'engine';
+    engineBtn.setAttribute('aria-pressed','true');
+    pumpBtn.setAttribute('aria-pressed','false');
+    updateAll();
+  });
+  pumpBtn.addEventListener('click', function(){
+    state.mode = 'pump';
+    pumpBtn.setAttribute('aria-pressed','true');
+    engineBtn.setAttribute('aria-pressed','false');
+    updateAll();
+  });
+
+  var s1 = document.getElementById('slider-dt1');
+  var s1v = document.getElementById('dt1-value');
+  s1.addEventListener('input', function(){
+    state.dT1 = Number(s1.value);
+    s1v.textContent = state.dT1;
+    updateAll();
+  });
+
+  var s2 = document.getElementById('slider-dt2');
+  var s2v = document.getElementById('dt2-value');
+  s2.addEventListener('input', function(){
+    state.dT2 = Number(s2.value);
+    s2v.textContent = state.dT2;
+    updateAll();
+  });
+
+  updateAll();
+})();
+</script>

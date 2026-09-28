@@ -1,0 +1,763 @@
+<title>Arranging Balls into Boxes</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=Source+Code+Pro:wght@500&display=swap">
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)']],
+      displayMath: [['\\[', '\\]']]
+    },
+    chtml: {
+      /* \text{...} runs (used for the numeric values substituted into the
+         formulas) pick up the page's own font instead of MathJax's math
+         font, so they match the plain-text answer after the equals sign. */
+      mtextInheritFont: true
+    },
+    options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] },
+    startup: { typeset: false }
+  };
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js"></script>
+<style>
+  :root{
+    --bg:#fff;
+    --card-bg:#ffffff;
+    --header-bg:#fbfbfc;
+    --text:#232528;
+    --text-muted:#6a6e75;
+    --border:#d7dade;
+    --border-strong:#b9bec5;
+    --accent:#d9730d;
+    --accent-soft:#fbe6d0;
+    --accent-ink:#7a3d05;
+    --track:#dfe2e6;
+    --panel-bg:#ffffff;
+    --panel-shadow:rgba(20,22,26,0.22);
+    --frame-bg:#fafafb;
+    --toggle-off-bg:#f1f2f4;
+    --toggle-off-border:#c7cbd1;
+    --focus-ring:#8fb8e8;
+    --topbtn-bg:#c1272d;
+    --topbtn-bg-hover:#a41f24;
+    --topbtn-bg-active:#8a191e;
+    --topbtn-text:#ffffff;
+  }
+  /* @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#000000;
+      --card-bg:#1c1e21;
+      --header-bg:#202225;
+      --text:#e8e9eb;
+      --text-muted:#a3a8b0;
+      --border:#34373c;
+      --border-strong:#484c53;
+      --accent:#e8934a;
+      --accent-soft:#3c2b16;
+      --accent-ink:#f6c894;
+      --track:#3a3d42;
+      --panel-bg:#232629;
+      --panel-shadow:rgba(0,0,0,0.55);
+      --frame-bg:#202225;
+      --toggle-off-bg:#28292c;
+      --toggle-off-border:#45484e;
+      --focus-ring:#5a8fd6;
+    }
+  } */
+  :root[data-theme="dark"]{
+    --bg:#000000;
+    --card-bg:#1c1e21;
+    --header-bg:#202225;
+    --text:#e8e9eb;
+    --text-muted:#a3a8b0;
+    --border:#34373c;
+    --border-strong:#484c53;
+    --accent:#e8934a;
+    --accent-soft:#3c2b16;
+    --accent-ink:#f6c894;
+    --track:#3a3d42;
+    --panel-bg:#232629;
+    --panel-shadow:rgba(0,0,0,0.55);
+    --frame-bg:#202225;
+    --toggle-off-bg:#28292c;
+    --toggle-off-border:#45484e;
+    --focus-ring:#5a8fd6;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{ margin:0; }
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:"Source Sans 3", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    padding:28px 14px 48px;
+  }
+  .sim-card{
+    width:100%;
+    max-width:700px;
+    margin:0 auto;
+    background:var(--card-bg);
+    border:1px solid var(--border);
+    border-radius:8px;
+    box-shadow:0 1px 3px rgba(0,0,0,0.08), 0 10px 30px rgba(0,0,0,0.06);
+    overflow:hidden;
+  }
+  header{
+    background:var(--header-bg);
+    border-bottom:1px solid var(--border);
+    padding:16px 20px 14px;
+  }
+  h1{
+    margin:0 0 12px;
+    font-size:1.32rem;
+    font-weight:700;
+    text-align:center;
+    letter-spacing:0.01em;
+    text-wrap:balance;
+  }
+  .btn-row{
+    display:flex;
+    justify-content:center;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+  .top-btn{
+    font-family:inherit;
+    font-size:0.989rem;
+    font-weight:400;
+    padding:6px 16px;
+    border-radius:5px;
+    border:1px solid var(--topbtn-bg-active);
+    background:var(--topbtn-bg);
+    color:var(--topbtn-text);
+    cursor:pointer;
+  }
+  .top-btn:hover{ background:var(--topbtn-bg-hover); border-color:var(--topbtn-bg-hover); }
+  .top-btn:focus-visible{ outline:2px solid var(--focus-ring); outline-offset:1px; }
+  .top-btn[aria-pressed="true"]{
+    background:var(--topbtn-bg-active);
+    border-color:var(--topbtn-bg-active);
+    color:#fff;
+    box-shadow:inset 0 2px 5px rgba(0,0,0,0.35);
+  }
+
+  .sim-body{ position:relative; padding:18px 22px 24px; }
+
+  .controls-row{
+    display:flex;
+    gap:22px;
+    margin-bottom:14px;
+  }
+  .control-group{
+    flex:1 1 0;
+    min-width:0;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .control-group label{
+    font-size:0.989rem;
+    color:var(--text);
+    white-space:nowrap;
+  }
+
+input[type="range"]{
+    flex:1 1 auto; margin-top:0.7em;
+    --accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:210px;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+input[type="range"]::-moz-range-thumb{
+    width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+
+
+
+  .value-box{
+    min-width:2.4em;
+    text-align:center;
+    font-variant-numeric:tabular-nums;
+    font-family:"Source Code Pro", ui-monospace, monospace;
+    font-size:0.989rem;
+    padding:2px 6px;
+    border:1px solid var(--border-strong);
+    border-radius:4px;
+    background:var(--frame-bg);
+  }
+
+  .toggle-rows{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    margin-bottom:16px;
+    padding:12px 14px;
+    background:var(--frame-bg);
+    border:1px solid var(--border);
+    border-radius:6px;
+  }
+  .toggle-line{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex-wrap:wrap;
+    font-size:0.946rem;
+  }
+  .toggle-line .tag{ color:var(--text); margin-right:2px; }
+  .toggle-line .spacer{ width:18px; }
+  .tag-group{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex-wrap:nowrap;
+  }
+  .seg{
+    display:inline-flex;
+    border:1px solid var(--toggle-off-border);
+    border-radius:5px;
+    overflow:hidden;
+  }
+  .seg button{
+    font-family:inherit;
+    font-size:0.902rem;
+    font-weight:600;
+    padding:5px 12px;
+    border:none;
+    background:var(--toggle-off-bg);
+    color:var(--text);
+    cursor:pointer;
+    border-right:1px solid var(--toggle-off-border);
+  }
+  .seg button:last-child{ border-right:none; }
+  .seg button:hover{ filter:brightness(0.97); }
+  .seg button:focus-visible{ outline:2px solid var(--focus-ring); outline-offset:-2px; }
+  .seg button[aria-pressed="true"]{
+    background:var(--accent-soft);
+    color:var(--accent-ink);
+  }
+
+  .framed{
+    border:1px solid var(--border-strong);
+    border-radius:6px;
+    background:var(--frame-bg);
+    padding:10px 12px;
+    margin-bottom:10px;
+    min-height:56px;
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:6px;
+  }
+  #boxesFrame{ min-height:76px; }
+
+  .ball{
+    width:24px; height:24px;
+    border-radius:50%;
+    flex:0 0 auto;
+    box-shadow:inset -3px -3px 6px rgba(0,0,0,0.35), inset 2px 2px 4px rgba(255,255,255,0.55);
+  }
+  .box3d{
+    width:48px; height:48px;
+    border-radius:5px;
+    flex:0 0 auto;
+    box-shadow:inset -6px -6px 10px rgba(0,0,0,0.32), inset 4px 4px 6px rgba(255,255,255,0.35);
+    border:1px solid rgba(0,0,0,0.18);
+  }
+
+  .problem-text{
+    text-align:left;
+    font-size:1.176rem;
+    line-height:1.45;
+    margin:12px 4px 4px;
+  }
+  .solution-text{
+    text-align:center;
+    margin:6px 4px 2px;
+    font-size:1.224rem;
+    min-height:2.2em;
+  }
+  .solution-text mjx-container{ color:var(--text); }
+  .solution-text .eq-value{
+    font-family:"Source Sans 3", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-variant-numeric:tabular-nums;
+    font-weight:600;
+  }
+
+  /* overlay panels: sized to their own content (see resizeBodyForPanel in JS),
+     never scrollbars, so the card grows to fit whichever panel is open */
+  .panel{
+    position:absolute;
+    top:0;
+    left:0;
+    right:0;
+    background:var(--panel-bg);
+    border:1px solid var(--border-strong);
+    border-radius:6px;
+    box-shadow:0 10px 30px var(--panel-shadow);
+    z-index:20;
+    padding:18px 44px 20px 20px;
+  }
+  .panel h2{
+    margin:0 0 10px;
+    font-size:1.05rem;
+    font-weight:700;
+    color:var(--accent-ink);
+  }
+  .panel h3{
+    margin:16px 0 6px;
+    font-size:0.9rem;
+    font-weight:700;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    color:var(--text-muted);
+  }
+  .panel p{ margin:0 0 10px; line-height:1.55; font-size:0.94rem; }
+  .panel p.ref{ font-size:0.86rem; color:var(--text-muted); }
+  .panel a{ color:var(--accent-ink); }
+  .panel-close{
+    position:absolute;
+    top:10px; right:10px;
+    width:26px; height:26px;
+    border-radius:50%;
+    border:1px solid var(--border-strong);
+    background:var(--toggle-off-bg);
+    color:var(--text);
+    font-size:15px;
+    line-height:1;
+    cursor:pointer;
+  }
+  .panel-close:hover{ background:var(--accent-soft); color:var(--accent-ink); }
+  .panel-close:focus-visible{ outline:2px solid var(--focus-ring); }
+
+  /* Left-justify displayed equations inside the Details panel only */
+  #panel-details mjx-container[display="true"]{
+    text-align:left !important;
+    margin:4px 0 0 !important;
+  }
+  .eq-list{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    margin:6px 0 4px;
+  }
+  .eq-item{ margin:0; }
+  .eq-case{
+    font-size:0.84rem;
+    color:var(--text-muted);
+    margin:0;
+  }
+
+  @media (max-width:480px){
+    .controls-row{ flex-direction:column; gap:10px; }
+  }
+</style>
+
+<div class="sim-card">
+  <header>
+    <div class="btn-row" role="group" aria-label="Simulation information">
+      <button class="top-btn" id="btn-directions" aria-pressed="false">Directions</button>
+      <button class="top-btn" id="btn-details" aria-pressed="false">Details</button>
+      <button class="top-btn" id="btn-about" aria-pressed="false">About</button>
+    </div>
+  </header>
+
+  <div class="sim-body" id="simBody">
+
+    <div class="controls-row">
+      <div class="control-group">
+        <label for="ballsSlider">number of balls</label>
+        <input type="range" id="ballsSlider" min="1" max="40" step="1" value="10">
+        <span class="value-box" id="ballsValue">10</span>
+      </div>
+      <div class="control-group">
+        <label for="boxesSlider">number of boxes</label>
+        <input type="range" id="boxesSlider" min="1" max="6" step="1" value="4">
+        <span class="value-box" id="boxesValue">4</span>
+      </div>
+    </div>
+
+    <div class="toggle-rows">
+      <div class="toggle-line">
+        <div class="tag-group">
+          <span class="tag">balls:</span>
+          <div class="seg" id="seg-balls">
+            <button data-val="true" aria-pressed="true">distinguishable</button>
+            <button data-val="false" aria-pressed="false">indistinguishable</button>
+          </div>
+        </div>
+        <span class="spacer"></span>
+        <div class="tag-group">
+          <span class="tag">boxes:</span>
+          <div class="seg" id="seg-boxes">
+            <button data-val="true" aria-pressed="true">distinguishable</button>
+            <button data-val="false" aria-pressed="false">indistinguishable</button>
+          </div>
+        </div>
+        <span class="spacer"></span>
+        <div class="tag-group">
+          <span class="tag">empty boxes allowed:</span>
+          <div class="seg" id="seg-empty">
+            <button data-val="true" aria-pressed="true">yes</button>
+            <button data-val="false" aria-pressed="false">no</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="framed" id="ballsFrame"></div>
+    <div class="framed" id="boxesFrame"></div>
+
+    <div class="problem-text" id="problemText"></div>
+    <div class="solution-text" id="solutionText"></div>
+
+    <div class="panel" id="panel-directions" hidden>
+      <button class="panel-close" aria-label="Close Directions">&times;</button>
+      <h2>Directions</h2>
+      <p>This simulation provides the answers to a variety of questions of the type, In how many ways can <em>r</em> balls be placed into <em>n</em> boxes? You can vary the number of balls and the number of boxes. Options include distinguishable or indistinguishable balls, distinguishable or indistinguishable boxes, and whether or not empty boxes are permitted.</p>
+    </div>
+
+    <div class="panel" id="panel-details" hidden>
+      <button class="panel-close" aria-label="Close Details">&times;</button>
+      <h2>Details</h2>
+      <p>Notation follows Martin's text [1]. In particular, \(\Pi(r,n)\) stands for the number of integer partitions of \(r\) into exactly \(n\) parts.</p>
+
+      <h3>Equations Used</h3>
+      <p>For \(r\) balls placed into \(n\) boxes, the count depends on which of the eight combinations of options is selected:</p>
+      <div class="eq-list">
+        <div class="eq-item">
+          <p class="eq-case">Distinguishable balls, distinguishable boxes, empty boxes allowed</p>
+          \[ n^r \]
+        </div>
+        <div class="eq-item">
+          <p class="eq-case">Distinguishable balls, distinguishable boxes, empty boxes not allowed</p>
+          \[ \sum_{k=0}^{n} (-1)^k \binom{n}{k}(n-k)^r \]
+        </div>
+        <div class="eq-item">
+          <p class="eq-case">Distinguishable balls, indistinguishable boxes, empty boxes not allowed</p>
+          \[ S(r,n) = \frac{1}{n!}\sum_{k=0}^{n} (-1)^k \binom{n}{k}(n-k)^r \]
+        </div>
+        <div class="eq-item">
+          <p class="eq-case">Distinguishable balls, indistinguishable boxes, empty boxes allowed</p>
+          \[ \sum_{k=1}^{n} S(r,k) \]
+        </div>
+        <div class="eq-item">
+          <p class="eq-case">Indistinguishable balls, distinguishable boxes, empty boxes allowed</p>
+          \[ \left(\!\!\binom{n}{r}\!\!\right) = \binom{n+r-1}{r} \]
+        </div>
+        <div class="eq-item">
+          <p class="eq-case">Indistinguishable balls, distinguishable boxes, empty boxes not allowed</p>
+          \[ \left(\!\!\binom{n}{r-n}\!\!\right) = \binom{r-1}{n-1} \]
+        </div>
+        <div class="eq-item">
+          <p class="eq-case">Indistinguishable balls, indistinguishable boxes, empty boxes not allowed</p>
+          \[ \Pi(r,n) \]
+        </div>
+        <div class="eq-item">
+          <p class="eq-case">Indistinguishable balls, indistinguishable boxes, empty boxes allowed</p>
+          \[ \sum_{k=1}^{n} \Pi(r,k) \]
+        </div>
+      </div>
+
+      <h3>References</h3>
+      <p class="ref">[1] G.&nbsp;E. Martin, <em>Counting: The Art of Enumerative Combinatorics</em>, New York: Springer-Verlag, 2001.</p>
+    </div>
+
+    <div class="panel" id="panel-about" hidden>
+      <button class="panel-close" aria-label="Close About">&times;</button>
+      <h2>About</h2>
+      <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/ArrangingBallsIntoBoxes/" target="_blank" rel="noopener">Mathematica simulation</a> by Marc Brodie. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.</p>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- MathJax helper (safe regardless of load timing) ---------- */
+  function typeset(el){
+    return new Promise(function(resolve){
+      function attempt(){
+        if(window.MathJax && MathJax.typesetPromise){
+          MathJax.typesetPromise([el]).catch(function(){}).then(resolve);
+        } else {
+          setTimeout(attempt, 60);
+        }
+      }
+      attempt();
+    });
+  }
+
+  /* ---------- exact combinatorics (BigInt) ---------- */
+  function binomial(nn, kk){
+    if(kk < 0 || nn < 0 || kk > nn) return 0n;
+    kk = Math.min(kk, nn - kk);
+    let result = 1n;
+    for(let i = 0; i < kk; i++){
+      result = result * BigInt(nn - i) / BigInt(i + 1);
+    }
+    return result;
+  }
+  function surjections(r, n){
+    let sum = 0n;
+    for(let k = 0; k <= n; k++){
+      const term = binomial(n, k) * (BigInt(n - k) ** BigInt(r));
+      sum += (k % 2 === 0) ? term : -term;
+    }
+    return sum;
+  }
+  function stirling2Table(r, n){
+    const S = Array.from({length: r + 1}, function(){ return new Array(n + 1).fill(0n); });
+    S[0][0] = 1n;
+    for(let i = 1; i <= r; i++){
+      for(let j = 1; j <= n; j++){
+        S[i][j] = BigInt(j) * S[i - 1][j] + S[i - 1][j - 1];
+      }
+    }
+    return S;
+  }
+  function partitionsTable(r, maxK){
+    const P = Array.from({length: r + 1}, function(){ return new Array(maxK + 1).fill(0n); });
+    P[0][0] = 1n;
+    for(let i = 1; i <= r; i++){
+      for(let j = 1; j <= maxK; j++){
+        const a = P[i - 1][j - 1];
+        const b = (i - j >= 0) ? P[i - j][j] : 0n;
+        P[i][j] = a + b;
+      }
+    }
+    return P;
+  }
+
+  function formatWithCommas(bi){
+    let s = bi.toString();
+    let neg = "";
+    if(s[0] === "-"){ neg = "-"; s = s.slice(1); }
+    let out = "";
+    for(let i = 0; i < s.length; i++){
+      if(i > 0 && (s.length - i) % 3 === 0) out += ",";
+      out += s[i];
+    }
+    return neg + out;
+  }
+
+  /* Wrap a substituted numeric literal in \text{...} so MathJax renders it
+     with the page font (see chtml.mtextInheritFont above) instead of the
+     math font -- matching the plain-text answer after the equals sign. */
+  function t(x){ return "\\text{" + x + "}"; }
+
+  function computeCase(r, n, distBalls, distBoxes, emptyAllowed){
+    if(distBalls && distBoxes && emptyAllowed){
+      const value = BigInt(n) ** BigInt(r);
+      return {
+        problem: "The number of ways to place " + r + " distinguishable balls into " + n + " distinguishable boxes if empty boxes are allowed is",
+        formula: t(n) + "^{" + t(r) + "}",
+        value: value
+      };
+    }
+    if(distBalls && distBoxes && !emptyAllowed){
+      const value = surjections(r, n);
+      return {
+        problem: "The number of ways to place " + r + " distinguishable balls into " + n + " distinguishable boxes if empty boxes are not allowed is",
+        formula: "\\sum_{k=0}^{" + t(n) + "} (-1)^k \\binom{" + t(n) + "}{k}(" + t(n) + "-k)^{" + t(r) + "}",
+        value: value
+      };
+    }
+    if(distBalls && !distBoxes && !emptyAllowed){
+      const S = stirling2Table(r, n);
+      const value = S[r][n];
+      return {
+        problem: "The number of ways to place " + r + " distinguishable balls into " + n + " indistinguishable boxes if empty boxes are not allowed is",
+        formula: "\\frac{1}{" + t(n) + "!}\\sum_{k=0}^{" + t(n) + "} (-1)^k \\binom{" + t(n) + "}{k}(" + t(n) + "-k)^{" + t(r) + "} = S(" + t(r) + "," + t(n) + ")",
+        value: value
+      };
+    }
+    if(distBalls && !distBoxes && emptyAllowed){
+      const S = stirling2Table(r, n);
+      let value = 0n;
+      for(let k = 1; k <= n; k++) value += S[r][k];
+      return {
+        problem: "The number of ways to place " + r + " distinguishable balls into " + n + " indistinguishable boxes if empty boxes are allowed is",
+        formula: "\\sum_{k=1}^{" + t(n) + "} S(" + t(r) + ",k)",
+        value: value
+      };
+    }
+    if(!distBalls && distBoxes && emptyAllowed){
+      const value = binomial(n + r - 1, r);
+      return {
+        problem: "The number of ways to place " + r + " indistinguishable balls into " + n + " distinguishable boxes if empty boxes are allowed is",
+        formula: "\\left(\\!\\!\\binom{" + t(n) + "}{" + t(r) + "}\\!\\!\\right) = \\binom{" + t(n + "+" + r + "-1") + "}{" + t(r) + "}",
+        value: value
+      };
+    }
+    if(!distBalls && distBoxes && !emptyAllowed){
+      const value = binomial(r - 1, n - 1);
+      return {
+        problem: "The number of ways to place " + r + " indistinguishable balls into " + n + " distinguishable boxes if empty boxes are not allowed is",
+        formula: "\\left(\\!\\!\\binom{" + t(n) + "}{" + t(r + "-" + n) + "}\\!\\!\\right) = \\binom{" + t(r + "-1") + "}{" + t(n + "-1") + "}",
+        value: value
+      };
+    }
+    if(!distBalls && !distBoxes && !emptyAllowed){
+      const P = partitionsTable(r, n);
+      const value = P[r][n];
+      return {
+        problem: "The number of ways to place " + r + " indistinguishable balls into " + n + " indistinguishable boxes if empty boxes are not allowed is",
+        formula: "\\Pi(" + t(r) + "," + t(n) + ")",
+        value: value
+      };
+    }
+    // !distBalls && !distBoxes && emptyAllowed
+    const P = partitionsTable(r, n);
+    let value = 0n;
+    for(let k = 1; k <= n; k++) value += P[r][k];
+    return {
+      problem: "The number of ways to place " + r + " indistinguishable balls into " + n + " indistinguishable boxes if empty boxes are allowed is",
+      formula: "\\sum_{k=1}^{" + t(n) + "} \\Pi(" + t(r) + ",k) = \\Pi(" + t(r + "+" + n) + ",\\," + t(n) + ")",
+      value: value
+    };
+  }
+
+  /* ---------- visuals ---------- */
+  const boxColors = ["#c8392b", "#2f6fbb", "#e2b422", "#3f8f5f", "#e0812f", "#9750a8"]; // red, blue, gold, green, orange, magenta
+  function ballColor(i){
+    const hue = (i * 137.508) % 360;
+    return "hsl(" + hue.toFixed(1) + ", 62%, 54%)";
+  }
+
+  const ballsFrame = document.getElementById("ballsFrame");
+  const boxesFrame = document.getElementById("boxesFrame");
+  const problemText = document.getElementById("problemText");
+  const solutionText = document.getElementById("solutionText");
+
+  const ballsSlider = document.getElementById("ballsSlider");
+  const boxesSlider = document.getElementById("boxesSlider");
+  const ballsValue = document.getElementById("ballsValue");
+  const boxesValue = document.getElementById("boxesValue");
+
+  const state = { r: 10, n: 4, distBalls: true, distBoxes: true, emptyAllowed: true };
+
+  function renderBalls(){
+    ballsFrame.innerHTML = "";
+    const frag = document.createDocumentFragment();
+    const fixedColor = ballColor(0);
+    for(let i = 0; i < state.r; i++){
+      const d = document.createElement("div");
+      d.className = "ball";
+      const c = state.distBalls ? ballColor(i) : fixedColor;
+      d.style.background = "radial-gradient(circle at 32% 28%, " + lighten(c) + ", " + c + " 65%)";
+      frag.appendChild(d);
+    }
+    ballsFrame.appendChild(frag);
+  }
+  function renderBoxes(){
+    boxesFrame.innerHTML = "";
+    const frag = document.createDocumentFragment();
+    const fixedColor = boxColors[0];
+    for(let i = 0; i < state.n; i++){
+      const d = document.createElement("div");
+      d.className = "box3d";
+      const c = state.distBoxes ? boxColors[i % boxColors.length] : fixedColor;
+      d.style.background = "linear-gradient(135deg, " + lighten(c) + ", " + c + " 60%)";
+      frag.appendChild(d);
+    }
+    boxesFrame.appendChild(frag);
+  }
+  function lighten(hex){
+    // simple lighten for hsl() or hex strings by mixing toward white
+    if(hex.indexOf("hsl") === 0){
+      const m = hex.match(/hsl\(([\d.]+),\s*([\d.]+)%,\s*([\d.]+)%\)/);
+      if(m) return "hsl(" + m[1] + ", " + m[2] + "%, " + Math.min(82, parseFloat(m[3]) + 22) + "%)";
+      return hex;
+    }
+    const n = parseInt(hex.slice(1), 16);
+    let r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+    r = Math.round(r + (255 - r) * 0.45);
+    g = Math.round(g + (255 - g) * 0.45);
+    b = Math.round(b + (255 - b) * 0.45);
+    return "rgb(" + r + "," + g + "," + b + ")";
+  }
+
+  function render(){
+    ballsValue.textContent = state.r;
+    boxesValue.textContent = state.n;
+    renderBalls();
+    renderBoxes();
+    const result = computeCase(state.r, state.n, state.distBalls, state.distBoxes, state.emptyAllowed);
+    problemText.textContent = result.problem;
+    solutionText.innerHTML = "<span class=\"eq-formula\">\\(" + result.formula + "\\)</span>" +
+      "<span class=\"eq-value\"> = " + formatWithCommas(result.value) + "</span>";
+    typeset(solutionText);
+  }
+
+  ballsSlider.addEventListener("input", function(){ state.r = parseInt(ballsSlider.value, 10); render(); });
+  boxesSlider.addEventListener("input", function(){ state.n = parseInt(boxesSlider.value, 10); render(); });
+
+  function wireSeg(id, key){
+    const seg = document.getElementById(id);
+    seg.querySelectorAll("button").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        state[key] = (btn.dataset.val === "true");
+        seg.querySelectorAll("button").forEach(function(b){ b.setAttribute("aria-pressed", b === btn ? "true" : "false"); });
+        render();
+      });
+    });
+  }
+  wireSeg("seg-balls", "distBalls");
+  wireSeg("seg-boxes", "distBoxes");
+  wireSeg("seg-empty", "emptyAllowed");
+
+  /* ---------- info panels ---------- */
+  const simBody = document.getElementById("simBody");
+  const panels = {
+    directions: document.getElementById("panel-directions"),
+    details: document.getElementById("panel-details"),
+    about: document.getElementById("panel-about")
+  };
+  const topButtons = {
+    directions: document.getElementById("btn-directions"),
+    details: document.getElementById("btn-details"),
+    about: document.getElementById("btn-about")
+  };
+  let openPanel = null;
+
+  /* Panels are absolutely positioned (so they overlay the controls instead of
+     pushing them around), which means they don't naturally add height to
+     sim-body. Instead of letting a panel scroll internally, measure its own
+     content height and grow sim-body to match, so the whole card gets taller
+     and everything is visible with no scrollbar. */
+  function resizeBodyForPanel(){
+    if(!openPanel){ simBody.style.minHeight = ""; return; }
+    simBody.style.minHeight = panels[openPanel].scrollHeight + "px";
+  }
+
+  function closeAll(){
+    Object.keys(panels).forEach(function(key){
+      panels[key].hidden = true;
+      topButtons[key].setAttribute("aria-pressed", "false");
+    });
+    openPanel = null;
+    resizeBodyForPanel();
+  }
+  function openPanelByKey(key){
+    closeAll();
+    panels[key].hidden = false;
+    topButtons[key].setAttribute("aria-pressed", "true");
+    openPanel = key;
+    resizeBodyForPanel();
+    if(key === "details") typeset(panels.details).then(resizeBodyForPanel);
+  }
+  Object.keys(topButtons).forEach(function(key){
+    topButtons[key].addEventListener("click", function(){
+      if(openPanel === key){ closeAll(); } else { openPanelByKey(key); }
+    });
+  });
+  Object.keys(panels).forEach(function(key){
+    panels[key].querySelector(".panel-close").addEventListener("click", closeAll);
+  });
+  document.addEventListener("keydown", function(e){
+    if(e.key === "Escape") closeAll();
+  });
+  window.addEventListener("resize", function(){
+    if(openPanel) resizeBodyForPanel();
+  });
+
+  render();
+})();
+</script>
