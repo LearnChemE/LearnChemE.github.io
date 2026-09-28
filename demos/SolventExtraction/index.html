@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Solvent Extraction - LearnChemE</title>
+<style>
+  :root{
+    --dark-red:#8b0000;
+    --dark-red-hover:#a30000;
+    --ink:#1a1a1a;
+    --panel-bg:#ffffff;
+    --panel-border:#8b0000;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;
+    padding:0;
+    font-family:Helvetica, Arial, sans-serif;
+    color:var(--ink);
+    background:#ffffff;
+  }
+  #app{
+    max-width:980px;
+    margin:0 auto;
+    padding:14px 16px 24px 16px;
+    position:relative;
+  }
+  h1{
+    font-size:1.32rem;
+    text-align:center;
+    margin:2px 0 4px 0;
+    font-weight:700;
+  }
+
+  /* ---------- Figure ---------- */
+  #figure-outer{
+    position:relative;
+  }
+  #figure-wrap{
+    position:relative;
+    width:100%;
+    aspect-ratio: 763 / 400;
+    margin:0 auto;
+    user-select:none;
+  }
+  #figure-wrap svg{
+    position:absolute;
+    top:0; left:0;
+    width:100%;
+    height:100%;
+    display:block;
+  }
+  .lbl{
+    position:absolute;
+    transform:translate(-50%,-50%);
+    text-align:center;
+    line-height:1.25;
+    font-size:17px;
+    font-weight:400;
+    white-space:nowrap;
+    pointer-events:none;
+  }
+  .lbl-name{
+    font-weight:400;
+    font-size:17px;
+  }
+  .lbl-val{
+    font-size:17px;
+    font-weight:400;
+    color:#222;
+  }
+  .lbl-val.computed{
+    color:#0b4fa0;
+    font-weight:400;
+  }
+  .stream-lbl{
+    font-size:17.6px;
+    color:#000 !important;
+  }
+
+  /* ---------- Controls ---------- */
+  #controls{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px 30px;
+    margin:6px auto 0 auto;
+    padding:14px 18px;
+    border:1px solid #ccc;
+    border-radius:8px;
+    background:#fafafa;
+    width:60.7%;
+  }
+  .ctrl{
+    display:flex;
+    flex-direction:column;
+    gap:3px;
+  }
+  .ctrl label{
+    font-size:17px;
+  }
+  .slider-row{
+    display:flex;
+    align-items:center;
+    gap:4px;
+  }
+  .slider-row input[type=range]{
+    flex:1 1 auto;
+    min-width:0;
+    margin-bottom:0;
+  }
+  .slider-row .val{
+    font-weight:400;
+    color:#000;
+    min-width:0;
+    text-align:left;
+    font-size:17px;
+    flex:0 0 auto;
+  }
+  @media (max-width:640px){
+    #controls{ grid-template-columns:1fr; width:100%; }
+  }
+
+  input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+  input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+
+  /* ---------- Buttons ---------- */
+  #buttonrow{
+    display:flex;
+    justify-content:center;
+    gap:14px;
+    margin-top:8px;
+  }
+  .lc-btn{
+    background:var(--dark-red);
+    color:#fff;
+    border:none;
+    padding:8px 22px;
+    border-radius:20px;
+    font-family:Helvetica, Arial, sans-serif;
+    font-size:1.045rem;
+    font-weight:400;
+    cursor:pointer;
+    letter-spacing:0.02em;
+  }
+  .lc-btn:hover{
+    background:var(--dark-red-hover);
+  }
+
+  /* ---------- Panels ---------- */
+  .panel{
+    display:none;
+    position:absolute;
+    left:50%;
+    transform:translateX(-50%);
+    bottom:100px;
+    width:640px;
+    max-width:92%;
+    max-height:420px;
+    background:var(--panel-bg);
+    border:2px solid var(--panel-border);
+    border-radius:10px;
+    box-shadow:0 6px 24px rgba(0,0,0,0.25);
+    text-align:left;
+    z-index:50;
+    overflow:hidden;
+  }
+  .panel.wide{
+    width:760px;
+  }
+  #panel-details{
+    top:172px;
+    bottom:64px;
+    max-height:none;
+  }
+  #panel-about{
+    bottom:147px;
+  }
+  .panel.open{
+    display:block;
+  }
+  .panel-body{
+    max-height:420px;
+    overflow-y:auto;
+    padding:20px 26px 22px 26px;
+  }
+  #panel-details .panel-body{
+    height:100%;
+    max-height:none;
+  }
+  .panel h2{
+    margin-top:0;
+    font-size:1.15rem;
+    color:var(--dark-red);
+  }
+  .panel p, .panel li{
+    font-size:0.95rem;
+    line-height:1.35;
+    text-align:left;
+    margin:0.4em 0;
+  }
+  .panel ul{
+    margin:0 0 0.4em 0;
+    padding-left:1.3em;
+  }
+  .panel li{
+    margin:0.15em 0;
+  }
+  .panel p.no-gap-after{
+    margin-bottom:0;
+  }
+  .panel-close{
+    position:absolute;
+    top:10px;
+    right:12px;
+    background:var(--dark-red);
+    color:#fff;
+    border:none;
+    width:26px;
+    height:26px;
+    border-radius:50%;
+    font-size:0.95rem;
+    line-height:1;
+    cursor:pointer;
+  }
+  .panel-close:hover{
+    background:var(--dark-red-hover);
+  }
+  .eqblock{
+    margin:6px 0;
+    text-align:left;
+  }
+  .eqblock mjx-container{
+    display:block !important;
+    margin:2px 0 !important;
+    text-align:left !important;
+  }
+  .eq-inline mjx-container{
+    display:inline-block !important;
+    vertical-align:middle;
+  }
+</style>
+<style id="MJX-SVG-styles">
+mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+  min-height: 1px;
+  min-width: 1px;
+}
+
+mjx-container[jax="SVG"] > svg a {
+  fill: blue;
+  stroke: blue;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][display="true"][width="full"] {
+  display: flex;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line], svg[data-table] > g > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame], svg[data-table] > g > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed, svg[data-table] > g > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted, svg[data-table] > g > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > g > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"] path[data-c], mjx-container[jax="SVG"] use[data-c] {
+  stroke-width: 3;
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div id="figure-outer">
+    <div id="figure-wrap">
+      <svg viewBox="0 0 763 400" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arrow" markerWidth="6.8" markerHeight="6.8" refX="3.4" refY="3.4" orient="auto">
+            <path d="M0,0 L6.8,3.4 L0,6.8 Z" fill="#111"/>
+          </marker>
+          <marker id="arrow-red" markerWidth="6.8" markerHeight="6.8" refX="3.4" refY="3.4" orient="auto">
+            <path d="M0,0 L6.8,3.4 L0,6.8 Z" fill="#cc0000"/>
+          </marker>
+          <marker id="arrow-blue" markerWidth="6.8" markerHeight="6.8" refX="3.4" refY="3.4" orient="auto">
+            <path d="M0,0 L6.8,3.4 L0,6.8 Z" fill="#0047ab"/>
+          </marker>
+          <marker id="arrow-split" markerWidth="6.8" markerHeight="6.8" refX="3.4" refY="3.4" orient="auto">
+            <path d="M0,0 L3.4,1.7 L3.4,5.1 L0,6.8 Z" fill="#cc0000"/>
+            <path d="M3.4,1.7 L6.8,3.4 L3.4,5.1 Z" fill="#0047ab"/>
+          </marker>
+          <clipPath id="mixer-clip">
+            <rect x="150" y="150" width="170" height="100"/>
+          </clipPath>
+        </defs>
+
+        <!-- Mixer box -->
+        <rect x="150" y="150" width="170" height="100" fill="#ffffff" stroke="#111" stroke-width="2.5"/>
+        <g id="mixer-speckles" clip-path="url(#mixer-clip)"></g>
+        <rect x="211.8" y="188.6" width="46.4" height="20.8" fill="#ffffff"/>
+        <text x="235" y="205" font-size="14.4" font-weight="700" text-anchor="middle" font-family="Helvetica, Arial, sans-serif">Mixer</text>
+
+        <!-- Settler box -->
+        <rect x="443" y="150" width="170" height="100" fill="#ffffff" stroke="#111" stroke-width="2.5"/>
+        <rect id="settler-blue" x="443" y="150" width="170" height="100" fill="#336cbc"/>
+        <rect id="settler-red" x="443" y="250" width="170" height="0" fill="#d63333"/>
+        <line id="settler-divider" x1="443" y1="150" x2="613" y2="150" stroke="#111" stroke-width="1"/>
+        <rect x="501.7" y="188.6" width="53.6" height="20.8" fill="#ffffff"/>
+        <text x="528" y="205" font-size="14.4" font-weight="700" text-anchor="middle" font-family="Helvetica, Arial, sans-serif">Settler</text>
+
+        <!-- Feed arrow: down into mixer (short, close to box so labels have room above) -->
+        <line x1="200" y1="108" x2="200" y2="148" stroke="#cc0000" stroke-width="3.6" marker-end="url(#arrow-red)"/>
+
+        <!-- Solvent arrow: up into mixer -->
+        <line x1="200" y1="292" x2="200" y2="252" stroke="#0047ab" stroke-width="3.6" stroke-dasharray="7,5" marker-end="url(#arrow-blue)"/>
+
+        <!-- Mixer -> Settler, two mixed phases: solid, alternating red/blue, 5 red + 5 blue segments -->
+        <g id="mixed-line-top">
+          <line x1="320.0" y1="178" x2="332.1" y2="178" stroke="#cc0000" stroke-width="3.6"/>
+          <line x1="332.1" y1="178" x2="344.2" y2="178" stroke="#0047ab" stroke-width="3.6"/>
+          <line x1="344.2" y1="178" x2="356.3" y2="178" stroke="#cc0000" stroke-width="3.6"/>
+          <line x1="356.3" y1="178" x2="368.4" y2="178" stroke="#0047ab" stroke-width="3.6"/>
+          <line x1="368.4" y1="178" x2="380.5" y2="178" stroke="#cc0000" stroke-width="3.6"/>
+          <line x1="380.5" y1="178" x2="392.6" y2="178" stroke="#0047ab" stroke-width="3.6"/>
+          <line x1="392.6" y1="178" x2="404.7" y2="178" stroke="#cc0000" stroke-width="3.6"/>
+          <line x1="404.7" y1="178" x2="416.8" y2="178" stroke="#0047ab" stroke-width="3.6"/>
+          <line x1="416.8" y1="178" x2="428.9" y2="178" stroke="#cc0000" stroke-width="3.6"/>
+          <line x1="428.9" y1="178" x2="441.0" y2="178" stroke="#0047ab" stroke-width="3.6" marker-end="url(#arrow-split)"/>
+        </g>
+        <g id="mixed-line-bottom">
+          <line x1="320.0" y1="222" x2="332.1" y2="222" stroke="#cc0000" stroke-width="3.6"/>
+          <line x1="332.1" y1="222" x2="344.2" y2="222" stroke="#0047ab" stroke-width="3.6"/>
+          <line x1="344.2" y1="222" x2="356.3" y2="222" stroke="#cc0000" stroke-width="3.6"/>
+          <line x1="356.3" y1="222" x2="368.4" y2="222" stroke="#0047ab" stroke-width="3.6"/>
+          <line x1="368.4" y1="222" x2="380.5" y2="222" stroke="#cc0000" stroke-width="3.6"/>
+          <line x1="380.5" y1="222" x2="392.6" y2="222" stroke="#0047ab" stroke-width="3.6"/>
+          <line x1="392.6" y1="222" x2="404.7" y2="222" stroke="#cc0000" stroke-width="3.6"/>
+          <line x1="404.7" y1="222" x2="416.8" y2="222" stroke="#0047ab" stroke-width="3.6"/>
+          <line x1="416.8" y1="222" x2="428.9" y2="222" stroke="#cc0000" stroke-width="3.6"/>
+          <line x1="428.9" y1="222" x2="441.0" y2="222" stroke="#0047ab" stroke-width="3.6" marker-end="url(#arrow-split)"/>
+        </g>
+
+        <!-- Extract arrow: up out of settler -->
+        <line x1="563" y1="148" x2="563" y2="108" stroke="#0047ab" stroke-width="3.6" stroke-dasharray="7,5" marker-end="url(#arrow-blue)"/>
+
+        <!-- Residue arrow: down out of settler -->
+        <line x1="563" y1="252" x2="563" y2="292" stroke="#cc0000" stroke-width="3.6" marker-end="url(#arrow-red)"/>
+      </svg>
+
+      <!-- Static + dynamic text overlays, positioned by percentage of the 763x400 viewBox -->
+      <div class="lbl lbl-name stream-lbl" style="left:26.2%; top:14.5%; color:#cc0000 !important;">Feed (aqueous)</div>
+      <div class="lbl lbl-val stream-lbl" style="left:26.2%; top:19.75%; color:#cc0000 !important;">F = <span id="disp-F">5.0</span> m&sup3;/h</div>
+      <div class="lbl lbl-val stream-lbl" style="left:26.2%; top:25%; color:#cc0000 !important;">z = <span id="disp-x1">0.50</span> mol/L</div>
+
+      <div class="lbl lbl-name stream-lbl" style="left:26.2%; top:86.75%; color:#0047ab !important;">Solvent (organic)</div>
+      <div class="lbl lbl-val stream-lbl" style="left:26.2%; top:81.5%; color:#0047ab !important;">E = <span id="disp-E-in">5.0</span> m&sup3;/h</div>
+      <div class="lbl lbl-val stream-lbl" style="left:26.2%; top:76.25%; color:#0047ab !important;">0 mol/L</div>
+
+      <div class="lbl lbl-name stream-lbl" style="left:73.8%; top:10.75%; color:#0047ab !important;">Extract (organic)</div>
+      <div class="lbl lbl-val computed stream-lbl" style="left:73.8%; top:16%; color:#0047ab !important;">E = <span id="disp-E-out">5.0</span> m&sup3;/h</div>
+      <div class="lbl lbl-val computed stream-lbl" style="left:73.8%; top:21.25%; color:#0047ab !important;">y = <span id="disp-y">0.50</span> mol/L</div>
+
+      <div class="lbl lbl-name stream-lbl" style="left:73.8%; top:90.75%; color:#cc0000 !important;">Residue (aqueous)</div>
+      <div class="lbl lbl-val computed stream-lbl" style="left:73.8%; top:85.5%; color:#cc0000 !important;">F = <span id="disp-F-out">5.0</span> m&sup3;/h</div>
+      <div class="lbl lbl-val computed stream-lbl" style="left:73.8%; top:80.25%; color:#cc0000 !important;">x = <span id="disp-x">0.25</span> mol/L</div>
+
+      <div class="lbl lbl-val" style="left:50%; top:50%; font-style:italic; font-size:18.7px;">mixed phases</div>
+
+      <div class="lbl lbl-name" style="left:50%; top:10.75%;">fraction of uranyl nitrate extracted</div>
+      <div class="lbl lbl-val computed" style="left:50%; top:16%; color:#000; font-size:17.6px;"><span id="disp-frac">50.0</span>%</div>
+    </div>
+  </div>
+
+  <div id="controls">
+    <div class="ctrl">
+      <label for="s-x1" style="color:#cc0000;">feed concentration, z (mol/L)</label>
+      <div class="slider-row">
+        <input type="range" id="s-x1" min="0.1" max="1.0" step="0.01" value="0.50">
+        <span class="val" id="v-x1">0.50</span>
+      </div>
+    </div>
+    <div class="ctrl">
+      <label for="s-F" style="color:#cc0000;">feed flow rate, F (m&sup3;/h)</label>
+      <div class="slider-row">
+        <input type="range" id="s-F" min="1" max="10" step="0.1" value="5.0">
+        <span class="val" id="v-F">5.0</span>
+      </div>
+    </div>
+    <div class="ctrl">
+      <label for="s-E" style="color:#0047ab;">solvent flow rate, E (m&sup3;/h)</label>
+      <div class="slider-row">
+        <input type="range" id="s-E" min="1" max="10" step="0.1" value="5.0">
+        <span class="val" id="v-E">5.0</span>
+      </div>
+    </div>
+    <div class="ctrl">
+      <label for="s-D">distribution coefficient, D</label>
+      <div class="slider-row">
+        <input type="range" id="s-D" min="1" max="10" step="0.1" value="5.0">
+        <span class="val" id="v-D">5.0</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="buttonrow">
+    <button class="lc-btn" id="btn-directions">Directions</button>
+    <button class="lc-btn" id="btn-details">Details</button>
+    <button class="lc-btn" id="btn-about">About</button>
+  </div>
+
+  <div class="panel" id="panel-directions">
+    <button class="panel-close" data-close>&times;</button>
+    <div class="panel-body">
+    <h2>Directions</h2>
+    <p>This simulation models a single equilibrium stage for the solvent extraction of uranyl nitrate from an aqueous feed, using tributyl phosphate (TBP) dissolved in kerosene as the organic extractant. The aqueous feed and the organic extractant are combined in a mixer, and the resulting two-phase mixture is separated in a settler: the organic (extract) phase leaves from the top, and the aqueous (residue, or raffinate) phase leaves from the bottom.</p>
+    <p class="no-gap-after">Use the sliders to change:</p>
+    <ul>
+      <li><b>z</b> &ndash; the molar concentration of uranyl nitrate in the aqueous feed (0.1&ndash;1 mol/L)</li>
+      <li><b>F</b> &ndash; the volumetric flow rate of the aqueous feed (1&ndash;10 m&sup3;/h)</li>
+      <li><b>E</b> &ndash; the volumetric flow rate of the organic extractant (1&ndash;10 m&sup3;/h)</li>
+      <li><b>D</b> &ndash; the equilibrium distribution coefficient relating the extract and residue concentrations, y = Dx, where D ranges from 1 to 10</li>
+    </ul>
+    <p>The diagram updates immediately to show the resulting extract concentration (y) and residue concentration (x), along with the fraction of uranyl nitrate recovered into the extract. See the Details panel for the mass-balance derivation.</p>
+    </div>
+  </div>
+
+  <div class="panel wide" id="panel-details">
+    <button class="panel-close" data-close>&times;</button>
+    <div class="panel-body">
+    <h2>Details</h2>
+    <p>The aqueous feed (flow rate F, uranyl nitrate concentration z) and the organic extractant (flow rate E, uranyl nitrate concentration 0) are contacted in the mixer. The two immiscible liquid phases are then disengaged in the settler. Because the two phases are immiscible and the solute is present at low concentration, the aqueous and organic volumetric flow rates are each essentially unchanged across the stage.</p>
+    <p>An overall mass balance on uranyl nitrate over the mixer&ndash;settler unit gives:</p>
+    <div class="eqblock"><mjx-container class="MathJax" jax="SVG" display="true"><svg style="vertical-align: -0.464ex;" xmlns="http://www.w3.org/2000/svg" width="14.355ex" height="2.002ex" role="img" focusable="false" viewBox="0 -680 6345 885"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D439" d="M48 1Q31 1 31 11Q31 13 34 25Q38 41 42 43T65 46Q92 46 125 49Q139 52 144 61Q146 66 215 342T285 622Q285 629 281 629Q273 632 228 634H197Q191 640 191 642T193 659Q197 676 203 680H742Q749 676 749 669Q749 664 736 557T722 447Q720 440 702 440H690Q683 445 683 453Q683 454 686 477T689 530Q689 560 682 579T663 610T626 626T575 633T503 634H480Q398 633 393 631Q388 629 386 623Q385 622 352 492L320 363H375Q378 363 398 363T426 364T448 367T472 374T489 386Q502 398 511 419T524 457T529 475Q532 480 548 480H560Q567 475 567 470Q567 467 536 339T502 207Q500 200 482 200H470Q463 206 463 212Q463 215 468 234T473 274Q473 303 453 310T364 317H309L277 190Q245 66 245 60Q245 46 334 46H359Q365 40 365 39T363 19Q359 6 353 0H336Q295 2 185 2Q120 2 86 2T48 1Z"></path></g><g data-mml-node="mi" transform="translate(749,0)"><path data-c="1D467" d="M347 338Q337 338 294 349T231 360Q211 360 197 356T174 346T162 335T155 324L153 320Q150 317 138 317Q117 317 117 325Q117 330 120 339Q133 378 163 406T229 440Q241 442 246 442Q271 442 291 425T329 392T367 375Q389 375 411 408T434 441Q435 442 449 442H462Q468 436 468 434Q468 430 463 420T449 399T432 377T418 358L411 349Q368 298 275 214T160 106L148 94L163 93Q185 93 227 82T290 71Q328 71 360 90T402 140Q406 149 409 151T424 153Q443 153 443 143Q443 138 442 134Q425 72 376 31T278 -11Q252 -11 232 6T193 40T155 57Q111 57 76 -3Q70 -11 59 -11H54H41Q35 -5 35 -2Q35 13 93 84Q132 129 225 214T340 322Q352 338 347 338Z"></path></g><g data-mml-node="mo" transform="translate(1491.8,0)"><path data-c="3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path></g><g data-mml-node="mi" transform="translate(2547.6,0)"><path data-c="1D439" d="M48 1Q31 1 31 11Q31 13 34 25Q38 41 42 43T65 46Q92 46 125 49Q139 52 144 61Q146 66 215 342T285 622Q285 629 281 629Q273 632 228 634H197Q191 640 191 642T193 659Q197 676 203 680H742Q749 676 749 669Q749 664 736 557T722 447Q720 440 702 440H690Q683 445 683 453Q683 454 686 477T689 530Q689 560 682 579T663 610T626 626T575 633T503 634H480Q398 633 393 631Q388 629 386 623Q385 622 352 492L320 363H375Q378 363 398 363T426 364T448 367T472 374T489 386Q502 398 511 419T524 457T529 475Q532 480 548 480H560Q567 475 567 470Q567 467 536 339T502 207Q500 200 482 200H470Q463 206 463 212Q463 215 468 234T473 274Q473 303 453 310T364 317H309L277 190Q245 66 245 60Q245 46 334 46H359Q365 40 365 39T363 19Q359 6 353 0H336Q295 2 185 2Q120 2 86 2T48 1Z"></path></g><g data-mml-node="mi" transform="translate(3296.6,0)"><path data-c="1D465" d="M52 289Q59 331 106 386T222 442Q257 442 286 424T329 379Q371 442 430 442Q467 442 494 420T522 361Q522 332 508 314T481 292T458 288Q439 288 427 299T415 328Q415 374 465 391Q454 404 425 404Q412 404 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145Q504 144 502 134Q486 77 440 33T333 -11Q263 -11 227 52Q186 -10 133 -10H127Q78 -10 57 16T35 71Q35 103 54 123T99 143Q142 143 142 101Q142 81 130 66T107 46T94 41L91 40Q91 39 97 36T113 29T132 26Q168 26 194 71Q203 87 217 139T245 247T261 313Q266 340 266 352Q266 380 251 392T217 404Q177 404 142 372T93 290Q91 281 88 280T72 278H58Q52 284 52 289Z"></path></g><g data-mml-node="mo" transform="translate(4090.8,0)"><path data-c="2B" d="M56 237T56 250T70 270H369V420L370 570Q380 583 389 583Q402 583 409 568V270H707Q722 262 722 250T707 230H409V-68Q401 -82 391 -82H389H387Q375 -82 369 -68V230H70Q56 237 56 250Z"></path></g><g data-mml-node="mi" transform="translate(5091,0)"><path data-c="1D438" d="M492 213Q472 213 472 226Q472 230 477 250T482 285Q482 316 461 323T364 330H312Q311 328 277 192T243 52Q243 48 254 48T334 46Q428 46 458 48T518 61Q567 77 599 117T670 248Q680 270 683 272Q690 274 698 274Q718 274 718 261Q613 7 608 2Q605 0 322 0H133Q31 0 31 11Q31 13 34 25Q38 41 42 43T65 46Q92 46 125 49Q139 52 144 61Q146 66 215 342T285 622Q285 629 281 629Q273 632 228 634H197Q191 640 191 642T193 659Q197 676 203 680H757Q764 676 764 669Q764 664 751 557T737 447Q735 440 717 440H705Q698 445 698 453L701 476Q704 500 704 528Q704 558 697 578T678 609T643 625T596 632T532 634H485Q397 633 392 631Q388 629 386 622Q385 619 355 499T324 377Q347 376 372 376H398Q464 376 489 391T534 472Q538 488 540 490T557 493Q562 493 565 493T570 492T572 491T574 487T577 483L544 351Q511 218 508 216Q505 213 492 213Z"></path></g><g data-mml-node="mi" transform="translate(5855,0)"><path data-c="1D466" d="M21 287Q21 301 36 335T84 406T158 442Q199 442 224 419T250 355Q248 336 247 334Q247 331 231 288T198 191T182 105Q182 62 196 45T238 27Q261 27 281 38T312 61T339 94Q339 95 344 114T358 173T377 247Q415 397 419 404Q432 431 462 431Q475 431 483 424T494 412T496 403Q496 390 447 193T391 -23Q363 -106 294 -155T156 -205Q111 -205 77 -183T43 -117Q43 -95 50 -80T69 -58T89 -48T106 -45Q150 -45 150 -87Q150 -107 138 -122T115 -142T102 -147L99 -148Q101 -153 118 -160T152 -167H160Q177 -167 186 -165Q219 -156 247 -127T290 -65T313 -9T321 21L315 17Q309 13 296 6T270 -6Q250 -11 231 -11Q185 -11 150 11T104 82Q103 89 103 113Q103 170 138 262T173 379Q173 380 173 381Q173 390 173 393T169 400T158 404H154Q131 404 112 385T82 344T65 302T57 280Q55 278 41 278H27Q21 284 21 287Z"></path></g></g></g></svg></mjx-container></div>
+    <p>The extract and residue leaving the settler are in equilibrium, with the distribution of uranyl nitrate between the organic and aqueous phases described by:</p>
+    <div class="eqblock"><mjx-container class="MathJax" jax="SVG" display="true"><svg style="vertical-align: -0.464ex;" xmlns="http://www.w3.org/2000/svg" width="7.293ex" height="2.009ex" role="img" focusable="false" viewBox="0 -683 3223.6 888"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D466" d="M21 287Q21 301 36 335T84 406T158 442Q199 442 224 419T250 355Q248 336 247 334Q247 331 231 288T198 191T182 105Q182 62 196 45T238 27Q261 27 281 38T312 61T339 94Q339 95 344 114T358 173T377 247Q415 397 419 404Q432 431 462 431Q475 431 483 424T494 412T496 403Q496 390 447 193T391 -23Q363 -106 294 -155T156 -205Q111 -205 77 -183T43 -117Q43 -95 50 -80T69 -58T89 -48T106 -45Q150 -45 150 -87Q150 -107 138 -122T115 -142T102 -147L99 -148Q101 -153 118 -160T152 -167H160Q177 -167 186 -165Q219 -156 247 -127T290 -65T313 -9T321 21L315 17Q309 13 296 6T270 -6Q250 -11 231 -11Q185 -11 150 11T104 82Q103 89 103 113Q103 170 138 262T173 379Q173 380 173 381Q173 390 173 393T169 400T158 404H154Q131 404 112 385T82 344T65 302T57 280Q55 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(767.8,0)"><path data-c="3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path></g><g data-mml-node="mi" transform="translate(1823.6,0)"><path data-c="1D437" d="M287 628Q287 635 230 637Q207 637 200 638T193 647Q193 655 197 667T204 682Q206 683 403 683Q570 682 590 682T630 676Q702 659 752 597T803 431Q803 275 696 151T444 3L430 1L236 0H125H72Q48 0 41 2T33 11Q33 13 36 25Q40 41 44 43T67 46Q94 46 127 49Q141 52 146 61Q149 65 218 339T287 628ZM703 469Q703 507 692 537T666 584T629 613T590 629T555 636Q553 636 541 636T512 636T479 637H436Q392 637 386 627Q384 623 313 339T242 52Q242 48 253 48T330 47Q335 47 349 47T373 46Q499 46 581 128Q617 164 640 212T683 339T703 469Z"></path></g><g data-mml-node="mi" transform="translate(2651.6,0)"><path data-c="1D465" d="M52 289Q59 331 106 386T222 442Q257 442 286 424T329 379Q371 442 430 442Q467 442 494 420T522 361Q522 332 508 314T481 292T458 288Q439 288 427 299T415 328Q415 374 465 391Q454 404 425 404Q412 404 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145Q504 144 502 134Q486 77 440 33T333 -11Q263 -11 227 52Q186 -10 133 -10H127Q78 -10 57 16T35 71Q35 103 54 123T99 143Q142 143 142 101Q142 81 130 66T107 46T94 41L91 40Q91 39 97 36T113 29T132 26Q168 26 194 71Q203 87 217 139T245 247T261 313Q266 340 266 352Q266 380 251 392T217 404Q177 404 142 372T93 290Q91 281 88 280T72 278H58Q52 284 52 289Z"></path></g></g></g></svg></mjx-container></div>
+    <p>Substituting the equilibrium relation into the mass balance and solving for the residue concentration:</p>
+    <div class="eqblock"><mjx-container class="MathJax" jax="SVG" display="true"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="30.925ex" height="2.262ex" role="img" focusable="false" viewBox="0 -750 13668.7 1000"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D439" d="M48 1Q31 1 31 11Q31 13 34 25Q38 41 42 43T65 46Q92 46 125 49Q139 52 144 61Q146 66 215 342T285 622Q285 629 281 629Q273 632 228 634H197Q191 640 191 642T193 659Q197 676 203 680H742Q749 676 749 669Q749 664 736 557T722 447Q720 440 702 440H690Q683 445 683 453Q683 454 686 477T689 530Q689 560 682 579T663 610T626 626T575 633T503 634H480Q398 633 393 631Q388 629 386 623Q385 622 352 492L320 363H375Q378 363 398 363T426 364T448 367T472 374T489 386Q502 398 511 419T524 457T529 475Q532 480 548 480H560Q567 475 567 470Q567 467 536 339T502 207Q500 200 482 200H470Q463 206 463 212Q463 215 468 234T473 274Q473 303 453 310T364 317H309L277 190Q245 66 245 60Q245 46 334 46H359Q365 40 365 39T363 19Q359 6 353 0H336Q295 2 185 2Q120 2 86 2T48 1Z"></path></g><g data-mml-node="mi" transform="translate(749,0)"><path data-c="1D467" d="M347 338Q337 338 294 349T231 360Q211 360 197 356T174 346T162 335T155 324L153 320Q150 317 138 317Q117 317 117 325Q117 330 120 339Q133 378 163 406T229 440Q241 442 246 442Q271 442 291 425T329 392T367 375Q389 375 411 408T434 441Q435 442 449 442H462Q468 436 468 434Q468 430 463 420T449 399T432 377T418 358L411 349Q368 298 275 214T160 106L148 94L163 93Q185 93 227 82T290 71Q328 71 360 90T402 140Q406 149 409 151T424 153Q443 153 443 143Q443 138 442 134Q425 72 376 31T278 -11Q252 -11 232 6T193 40T155 57Q111 57 76 -3Q70 -11 59 -11H54H41Q35 -5 35 -2Q35 13 93 84Q132 129 225 214T340 322Q352 338 347 338Z"></path></g><g data-mml-node="mo" transform="translate(1491.8,0)"><path data-c="3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path></g><g data-mml-node="mi" transform="translate(2547.6,0)"><path data-c="1D439" d="M48 1Q31 1 31 11Q31 13 34 25Q38 41 42 43T65 46Q92 46 125 49Q139 52 144 61Q146 66 215 342T285 622Q285 629 281 629Q273 632 228 634H197Q191 640 191 642T193 659Q197 676 203 680H742Q749 676 749 669Q749 664 736 557T722 447Q720 440 702 440H690Q683 445 683 453Q683 454 686 477T689 530Q689 560 682 579T663 610T626 626T575 633T503 634H480Q398 633 393 631Q388 629 386 623Q385 622 352 492L320 363H375Q378 363 398 363T426 364T448 367T472 374T489 386Q502 398 511 419T524 457T529 475Q532 480 548 480H560Q567 475 567 470Q567 467 536 339T502 207Q500 200 482 200H470Q463 206 463 212Q463 215 468 234T473 274Q473 303 453 310T364 317H309L277 190Q245 66 245 60Q245 46 334 46H359Q365 40 365 39T363 19Q359 6 353 0H336Q295 2 185 2Q120 2 86 2T48 1Z"></path></g><g data-mml-node="mi" transform="translate(3296.6,0)"><path data-c="1D465" d="M52 289Q59 331 106 386T222 442Q257 442 286 424T329 379Q371 442 430 442Q467 442 494 420T522 361Q522 332 508 314T481 292T458 288Q439 288 427 299T415 328Q415 374 465 391Q454 404 425 404Q412 404 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145Q504 144 502 134Q486 77 440 33T333 -11Q263 -11 227 52Q186 -10 133 -10H127Q78 -10 57 16T35 71Q35 103 54 123T99 143Q142 143 142 101Q142 81 130 66T107 46T94 41L91 40Q91 39 97 36T113 29T132 26Q168 26 194 71Q203 87 217 139T245 247T261 313Q266 340 266 352Q266 380 251 392T217 404Q177 404 142 372T93 290Q91 281 88 280T72 278H58Q52 284 52 289Z"></path></g><g data-mml-node="mo" transform="translate(4090.8,0)"><path data-c="2B" d="M56 237T56 250T70 270H369V420L370 570Q380 583 389 583Q402 583 409 568V270H707Q722 262 722 250T707 230H409V-68Q401 -82 391 -82H389H387Q375 -82 369 -68V230H70Q56 237 56 250Z"></path></g><g data-mml-node="mi" transform="translate(5091,0)"><path data-c="1D438" d="M492 213Q472 213 472 226Q472 230 477 250T482 285Q482 316 461 323T364 330H312Q311 328 277 192T243 52Q243 48 254 48T334 46Q428 46 458 48T518 61Q567 77 599 117T670 248Q680 270 683 272Q690 274 698 274Q718 274 718 261Q613 7 608 2Q605 0 322 0H133Q31 0 31 11Q31 13 34 25Q38 41 42 43T65 46Q92 46 125 49Q139 52 144 61Q146 66 215 342T285 622Q285 629 281 629Q273 632 228 634H197Q191 640 191 642T193 659Q197 676 203 680H757Q764 676 764 669Q764 664 751 557T737 447Q735 440 717 440H705Q698 445 698 453L701 476Q704 500 704 528Q704 558 697 578T678 609T643 625T596 632T532 634H485Q397 633 392 631Q388 629 386 622Q385 619 355 499T324 377Q347 376 372 376H398Q464 376 489 391T534 472Q538 488 540 490T557 493Q562 493 565 493T570 492T572 491T574 487T577 483L544 351Q511 218 508 216Q505 213 492 213Z"></path></g><g data-mml-node="mi" transform="translate(5855,0)"><path data-c="1D437" d="M287 628Q287 635 230 637Q207 637 200 638T193 647Q193 655 197 667T204 682Q206 683 403 683Q570 682 590 682T630 676Q702 659 752 597T803 431Q803 275 696 151T444 3L430 1L236 0H125H72Q48 0 41 2T33 11Q33 13 36 25Q40 41 44 43T67 46Q94 46 127 49Q141 52 146 61Q149 65 218 339T287 628ZM703 469Q703 507 692 537T666 584T629 613T590 629T555 636Q553 636 541 636T512 636T479 637H436Q392 637 386 627Q384 623 313 339T242 52Q242 48 253 48T330 47Q335 47 349 47T373 46Q499 46 581 128Q617 164 640 212T683 339T703 469Z"></path></g><g data-mml-node="mi" transform="translate(6683,0)"><path data-c="1D465" d="M52 289Q59 331 106 386T222 442Q257 442 286 424T329 379Q371 442 430 442Q467 442 494 420T522 361Q522 332 508 314T481 292T458 288Q439 288 427 299T415 328Q415 374 465 391Q454 404 425 404Q412 404 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145Q504 144 502 134Q486 77 440 33T333 -11Q263 -11 227 52Q186 -10 133 -10H127Q78 -10 57 16T35 71Q35 103 54 123T99 143Q142 143 142 101Q142 81 130 66T107 46T94 41L91 40Q91 39 97 36T113 29T132 26Q168 26 194 71Q203 87 217 139T245 247T261 313Q266 340 266 352Q266 380 251 392T217 404Q177 404 142 372T93 290Q91 281 88 280T72 278H58Q52 284 52 289Z"></path></g><g data-mml-node="mo" transform="translate(7532.8,0)"><path data-c="3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path></g><g data-mml-node="mi" transform="translate(8588.6,0)"><path data-c="1D465" d="M52 289Q59 331 106 386T222 442Q257 442 286 424T329 379Q371 442 430 442Q467 442 494 420T522 361Q522 332 508 314T481 292T458 288Q439 288 427 299T415 328Q415 374 465 391Q454 404 425 404Q412 404 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145Q504 144 502 134Q486 77 440 33T333 -11Q263 -11 227 52Q186 -10 133 -10H127Q78 -10 57 16T35 71Q35 103 54 123T99 143Q142 143 142 101Q142 81 130 66T107 46T94 41L91 40Q91 39 97 36T113 29T132 26Q168 26 194 71Q203 87 217 139T245 247T261 313Q266 340 266 352Q266 380 251 392T217 404Q177 404 142 372T93 290Q91 281 88 280T72 278H58Q52 284 52 289Z"></path></g><g data-mml-node="mrow" transform="translate(9327.2,0)"><g data-mml-node="mo"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mi" transform="translate(389,0)"><path data-c="1D439" d="M48 1Q31 1 31 11Q31 13 34 25Q38 41 42 43T65 46Q92 46 125 49Q139 52 144 61Q146 66 215 342T285 622Q285 629 281 629Q273 632 228 634H197Q191 640 191 642T193 659Q197 676 203 680H742Q749 676 749 669Q749 664 736 557T722 447Q720 440 702 440H690Q683 445 683 453Q683 454 686 477T689 530Q689 560 682 579T663 610T626 626T575 633T503 634H480Q398 633 393 631Q388 629 386 623Q385 622 352 492L320 363H375Q378 363 398 363T426 364T448 367T472 374T489 386Q502 398 511 419T524 457T529 475Q532 480 548 480H560Q567 475 567 470Q567 467 536 339T502 207Q500 200 482 200H470Q463 206 463 212Q463 215 468 234T473 274Q473 303 453 310T364 317H309L277 190Q245 66 245 60Q245 46 334 46H359Q365 40 365 39T363 19Q359 6 353 0H336Q295 2 185 2Q120 2 86 2T48 1Z"></path></g><g data-mml-node="mo" transform="translate(1360.2,0)"><path data-c="2B" d="M56 237T56 250T70 270H369V420L370 570Q380 583 389 583Q402 583 409 568V270H707Q722 262 722 250T707 230H409V-68Q401 -82 391 -82H389H387Q375 -82 369 -68V230H70Q56 237 56 250Z"></path></g><g data-mml-node="mi" transform="translate(2360.4,0)"><path data-c="1D438" d="M492 213Q472 213 472 226Q472 230 477 250T482 285Q482 316 461 323T364 330H312Q311 328 277 192T243 52Q243 48 254 48T334 46Q428 46 458 48T518 61Q567 77 599 117T670 248Q680 270 683 272Q690 274 698 274Q718 274 718 261Q613 7 608 2Q605 0 322 0H133Q31 0 31 11Q31 13 34 25Q38 41 42 43T65 46Q92 46 125 49Q139 52 144 61Q146 66 215 342T285 622Q285 629 281 629Q273 632 228 634H197Q191 640 191 642T193 659Q197 676 203 680H757Q764 676 764 669Q764 664 751 557T737 447Q735 440 717 440H705Q698 445 698 453L701 476Q704 500 704 528Q704 558 697 578T678 609T643 625T596 632T532 634H485Q397 633 392 631Q388 629 386 622Q385 619 355 499T324 377Q347 376 372 376H398Q464 376 489 391T534 472Q538 488 540 490T557 493Q562 493 565 493T570 492T572 491T574 487T577 483L544 351Q511 218 508 216Q505 213 492 213Z"></path></g><g data-mml-node="mi" transform="translate(3124.4,0)"><path data-c="1D437" d="M287 628Q287 635 230 637Q207 637 200 638T193 647Q193 655 197 667T204 682Q206 683 403 683Q570 682 590 682T630 676Q702 659 752 597T803 431Q803 275 696 151T444 3L430 1L236 0H125H72Q48 0 41 2T33 11Q33 13 36 25Q40 41 44 43T67 46Q94 46 127 49Q141 52 146 61Q149 65 218 339T287 628ZM703 469Q703 507 692 537T666 584T629 613T590 629T555 636Q553 636 541 636T512 636T479 637H436Q392 637 386 627Q384 623 313 339T242 52Q242 48 253 48T330 47Q335 47 349 47T373 46Q499 46 581 128Q617 164 640 212T683 339T703 469Z"></path></g><g data-mml-node="mo" transform="translate(3952.4,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g></g></g></g></svg></mjx-container></div>
+    <div class="eqblock"><mjx-container class="MathJax" jax="SVG" display="true"><svg style="vertical-align: -1.738ex;" xmlns="http://www.w3.org/2000/svg" width="13.369ex" height="4.805ex" role="img" focusable="false" viewBox="0 -1356 5909 2124"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D465" d="M52 289Q59 331 106 386T222 442Q257 442 286 424T329 379Q371 442 430 442Q467 442 494 420T522 361Q522 332 508 314T481 292T458 288Q439 288 427 299T415 328Q415 374 465 391Q454 404 425 404Q412 404 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145Q504 144 502 134Q486 77 440 33T333 -11Q263 -11 227 52Q186 -10 133 -10H127Q78 -10 57 16T35 71Q35 103 54 123T99 143Q142 143 142 101Q142 81 130 66T107 46T94 41L91 40Q91 39 97 36T113 29T132 26Q168 26 194 71Q203 87 217 139T245 247T261 313Q266 340 266 352Q266 380 251 392T217 404Q177 404 142 372T93 290Q91 281 88 280T72 278H58Q52 284 52 289Z"></path></g><g data-mml-node="mo" transform="translate(849.8,0)"><path data-c="3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path></g><g data-mml-node="mstyle" transform="translate(1905.6,0)"><g data-mml-node="mfrac"><g data-mml-node="mrow" transform="translate(1394.7,676)"><g data-mml-node="mi"><path data-c="1D439" d="M48 1Q31 1 31 11Q31 13 34 25Q38 41 42 43T65 46Q92 46 125 49Q139 52 144 61Q146 66 215 342T285 622Q285 629 281 629Q273 632 228 634H197Q191 640 191 642T193 659Q197 676 203 680H742Q749 676 749 669Q749 664 736 557T722 447Q720 440 702 440H690Q683 445 683 453Q683 454 686 477T689 530Q689 560 682 579T663 610T626 626T575 633T503 634H480Q398 633 393 631Q388 629 386 623Q385 622 352 492L320 363H375Q378 363 398 363T426 364T448 367T472 374T489 386Q502 398 511 419T524 457T529 475Q532 480 548 480H560Q567 475 567 470Q567 467 536 339T502 207Q500 200 482 200H470Q463 206 463 212Q463 215 468 234T473 274Q473 303 453 310T364 317H309L277 190Q245 66 245 60Q245 46 334 46H359Q365 40 365 39T363 19Q359 6 353 0H336Q295 2 185 2Q120 2 86 2T48 1Z"></path></g><g data-mml-node="mi" transform="translate(749,0)"><path data-c="1D467" d="M347 338Q337 338 294 349T231 360Q211 360 197 356T174 346T162 335T155 324L153 320Q150 317 138 317Q117 317 117 325Q117 330 120 339Q133 378 163 406T229 440Q241 442 246 442Q271 442 291 425T329 392T367 375Q389 375 411 408T434 441Q435 442 449 442H462Q468 436 468 434Q468 430 463 420T449 399T432 377T418 358L411 349Q368 298 275 214T160 106L148 94L163 93Q185 93 227 82T290 71Q328 71 360 90T402 140Q406 149 409 151T424 153Q443 153 443 143Q443 138 442 134Q425 72 376 31T278 -11Q252 -11 232 6T193 40T155 57Q111 57 76 -3Q70 -11 59 -11H54H41Q35 -5 35 -2Q35 13 93 84Q132 129 225 214T340 322Q352 338 347 338Z"></path></g></g><g data-mml-node="mrow" transform="translate(220,-686)"><g data-mml-node="mi"><path data-c="1D439" d="M48 1Q31 1 31 11Q31 13 34 25Q38 41 42 43T65 46Q92 46 125 49Q139 52 144 61Q146 66 215 342T285 622Q285 629 281 629Q273 632 228 634H197Q191 640 191 642T193 659Q197 676 203 680H742Q749 676 749 669Q749 664 736 557T722 447Q720 440 702 440H690Q683 445 683 453Q683 454 686 477T689 530Q689 560 682 579T663 610T626 626T575 633T503 634H480Q398 633 393 631Q388 629 386 623Q385 622 352 492L320 363H375Q378 363 398 363T426 364T448 367T472 374T489 386Q502 398 511 419T524 457T529 475Q532 480 548 480H560Q567 475 567 470Q567 467 536 339T502 207Q500 200 482 200H470Q463 206 463 212Q463 215 468 234T473 274Q473 303 453 310T364 317H309L277 190Q245 66 245 60Q245 46 334 46H359Q365 40 365 39T363 19Q359 6 353 0H336Q295 2 185 2Q120 2 86 2T48 1Z"></path></g><g data-mml-node="mo" transform="translate(971.2,0)"><path data-c="2B" d="M56 237T56 250T70 270H369V420L370 570Q380 583 389 583Q402 583 409 568V270H707Q722 262 722 250T707 230H409V-68Q401 -82 391 -82H389H387Q375 -82 369 -68V230H70Q56 237 56 250Z"></path></g><g data-mml-node="mi" transform="translate(1971.4,0)"><path data-c="1D438" d="M492 213Q472 213 472 226Q472 230 477 250T482 285Q482 316 461 323T364 330H312Q311 328 277 192T243 52Q243 48 254 48T334 46Q428 46 458 48T518 61Q567 77 599 117T670 248Q680 270 683 272Q690 274 698 274Q718 274 718 261Q613 7 608 2Q605 0 322 0H133Q31 0 31 11Q31 13 34 25Q38 41 42 43T65 46Q92 46 125 49Q139 52 144 61Q146 66 215 342T285 622Q285 629 281 629Q273 632 228 634H197Q191 640 191 642T193 659Q197 676 203 680H757Q764 676 764 669Q764 664 751 557T737 447Q735 440 717 440H705Q698 445 698 453L701 476Q704 500 704 528Q704 558 697 578T678 609T643 625T596 632T532 634H485Q397 633 392 631Q388 629 386 622Q385 619 355 499T324 377Q347 376 372 376H398Q464 376 489 391T534 472Q538 488 540 490T557 493Q562 493 565 493T570 492T572 491T574 487T577 483L544 351Q511 218 508 216Q505 213 492 213Z"></path></g><g data-mml-node="mi" transform="translate(2735.4,0)"><path data-c="1D437" d="M287 628Q287 635 230 637Q207 637 200 638T193 647Q193 655 197 667T204 682Q206 683 403 683Q570 682 590 682T630 676Q702 659 752 597T803 431Q803 275 696 151T444 3L430 1L236 0H125H72Q48 0 41 2T33 11Q33 13 36 25Q40 41 44 43T67 46Q94 46 127 49Q141 52 146 61Q149 65 218 339T287 628ZM703 469Q703 507 692 537T666 584T629 613T590 629T555 636Q553 636 541 636T512 636T479 637H436Q392 637 386 627Q384 623 313 339T242 52Q242 48 253 48T330 47Q335 47 349 47T373 46Q499 46 581 128Q617 164 640 212T683 339T703 469Z"></path></g></g><rect width="3763.4" height="60" x="120" y="220"></rect></g></g></g></g></svg></mjx-container></div>
+    <p>The extract concentration then follows from the equilibrium relation:</p>
+    <div class="eqblock"><mjx-container class="MathJax" jax="SVG" display="true"><svg style="vertical-align: -1.738ex;" xmlns="http://www.w3.org/2000/svg" width="13.183ex" height="4.812ex" role="img" focusable="false" viewBox="0 -1359 5827 2127"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D466" d="M21 287Q21 301 36 335T84 406T158 442Q199 442 224 419T250 355Q248 336 247 334Q247 331 231 288T198 191T182 105Q182 62 196 45T238 27Q261 27 281 38T312 61T339 94Q339 95 344 114T358 173T377 247Q415 397 419 404Q432 431 462 431Q475 431 483 424T494 412T496 403Q496 390 447 193T391 -23Q363 -106 294 -155T156 -205Q111 -205 77 -183T43 -117Q43 -95 50 -80T69 -58T89 -48T106 -45Q150 -45 150 -87Q150 -107 138 -122T115 -142T102 -147L99 -148Q101 -153 118 -160T152 -167H160Q177 -167 186 -165Q219 -156 247 -127T290 -65T313 -9T321 21L315 17Q309 13 296 6T270 -6Q250 -11 231 -11Q185 -11 150 11T104 82Q103 89 103 113Q103 170 138 262T173 379Q173 380 173 381Q173 390 173 393T169 400T158 404H154Q131 404 112 385T82 344T65 302T57 280Q55 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(767.8,0)"><path data-c="3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path></g><g data-mml-node="mstyle" transform="translate(1823.6,0)"><g data-mml-node="mfrac"><g data-mml-node="mrow" transform="translate(980.7,676)"><g data-mml-node="mi"><path data-c="1D437" d="M287 628Q287 635 230 637Q207 637 200 638T193 647Q193 655 197 667T204 682Q206 683 403 683Q570 682 590 682T630 676Q702 659 752 597T803 431Q803 275 696 151T444 3L430 1L236 0H125H72Q48 0 41 2T33 11Q33 13 36 25Q40 41 44 43T67 46Q94 46 127 49Q141 52 146 61Q149 65 218 339T287 628ZM703 469Q703 507 692 537T666 584T629 613T590 629T555 636Q553 636 541 636T512 636T479 637H436Q392 637 386 627Q384 623 313 339T242 52Q242 48 253 48T330 47Q335 47 349 47T373 46Q499 46 581 128Q617 164 640 212T683 339T703 469Z"></path></g><g data-mml-node="mi" transform="translate(828,0)"><path data-c="1D439" d="M48 1Q31 1 31 11Q31 13 34 25Q38 41 42 43T65 46Q92 46 125 49Q139 52 144 61Q146 66 215 342T285 622Q285 629 281 629Q273 632 228 634H197Q191 640 191 642T193 659Q197 676 203 680H742Q749 676 749 669Q749 664 736 557T722 447Q720 440 702 440H690Q683 445 683 453Q683 454 686 477T689 530Q689 560 682 579T663 610T626 626T575 633T503 634H480Q398 633 393 631Q388 629 386 623Q385 622 352 492L320 363H375Q378 363 398 363T426 364T448 367T472 374T489 386Q502 398 511 419T524 457T529 475Q532 480 548 480H560Q567 475 567 470Q567 467 536 339T502 207Q500 200 482 200H470Q463 206 463 212Q463 215 468 234T473 274Q473 303 453 310T364 317H309L277 190Q245 66 245 60Q245 46 334 46H359Q365 40 365 39T363 19Q359 6 353 0H336Q295 2 185 2Q120 2 86 2T48 1Z"></path></g><g data-mml-node="mi" transform="translate(1577,0)"><path data-c="1D467" d="M347 338Q337 338 294 349T231 360Q211 360 197 356T174 346T162 335T155 324L153 320Q150 317 138 317Q117 317 117 325Q117 330 120 339Q133 378 163 406T229 440Q241 442 246 442Q271 442 291 425T329 392T367 375Q389 375 411 408T434 441Q435 442 449 442H462Q468 436 468 434Q468 430 463 420T449 399T432 377T418 358L411 349Q368 298 275 214T160 106L148 94L163 93Q185 93 227 82T290 71Q328 71 360 90T402 140Q406 149 409 151T424 153Q443 153 443 143Q443 138 442 134Q425 72 376 31T278 -11Q252 -11 232 6T193 40T155 57Q111 57 76 -3Q70 -11 59 -11H54H41Q35 -5 35 -2Q35 13 93 84Q132 129 225 214T340 322Q352 338 347 338Z"></path></g></g><g data-mml-node="mrow" transform="translate(220,-686)"><g data-mml-node="mi"><path data-c="1D439" d="M48 1Q31 1 31 11Q31 13 34 25Q38 41 42 43T65 46Q92 46 125 49Q139 52 144 61Q146 66 215 342T285 622Q285 629 281 629Q273 632 228 634H197Q191 640 191 642T193 659Q197 676 203 680H742Q749 676 749 669Q749 664 736 557T722 447Q720 440 702 440H690Q683 445 683 453Q683 454 686 477T689 530Q689 560 682 579T663 610T626 626T575 633T503 634H480Q398 633 393 631Q388 629 386 623Q385 622 352 492L320 363H375Q378 363 398 363T426 364T448 367T472 374T489 386Q502 398 511 419T524 457T529 475Q532 480 548 480H560Q567 475 567 470Q567 467 536 339T502 207Q500 200 482 200H470Q463 206 463 212Q463 215 468 234T473 274Q473 303 453 310T364 317H309L277 190Q245 66 245 60Q245 46 334 46H359Q365 40 365 39T363 19Q359 6 353 0H336Q295 2 185 2Q120 2 86 2T48 1Z"></path></g><g data-mml-node="mo" transform="translate(971.2,0)"><path data-c="2B" d="M56 237T56 250T70 270H369V420L370 570Q380 583 389 583Q402 583 409 568V270H707Q722 262 722 250T707 230H409V-68Q401 -82 391 -82H389H387Q375 -82 369 -68V230H70Q56 237 56 250Z"></path></g><g data-mml-node="mi" transform="translate(1971.4,0)"><path data-c="1D438" d="M492 213Q472 213 472 226Q472 230 477 250T482 285Q482 316 461 323T364 330H312Q311 328 277 192T243 52Q243 48 254 48T334 46Q428 46 458 48T518 61Q567 77 599 117T670 248Q680 270 683 272Q690 274 698 274Q718 274 718 261Q613 7 608 2Q605 0 322 0H133Q31 0 31 11Q31 13 34 25Q38 41 42 43T65 46Q92 46 125 49Q139 52 144 61Q146 66 215 342T285 622Q285 629 281 629Q273 632 228 634H197Q191 640 191 642T193 659Q197 676 203 680H757Q764 676 764 669Q764 664 751 557T737 447Q735 440 717 440H705Q698 445 698 453L701 476Q704 500 704 528Q704 558 697 578T678 609T643 625T596 632T532 634H485Q397 633 392 631Q388 629 386 622Q385 619 355 499T324 377Q347 376 372 376H398Q464 376 489 391T534 472Q538 488 540 490T557 493Q562 493 565 493T570 492T572 491T574 487T577 483L544 351Q511 218 508 216Q505 213 492 213Z"></path></g><g data-mml-node="mi" transform="translate(2735.4,0)"><path data-c="1D437" d="M287 628Q287 635 230 637Q207 637 200 638T193 647Q193 655 197 667T204 682Q206 683 403 683Q570 682 590 682T630 676Q702 659 752 597T803 431Q803 275 696 151T444 3L430 1L236 0H125H72Q48 0 41 2T33 11Q33 13 36 25Q40 41 44 43T67 46Q94 46 127 49Q141 52 146 61Q149 65 218 339T287 628ZM703 469Q703 507 692 537T666 584T629 613T590 629T555 636Q553 636 541 636T512 636T479 637H436Q392 637 386 627Q384 623 313 339T242 52Q242 48 253 48T330 47Q335 47 349 47T373 46Q499 46 581 128Q617 164 640 212T683 339T703 469Z"></path></g></g><rect width="3763.4" height="60" x="120" y="220"></rect></g></g></g></g></svg></mjx-container></div>
+    <p>The fraction of the uranyl nitrate in the feed that is recovered in the extract is:</p>
+    <div class="eqblock"><mjx-container class="MathJax" jax="SVG" display="true"><svg style="vertical-align: -1.738ex;" xmlns="http://www.w3.org/2000/svg" width="15.907ex" height="4.812ex" role="img" focusable="false" viewBox="0 -1359 7031 2127"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mstyle"><g data-mml-node="mfrac"><g data-mml-node="mrow" transform="translate(220,676)"><g data-mml-node="mi"><path data-c="1D438" d="M492 213Q472 213 472 226Q472 230 477 250T482 285Q482 316 461 323T364 330H312Q311 328 277 192T243 52Q243 48 254 48T334 46Q428 46 458 48T518 61Q567 77 599 117T670 248Q680 270 683 272Q690 274 698 274Q718 274 718 261Q613 7 608 2Q605 0 322 0H133Q31 0 31 11Q31 13 34 25Q38 41 42 43T65 46Q92 46 125 49Q139 52 144 61Q146 66 215 342T285 622Q285 629 281 629Q273 632 228 634H197Q191 640 191 642T193 659Q197 676 203 680H757Q764 676 764 669Q764 664 751 557T737 447Q735 440 717 440H705Q698 445 698 453L701 476Q704 500 704 528Q704 558 697 578T678 609T643 625T596 632T532 634H485Q397 633 392 631Q388 629 386 622Q385 619 355 499T324 377Q347 376 372 376H398Q464 376 489 391T534 472Q538 488 540 490T557 493Q562 493 565 493T570 492T572 491T574 487T577 483L544 351Q511 218 508 216Q505 213 492 213Z"></path></g><g data-mml-node="mi" transform="translate(764,0)"><path data-c="1D466" d="M21 287Q21 301 36 335T84 406T158 442Q199 442 224 419T250 355Q248 336 247 334Q247 331 231 288T198 191T182 105Q182 62 196 45T238 27Q261 27 281 38T312 61T339 94Q339 95 344 114T358 173T377 247Q415 397 419 404Q432 431 462 431Q475 431 483 424T494 412T496 403Q496 390 447 193T391 -23Q363 -106 294 -155T156 -205Q111 -205 77 -183T43 -117Q43 -95 50 -80T69 -58T89 -48T106 -45Q150 -45 150 -87Q150 -107 138 -122T115 -142T102 -147L99 -148Q101 -153 118 -160T152 -167H160Q177 -167 186 -165Q219 -156 247 -127T290 -65T313 -9T321 21L315 17Q309 13 296 6T270 -6Q250 -11 231 -11Q185 -11 150 11T104 82Q103 89 103 113Q103 170 138 262T173 379Q173 380 173 381Q173 390 173 393T169 400T158 404H154Q131 404 112 385T82 344T65 302T57 280Q55 278 41 278H27Q21 284 21 287Z"></path></g></g><g data-mml-node="mrow" transform="translate(240,-686)"><g data-mml-node="mi"><path data-c="1D439" d="M48 1Q31 1 31 11Q31 13 34 25Q38 41 42 43T65 46Q92 46 125 49Q139 52 144 61Q146 66 215 342T285 622Q285 629 281 629Q273 632 228 634H197Q191 640 191 642T193 659Q197 676 203 680H742Q749 676 749 669Q749 664 736 557T722 447Q720 440 702 440H690Q683 445 683 453Q683 454 686 477T689 530Q689 560 682 579T663 610T626 626T575 633T503 634H480Q398 633 393 631Q388 629 386 623Q385 622 352 492L320 363H375Q378 363 398 363T426 364T448 367T472 374T489 386Q502 398 511 419T524 457T529 475Q532 480 548 480H560Q567 475 567 470Q567 467 536 339T502 207Q500 200 482 200H470Q463 206 463 212Q463 215 468 234T473 274Q473 303 453 310T364 317H309L277 190Q245 66 245 60Q245 46 334 46H359Q365 40 365 39T363 19Q359 6 353 0H336Q295 2 185 2Q120 2 86 2T48 1Z"></path></g><g data-mml-node="mi" transform="translate(749,0)"><path data-c="1D467" d="M347 338Q337 338 294 349T231 360Q211 360 197 356T174 346T162 335T155 324L153 320Q150 317 138 317Q117 317 117 325Q117 330 120 339Q133 378 163 406T229 440Q241 442 246 442Q271 442 291 425T329 392T367 375Q389 375 411 408T434 441Q435 442 449 442H462Q468 436 468 434Q468 430 463 420T449 399T432 377T418 358L411 349Q368 298 275 214T160 106L148 94L163 93Q185 93 227 82T290 71Q328 71 360 90T402 140Q406 149 409 151T424 153Q443 153 443 143Q443 138 442 134Q425 72 376 31T278 -11Q252 -11 232 6T193 40T155 57Q111 57 76 -3Q70 -11 59 -11H54H41Q35 -5 35 -2Q35 13 93 84Q132 129 225 214T340 322Q352 338 347 338Z"></path></g></g><rect width="1454" height="60" x="120" y="220"></rect></g></g><g data-mml-node="mo" transform="translate(1971.8,0)"><path data-c="3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path></g><g data-mml-node="mstyle" transform="translate(3027.6,0)"><g data-mml-node="mfrac"><g data-mml-node="mrow" transform="translate(1205.7,676)"><g data-mml-node="mi"><path data-c="1D438" d="M492 213Q472 213 472 226Q472 230 477 250T482 285Q482 316 461 323T364 330H312Q311 328 277 192T243 52Q243 48 254 48T334 46Q428 46 458 48T518 61Q567 77 599 117T670 248Q680 270 683 272Q690 274 698 274Q718 274 718 261Q613 7 608 2Q605 0 322 0H133Q31 0 31 11Q31 13 34 25Q38 41 42 43T65 46Q92 46 125 49Q139 52 144 61Q146 66 215 342T285 622Q285 629 281 629Q273 632 228 634H197Q191 640 191 642T193 659Q197 676 203 680H757Q764 676 764 669Q764 664 751 557T737 447Q735 440 717 440H705Q698 445 698 453L701 476Q704 500 704 528Q704 558 697 578T678 609T643 625T596 632T532 634H485Q397 633 392 631Q388 629 386 622Q385 619 355 499T324 377Q347 376 372 376H398Q464 376 489 391T534 472Q538 488 540 490T557 493Q562 493 565 493T570 492T572 491T574 487T577 483L544 351Q511 218 508 216Q505 213 492 213Z"></path></g><g data-mml-node="mi" transform="translate(764,0)"><path data-c="1D437" d="M287 628Q287 635 230 637Q207 637 200 638T193 647Q193 655 197 667T204 682Q206 683 403 683Q570 682 590 682T630 676Q702 659 752 597T803 431Q803 275 696 151T444 3L430 1L236 0H125H72Q48 0 41 2T33 11Q33 13 36 25Q40 41 44 43T67 46Q94 46 127 49Q141 52 146 61Q149 65 218 339T287 628ZM703 469Q703 507 692 537T666 584T629 613T590 629T555 636Q553 636 541 636T512 636T479 637H436Q392 637 386 627Q384 623 313 339T242 52Q242 48 253 48T330 47Q335 47 349 47T373 46Q499 46 581 128Q617 164 640 212T683 339T703 469Z"></path></g></g><g data-mml-node="mrow" transform="translate(220,-686)"><g data-mml-node="mi"><path data-c="1D439" d="M48 1Q31 1 31 11Q31 13 34 25Q38 41 42 43T65 46Q92 46 125 49Q139 52 144 61Q146 66 215 342T285 622Q285 629 281 629Q273 632 228 634H197Q191 640 191 642T193 659Q197 676 203 680H742Q749 676 749 669Q749 664 736 557T722 447Q720 440 702 440H690Q683 445 683 453Q683 454 686 477T689 530Q689 560 682 579T663 610T626 626T575 633T503 634H480Q398 633 393 631Q388 629 386 623Q385 622 352 492L320 363H375Q378 363 398 363T426 364T448 367T472 374T489 386Q502 398 511 419T524 457T529 475Q532 480 548 480H560Q567 475 567 470Q567 467 536 339T502 207Q500 200 482 200H470Q463 206 463 212Q463 215 468 234T473 274Q473 303 453 310T364 317H309L277 190Q245 66 245 60Q245 46 334 46H359Q365 40 365 39T363 19Q359 6 353 0H336Q295 2 185 2Q120 2 86 2T48 1Z"></path></g><g data-mml-node="mo" transform="translate(971.2,0)"><path data-c="2B" d="M56 237T56 250T70 270H369V420L370 570Q380 583 389 583Q402 583 409 568V270H707Q722 262 722 250T707 230H409V-68Q401 -82 391 -82H389H387Q375 -82 369 -68V230H70Q56 237 56 250Z"></path></g><g data-mml-node="mi" transform="translate(1971.4,0)"><path data-c="1D438" d="M492 213Q472 213 472 226Q472 230 477 250T482 285Q482 316 461 323T364 330H312Q311 328 277 192T243 52Q243 48 254 48T334 46Q428 46 458 48T518 61Q567 77 599 117T670 248Q680 270 683 272Q690 274 698 274Q718 274 718 261Q613 7 608 2Q605 0 322 0H133Q31 0 31 11Q31 13 34 25Q38 41 42 43T65 46Q92 46 125 49Q139 52 144 61Q146 66 215 342T285 622Q285 629 281 629Q273 632 228 634H197Q191 640 191 642T193 659Q197 676 203 680H757Q764 676 764 669Q764 664 751 557T737 447Q735 440 717 440H705Q698 445 698 453L701 476Q704 500 704 528Q704 558 697 578T678 609T643 625T596 632T532 634H485Q397 633 392 631Q388 629 386 622Q385 619 355 499T324 377Q347 376 372 376H398Q464 376 489 391T534 472Q538 488 540 490T557 493Q562 493 565 493T570 492T572 491T574 487T577 483L544 351Q511 218 508 216Q505 213 492 213Z"></path></g><g data-mml-node="mi" transform="translate(2735.4,0)"><path data-c="1D437" d="M287 628Q287 635 230 637Q207 637 200 638T193 647Q193 655 197 667T204 682Q206 683 403 683Q570 682 590 682T630 676Q702 659 752 597T803 431Q803 275 696 151T444 3L430 1L236 0H125H72Q48 0 41 2T33 11Q33 13 36 25Q40 41 44 43T67 46Q94 46 127 49Q141 52 146 61Q149 65 218 339T287 628ZM703 469Q703 507 692 537T666 584T629 613T590 629T555 636Q553 636 541 636T512 636T479 637H436Q392 637 386 627Q384 623 313 339T242 52Q242 48 253 48T330 47Q335 47 349 47T373 46Q499 46 581 128Q617 164 640 212T683 339T703 469Z"></path></g></g><rect width="3763.4" height="60" x="120" y="220"></rect></g></g></g></g></svg></mjx-container></div>
+    <p>Increasing the extractant flow rate E or the distribution coefficient D drives more uranyl nitrate into the extract phase and lowers the residue concentration x.</p>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-about">
+    <button class="panel-close" data-close>&times;</button>
+    <div class="panel-body">
+    <h2>About</h2>
+    <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  var elX1 = document.getElementById('s-x1');
+  var elF  = document.getElementById('s-F');
+  var elE  = document.getElementById('s-E');
+  var elD  = document.getElementById('s-D');
+
+  var vX1 = document.getElementById('v-x1');
+  var vF  = document.getElementById('v-F');
+  var vE  = document.getElementById('v-E');
+  var vD  = document.getElementById('v-D');
+
+  var dispF   = document.getElementById('disp-F');
+  var dispX1  = document.getElementById('disp-x1');
+  var dispEin = document.getElementById('disp-E-in');
+  var dispEout= document.getElementById('disp-E-out');
+  var dispY   = document.getElementById('disp-y');
+  var dispFout= document.getElementById('disp-F-out');
+  var dispX   = document.getElementById('disp-x');
+
+  var dispFrac = document.getElementById('disp-frac');
+
+  function fmt(n, d){ return Number(n).toFixed(d); }
+
+  // ---------- Mixer speckle pattern (fixed random positions, generated once) ----------
+  var speckleGroup = document.getElementById('mixer-speckles');
+  var speckles = [];
+  (function generateSpeckles(){
+    var boxX = 150, boxY = 150, boxW = 170, boxH = 100;
+    var cell = 5;
+    var cols = Math.ceil(boxW / cell);
+    var rows = Math.ceil(boxH / cell);
+    for(var r=0;r<rows;r++){
+      for(var c=0;c<cols;c++){
+        var x = boxX + c * cell;
+        var y = boxY + r * cell;
+        var threshold = Math.random();
+        var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        rect.setAttribute('x', x);
+        rect.setAttribute('y', y);
+        rect.setAttribute('width', cell + 0.6);
+        rect.setAttribute('height', cell + 0.6);
+        rect.setAttribute('fill', '#d63333');
+        speckleGroup.appendChild(rect);
+        speckles.push({el: rect, threshold: threshold});
+      }
+    }
+  })();
+  function updateSpeckles(F, E){
+    var fractionRed = F / (F + E);
+    if (fractionRed > 1) fractionRed = 1;
+    if (fractionRed < 0) fractionRed = 0;
+    for(var i=0;i<speckles.length;i++){
+      var s = speckles[i];
+      s.el.setAttribute('fill', s.threshold < fractionRed ? '#d63333' : '#336cbc');
+    }
+  }
+
+  // ---------- Settler blue/red split (blue on top, red on bottom, sized by F/E) ----------
+  var settlerBlue = document.getElementById('settler-blue');
+  var settlerRed = document.getElementById('settler-red');
+  var settlerDivider = document.getElementById('settler-divider');
+  var SETTLER_X = 443, SETTLER_Y = 150, SETTLER_W = 170, SETTLER_H = 100;
+  function updateSettlerSplit(F, E){
+    var fractionRed = F / (F + E);
+    if (fractionRed > 1) fractionRed = 1;
+    if (fractionRed < 0) fractionRed = 0;
+    var redHeight = SETTLER_H * fractionRed;
+    var blueHeight = SETTLER_H - redHeight;
+    var divY = SETTLER_Y + blueHeight;
+    settlerBlue.setAttribute('height', blueHeight);
+    settlerRed.setAttribute('y', divY);
+    settlerRed.setAttribute('height', redHeight);
+    settlerDivider.setAttribute('y1', divY);
+    settlerDivider.setAttribute('y2', divY);
+  }
+
+  function update(){
+    var x1 = parseFloat(elX1.value);
+    var F  = parseFloat(elF.value);
+    var E  = parseFloat(elE.value);
+    var D  = parseFloat(elD.value);
+
+    var x = (F * x1) / (F + E * D);
+    var y = D * x;
+    var frac = (E * y) / (F * x1) * 100;
+
+    vX1.textContent = fmt(x1,2);
+    vF.textContent  = fmt(F,1);
+    vE.textContent  = fmt(E,1);
+    vD.textContent  = fmt(D,1);
+
+    dispF.textContent   = fmt(F,1);
+    dispX1.textContent  = fmt(x1,2);
+    dispEin.textContent = fmt(E,1);
+    dispEout.textContent= fmt(E,1);
+    dispY.textContent   = fmt(y,2);
+    dispFout.textContent= fmt(F,1);
+    dispX.textContent   = fmt(x,2);
+
+    dispFrac.textContent = fmt(frac,1);
+
+    updateSpeckles(F, E);
+    updateSettlerSplit(F, E);
+  }
+
+  [elX1, elF, elE, elD].forEach(function(el){
+    el.addEventListener('input', update);
+  });
+  update();
+
+  function closeAllPanels(){
+    document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('open'); });
+  }
+  function togglePanel(id){
+    var p = document.getElementById(id);
+    var wasOpen = p.classList.contains('open');
+    closeAllPanels();
+    if(!wasOpen){ p.classList.add('open'); }
+  }
+
+  document.getElementById('btn-directions').addEventListener('click', function(){ togglePanel('panel-directions'); });
+  document.getElementById('btn-details').addEventListener('click', function(){ togglePanel('panel-details'); });
+  document.getElementById('btn-about').addEventListener('click', function(){ togglePanel('panel-about'); });
+  document.querySelectorAll('.panel-close').forEach(function(btn){
+    btn.addEventListener('click', function(){ closeAllPanels(); });
+  });
+})();
+</script>
+</body>
+</html>
