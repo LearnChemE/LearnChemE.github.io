@@ -116,10 +116,10 @@
 
   .stage{
     margin-top:14px;
-    display:flex;
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(min(100%, 320px), 1fr));
     gap:18px;
-    flex-wrap:wrap;
-    justify-content:center;
+    justify-items:center;
   }
   .chartBox{
     background:#fff;
@@ -127,6 +127,7 @@
     border-radius:6px;
     padding:8px 10px 10px;
     flex:0 0 auto;
+    width:min(562px, 100%);
   }
   .chartTitle{
     text-align:center;
@@ -137,6 +138,8 @@
   }
   canvas{
     display:block;
+    width:100%;
+    height:auto;
   }
 
   .controls{
@@ -215,9 +218,9 @@
     margin-top:20px;
   }
 
-  @media (max-width:900px){
+  /* @media (max-width:900px){
     .stage{flex-direction:column;align-items:center;}
-  }
+  } */
 </style>
 
 
@@ -492,8 +495,6 @@ window.MathJax = {
     const dpr = window.devicePixelRatio || 1;
     const w = canvas.width, h = canvas.height;
     if (!canvas._scaled){
-      canvas.style.width = w+'px';
-      canvas.style.height = h+'px';
       canvas.width = w*dpr;
       canvas.height = h*dpr;
       canvas._scaled = true;
