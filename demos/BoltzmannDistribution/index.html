@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Boltzmann Distribution</title>
+<style>
+:root{--red:#8b1a1a;--ink:#000000;--mute:#000000;--line:#d5d9e0;--card:#ffffff;--bg:#fff;--accent:#1f4e79;--cv:#b23a48}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Helvetica,Arial,sans-serif;font-size:14px}
+.panel a{color:#000;text-decoration:underline}
+.wrap{max-width:1180px;margin:0 auto;padding:12px 16px 28px;position:relative}
+h1{font-size:20px;margin:4px 0 2px}
+.sub{color:var(--mute);margin:0 0 10px;font-size:13px}
+.btnrow{display:flex;gap:8px;margin-bottom:10px}
+.rbtn{background:var(--red);color:#fff;border:0;border-radius:4px;padding:6px 14px;font-family:Helvetica,Arial,sans-serif;font-size:15px;cursor:pointer}
+.rbtn:hover{background:#a52222}
+.btnwrap{position:relative;display:inline-block}
+.panel{display:none;position:absolute;left:6px;top:calc(100% + 8px);z-index:20;background:#fff;border:1px solid var(--red);border-radius:6px;box-shadow:0 6px 24px rgba(0,0,0,.25);padding:14px 18px 14px;width:min(560px,calc(100vw - 40px));max-height:75vh;overflow-y:auto;text-align:left;line-height:1.45}
+.panel.wide{width:min(840px,calc(100vw - 40px))}
+.panel h3{margin:0 0 8px;font-size:15px;color:var(--red)}
+.panel .x{position:absolute;right:8px;top:4px;background:none;border:0;color:var(--red);font-size:22px;cursor:pointer;line-height:1}
+.panel p{margin:6px 0}
+.panel ul{margin:4px 0 4px 18px;padding:0}
+.eq{margin:6px 0 6px 14px;font-family:"Times New Roman",serif;font-size:15px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.controls{display:inline-grid;grid-template-columns:repeat(2,max-content);gap:10px 12px;margin-bottom:10px;max-width:100%}
+.ctl label{display:block;font-size:17px;color:var(--mute);margin-bottom:3px}
+.ctl select{padding:4px;font-size:13px;width:auto}
+.ctl input[type=number]{width:100%;padding:4px;font-size:13px}
+.ctl input[type=range]{width:100%}
+.ctl input[type=range].halfSlide{width:75%;min-width:165px}
+input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+.val{font-weight:normal;color:var(--ink);font-size:17px}
+.chk{display:flex;align-items:center;gap:6px;font-size:17px;margin-top:4px}
+.seg{display:inline-flex;border:1px solid var(--red);border-radius:4px;overflow:hidden}
+.seg button{background:#fff;color:var(--red);border:0;padding:6px 12px;font-size:13px;cursor:pointer;font-family:inherit}
+.seg button.on{background:var(--red);color:#fff}
+.tiles{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 12px;display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.tiles .vrow{display:flex;align-items:baseline;justify-content:space-between;gap:18px}
+.tiles .vrow .k{font-size:14px;color:var(--mute);white-space:nowrap}
+.tiles .vrow .v{font-size:17px;font-weight:normal;font-variant-numeric:tabular-nums;white-space:nowrap}
+.banner{padding:8px 12px;border-radius:6px;margin-bottom:10px;font-size:15.5px;border-left:5px solid var(--accent);background:#eaf1f8}
+.banner.frozen{border-color:#3a6ea5;background:#e6eff9}
+.banner.thaw{border-color:#d4900a;background:#fdf3dc}
+.banner.equi{border-color:#2a9d8f;background:#e3f4f1}
+.banner.sat{border-color:#8e44ad;background:#f1e8f6}
+.grid2{display:grid;gap:10px;margin-bottom:10px}
+.r1{grid-template-columns:minmax(230px,320px) 1fr}
+@media(max-width:760px){.r1{grid-template-columns:1fr}}
+.top-row{display:flex;gap:12px;align-items:flex-start;margin-bottom:10px;flex-wrap:wrap}
+.top-row .controls{margin-bottom:0;flex:0 0 auto}
+.cvcard{flex:1 1 260px;min-width:220px}
+@media(max-width:760px){.top-row{flex-direction:column}}
+.card h4{margin:0 0 4px;font-size:13px}
+.card .cap{font-size:12px;color:var(--mute);margin:0 0 4px}
+svg{display:block;width:100%;height:auto;user-select:none}
+.dragc{touch-action:none;cursor:ew-resize}
+.tk{font-size:17px;fill:#000;font-family:Helvetica,Arial,sans-serif}
+.al{font-size:17px;fill:#000;font-family:Helvetica,Arial,sans-serif}
+.sm{font-size:17px;fill:#000;font-family:Helvetica,Arial,sans-serif}
+.cinputs{display:grid;grid-template-columns:repeat(6,1fr);gap:4px}
+.cinputs input{width:100%;padding:3px}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  
+<div class="top-row">
+<div class="card controls">
+  <div class="btnwrap" style="grid-column:1/-1">
+    <div class="btnrow">
+      <button class="rbtn" data-p="pDir">Directions</button>
+      <button class="rbtn" data-p="pDet">Details</button>
+      <button class="rbtn" data-p="pAbout">About</button>
+    </div>
+
+    <div class="panel" id="pDir"><button class="x" aria-label="close">&times;</button>
+    <h3>Directions</h3>
+    <p>This simulation shows how a set of discrete molecular energy levels gives rise to the Boltzmann population distribution, and how that distribution in turn determines macroscopic properties like average energy, heat capacity, and entropy. Use it to see why heat capacity is near zero at low temperature (levels are &ldquo;frozen out&rdquo;) and rises toward the classical equipartition value as higher levels thaw.</p>
+    <ul>
+    <li><b>level scheme</b> sets the energies <i>E<sub>n</sub></i> and degeneracies <i>g<sub>n</sub></i>. Try the evenly spaced ladders first, then the rigid rotor and the two-level system.</li>
+    <li><b>&epsilon;/k</b> is the level spacing expressed as a temperature (&theta;). Pick a real-molecule preset to see where room temperature (298&nbsp;K) falls.</li>
+    <li>Drag the <b>temperature</b> slider, or click/drag directly on the heat capacity plot.</li>
+    <li>The <b>Populations</b> view shows the bar chart of <i>p<sub>n</sub></i>. The <b>Freeze-out / equipartition</b> view replaces it with <i>p<sub>n</sub></i> vs. <i>T</i>, and adds shaded regimes and the classical (equipartition) limit to the lower plots.</li>
+    <li>Untick &ldquo;infinite ladder&rdquo; to make only <i>N</i> levels exist &mdash; then <i>C<sub>v</sub></i> falls back to zero at high <i>T</i> (Schottky peak).</li>
+    </ul></div>
+
+    <div class="panel wide" id="pDet"><button class="x" aria-label="close">&times;</button>
+    <h3>Details</h3>
+    <p>For independent molecules with energy levels <i>E<sub>n</sub></i> (degeneracy <i>g<sub>n</sub></i>), measured from the ground level (<i>E</i><sub>0</sub> = 0):</p>
+    <p>The partition function is:</p>
+    <div class="eq">q = &Sigma;<sub>n</sub> g<sub>n</sub> e<sup>&minus;E<sub>n</sub>/kT</sup></div>
+    <p>where <i>g<sub>n</sub></i> is the number of distinct states of level <i>n</i>.</p>
+    <p>The fraction of molecules with energy level n is</p>
+    <div class="eq">p<sub>n</sub> = g<sub>n</sub> e<sup>&minus;E<sub>n</sub>/kT</sup> / q &nbsp;&nbsp;(population of level n; per single state: p<sub>n</sub>/g<sub>n</sub>)</div>
+    <p>The average energy per molecule is:</p>
+    <div class="eq">&#10216;E&#10217; = &Sigma;<sub>n</sub> E<sub>n</sub> p<sub>n</sub> = kT<sup>2</sup> (&part; ln q / &part;T)</div>
+    <p>The heat capacity per molecule divided by k is:</p>
+    <div class="eq">C<sub>v</sub>/k = (&#10216;E<sup>2</sup>&#10217; &minus; &#10216;E&#10217;<sup>2</sup>) / (kT)<sup>2</sup> = (&part;&#10216;E&#10217;/&part;T)/k</div>
+    <p>The entropy per molecule divided by k is:</p>
+    <div class="eq">S/k = ln q + &#10216;E&#10217;/kT</div>
+    <p>Because <i>E</i><sub>0</sub> = 0, <i>q</i> is roughly the number of states thermally accessible: <i>q</i> &rarr; <i>g</i><sub>0</sub> = 1 as <i>T</i> &rarr; 0, and grows as more levels &ldquo;thaw.&rdquo; Per-mole quantities: &#10216;E&#10217;<sub>molar</sub> = R&theta;(&#10216;E&#10217;/&epsilon;) and <i>C<sub>v</sub></i>/R = <i>C<sub>v</sub></i>/<i>k</i>.</p>
+    <p><b>Schemes.</b> Evenly spaced: <i>E<sub>n</sub></i> = n&epsilon;, with <i>g<sub>n</sub></i> = 1 (1-D oscillator), n+1 (2-D oscillator) or (n+1)(n+2)/2 (3-D oscillator). Rigid rotor: <i>E<sub>J</sub></i> = J(J+1)&epsilon;, <i>g<sub>J</sub></i> = 2J+1 (linear molecule; nuclear-spin/symmetry-number effects are ignored, so H<sub>2</sub> and N<sub>2</sub> rotation are idealized). Two-level: ground level (g = 1) and one excited level of degeneracy g. Custom: six evenly spaced levels with degeneracies you choose.</p>
+    <p><b>Regimes.</b> Freeze-out: kT &lt; &epsilon;/2 &mdash; excited levels have Boltzmann factors below e<sup>&minus;2</sup> &asymp; 0.14, so nearly all molecules sit in the ground level and <i>C<sub>v</sub></i> &asymp; 0 (that degree of freedom does not store energy). Thawing: &epsilon;/2 &lt; kT &lt; 2&epsilon;. Equipartition: kT &gt; 2&epsilon; for an unbounded ladder, where <i>C<sub>v</sub></i>/k approaches the classical value: 1 (1-D oscillator, with each of the kinetic and potential terms contributing &frac12;), 2 (2-D oscillator), 3 (3-D oscillator), 1 (linear rotor). Dashed lines mark these limits.</p>
+    <p><b>Finite systems.</b> If only <i>N</i> levels exist, &#10216;E&#10217; is bounded and the populations approach <i>g<sub>n</sub></i>/&Sigma;<i>g</i> as <i>T</i> &rarr; &infin; (all states equally likely). <i>C<sub>v</sub></i> passes through a maximum (Schottky anomaly) and then decays to zero &mdash; equipartition never occurs.</p>
+    <p><b>Numerics.</b> For an unbounded ladder the sums are evaluated over all levels with e<sup>&minus;E/kT</sup> &gt; e<sup>&minus;60</sup>, so the displayed thermodynamic values do not depend on the &ldquo;levels shown&rdquo; slider; that slider only sets how many levels are drawn.</p>
+    <p><b>Symbols.</b></p>
+    <ul>
+    <li><i>n</i>, <i>J</i> &mdash; the quantum number labeling an energy level (n = 0, 1, 2, &hellip;; <i>J</i> is used for the rigid rotor).</li>
+    <li><i>E<sub>n</sub></i> &mdash; the energy of level <i>n</i>, measured from the ground level (<i>E</i><sub>0</sub> = 0).</li>
+    <li><i>g<sub>n</sub></i> &mdash; the degeneracy (number of distinct states) of level <i>n</i>.</li>
+    <li>&epsilon; &mdash; the energy-level spacing; the unit of energy used throughout (e.g. <i>E<sub>n</sub></i> = n&epsilon; for the evenly spaced ladders).</li>
+    <li><i>k</i> &mdash; Boltzmann's constant. <i>R</i> &mdash; the gas constant, its molar equivalent (<i>R</i> = <i>N<sub>A</sub>k</i>).</li>
+    <li><i>T</i> &mdash; the absolute temperature.</li>
+    <li>&theta; &mdash; the level spacing expressed as a temperature, &theta; = &epsilon;/<i>k</i> (set by the &ldquo;level spacing &epsilon;/k&rdquo; slider, or by a real-molecule preset).</li>
+    <li><i>kT/&epsilon;</i> &mdash; the dimensionless temperature (= <i>T</i>/&theta;) plotted on the horizontal axis of the plots.</li>
+    <li><i>q</i> &mdash; the partition function, <i>q</i> = &Sigma;<sub>n</sub> g<sub>n</sub>e<sup>&minus;E<sub>n</sub>/kT</sup>.</li>
+    <li><i>p<sub>n</sub></i> &mdash; the population of level <i>n</i> (the fraction of molecules in that level); <i>p<sub>n</sub></i>/<i>g<sub>n</sub></i> is the population per individual state within level <i>n</i>.</li>
+    <li>&#10216;<i>E</i>&#10217; &mdash; the average (mean) energy per molecule.</li>
+    <li><i>C<sub>v</sub></i> &mdash; the constant-volume heat capacity per molecule; <i>C<sub>v</sub></i>/<i>k</i> = <i>C<sub>v</sub></i>/<i>R</i> on a molar basis.</li>
+    <li><i>S</i> &mdash; the entropy per molecule, reported as <i>S/k</i>.</li>
+    <li><i>N</i> &mdash; the number of energy levels that exist, when &ldquo;only these levels exist (finite ladder)&rdquo; is checked.</li>
+    <li>298&nbsp;K &mdash; the dotted reference line marking room temperature on the plots.</li>
+    </ul>
+    </div>
+
+    <div class="panel" id="pAbout"><button class="x" aria-label="close">&times;</button>
+    <h3>About</h3>
+    <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.</p></div>
+  </div>
+  <div class="ctl"><label>level scheme</label>
+    <select id="scheme">
+      <option value="ho1">Evenly spaced, g = 1 (1-D oscillator)</option>
+      <option value="ho2">Evenly spaced, g = n+1 (2-D oscillator)</option>
+      <option value="ho3">Evenly spaced, g = (n+1)(n+2)/2 (3-D oscillator)</option>
+      <option value="rot">Rigid rotor: E = J(J+1)&epsilon;, g = 2J+1</option>
+      <option value="two">Two-level system</option>
+      <option value="cus">Custom degeneracies (6 levels)</option>
+    </select>
+    <div style="margin-top:6px"><label>real-molecule presets</label>
+    <select id="preset">
+      <option value="">&mdash; choose a preset &mdash;</option>
+      <option value="i2">I&#8322; vibration (&theta; = 308 K)</option>
+      <option value="co">CO vibration (&theta; = 3084 K)</option>
+      <option value="n2v">N&#8322; vibration (&theta; = 3374 K)</option>
+      <option value="h2r">H&#8322; rotation (&theta; = 85.3 K)</option>
+      <option value="n2r">N&#8322; rotation (&theta; = 2.88 K)</option>
+    </select></div>
+
+    <div style="margin-top:12px"><label>level spacing &epsilon;/k (K): <span class="val" id="thetaV"></span></label>
+    <input type="range" id="theta" class="halfSlide" min="0" max="1000" value="700"></div>
+
+    <div class="chk" id="nWrap" style="margin-top:10px"><label style="margin:0;white-space:nowrap">levels shown: <span class="val" id="nV"></span></label></div>
+    <input type="range" id="nlev" class="halfSlide" min="2" max="12" value="8">
+
+    <div style="margin-top:10px"><label style="margin:0">temperature <i>T</i> <span class="val" id="TK"></span> &nbsp; <i>kT/&epsilon;</i> = <span class="val" id="tstar"></span></label>
+    <input type="range" id="tslide" class="halfSlide" min="0" max="1000" value="400"></div>
+
+    <label class="chk" id="finWrap" style="margin-top:10px"><input type="checkbox" id="fin"> only these levels exist (finite ladder)</label>
+    <div id="gexWrap" class="hidden"><label>excited-level degeneracy g: <span class="val" id="gexV"></span></label><input type="range" id="gex" min="1" max="6" value="3"></div>
+    <div id="cusWrap" class="hidden"><label>degeneracy of levels 0&ndash;5</label><div class="cinputs" id="cinputs"></div></div>
+  </div>
+  <div class="ctl"><label>current values</label>
+    <div class="tiles" id="tiles"></div>
+  </div>
+</div>
+<div class="card cvcard">
+  <div class="ctl" style="margin-bottom:2px;display:flex;align-items:center;gap:8px"><label style="display:inline;margin-bottom:0">temperature axis range (kT/&epsilon;)</label>
+  <select id="tmax" style="font-size:15.6px"><option value="3">0&ndash;3</option><option value="6" selected>0&ndash;6</option><option value="12">0&ndash;12</option><option value="30">0&ndash;30</option><option value="100">0&ndash;100</option></select></div>
+  <div id="cCv" class="dragc"></div>
+</div>
+</div>
+
+<div class="banner" id="banner"></div>
+
+<div class="grid2 r1">
+  <div class="card"><h4 style="font-size:17px">energy levels &amp; <i>kT</i></h4><p class="cap" style="font-size:17px">level brightness &prop; e<sup>&minus;E/kT</sup></p><div id="cLad"></div></div>
+  <div class="card"><p class="cap" id="mainCap" style="font-size:19px"></p>
+    <div style="margin-bottom:8px">
+    <div class="seg" id="viewSeg"><button data-v="pop" class="on">Populations</button><button data-v="frz">Freeze-out / equipartition</button></div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px 20px;margin-top:4px">
+    <label class="chk" id="psWrap" style="margin-top:0"><input type="checkbox" id="ps"> show population per <i>state</i> (p<sub>n</sub>/g<sub>n</sub>)</label>
+    <label class="chk" id="fyWrap" style="margin-top:0"><input type="checkbox" id="fy"> fix bar-chart axis at 0&ndash;1</label>
+    </div>
+    </div>
+  <div id="cMain" class="dragc"></div></div>
+</div>
+</div>
+
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+const COL=['#1f4e79','#2a9d8f','#d4900a','#e76f51','#8e44ad','#7f8c8d','#b5179e'];
+const CVSYM='C<tspan baseline-shift="-20%" font-size="70%">v</tspan>';
+const CVLAB='heat capacity/k, '+CVSYM+'/k';
+const S={scheme:'ho1',theta:1000,N:8,finite:false,gEx:3,custom:[1,2,3,4,5,6],t:0.8,tmax:6,view:'pop',perState:false,fixY:false};
+const SCH={
+  ho1:{E:n=>n,g:n=>1,f:1},
+  ho2:{E:n=>n,g:n=>n+1,f:2},
+  ho3:{E:n=>n,g:n=>(n+1)*(n+2)/2,f:3},
+  rot:{E:n=>n*(n+1),g:n=>2*n+1,f:1},
+  two:{E:n=>n,g:n=>n===0?1:S.gEx,f:0,count:2},
+  cus:{E:n=>n,g:n=>S.custom[n],f:0,count:6}
+};
+const count=()=>{const c=SCH[S.scheme];return c.count?c.count:(S.finite?S.N:Infinity)};
+const dispCount=()=>{const c=SCH[S.scheme];return c.count?c.count:S.N};
+const isInf=()=>!isFinite(count());
+const fClass=()=>isInf()?SCH[S.scheme].f:0;
+
+function thermo(t){
+  const sc=SCH[S.scheme],cnt=count();
+  let q=0,s1=0,s2=0;const w=[];
+  for(let n=0;n<cnt&&n<200000;n++){
+    const E=sc.E(n);
+    if(n>=2&&E/t>60)break;
+    const ww=sc.g(n)*Math.exp(-E/t);
+    q+=ww;s1+=ww*E;s2+=ww*E*E;w.push(ww);
+  }
+  const U=s1/q;
+  return {q,U,Cv:Math.max(0,(s2/q-U*U)/(t*t)),S:Math.log(q)+U/t,p:w.map(x=>x/q)};
+}
+
+/* ---------- cache of curves vs t ---------- */
+let cache=null;
+function ensureCache(){
+  const key=JSON.stringify([S.scheme,S.N,S.finite,S.gEx,S.custom,S.tmax]);
+  if(cache&&cache.key===key)return;
+  const M=260,ts=[],Cv=[],U=[],P=[];
+  const nc=Math.min(7,dispCount());
+  for(let n=0;n<nc;n++)P.push([]);
+  for(let i=0;i<=M;i++){
+    const t=Math.max(0.004,S.tmax*i/M);
+    const r=thermo(t);ts.push(t);Cv.push(r.Cv);U.push(r.U);
+    for(let n=0;n<nc;n++)P[n].push(r.p[n]||0);
+  }
+  cache={key,ts,Cv,U,P};
+}
+
+/* ---------- svg helpers ---------- */
+const frames={};
+function mkFrame(W,H,m,xr,yr){const iw=W-m.l-m.r,ih=H-m.t-m.b;
+  return {W,H,m,xr,yr,iw,ih,X:v=>m.l+(v-xr[0])/(xr[1]-xr[0])*iw,Y:v=>m.t+ih-(v-yr[0])/(yr[1]-yr[0])*ih};}
+function niceStep(r,n){const raw=r/n,p=Math.pow(10,Math.floor(Math.log10(raw))),m=raw/p;return(m<1.5?1:m<3?2:m<7?5:10)*p;}
+function ticks(a,b,n){const s=niceStep(b-a,n),o=[];for(let v=Math.ceil(a/s-1e-9)*s;v<=b+1e-9;v+=s)o.push(+v.toPrecision(10));return o;}
+const fmtN=v=>String(+v.toPrecision(6));
+function axesSVG(f,o){
+  const fs=o.fontSize?` style="font-size:${o.fontSize}px"`:'';
+  let s=`<rect x="${f.m.l}" y="${f.m.t}" width="${f.iw}" height="${f.ih}" fill="none" stroke="#333"/>`;
+  const L=5,bot=f.m.t+f.ih;
+  for(const v of (o.xt||[])){const x=f.X(v);
+    s+=`<line x1="${x}" x2="${x}" y1="${bot}" y2="${bot-L}" stroke="#333"/><line x1="${x}" x2="${x}" y1="${f.m.t}" y2="${f.m.t+L}" stroke="#333"/>`;
+    if(!o.noXL)s+=`<text x="${x}" y="${bot+20}" text-anchor="middle" class="tk"${fs}>${fmtN(v)}</text>`;}
+  for(const v of (o.yt||[])){const y=f.Y(v);
+    s+=`<line x1="${f.m.l}" x2="${f.m.l+L}" y1="${y}" y2="${y}" stroke="#333"/><line x1="${f.m.l+f.iw}" x2="${f.m.l+f.iw-L}" y1="${y}" y2="${y}" stroke="#333"/>`;
+    s+=`<text x="${f.m.l-8}" y="${y+5}" text-anchor="end" class="tk"${fs}>${(o.yf||fmtN)(v)}</text>`;}
+  if(o.xlab)s+=`<text x="${f.m.l+f.iw/2}" y="${f.H-4}" text-anchor="middle" class="al"${fs}>${o.xlab}</text>`;
+  if(o.ylab)s+=`<text transform="translate(${o.ylabX!=null?o.ylabX:17} ${f.m.t+f.ih/2}) rotate(-90)" text-anchor="middle" class="al"${fs}>${o.ylab}</text>`;
+  return s;
+}
+const svgWrap=(f,inner)=>`<svg viewBox="0 0 ${f.W} ${f.H}" xmlns="http://www.w3.org/2000/svg">${inner}</svg>`;
+const path=(f,xs,ys)=>xs.map((x,i)=>(i?'L':'M')+f.X(x).toFixed(1)+' '+f.Y(ys[i]).toFixed(1)).join('');
+
+/* ---------- panels ---------- */
+function ladder(th){
+  const nd=dispCount(),sc=SCH[S.scheme];let Emax=0;const Es=[];
+  for(let n=0;n<nd;n++){Es.push(sc.E(n));Emax=Math.max(Emax,Es[n]);}
+  const ymax=Emax*1.12||1;
+  const f=mkFrame(300,420,{l:50,r:8,t:20,b:14},[0,1],[0,ymax]);
+  let s='';
+  const yk=Math.min(S.t,ymax);
+  s+=`<rect x="${f.m.l}" y="${f.Y(yk)}" width="${f.iw}" height="${f.Y(0)-f.Y(yk)}" fill="#f6c453" opacity=".25"/>`;
+  s+=axesSVG(f,{yt:ticks(0,ymax,6),ylab:'E<sub>n</sub>/ε'.replace(/<[^>]+>/g,''),noXL:true,fontSize:17});
+  for(let n=0;n<nd;n++){
+    const E=Es[n],y=f.Y(E),a=Math.exp(-E/S.t),op=0.18+0.82*a,c=COL[Math.min(n,6)];
+    s+=`<line x1="${f.m.l+14}" x2="${f.m.l+98}" y1="${y}" y2="${y}" stroke="${c}" stroke-width="4" stroke-linecap="round" opacity="${op.toFixed(3)}"/>`;
+    s+=`<text x="${f.m.l+106}" y="${y+3.5}" class="sm" style="font-size:17px">g=${sc.g(n)} · ${a<0.001?sciFmt(a):a.toFixed(a<0.1?3:2)}</text>`;
+  }
+  s+=`<line x1="${f.m.l}" x2="${f.m.l+f.iw}" y1="${f.Y(yk)}" y2="${f.Y(yk)}" stroke="#b7791f" stroke-width="2" stroke-dasharray="6 3"/>`;
+  s+=`<line x1="${f.m.l}" x2="${f.m.l+16}" y1="11" y2="11" stroke="#b7791f" stroke-width="3" stroke-dasharray="6 3"/>`;
+  s+=`<text x="${f.m.l+22}" y="16" style="font-size:17px;font-weight:normal;fill:#000;font-family:Helvetica,Arial">kT = ${S.t<10?S.t.toFixed(2):S.t.toFixed(1)}ε${S.t>ymax?' (above top of scale)':''}</text>`;
+  $('cLad').innerHTML=svgWrap(f,s);
+}
+
+function barChart(th){
+  const nd=dispCount(),sc=SCH[S.scheme];
+  const vals=[];for(let n=0;n<nd;n++){const p=th.p[n]||0;vals.push(S.perState?p/sc.g(n):p);}
+  let ymax=1;
+  if(!S.fixY){const mx=Math.max(...vals,1e-9);ymax=Math.min(1,mx*1.18);const st=niceStep(ymax,5);ymax=Math.ceil(ymax/st-1e-9)*st;}
+  const f=mkFrame(580,400,{l:66,r:12,t:20,b:90},[0,nd],[0,ymax]);
+  let s=axesSVG(f,{yt:ticks(0,ymax,5),ylab:S.perState?'population per state, pₙ/gₙ':'level population, pₙ = gₙe<tspan baseline-shift="35%" font-size="70%">(−Eₙ/kT)</tspan>/q',xlab:'energy level n   (E/ε, degeneracy g)',xt:[],noXL:true,fontSize:14,ylabX:30});
+  const bw=f.iw/nd;
+  for(let n=0;n<nd;n++){
+    const x0=f.m.l+n*bw+bw*0.15,w=bw*0.7,y=f.Y(vals[n]);
+    s+=`<rect x="${x0}" y="${y}" width="${w}" height="${f.Y(0)-y}" fill="${COL[Math.min(n,6)]}" opacity=".88"/>`;
+    if(vals[n]>=0.0005)s+=`<text x="${x0+w/2}" y="${y-4}" text-anchor="middle" class="tk" style="font-size:14px">${vals[n]<0.01?vals[n].toFixed(4):vals[n].toFixed(3)}</text>`;
+    const cx=x0+w/2,by=f.Y(0);
+    s+=`<text x="${cx}" y="${by+20}" text-anchor="middle" class="tk" style="font-size:14px;font-weight:normal">${n}</text>`;
+    s+=`<text x="${cx}" y="${by+38}" text-anchor="middle" class="sm" style="font-size:14px">E=${sc.E(n)}</text>`;
+    s+=`<text x="${cx}" y="${by+56}" text-anchor="middle" class="sm" style="font-size:14px">g=${sc.g(n)}</text>`;
+  }
+  if(isInf()){const sh=th.p.slice(0,nd).reduce((a,b)=>a+b,0);if(sh<0.9995)s+=`<text x="${f.m.l+f.iw-6}" y="${f.m.t+16}" text-anchor="end" class="sm" style="font-size:14px">${((1-sh)*100).toFixed(1)}% of molecules are in levels above n = ${nd-1} (not drawn)</text>`;}
+  $('cMain').innerHTML=svgWrap(f,s);frames.cMain=null;
+}
+
+function bandLabel(f,x0,x1,txt,curveYAt,frac){
+  const w=f.X(x1)-f.X(x0);if(w<8)return '';
+  const cx=(f.X(x0)+f.X(x1))/2;
+  const fs=10.5;
+  if(w<80){
+    /* rotated vertical label: horizontal position defaults to the band's
+       center, but can be biased toward its start (frac<0.5) when that's
+       where the curve leaves the most vertical room. Then find where along
+       this vertical strip the curve actually is, and place the label above
+       it, below it, or wherever leaves the most room, so it doesn't run
+       through the curve. */
+    const cxN=f.X(x0)+w*(frac!=null?frac:0.5);
+    const estLen=txt.length*fs*0.68,gap=4,half=6;
+    let yMin=Infinity,yMax=-Infinity;
+    for(let vx=cxN-half;vx<=cxN+half;vx+=1.5){
+      const cy=curveYAt?curveYAt(vx):null;
+      if(cy!=null){yMin=Math.min(yMin,cy);yMax=Math.max(yMax,cy);}
+    }
+    const top=f.m.t+6,bot=f.m.t+f.ih-6;
+    let center;
+    if(yMin===Infinity){
+      center=(top+bot)/2;
+    }else if(yMin-gap-estLen>=top){
+      center=yMin-gap-estLen/2;
+    }else if(yMax+gap+estLen<=bot){
+      center=yMax+gap+estLen/2;
+    }else{
+      const roomAbove=yMin-top,roomBelow=bot-yMax;
+      center=roomAbove>=roomBelow?Math.max(top+estLen/2,yMin-gap-estLen/2):Math.min(bot-estLen/2,yMax+gap+estLen/2);
+    }
+    return `<text transform="translate(${cxN+3} ${center}) rotate(-90)" text-anchor="middle" style="font-size:${fs}px;fill:#000;font-family:Helvetica,Arial;font-weight:normal">${txt}</text>`;
+  }
+  return `<text x="${cx}" y="${f.m.t+16}" text-anchor="middle" style="font-size:${fs}px;fill:#000;font-family:Helvetica,Arial;font-weight:normal">${txt}</text>`;
+}
+function regimeBands(f,ymax){
+  const tm=S.tmax,inf=isInf();let s='';
+  const M=cache.ts.length-1;
+  const curveYAt=(vx)=>{
+    const dataX=(vx-f.m.l)/f.iw*tm;
+    if(dataX<0||dataX>tm)return null;
+    const idx=Math.max(0,Math.min(M,Math.round(dataX/tm*M)));
+    return f.Y(cache.Cv[idx]);
+  };
+  const a=Math.min(0.5,tm);
+  s+=`<rect x="${f.X(0)}" y="${f.m.t}" width="${f.X(a)-f.X(0)}" height="${f.ih}" fill="#3a6ea5" opacity=".13"/>`;
+  s+=bandLabel(f,0,a,'frozen out',curveYAt,0.19);
+  const hi=inf?2:Math.max(2,2*Math.max(...Array.from({length:dispCount()},(_,n)=>SCH[S.scheme].E(n))));
+  const b=Math.min(hi,tm);
+  if(b>a){s+=`<rect x="${f.X(a)}" y="${f.m.t}" width="${f.X(b)-f.X(a)}" height="${f.ih}" fill="#d4900a" opacity=".13"/>`;s+=bandLabel(f,a,b,'thawing',curveYAt);}
+  if(tm>b){s+=`<rect x="${f.X(b)}" y="${f.m.t}" width="${f.X(tm)-f.X(b)}" height="${f.ih}" fill="${inf?'#2a9d8f':'#8e44ad'}" opacity=".12"/>`;s+=bandLabel(f,b,tm,inf?'equipartition':'saturated',curveYAt);}
+  return s;
+}
+function roomMarker(f,curveY,fontSize,aboveOff,belowOff,preferBelow,tyOverride){
+  const tr=298/S.theta;if(tr>S.tmax)return '';
+  aboveOff=aboveOff!=null?aboveOff:46;belowOff=belowOff!=null?belowOff:30;
+  let ty=f.m.t+f.ih-6;
+  if(tyOverride!=null){
+    ty=tyOverride;
+  }else if(curveY!=null){
+    if(preferBelow){
+      ty=curveY+belowOff;
+      if(ty>f.m.t+f.ih-4)ty=curveY-aboveOff;
+    }else{
+      ty=curveY-aboveOff;
+      if(ty<f.m.t+10)ty=curveY+belowOff;
+    }
+  }
+  const fs=` style="font-weight:normal${fontSize?`;font-size:${fontSize}px`:''}"`;
+  return `<line x1="${f.X(tr)}" x2="${f.X(tr)}" y1="${f.m.t}" y2="${f.m.t+f.ih}" stroke="#555" stroke-dasharray="2 3"/><text x="${f.X(tr)+3}" y="${ty}" class="sm"${fs}>298 K</text>`;
+}
+
+function ptChart(th){
+  const nc=cache.P.length;
+  const f=mkFrame(580,380,{l:60,r:16,t:36,b:52},[0,S.tmax],[0,1]);
+  let s=axesSVG(f,{xt:ticks(0,S.tmax,8),yt:ticks(0,1,5),xlab:'kT/ε',ylab:'level population, pₙ'});
+  for(let n=0;n<nc;n++){
+    s+=`<path d="${path(f,cache.ts,cache.P[n])}" fill="none" stroke="${COL[n]}" stroke-width="2.2"/>`;
+  }
+  {
+    const tr298=298/S.theta,fsz=15.3;
+    let tyOverride=null;
+    if(tr298<=S.tmax){
+      const M=cache.ts.length-1;
+      const idx=Math.max(0,Math.min(M,Math.round(tr298/S.tmax*M)));
+      const textUnits=60,idxSpan=Math.max(1,Math.round(textUnits/(f.iw/M)));
+      const j0=idx,j1=Math.min(M,idx+idxSpan);
+      /* find the widest empty vertical band (in population space, across the
+         label's horizontal footprint) that clears every curve, so the label
+         can sit in whatever gap actually exists rather than always "above". */
+      const bands=[];
+      for(let n=0;n<nc;n++){
+        let lo=cache.P[n][j0],hi=cache.P[n][j0];
+        for(let j=j0;j<=j1;j++){lo=Math.min(lo,cache.P[n][j]);hi=Math.max(hi,cache.P[n][j]);}
+        bands.push([lo,hi]);
+      }
+      const buf=0.02;
+      bands.sort((a,b)=>a[0]-b[0]);
+      const merged=[];
+      for(const [lo,hi] of bands){
+        const l=Math.max(0,lo-buf),h=Math.min(1,hi+buf);
+        if(merged.length&&l<=merged[merged.length-1][1])merged[merged.length-1][1]=Math.max(merged[merged.length-1][1],h);
+        else merged.push([l,h]);
+      }
+      let best=null,prevHi=0;
+      for(const [l,h] of merged){
+        if(l>prevHi){const size=l-prevHi;if(!best||size>best.size)best={lo:prevHi,hi:l,size};}
+        prevHi=Math.max(prevHi,h);
+      }
+      if(1>prevHi){const size=1-prevHi;if(!best||size>best.size)best={lo:prevHi,hi:1,size};}
+      tyOverride=best?f.Y((best.lo+best.hi)/2)+fsz*0.32:f.m.t+f.ih-6;
+      const marginTop=f.m.t+fsz*0.85,marginBot=f.m.t+f.ih-fsz*0.4;
+      tyOverride=Math.max(marginTop,Math.min(marginBot,tyOverride));
+    }
+    s+=roomMarker(f,null,15.3,0,0,false,tyOverride);
+  }
+  s+=`<line x1="${f.X(S.t)}" x2="${f.X(S.t)}" y1="${f.m.t}" y2="${f.m.t+f.ih}" stroke="#b23a48" stroke-width="1.5"/>`;
+  for(let n=0;n<nc;n++)s+=`<circle cx="${f.X(S.t)}" cy="${f.Y(th.p[n]||0)}" r="4.5" fill="${COL[n]}" stroke="#fff"/>`;
+  let lx=f.m.l+8;
+  for(let n=0;n<nc;n++){s+=`<rect x="${lx}" y="${f.m.t-24}" width="12" height="4" fill="${COL[n]}"/><text x="${lx+16}" y="${f.m.t-18}" class="sm">n=${n}</text>`;lx+=64;}
+  $('cMain').innerHTML=svgWrap(f,s);frames.cMain=f;
+}
+
+function cvChart(th){
+  const inf=isInf(),fc=fClass();
+  let dataMax=Math.max(...cache.Cv,th.Cv);if(inf&&fc)dataMax=Math.max(dataMax,fc);
+  const broken=dataMax>10;
+  let ymax;
+  if(broken){ymax=100;}
+  else{ymax=Math.max(1,dataMax)*1.15;const st=niceStep(ymax,5);ymax=Math.ceil(ymax/st-1e-9)*st;}
+  const f=mkFrame(320,182,{l:58,r:10,t:22,b:40},[0,S.tmax],[0,ymax]);
+  let yticks;
+  if(broken){
+    const split=0.5;
+    f.Y=v=>{const vv=Math.max(0,Math.min(100,v)),frac=vv<=10?(vv/10)*split:split+((vv-10)/90)*(1-split);return f.m.t+f.ih*(1-frac);};
+    yticks=[0,10,100];
+  }else{
+    yticks=ticks(0,ymax,5);
+  }
+  let s='';
+  if(S.view==='frz')s+=regimeBands(f,ymax);
+  const cvYFmt=v=>{const t=fmtN(v);return t==='1'?'1.0':t;};
+  s+=axesSVG(f,{xt:ticks(0,S.tmax,8),yt:yticks,xlab:'kT/ε',ylab:CVLAB,ylabX:26,fontSize:10.5,yf:broken?fmtN:cvYFmt});
+  if(S.view==='frz'&&inf&&fc){
+    s+=`<line x1="${f.m.l}" x2="${f.m.l+f.iw}" y1="${f.Y(fc)}" y2="${f.Y(fc)}" stroke="#1b6f65" stroke-width="1.6" stroke-dasharray="7 4"/>`;
+    const hiG=2,bG=Math.min(hiG,S.tmax);
+    const gx=(f.X(bG)+f.X(S.tmax))/2,gy=f.m.t+f.ih/2;
+    s+=`<text x="${gx}" y="${gy}" text-anchor="middle" style="font-size:10.5px;fill:#000;font-family:Helvetica,Arial">${CVSYM}/k = ${fc}</text>`;
+  }
+  {
+    const tr298=298/S.theta;
+    let tyOverride=null;
+    if(tr298<=S.tmax){
+      const M=cache.ts.length-1;
+      const idx=Math.max(0,Math.min(M,Math.round(tr298/S.tmax*M)));
+      const textUnits=52,idxSpan=Math.max(1,Math.round(textUnits/(f.iw/M)));
+      const j0=idx,j1=Math.min(M,idx+idxSpan);
+      let minCv=cache.Cv[idx],maxCv=cache.Cv[idx];
+      for(let j=j0;j<=j1;j++){minCv=Math.min(minCv,cache.Cv[j]);maxCv=Math.max(maxCv,cache.Cv[j]);}
+      const yTop=f.Y(maxCv),yBot=f.Y(minCv);
+      const belowGap=14,aboveGap=14;
+      const tyBelow=yBot+belowGap;
+      const tyAbove=yTop-aboveGap;
+      if(tyBelow<=f.m.t+f.ih-4)tyOverride=tyBelow;
+      else if(tyAbove>=f.m.t+10)tyOverride=tyAbove;
+      else tyOverride=f.m.t+f.ih-6;
+    }
+    s+=roomMarker(f,null,9.8,0,0,false,tyOverride);
+  }
+  s+=`<path d="${path(f,cache.ts,cache.Cv)}" fill="none" stroke="#b23a48" stroke-width="1.68"/>`;
+  s+=`<line x1="${f.X(S.t)}" x2="${f.X(S.t)}" y1="${f.m.t}" y2="${f.m.t+f.ih}" stroke="#b23a48" stroke-width="1" opacity=".5"/><circle cx="${f.X(S.t)}" cy="${f.Y(th.Cv)}" r="3.85" fill="#b23a48" stroke="#fff" stroke-width="1.5"/>`;
+  $('cCv').innerHTML=svgWrap(f,s);frames.cCv=f;
+}
+
+function uChart(th){
+  const inf=isInf(),fc=fClass();
+  let ymax=Math.max(...cache.U)*1.08;if(!(ymax>0))ymax=1;
+  const st=niceStep(ymax,5);ymax=Math.ceil(ymax/st-1e-9)*st;
+  const f=mkFrame(560,360,{l:64,r:16,t:20,b:52},[0,S.tmax],[0,ymax]);
+  let s=axesSVG(f,{xt:ticks(0,S.tmax,8),yt:ticks(0,ymax,5),xlab:'kT/ε',ylab:'average energy, ⟨E⟩/ε'});
+  if(S.view==='frz'&&inf&&fc){
+    s+=`<line x1="${f.X(0)}" y1="${f.Y(0)}" x2="${f.X(S.tmax)}" y2="${f.Y(Math.min(fc*S.tmax,ymax*10))}" stroke="#1b6f65" stroke-width="1.6" stroke-dasharray="7 4" clip-path="url(#uclip)"/>`;
+    s=`<defs><clipPath id="uclip"><rect x="${f.m.l}" y="${f.m.t}" width="${f.iw}" height="${f.ih}"/></clipPath></defs>`+s;
+    s+=`<text x="${f.m.l+8}" y="${f.m.t+18}" style="font-size:17px;fill:#000;font-family:Helvetica,Arial;font-weight:bold">dashed: classical ⟨E⟩ = ${fc}·kT</text>`;
+  }
+  {
+    const trU=298/S.theta;
+    let curveY=null;
+    if(trU<=S.tmax){
+      const idx=Math.max(0,Math.min(cache.U.length-1,Math.round(trU/S.tmax*(cache.U.length-1))));
+      curveY=f.Y(cache.U[idx]);
+    }
+    s+=roomMarker(f,curveY);
+  }
+  s+=`<path d="${path(f,cache.ts,cache.U)}" fill="none" stroke="#1f4e79" stroke-width="2.4"/>`;
+  s+=`<line x1="${f.X(S.t)}" x2="${f.X(S.t)}" y1="${f.m.t}" y2="${f.m.t+f.ih}" stroke="#1f4e79" stroke-width="1" opacity=".5"/><circle cx="${f.X(S.t)}" cy="${f.Y(th.U)}" r="5.5" fill="#1f4e79" stroke="#fff" stroke-width="1.5"/>`;
+  $('cU').innerHTML=svgWrap(f,s);frames.cU=f;
+}
+
+/* ---------- readouts ---------- */
+const f3=(v,d=3)=>v.toFixed(d);
+function sig3(v){
+  if(!(v>0))return '0';
+  if(v<1e-6)return v.toExponential(2);
+  const exp=Math.floor(Math.log10(v));
+  const decimals=Math.max(0,2-exp);
+  const factor=Math.pow(10,exp-2);
+  const r=Math.round(v/factor)*factor;
+  return r.toFixed(decimals);
+}
+const SUP={'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹','-':'⁻'};
+function sciFmt(v,d){
+  const s=v.toExponential(d||0);
+  const parts=s.split('e');
+  const expStr=parts[1].split('').map(c=>SUP[c]||c).join('');
+  return parts[0]+'×10'+expStr;
+}
+function fmtT(v){
+  if(!(v>0))return '0';
+  return sig3(v);
+}
+function readouts(th){
+  const T=S.t*S.theta;
+  $('TK').textContent=fmtT(T)+' K';
+  $('tstar').textContent=sig3(S.t);
+  const acc=th.p.filter(p=>p>0.01).length;
+  const Emol=8.314*S.theta*th.U/1000;
+  const tiles=[
+    ['partition function q',sig3(th.q)],
+    ['⟨E⟩/ε',sig3(th.U)],
+    ['⟨E⟩ (kJ/mol)',sig3(Emol)],
+    ['C<sub>v</sub>/k  (= C<sub>v</sub>/R)',f3(th.Cv)],
+    ['S/k',sig3(th.S)],
+    ['ground-level pop. p₀',f3(th.p[0])],
+    ['levels with p > 1%',acc>=1000?'≥1000':String(acc)]
+  ];
+  $('tiles').innerHTML=tiles.map(t=>`<div class="vrow"><span class="k">${t[0]}</span><span class="v">${t[1]}</span></div>`).join('');
+  const b=$('banner'),inf=isInf(),fc=fClass(),t=S.t;
+  let cls,msg;
+  const Emax=Math.max(...Array.from({length:dispCount()},(_,n)=>SCH[S.scheme].E(n)));
+  if(t<0.5){cls='frozen';msg=`<b>Frozen out</b> (kT &lt; ε/2): ${(th.p[0]*100).toFixed(1)}% of molecules are in the ground level, so the excited levels are inaccessible and C<sub>v</sub> ≈ ${th.Cv.toFixed(3)} k — this degree of freedom barely stores energy.`;}
+  else if(inf&&t<2||(!inf&&t<Math.max(2,2*Emax))){cls='thaw';msg=`<b>Thawing</b>: kT is comparable to the level spacing, so higher levels are becoming accessible (${th.p.filter(p=>p>0.01).length} levels hold more than 1%). C<sub>v</sub> = ${th.Cv.toFixed(3)} k is rising${inf?'.':' toward its Schottky maximum and will then fall.'}`;}
+  else if(inf){cls='equi';msg=`<b>Equipartition</b> (kT ≫ ε): many levels are populated and C<sub>v</sub>/k = ${th.Cv.toFixed(3)} is close to the classical value ${fc}. The quantum staircase looks like a continuum.`;}
+  else{cls='sat';msg=`<b>Saturated</b> (finite ladder): every state is nearly equally likely, ⟨E⟩ has hit its ceiling, and C<sub>v</sub> = ${th.Cv.toFixed(3)} k → 0. Equipartition never applies to a bounded spectrum.`;}
+  b.className='banner '+cls;b.innerHTML=msg;
+}
+
+function render(){
+  ensureCache();
+  const th=thermo(S.t);
+  readouts(th);ladder(th);
+  if(S.view==='pop'){
+    $('mainCap').innerHTML=(S.perState?'Fraction of molecules in one <i>state</i> of each level.':'Fraction of molecules in each level (degeneracy included).')+' First '+dispCount()+' levels shown.';
+    barChart(th);
+  }else{
+    $('mainCap').innerHTML='Click or drag on the plot to change <i>T</i>. First '+cache.P.length+' levels shown.';
+    ptChart(th);
+  }
+  cvChart(th);
+}
+
+/* ---------- controls ---------- */
+function thetaFromSlider(v){const x=Math.pow(10,v/1000*Math.log10(5000));return x<10?Math.round(x*100)/100:x<100?Math.round(x*10)/10:Math.round(x);}
+function thetaToSlider(th){return Math.round(1000*Math.log10(Math.max(1,th))/Math.log10(5000));}
+function syncTSlider(){$('tslide').value=Math.round(1000*Math.sqrt(Math.max(0,S.t)/S.tmax));}
+function syncUI(){
+  $('scheme').value=S.scheme;$('theta').value=thetaToSlider(S.theta);$('thetaV').textContent=S.theta;
+  $('nlev').value=S.N;$('nV').textContent=S.N;$('fin').checked=S.finite;$('gex').value=S.gEx;$('gexV').textContent=S.gEx;
+  const two=S.scheme==='two',cus=S.scheme==='cus';
+  $('nWrap').classList.toggle('hidden',two||cus);$('nlev').classList.toggle('hidden',two||cus);$('finWrap').classList.toggle('hidden',two||cus);
+  $('gexWrap').classList.toggle('hidden',!two);$('cusWrap').classList.toggle('hidden',!cus);
+  $('psWrap').classList.toggle('hidden',S.view!=='pop');$('fyWrap').classList.toggle('hidden',S.view!=='pop');
+  document.querySelectorAll('#viewSeg button').forEach(b=>b.classList.toggle('on',b.dataset.v===S.view));
+  syncTSlider();
+}
+$('scheme').onchange=e=>{S.scheme=e.target.value;if(S.scheme==='rot')S.N=Math.min(S.N,6);syncUI();render();};
+$('theta').oninput=e=>{S.theta=thetaFromSlider(+e.target.value);$('thetaV').textContent=S.theta;render();};
+$('nlev').oninput=e=>{S.N=+e.target.value;$('nV').textContent=S.N;render();};
+$('fin').onchange=e=>{S.finite=e.target.checked;render();};
+$('gex').oninput=e=>{S.gEx=+e.target.value;$('gexV').textContent=S.gEx;render();};
+$('ps').onchange=e=>{S.perState=e.target.checked;render();};
+$('fy').onchange=e=>{S.fixY=e.target.checked;render();};
+$('tmax').onchange=e=>{S.tmax=+e.target.value;S.t=Math.min(S.t,S.tmax);syncTSlider();render();};
+$('tslide').oninput=e=>{const s=+e.target.value/1000;S.t=Math.max(0.005,S.tmax*s*s);render();};
+document.querySelectorAll('#viewSeg button').forEach(b=>b.onclick=()=>{S.view=b.dataset.v;syncUI();render();});
+$('cinputs').innerHTML=S.custom.map((g,i)=>`<input type="number" min="1" max="10" step="1" value="${g}" data-i="${i}" title="g of level ${i}">`).join('');
+$('cinputs').oninput=e=>{const i=+e.target.dataset.i;const v=Math.max(1,Math.min(10,Math.round(+e.target.value||1)));S.custom[i]=v;render();};
+const PRE={i2:['ho1',308],co:['ho1',3084],n2v:['ho1',3374],h2r:['rot',85.3],n2r:['rot',2.88]};
+$('preset').onchange=e=>{const p=PRE[e.target.value];if(!p)return;S.scheme=p[0];S.theta=p[1];S.finite=false;if(S.scheme==='rot')S.N=6;
+  S.tmax=(298/S.theta>S.tmax)?(298/S.theta>30?100:298/S.theta>12?30:12):S.tmax;
+  if(S.tmax<6&&298/S.theta<S.tmax)S.tmax=S.tmax;$('tmax').value=S.tmax;
+  syncUI();render();};
+
+function attachDrag(id){
+  const el=$(id);let d=false;
+  const set=e=>{const f=frames[id];if(!f)return;const r=el.getBoundingClientRect();
+    const xv=(e.clientX-r.left)/r.width*f.W;
+    let t=f.xr[0]+(xv-f.m.l)/f.iw*(f.xr[1]-f.xr[0]);
+    S.t=Math.min(S.tmax,Math.max(0.005,t));syncTSlider();render();};
+  el.addEventListener('pointerdown',e=>{d=true;el.setPointerCapture(e.pointerId);set(e);});
+  el.addEventListener('pointermove',e=>{if(d)set(e);});
+  el.addEventListener('pointerup',()=>{d=false;});el.addEventListener('pointercancel',()=>{d=false;});
+}
+['cCv','cMain'].forEach(attachDrag);
+
+/* panels */
+document.querySelectorAll('.rbtn').forEach(b=>b.onclick=()=>{
+  const id=b.dataset.p,open=$(id).style.display==='block';
+  document.querySelectorAll('.panel').forEach(p=>p.style.display='none');
+  if(!open)$(id).style.display='block';});
+document.querySelectorAll('.panel .x').forEach(x=>x.onclick=()=>x.parentElement.style.display='none');
+
+syncUI();render();
+</script>
+</body>
+</html>

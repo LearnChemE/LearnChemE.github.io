@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Batch Polymerization Runaway</title>
+<style>
+/* LearnChemE layout: title + flyout buttons, control panel, two hi-DPI plots side by side (stack on phones) */
+:root {
+  --bg: #ffffff; --fg: #000000; --muted: #5a5559; --line: #d9d4d6; --panel: #f7f5f5;
+  --brand: #98000D; --brand-hover: #b3101f;
+  --cT: #c4161c; --cX: #1f5fa8; --cQr: #1f5fa8; --cCrit: #2e7d32; --cPsi: #6a3d9a; --cMAT: #e08a00;
+  --font: Helvetica, "Helvetica Neue", Arial, sans-serif;
+  color-scheme: light;
+}
+[hidden] { display: none !important; }
+html, body { background: var(--bg); color: var(--fg); }
+body { font-family: var(--font); font-size: 15px; }
+.wrap { max-width: 1200px; margin: 0 auto; padding-inline: 16px; padding-block: 14px 28px; }
+header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; position: relative; }
+h1 { font-size: 1.45rem; margin: 0; font-weight: bold; text-wrap: balance; }
+.btnrow { display: flex; gap: 9px; margin-left: auto; }
+button.lc { background: var(--brand); color: #fff; border: none; border-radius: 4px; padding: 7.7px 15.4px; font: inherit; font-size: 16.5px; cursor: pointer; }
+button.lc:hover { background: var(--brand-hover); }
+button.lc:focus-visible, input:focus-visible { outline: 2px solid var(--cX); outline-offset: 2px; }
+button.lc.on { box-shadow: inset 0 0 0 2px #fff; }
+
+.flyout { position: absolute; z-index: 30; right: 12px; top: 56px; width: min(720px, calc(100% - 24px));
+  background: var(--bg); border: 1px solid var(--line); border-radius: 6px; box-shadow: 0 8px 28px rgba(60,0,8,.18);
+  display: flex; flex-direction: column; max-height: min(78vh, 760px); }
+.flyout .fhead { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px 6px 18px; border-bottom: 1px solid var(--line); }
+.flyout .fhead b { font-size: 1.05rem; }
+.flyout .x { background: none; border: none; font-size: 1.6rem; line-height: 1; cursor: pointer; color: var(--muted); padding: 0 4px; }
+.flyout .x:hover { color: var(--brand); }
+.flyout .fbody { overflow-y: auto; padding: 10px 18px 16px; line-height: 1.5; }
+.flyout .fbody p { margin: 0.5em 0; max-width: 68ch; }
+.flyout .fbody h3 { font-size: 1rem; margin: 1.1em 0 0.3em; color: var(--brand); }
+.flyout mjx-container[display="true"] { text-align: left !important; margin: 0.45em 0 0.45em 1.2em !important; }
+.flyout table { border-collapse: collapse; font-size: 0.92rem; }
+.flyout td, .flyout th { padding: 3px 10px 3px 0; text-align: left; border-bottom: 1px solid var(--line); }
+.flyout a { color: var(--brand); }
+
+.controls { position: relative; margin-top: 12px; display: grid; align-items: center;
+  grid-template-columns: max-content 220px 6.3em max-content 220px 6.3em 1fr; gap: 12px 12px;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 12px 16px; font-size: 17px; color: #000; }
+.srow { display: contents; }
+.srow label, .srow output { font-size: 17px; color: #000; white-space: nowrap; }
+.srow output { font-variant-numeric: tabular-nums; text-align: left; }
+.srow.dis label, .srow.dis output, .srow.dis input { opacity: 0.45; }
+.c1 { grid-column: 1; } .c2 { grid-column: 2; } .c3 { grid-column: 3; } .c5 { grid-column: 4; margin-left: 10px; } .c6 { grid-column: 5; } .c7 { grid-column: 6; }
+.checks { grid-column: 4 / 8; margin-left: 10px; display: flex; flex-wrap: wrap; gap: 8px 26px; align-items: center; }
+.checks label { display: inline-flex; align-items: center; gap: 7px; font-size: 17px; color: #000; cursor: pointer; }
+input[type=checkbox], input[type=radio] { accent-color: var(--brand); width: 17px; height: 17px; }
+input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+input[type="range"]{margin:0;min-width:0;height:26px;background:transparent;touch-action:none;cursor:pointer}
+input[type="range"]::-webkit-slider-runnable-track{height:5px;border-radius:3px;background:var(--grey)}
+input[type="range"]::-webkit-slider-thumb{box-sizing:border-box;margin-top:-5px}
+input[type="range"]::-moz-range-track{height:5px;border-radius:3px;background:var(--grey)}
+input[type="range"]::-moz-range-thumb{box-sizing:border-box}
+input[type="range"]:disabled::-webkit-slider-thumb{cursor:default}
+
+.plots { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 18px; }
+.pcol { flex: 1 1 440px; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.pcol canvas { -webkit-user-drag: none; user-select: none; -webkit-user-select: none; width: 100%; display: block; border: 1px solid var(--line); border-radius: 4px; background: var(--bg); touch-action: none; }
+.tabs { display: flex; flex-wrap: wrap; gap: 4px 18px; align-items: center; min-height: 30px; }
+.tabs label { display: inline-flex; gap: 6px; align-items: center; cursor: pointer; font-size: 17px; color: #000; }
+.sub { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 17px; color: #000; align-items: center; }
+.sub label { display: inline-flex; gap: 6px; align-items: center; cursor: pointer; }
+.readout { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 17px; color: #000; font-variant-numeric: tabular-nums; align-items: center; }
+/* reserve the readout height so changing numbers never change the page height
+   (a height change shifts the whole page under the pointer while dragging) */
+#readR { min-height: 100px; align-content: flex-start; }
+#readL { min-height: 1.6em; }
+.readout sup { line-height: 0; font-size: 0.75em; }
+.readout > span { white-space: nowrap; }
+.timerow output { min-width: 4.5em; }
+/* time slider drawn and driven with pointer events (same look as the range sliders) */
+.tslider { -webkit-user-drag: none; position: relative; height: 26px; cursor: pointer; touch-action: none; user-select: none; -webkit-user-select: none; outline: none; }
+.tslider .ttrack { position: absolute; left: 0; right: 0; top: 50%; height: 5px; margin-top: -2.5px; border-radius: 3px; background: #999; opacity: .95; }
+.tslider .tthumb { position: absolute; top: 50%; width: 15px; height: 15px; margin: -7.5px 0 0 -7.5px; box-sizing: border-box; border: 2px solid #fff; border-radius: 50%; background: #98000D; box-shadow: 0 1px 2px rgba(0,0,0,.35); pointer-events: none; }
+.tslider:focus-visible .tthumb { outline: 2px solid var(--cX); outline-offset: 2px; }
+.readout span b { font-weight: bold; }
+.pill { display: inline-block; padding: 2px 10px; border-radius: 999px; font-weight: bold; font-size: 0.85rem; letter-spacing: 0.04em; color: #fff; }
+.pill.safe { background: #2e7d32; } .pill.run { background: #c4161c; }
+.timerow { display: grid; grid-template-columns: max-content 220px max-content; gap: 12px; align-items: center; font-size: 17px; color: #000; }
+.timerow output { text-align: left; font-variant-numeric: tabular-nums; }
+@media (max-width: 1000px) {
+  .controls { grid-template-columns: max-content minmax(0, 220px) 6.6em; }
+  .c1, .c5 { grid-column: 1; margin-left: 0; } .c2, .c6 { grid-column: 2; } .c3, .c7 { grid-column: 3; } .checks { grid-column: 1 / 4; margin-left: 0; }
+}
+@media (max-width: 520px) { .controls { grid-template-columns: minmax(0, 1fr) 6.8em; gap: 2px 10px; } .c1, .c5 { grid-column: 1 / 3; margin-top: 6px; } .c2, .c6 { grid-column: 1; } .c3, .c7 { grid-column: 2; } .checks { grid-column: 1 / 3; margin-top: 6px; } .timerow { grid-template-columns: max-content minmax(0,1fr) max-content; } h1 { font-size: 1.2rem; } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+<section class="controls" aria-label="Reactor settings">
+  <div class="srow"><label class="c1" for="sI">initiator [I]<sub>0</sub></label><input class="c2" type="range" id="sI" min="0.001" max="0.1" step="0.001" value="0.010"><output class="c3" id="oI"></output></div>
+  <div class="checks">
+    <label><input type="checkbox" id="cGel" checked> gel effect</label>
+    <label><input type="checkbox" id="cFail"> loss of cooling</label>
+    <div class="btnrow">
+    <button class="lc" id="bDir" data-p="pDir">Directions</button>
+    <button class="lc" id="bDet" data-p="pDet">Details</button>
+    <button class="lc" id="bAbt" data-p="pAbt">About</button>
+  </div>
+  </div>
+  <div class="srow"><label class="c1" for="sUA">heat removal <i>UA</i>/<i>V</i></label><input class="c2" type="range" id="sUA" min="5" max="80" step="1" value="25"><output class="c3" id="oUA"></output></div>
+  <div class="srow"><label class="c5" for="sTj">jacket temperature <i>T</i><sub>j</sub></label><input class="c6" type="range" id="sTj" min="50" max="90" step="0.5" value="70"><output class="c7" id="oTj"></output></div>
+  <div class="srow dis" id="rTf"><label class="c1" for="sTf">cooling fails at <i>t</i><sub>f</sub></label><input class="c2" type="range" id="sTf" min="0" max="240" step="1" value="60" disabled><output class="c3" id="oTf"></output></div>
+  <div class="srow dis" id="rRes"><label class="c5" for="sRes">cooling remaining</label><input class="c6" type="range" id="sRes" min="0" max="100" step="5" value="0" disabled><output class="c7" id="oRes"></output></div>
+
+
+  <div class="flyout" id="pDir" hidden>
+    <div class="fhead"><b>Directions</b><button class="x" aria-label="Close">&times;</button></div>
+    <div class="fbody">
+      <p>This simulation models bulk free-radical polymerization of methyl methacrylate (MMA) with AIBN initiator in a jacketed, well-mixed batch reactor. The reactor starts at the jacket temperature with no polymer.</p>
+      <p>Set the initiator loading, jacket temperature and heat-removal capacity with the sliders. The left plot shows reactor temperature (red) and monomer conversion (blue) for 300 minutes. The dashed orange line is the maximum allowable temperature of 100 °C, close to the normal boiling point of MMA. A run is labeled <b>runaway</b> if the reactor temperature exceeds it.</p>
+      <p>Uncheck <b>gel effect</b> to see how much of the runaway comes from the drop in the termination rate constant as the mixture becomes viscous. Check <b>loss of cooling</b> to cut the heat-removal capacity at a chosen time to a chosen fraction of its normal value; 0% means the reactor becomes adiabatic.</p>
+      <p>The right plot has three views:</p>
+      <p><b>Semenov diagram</b>: heat generation <i>Q</i><sub>g</sub> versus temperature at the composition the reactor has at the selected time, with the heat-removal line <i>Q</i><sub>r</sub>. Drag on the left plot or use the time slider to move through the batch. The dotted green line (critical <i>Q</i><sub>r</sub>) is the critical removal line tangent to <i>Q</i><sub>g</sub>; when <i>Q</i><sub>r</sub> is less steep than it, there is no low-temperature intersection and the temperature must climb.</p>
+      <p><b>Semenov number</b>: Ψ versus time, compared with the classical critical value 1/<i>e</i>.</p>
+      <p><b>Safe-limit scan</b>: the peak temperature for a range of initiator loadings or jacket temperatures, with the other settings fixed. It reports the maximum safe value from the simulation (peak temperature = 100 °C) and from the Semenov criterion (largest Ψ = 1/<i>e</i>). Find the maximum safe initiator loading or jacket temperature and compare the two estimates.</p>
+    </div>
+  </div>
+
+  <div class="flyout" id="pDet" hidden>
+    <div class="fhead"><b>Details</b><button class="x" aria-label="Close">&times;</button></div>
+    <div class="fbody" id="detBody">
+      <h3>Kinetics</h3>
+      <p>Initiator decomposition, propagation and termination:</p>
+      $$\mathrm{I} \xrightarrow{k_d} 2\,\mathrm{R}^\bullet \ (\text{efficiency } f), \qquad \mathrm{P}_n^\bullet + \mathrm{M} \xrightarrow{k_p} \mathrm{P}_{n+1}^\bullet, \qquad \mathrm{P}_n^\bullet + \mathrm{P}_m^\bullet \xrightarrow{k_t} \text{dead polymer}$$
+      <p>With the quasi-steady-state approximation for radicals, the total radical concentration is</p>
+      $$\lambda_0 = \sqrt{\frac{2 f k_d [\mathrm{I}]}{k_t}}$$
+      <h3>Mole and energy balances</h3>
+      $$\frac{d[\mathrm{I}]}{dt} = -k_d [\mathrm{I}]$$
+      $$\frac{dX}{dt} = k_p (1-X)\,\lambda_0$$
+      $$\rho c_p \frac{dT}{dt} = \underbrace{(-\Delta H_p)[\mathrm{M}]_0 \frac{dX}{dt}}_{Q_g} \; - \; \underbrace{\frac{UA}{V}\,(T - T_j)}_{Q_r}$$
+      <p>where <i>X</i> is monomer conversion, [M]<sub>0</sub> = 9.4 mol/L (bulk MMA), −Δ<i>H</i><sub>p</sub> = 57.8 kJ/mol and ρ<i>c</i><sub>p</sub> = 1800 kJ/(m³·K). The adiabatic temperature rise for complete conversion is about 300 K. After cooling is lost at time <i>t</i><sub>f</sub>, <i>UA</i>/<i>V</i> is multiplied by the remaining fraction.</p>
+      <h3>Gel (Trommsdorff) effect</h3>
+      <p>As polymer accumulates, the viscosity rises and the large radicals can no longer diffuse together to terminate. The Schmidt–Ray correlation for MMA reduces <i>k</i><sub>t</sub> with conversion (<i>T</i> in K):</p>
+      $$k_t = k_{t0}\, g_t, \qquad g_t = \exp\!\left[-2\left(A_1 X + A_2 X^2 + A_3 X^3\right)\right]$$
+      $$A_1 = 2.57 - 5.05\times10^{-3}\,T, \quad A_2 = 9.56 - 1.76\times10^{-2}\,T, \quad A_3 = -3.03 + 7.85\times10^{-3}\,T$$
+      <p>Because the rate is proportional to <i>k</i><sub>t</sub><sup>−1/2</sup>, the rate accelerates as conversion increases, even at constant temperature. This autoacceleration and the Arrhenius rise of the rate with temperature reinforce each other.</p>
+      <h3>Rate constants</h3>
+      <table>
+        <tr><th>constant</th><th>expression</th><th>value at 70 °C</th></tr>
+        <tr><td><i>k</i><sub>d</sub> (AIBN), s⁻¹</td><td>1.58×10¹⁵ exp(−15 500/<i>T</i>)</td><td>3.7×10⁻⁵</td></tr>
+        <tr><td><i>k</i><sub>p</sub>, L/(mol·s)</td><td>4.92×10⁵ exp(−2190/<i>T</i>)</td><td>830</td></tr>
+        <tr><td><i>k</i><sub>t0</sub>, L/(mol·s)</td><td>9.8×10⁷ exp(−353/<i>T</i>)</td><td>3.5×10⁷</td></tr>
+        <tr><td><i>f</i></td><td>constant</td><td>0.58</td></tr>
+      </table>
+      <h3>Semenov analysis</h3>
+      <p>At any instant, the heat generation rate depends on temperature through the rate constants, with composition (<i>X</i>, [I]) fixed:</p>
+      $$Q_g(T) = (-\Delta H_p)[\mathrm{M}]_0\, k_p(T)\,(1-X)\sqrt{\frac{2 f k_d(T) [\mathrm{I}]}{k_{t0}(T)\, g_t(X,T)}}, \qquad Q_r(T) = \frac{UA}{V}(T - T_j)$$
+      <p>A stable operating point needs an intersection where the removal line is steeper than the generation curve. The critical removal line passes through (<i>T</i><sub>j</sub>, 0) and is tangent to <i>Q</i><sub>g</sub>; its slope is the minimum over <i>T</i> &gt; <i>T</i><sub>j</sub> of <i>Q</i><sub>g</sub>(<i>T</i>)/(<i>T</i> − <i>T</i><sub>j</sub>).</p>
+      <p>Approximating the rate with one apparent activation energy gives the Semenov number and the classical critical value:</p>
+      $$\Psi = \frac{Q_g(T_j)}{UA/V}\,\frac{E_{app}}{R T_j^2} \le \frac{1}{e}, \qquad E_{app} = E_p + \frac{E_d}{2} - \frac{E_t}{2} = 81.2\ \text{kJ/mol}$$
+      <p>Ψ is evaluated at the jacket temperature and the current composition. The gel effect raises Ψ during the batch. The Semenov criterion neglects reactant consumption, so it is conservative here: the batch can pass Ψ = 1/<i>e</i> and still finish below the allowable temperature if monomer or initiator is used up first.</p>
+      <h3>Safe-limit scan</h3>
+      <p>The scan runs the full model across the slider range of the chosen variable. The simulation limit is where the peak temperature reaches 100 °C. The Semenov limit is where the largest Ψ during normal operation (full cooling) reaches 1/<i>e</i>. The sharp rise of peak temperature with the scanned variable is the parametric sensitivity that marks runaway.</p>
+      <h3>Assumptions</h3>
+      <p>Well-mixed, constant volume (density change on polymerization is neglected), constant ρ<i>c</i><sub>p</sub> and <i>f</i>, no glass effect on <i>k</i><sub>p</sub>, no depropagation (the ceiling temperature of PMMA is near 220 °C), and no boiling or pressure rise. Temperatures above about 100 °C would boil MMA in an open reactor, so the curves beyond that point show the thermal driving force, not a realistic trajectory.</p>
+      <h3>References</h3>
+      <p>A. D. Schmidt and W. H. Ray, “The dynamic behavior of continuous polymerization reactors—I,” <i>Chem. Eng. Sci.</i> 36 (1981) 1401–1410.<br>
+      F. Stoessel, <i>Thermal Safety of Chemical Processes</i>, 2nd ed., Wiley-VCH (2020).<br>
+      M. Morbidelli and A. Varma, “A generalized criterion for parametric sensitivity,” <i>Chem. Eng. Sci.</i> 43 (1988) 91–102.</p>
+      <h3>Nomenclature</h3>
+      <table>
+        <tr><td><i>A</i><sub>1</sub>, <i>A</i><sub>2</sub>, <i>A</i><sub>3</sub></td><td>coefficients in the gel-effect correlation (dimensionless)</td></tr>
+        <tr><td><i>E</i><sub>app</sub></td><td>apparent activation energy of the polymerization rate (kJ/mol)</td></tr>
+        <tr><td><i>E</i><sub>d</sub>, <i>E</i><sub>p</sub>, <i>E</i><sub>t</sub></td><td>activation energies for initiator decomposition, propagation and termination (kJ/mol)</td></tr>
+        <tr><td><i>e</i></td><td>base of natural logarithms, 2.718</td></tr>
+        <tr><td><i>f</i></td><td>initiator efficiency, fraction of radicals that start chains</td></tr>
+        <tr><td><i>g</i><sub>t</sub></td><td>gel-effect factor, <i>k</i><sub>t</sub>/<i>k</i><sub>t0</sub></td></tr>
+        <tr><td>Δ<i>H</i><sub>p</sub></td><td>enthalpy of polymerization (kJ/mol monomer)</td></tr>
+        <tr><td>[I], [I]<sub>0</sub></td><td>initiator (AIBN) concentration and its initial value (mol/L)</td></tr>
+        <tr><td><i>k</i><sub>d</sub></td><td>initiator decomposition rate constant (s⁻¹)</td></tr>
+        <tr><td><i>k</i><sub>p</sub></td><td>propagation rate constant (L/(mol·s))</td></tr>
+        <tr><td><i>k</i><sub>t</sub>, <i>k</i><sub>t0</sub></td><td>termination rate constant with and without the gel effect (L/(mol·s))</td></tr>
+        <tr><td>[M]<sub>0</sub></td><td>initial monomer concentration (mol/L)</td></tr>
+        <tr><td>M, I, R<sup>•</sup>, P<sub><i>n</i></sub><sup>•</sup></td><td>monomer, initiator, primary radical, growing polymer radical with <i>n</i> monomer units</td></tr>
+        <tr><td><i>Q</i><sub>g</sub></td><td>rate of heat generation per reactor volume (kW/m³)</td></tr>
+        <tr><td><i>Q</i><sub>r</sub></td><td>rate of heat removal to the jacket per reactor volume (kW/m³)</td></tr>
+        <tr><td><i>R</i></td><td>gas constant, 8.314 J/(mol·K)</td></tr>
+        <tr><td><i>T</i></td><td>reactor temperature (K in equations, °C in plots)</td></tr>
+        <tr><td><i>T</i><sub>j</sub></td><td>jacket (coolant) temperature</td></tr>
+        <tr><td><i>T</i><sub>max</sub></td><td>peak reactor temperature during the batch</td></tr>
+        <tr><td><i>t</i>, <i>t</i><sub>f</sub></td><td>time; time at which cooling fails (min)</td></tr>
+        <tr><td><i>UA</i>/<i>V</i></td><td>heat-transfer coefficient × area per reactor volume (kW/(m³·K))</td></tr>
+        <tr><td><i>X</i></td><td>monomer conversion (fraction of monomer polymerized)</td></tr>
+        <tr><td>λ<sub>0</sub></td><td>total concentration of growing radicals (mol/L)</td></tr>
+        <tr><td>ρ<i>c</i><sub>p</sub></td><td>volumetric heat capacity of the reacting mixture (kJ/(m³·K))</td></tr>
+        <tr><td>Ψ</td><td>Semenov number (dimensionless)</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="flyout" id="pAbt" hidden>
+    <div class="fhead"><b>About</b><button class="x" aria-label="Close">&times;</button></div>
+    <div class="fbody">
+      <p>This simulation was created in the <a href="https://www.colorado.edu/chbe/" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="https://learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.</p>
+    </div>
+  </div>
+</section>
+
+<section class="plots">
+  <div class="pcol">
+    <div class="readout" id="readL"></div>
+    <canvas id="cvL" draggable="false" aria-label="Reactor temperature and conversion versus time"></canvas>
+    <div class="timerow"><span id="lT">selected time</span><div class="tslider" id="sT" role="slider" tabindex="0" aria-labelledby="lT" aria-valuemin="0" aria-valuemax="300" aria-valuenow="40"><div class="ttrack"></div><div class="tthumb" id="sTthumb"></div></div><output id="oT"></output></div>
+  </div>
+  <div class="pcol">
+    <div class="tabs" role="radiogroup" aria-label="Right plot">
+      <label><input type="radio" name="view" value="sem" checked> Semenov diagram</label>
+      <label><input type="radio" name="view" value="psi"> Semenov number</label>
+      <label><input type="radio" name="view" value="scan"> safe-limit scan</label>
+    </div>
+    <canvas id="cvR" draggable="false" aria-label="Semenov analysis plot"></canvas>
+    <div class="sub" id="scanOpts" hidden>
+      <span>scan:</span>
+      <label><input type="radio" name="svar" value="I" checked><span>initiator [I]<sub>0</sub></span></label>
+      <label><input type="radio" name="svar" value="Tj"><span>jacket temperature <i>T</i><sub>j</sub></span></label>
+    </div>
+    <div class="readout" id="readR"></div>
+  </div>
+</section>
+</div>
+
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(', '\\)']] }, svg: { fontCache: 'global', displayAlign: 'left' }, startup: { typeset: false } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js" async></script>
+
+<script>
+"use strict";
+/* ---------------- model ---------------- */
+const P = { f: 0.58, kd0: 1.58e15, Ed_R: 15500, kp0: 4.917e5, Ep_R: 2190, kt0: 9.8e7, Et_R: 353, M0: 9.4, dH: 57.8, rhoCp: 1800 };
+P.Eapp_R = P.Ep_R + P.Ed_R / 2 - P.Et_R / 2;
+const MAT = 100; // °C
+function gt(x, T) {
+  const A1 = 2.57 - 5.05e-3 * T, A2 = 9.56 - 1.76e-2 * T, A3 = -3.03 + 7.85e-3 * T;
+  return Math.exp(-2 * (A1 * x + A2 * x * x + A3 * x * x * x));
+}
+function rates(T, x, I, gel) {
+  const kd = P.kd0 * Math.exp(-P.Ed_R / T);
+  const kp = P.kp0 * Math.exp(-P.Ep_R / T);
+  const kt = P.kt0 * Math.exp(-P.Et_R / T) * (gel ? gt(x, T) : 1);
+  const lam = Math.sqrt(Math.max(0, 2 * P.f * kd * I / kt));
+  const dxdt = kp * (1 - x) * lam;
+  return { kd, dxdt, Qg: P.dH * P.M0 * 1000 * dxdt };
+}
+const qg = (T, x, I, gel) => rates(T, x, I, gel).Qg;
+function simulate(s) {
+  const f = (t, y) => {
+    const I = s.I0 * Math.exp(y[0]);
+    const ua = (s.fail && t >= s.tf) ? s.UAV * s.resid : s.UAV;
+    const r = rates(y[2], Math.min(Math.max(y[1], 0), 1), I, s.gel);
+    return [-r.kd, r.dxdt, (r.Qg - ua * (y[2] - s.Tj)) / P.rhoCp];
+  };
+  const a = [[], [1/5], [3/40, 9/40], [44/45, -56/15, 32/9], [19372/6561, -25360/2187, 64448/6561, -212/729],
+    [9017/3168, -355/33, 46732/5247, 49/176, -5103/18656], [35/384, 0, 500/1113, 125/192, -2187/6784, 11/84]];
+  const c = [0, 1/5, 3/10, 4/5, 8/9, 1, 1];
+  const b = [35/384, 0, 500/1113, 125/192, -2187/6784, 11/84, 0];
+  const be = [5179/57600, 0, 7571/16695, 393/640, -92097/339200, 187/2100, 1/40];
+  const atol = [1e-4, 1e-7, 1e-4], rtol = 1e-6;
+  let t = 0, y = [0, 0, s.Tj], h = 1, n = 0;
+  const out = [{ t: 0, I: s.I0, x: 0, T: s.Tj }];
+  const brk = s.fail ? s.tf : Infinity;
+  while (t < s.tEnd - 1e-9 && n < 100000) {
+    n++;
+    if (t < brk && t + h > brk) h = brk - t;
+    h = Math.min(h, s.tEnd - t, 60);
+    const k = [];
+    for (let i = 0; i < 7; i++) {
+      const yi = y.slice();
+      for (let j = 0; j < i; j++) for (let m = 0; m < 3; m++) yi[m] += h * a[i][j] * k[j][m];
+      k.push(f(t + c[i] * h, yi));
+    }
+    const yn = [0, 0, 0]; let err = 0;
+    for (let m = 0; m < 3; m++) {
+      let s5 = 0, s4 = 0;
+      for (let i = 0; i < 7; i++) { s5 += b[i] * k[i][m]; s4 += be[i] * k[i][m]; }
+      yn[m] = y[m] + h * s5;
+      const sc = atol[m] + (m === 0 ? 0 : rtol * Math.max(Math.abs(y[m]), Math.abs(yn[m])));
+      err = Math.max(err, Math.abs(h * (s5 - s4)) / sc);
+    }
+    if (err <= 1 || h < 1e-6) {
+      t += h; y = yn; if (y[1] > 1) y[1] = 1;
+      out.push({ t, I: s.I0 * Math.exp(y[0]), x: y[1], T: y[2] });
+      h *= Math.min(5, 0.9 * Math.pow(Math.max(err, 1e-10), -0.2));
+    } else h *= Math.max(0.2, 0.9 * Math.pow(err, -0.25));
+  }
+  return out;
+}
+const psiOf = (p, s, ua) => ua > 0 ? qg(s.Tj, p.x, p.I, s.gel) * P.Eapp_R / (s.Tj * s.Tj) / ua : Infinity;
+function summarize(out, s) {
+  let Tm = -1, tm = 0, psiMax = 0;
+  for (const p of out) {
+    if (p.T > Tm) { Tm = p.T; tm = p.t; }
+    if (!(s.fail && p.t >= s.tf)) psiMax = Math.max(psiMax, psiOf(p, s, s.UAV));
+  }
+  return { Tmax: Tm - 273.15, tmax: tm / 60, xEnd: out[out.length - 1].x, psiMax };
+}
+function at(out, t) { // linear interpolation at time t (s)
+  let lo = 0, hi = out.length - 1;
+  if (t <= out[0].t) return out[0]; if (t >= out[hi].t) return out[hi];
+  while (hi - lo > 1) { const m = (lo + hi) >> 1; if (out[m].t <= t) lo = m; else hi = m; }
+  const A = out[lo], B = out[hi], w = (t - A.t) / (B.t - A.t);
+  return { t, I: A.I * Math.pow(B.I / A.I || 1, w) || A.I + w * (B.I - A.I), x: A.x + w * (B.x - A.x), T: A.T + w * (B.T - A.T) };
+}
+
+/* ---------------- state ---------------- */
+const $ = id => document.getElementById(id);
+const TEND = 300 * 60;
+let S, RUN, SUM, tSel = 40;
+let scanCache = null, scanTimer = 0;
+function readState() {
+  return { I0: +$('sI').value, Tj: +$('sTj').value + 273.15, UAV: +$('sUA').value, gel: $('cGel').checked,
+    fail: $('cFail').checked, tf: +$('sTf').value * 60, resid: +$('sRes').value / 100, tEnd: TEND };
+}
+function view() { return document.querySelector('input[name=view]:checked').value; }
+function svar() { return document.querySelector('input[name=svar]:checked').value; }
+
+/* ---------------- canvas helpers ---------------- */
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const FONT = 'Helvetica, "Helvetica Neue", Arial, sans-serif';
+const INK = '#000000';
+function setup(cv) {
+  const dpr = window.devicePixelRatio || 1, w = cv.clientWidth, h = Math.round(w * 0.84);
+  cv.style.height = h + 'px';
+  if (cv.width !== Math.round(w * dpr) || cv.height !== Math.round(h * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
+  const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, w, h);
+  ctx.fillStyle = css('--bg'); ctx.fillRect(0, 0, w, h);
+  const k = Math.min(1, w / 470);           // shrink only on narrow phone screens
+  return { ctx, w, h, fs: 17 * k, fa: 18 * k };
+}
+// rich text: "T_j", "Q_{g}", "m^3"; italic letters wrapped in *...*
+function richParts(str) {
+  const parts = []; let i = 0, ital = false;
+  const push = (txt, m) => { if (txt) parts.push({ txt, m, ital }); };
+  while (i < str.length) {
+    const ch = str[i];
+    if (ch === '*') { ital = !ital; i++; continue; }
+    if (ch === '_' || ch === '^') {
+      const m = ch === '_' ? -1 : 1; i++;
+      if (str[i] === '{') { const j = str.indexOf('}', i); push(str.slice(i + 1, j), m); i = j + 1; }
+      else { push(str[i], m); i++; }
+      continue;
+    }
+    let j = i; while (j < str.length && !'_^*'.includes(str[j])) j++;
+    push(str.slice(i, j), 0); i = j;
+  }
+  return parts;
+}
+function richW(ctx, str, fs) {
+  let W = 0;
+  for (const p of richParts(str)) { ctx.font = `${p.ital ? 'italic ' : ''}${p.m ? fs * 0.72 : fs}px ${FONT}`; W += ctx.measureText(p.txt).width; }
+  return W;
+}
+function rich(ctx, str, x, y, fs, align = 'left', color = INK) {
+  const W = richW(ctx, str, fs);
+  let cx = align === 'center' ? x - W / 2 : align === 'right' ? x - W : x;
+  ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillStyle = color;
+  for (const p of richParts(str)) {
+    ctx.font = `${p.ital ? 'italic ' : ''}${p.m ? fs * 0.72 : fs}px ${FONT}`;
+    ctx.fillText(p.txt, cx, y + (p.m < 0 ? fs * 0.32 : p.m > 0 ? -fs * 0.38 : 0));
+    cx += ctx.measureText(p.txt).width;
+  }
+  return W;
+}
+function richV(ctx, str, x, y, fs, color = INK) { ctx.save(); ctx.translate(x, y); ctx.rotate(-Math.PI / 2); rich(ctx, str, 0, 0, fs, 'center', color); ctx.restore(); }
+function niceStep(range, n) { const r = range / n, p = Math.pow(10, Math.floor(Math.log10(r))), q = r / p; return (q < 1.5 ? 1 : q < 3 ? 2 : q < 7 ? 5 : 10) * p; }
+function ticks(lo, hi, n) { const st = niceStep(hi - lo, n), out = []; for (let v = Math.ceil(lo / st - 1e-9) * st; v <= hi + st * 1e-6; v += st) out.push(+v.toPrecision(12)); return { out, st }; }
+function fmtTick(v, st) { const d = Math.max(0, -Math.floor(Math.log10(st) + 1e-9)); return v.toFixed(d); }
+function frame(g, opt) {
+  const { ctx, w, h, fa } = g;
+  ctx.font = `${fa}px ${FONT}`;
+  const ty = ticks(opt.y0, opt.y1, opt.ny || 6);
+  const tyW = Math.max(...ty.out.map(v => ctx.measureText(fmtTick(v, ty.st)).width));
+  let ty2 = null, ty2W = 0;
+  if (opt.right) { ty2 = ticks(opt.right.y0, opt.right.y1, 5); ty2W = Math.max(...ty2.out.map(v => ctx.measureText(fmtTick(v, ty2.st)).width)); }
+  const box = { l: tyW + fa + 18, r: w - (opt.right ? ty2W + fa + 18 : fa * 1.3), t: fa * 1.1, b: h - fa * 3.3 };
+  box.X = v => box.l + (v - opt.x0) / (opt.x1 - opt.x0) * (box.r - box.l);
+  box.Y = v => box.b - (v - opt.y0) / (opt.y1 - opt.y0) * (box.b - box.t);
+  if (opt.right) box.Y2 = v => box.b - (v - opt.right.y0) / (opt.right.y1 - opt.right.y0) * (box.b - box.t);
+  const tx = ticks(opt.x0, opt.x1, opt.nx || 5);
+  ctx.lineWidth = 1; ctx.strokeStyle = '#ebe7e8';
+  for (const v of tx.out) { ctx.beginPath(); ctx.moveTo(box.X(v), box.t); ctx.lineTo(box.X(v), box.b); ctx.stroke(); }
+  for (const v of ty.out) { ctx.beginPath(); ctx.moveTo(box.l, box.Y(v)); ctx.lineTo(box.r, box.Y(v)); ctx.stroke(); }
+  ctx.strokeStyle = INK; ctx.strokeRect(box.l, box.t, box.r - box.l, box.b - box.t);
+  ctx.fillStyle = INK; ctx.font = `${fa}px ${FONT}`; ctx.textBaseline = 'top'; ctx.textAlign = 'center';
+  for (const v of tx.out) { ctx.beginPath(); ctx.moveTo(box.X(v), box.b); ctx.lineTo(box.X(v), box.b + 5); ctx.stroke(); ctx.fillText(fmtTick(v, tx.st), box.X(v), box.b + 7); }
+  ctx.textBaseline = 'middle'; ctx.textAlign = 'right';
+  for (const v of ty.out) { ctx.beginPath(); ctx.moveTo(box.l - 5, box.Y(v)); ctx.lineTo(box.l, box.Y(v)); ctx.stroke(); ctx.fillText(fmtTick(v, ty.st), box.l - 7, box.Y(v)); }
+  rich(ctx, opt.xl, (box.l + box.r) / 2, h - fa * 1.0, fa, 'center');
+  richV(ctx, opt.yl, box.l - 7 - tyW - 5 - fa * 0.5, (box.t + box.b) / 2, fa, opt.ylc || INK);  // title sits 5 px from the tick numbers
+  if (opt.right) {
+    ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.font = `${fa}px ${FONT}`; ctx.fillStyle = INK;
+    for (const v of ty2.out) { ctx.beginPath(); ctx.moveTo(box.r, box.Y2(v)); ctx.lineTo(box.r + 5, box.Y2(v)); ctx.stroke(); ctx.fillText(fmtTick(v, ty2.st), box.r + 7, box.Y2(v)); }
+    richV(ctx, opt.right.label, box.r + 7 + ty2W + 5 + fa * 0.5, (box.t + box.b) / 2, fa, opt.right.color || INK);
+  }
+  return box;
+}
+function clipBox(ctx, box) { ctx.save(); ctx.beginPath(); ctx.rect(box.l, box.t, box.r - box.l, box.b - box.t); ctx.clip(); }
+function poly(ctx, pts, color, lw = 2.2, dash) {
+  ctx.strokeStyle = color; ctx.lineWidth = lw; ctx.setLineDash(dash || []); ctx.lineJoin = 'round';
+  ctx.beginPath(); let started = false;
+  for (const [x, y] of pts) { if (!isFinite(y)) { started = false; continue; } if (!started) { ctx.moveTo(x, y); started = true; } else ctx.lineTo(x, y); }
+  ctx.stroke(); ctx.setLineDash([]);
+}
+function dot(ctx, x, y, r, fill) { ctx.fillStyle = fill; ctx.beginPath(); ctx.arc(x, y, r, 0, 2 * Math.PI); ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke(); }
+
+/* Label placer: keeps text off every drawn curve and off other labels */
+class Placer {
+  constructor(ctx, box, fs) { this.ctx = ctx; this.box = box; this.fs = fs; this.pts = []; this.rects = []; }
+  // densify a pixel polyline and keep the part inside the plot
+  curve(pts) {
+    const out = [], b = this.box;
+    for (let i = 0; i < pts.length; i++) {
+      const [x, y] = pts[i]; if (!isFinite(x) || !isFinite(y)) continue;
+      if (i > 0 && isFinite(pts[i - 1][1])) {
+        const [x0, y0] = pts[i - 1], n = Math.ceil(Math.hypot(x - x0, y - y0) / 3);
+        for (let k = 1; k < n; k++) { const xx = x0 + (x - x0) * k / n, yy = y0 + (y - y0) * k / n; if (xx >= b.l && xx <= b.r && yy >= b.t && yy <= b.b) out.push([xx, yy]); }
+      }
+      if (x >= b.l && x <= b.r && y >= b.t && y <= b.b) out.push([x, y]);
+    }
+    this.pts.push(...out);
+    return out;
+  }
+  free(r, pad = 3) {
+    const b = this.box;
+    if (r.x < b.l + 3 || r.x + r.w > b.r - 3 || r.y < b.t + 3 || r.y + r.h > b.b - 3) return false;
+    for (const q of this.rects) if (r.x < q.x + q.w + pad && r.x + r.w + pad > q.x && r.y < q.y + q.h + pad && r.y + r.h + pad > q.y) return false;
+    for (const [x, y] of this.pts) if (x > r.x - pad && x < r.x + r.w + pad && y > r.y - pad && y < r.y + r.h + pad) return false;
+    return true;
+  }
+  // put a text label next to a curve; prefer spots clearly closer to this curve than to any other,
+  // then any free spot beside it, then a free spot nearby joined to the curve by a short leader line
+  onCurve(text, cpts, prefs = [], color = INK) {
+    if (!cpts.length) return null;
+    const ctx = this.ctx, W = richW(ctx, text, this.fs), H = this.fs * 1.3;
+    const fr = [...prefs]; for (let f = 0.05; f < 0.96; f += 0.05) fr.push(f);
+    const own = new Set(cpts);
+    const otherDist = r => { let d = Infinity; for (const p of this.pts) { if (own.has(p)) continue; const dx = Math.max(r.x - p[0], 0, p[0] - r.x - r.w), dy = Math.max(r.y - p[1], 0, p[1] - r.y - r.h); d = Math.min(d, Math.hypot(dx, dy)); } return d; };
+    const at = f => cpts[Math.min(cpts.length - 1, Math.round(f * (cpts.length - 1)))];
+    for (const strict of [true, false]) for (const g of [7, 16]) for (const f of fr) {
+      const [px, py] = at(f);
+      const cands = [[px + g, py - H - g], [px - W - g, py - H - g], [px + g, py + g], [px - W - g, py + g], [px - W / 2, py - H - g * 1.5], [px - W / 2, py + g * 1.5]];
+      for (const [x, y] of cands) {
+        const r = { x, y, w: W, h: H };
+        if (this.free(r) && (!strict || otherDist(r) > 2.2 * g + 6)) { this.rects.push(r); rich(ctx, text, x, y + H / 2, this.fs, 'left', color); return r; }
+      }
+    }
+    // leader-line fallback
+    let best = null;
+    for (const f of fr.slice(0, Math.max(1, prefs.length))) {
+      const [px, py] = at(f);
+      for (const [x, y] of this.grid(W, H, 9, 9)) {
+        const r = { x, y, w: W, h: H }; if (!this.free(r, 4)) continue;
+        const cx = Math.max(r.x, Math.min(px, r.x + r.w)), cy = Math.max(r.y, Math.min(py, r.y + r.h)), d = Math.hypot(cx - px, cy - py);
+        if (!best || d < best.d) best = { r, d, px, py, cx, cy };
+      }
+    }
+    if (!best) return null;
+    this.rects.push(best.r);
+    ctx.strokeStyle = INK; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(best.cx, best.cy); ctx.lineTo(best.px, best.py); ctx.stroke();
+    rich(ctx, text, best.r.x, best.r.y + H / 2, this.fs, 'left', color);
+    return best.r;
+  }
+  // first free spot among candidate top-left corners for a box of size W x H
+  spot(W, H, cands) {
+    for (const [x, y] of cands) { const r = { x, y, w: W, h: H }; if (this.free(r, 5)) { this.rects.push(r); return r; } }
+    return null;
+  }
+  grid(W, H, nx = 7, ny = 7) {
+    const b = this.box, c = [], m = 8;
+    for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++)
+      c.push([b.l + m + (b.r - b.l - W - 2 * m) * i / (nx - 1), b.t + m + (b.b - b.t - H - 2 * m) * j / (ny - 1)]);
+    return c;
+  }
+}
+const hline = (box, y) => [[box.l, y], [box.r, y]];
+
+/* ---------------- left plot: T and x vs t ---------------- */
+const cvL = $('cvL'), cvR = $('cvR');
+let boxL = null;
+function drawLeft() {
+  const g = setup(cvL), { ctx, fs } = g;
+  const TjC = S.Tj - 273.15;
+  const y0 = Math.floor((TjC - 5) / 5) * 5;
+  let y1 = Math.max(SUM.Tmax + 5, MAT + 10);
+  y1 = Math.ceil(y1 / niceStep(y1 - y0, 6)) * niceStep(y1 - y0, 6);
+  const box = frame(g, { x0: 0, x1: 300, y0, y1, xl: 'time (min)', yl: 'temperature (°C)', ylc: css('--cT'), right: { y0: 0, y1: 1, label: 'conversion *X*', color: css('--cX') } });
+  boxL = box;
+  const Tpts = RUN.map(p => [box.X(p.t / 60), box.Y(p.T - 273.15)]), Xpts = RUN.map(p => [box.X(p.t / 60), box.Y2(p.x)]);
+  clipBox(ctx, box);
+  if (S.fail) {
+    const xf = box.X(S.tf / 60);
+    ctx.fillStyle = 'rgba(31,95,168,0.08)'; ctx.fillRect(xf, box.t, box.r - xf, box.b - box.t);
+    ctx.strokeStyle = 'rgba(31,95,168,0.5)'; ctx.setLineDash([3, 3]); ctx.beginPath(); ctx.moveTo(xf, box.t); ctx.lineTo(xf, box.b); ctx.stroke(); ctx.setLineDash([]);
+  }
+  poly(ctx, hline(box, box.Y(MAT)), css('--cMAT'), 1.6, [7, 5]);
+  poly(ctx, hline(box, box.Y(TjC)), '#9a9396', 1, [2, 3]);
+  poly(ctx, Xpts, css('--cX'));
+  poly(ctx, Tpts, css('--cT'), 2.6);
+  const pc = at(RUN, tSel * 60), xc = box.X(tSel);
+  ctx.strokeStyle = 'rgba(0,0,0,0.45)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(xc, box.t); ctx.lineTo(xc, box.b); ctx.stroke();
+  dot(ctx, xc, box.Y(pc.T - 273.15), 5, css('--cT')); dot(ctx, xc, box.Y2(pc.x), 5, css('--cX'));
+  ctx.restore();
+  const L = new Placer(ctx, box, fs);
+  const cT = L.curve(Tpts), cX = L.curve(Xpts), cM = L.curve(hline(box, box.Y(MAT))), cJ = L.curve(hline(box, box.Y(TjC)));
+  if (S.fail) L.curve([[box.X(S.tf / 60), box.t], [box.X(S.tf / 60), box.b]]);
+  if (SUM.Tmax > y1) { const ptxt = `peak ${SUM.Tmax.toFixed(0)} °C (off scale)`, W = richW(ctx, ptxt, fs), r = L.spot(W, fs * 1.3, [[Math.min(box.r - W - 6, Math.max(box.l + 6, box.X(SUM.tmax) + 8)), box.t + 6]]); if (r) rich(ctx, ptxt, r.x, r.y + fs * 0.65, fs); }
+  L.onCurve('temperature', cT, [0.85, 0.7, 0.95, 0.5], css('--cT'));
+  L.onCurve('conversion', cX, [0.12, 0.2, 0.3, 0.6], css('--cX'));
+  L.onCurve('maximum allowable temperature', cM, [0.02, 0.25, 0.5]);
+  L.onCurve('*T*_j', cJ, [0.97, 0.9, 0.8]);
+  if (S.fail && S.tf / 60 < 270) {
+    const txt = 'cooling lost', W = richW(ctx, txt, fs), xf = box.X(S.tf / 60) + 6;
+    const r = L.spot(W, fs * 1.3, [0.02, 0.15, 0.3, 0.45, 0.6, 0.75, 0.88].map(f => [xf, box.t + 4 + f * (box.b - box.t - fs * 1.3 - 8)]));
+    if (r) rich(ctx, txt, r.x, r.y + fs * 0.65, fs);
+  }
+}
+
+/* ---------------- right plots ---------------- */
+function drawSemenov() {
+  const g = setup(cvR), { ctx, fs } = g;
+  const pc = at(RUN, tSel * 60), TjC = S.Tj - 273.15;
+  const ua = (S.fail && tSel * 60 >= S.tf) ? S.UAV * S.resid : S.UAV;
+  const Top = pc.T;
+  // critical removal line: minimum slope of Qg/(T - Tj) over T > Tj
+  let sc = Infinity, Tc = null;
+  for (let i = 1; i <= 2000; i++) {
+    const T = TjC + 0.05 + 250 * i / 2000, sl = qg(T + 273.15, pc.x, pc.I, S.gel) / (T - TjC);
+    if (sl < sc) { sc = sl; Tc = T; }
+  }
+  const qOp = qg(Top, pc.x, pc.I, S.gel);
+  const ax = semAxes(), TloC = ax.TloC, ThiC = ax.ThiC, ymax = ax.ymax;
+  const N = 240, Ts = [];
+  for (let i = 0; i <= N; i++) Ts.push(TloC + (ThiC - TloC) * i / N);
+  const box = frame(g, { x0: TloC, x1: ThiC, y0: 0, y1: ymax, xl: 'reactor temperature *T* (°C)', yl: 'heat rate (kW/m^3)' });
+  const pG = Ts.map(T => [box.X(T), box.Y(qg(T + 273.15, pc.x, pc.I, S.gel))]);
+  const pN = Ts.map(T => [box.X(T), box.Y(qg(T + 273.15, pc.x, pc.I, false))]);
+  const pR = [[box.X(TjC), box.Y(0)], [box.X(ThiC), box.Y(ua * (ThiC - TjC))]];
+  const pC = isFinite(sc) ? [[box.X(TjC), box.Y(0)], [box.X(ThiC), box.Y(sc * (ThiC - TjC))]] : [];
+  clipBox(ctx, box);
+  if (S.gel) poly(ctx, pN, '#9a9396', 1.8, [6, 4]);
+  poly(ctx, pG, css('--cT'), 2.6);
+  if (pC.length) poly(ctx, pC, css('--cCrit'), 2.7, [3, 5]);
+  poly(ctx, pR, css('--cQr'), 2.4);
+  if (isFinite(sc) && Tc <= ThiC) dot(ctx, box.X(Tc), box.Y(sc * (Tc - TjC)), 4, css('--cCrit'));
+  dot(ctx, box.X(Top - 273.15), box.Y(qOp), 6, css('--cT'));
+  ctx.restore();
+  const offScale = Top - 273.15 > ThiC || qOp > ymax;
+  // labels on the curves
+  const L = new Placer(ctx, box, fs);
+  const cG = L.curve(pG), cN = S.gel ? L.curve(pN) : [], cC = L.curve(pC), cR = L.curve(pR);
+  L.rects.push({ x: box.X(Top - 273.15) - 8, y: box.Y(qOp) - 8, w: 16, h: 16 });
+  L.onCurve('*Q*_g', cG, [0.75, 0.6, 0.9, 0.45]);
+  L.onCurve('*Q*_r', cR, [0.9, 0.8, 0.7, 0.6]);
+  if (S.gel) L.onCurve('*Q*_g without gel effect', cN, [0.92, 0.85, 0.75]);
+  L.onCurve('critical *Q*_r', cC, [0.95, 0.85, 0.7, 0.55]);
+  {
+    const l1 = '*Q*_g = heat generation rate', l2 = '*Q*_r = heat removal rate', H = fs * 1.35;
+    const W = Math.max(richW(ctx, l1, fs), richW(ctx, l2, fs)) + 12, r = L.spot(W, 2 * H + 8, L.grid(W, 2 * H + 8));
+    if (r) {
+      ctx.fillStyle = 'rgba(255,255,255,0.92)'; ctx.fillRect(r.x, r.y, r.w, r.h);
+      ctx.strokeStyle = '#c9c3c5'; ctx.lineWidth = 1; ctx.strokeRect(r.x + 0.5, r.y + 0.5, r.w - 1, r.h - 1);
+      rich(ctx, l1, r.x + 6, r.y + 4 + H / 2, fs); rich(ctx, l2, r.x + 6, r.y + 4 + 1.5 * H, fs);
+    }
+  }
+  if (offScale) { const txt = `operating point off scale (*T* = ${(Top - 273.15).toFixed(0)} °C)`, W = richW(ctx, txt, fs), r = L.spot(W, fs * 1.3, L.grid(W, fs * 1.3, 3, 7)); if (r) rich(ctx, txt, r.x, r.y + fs * 0.65, fs); }
+  const stable = ua > sc;
+  $('readR').innerHTML = `<span><i>t</i> = ${tSel.toFixed(0)} min</span><span>conversion, <i>X</i> = ${pc.x.toFixed(3)}</span><span>initiator concentration, [I] = ${sci(pc.I)} mol/L</span>` +
+    `<span>removal slope ${ua.toFixed(1)} vs critical ${isFinite(sc) ? sc.toFixed(1) : '—'} kW/(m³·K)</span>` +
+    `<span class="pill ${stable ? 'safe' : 'run'}">${stable ? 'stable intersection' : 'no stable intersection'}</span>`;
+}
+// Semenov-diagram axes are fixed for a run, so moving the time slider moves the
+// operating point along fixed axes instead of rescaling the whole diagram
+let semCache = null;
+function semAxes() {
+  if (semCache && semCache.run === RUN) return semCache;
+  const TjC = S.Tj - 273.15;
+  const ThiC = Math.min(TjC + 60, Math.max(TjC + 35, SUM.Tmax + 8));
+  let ymax = 1;
+  for (let i = 0; i <= 80; i++) {
+    const p = at(RUN, TEND * i / 80);
+    if (p.T - 273.15 > ThiC) continue;
+    let sc = Infinity, Tc = TjC;
+    for (let k = 1; k <= 300; k++) { const T = TjC + 0.1 + (ThiC - TjC) * k / 300, sl = qg(T + 273.15, p.x, p.I, S.gel) / (T - TjC); if (sl < sc) { sc = sl; Tc = T; } }
+    ymax = Math.max(ymax, 2.5 * qg(p.T, p.x, p.I, S.gel), 2.2 * sc * (Tc - TjC), 3 * qg(S.Tj, p.x, p.I, S.gel));
+  }
+  ymax = Math.min(ymax, S.UAV * (ThiC - TjC));
+  for (let k = 0; k < 3; k++) { const st = niceStep(ymax, 6); ymax = Math.ceil(ymax / st - 1e-9) * st; }
+  semCache = { run: RUN, TloC: TjC - 10, ThiC, ymax };
+  return semCache;
+}
+// Semenov-number definition drawn as a fraction; returns size or draws at (x, y) top-left
+function psiDef(ctx, fs, x, y) {
+  const lhs = 'Ψ = ', num = '*Q*_g(*T*_j) *E*_{app}', den = '(*UA*/*V*) *R* *T*_j^2';
+  const a = richW(ctx, lhs, fs), wn = richW(ctx, num, fs), wd = richW(ctx, den, fs), wf = Math.max(wn, wd) + 6;
+  const W = a + wf + 16, H = fs * 3.1;
+  if (x === undefined) return { W, H };
+  ctx.fillStyle = 'rgba(255,255,255,0.92)'; ctx.fillRect(x, y, W, H);
+  ctx.strokeStyle = '#c9c3c5'; ctx.lineWidth = 1; ctx.strokeRect(x + 0.5, y + 0.5, W - 1, H - 1);
+  const cy = y + H / 2, x0 = x + 8;
+  rich(ctx, lhs, x0, cy, fs);
+  const fx = x0 + a;
+  rich(ctx, num, fx + wf / 2, cy - fs * 0.72, fs, 'center');
+  ctx.strokeStyle = INK; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.moveTo(fx, cy); ctx.lineTo(fx + wf, cy); ctx.stroke();
+  rich(ctx, den, fx + wf / 2, cy + fs * 0.78, fs, 'center');
+  return { W, H };
+}
+function drawPsi() {
+  const g = setup(cvR), { ctx, fs } = g;
+  const pts = RUN.map(p => { const ua = (S.fail && p.t >= S.tf) ? S.UAV * S.resid : S.UAV; return [p.t / 60, psiOf(p, S, ua)]; });
+  const fin = pts.filter(p => isFinite(p[1]) && (!S.fail || p[0] < S.tf / 60)).map(p => p[1]);
+  let y1 = Math.max(0.6, ...fin.map(v => Math.min(v, 3)));
+  const st = niceStep(y1 * 1.1, 6); y1 = Math.ceil(y1 * 1.1 / st) * st;
+  const box = frame(g, { x0: 0, x1: 300, y0: 0, y1, xl: 'time (min)', yl: 'Semenov number Ψ' });
+  const pP = pts.map(([t, v]) => [box.X(t), box.Y(Math.min(v, y1 * 2))]);
+  const pE = hline(box, box.Y(1 / Math.E));
+  clipBox(ctx, box);
+  if (S.fail) { const xf = box.X(S.tf / 60); ctx.fillStyle = 'rgba(31,95,168,0.08)'; ctx.fillRect(xf, box.t, box.r - xf, box.b - box.t); }
+  poly(ctx, pE, css('--cCrit'), 1.8, [7, 5]);
+  poly(ctx, pP, css('--cPsi'), 2.6);
+  const xc = box.X(tSel), pc = at(RUN, tSel * 60), uac = (S.fail && tSel * 60 >= S.tf) ? S.UAV * S.resid : S.UAV, pv = psiOf(pc, S, uac);
+  ctx.strokeStyle = 'rgba(0,0,0,0.45)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(xc, box.t); ctx.lineTo(xc, box.b); ctx.stroke();
+  if (isFinite(pv) && pv <= y1) dot(ctx, xc, box.Y(pv), 5, css('--cPsi'));
+  ctx.restore();
+  const L = new Placer(ctx, box, fs);
+  const cP = L.curve(pP), cE = L.curve(pE);
+  if (S.fail) L.curve([[box.X(S.tf / 60), box.t], [box.X(S.tf / 60), box.b]]);
+  // definition first, so it gets the clearest spot; it moves as the curve changes
+  const d = psiDef(ctx, fs), spot = L.spot(d.W, d.H, L.grid(d.W, d.H));
+  if (spot) psiDef(ctx, fs, spot.x, spot.y);
+  L.onCurve('critical Ψ = 1/*e*', cE, [0.97, 0.75, 0.5, 0.25, 0.03]);
+  if (S.fail && S.tf / 60 < 270) {
+    const txt = S.resid > 0 ? 'cooling reduced' : 'cooling lost', W = richW(ctx, txt, fs), xf = box.X(S.tf / 60) + 6;
+    const r = L.spot(W, fs * 1.3, [0.02, 0.15, 0.3, 0.45, 0.6, 0.75, 0.88].map(f => [xf, box.t + 4 + f * (box.b - box.t - fs * 1.3 - 8)]));
+    if (r) rich(ctx, txt, r.x, r.y + fs * 0.65, fs);
+  }
+  const exceed = SUM.psiMax > 1 / Math.E;
+  $('readR').innerHTML = `<span>Ψ at <i>t</i> = ${tSel.toFixed(0)} min: ${isFinite(pv) ? pv.toFixed(3) : '∞'}</span>` +
+    `<span>largest Ψ with full cooling: ${SUM.psiMax.toFixed(3)}</span>` +
+    `<span class="pill ${exceed ? 'run' : 'safe'}">${exceed ? 'exceeds 1/e' : 'below 1/e'}</span>`;
+}
+function computeScan() {
+  const v = svar(), base = readState();
+  const lo = v === 'I' ? 0.001 : 50, hi = v === 'I' ? 0.1 : 90, N = 50;
+  const mk = val => v === 'I' ? Object.assign({}, base, { I0: val }) : Object.assign({}, base, { Tj: val + 273.15 });
+  const evalAt = val => {
+    const s = mk(val), sm = summarize(simulate(s), s);
+    let psiMax = sm.psiMax;
+    if (s.fail) { const s2 = Object.assign({}, s, { fail: false }); psiMax = summarize(simulate(s2), s2).psiMax; }
+    return { val, Tmax: sm.Tmax, psiMax };
+  };
+  const pts = []; for (let i = 0; i <= N; i++) pts.push(evalAt(lo + (hi - lo) * i / N));
+  const cross = (key, target) => {
+    const i = pts.findIndex(p => p[key] > target);
+    if (i === -1) return { val: hi, flag: 'above' };
+    if (i === 0) return { val: lo, flag: 'below' };
+    let a = pts[i - 1].val, b = pts[i].val;
+    for (let k = 0; k < 12; k++) { const m = (a + b) / 2; if (evalAt(m)[key] > target) b = m; else a = m; }
+    return { val: (a + b) / 2, flag: '' };
+  };
+  return { v, lo, hi, pts, key: JSON.stringify(base) + v, sim: cross('Tmax', MAT), sem: cross('psiMax', 1 / Math.E) };
+}
+function drawScan() {
+  const g = setup(cvR), { ctx, fs } = g;
+  const key = JSON.stringify(readState()) + svar();
+  if (!scanCache || scanCache.key !== key) {
+    ctx.fillStyle = INK; ctx.font = `${fs}px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('computing scan…', g.w / 2, g.h / 2);
+    clearTimeout(scanTimer);
+    scanTimer = setTimeout(() => { scanCache = computeScan(); if (view() === 'scan') drawScan(); }, 120);
+    return;
+  }
+  const sc = scanCache, isI = sc.v === 'I';
+  let y1 = Math.max(MAT + 10, ...sc.pts.map(p => p.Tmax));
+  const st = niceStep(y1 - 40, 6); y1 = Math.ceil(y1 / st) * st;
+  const y0 = Math.floor(Math.min(...sc.pts.map(p => p.Tmax)) / 10) * 10 - 10;
+  const box = frame(g, { x0: sc.lo, x1: sc.hi, y0, y1, xl: isI ? 'initiator loading [I]_0 (mol/L)' : 'jacket temperature *T*_j (°C)', yl: 'peak reactor temperature (°C)' });
+  const pS = sc.pts.map(p => [box.X(p.val), box.Y(p.Tmax)]), pM = hline(box, box.Y(MAT));
+  const vl = val => [[box.X(val), box.t], [box.X(val), box.b]];
+  clipBox(ctx, box);
+  poly(ctx, pM, css('--cMAT'), 1.6, [7, 5]);
+  if (!sc.sem.flag) poly(ctx, vl(sc.sem.val), css('--cCrit'), 1.8, [2, 4]);
+  if (!sc.sim.flag) poly(ctx, vl(sc.sim.val), css('--cT'), 1.8, [8, 4]);
+  poly(ctx, pS, INK, 2.4);
+  const cur = isI ? S.I0 : S.Tj - 273.15;
+  dot(ctx, box.X(cur), box.Y(SUM.Tmax), 6, SUM.Tmax > MAT ? css('--cT') : css('--cCrit'));
+  ctx.restore();
+  const L = new Placer(ctx, box, fs);
+  const cS = L.curve(pS), cM = L.curve(pM);
+  const cSem = sc.sem.flag ? [] : L.curve(vl(sc.sem.val)), cSim = sc.sim.flag ? [] : L.curve(vl(sc.sim.val));
+  L.rects.push({ x: box.X(cur) - 8, y: box.Y(SUM.Tmax) - 8, w: 16, h: 16 });
+  L.onCurve('Semenov limit', cSem, [0.97, 0.85, 0.7, 0.3]);
+  L.onCurve('simulation limit', cSim, [0.85, 0.97, 0.7, 0.3]);
+  L.onCurve('maximum allowable temperature', cM, [0.97, 0.6, 0.3]);
+  L.onCurve('peak temperature', cS, [0.8, 0.9, 0.6]);
+  const fmt = v => isI ? v.toFixed(4) + ' mol/L' : v.toFixed(1) + ' °C';
+  const say = c => c.flag === 'above' ? `above ${fmt(sc.hi)}` : c.flag === 'below' ? `below ${fmt(sc.lo)}` : fmt(c.val);
+  const nm = isI ? 'maximum safe [I]<sub>0</sub>' : 'maximum safe <i>T</i><sub>j</sub>';
+  $('readR').innerHTML = `<span>${nm}, simulation (<i>T</i><sub>max</sub> = ${MAT} °C): ${say(sc.sim)}</span>` +
+    `<span>Semenov (Ψ<sub>max</sub> = 1/<i>e</i>): ${say(sc.sem)}</span>`;
+}
+
+// number in scientific notation as HTML, e.g. 8.81 × 10<sup>−3</sup>
+function sci(v, d = 2) {
+  if (!(v > 0)) return '0';
+  let e = Math.floor(Math.log10(v)), m = v / Math.pow(10, e);
+  if (+m.toFixed(d) >= 10) { m /= 10; e += 1; }
+  if (e >= -2 && e <= 3) return v.toPrecision(d + 1);
+  return `${m.toFixed(d)} × 10<sup>${e < 0 ? '−' + (-e) : e}</sup>`;
+}
+/* ---------------- update ---------------- */
+function fmtI(v) { return v.toFixed(3) + ' mol/L'; }
+function update() {
+  S = readState();
+  $('oI').textContent = fmtI(S.I0);
+  $('oTj').textContent = (S.Tj - 273.15).toFixed(1) + ' °C';
+  $('oUA').innerHTML = S.UAV.toFixed(0) + ' kW/(m³·K)';
+  $('oTf').textContent = (S.tf / 60).toFixed(0) + ' min';
+  $('oRes').textContent = (S.resid * 100).toFixed(0) + ' %';
+  for (const [r, s] of [['rTf', 'sTf'], ['rRes', 'sRes']]) { $(r).classList.toggle('dis', !S.fail); $(s).disabled = !S.fail; }
+  $('oT').textContent = tSel.toFixed(0) + ' min';
+  RUN = simulate(S); SUM = summarize(RUN, S);
+  const run = SUM.Tmax > MAT;
+  $('readL').innerHTML = `<span>peak <i>T</i> = ${SUM.Tmax.toFixed(1)} °C at ${SUM.tmax.toFixed(0)} min</span>` +
+    `<span>final <i>X</i> = ${SUM.xEnd.toFixed(3)}</span>` +
+    `<span class="pill ${run ? 'run' : 'safe'}">${run ? 'RUNAWAY' : 'SAFE'}</span>`;
+  draw();
+}
+function draw() {
+  drawLeft();
+  $('scanOpts').hidden = view() !== 'scan';
+  ({ sem: drawSemenov, psi: drawPsi, scan: drawScan })[view()]();
+}
+['sI', 'sTj', 'sUA', 'sTf', 'sRes', 'cGel', 'cFail'].forEach(id => $(id).addEventListener('input', update));
+document.querySelectorAll('input[name=view], input[name=svar]').forEach(el => el.addEventListener('change', draw));
+// selected time: one setter shared by the time slider and dragging on the left plot
+let drawPending = 0;
+function setTime(t) {
+  tSel = Math.max(0, Math.min(300, Math.round(t * 2) / 2));
+  const sl = $('sT'), th = $('sTthumb'), w = sl.clientWidth;
+  th.style.left = (7.5 + (w - 15) * tSel / 300) + 'px';
+  sl.setAttribute('aria-valuenow', tSel);
+  $('oT').textContent = tSel.toFixed(0) + ' min';
+  if (!drawPending) drawPending = requestAnimationFrame(() => { drawPending = 0; draw(); });
+}
+{
+  const sl = $('sT');
+  const fromX = e => { const r = sl.getBoundingClientRect(); return (e.clientX - r.left - 7.5) / (r.width - 15) * 300; };
+  sl.addEventListener('pointerdown', e => { e.preventDefault(); sl.focus(); sl.setPointerCapture(e.pointerId); setTime(fromX(e)); });
+  sl.addEventListener('pointermove', e => { if (sl.hasPointerCapture(e.pointerId)) setTime(fromX(e)); });
+  sl.addEventListener('keydown', e => {
+    const step = { ArrowLeft: -1, ArrowDown: -1, ArrowRight: 1, ArrowUp: 1, PageDown: -10, PageUp: 10 }[e.key];
+    if (step) { e.preventDefault(); setTime(tSel + step); }
+    else if (e.key === 'Home') { e.preventDefault(); setTime(0); }
+    else if (e.key === 'End') { e.preventDefault(); setTime(300); }
+  });
+}
+// drag on the left plot to pick the time
+function pickTime(e) {
+  if (!boxL) return;
+  const r = cvL.getBoundingClientRect(), x = e.clientX - r.left;
+  setTime((x - boxL.l) / (boxL.r - boxL.l) * 300);
+}
+cvL.addEventListener('pointerdown', e => { e.preventDefault(); cvL.setPointerCapture(e.pointerId); pickTime(e); });
+// Opera can start a native drag-and-drop of the figure; block it on the plots and the time slider
+for (const el of [cvL, cvR, $('sT')]) {
+  el.addEventListener('dragstart', e => e.preventDefault());
+  el.addEventListener('mousedown', e => e.preventDefault());
+}
+document.addEventListener('dragstart', e => { if (e.target.closest && e.target.closest('.plots')) e.preventDefault(); });
+cvL.addEventListener('pointermove', e => { if (cvL.hasPointerCapture(e.pointerId)) pickTime(e); });
+let rz = 0; window.addEventListener('resize', () => { cancelAnimationFrame(rz); rz = requestAnimationFrame(() => { setTime(tSel); draw(); }); });
+
+/* ---------------- flyout panels ---------------- */
+let typeset = false;
+function closeAll() { document.querySelectorAll('.flyout').forEach(p => p.hidden = true); document.querySelectorAll('.btnrow .lc').forEach(b => b.classList.remove('on')); }
+document.querySelectorAll('.btnrow .lc').forEach(b => b.addEventListener('click', () => {
+  const p = $(b.dataset.p), open = !p.hidden; closeAll();
+  if (!open) {
+    const cr = document.querySelector('.controls').getBoundingClientRect(), br = b.getBoundingClientRect();
+    p.style.top = (br.bottom - cr.top + 8) + 'px';
+    p.hidden = false; b.classList.add('on');
+    if (b.dataset.p === 'pDet' && !typeset && window.MathJax && MathJax.typesetPromise) { typeset = true; MathJax.typesetPromise([$('detBody')]).catch(() => { typeset = false; }); }
+  }
+}));
+document.querySelectorAll('.flyout .x').forEach(x => x.addEventListener('click', closeAll));
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAll(); });
+
+update();
+setTime(tSel);
+</script>
+</body>
+</html>

@@ -1,0 +1,525 @@
+<title>Polymer MWD in Batch, PFR and CSTR</title>
+<style>
+/* Layout: control rows on top, wide MWD plot beside a PDI-vs-conversion plot, results table below (LearnChemE house style) */
+:root{
+  --bg:#ffffff; --fg:#1b1b1d; --muted:#5d5a5b; --line:#d9d2d3; --soft:#f6f2f2;
+  --panel:#ffffff; --shadow:rgba(40,0,4,.20);
+  --btn:#98000D; --btnFg:#ffffff; --btnHover:#76000a;
+  --batch:#98000D; --pfr:#1f5fbf; --cstr:#178a3a;
+  --grid:#ebe7e7; --axis:#000000; --ink:#000000;
+  --font:Helvetica, "Helvetica Neue", Arial, sans-serif;
+  --serif:"Times New Roman", Times, serif;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#17151a; --fg:#ece8e9; --muted:#aaa3a5; --line:#3a3437; --soft:#211d21;
+  --panel:#221e22; --shadow:rgba(0,0,0,.55);
+  --btn:#b3121f; --btnFg:#ffffff; --btnHover:#d02331;
+  --batch:#ff6b6b; --pfr:#6fa8ff; --cstr:#4fd17a;
+  --grid:#2c282c; --axis:#e6e2e3; --ink:#ece8e9; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#17151a; --fg:#ece8e9; --muted:#aaa3a5; --line:#3a3437; --soft:#211d21;
+  --panel:#221e22; --shadow:rgba(0,0,0,.55);
+  --btn:#b3121f; --btnFg:#ffffff; --btnHover:#d02331;
+  --batch:#ff6b6b; --pfr:#6fa8ff; --cstr:#4fd17a;
+  --grid:#2c282c; --axis:#e6e2e3; --ink:#ece8e9; color-scheme:dark }
+
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--fg);font-family:var(--font);font-size:15px}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:16px;padding-block:14px 28px;display:flex;flex-direction:column;gap:12px}
+h1{font-size:1.25rem;font-weight:700;margin:0;text-wrap:balance}
+.toprow{position:relative;display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px}
+.grp{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.lbl{font-size:17px;color:var(--ink)}
+.seg{display:inline-flex;border:1.5px solid var(--btn);border-radius:6px;overflow:hidden}
+.seg button{font:inherit;font-size:17px;padding:6px 12px;border:0;background:transparent;color:var(--fg);cursor:pointer}
+.seg button+button{border-left:1.5px solid var(--btn)}
+.seg button[aria-pressed="true"]{background:var(--btn);color:var(--btnFg)}
+.seg button:focus-visible,.pbtn:focus-visible,.close:focus-visible{outline:2px solid var(--pfr);outline-offset:2px}
+.spacer{flex:1}
+.pbtns{display:flex;gap:8px}
+.pbtn{font:inherit;font-size:17px;background:var(--btn);color:var(--btnFg);border:0;border-radius:5px;padding:7px 14px;cursor:pointer}
+.pbtn:hover{background:var(--btnHover)}
+.panel{position:absolute;top:calc(100% + 6px);right:0;z-index:20;width:min(660px,calc(100vw - 32px));background:var(--panel);border:1px solid var(--line);border-radius:8px;box-shadow:0 10px 30px var(--shadow);display:flex;flex-direction:column;max-height:72vh}
+.panel .phead{display:flex;justify-content:space-between;align-items:center;padding:10px 14px 6px;border-bottom:1px solid var(--line)}
+.panel .phead b{font-size:1rem}
+.panel .pbody{padding:10px 16px 14px;overflow-y:auto;line-height:1.5;font-size:.93rem}
+.panel .pbody p{margin:.45em 0}
+.panel .pbody h3{font-size:.95rem;margin:.9em 0 .2em;color:var(--btn)}
+.panel a{color:var(--pfr)}
+.close{font:inherit;font-size:1.4rem;line-height:1;border:0;background:transparent;color:var(--fg);cursor:pointer;padding:0 4px}
+mjx-container[display="true"]{text-align:left!important;margin:.4em 0 .4em 1.2em!important}
+.controls{display:flex;flex-direction:column;gap:10px;padding:10px 14px;background:var(--soft);border-radius:8px;max-width:100%;box-sizing:border-box}
+.crow{display:flex;flex-wrap:wrap;align-items:center;gap:10px 26px}
+.controls.frmode .sl input[type=range]{width:140px}
+.controls.frmode .crow{column-gap:16px}
+.controls.frmode .seg button{padding:6px 9px}
+#mechBtn{white-space:nowrap}
+.sl{display:flex;align-items:center;gap:8px;min-width:0}
+.sl label{font-size:17px;white-space:nowrap;color:var(--ink)}
+input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+input[type="range"]:focus-visible{outline:2px solid var(--pfr);outline-offset:4px}
+.sl input[type=range]{width:190px;max-width:42vw;margin-bottom:0}
+.sl output{font-variant-numeric:tabular-nums;min-width:4.2em;font-size:17px;color:var(--ink)}
+.tau{font-family:var(--serif);font-style:italic;font-size:1.08em}
+.plots{display:grid;grid-template-columns:minmax(0,1.75fr) minmax(0,1fr);gap:14px}
+@media (max-width:820px){.plots{grid-template-columns:minmax(0,1fr)}}
+.plot{min-width:0;display:flex;flex-direction:column;gap:4px}
+.plot canvas{width:100%;display:block}
+.cap{font-size:17px;color:var(--ink);line-height:1.4}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;font-size:.92rem;font-variant-numeric:tabular-nums;min-width:520px}
+th,td{padding:6px 14px;text-align:center;border-bottom:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left}
+th{font-weight:600;color:var(--muted)}
+.sw{display:inline-block;width:22px;height:0;border-top:3px solid;vertical-align:middle;margin-right:8px}
+.nom{min-width:0;font-size:inherit}
+.nom td{text-align:left;padding:3px 12px 3px 0;border:0;vertical-align:top}
+.nom td:first-child{white-space:nowrap}
+.tblrow{display:flex;flex-wrap:wrap;align-items:flex-start;gap:12px 28px}
+.tblrow .tbl{flex:0 0 auto;max-width:100%}
+.tblrow .note{flex:1 1 320px;min-width:0;max-width:none}
+.ctlrow{position:relative;display:flex;flex-wrap:wrap;align-items:center;gap:12px 16px}
+.ctlrow .controls{align-self:auto}
+.panel.mech{width:max-content;max-width:calc(100vw - 32px);font-size:17px;line-height:1.4;color:var(--ink)}
+.panel.mech .phead b{font-size:17px}
+.panel.mech .pbody{font-size:17px;line-height:1.4}
+.panel.mech .pbody h3{font-size:17px;color:var(--ink);font-weight:700;margin:.9em 0 .2em}
+.mech .pbody>h3:first-child{margin-top:0}
+.mech p{margin:0 0 .45em}
+.mech p>b,.mech p>span{display:block}
+.mech p>span{padding-left:1.2em}
+.mech p.inl>b,.mech p.inl>b+span{display:inline;padding-left:0}
+.mech .a{font-family:"Cambria Math","STIX Two Math","Segoe UI Symbol","DejaVu Sans",serif;font-size:1.1em;line-height:1}
+.note{font-size:17px;line-height:1.45;max-width:75ch;margin:0}
+.note b{color:var(--btn)}
+</style>
+
+<div class="wrap">
+  <div class="toprow" id="toprow">
+    <div class="grp"><span class="lbl">polymerization</span>
+      <div class="seg" id="chemSeg">
+        <button id="chemStep" aria-pressed="true">step-growth</button>
+        <button id="chemFR" aria-pressed="false">free-radical</button>
+      </div>
+    </div>
+    <div class="grp"><span class="lbl">compare reactors at</span>
+      <div class="seg" id="modeSeg">
+        <button id="modeConv" aria-pressed="true">equal conversion</button>
+        <button id="modeTau" aria-pressed="false">equal residence time</button>
+      </div>
+    </div>
+    <div class="spacer"></div>
+    <div class="pbtns">
+      <button class="pbtn" data-panel="pDir">Directions</button>
+      <button class="pbtn" data-panel="pDet">Details</button>
+      <button class="pbtn" data-panel="pAbout">About</button>
+    </div>
+
+    <div class="panel" id="pDir" hidden>
+      <div class="phead"><b>Directions</b><button class="close" aria-label="Close">&times;</button></div>
+      <div class="pbody">
+        <p>This simulation compares the molecular weight distribution (MWD) of polymer leaving an isothermal batch reactor, a plug flow reactor (PFR) and a continuous stirred-tank reactor (CSTR).</p>
+        <p>Choose step-growth or free-radical polymerization. Choose whether the reactors are compared at the same monomer conversion (the CSTR then needs a longer residence time) or at the same residence time (the CSTR then reaches a lower conversion).</p>
+        <p>The left plot shows the weight distribution on a logarithmic chain-length axis, the way a GPC trace is normally plotted. The batch and PFR curves are identical because each fluid element in an ideal PFR is a small batch reactor, so they are shown as one curve labeled batch/PFR. The right plot shows polydispersity (PDI) versus conversion; dots mark the current operating points.</p>
+        <p>The y-axis of the left plot is d<i>W</i>/d(log<sub>10</sub> <i>n</i>) = ln(10)&thinsp;<i>n</i>&thinsp;<i>w<sub>n</sub></i>, the weight fraction of polymer per decade of chain length, where <i>w<sub>n</sub></i> is the weight fraction of chains of length <i>n</i>. With this choice, the area under each curve on the logarithmic axis equals 1, so equal areas anywhere on the plot represent equal masses of polymer. A broad, low curve (high PDI) therefore contains the same total mass as a tall, narrow one. The values can exceed 1 because they are a density per decade, not a fraction. For a most-probable distribution, the peak is near the weight-average chain length, <i>x̄<sub>w</sub></i>.</p>
+        <p>For free-radical polymerization, set the initial kinetic chain length, the initiator decomposition rate, and the termination mode.</p>
+      </div>
+    </div>
+
+    <div class="panel" id="pDet" hidden>
+      <div class="phead"><b>Details</b><button class="close" aria-label="Close">&times;</button></div>
+      <div class="pbody">
+        <h3>Step-growth (A–B monomer, equal reactivity)</h3>
+        <p>Second-order kinetics in functional groups, with conversion $p$ and Damköhler number $\mathrm{Da} = k C_0 t$ (batch/PFR) or $k C_0 \tau$ (CSTR).</p>
+        <p>Batch reactor or PFR:</p>
+        $$p = \frac{\mathrm{Da}}{1+\mathrm{Da}}$$
+        $$w_n = n(1-p)^2 p^{\,n-1}, \qquad \bar{x}_n = \frac{1}{1-p}, \qquad \bar{x}_w = \frac{1+p}{1-p}, \qquad \mathrm{PDI} = 1+p$$
+        <p>CSTR (perfectly micromixed, steady state). The population balance for $n$-mers is</p>
+        $$0 = \frac{\delta_{n1}C_0 - P_n}{\tau} + k\sum_{i=1}^{n-1}P_iP_{n-i} - 2k\lambda_0 P_n$$
+        <p>where $\lambda_0 = \sum P_n = C_0(1-p)$. The conversion satisfies $p = \mathrm{Da}(1-p)^2$. Solving with a generating function gives</p>
+        $$\frac{P_n}{C_0} = \frac{a}{2\,\mathrm{Da}}\;\frac{(2n-2)!}{2^{2n-1}\,n!\,(n-1)!}\;z^n, \qquad a = \frac{1+p}{1-p}, \quad z = \frac{4p}{(1+p)^2}$$
+        $$w_n = n\,\frac{P_n}{C_0}, \qquad \bar{x}_w = 1+2\,\mathrm{Da}, \qquad \mathrm{PDI} = \frac{1+p^2}{1-p}$$
+        <p>In the CSTR, a molecule's age is distributed exponentially, and old (large) molecules react with new (small) ones. This back-mixing makes the distribution far broader than in a batch reactor: at $p = 0.99$, PDI = 1.99 for batch but 199 for the CSTR.</p>
+
+        <h3>Free-radical (initiator decomposition, propagation, termination)</h3>
+        <p>With the quasi-steady-state assumption for radicals, $[R\cdot] = \left(2fk_d[I]/k_t\right)^{1/2}$ and the instantaneous kinetic chain length is</p>
+        $$\nu = \frac{k_p[M]}{2\left(f k_d k_t [I]\right)^{1/2}} = \nu_0\,\frac{[M]}{[M]_0}\left(\frac{[I]_0}{[I]}\right)^{1/2}$$
+        <p>Dead polymer formed at any instant has a Schulz–Flory distribution (continuous form):</p>
+        $$\text{disproportionation: } w(n) = \frac{n}{\nu^2}e^{-n/\nu}, \;\; \mathrm{PDI}=2 \qquad \text{combination: } w(n) = \frac{n^2}{2\nu^3}e^{-n/\nu}, \;\; \mathrm{PDI}=1.5$$
+        <p>Dimensionless time is $\theta = k_p[R\cdot]_0\,t$ and the initiator decay ratio is $\beta = k_d/(k_p[R\cdot]_0)$.</p>
+        <p>Batch reactor or PFR: $[I]/[I]_0 = e^{-\beta\theta}$ and</p>
+        $$X = 1 - \exp\!\left[-\frac{2}{\beta}\left(1-e^{-\beta\theta/2}\right)\right], \qquad \nu = \frac{\nu_0(1-X)}{1-\beta L/2}, \quad L = -\ln(1-X)$$
+        <p>Because $\nu$ drifts as monomer and initiator are consumed, the product is a superposition of instantaneous distributions:</p>
+        $$W(n) = \frac{1}{X}\int_0^X w\big(n;\nu(X')\big)\,dX'$$
+        <p>CSTR: $[I]/[I]_0 = 1/(1+\beta\theta)$ and $X/(1-X) = \theta/\sqrt{1+\beta\theta}$. Every radical grows and dies at the same uniform $[M]$ and $[I]$, and a radical's lifetime (seconds) is much shorter than $\tau$, so the residence time distribution does not broaden the product. The CSTR product is the single instantaneous distribution, PDI = 2 (disproportionation) or 1.5 (combination), which is narrower than the batch product.</p>
+        <p>Chain transfer, gel effect, and temperature changes are not included. Chain lengths are in monomer repeat units; multiply by the repeat-unit molecular weight to obtain $M_n$ and $M_w$.</p>
+
+        <h3>Definitions</h3>
+        <table class="nom"><tbody>
+          <tr><td>$a$</td><td>parameter in the CSTR step-growth solution, $(1+p)/(1-p)$</td></tr>
+          <tr><td>$C_0$</td><td>initial (feed) concentration of functional groups (mol/L)</td></tr>
+          <tr><td>$\mathrm{Da}$</td><td>Damköhler number for step growth, $kC_0t$ (batch/PFR) or $kC_0\tau$ (CSTR)</td></tr>
+          <tr><td>$dW/d(\log_{10}n)$</td><td>weight fraction of polymer per decade of chain length, $\ln(10)\,n\,w_n$</td></tr>
+          <tr><td>$f$</td><td>initiator efficiency</td></tr>
+          <tr><td>$[I],\ [I]_0$</td><td>initiator concentration; feed or initial value (mol/L)</td></tr>
+          <tr><td>$k$</td><td>step-growth rate constant (L/(mol·s))</td></tr>
+          <tr><td>$k_d$</td><td>initiator decomposition rate constant (1/s)</td></tr>
+          <tr><td>$k_p$</td><td>propagation rate constant (L/(mol·s))</td></tr>
+          <tr><td>$k_t$</td><td>termination rate constant (L/(mol·s))</td></tr>
+          <tr><td>$L$</td><td>$-\ln(1-X)$</td></tr>
+          <tr><td>$[M],\ [M]_0$</td><td>monomer concentration; feed or initial value (mol/L)</td></tr>
+          <tr><td>$M_n,\ M_w$</td><td>number- and weight-average molecular weights (g/mol)</td></tr>
+          <tr><td>$n$</td><td>chain length (number of repeat units in a molecule)</td></tr>
+          <tr><td>$p$</td><td>conversion of functional groups (step growth)</td></tr>
+          <tr><td>$P_n$</td><td>concentration of chains of length $n$ (mol/L)</td></tr>
+          <tr><td>$\mathrm{PDI}$</td><td>polydispersity, $\bar{x}_w/\bar{x}_n$</td></tr>
+          <tr><td>$[R\cdot],\ [R\cdot]_0$</td><td>total radical concentration; initial batch value (mol/L)</td></tr>
+          <tr><td>$t$</td><td>reaction time in the batch reactor, or residence time in the PFR (s)</td></tr>
+          <tr><td>$w_n,\ w(n)$</td><td>weight fraction of chains of length $n$ (per unit $n$)</td></tr>
+          <tr><td>$W(n)$</td><td>weight distribution of the accumulated batch/PFR product</td></tr>
+          <tr><td>$X$</td><td>monomer conversion (free radical)</td></tr>
+          <tr><td>$\bar{x}_n,\ \bar{x}_w$</td><td>number- and weight-average chain lengths</td></tr>
+          <tr><td>$z$</td><td>parameter in the CSTR step-growth solution, $4p/(1+p)^2$</td></tr>
+          <tr><td>$\beta$</td><td>initiator decay ratio, $k_d/(k_p[R\cdot]_0)$</td></tr>
+          <tr><td>$\delta_{n1}$</td><td>Kronecker delta (1 if $n=1$, otherwise 0)</td></tr>
+          <tr><td>$\theta$</td><td>dimensionless time, $k_p[R\cdot]_0t$ (batch/PFR) or $k_p[R\cdot]_0\tau$ (CSTR)</td></tr>
+          <tr><td>$\lambda_0$</td><td>total concentration of molecules (zeroth moment, mol/L)</td></tr>
+          <tr><td>$\nu,\ \nu_0$</td><td>instantaneous kinetic chain length; value at feed conditions</td></tr>
+          <tr><td>$\tau$</td><td>CSTR residence time (s)</td></tr>
+        </tbody></table>
+      </div>
+    </div>
+
+    <div class="panel" id="pAbout" hidden>
+      <div class="phead"><b>About</b><button class="close" aria-label="Close">&times;</button></div>
+      <div class="pbody">
+        <p>This simulation was created in the <a href="https://www.colorado.edu/chbe/" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="https://learncheme.com/" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="ctlrow">
+  <div class="controls" id="controls">
+    <div class="crow">
+      <div class="sl"><label for="main" id="mainLbl">conversion, <i>p</i></label><input type="range" id="main"><output id="mainOut"></output></div>
+      <div class="sl fr"><label for="nu0">initial kinetic chain length, <i>ν</i><sub>0</sub></label><input type="range" id="nu0" min="2" max="4" step="0.01" value="3"><output id="nu0Out"></output></div>
+    </div>
+    <div class="crow fr" id="frRow2">
+      <div class="sl fr"><label for="beta">initiator decay ratio, <i>β</i></label><input type="range" id="beta" min="0" max="0.5" step="0.01" value="0.1"><output id="betaOut"></output></div>
+      <div class="grp fr"><span class="lbl">termination</span>
+        <div class="seg"><button id="termD" aria-pressed="true">disproportionation</button><button id="termC" aria-pressed="false">combination</button></div>
+      </div>
+    </div>
+  </div>
+    <button class="pbtn" id="mechBtn" data-panel="pMech" data-anchor="left">Effect of reactor type on polymer MWD</button>
+    <div class="panel mech" id="pMech" hidden>
+      <div class="phead"><b>Effect of reactor type on polymer MWD</b><button class="close" aria-label="Close">&times;</button></div>
+      <div class="pbody">
+        <h3>If chain growth time &gt;&gt; mean residence time</h3>
+        <p><b>Batch/PFR:</b><span>all molecules have the same residence time</span><span><span class="a">&rarr;</span> narrow MWD</span></p>
+        <p class="inl"><b>CSTR:</b> <span>broad residence time distribution</span><span><span class="a">&rarr;</span> broad MWD</span></p>
+        <h3>If chain growth time &lt;&lt; mean residence time</h3>
+        <p class="inl"><b>Batch/PFR:</b> <span>varying monomer concentration</span><span><span class="a">&rarr;</span> varying chain center concentration</span><span><span class="a">&rarr;</span> varying termination rate</span><span><span class="a">&rarr;</span> broad MWD</span></p>
+        <p class="inl"><b>CSTR:</b> <span>uniform concentration</span><span><span class="a">&rarr;</span> uniform termination rate</span><span><span class="a">&rarr;</span> narrow MWD</span></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="plots">
+    <div class="plot">
+      <canvas id="cMWD"></canvas><div class="cap" id="capMWD"></div>
+    </div>
+    <div class="plot">
+      <canvas id="cPDI"></canvas>
+    </div>
+  </div>
+  <div class="tblrow">
+    <div class="tbl"><table>
+      <thead><tr><th>reactor</th><th>conversion</th><th id="thTime">dimensionless time</th><th>x̄<sub>n</sub></th><th>x̄<sub>w</sub></th><th>PDI</th></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table></div>
+    <p class="note" id="note"></p>
+  </div>
+</div>
+
+<script>
+window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},svg:{fontCache:'global'},chtml:{displayAlign:'left'}};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js" async></script>
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const LN10=Math.LN10;
+const S={chem:'step',mode:'conv',term:'disp',
+  v:{'step-conv':0.95,'step-tau':Math.log10(50),'fr-conv':0.8,'fr-tau':2}};
+
+/* ---------- math ---------- */
+const LG=[0.99999999999980993,676.5203681218851,-1259.1392167224028,771.32342877765313,-176.61502916214059,12.507343278686905,-0.13857109526572012,9.9843695780195716e-6,1.5056327351493116e-7];
+function lgamma(x){
+  if(x<0.5) return Math.log(Math.PI/Math.sin(Math.PI*x))-lgamma(1-x);
+  x-=1; let a=LG[0]; const t=x+7.5;
+  for(let i=1;i<9;i++) a+=LG[i]/(x+i);
+  return 0.5*Math.log(2*Math.PI)+(x+0.5)*Math.log(t)-t+Math.log(a);
+}
+// step-growth weight fractions per unit n
+function stepBatchW(n,p){return n*(1-p)*(1-p)*Math.exp((n-1)*Math.log(p));}
+function stepCstrW(n,p){
+  const Da=p/((1-p)*(1-p)), a=(1+p)/(1-p), z=4*p/((1+p)*(1+p));
+  const ly=Math.log(a/(2*Da))+lgamma(2*n-1)-(2*n-1)*Math.LN2-lgamma(n+1)-lgamma(n)+n*Math.log(z);
+  return n*Math.exp(ly);
+}
+const stepCstrP=Da=>((2*Da+1)-Math.sqrt(4*Da+1))/(2*Da);
+// free-radical
+function frInst(n,nu,term){const r=n/nu;return term==='disp'?(r/nu)*Math.exp(-r):(r*r/(2*nu))*Math.exp(-r);}
+const kN=t=>t==='disp'?1:2, kW=t=>t==='disp'?2:3;
+function frBatchNu(X,nu0,b){const L=-Math.log(1-X);return nu0*(1-X)/(1-b*L/2);}
+function frBatchX(T,b){return b<1e-9?1-Math.exp(-T):1-Math.exp(-(2/b)*(1-Math.exp(-b*T/2)));}
+function frBatchT(X,b){const L=-Math.log(1-X);if(b<1e-9)return L;const q=1-b*L/2;return q>0?-(2/b)*Math.log(q):Infinity;}
+function frCstrX(T,b){const g=T/Math.sqrt(1+b*T);return g/(1+g);}
+function frCstrT(X,b){const g=X/(1-X);return (b*g*g+Math.sqrt(b*b*g*g*g*g+4*g*g))/2;}
+function frCstrNu(X,T,nu0,b){return nu0*(1-X)*Math.sqrt(1+b*T);}
+// cumulative batch FR product at conversion X
+function frBatchCum(X,nu0,b,term,m=400){
+  const nus=[];let sw=0,sn=0;
+  for(let i=0;i<m;i++){const x=X*(i+0.5)/m;const nu=frBatchNu(x,nu0,b);nus.push(nu);sw+=kW(term)*nu;sn+=1/(kN(term)*nu);}
+  const Mw=sw/m, Mn=1/(sn/m);
+  return {nus,Mn,Mw,w:n=>{let s=0;for(const nu of nus)s+=frInst(n,nu,term);return s/m;}};
+}
+window.__mwd={lgamma,stepBatchW,stepCstrW,stepCstrP,frInst,frBatchCum,frCstrX,frCstrT,frBatchX,frBatchT};
+
+/* ---------- slider config ---------- */
+const nu0=()=>Math.pow(10,+$('nu0').value), beta=()=>+$('beta').value;
+const key=()=>S.chem+'-'+S.mode;
+const CFG={
+  'step-conv':{min:0.5,max:0.99,step:0.005,lbl:'conversion, <i>p</i>',fmt:v=>v.toFixed(3)},
+  'step-tau':{min:0,max:2.7,step:0.01,lbl:'Damköhler number, <i>k C</i><sub>0</sub><span class="tau">τ</span>',fmt:v=>fmtNum(Math.pow(10,v))},
+  'fr-conv':{min:0.05,max:0.95,step:0.01,lbl:'monomer conversion, <i>X</i>',fmt:v=>v.toFixed(2)},
+  'fr-tau':{min:0.1,max:4,step:0.05,lbl:'dimensionless time, <i>k</i><sub>p</sub>[R·]<sub>0</sub><span class="tau">τ</span>',fmt:v=>v.toFixed(2)}
+};
+function fmtNum(v){if(!isFinite(v))return '—';if(v>=1e5)return v.toExponential(2).replace('e+','×10^');if(v>=100)return Math.round(v).toLocaleString('en-US');if(v>=10)return v.toFixed(1);return v.toFixed(2);}
+function setupMain(){
+  const c=CFG[key()],el=$('main');
+  el.min=c.min;el.max=c.max;el.step=c.step;el.value=S.v[key()];
+  $('mainLbl').innerHTML=c.lbl;
+}
+
+/* ---------- model ---------- */
+function compute(){
+  const v=S.v[key()];
+  const R={};
+  if(S.chem==='step'){
+    let pB,pC,DaB,DaC;
+    if(S.mode==='conv'){pB=pC=v;DaB=v/(1-v);DaC=v/((1-v)*(1-v));}
+    else{DaB=DaC=Math.pow(10,v);pB=DaB/(1+DaB);pC=stepCstrP(DaC);}
+    const b={X:pB,t:DaB,Mn:1/(1-pB),Mw:(1+pB)/(1-pB),w:n=>stepBatchW(n,pB)};
+    R.batch=b;R.pfr=Object.assign({},b);
+    R.cstr={X:pC,t:DaC,Mn:1/(1-pC),Mw:1+2*DaC,w:n=>stepCstrW(n,pC)};
+  }else{
+    const n0=nu0(),bt=beta(),term=S.term;
+    let XB,XC,TB,TC;
+    if(S.mode==='conv'){XB=XC=v;TB=frBatchT(v,bt);TC=frCstrT(v,bt);}
+    else{TB=TC=v;XB=frBatchX(v,bt);XC=frCstrX(v,bt);}
+    const cum=frBatchCum(XB,n0,bt,term);
+    const b={X:XB,t:TB,Mn:cum.Mn,Mw:cum.Mw,w:cum.w};
+    R.batch=b;R.pfr=Object.assign({},b);
+    const nuC=frCstrNu(XC,TC,n0,bt);
+    R.cstr={X:XC,t:TC,Mn:kN(term)*nuC,Mw:kW(term)*nuC,w:n=>frInst(n,nuC,term)};
+  }
+  for(const k in R)R[k].pdi=R[k].Mw/R[k].Mn;
+  return R;
+}
+function pdiCurves(){
+  if(S.chem==='step'){
+    const b=[],c=[];
+    for(let i=0;i<=400;i++){const p=0.999*i/400;b.push([p,1+p]);}
+    for(let i=0;i<=400;i++){const p=0.998*i/400;c.push([p,(1+p*p)/(1-p)]);}
+    return {batch:b,cstr:c,ylog:true,ymin:1,ymax:1000};
+  }
+  const n0=nu0(),bt=beta(),term=S.term;
+  const Xmax=Math.min(0.97,bt>0?(1-Math.exp(-2/bt))*0.999:0.97);
+  const b=[];let sw=0,sn=0;const m=600,dx=Xmax/m;
+  b.push([0,kW(term)/kN(term)]);
+  for(let i=0;i<m;i++){const x=(i+0.5)*dx;const nu=frBatchNu(x,n0,bt);sw+=kW(term)*nu*dx;sn+=dx/(kN(term)*nu);const X=(i+1)*dx;b.push([X,(sw/X)/(X/sn)]);}
+  const pc=kW(term)/kN(term);
+  const c=[[0,pc],[1,pc]];
+  let ymax=Math.max(...b.map(q=>q[1]));ymax=Math.max(3,Math.ceil(ymax+0.4));
+  return {batch:b,cstr:c,ylog:false,ymin:1,ymax};
+}
+
+/* ---------- drawing ---------- */
+function css(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();}
+function prep(cv,h){
+  const dpr=window.devicePixelRatio||1,w=cv.clientWidth;
+  cv.style.height=h+'px';cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);
+  const ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);return {ctx,w,h};
+}
+// rich text: array of [text, 'sub'|'sup'|'it'|'']
+function rich(ctx,parts,x,y,size,align){
+  const base=`${size}px Helvetica, Arial, sans-serif`;
+  const fontOf=t=>t==='sub'||t==='sup'?`${Math.round(size*0.72)}px Helvetica, Arial, sans-serif`:t==='it'?`italic ${size}px Helvetica, Arial, sans-serif`:base;
+  let W=0;for(const [s,t] of parts){ctx.font=fontOf(t);W+=ctx.measureText(s).width;}
+  let cx=align==='center'?x-W/2:align==='right'?x-W:x;
+  ctx.textAlign='left';
+  for(const [s,t] of parts){ctx.font=fontOf(t);const dy=t==='sub'?size*0.3:t==='sup'?-size*0.38:0;ctx.fillText(s,cx,y+dy);cx+=ctx.measureText(s).width;}
+}
+function niceLinTicks(a,b){const span=b-a,raw=span/6,mag=Math.pow(10,Math.floor(Math.log10(raw)));const f=raw/mag;const st=(f<1.5?1:f<3?2:f<7?5:10)*mag;const t=[];for(let v=Math.ceil(a/st-1e-9)*st;v<=b+1e-9;v+=st)t.push(+v.toFixed(10));t.step=st;return t;}
+function fmtTick(v){if(Math.abs(v)>=1e4||(v!==0&&Math.abs(v)<1e-3))return null;return (+v.toPrecision(6)).toString();}
+const FS=17, FONT=`${FS}px Helvetica, Arial, sans-serif`, BFONT=`bold ${FS}px Helvetica, Arial, sans-serif`;
+function drawPlot(cv,h,o){
+  const {ctx,w}=prep(cv,h);
+  const fg=css('--axis'),grid=css('--grid'),bg=css('--bg');
+  const L=82,Rm=16,T=14,B=64,pw=w-L-Rm,ph=h-T-B;
+  const tx=v=>L+pw*(o.xlog?(Math.log10(v)-Math.log10(o.xmin))/(Math.log10(o.xmax)-Math.log10(o.xmin)):(v-o.xmin)/(o.xmax-o.xmin));
+  const ty=v=>T+ph*(1-(o.ylog?(Math.log10(v)-Math.log10(o.ymin))/(Math.log10(o.ymax)-Math.log10(o.ymin)):(v-o.ymin)/(o.ymax-o.ymin)));
+  ctx.lineWidth=1;ctx.font=FONT;ctx.fillStyle=fg;
+  // x ticks
+  const xt=[];
+  if(o.xlog){for(let e=Math.round(Math.log10(o.xmin));e<=Math.round(Math.log10(o.xmax));e++)xt.push({v:Math.pow(10,e),major:true,e});
+    for(let e=Math.round(Math.log10(o.xmin));e<Math.round(Math.log10(o.xmax));e++)for(let k=2;k<10;k++)xt.push({v:k*Math.pow(10,e),major:false});}
+  else{const lt=niceLinTicks(o.xmin,o.xmax);const d=Math.max(0,-Math.floor(Math.log10(lt.step)+1e-9));lt.forEach(v=>xt.push({v,major:true,s:v===0?'0':v.toFixed(d)}));}
+  for(const t of xt){const x=tx(t.v);ctx.strokeStyle=grid;if(t.major){ctx.beginPath();ctx.moveTo(x,T);ctx.lineTo(x,T+ph);ctx.stroke();}
+    ctx.strokeStyle=fg;ctx.beginPath();ctx.moveTo(x,T+ph);ctx.lineTo(x,T+ph+(t.major?6:3));ctx.stroke();
+    if(t.major){ctx.textBaseline='alphabetic';ctx.fillStyle=fg;
+      if(o.xlog){const e=t.e;if(e>=-1&&e<=3){ctx.textAlign='center';ctx.font=FONT;ctx.fillText(String(Math.pow(10,e)),x,T+ph+25);}else rich(ctx,[['10',''],[String(e),'sup']],x,T+ph+25,FS,'center');}
+      else{ctx.textAlign='center';ctx.font=FONT;ctx.fillText(t.s,x,T+ph+25);}}}
+  // y ticks
+  let yt,yfmt;
+  if(o.ylog){yt=[];for(let e=Math.round(Math.log10(o.ymin));e<=Math.round(Math.log10(o.ymax));e++)yt.push(Math.pow(10,e));yfmt=v=>fmtTick(v)??v.toExponential(0);}
+  else{yt=niceLinTicks(o.ymin,o.ymax);const d=Math.max(o.yMinDec||0,-Math.floor(Math.log10(yt.step)+1e-9));yfmt=v=>v===0?'0':v.toFixed(d);}
+  ctx.textAlign='right';ctx.textBaseline='middle';
+  ctx.font=FONT;let tickW=0;for(const v of yt)tickW=Math.max(tickW,ctx.measureText(yfmt(v)).width);
+  for(const v of yt){const y=ty(v);ctx.strokeStyle=grid;ctx.beginPath();ctx.moveTo(L,y);ctx.lineTo(L+pw,y);ctx.stroke();
+    ctx.strokeStyle=fg;ctx.beginPath();ctx.moveTo(L-6,y);ctx.lineTo(L,y);ctx.stroke();ctx.font=FONT;ctx.fillStyle=fg;ctx.fillText(yfmt(v),L-9,y);}
+  if(o.ylog){ctx.strokeStyle=fg;for(let e=Math.round(Math.log10(o.ymin));e<Math.round(Math.log10(o.ymax));e++)for(let k=2;k<10;k++){const y=ty(k*Math.pow(10,e));ctx.beginPath();ctx.moveTo(L-3,y);ctx.lineTo(L,y);ctx.stroke();}}
+  ctx.textBaseline='alphabetic';
+  ctx.strokeStyle=fg;ctx.lineWidth=1.2;ctx.strokeRect(L,T,pw,ph);
+  // axis labels
+  ctx.fillStyle=fg;rich(ctx,o.xlabel,L+pw/2,h-12,FS,'center');
+  ctx.save();ctx.translate(Math.max(FS+2,L-9-tickW-14),T+ph/2);ctx.rotate(-Math.PI/2);rich(ctx,o.ylabel,0,0,FS,'center');ctx.restore();
+  // series (keep pixel paths for label placement)
+  const clampY=y=>Math.min(Math.max(y,o.ylog?o.ymin*0.5:o.ymin-1),o.ymax*2);
+  const pix=[];
+  ctx.save();ctx.beginPath();ctx.rect(L,T,pw,ph);ctx.clip();
+  for(const s of o.series){const pp=[];ctx.strokeStyle=s.color;ctx.lineWidth=s.width;ctx.lineJoin='round';ctx.beginPath();let on=false;
+    for(const [x,y] of s.pts){if(!(y>0||(!o.ylog&&y>=0))||!isFinite(y)){on=false;continue;}const X=tx(x),Y=ty(clampY(y));pp.push([X,Y,on]);if(!on){ctx.moveTo(X,Y);on=true;}else ctx.lineTo(X,Y);}ctx.stroke();pix.push(pp);}
+  for(const m of (o.markers||[])){const X=tx(m.x),Y=ty(m.y);ctx.beginPath();ctx.arc(X,Y,m.r||5,0,2*Math.PI);ctx.fillStyle=m.color;ctx.fill();ctx.lineWidth=1.5;ctx.strokeStyle=bg;ctx.stroke();}
+  ctx.restore();
+  // curve labels: try candidate anchors, reject boxes that leave the plot or touch a curve or another label
+  ctx.font=BFONT;
+  const placed=[];
+  const hitsCurve=(bx)=>{for(const pp of pix){for(let i=0;i<pp.length;i++){const [x1,y1,c]=pp[i];
+      const [x0,y0]=c&&i>0?pp[i-1]:[x1,y1];const n=Math.max(1,Math.ceil(Math.hypot(x1-x0,y1-y0)/3));
+      for(let j=0;j<=n;j++){const x=x0+(x1-x0)*j/n,y=y0+(y1-y0)*j/n;if(x>bx.x-3&&x<bx.x+bx.w+3&&y>bx.y-3&&y<bx.y+bx.h+3)return true;}}}return false;};
+  const overlap=(a,b)=>a.x<b.x+b.w+4&&b.x<a.x+a.w+4&&a.y<b.y+b.h+4&&b.y<a.y+a.h+4;
+  for(const lb of (o.labels||[])){
+    const tw=ctx.measureText(lb.text).width,th=FS;let best=null;
+    for(const c of lb.cands){const X=tx(c.x)+(c.dx||0),Y=ty(clampY(c.y))+(c.dy||0);
+      const bx={x:c.align==='left'?X:c.align==='right'?X-tw:X-tw/2,y:Y-th/2,w:tw,h:th};
+      if(!best)best=bx;
+      if(bx.x<L+4||bx.x+bx.w>L+pw-4||bx.y<T+3||bx.y+bx.h>T+ph-3)continue;
+      if(hitsCurve(bx)||placed.some(p=>overlap(p,bx)))continue;best=bx;break;}
+    placed.push(best);
+    ctx.textAlign='left';ctx.textBaseline='middle';ctx.lineJoin='round';
+    ctx.strokeStyle=bg;ctx.lineWidth=4;ctx.strokeText(lb.text,best.x,best.y+th/2);
+    ctx.fillStyle=lb.color;ctx.fillText(lb.text,best.x,best.y+th/2);
+  }
+  ctx.textBaseline='alphabetic';
+}
+function interpY(pts,x){for(let i=1;i<pts.length;i++)if(pts[i][0]>=x){const [x0,y0]=pts[i-1],[x1,y1]=pts[i];return y0+(y1-y0)*(x-x0)/((x1-x0)||1);}return pts[pts.length-1][1];}
+function curveCands(pts,xs,offs){const c=[];for(const x of xs){const y=interpY(pts,x);for(const o of offs)c.push(Object.assign({x,y},o));}return c;}
+const OFFS=[{dy:-16,align:'center'},{dy:16,align:'center'},{dx:12,align:'left'},{dx:-12,align:'right'}];
+
+/* ---------- render ---------- */
+function render(){
+  const R=compute();
+  const col={batch:css('--batch'),pfr:css('--pfr'),cstr:css('--cstr')};
+  // n grid
+  const N=700,ns=[];for(let i=0;i<=N;i++)ns.push(Math.pow(10,7*i/N));
+  const curves={};let gmax=0;
+  for(const k of ['batch','cstr']){curves[k]=ns.map(n=>{const f=LN10*n*R[k].w(n);return [n,isFinite(f)?f:0];});for(const q of curves[k])gmax=Math.max(gmax,q[1]);}
+  let lo=1e9,hi=1;for(const k of ['batch','cstr'])for(const [n,f] of curves[k])if(f>0.004*gmax){lo=Math.min(lo,n);hi=Math.max(hi,n);}
+  let e0=Math.max(0,Math.floor(Math.log10(lo))),e1=Math.ceil(Math.log10(hi)+0.05);if(e1-e0<2)e1=e0+2;
+  const W=$('cMWD').clientWidth,h=Math.max(280,Math.min(460,W*0.6));
+  const ylab=[['d',''],['W','it'],[' / d(log',''],['10','sub'],[' ',''],['n','it'],[')','']];
+  drawPlot($('cMWD'),h,{xlog:true,xmin:Math.pow(10,e0),xmax:Math.pow(10,e1),ylog:false,ymin:0,ymax:niceTop(gmax*1.08),
+    xlabel:S.chem==='step'?[['chain length, ',''],['n','it'],[' (repeat units)','']]:[['dead-polymer chain length, ',''],['n','it'],[' (repeat units)','']],
+    ylabel:ylab,
+    yMinDec:1,
+    series:[{pts:curves.batch,color:col.batch,width:3.2},{pts:curves.cstr,color:col.cstr,width:3}],
+    labels:[mwdLabel('batch/PFR',curves.batch,col.batch),mwdLabel('CSTR',curves.cstr,col.cstr)]});
+  // PDI plot
+  const P=pdiCurves();
+  drawPlot($('cPDI'),h,{xlog:false,xmin:0,xmax:1,ylog:P.ylog,ymin:P.ymin,ymax:P.ymax,
+    xlabel:[[S.chem==='step'?'conversion, ':'monomer conversion, ',''],[S.chem==='step'?'p':'X','it']],
+    ylabel:[['polydispersity = ',''],['x̄','it'],['w','sub'],[' / ',''],['x̄','it'],['n','sub']],
+    series:[{pts:P.batch,color:col.batch,width:3},{pts:P.cstr,color:col.cstr,width:3}],
+    markers:[{x:R.batch.X,y:R.batch.pdi,color:col.batch,r:5.5},{x:R.cstr.X,y:R.cstr.pdi,color:col.cstr,r:5.5}],
+    labels:[{text:'batch/PFR',color:col.batch,cands:curveCands(P.batch,[0.3,0.5,0.15,0.7,0.85],OFFS)},
+            {text:'CSTR',color:col.cstr,cands:S.chem==='step'?pdiCstrCands(P.cstr):curveCands(P.cstr,[0.25,0.5,0.75,0.1],[{dy:18,align:'center'},{dy:-16,align:'center'}])}]});
+  // table
+  $('thTime').innerHTML=S.chem==='step'?'<i>k C</i><sub>0</sub><i>t</i> or <i>k C</i><sub>0</sub><span class="tau">τ</span>':'<i>k</i><sub>p</sub>[R·]<sub>0</sub><i>t</i> or <span class="tau">τ</span>';
+  const rows=[['batch','batch/PFR',''],['cstr','CSTR','']];
+  $('tbody').innerHTML=rows.map(([k,nm,d])=>{const r=R[k];return `<tr><td><span class="sw" style="border-color:${col[k]}"></span>${nm}</td><td>${r.X.toFixed(3)}</td><td>${fmtNum(r.t)}</td><td>${fmtNum(r.Mn)}</td><td>${fmtNum(r.Mw)}</td><td>${r.pdi<10?r.pdi.toFixed(2):r.pdi.toFixed(1)}</td></tr>`;}).join('');
+  // captions
+  const ratio=R.cstr.pdi/R.batch.pdi;
+  let note;
+  if(S.chem==='step'){
+    note=`<b>Step-growth:</b> back-mixing broadens the CSTR product. Large molecules that have stayed in the tank a long time keep coupling with fresh short chains, so the CSTR PDI is ${ratio.toFixed(1)} times the batch/PFR value here.`+(S.mode==='conv'?` At equal conversion the CSTR needs ${fmtNum(R.cstr.t/R.batch.t)} times the residence time.`:` At equal residence time the CSTR also reaches a lower conversion.`);
+  }else{
+    note=`<b>Free-radical:</b> each chain lives far less than a second, so the MWD is set by the [M] and [I] it sees while growing. In the CSTR these are uniform, giving a single Schulz–Flory distribution (PDI ${R.cstr.pdi.toFixed(2)}). In the batch reactor and PFR, the kinetic chain length drifts from ${fmtNum(nu0())} to ${fmtNum(frBatchNu(R.batch.X,nu0(),beta()))} as conversion rises, so the accumulated product is broader (PDI ${R.batch.pdi.toFixed(2)}).`;
+  }
+  $('note').innerHTML=note;
+  $('capMWD').textContent='Weight distribution of the polymer leaving each reactor.';
+  $('mainOut').textContent=CFG[key()].fmt(S.v[key()]);
+  $('nu0Out').textContent=fmtNum(nu0());$('betaOut').textContent=beta().toFixed(2);
+  document.querySelectorAll('.fr').forEach(e=>e.hidden=S.chem!=='fr');
+  const fr=S.chem==='fr',btn=$('mechBtn');$('controls').classList.toggle('frmode',fr);
+  if(fr&&btn.parentElement!==$('frRow2'))$('frRow2').appendChild(btn);
+  if(!fr&&btn.parentElement!==$('controls').parentElement)$('controls').after(btn);
+}
+function mwdLabel(text,pts,color){
+  let im=0;for(let i=1;i<pts.length;i++)if(pts[i][1]>pts[im][1])im=i;
+  const ymax=pts[im][1],cands=[{x:pts[im][0],y:ymax,dy:-16,align:'center'}];
+  for(const fr of [0.6,0.35,0.8]){let r=im;while(r<pts.length-1&&pts[r][1]>fr*ymax)r++;let l=im;while(l>0&&pts[l][1]>fr*ymax)l--;
+    cands.push({x:pts[r][0],y:pts[r][1],dx:12,align:'left'},{x:pts[l][0],y:pts[l][1],dx:-12,align:'right'});}
+  return {text,color,cands};
+}
+function pdiCstrCands(pts){const c=[];for(const P of [30,60,12,120]){const p=(-P+Math.sqrt(P*P-4*(1-P)))/2;c.push({x:p,y:P,dx:-12,align:'right'});}return c;}
+function niceTop(v){const m=Math.pow(10,Math.floor(Math.log10(v)));const f=v/m;const s=f<=1?1:f<=1.2?1.2:f<=1.5?1.5:f<=2?2:f<=2.5?2.5:f<=3?3:f<=4?4:f<=5?5:f<=6?6:f<=8?8:10;return s*m;}
+
+/* ---------- UI wiring ---------- */
+function seg(a,b,on){$(a).setAttribute('aria-pressed',on);$(b).setAttribute('aria-pressed',!on);}
+$('chemStep').onclick=()=>{S.chem='step';seg('chemStep','chemFR',true);setupMain();render();};
+$('chemFR').onclick=()=>{S.chem='fr';seg('chemStep','chemFR',false);setupMain();render();};
+$('modeConv').onclick=()=>{S.mode='conv';seg('modeConv','modeTau',true);setupMain();render();};
+$('modeTau').onclick=()=>{S.mode='tau';seg('modeConv','modeTau',false);setupMain();render();};
+$('termD').onclick=()=>{S.term='disp';seg('termD','termC',true);render();};
+$('termC').onclick=()=>{S.term='comb';seg('termD','termC',false);render();};
+$('main').addEventListener('input',e=>{S.v[key()]=+e.target.value;render();});
+$('nu0').addEventListener('input',render);$('beta').addEventListener('input',render);
+
+const panels=['pDir','pDet','pAbout','pMech'];
+function closeAll(){panels.forEach(p=>$(p).hidden=true);}
+document.querySelectorAll('.pbtn').forEach(b=>b.addEventListener('click',e=>{
+  e.stopPropagation();const p=$(b.dataset.panel);const was=!p.hidden;closeAll();if(was)return;
+  p.hidden=false;
+  if(b.dataset.anchor==='left'){const host=p.offsetParent.getBoundingClientRect(),br=b.getBoundingClientRect();let L=br.left-host.left;
+    p.style.right='auto';p.style.left=L+'px';p.style.top=(br.bottom-host.top+6)+'px';
+    const r=p.getBoundingClientRect(),lim=Math.min(document.documentElement.clientWidth-8,$('cPDI').getBoundingClientRect().right);
+    if(r.right>lim){const R=Math.min(br.right,lim);p.style.left=Math.max(0,L-(r.right-R))+'px';}}
+  else{p.style.right='0px';const r=p.getBoundingClientRect();if(r.left<8)p.style.right=(r.left-8)+'px';}
+}));
+document.querySelectorAll('.panel .close').forEach(c=>c.addEventListener('click',closeAll));
+document.querySelectorAll('.panel').forEach(p=>p.addEventListener('click',e=>e.stopPropagation()));
+document.addEventListener('click',closeAll);
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAll();});
+
+let raf=0;const rr=()=>{cancelAnimationFrame(raf);raf=requestAnimationFrame(render);};
+new ResizeObserver(rr).observe($('cMWD'));
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',rr);
+new MutationObserver(rr).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+setupMain();render();
+})();
+</script>
