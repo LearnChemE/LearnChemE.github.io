@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
+    <title>Jablonski Diagram</title>
+    <meta name="keywords" content="LearnChemE, chemical engineering, engineering, simulation">
+    <meta name="author" content="">
+    <meta name="application-name" content="Jablonski Diagram">
+    <meta name="description" content="An interactive Jablonski diagram showing photophysical processes and quantum yield.">
+
+    <!-- MathJax -->
+    <script>
+        MathJax = {
+            chtml: {
+                scale: 0.95,
+                mathmlSpacing: true,
+                displayAlign: 'left',
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <!-- Bootstrap -->
+    <script src="
+      https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js
+      "></script>
+    <link href="
+      https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css
+      " rel="stylesheet">
+
+    <!-- Sliders -->
+    <style>
+input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 5px;
+  border-radius: 3px;
+  background: #d3d3d3;
+  outline: none;
+  opacity: 0.7;
+  margin-bottom: 0.5rem;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #4CAF50;
+  cursor: pointer;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #4CAF50;
+  cursor: pointer;
+}
+    </style>
+    <!-- Main stylesheet -->
+    <style>
+/* :root basically means the entire document. By default, it uses serif (e.g. times new roman) font, which looks awful */
+:root {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 16px;
+}
+
+/* Octothorpes (#) refer to an ID of an element, like <div id="simulation-title"></div>*/
+/* vw means "viewport width". It is a percentage of the window width, so 100vw means the width of the entire browser. Margin is essentially what it says it is - it adds a buffer between elements. */
+#master-wrapper {
+  margin-top: 10px;
+  display: grid;
+}
+
+/* You can use calc() to calculate variables, so height in this context is the browser width minus 100 pixels */
+/* Position: absolute means that you can specify the exact placement in pixels of the element, instead of the browser trying to automatically detect where to put it. So it is 0px to the left and 0px from the top of the browser window.  I wouldn't recommend using position:absolute for most things, but in this context it makes the simulation-wrapper element essentially the same exact size as the browser window. */
+#simulation-wrapper {
+  display: grid;
+  grid-template-rows: min-content max-content;
+  justify-items: center;
+  align-items: center;
+  width: 100vw;
+  height: min-content;
+}
+
+/* Display: grid is my favorite way of placing elements. As you can tell, I use it a lot. See this website for a brief synopsis: https://grid.malven.co . Gap is the space between grid elements. */
+.inputs-wrapper {
+  display: grid;
+  grid-template-columns: max-content max-content max-content max-content;
+  justify-items: center;
+  align-items: center;
+  gap: 15px 5px;
+  margin-top: 10px;
+}
+
+.inputs-wrapper2 {
+  display: grid;
+  grid-template-columns: max-content;
+  justify-items: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 5px;
+}
+
+.input-row {
+  display: grid;
+  grid-template-columns: 230px 135px 95px;
+  gap: 8px;
+  align-items: center;
+  margin-top: 0;
+}
+
+.input-row .input-label {
+  justify-self: end;
+  text-align: right;
+}
+
+.input-row .value-label {
+  justify-self: start;
+  text-align: left;
+}
+
+.select-row {
+  display: grid;
+  grid-template-columns: repeat(3, max-content);
+  gap: 10px;
+  align-items: center;
+}
+
+.select-container>form {
+  display: grid;
+}
+
+select {
+  padding: 2px 5px;
+}
+
+#graphics-wrapper {
+  width: 100vw;
+  height: max-content;
+  display: grid;
+  justify-content: center;
+}
+
+/* Box shadows can often make elements appear as though they're "floating" above the page, and I really like the aesthetic of it, so I use it a lot alongside a 1 pixel black border */
+canvas {
+  border: 1px solid black;
+  box-shadow: 0px 0px 2px 2px grey;
+}
+
+label {
+  margin-right: 20px;
+}
+
+#modal-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, max-content);
+  gap: 10px;
+  justify-content: center;
+}
+
+.modal-body .modal-equation {
+  width: max-content;
+  margin-left: 15px;
+  padding: 2px;
+}
+
+.modal-text+.modal-text {
+  margin-top: 10px;
+}
+
+.modal-equation.no-padding {
+  padding: 0px;
+}
+
+.input-area {
+  display: grid;
+  grid-template-columns: max-content max-content;
+  margin: 0 auto;
+  gap: 3px 10px;
+  width: max-content;
+  justify-items: center;
+}
+
+/* Prevents the ⚠ warning prefix from wrapping the rate value onto a new line */
+.value-label {
+  white-space: nowrap;
+}
+
+.modal-header {
+  justify-content: space-between;
+}
+
+.close {
+  border: none;
+  background: none;
+  scale: 1.5;
+}
+
+    </style>
+
+    <!-- P5 -->
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.11.13/lib/p5.min.js"></script>
+
+</head>
+
+<body>
+    <div id="simulation-wrapper">
+
+        <!-- Row 1: rate constant sliders -->
+        <div class="inputs-wrapper2">
+
+            <div id="modal-buttons">
+                <div id="dir" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directionsModal">
+                    Directions
+                </div>
+                <div id="detail" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#detailsModal">
+                    Details
+                </div>
+                <div id="about" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#aboutModal">
+                    About
+                </div>
+            </div>
+
+            <div class="input-area">
+
+                <div class="input-row">
+                    <div class="input-label">\(k_f\) fluorescence (s<sup>-1</sup>)</div>
+                    <input type="range" id="kf-slider" min="0" max="100" value="50" step="1" />
+                    <div id="kf-label" class="value-label">1.0×10<sup>8</sup></div>
+                </div>
+
+                <div class="input-row">
+                    <div class="input-label">\(k_p\) phosphorescence (s<sup>-1</sup>)</div>
+                    <input type="range" id="kp-slider" min="0" max="100" value="20" step="1" />
+                    <div id="kp-label" class="value-label">1.0×10<sup>3</sup></div>
+                </div>
+
+                <div class="input-row">
+                    <div class="input-label">\(k_{S_1 \to T_1}\) intersystem crossing (s<sup>-1</sup>)</div>
+                    <input type="range" id="kiscS1T1-slider" min="0" max="100" value="50" step="1" />
+                    <div id="kiscS1T1-label" class="value-label">1.0×10<sup>9</sup></div>
+                </div>
+
+                <div class="input-row">
+                    <div class="input-label">\(k_{T_1 \to S_0}\) intersystem crossing (s<sup>-1</sup>)</div>
+                    <input type="range" id="kiscT1S0-slider" min="0" max="100" value="85" step="1" />
+                    <div id="kiscT1S0-label" class="value-label">1.0×10<sup>11</sup></div>
+                </div>
+
+                <div class="input-row">
+                    <div class="input-label">\(k_{S_1 \to S_0}\) internal conversion (s<sup>-1</sup>)</div>
+                    <input type="range" id="kicS1S0-slider" min="0" max="100" value="40" step="1" />
+                    <div id="kicS1S0-label" class="value-label">1.0×10<sup>10</sup></div>
+                </div>
+
+                <div class="input-row">
+                    <div class="input-label">\(k_r\) reaction (s<sup>-1</sup>)</div>
+                    <input type="range" id="kr-slider" min="0" max="100" value="30" step="1" />
+                    <div id="kr-label" class="value-label">1.0×10<sup>3</sup></div>
+                </div>
+
+                <div class="input-row">
+                    <div class="input-label">light intensity (a.u.)</div>
+                    <input type="range" id="intensity-slider" min="1" max="100" value="50" step="1" />
+                    <div id="intensity-label" class="value-label">50</div>
+                </div>
+
+                <div class="input-row">
+                    <div class="input-label">absorbance rate (a.u.)</div>
+                    <input type="range" id="absorbance-slider" min="0.1" max="5" value="1" step="0.1" />
+                    <div id="absorbance-label" class="value-label">1</div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Canvas injected here by p5.js -->
+    <div id="graphics-wrapper"></div>
+
+    <!-- Directions Modal -->
+    <div class="modal fade" id="directionsModal" tabindex="-1" role="dialog" aria-labelledby="directionsModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="directionsModalLabel">Directions</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        This simulation shows a Jablonski diagram with the singlet ground state
+                        (S<sub>0</sub>), first and second excited singlet states (S<sub>1</sub>, S<sub>2</sub>),
+                        and first excited triplet state (T<sub>1</sub>). Vibrational substates are shown
+                        for each electronic state.
+                    </p>
+                    <p>
+                        Adjust the rate constant sliders to change the rates of fluorescence,
+                        phosphorescence, intersystem crossing, internal conversion, and reaction.
+                        Arrow thicknesses update to reflect each pathway's quantum yield, which is the fraction
+                        of absorbed photons that exit through that process.
+                        Mouse over the transitions arrows to identify the type of transition.
+                    </p>
+                    <p>
+                        The light intensity and absorbance rate sliders are included as a learning tool.
+                        Notice that changing them has no effect on the quantum yields shown on the diagram.
+                    </p>
+                    <p>
+                        A ⚠ symbol and amber color appear on a slider's value label when that rate constant
+                        is outside the typical literature range for that process. The simulation remains
+                        fully functional at these values; the warning is a reminder that the combination
+                        may not represent a physically realistic molecule.
+                    </p>
+                    <p>
+                        Quantum yield describes the fraction of absorbed photons that produce a specific photophysical outcome.
+                        After a molecule absorbs light, the excited state can relax through several competing pathways such as fluorescence,
+                        phosphorescence, internal conversion, or intersystem crossing. The quantum yield of each pathway represents the
+                        probability that an absorbed photon ultimately leaves through that process.
+                    </p>
+                    <p>
+                        Scroll to zoom and drag the screen to pan.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Details Modal -->
+    <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detailsModalLabel">Details</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-text">
+                        After absorption to S<sub>2</sub>, the molecule undergoes vibrational relaxation to v = 0 of S<sub>2</sub>, 
+                        internal conversion to S<sub>1</sub>, then vibrational relaxation to v = 0 of S<sub>1</sub>. 
+                        Absorption directly to S<sub>1</sub> can also occur, which likewise leads to vibrational relaxation to v = 0 of S<sub>1</sub>.
+                        Vibrational relaxation is fast relative to emission (Kasha's rule) and is not adjustable in this simulation.
+                        From S<sub>1</sub> (v = 0), three pathways compete: 
+                        fluorescence (\(k_f\)), intersystem crossing to T<sub>1</sub> (\(k_{S_1 \to T_1}\)), 
+                        and internal conversion to S<sub>0</sub> (\(k_{S_1 \to S_0}\)).
+                        From T<sub>1</sub> (v = 0), three pathways compete: 
+                        phosphorescence (\(k_p\)), intersystem crossing to S<sub>0</sub> (\(k_{T_1 \to S_0}\)), 
+                        and reaction (\(k_r\)).
+                    </div>
+                    <div class="modal-text">
+                        Fluorescence quantum yield:
+                    </div>
+                    <div class="modal-equation">
+                        $$\Phi_f = \frac{k_f}{k_f + k_{S_1 \to T_1} + k_{S_1 \to S_0}}$$
+                    </div>
+                    <div class="modal-text">
+                        Phosphorescence quantum yield:
+                    </div>
+                    <div class="modal-equation">
+                        $$\Phi_p = \frac{k_{S_1 \to T_1}}{k_f + k_{S_1 \to T_1} + k_{S_1 \to S_0}} \cdot \frac{k_p}{k_p + k_{T_1 \to S_0} + k_r}$$
+                    </div>
+                    <div class="modal-text">
+                        Reaction quantum yield:
+                    </div>
+                    <div class="modal-equation">
+                        $$\Phi_r = \frac{k_{S_1 \to T_1}}{k_f + k_{S_1 \to T_1} + k_{S_1 \to S_0}} \cdot \frac{k_r}{k_p + k_{T_1 \to S_0} + k_r}$$
+                    </div>
+                    <div class="modal-text">
+                        Heat (non-radiative) quantum yield from internal conversion S<sub>1</sub>→S<sub>0</sub> 
+                        and intersystem crossing T<sub>1</sub>→S<sub>0</sub>:
+                    </div>
+                    <div class="modal-equation">
+                        $$\Phi_h = \frac{k_{S_1 \to S_0}}{k_f + k_{S_1 \to T_1} + k_{S_1 \to S_0}} + \frac{k_{S_1 \to T_1}}{k_f + k_{S_1 \to T_1} + k_{S_1 \to S_0}} \cdot \frac{k_{T_1 \to S_0}}{k_p + k_{T_1 \to S_0} + k_r}$$
+                    </div>
+                    <div class="modal-text">
+                        All four quantum yields sum to 1. Arrow thickness indicates each pathway's quantum yield.
+                        Vibrational relaxation and absorption arrows have fixed width because they carry 100% of 
+                        the population. Light intensity and absorbance rate affect photons absorbed per second 
+                        but do not change branching fractions, so quantum yields are independent of these parameters.
+                    </div>
+                    <p></p>
+                    <p>
+                    The quantum yield (\(\Phi\)) of a photophysical process is defined as the number of events of that process divided by
+                    the number of photons absorbed. Photochemists use quantum yields to quantify how efficiently absorbed energy
+                    produces a particular outcome such as fluorescence emission or a photochemical reaction.
+                    </p>
+                    
+                    <p>
+                    Because excited states can decay through multiple competing pathways, the quantum yield depends on the
+                    relative magnitudes of the rate constants connecting the states in the Jablonski diagram. In this simulation,
+                    the quantum yields are calculated from the branching ratios of the rate constants for each pathway.
+                    </p>
+                    
+                    <p>
+                    Rate constant ranges were chosen based on representative orders of magnitude from the reference below.
+                    Each slider covers an expanded range that extends beyond typical laboratory values to allow
+                    exploration of extreme cases. When a slider is within the typical literature range for that
+                    process, the value label is shown normally. When it falls outside that range, the label
+                    turns amber and shows a ⚠ symbol. The simulation remains fully functional in either case.
+                    </p>
+                    
+                    <p>
+                    Source: Edinburgh Instruments. <a href="https://www.edinst.com/resource/what-is-a-jablonski-diagram-perrin-jablonski-diagram/" target="_blank">&ldquo;What is a Jablonski (Perrin-Jablonski) Diagram?&rdquo;</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Modal -->
+    <div class="modal fade" id="aboutModal" tabindex="-1" role="dialog" aria-labelledby="aboutModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="aboutModalLabel">About</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        This simulation was created in the Department of Chemical and Biological Engineering at
+                        University of Colorado Boulder for <a href="https://learncheme.com/" target="_blank">LearnChemE.com</a>
+                        by Alexander Osterbaan under the direction of Professor Christopher N. Bowman.
+                        Address any questions or comments to LearnChemE@gmail.com.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+// Helper functions for the Jablonski Diagram simulation
+
+// --- Rate slider utilities ---
+
+function sliderToRate(val, logMin, logMax) {
+    const log = logMin + (val / 100) * (logMax - logMin);
+    return Math.pow(10, log);
+}
+
+function formatRate(k) {
+    let exp      = Math.floor(Math.log10(k));
+    let mantissa = Number((k / Math.pow(10, exp)).toFixed(1));
+    if (mantissa >= 10) { mantissa /= 10; exp += 1; }
+    const expStr = exp < 0 ? "\u2212" + Math.abs(exp) : String(exp);
+    return mantissa.toFixed(1) + "\u00D710<sup>" + expStr + "</sup>";
+}
+
+// Updates a slider's value label. Shows a warning symbol and amber color when
+// the rate falls outside the physically typical range (normalBounds, log10 scale).
+function updateLabel(labelEl, rate, normalBounds) {
+    const log      = Math.log10(rate);
+    const inNormal = log >= normalBounds[0] && log <= normalBounds[1];
+    labelEl.innerHTML   = inNormal ? formatRate(rate) : "\u26A0 " + formatRate(rate);
+    labelEl.style.color = inNormal ? "" : "#e07000";
+}
+
+// --- Drawing utilities ---
+
+function drawLine(graphHeight, graphWidth, startPercentX, startPercentY, endPercentX, thickness) {
+    const y  = graphHeight * (1 - startPercentY);
+    const x1 = graphWidth  * startPercentX;
+    const x2 = graphWidth  * endPercentX;
+    strokeWeight(thickness);
+    line(x1, y, x2, y);
+}
+
+function lineSpacing(numLines, startPercentY, endPercentY) {
+    const yPositions = [];
+    for (let i = 0; i < numLines; i++) {
+        const t            = i / (numLines - 1);
+        const exponentialT = Math.pow(t, 2);
+        const yPercent     = endPercentY + exponentialT * (startPercentY - endPercentY);
+        yPositions.push(yPercent);
+    }
+    return yPositions;
+}
+
+function phiToStroke(phi) {
+    return ARROW_WIDTH_MIN + phi * (ARROW_WIDTH_MAX - ARROW_WIDTH_MIN);
+}
+
+// --- Arrow drawing ---
+
+function arrow(start, end, col, size, weight) {
+    const [x1, y1] = start;
+    const [x2, y2] = end;
+    const angle = Math.atan2(y2 - y1, x2 - x1);
+    push();
+    fill(col[0], col[1], col[2]); noStroke();
+    translate(x2, y2); rotate(angle);
+    triangle(0, 0, -size, -size / 2, -size, size / 2);
+    pop();
+}
+
+// Hover pop-ups: every process arrow drawn this frame is recorded (in diagram coordinates)
+// so the mouse can be hit-tested against it.
+const PROCESS_NAMES = [
+    ["absorption",             () => g.absorption],
+    ["fluorescence",           () => g.fluorescence],
+    ["phosphorescence",        () => g.phosphorescence],
+    ["intersystem crossing",   () => g.intersystemCrossing],
+    ["internal conversion",    () => g.internalConversion],
+    ["vibrational relaxation", () => g.vibrationalRelaxation],
+];
+function registerArrow(x1, y1, x2, y2, col, w) {
+    const entry = PROCESS_NAMES.find(([, c]) => c() === col);
+    if (!entry || !g.hitSegments) return;
+    g.hitSegments.push({ x1, y1, x2, y2, w, name: entry[0], col });
+}
+function distToSegment(px, py, s) {
+    const dx = s.x2 - s.x1, dy = s.y2 - s.y1;
+    const L2 = dx * dx + dy * dy;
+    let t = L2 === 0 ? 0 : ((px - s.x1) * dx + (py - s.y1) * dy) / L2;
+    t = Math.max(0, Math.min(1, t));
+    return Math.hypot(px - (s.x1 + t * dx), py - (s.y1 + t * dy));
+}
+
+function dashedArrow(x1, y1, x2, y2, col, arrowWidth, label) {
+    registerArrow(x1, y1, x2, y2, col, arrowWidth);
+    const dx  = x2 - x1, dy = y2 - y1;
+    const len = Math.sqrt(dx * dx + dy * dy);
+    const nx  = dx / len, ny = dy / len;
+    push();
+    stroke(col[0], col[1], col[2]); strokeWeight(arrowWidth);
+    drawingContext.setLineDash([7, 10]);
+    line(x1, y1, x2 - nx * ARROW_HEAD_SIZE, y2 - ny * ARROW_HEAD_SIZE);
+    drawingContext.setLineDash([]);
+    pop();
+    arrow([x1, y1], [x2, y2], col, ARROW_HEAD_SIZE, arrowWidth);
+    if (label) {
+        push();
+        noStroke(); fill(col[0], col[1], col[2]);
+        textSize(17); textAlign(LEFT, CENTER);
+        text(label, (x1 + x2) / 2 + 6, (y1 + y2) / 2);
+        pop();
+    }
+}
+
+function straightArrow(x, y1, y2, col, arrowWidth, label) {
+    registerArrow(x, y1, x, y2, col, arrowWidth);
+    const dir = y2 > y1 ? 1 : -1;
+    push();
+    stroke(col[0], col[1], col[2]); strokeWeight(arrowWidth);
+    line(x, y1, x, y2 - dir * ARROW_HEAD_SIZE);
+    pop();
+    arrow([x, y1], [x, y2], col, ARROW_HEAD_SIZE, arrowWidth);
+    if (label) {
+        push();
+        noStroke(); fill(col[0], col[1], col[2]);
+        textSize(17); textAlign(LEFT, CENTER);
+        text(label, x + 6, (y1 + y2) / 2);
+        pop();
+    }
+}
+
+// --- Diagram components ---
+
+function drawEnergyAxis(graphWidth, graphHeight, percents) {
+    push();
+    stroke(80); strokeWeight(1.5);
+    const axisX      = graphWidth  * percents.x;
+    const axisBottom = graphHeight * percents.bottom;
+    const axisTop    = graphHeight * percents.top;
+    const arrowTip   = graphHeight * percents.arrowTip;
+    line(axisX, axisBottom, axisX, axisTop);
+    arrow([axisX, axisBottom], [axisX, arrowTip], [80, 80, 80], ARROW_HEAD_SIZE, 3);
+    noStroke(); fill(80); textSize(17); textAlign(CENTER, CENTER);
+    push();
+    translate(graphWidth * percents.labelX, graphHeight * percents.labelY);
+    rotate(-HALF_PI);
+    text("Energy", 0, 0);
+    pop();
+    pop();
+}
+
+function drawLegend() {
+    const items = [
+        { label: "absorption",             col: g.absorption,            dash: false },
+        { label: "fluorescence",           col: g.fluorescence,          dash: false },
+        { label: "phosphorescence",        col: g.phosphorescence,       dash: false },
+        { label: "intersystem crossing",   col: g.intersystemCrossing,   dash: true  },
+        { label: "internal conversion",    col: g.internalConversion,    dash: true  },
+        { label: "vibrational relaxation", col: g.vibrationalRelaxation, dash: true  },
+    ];
+    // Two horizontal rows of three, column-aligned, in the empty band at the top of the diagram
+    const x0 = 60, rowY = [20, 48], swatch = 30, pad = 8, colGap = 28;
+    push();
+    textSize(17); textAlign(LEFT, CENTER);
+    const colW = [0, 1, 2].map(c => Math.max(textWidth(items[c].label), textWidth(items[c + 3].label)) + swatch + pad);
+    items.forEach(function(item, i) {
+        const r = Math.floor(i / 3), c = i % 3;
+        let x = x0;
+        for (let k = 0; k < c; k++) x += colW[k] + colGap;
+        const y = rowY[r];
+        stroke(item.col[0], item.col[1], item.col[2]); strokeWeight(4); strokeCap(SQUARE);
+        if (item.dash) drawingContext.setLineDash([7, 5]);
+        line(x, y, x + swatch, y);
+        drawingContext.setLineDash([]);
+        noStroke(); fill(item.col[0], item.col[1], item.col[2]);
+        text(item.label, x + swatch + pad, y);
+    });
+    pop();
+}
+
+// Draws Φ with an italic subscript (matching the MathJax \Phi_x style). Returns the width drawn.
+// Assumes textAlign(LEFT, *) is active.
+function drawPhi(sub, x, y, size) {
+    push();
+    textFont("Times New Roman"); textStyle(NORMAL); textSize(size);
+    text("\u03A6", x, y);
+    const w1 = textWidth("\u03A6");
+    textStyle(ITALIC); textSize(size * 0.72);
+    text(sub, x + w1 + 1, y + size * 0.3);
+    const w2 = textWidth(sub);
+    pop();
+    return w1 + 1 + w2 + 2;
+}
+
+function drawQuantumYieldPie(cx, cy, r, values, colors) {
+    const total            = values.reduce((a, b) => a + b, 0);
+    const normalizedValues = values.map(v => v / total);
+    let startAngle         = -HALF_PI;
+
+    noStroke();
+
+    for (let i = 0; i < normalizedValues.length; i++) {
+        const angle = normalizedValues[i] * TWO_PI;
+        if (angle < 0.001) continue;
+        fill(colors[i]);
+        arc(cx, cy, r * 2, r * 2, startAngle, startAngle + angle, PIE);
+        startAngle += angle;
+    }
+
+    stroke(0); strokeWeight(1.5);
+    noFill();
+    ellipse(cx, cy, r * 2, r * 2);
+}
+
+</script>
+    <script>
+// Jablonski Diagram Simulation
+
+// --- Constants ---
+const GRAPH_WIDTH     = 800;
+const GRAPH_HEIGHT    = 500;
+const PANEL_X         = 665;   // left edge of the right-hand panel (diagram content ends ~x = 640)
+const PANEL_WIDTH     = 300;   // right-hand panel for pie chart and quantum yields
+const ARROW_HEAD_SIZE = 14;
+const ARROW_WIDTH_MIN = 0.2;
+const ARROW_WIDTH_MAX = 10;
+
+// SLIDERS is the single source of truth for all rate constant bounds (log10 scale).
+// Each entry has two ranges:
+//   expanded — the full slider travel (wider than physically typical, for exploration)
+//   normal   — the physically typical literature range
+// Changing any number here propagates automatically to the slider range,
+// the initial state in window.g, the event listeners, and the warning logic.
+const SLIDERS = {
+    //              expanded:  [logMin, logMax]    normal:  [logMin, logMax]
+    kf:       { expanded: [ 5, 11], normal: [ 6,  9] },  // fluorescence rate
+    kp:       { expanded: [-3,  8], normal: [-2,  6] },  // phosphorescence rate
+    kiscS1T1: { expanded: [ 4, 13], normal: [ 6, 12] },  // ISC S1 → T1
+    kiscT1S0: { expanded: [ 0, 11], normal: [ 2,  8] },  // ISC T1 → S0
+    kicS1S0:  { expanded: [ 5, 13], normal: [ 7, 12] },  // IC  S1 → S0
+    kr:       { expanded: [-2, 11], normal: [ 0,  9] },  // reaction rate
+};
+
+// --- Global state ---
+window.g = {
+    cnv:      undefined,
+    kf:       sliderToRate(50, ...SLIDERS.kf.expanded),
+    kp:       sliderToRate(50, ...SLIDERS.kp.expanded),
+    kiscS1T1: sliderToRate(50, ...SLIDERS.kiscS1T1.expanded),
+    kiscT1S0: sliderToRate(50, ...SLIDERS.kiscT1S0.expanded),
+    kicS1S0:  sliderToRate(50, ...SLIDERS.kicS1S0.expanded),
+    kr:       sliderToRate(50, ...SLIDERS.kr.expanded),
+
+    absorption:            [0,   100, 255],
+    fluorescence:          [0,   200, 0  ],
+    phosphorescence:       [200, 0,   0  ],
+    intersystemCrossing:   [0,   150, 255],
+    internalConversion:    [150, 0,   200],
+    vibrationalRelaxation: [200, 180, 0  ],
+};
+
+// --- p5.js setup ---
+function setup() {
+    g.cnv = createCanvas(PANEL_X + PANEL_WIDTH, GRAPH_HEIGHT);
+    g.cnv.parent("graphics-wrapper");
+    setupZoom();
+    const mainEl = document.getElementsByTagName("main")[0];
+    if (mainEl) mainEl.remove();
+}
+
+// --- Slider references ---
+const kfSlider         = document.getElementById("kf-slider");
+const kfLabel          = document.getElementById("kf-label");
+const kpSlider         = document.getElementById("kp-slider");
+const kpLabel          = document.getElementById("kp-label");
+const kiscS1T1Slider   = document.getElementById("kiscS1T1-slider");
+const kiscS1T1Label    = document.getElementById("kiscS1T1-label");
+const kiscT1S0Slider   = document.getElementById("kiscT1S0-slider");
+const kiscT1S0Label    = document.getElementById("kiscT1S0-label");
+const kicS1S0Slider    = document.getElementById("kicS1S0-slider");
+const kicS1S0Label     = document.getElementById("kicS1S0-label");
+const krSlider         = document.getElementById("kr-slider");
+const krLabel          = document.getElementById("kr-label");
+const intensitySlider  = document.getElementById("intensity-slider");
+const intensityLabel   = document.getElementById("intensity-label");
+const absorbanceSlider = document.getElementById("absorbance-slider");
+const absorbanceLabel  = document.getElementById("absorbance-label");
+
+// --- Slider event listeners ---
+kfSlider.addEventListener("input", function() {
+    g.kf = sliderToRate(Number(kfSlider.value), ...SLIDERS.kf.expanded);
+    updateLabel(kfLabel, g.kf, SLIDERS.kf.normal);
+});
+kpSlider.addEventListener("input", function() {
+    g.kp = sliderToRate(Number(kpSlider.value), ...SLIDERS.kp.expanded);
+    updateLabel(kpLabel, g.kp, SLIDERS.kp.normal);
+});
+kiscS1T1Slider.addEventListener("input", function() {
+    g.kiscS1T1 = sliderToRate(Number(kiscS1T1Slider.value), ...SLIDERS.kiscS1T1.expanded);
+    updateLabel(kiscS1T1Label, g.kiscS1T1, SLIDERS.kiscS1T1.normal);
+});
+kiscT1S0Slider.addEventListener("input", function() {
+    g.kiscT1S0 = sliderToRate(Number(kiscT1S0Slider.value), ...SLIDERS.kiscT1S0.expanded);
+    updateLabel(kiscT1S0Label, g.kiscT1S0, SLIDERS.kiscT1S0.normal);
+});
+kicS1S0Slider.addEventListener("input", function() {
+    g.kicS1S0 = sliderToRate(Number(kicS1S0Slider.value), ...SLIDERS.kicS1S0.expanded);
+    updateLabel(kicS1S0Label, g.kicS1S0, SLIDERS.kicS1S0.normal);
+});
+krSlider.addEventListener("input", function() {
+    g.kr = sliderToRate(Number(krSlider.value), ...SLIDERS.kr.expanded);
+    updateLabel(krLabel, g.kr, SLIDERS.kr.normal);
+});
+intensitySlider.addEventListener("input", function() {
+    intensityLabel.innerHTML = intensitySlider.value;
+});
+absorbanceSlider.addEventListener("input", function() {
+    absorbanceLabel.innerHTML = absorbanceSlider.value;
+});
+
+// --- Initialize labels to reflect the starting slider position ---
+updateLabel(kfLabel,       g.kf,       SLIDERS.kf.normal);
+updateLabel(kpLabel,       g.kp,       SLIDERS.kp.normal);
+updateLabel(kiscS1T1Label, g.kiscS1T1, SLIDERS.kiscS1T1.normal);
+updateLabel(kiscT1S0Label, g.kiscT1S0, SLIDERS.kiscT1S0.normal);
+updateLabel(kicS1S0Label,  g.kicS1S0,  SLIDERS.kicS1S0.normal);
+updateLabel(krLabel,       g.kr,       SLIDERS.kr.normal);
+
+// --- Zoom / pan state (scroll wheel zooms about the cursor, drag pans, double-click resets) ---
+const ZOOM_MIN = 1, ZOOM_MAX = 5;
+g.zoom = 1; g.panX = 0; g.panY = 0;
+
+function clampPan() {
+    g.panX = Math.min(0, Math.max(width  - g.zoom * width,  g.panX));
+    g.panY = Math.min(0, Math.max(height - g.zoom * height, g.panY));
+}
+
+function canvasMouse(e) {
+    const r = g.cnv.elt.getBoundingClientRect();
+    return [(e.clientX - r.left) * width / r.width, (e.clientY - r.top) * height / r.height];
+}
+
+function setupZoom() {
+    const el = g.cnv.elt;
+    let dragging = false, lastX = 0, lastY = 0;
+    const updateCursor = () => { el.style.cursor = g.zoom > 1 ? (dragging ? "grabbing" : "grab") : "default"; };
+
+    el.addEventListener("wheel", function(e) {
+        e.preventDefault();
+        const [mx, my] = canvasMouse(e);
+        const newZoom  = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, g.zoom * Math.exp(-e.deltaY * 0.0015)));
+        g.panX = mx - (mx - g.panX) * newZoom / g.zoom;
+        g.panY = my - (my - g.panY) * newZoom / g.zoom;
+        g.zoom = newZoom;
+        clampPan(); updateCursor();
+    }, { passive: false });
+
+    el.addEventListener("mousedown", function(e) {
+        if (g.zoom <= 1) return;
+        dragging = true; g.dragging = true; lastX = e.clientX; lastY = e.clientY; updateCursor();
+        e.preventDefault();
+    });
+    window.addEventListener("mousemove", function(e) {
+        if (!dragging) return;
+        const r = el.getBoundingClientRect();
+        g.panX += (e.clientX - lastX) * width  / r.width;
+        g.panY += (e.clientY - lastY) * height / r.height;
+        lastX = e.clientX; lastY = e.clientY;
+        clampPan();
+    });
+    window.addEventListener("mouseup", function() { dragging = false; g.dragging = false; updateCursor(); });
+    el.addEventListener("dblclick", function() { g.zoom = 1; g.panX = 0; g.panY = 0; updateCursor(); });
+}
+
+// --- Main draw loop ---
+function draw() {
+    background(248);
+    g.hitSegments = [];
+    push();
+    translate(g.panX, g.panY);
+    scale(g.zoom);
+    drawScene();
+    pop();
+    drawHoverPopup();
+}
+
+function drawHoverPopup() {
+    if (g.dragging || mouseX < 0 || mouseY < 0 || mouseX > width || mouseY > height) return;
+    const wx = (mouseX - g.panX) / g.zoom, wy = (mouseY - g.panY) / g.zoom;
+    let best = null, bestD = Infinity;
+    for (const seg of g.hitSegments) {
+        const d = distToSegment(wx, wy, seg);
+        if (d <= Math.max(seg.w / 2 + 3, 6) && d < bestD) { best = seg; bestD = d; }
+    }
+    if (!best) { g.cnv.elt.title = ""; return; }
+    push();
+    textSize(17); textAlign(LEFT, CENTER);
+    const w = textWidth(best.name) + 16, h = 28;
+    let bx = mouseX + 14, by = mouseY - h - 8;
+    if (bx + w > width - 2) bx = mouseX - w - 14;
+    if (by < 2) by = mouseY + 16;
+    fill(255); stroke(best.col[0], best.col[1], best.col[2]); strokeWeight(1.5);
+    rect(bx, by, w, h, 5);
+    noStroke(); fill(best.col[0], best.col[1], best.col[2]);
+    text(best.name, bx + 8, by + h / 2 + 1);
+    pop();
+}
+
+function drawScene() {
+
+    const axisPercents = {
+        x: 0.0375, bottom: 0.925, top: 0.05, arrowTip: 0.045,
+        labelX: 0.0175, labelY: 0.5,
+    };
+    drawEnergyAxis(GRAPH_WIDTH, GRAPH_HEIGHT, axisPercents);
+
+    // ----- S0 energy levels -----
+    const S0LineBot     = 0.05,  S0LineTop = 0.55, S0LineNum = 14;
+    const S0LineXStart  = 0.05,  S0LineXEnd = 0.775, S0PercentSplit = 0.3;
+    const S0LineYValues = lineSpacing(S0LineNum, S0LineBot, S0LineTop);
+    let S1LineXStartGuide, T1LineXEndGuide, S2LineXEndGuide;
+    let S0YAnchor0, S0YAnchor1, S0YAnchor2, S0YAnchorS1, S0YAnchorT1;
+
+    for (const yPercent of S0LineYValues) {
+        if (yPercent === S0LineYValues[S0LineYValues.length - 1]) {
+            drawLine(GRAPH_HEIGHT, GRAPH_WIDTH, S0LineXStart, yPercent, S0LineXEnd, 2);
+        }
+        if (yPercent > (S0LineTop - S0LineBot) * S0PercentSplit + S0LineBot) {
+            let splitPercent = (yPercent - S0LineBot - 0.1) / (S0LineTop - S0LineBot);
+            splitPercent     = Math.pow(splitPercent, 0.4);
+            if (splitPercent > 0.9) splitPercent = 0.9;
+            const splitAmount     = (S0LineXEnd - S0LineXStart) * splitPercent;
+            const S0LineXMidEnd   = (S0LineXEnd - S0LineXStart) / 2 + S0LineXStart - splitAmount / 2;
+            const S0LineXMidStart = -(S0LineXEnd - S0LineXStart) / 2 + S0LineXEnd + splitAmount / 2;
+            // S0LineYValues[1] is intentionally skipped to leave a gap in the split region
+            if (yPercent !== S0LineYValues[1]) {
+                drawLine(GRAPH_HEIGHT, GRAPH_WIDTH, S0LineXStart,    yPercent, S0LineXMidEnd, 1);
+                drawLine(GRAPH_HEIGHT, GRAPH_WIDTH, S0LineXMidStart, yPercent, S0LineXEnd,    1);
+            }
+            if (yPercent === S0LineYValues[3]) { S1LineXStartGuide = S0LineXMidEnd;   S0YAnchorS1 = yPercent; }
+            if (yPercent === S0LineYValues[5]) { T1LineXEndGuide   = S0LineXMidStart; S0YAnchorT1 = yPercent; }
+        } else {
+            drawLine(GRAPH_HEIGHT, GRAPH_WIDTH, S0LineXStart, yPercent, S0LineXEnd, 1);
+        }
+        if (yPercent === S0LineYValues[S0LineYValues.length - 1]) S0YAnchor0 = yPercent;
+        if (yPercent === S0LineYValues[S0LineYValues.length - 2]) S0YAnchor1 = yPercent;
+        if (yPercent === S0LineYValues[S0LineYValues.length - 3]) S0YAnchor2 = yPercent;
+    }
+
+    // ----- S1 energy levels -----
+    const S1LineBot     = S0LineYValues[3], S1LineTop = S0LineYValues[3] + 0.2, S1LineNum = 7;
+    const S1LineXStart  = S1LineXStartGuide + 0.07, S1LineXEnd = 0.4, S1PercentSplit = 0.40;
+    const S1LineYValues = lineSpacing(S1LineNum, S1LineBot, S1LineTop);
+    let S1YAnchor0, S1YAnchorS2, S1XAnchorS0, S1XAnchorT1, S1XAnchorS2;
+
+    for (const yPercent of S1LineYValues) {
+        let splitPercent;
+        if (yPercent > (S1LineTop - S1LineBot) * S1PercentSplit + S1LineBot) {
+            splitPercent = (yPercent - S1LineBot) / (S1LineTop - S1LineBot);
+            if (splitPercent > 0.8) splitPercent = 0.8;
+        } else {
+            splitPercent = 0;
+        }
+        const splitAmount = (S1LineXEnd - S1LineXStart) * splitPercent;
+        if (yPercent === S1LineYValues[S1LineYValues.length - 1]) {
+            drawLine(GRAPH_HEIGHT, GRAPH_WIDTH, S1LineXStart + splitAmount, yPercent, S1LineXEnd, 2);
+        } else {
+            drawLine(GRAPH_HEIGHT, GRAPH_WIDTH, S1LineXStart + splitAmount, yPercent, S1LineXEnd, 1);
+        }
+        if (yPercent === S1LineYValues[3]) {
+            S2LineXEndGuide = S1LineXStart + splitAmount;
+            S1YAnchorS2     = yPercent;
+            S1XAnchorS2     = S1LineXStart + splitAmount;
+        }
+        if (yPercent === S1LineYValues[S1LineYValues.length - 1]) {
+            S1YAnchor0  = yPercent;
+            S1XAnchorS0 = S1LineXStart + splitAmount;
+            S1XAnchorT1 = S1LineXEnd;
+        }
+    }
+
+    // ----- T1 energy levels -----
+    const T1LineBot     = S0LineYValues[5], T1LineTop = S0LineYValues[5] + 0.17, T1LineNum = 8;
+    const T1LineXStart  = 0.5, T1LineXEnd = T1LineXEndGuide - 0.07;
+    const T1LineYValues = lineSpacing(T1LineNum, T1LineBot, T1LineTop);
+
+    for (const yPercent of T1LineYValues) {
+        if (yPercent === T1LineYValues[T1LineYValues.length - 1]) {
+            drawLine(GRAPH_HEIGHT, GRAPH_WIDTH, T1LineXStart, yPercent, T1LineXEnd, 2);
+        } else {
+            drawLine(GRAPH_HEIGHT, GRAPH_WIDTH, T1LineXStart, yPercent, T1LineXEnd, 1);
+        }
+    }
+
+    // ----- S2 energy levels -----
+    const S2LineBot     = S1LineYValues[3], S2LineTop = S1LineYValues[3] + 0.1, S2LineNum = 5;
+    const S2LineXStart  = 0.1, S2LineXEnd = S2LineXEndGuide - 0.07;
+    const S2LineYValues = lineSpacing(S2LineNum, S2LineBot, S2LineTop);
+
+    for (const yPercent of S2LineYValues) {
+        if (yPercent === S2LineYValues[S2LineYValues.length - 1]) {
+            drawLine(GRAPH_HEIGHT, GRAPH_WIDTH, S2LineXStart, yPercent, S2LineXEnd, 2);
+        } else {
+            drawLine(GRAPH_HEIGHT, GRAPH_WIDTH, S2LineXStart, yPercent, S2LineXEnd, 1);
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Quantum yields — every absorbed photon exits through exactly one of five
+    // terminal pathways: fluorescence (f), phosphorescence (p), reaction (r),
+    // internal conversion S1→S0 (ic), intersystem crossing T1→S0 (isc_T1).
+    // Their quantum yields sum to 1.
+    //
+    // S1 branching:
+    //   S1total = kf + kicS1S0 + kiscS1T1
+    //   phi_f   = kf       / S1total
+    //   phi_ic  = kicS1S0  / S1total
+    //   frac_T1 = kiscS1T1 / S1total   (fraction reaching T1)
+    //
+    // T1 branching (applied to frac_T1):
+    //   T1total    = kp + kiscT1S0 + kr
+    //   phi_p      = frac_T1 * (kp       / T1total)
+    //   phi_isc_T1 = frac_T1 * (kiscT1S0 / T1total)
+    //   phi_r      = frac_T1 * (kr       / T1total)
+    //
+    // Check: phi_f + phi_ic + phi_p + phi_isc_T1 + phi_r = 1
+    // -------------------------------------------------------------------------
+    const S1total  = g.kf + g.kicS1S0 + g.kiscS1T1;
+    const T1total  = g.kp + g.kiscT1S0 + g.kr;
+    const frac_T1  = g.kiscS1T1 / S1total;
+
+    const phi_f      = g.kf       / S1total;
+    const phi_ic     = g.kicS1S0  / S1total;
+    const phi_p      = frac_T1 * (g.kp       / T1total);
+    const phi_isc_T1 = frac_T1 * (g.kiscT1S0 / T1total);
+    const phi_r      = frac_T1 * (g.kr       / T1total);
+    // phi_f + phi_ic + phi_p + phi_isc_T1 + phi_r === 1
+
+    // Arrow widths scaled by quantum yield.
+    // Absorption and vibrational relaxation are fixed — they carry 100% of population.
+    const arrowWidthAbsorption      = 4;
+    const arrowWidthVib             = 2;
+    const arrowWidthFluorescence    = phiToStroke(phi_f);
+    const arrowWidthPhosphorescence = phiToStroke(phi_p);
+    const arrowWidthS1T1            = phiToStroke(frac_T1);
+    const arrowWidthT1S0            = phiToStroke(phi_isc_T1);
+    const arrowWidthS1S0            = phiToStroke(phi_ic);
+
+    // Pixel coordinate helpers
+    const toPixelX = (percentX) => GRAPH_WIDTH  * percentX;
+    const toPixelY = (percentY) => GRAPH_HEIGHT * (1 - percentY);
+
+    // State name labels
+    push();
+    noStroke(); textSize(17); textAlign(LEFT, CENTER); fill(40);
+    text("S\u2080", toPixelX(S0LineXEnd) - 10, toPixelY(S0LineYValues[S0LineYValues.length - 1]) + 10);
+    text("S\u2080", toPixelX(S0LineXStart),     toPixelY(S0LineYValues[S0LineYValues.length - 1]) + 10);
+    text("S\u2081", toPixelX(S1LineXStart) + 15, toPixelY(S1LineYValues[S1LineYValues.length - 1]) + 10);
+    text("T\u2081", toPixelX(T1LineXStart),      toPixelY(T1LineYValues[T1LineYValues.length - 1]) + 10);
+    text("S\u2082", toPixelX(S2LineXStart),      toPixelY(S2LineYValues[S2LineYValues.length - 1]) + 10);
+    pop();
+
+    // 1.0 Absorption: S0 → S1
+    straightArrow(toPixelX(0.27), toPixelY(S0YAnchor0), toPixelY(S1LineYValues[S1LineYValues.length - 1]), g.absorption, arrowWidthAbsorption);
+    // 1.1 Absorption: S0 → S1
+    straightArrow(toPixelX(0.29), toPixelY(S0YAnchor0), toPixelY(S1LineYValues[S1LineYValues.length - 2]), g.absorption, arrowWidthAbsorption);
+    // 1.2 Absorption: S0 → S1
+    straightArrow(toPixelX(0.31), toPixelY(S0YAnchor0), toPixelY(S1LineYValues[S1LineYValues.length - 3]), g.absorption, arrowWidthAbsorption);
+    // 1.3 Absorption: S0 → S2
+    straightArrow(toPixelX(0.25), toPixelY(S0YAnchor0), toPixelY(S2LineYValues[S2LineYValues.length - 1]), g.absorption, arrowWidthAbsorption);
+    // 1.4 Absorption: S0 → S2
+    straightArrow(toPixelX(0.23), toPixelY(S0YAnchor0), toPixelY(S2LineYValues[S2LineYValues.length - 2]), g.absorption, arrowWidthAbsorption);
+    // 1.5 Absorption: S0 → S2
+    straightArrow(toPixelX(0.21), toPixelY(S0YAnchor0), toPixelY(S2LineYValues[S2LineYValues.length - 3]), g.absorption, arrowWidthAbsorption);
+
+    // 2.0 Fluorescence: S1 → S0
+    straightArrow(toPixelX(S1XAnchorT1 - 0.01), toPixelY(S1YAnchor0), toPixelY(S0LineYValues[S0LineYValues.length - 1]), g.fluorescence, arrowWidthFluorescence);
+    // 2.1 Fluorescence: S1 → S0
+    straightArrow(toPixelX(S1XAnchorT1 - 0.03), toPixelY(S1YAnchor0), toPixelY(S0LineYValues[S0LineYValues.length - 2]), g.fluorescence, arrowWidthFluorescence);
+    // 2.2 Fluorescence: S1 → S0
+    straightArrow(toPixelX(S1XAnchorT1 - 0.05), toPixelY(S1YAnchor0), toPixelY(S0LineYValues[S0LineYValues.length - 3]), g.fluorescence, arrowWidthFluorescence);
+
+    // 3. Internal Conversion: S1 → S0
+    dashedArrow(toPixelX(S1XAnchorS0), toPixelY(S1YAnchor0), toPixelX(S1LineXStartGuide), toPixelY(S0YAnchorS1), g.internalConversion, arrowWidthS1S0);
+
+    // 4. Intersystem Crossing: S1 → T1
+    dashedArrow(toPixelX(S1XAnchorT1), toPixelY(S1YAnchor0), toPixelX(T1LineXStart), toPixelY(T1LineYValues[T1LineYValues.length - 2]), g.intersystemCrossing, arrowWidthS1T1);
+
+    // 5.0 Phosphorescence: T1 → S0
+    straightArrow(toPixelX(T1LineXEnd - 0.03), toPixelY(T1LineYValues[T1LineYValues.length - 1]), toPixelY(S0LineYValues[S0LineYValues.length - 1]), g.phosphorescence, arrowWidthPhosphorescence);
+    // 5.1 Phosphorescence: T1 → S0
+    straightArrow(toPixelX(T1LineXEnd - 0.05), toPixelY(T1LineYValues[T1LineYValues.length - 1]), toPixelY(S0LineYValues[S0LineYValues.length - 2]), g.phosphorescence, arrowWidthPhosphorescence);
+    // 5.2 Phosphorescence: T1 → S0
+    straightArrow(toPixelX(T1LineXEnd - 0.07), toPixelY(T1LineYValues[T1LineYValues.length - 1]), toPixelY(S0LineYValues[S0LineYValues.length - 3]), g.phosphorescence, arrowWidthPhosphorescence);
+
+    // 6. Intersystem Crossing: T1 → S0
+    dashedArrow(toPixelX(T1LineXEnd), toPixelY(T1LineYValues[T1LineYValues.length - 1]), toPixelX(T1LineXEndGuide), toPixelY(S0YAnchorT1), g.intersystemCrossing, arrowWidthT1S0);
+
+    // 7. Internal Conversion: S2 → S1
+    dashedArrow(toPixelX(S2LineXEnd), toPixelY(S1LineYValues[S1LineYValues.length - 4]), toPixelX(S2LineXEndGuide), toPixelY(S1LineYValues[S1LineYValues.length - 4]), g.internalConversion, 3);
+
+    // 8.0 Vibrational Relaxation: S2
+    dashedArrow(toPixelX(S2LineXEnd - 0.1), toPixelY(S2LineYValues[0]), toPixelX(S2LineXEnd - 0.1), toPixelY(S2LineYValues[S2LineYValues.length - 1]), g.vibrationalRelaxation, arrowWidthVib);
+    // 8.1 Vibrational Relaxation: S1
+    dashedArrow(toPixelX(S1LineXEnd - 0.02), toPixelY(S1LineYValues[S1LineYValues.length - 4]), toPixelX(S1LineXEnd - 0.02), toPixelY(S1LineYValues[S1LineYValues.length - 1]), g.vibrationalRelaxation, arrowWidthVib);
+    // 8.2 Vibrational Relaxation: T1
+    dashedArrow(toPixelX(T1LineXStart + 0.02), toPixelY(T1LineYValues[T1LineYValues.length - 2]), toPixelX(T1LineXStart + 0.02), toPixelY(T1LineYValues[T1LineYValues.length - 1]), g.vibrationalRelaxation, arrowWidthVib);
+    // 8.3 Vibrational Relaxation: S0 right (after phosphorescence/ISC landing)
+    dashedArrow(toPixelX(T1LineXEndGuide + 0.02), toPixelY(T1LineYValues[T1LineYValues.length - 1]), toPixelX(T1LineXEndGuide + 0.02), toPixelY(S0LineYValues[S0LineYValues.length - 1]), g.vibrationalRelaxation, arrowWidthVib);
+    // 8.4 Vibrational Relaxation: S0 left (after internal conversion landing)
+    dashedArrow(toPixelX(S1LineXStartGuide - 0.02), toPixelY(S1LineYValues[S1LineYValues.length - 1]), toPixelX(S1LineXStartGuide - 0.02), toPixelY(S0LineYValues[S0LineYValues.length - 1]), g.vibrationalRelaxation, arrowWidthVib);
+
+    // --- Right panel: pie chart and quantum yields ---
+    const phi_heat  = phi_ic + phi_isc_T1;
+    const panelMid  = PANEL_X + PANEL_WIDTH / 2;
+    const pieR      = 78 * 1.2 * 1.1;
+    const pieX      = PANEL_X + 10 + pieR;
+    const pieY      = 205;
+    const pieValues = [phi_f, phi_p, phi_r, phi_heat];
+    const pieColors = [
+        g.fluorescence,
+        g.phosphorescence,
+        [120, 120, 120],
+        g.vibrationalRelaxation,
+    ];
+    drawQuantumYieldPie(pieX, pieY, pieR, pieValues, pieColors);
+
+    push();
+    noStroke(); fill(30); textSize(17);
+    textAlign(LEFT, BASELINE);
+    text("quantum yield distribution", PANEL_X + 10, pieY - pieR - 16);
+
+    // Mini-legend next to the pie (15% larger than the 17px body text)
+    textAlign(LEFT, BASELINE);
+    const legendSubs      = ["f", "p", "r", "h"];
+    const phiLegendSize   = 17 * 1.15;
+    // One horizontal row directly below the pie
+    const smallLegendY    = pieY + pieR + 32;
+    const smallLegendStep = 64;
+    for (let i = 0; i < legendSubs.length; i++) {
+        const x = PANEL_X + 10 + i * smallLegendStep;
+        fill(pieColors[i]);
+        rect(x, smallLegendY - 14, 15, 15);
+        fill(30);
+        drawPhi(legendSubs[i], x + 21, smallLegendY, phiLegendSize);
+    }
+
+    // Quantum yield values
+    const qyX = PANEL_X + 10;
+    const qyY = smallLegendY + 36;
+    const qyRows = [
+        ["f", " (fluorescence) = ",        phi_f],
+        ["p", " (phosphorescence) = ",     phi_p],
+        ["r", " (reaction) = ",            phi_r],
+        ["h", " (heat, non-radiative) = ", phi_heat],
+    ];
+    textSize(17);
+    text("quantum yields", qyX, qyY);
+    qyRows.forEach(function(row, i) {
+        const y = qyY + 26 + i * 25;
+        const w = drawPhi(row[0], qyX, y, 17);
+        textSize(17);
+        text(row[1] + row[2].toFixed(3), qyX + w, y);
+    });
+    pop();
+
+    // --- Main legend ---
+    drawLegend();
+}
+
+</script>
+</body>
+</html>

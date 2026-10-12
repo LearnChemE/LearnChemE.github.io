@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DLP Cure Depth Simulator</title>
+<style>
+  :root {
+    --bg: #fff;
+    --surface: #ffffff;
+    --surface2: #f0f3f7;
+    --border: #d0d7de;
+    --border-light: #e8ecf0;
+    --gold-soft: #fdf6e3;
+    --gold-border: #e8d4a0;
+    --red-btn: #98000D;
+    --shadow: 0 1px 3px rgba(27,31,36,0.12), 0 8px 24px rgba(66,74,83,0.06);
+    --shadow-sm: 0 1px 2px rgba(27,31,36,0.1);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-weight: normal; }
+  body {
+    background: var(--bg);
+    color: #000;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 17px;
+    min-height: 100vh;
+  }
+  sub, sup { font-size: 0.75em; }
+
+  .topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    display: flex; align-items: center; gap: 12px;
+    height: 56px;
+  }
+  .topbar-icon {
+    width: 28px; height: 28px;
+    background: linear-gradient(135deg, #CFB87C, #a89155);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .topbar-icon svg { width: 16px; height: 16px; fill: white; }
+  .topbar-title { font-size: 22px; font-weight: bold; }
+
+  .container { max-width: 1180px; margin: 0 auto; padding: 24px 24px 48px; }
+  .sim-grid {
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-template-areas: ". btns" "sample inten" "resin light";
+    justify-content: center;
+    gap: 14px 18px;
+    align-items: start;
+  }
+  .btn-anchor { grid-area: btns; position: relative; }
+  .card-sample { grid-area: sample; }
+  .card-inten { grid-area: inten; }
+  .ctrl-resin { grid-area: resin; }
+  .ctrl-light { grid-area: light; }
+  .slider-row { display: flex; flex-wrap: wrap; gap: 0 20px; }
+  @media (max-width: 760px) {
+    .sim-grid { grid-template-columns: auto; grid-template-areas: "btns" "sample" "resin" "inten" "light"; }
+  }
+
+  /* ── Buttons + overlay panels ── */
+  .btn-row { display: flex; gap: 10px; }
+  .info-btn {
+    background: var(--red-btn);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 7px 16px;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 17px;
+    font-weight: normal;
+    cursor: pointer;
+  }
+  .info-btn:hover { background: #b3101e; }
+  .info-btn.active { background: #6e0009; }
+  .info-panel {
+    display: none;
+    position: absolute;
+    top: 44px;
+    left: 0;
+    z-index: 100;
+    width: min(620px, calc(100vw - 48px));
+    max-height: calc(100vh - 110px);
+    overflow-y: auto;
+    background: #fff;
+    border: 1px solid #bbb;
+    border-radius: 8px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+    padding: 20px 26px 22px 22px;
+    line-height: 1.5;
+    text-align: left;
+  }
+  .info-panel.wide { width: min(860px, calc(100vw - 48px)); }
+  .info-panel.open { display: block; }
+  .close-x {
+    position: absolute; top: 6px; right: 10px;
+    background: none; border: none;
+    color: var(--red-btn);
+    font-size: 26px; line-height: 1;
+    cursor: pointer;
+    font-family: Helvetica, Arial, sans-serif;
+  }
+  .info-panel p { margin: 0 0 10px; }
+  .info-panel ul, .info-panel ol { margin: 0 0 10px 22px; }
+  .info-panel li { margin-bottom: 6px; }
+  .info-panel .ph { margin: 14px 0 6px; text-decoration: underline; }
+  .info-panel .ph:first-of-type { margin-top: 0; }
+  .info-panel a { color: #0645ad; }
+  .eqn { margin: 4px 0 10px; text-align: left; overflow-x: auto; overflow-y: hidden; }
+  .eqn mjx-container[display="true"] { text-align: left !important; margin: 0.3em 0 !important; }
+  .defs td { padding: 2px 10px 2px 0; vertical-align: top; }
+
+  /* ── Parameter panel ── */
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .panel-body { padding: 18px; }
+  .section-label {
+    margin: 16px 0 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-label:first-child { margin-top: 0; }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border-light); }
+
+  .computed-row {
+    display: inline-block; white-space: nowrap;
+    background: var(--gold-soft);
+    border: 1px solid var(--gold-border);
+    border-radius: 7px;
+    padding: 8px 12px;
+    margin-bottom: 14px;
+  }
+
+  .param-group { margin-bottom: 16px; }
+  .param-label {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 8px; gap: 8px;
+  }
+  .param-value-display {
+    background: var(--gold-soft);
+    border: 1px solid var(--gold-border);
+    border-radius: 5px;
+    padding: 1px 7px;
+    white-space: nowrap;
+  }
+  .range-bounds { display: flex; justify-content: space-between; }
+  .param-group input[type="range"], .param-group .range-bounds { width: 220px; margin-left: 24px; }
+  .param-group .param-label { width: 244px; }
+  .param-group input[type="range"] { display: block; }
+  .oxy-hint { margin-top: 6px; line-height: 1.4; }
+  .divider { height: 1px; background: var(--border-light); margin: 16px 0; }
+
+  input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+
+  .metrics { display: grid; grid-template-columns: repeat(2, max-content); gap: 8px; margin-bottom: 14px; }
+  .metric { min-width: 108px; }
+  .computed-row > span { white-space: nowrap; }
+  .metric {
+    background: var(--surface2);
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    padding: 9px 11px;
+    line-height: 1.35;
+  }
+
+  .status-bar {
+    display: flex; align-items: center; gap: 8px;
+    padding: 9px 12px;
+    border-radius: 7px;
+    line-height: 1.4;
+  }
+  .status-bar.ok   { display: none; }
+  .status-bar.warn { background: #fff8c5; border: 1px solid #e4c97b; }
+  .status-bar.bad  { background: #fff0ee; border: 1px solid #ffc2c0; }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; animation: pulse 2s ease-in-out infinite; }
+  .status-bar.ok .status-dot   { background: #a89155; }
+  .status-bar.warn .status-dot { background: #9a6700; }
+  .status-bar.bad .status-dot  { background: #cf222e; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+
+  /* ── Figures ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    max-width: 100%;
+  }
+  .card-header {
+    display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
+    gap: 6px 12px;
+    padding: 11px 18px 10px;
+    border-bottom: 1px solid var(--border-light);
+    background: var(--surface2);
+  }
+  .card-pill {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 1px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+  .card-body { padding: 18px; }
+  .plot-wrap { position: relative; margin: 0 auto; }
+  canvas { display: block; }
+  .lbl {
+    position: absolute;
+    white-space: nowrap;
+    font-size: 17px;
+    line-height: 1;
+    color: #000;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="sim-grid">
+
+    <div class="btn-anchor">
+      <div class="btn-row">
+        <button class="info-btn" data-panel="directions">Directions</button>
+        <button class="info-btn" data-panel="details">Details</button>
+        <button class="info-btn" data-panel="about">About</button>
+      </div>
+
+      <!-- Directions -->
+      <div class="info-panel" id="panel-directions">
+        <button class="close-x" aria-label="close">&times;</button>
+        <p>This simulation predicts how deep a layer of photopolymer resin cures when it is exposed to UV light in a digital light processing (DLP) 3D printer. Light enters the top of a 1 mm deep resin sample and is attenuated by a photoabsorber as it travels down; resin cures wherever the local exposure exceeds a critical value.</p>
+        <ol>
+          <li>Use the <i>irradiance</i> slider (below the light intensity profile) to set the light intensity I<sub>0</sub> at the resin surface and the <i>exposure time</i> slider to set how long the light is on. Their product is the incident exposure E<sub>0</sub>, shown below these sliders.</li>
+          <li>Use the <i>photoabsorber</i> slider (below the sample cross-section) to change the photoabsorber concentration [A]. More photoabsorber absorbs light faster, which decreases the penetration depth D<sub>p</sub> and the cure depth.</li>
+          <li>Use the <i>O<sub>2</sub> inhibition</i> slider to include the effect of dissolved oxygen, which scavenges radicals and reduces the cure depth. At "none" the standard Jacobs working-curve equation is used (n = 1); moving right decreases n to as low as 0.68.</li>
+          <li>The left figure shows a cross-section of the 1 mm sample: cured polymer (gold) forms at the top where light enters, liquid resin (gray) remains below, and the black line (marked by the arrow) is the cure boundary at the cure depth C<sub>d</sub>. If C<sub>d</sub> exceeds 1 mm the whole sample is cured and is marked as over-cured (hatched).</li>
+          <li>The right figure shows the irradiance as a percentage of the surface irradiance versus depth z, with the cure depth marked by a dashed line, the penetration depth marked by a dot, and the percentage of the surface irradiance that reaches the bottom of the sample (1000 μm) labeled at the end of the curve.</li>
+          <li>A message appears below the resin sliders if the resin does not cure or if the entire sample is over-cured.</li>
+          <li>Open <i>Details</i> to see the equations with the current values substituted.</li>
+        </ol>
+      </div>
+
+      <!-- Details -->
+      <div class="info-panel wide" id="panel-details">
+        <button class="close-x" aria-label="close">&times;</button>
+
+        <div class="ph">Light attenuation (Beer–Lambert law)</div>
+        <p>UV light at the resin surface (z = 0) has irradiance \(I_0\). The photoabsorber attenuates the light exponentially with depth:</p>
+        <div class="eqn">$$I(z) = I_0\,\exp\!\left(-\varepsilon[A]\,z\right)$$</div>
+        <p>The penetration depth is the depth at which the intensity falls to \(1/e\) (about 37%) of \(I_0\):</p>
+        <div class="eqn">$$D_p = \frac{1}{\varepsilon[A]}$$</div>
+
+        <div class="ph">Exposure</div>
+        <p>The incident exposure (energy dose per unit area at the surface) is</p>
+        <div class="eqn">$$E_0 = I_0\,t$$</div>
+        <p>and the exposure at depth z is \(E(z) = E_0\exp(-z/D_p)\).</p>
+
+        <div class="ph">Cure depth (Jacobs working curve)</div>
+        <p>Resin cures where the local exposure exceeds the critical exposure \(E_c\). Setting \(E(C_d) = E_c\) gives the cure depth:</p>
+        <div class="eqn">$$C_d = D_p \ln\!\left(\frac{E_0}{E_c}\right)$$</div>
+        <p>No curing takes place (\(C_d = 0\)) when \(E_0 \le E_c\).</p>
+
+        <div class="ph">Oxygen inhibition</div>
+        <p>Dissolved oxygen scavenges radicals, so the cure depth is lower than predicted by the Jacobs equation. This is modeled with an empirical exponent \(n\) on the irradiance:</p>
+        <div class="eqn">$$C_d = \frac{D_p}{n}\ln\!\left(\frac{I_0^{\,n}\,t}{E_c}\right)$$</div>
+        <p>where \(0.68 \le n \le 1\). The inhibition slider value \(s\) (0 to 1) sets \(n = 1 - 0.32\,s\); \(n = 1\) recovers the Jacobs equation.</p>
+
+        <div class="ph">Sample quantities</div>
+        <div class="eqn">$$\frac{I(L)}{I_0} = \exp\!\left(-\frac{L}{D_p}\right) \qquad \text{fraction cured} = \min\!\left(\frac{C_d}{L},\,1\right)$$</div>
+
+        <div class="ph">Definitions</div>
+        <table class="defs">
+          <tr><td>\(I_0\)</td><td>irradiance at the resin surface (mW/cm<sup>2</sup>)</td></tr>
+          <tr><td>\(I(z)\)</td><td>irradiance at depth z (mW/cm<sup>2</sup>)</td></tr>
+          <tr><td>\(t\)</td><td>exposure time (s)</td></tr>
+          <tr><td>\(E_0\)</td><td>incident exposure (mJ/cm<sup>2</sup>)</td></tr>
+          <tr><td>\(E_c\)</td><td>critical exposure for curing = 10 mJ/cm<sup>2</sup> (fixed)</td></tr>
+          <tr><td>\(\varepsilon\)</td><td>absorptivity of the photoabsorber (natural-log basis) = 1000 M<sup>−1</sup> cm<sup>−1</sup> (fixed)</td></tr>
+          <tr><td>\([A]\)</td><td>photoabsorber concentration (M)</td></tr>
+          <tr><td>\(z\)</td><td>depth below the resin surface (μm)</td></tr>
+          <tr><td>\(D_p\)</td><td>penetration depth (μm)</td></tr>
+          <tr><td>\(C_d\)</td><td>cure depth (μm)</td></tr>
+          <tr><td>\(n\)</td><td>oxygen-inhibition exponent (dimensionless)</td></tr>
+          <tr><td>\(L\)</td><td>sample depth = 1 mm = 1000 μm</td></tr>
+        </table>
+        <p>The values of \(\varepsilon\) and \(E_c\) are typical of common acrylate photoinitiator systems.</p>
+
+        <div class="ph">Current values</div>
+        <div id="live-eqs"></div>
+      </div>
+
+      <!-- About -->
+      <div class="info-panel" id="panel-about">
+        <button class="close-x" aria-label="close">&times;</button>
+        <p>This simulation was created in the Department of Chemical and Biological Engineering at University of Colorado Boulder for <a href="https://learncheme.com/" target="_blank" rel="noopener">LearnChemE.com</a> by Alexander Osterbaan under the direction of Professor Christopher N. Bowman. Address any questions or comments to LearnChemE@gmail.com.</p>
+      </div>
+
+    </div>
+
+      <div class="card card-sample">
+        <div class="card-header">
+          <span>Sample cross-section</span>
+        </div>
+        <div class="card-body">
+          <div class="plot-wrap" id="sample-wrap"><canvas id="sample-canvas"></canvas></div>
+        </div>
+      </div>
+
+      <div class="card card-inten">
+        <div class="card-header">
+          <span>Light intensity profile</span>
+        </div>
+        <div class="card-body">
+          <div class="plot-wrap" id="intensity-wrap"><canvas id="intensity-canvas"></canvas></div>
+        </div>
+      </div>
+
+    <aside class="panel ctrl-resin">
+      <div class="panel-body">
+        <div class="section-label">Resin</div>
+          <div class="param-group">
+            <div class="param-label">
+              <span>Photoabsorber [A]</span>
+              <span class="param-value-display" id="conc-val">0.030 M</span>
+            </div>
+            <input type="range" id="conc-slider" min="0.7" max="2.0" step="0.01" value="1.477">
+            <div class="range-bounds"><span>0.005 M</span><span>0.100 M</span></div>
+          </div>
+
+          <div class="section-label"><span>O<sub>2</sub> inhibition</span></div>
+
+          <div class="param-group">
+            <div class="param-label">
+              <span>Inhibition strength</span>
+              <span class="param-value-display" id="n-label">none</span>
+            </div>
+            <input type="range" id="n-slider" min="0" max="1" step="0.01" value="0">
+            <div class="range-bounds"><span>n = 1</span><span>n = 0.68</span></div>
+            <div class="oxy-hint" id="n-hint">Standard Jacobs equation, no O<sub>2</sub> correction</div>
+          </div>
+
+          <div class="status-bar ok" id="status-bar">
+            <div class="status-dot"></div>
+            <span id="status-text">Ready</span>
+          </div>
+
+      </div>
+    </aside>
+
+    <aside class="panel ctrl-light">
+      <div class="panel-body">
+        <div class="section-label">Light source</div>
+        <div class="slider-row">
+          <div class="param-group">
+            <div class="param-label">
+              <span>Irradiance I<sub>0</sub></span>
+              <span class="param-value-display" id="irr-val">50 mW/cm²</span>
+            </div>
+            <input type="range" id="irr-slider" min="1" max="200" step="1" value="50">
+            <div class="range-bounds"><span>1 mW/cm²</span><span>200 mW/cm²</span></div>
+          </div>
+
+          <div class="param-group">
+            <div class="param-label">
+              <span>Exposure time t</span>
+              <span class="param-value-display" id="t-val">2.0 s</span>
+            </div>
+            <input type="range" id="t-slider" min="0.1" max="10" step="0.1" value="2">
+            <div class="range-bounds"><span>0.1 s</span><span>10 s</span></div>
+          </div>
+
+        </div>
+          <div class="computed-row">
+            <span>Incident exposure E<sub>0</sub> = </span><span id="e0-computed">100 mJ/cm²</span>
+          </div>
+
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(', '\\)']], displayMath: [['$$', '$$']] },
+  svg: { fontCache: 'global', displayAlign: 'left', displayIndent: '0' },
+  startup: {
+    ready: () => { MathJax.startup.defaultReady(); MathJax.startup.promise.then(() => { mjReady = true; }); }
+  }
+};
+let mjReady = false;
+</script>
+<script type="module"> import mathjax from 'https://cdn.jsdelivr.net/npm/mathjax@4.1.3/+esm' </script>
+<script>
+const EPS       = 1000;   // M^-1 cm^-1
+const SAMPLE_UM = 1000;   // μm
+const EC        = 10;     // mJ/cm²
+const FS        = 17;     // figure font size (px)
+
+const S = { irr: 50, t: 2.0, conc: 0.030, n: 1.0, raw: 0 };
+
+function getE0() { return S.irr * S.t; }
+function getDp() { return 1e4 / (EPS * S.conc); }          // μm
+function getCd() {
+  const arg = Math.pow(S.irr, S.n) * S.t / EC;
+  if (arg <= 1) return 0;
+  return (getDp() / S.n) * Math.log(arg);
+}
+function beerFrac(z_cm) { return Math.exp(-EPS * S.conc * z_cm); }
+
+// ── Canvas + HTML-overlay text helpers ─────────────────────────────────────────
+function getCanvas(id, w, h) {
+  const c   = document.getElementById(id);
+  const dpr = window.devicePixelRatio || 1;
+  c.width = Math.round(w * dpr); c.height = Math.round(h * dpr);
+  c.style.width = w + 'px'; c.style.height = h + 'px';
+  c.parentElement.style.width = w + 'px';
+  c.parentElement.style.height = h + 'px';
+  c.closest('.card').style.width = (w + 38) + 'px';
+  c.parentElement.querySelectorAll('.lbl').forEach(e => e.remove());
+  const ctx = c.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return { ctx, w, h, wrap: c.parentElement };
+}
+// ax: 0 left, 0.5 center, 1 right ; ay: 0 top, 0.5 middle, 1 bottom
+const SIDEWAYS = window.CSS && CSS.supports('writing-mode', 'sideways-lr');
+function txt(wrap, html, x, y, ax = 0.5, ay = 0.5, rot = 0) {
+  const d = document.createElement('div');
+  d.className = 'lbl';
+  d.innerHTML = html;
+  if (rot) {
+    // vertical text drawn with writing-mode (no rotate transform) so it renders
+    // with exactly the same font rasterization as the horizontal axis labels
+    if (SIDEWAYS) d.style.writingMode = 'sideways-lr';
+    else { d.style.writingMode = 'vertical-rl'; d.style.transform = 'rotate(180deg)'; }
+  }
+  wrap.appendChild(d);
+  d.style.left = Math.round(x - ax * d.offsetWidth) + 'px';
+  d.style.top  = Math.round(y - ay * d.offsetHeight) + 'px';
+  return d;
+}
+
+function plotWidths() {
+  const W = document.querySelector('.container').clientWidth - 48;
+  const sample = 250;
+  let intensity = W - (sample + 38) - 18 - 38;      // fits beside the cross-section
+  if (window.innerWidth <= 760) intensity = Math.max(300, W - 38);   // single column on narrow screens
+  return { sample, intensity: Math.min(520, intensity) };
+}
+
+// ── Sample cross-section ───────────────────────────────────────────────────────
+function drawSample(Cd, width) {
+  const { ctx, w, h, wrap } = getCanvas('sample-canvas', width, 280);
+  const PL = 62, PR = 8, PT = 34, PB = 12;
+  const pw = w - PL - PR, ph = h - PT - PB;
+  const x0 = PL, y0 = PT;
+
+  ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, w, h);
+  ctx.fillStyle = '#dde3ed'; ctx.fillRect(x0, y0, pw, ph);
+
+  const fillFrac = Math.min(Math.max(Cd, 0), SAMPLE_UM) / SAMPLE_UM;
+  const curedPx  = fillFrac * ph;
+  const yB = y0 + curedPx;
+
+  if (curedPx > 0.5) {
+    const grd = ctx.createLinearGradient(0, y0, 0, yB);
+    grd.addColorStop(0,   'rgba(207,184,124,0.95)');
+    grd.addColorStop(0.7, 'rgba(188,160,95,0.85)');
+    grd.addColorStop(1,   'rgba(168,145,85,0.7)');
+    ctx.fillStyle = grd;
+    ctx.fillRect(x0, y0, pw, curedPx);
+  }
+
+  if (Cd >= SAMPLE_UM) {
+    ctx.save();
+    ctx.beginPath(); ctx.rect(x0, y0, pw, ph); ctx.clip();
+    ctx.strokeStyle = 'rgba(224,82,82,0.35)'; ctx.lineWidth = 1.5;
+    for (let i = -ph; i < pw + ph; i += 14) {
+      ctx.beginPath(); ctx.moveTo(x0 + i, y0 + ph); ctx.lineTo(x0 + i + ph, y0); ctx.stroke();
+    }
+    ctx.restore();
+  } else if (curedPx > 0.5) {
+    ctx.strokeStyle = '#000'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(x0, yB); ctx.lineTo(x0 + pw, yB); ctx.stroke();
+  }
+
+  ctx.strokeStyle = '#8c959f'; ctx.lineWidth = 1;
+  ctx.strokeRect(x0, y0, pw, ph);
+
+  // UV arrows
+  ctx.save();
+  ctx.strokeStyle = '#98000D'; ctx.lineWidth = 1.5;
+  const nA = 5;
+  for (let i = 0; i < nA; i++) {
+    const ax = x0 + pw * (i + 1) / (nA + 1);
+    if (Math.abs(ax - (x0 + pw / 2)) < 16) continue;
+    ctx.beginPath(); ctx.moveTo(ax, y0 - 22); ctx.lineTo(ax, y0 - 3); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(ax - 4, y0 - 9); ctx.lineTo(ax, y0 - 3); ctx.lineTo(ax + 4, y0 - 9); ctx.stroke();
+  }
+  ctx.restore();
+  txt(wrap, 'UV', x0 + pw / 2, y0 - 14);
+
+  // depth ticks (inward) + labels
+  ctx.strokeStyle = '#555'; ctx.lineWidth = 1;
+  [0, 200, 400, 600, 800, 1000].forEach(d => {
+    const ty = y0 + (d / SAMPLE_UM) * ph;
+    ctx.beginPath(); ctx.moveTo(x0, ty); ctx.lineTo(x0 + 5, ty); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x0 + pw, ty); ctx.lineTo(x0 + pw - 5, ty); ctx.stroke();
+    txt(wrap, d.toString(), x0 - 5, ty, 1, 0.5);
+  });
+  txt(wrap, 'depth (μm)', 12, y0 + ph / 2, 0.5, 0.5, -90);
+
+  // region labels directly on the figure
+  const LH = 22, cx = x0 + pw / 2;
+  const liqH = ph - curedPx;
+  if (Cd >= SAMPLE_UM) {
+    txt(wrap, 'cured polymer', cx, y0 + ph * 0.4).style.color = '#fff';
+    txt(wrap, 'over-cured', cx, y0 + ph * 0.6);
+    return;
+  }
+  const AG = 18;                       // arrow length between label and line
+  let boundary = null;                 // 'below' | 'above'
+  if (curedPx > 0.5) {
+    if (liqH >= 2 * LH + AG + 2) boundary = 'below';
+    else if (curedPx >= LH + AG) boundary = 'above';
+  }
+  const arrow = (yFrom, yTo) => {      // small arrow from label to the black line
+    const dir = Math.sign(yTo - yFrom);
+    ctx.save(); ctx.strokeStyle = '#000'; ctx.fillStyle = '#000'; ctx.lineWidth = 1.3;
+    ctx.beginPath(); ctx.moveTo(cx, yFrom); ctx.lineTo(cx, yTo - dir * 5); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx, yTo); ctx.lineTo(cx - 4, yTo - dir * 6); ctx.lineTo(cx + 4, yTo - dir * 6); ctx.closePath(); ctx.fill();
+    ctx.restore();
+  };
+  if (boundary === 'below') { txt(wrap, 'cure boundary', cx, yB + AG + 1, 0.5, 0); arrow(yB + AG, yB + 1.5); }
+  if (boundary === 'above') { txt(wrap, 'cure boundary', cx, yB - AG - 1, 0.5, 1); arrow(yB - AG, yB - 1.5); }
+
+  let cTop = y0, cBot = yB - (boundary === 'above' ? LH + AG : 0);
+  if (cBot - cTop >= LH) txt(wrap, 'cured polymer', cx, (cTop + cBot) / 2).style.color = '#fff';
+
+  let lTop = yB + (boundary === 'below' ? LH + AG + 2 : 0), lBot = y0 + ph;
+  if (lBot - lTop >= LH) txt(wrap, 'liquid resin', cx, (lTop + lBot) / 2);
+}
+
+// ── Light intensity profile ────────────────────────────────────────────────────
+function drawIntensity(Cd, width) {
+  const { ctx, w, h, wrap } = getCanvas('intensity-canvas', width, 294);
+  const PL = 86, PR = 18, PT = 14, PB = 56;
+  const pw = w - PL - PR, ph = h - PT - PB;
+  const x0 = PL, y0 = PT;
+
+  ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, w, h);
+
+  // grid
+  ctx.strokeStyle = 'rgba(0,0,0,0.06)'; ctx.lineWidth = 0.5;
+  for (let i = 1; i < 5; i++) {
+    const x = x0 + (i / 5) * pw; ctx.beginPath(); ctx.moveTo(x, y0); ctx.lineTo(x, y0 + ph); ctx.stroke();
+  }
+  for (let i = 1; i < 4; i++) {
+    const y = y0 + (i / 4) * ph; ctx.beginPath(); ctx.moveTo(x0, y); ctx.lineTo(x0 + pw, y); ctx.stroke();
+  }
+
+  const N = 300;
+  const pt = i => [x0 + (i / N) * pw, y0 + ph - beerFrac((i / N) * 0.1) * ph];
+  const grd = ctx.createLinearGradient(x0, y0, x0, y0 + ph);
+  grd.addColorStop(0, 'rgba(207,184,124,0.35)');
+  grd.addColorStop(1, 'rgba(207,184,124,0.03)');
+  ctx.beginPath(); ctx.moveTo(x0, y0 + ph);
+  for (let i = 0; i <= N; i++) ctx.lineTo(...pt(i));
+  ctx.lineTo(x0 + pw, y0 + ph); ctx.closePath();
+  ctx.fillStyle = grd; ctx.fill();
+
+  ctx.beginPath(); ctx.strokeStyle = '#b09550'; ctx.lineWidth = 2.5;
+  for (let i = 0; i <= N; i++) { const [px, py] = pt(i); i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py); }
+  ctx.stroke();
+
+  // frame + inward ticks on all four sides
+  ctx.strokeStyle = '#555'; ctx.lineWidth = 1;
+  ctx.strokeRect(x0, y0, pw, ph);
+  [0, 200, 400, 600, 800, 1000].forEach(d => {
+    const x = x0 + (d / 1000) * pw;
+    ctx.beginPath(); ctx.moveTo(x, y0 + ph); ctx.lineTo(x, y0 + ph - 6); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x, y0); ctx.lineTo(x, y0 + 6); ctx.stroke();
+    txt(wrap, d.toString(), x, y0 + ph + 6, 0.5, 0);
+  });
+  let tickW = 0;
+  [0, 25, 50, 75, 100].forEach(p => {
+    const y = y0 + ph - (p / 100) * ph;
+    ctx.beginPath(); ctx.moveTo(x0, y); ctx.lineTo(x0 + 6, y); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x0 + pw, y); ctx.lineTo(x0 + pw - 6, y); ctx.stroke();
+    const t = txt(wrap, p === 100 ? '100%' : String(p), x0 - 6, y, 1, 0.5);
+    if (p < 100) tickW = Math.max(tickW, t.offsetWidth);
+  });
+  txt(wrap, 'depth z (μm)', x0 + pw / 2, y0 + ph + 30, 0.5, 0);
+  // y-axis label: placed just left of the tick numbers; shifted down only as far as
+  // needed to clear the "100%" label at the top of the axis
+  const yl = txt(wrap, '<div style="text-align:center;line-height:1.25">irradiance/(surface irradiance)<br>&times; 100</div>', 0, 0, 0, 0, -90);
+  const yH = yl.offsetHeight, yW = yl.offsetWidth;
+  const yc = Math.max(y0 + ph / 2, y0 + 14 + yH / 2);
+  yl.style.left = Math.round(x0 - 6 - tickW - 8 - yW) + 'px';
+  yl.style.top  = Math.round(yc - yH / 2) + 'px';
+
+  if (Cd > 0 && Cd <= SAMPLE_UM) {
+    const cx = x0 + (Cd / SAMPLE_UM) * pw;
+    ctx.save();
+    ctx.strokeStyle = '#000'; ctx.lineWidth = 1.5; ctx.setLineDash([5, 3]);
+    ctx.beginPath(); ctx.moveTo(cx, y0); ctx.lineTo(cx, y0 + ph); ctx.stroke();
+    ctx.restore();
+    const right = cx > x0 + pw - 185;
+    txt(wrap, `cure depth = ${Cd.toFixed(0)} μm`, right ? cx - 6 : cx + 6, y0 + 16, right ? 1 : 0, 0.5);
+  }
+
+  // penetration depth: I/I0 = 1/e at z = Dp
+  const Dp = getDp();
+  if (Dp <= SAMPLE_UM) {
+    const px = x0 + (Dp / SAMPLE_UM) * pw, py = y0 + ph - Math.exp(-1) * ph;
+    ctx.save();
+    ctx.strokeStyle = '#555'; ctx.lineWidth = 1; ctx.setLineDash([2, 3]);
+    ctx.beginPath(); ctx.moveTo(x0, py); ctx.lineTo(px, py); ctx.lineTo(px, y0 + ph); ctx.stroke();
+    ctx.setLineDash([]); ctx.fillStyle = '#000';
+    ctx.beginPath(); ctx.arc(px, py, 4, 0, 2 * Math.PI); ctx.fill();
+    ctx.restore();
+    const d = txt(wrap, `penetration depth = ${Dp.toFixed(0)} μm`, px + 8, py - 8, 0, 1);
+    d.style.background = 'rgba(255,255,255,0.8)'; d.style.padding = '1px 2px';
+    const lw = d.offsetWidth;
+    let lx = px + 8;                                        // right of the point
+    if (lx + lw > x0 + pw - 4) lx = px - 8 - lw;            // else left of it
+    if (lx < x0 + 4) lx = Math.min(Math.max(px - lw / 2, x0 + 4), x0 + pw - lw - 4);  // else centered above
+    d.style.left = Math.round(lx) + 'px';
+  }
+
+  // value at the bottom of the sample (z = 1000 μm)
+  const f1 = beerFrac(0.1) * 100;
+  const ex = x0 + pw, ey = y0 + ph - (f1 / 100) * ph;
+  ctx.fillStyle = '#000';
+  ctx.beginPath(); ctx.arc(ex, ey, 4, 0, 2 * Math.PI); ctx.fill();
+  const fTxt = (f1 >= 1 ? f1.toFixed(1) : f1 < 0.01 ? '<0.01' : f1.toPrecision(2)) + '%';
+  const below = Dp > 700 && Dp <= SAMPLE_UM;          // keep clear of the penetration-depth label
+  const e = txt(wrap, fTxt, ex - 8, below ? ey + 8 : ey - 8, 1, below ? 0 : 1);
+  e.style.background = 'rgba(255,255,255,0.8)'; e.style.padding = '1px 2px';
+}
+
+// ── Live equations (Details panel) ─────────────────────────────────────────────
+function liveEqTeX() {
+  const E0 = getE0(), Dp = getDp(), Cd = getCd(), n = S.n;
+  const conc = S.conc.toFixed(3), tt = S.t.toFixed(1);
+  const i1 = beerFrac(0.1) * 100, fill = Math.min(Cd / SAMPLE_UM * 100, 100);
+  const u = s => `\\ \\text{${s}}`;
+  const L = [];
+  L.push(`E_0 = I_0\\,t = (${S.irr}${u('mW/cm')}^2)(${tt}${u('s')}) = ${E0.toFixed(0)}${u('mJ/cm')}^2`);
+  L.push(`D_p = \\frac{1}{\\varepsilon[A]} = \\frac{1}{(1000${u('M')}^{-1}\\text{cm}^{-1})(${conc}${u('M')})} \\times 10^4${u('\\mu m/cm')} = ${Dp.toFixed(0)}${u('\\mu m')}`);
+  if (n >= 0.999) {
+    const arg = E0 / EC;
+    L.push(arg <= 1
+      ? `E_0 = ${E0.toFixed(0)}${u('mJ/cm')}^2 \\le E_c = ${EC}${u('mJ/cm')}^2 \\;\\Rightarrow\\; C_d = 0`
+      : `C_d = D_p \\ln\\!\\left(\\frac{E_0}{E_c}\\right) = (${Dp.toFixed(0)}${u('\\mu m')})\\ln\\!\\left(\\frac{${E0.toFixed(0)}}{${EC}}\\right) = ${Cd.toFixed(0)}${u('\\mu m')}`);
+  } else {
+    const arg = Math.pow(S.irr, n) * S.t / EC;
+    L.push(`n = 1 - 0.32\\,(${S.raw.toFixed(2)}) = ${n.toFixed(3)}`);
+    L.push(arg <= 1
+      ? `\\frac{I_0^{\\,n}\\,t}{E_c} = \\frac{(${S.irr})^{${n.toFixed(3)}}(${tt})}{${EC}} = ${arg.toFixed(3)} \\le 1 \\;\\Rightarrow\\; C_d = 0`
+      : `C_d = \\frac{D_p}{n}\\ln\\!\\left(\\frac{I_0^{\\,n}\\,t}{E_c}\\right) = \\frac{${Dp.toFixed(0)}${u('\\mu m')}}{${n.toFixed(3)}}\\ln\\!\\left(\\frac{(${S.irr})^{${n.toFixed(3)}}(${tt})}{${EC}}\\right) = ${Cd.toFixed(0)}${u('\\mu m')}`);
+  }
+  L.push(`\\frac{I(L)}{I_0} = \\exp\\!\\left(-\\frac{1000${u('\\mu m')}}{${Dp.toFixed(0)}${u('\\mu m')}}\\right) = ${i1.toFixed(1)}\\%`);
+  L.push(`\\text{fraction cured} = \\min\\!\\left(\\frac{${Cd.toFixed(0)}}{1000},\\,1\\right) = ${fill.toFixed(0)}\\%`);
+  return L.map(s => `<div class="eqn">$$${s}$$</div>`).join('');
+}
+// \text{μm} → proper mu
+function fixMu(s) { return s.replace(/\\text\{\\mu m\/cm\}/g, '\\mu\\text{m/cm}').replace(/\\text\{\\mu m\}/g, '\\mu\\text{m}').replace(/\\ \\text\{\\mu m\}/g, '\\ \\mu\\text{m}'); }
+
+let liveQueued = false;
+function renderLive() {
+  if (!document.getElementById('panel-details').classList.contains('open')) return;
+  if (liveQueued) return;
+  liveQueued = true;
+  requestAnimationFrame(() => {
+    liveQueued = false;
+    const el = document.getElementById('live-eqs');
+    if (!mjReady) { setTimeout(renderLive, 100); return; }
+    MathJax.typesetClear([el]);
+    el.innerHTML = fixMu(liveEqTeX());
+    MathJax.typesetPromise([el]).catch(() => {});
+  });
+}
+
+// ── Main update ────────────────────────────────────────────────────────────────
+function update() {
+  const E0 = getE0(), Cd = getCd(), Dp = getDp();
+  const i1 = beerFrac(0.1) * 100;
+  const fill = Math.min(Cd / SAMPLE_UM * 100, 100);
+
+  document.getElementById('e0-computed').textContent = E0.toFixed(0) + ' mJ/cm²';
+
+  const sb = document.getElementById('status-bar');
+  const st = document.getElementById('status-text');
+  if (Cd <= 0) {
+    sb.className = 'status-bar bad'; st.textContent = 'Below cure threshold: increase irradiance or exposure time';
+  } else if (Cd >= SAMPLE_UM) {
+    sb.className = 'status-bar warn'; st.textContent = `Over-cure: ${Cd.toFixed(0)} μm exceeds the 1 mm sample`;
+  } else {
+    sb.className = 'status-bar ok'; st.textContent = '';
+  }
+
+  const pw = plotWidths();
+  drawSample(Cd, pw.sample);
+  drawIntensity(Cd, pw.intensity);
+  // control panels match the width of the figure above them
+  document.querySelector('.ctrl-resin').style.width = document.querySelector('.card-sample').style.width;
+  document.querySelector('.ctrl-light').style.width = document.querySelector('.card-inten').style.width;
+  renderLive();
+}
+
+// ── Slider bindings ────────────────────────────────────────────────────────────
+document.getElementById('irr-slider').addEventListener('input', function () {
+  S.irr = parseFloat(this.value);
+  document.getElementById('irr-val').textContent = S.irr.toFixed(0) + ' mW/cm²';
+  update();
+});
+document.getElementById('t-slider').addEventListener('input', function () {
+  S.t = parseFloat(this.value);
+  document.getElementById('t-val').textContent = S.t.toFixed(1) + ' s';
+  update();
+});
+document.getElementById('conc-slider').addEventListener('input', function () {
+  S.conc = Math.pow(10, parseFloat(this.value)) / 1000;
+  document.getElementById('conc-val').textContent = S.conc.toFixed(3) + ' M';
+  update();
+});
+document.getElementById('n-slider').addEventListener('input', function () {
+  const raw = parseFloat(this.value);
+  S.raw = raw;
+  S.n = 1 - raw * (1 - 0.68);
+  const labels = ['none', 'mild', 'moderate', 'strong'];
+  const idx = raw < 0.01 ? 0 : raw < 0.4 ? 1 : raw < 0.75 ? 2 : 3;
+  const hints = [
+    'Standard Jacobs equation, no O<sub>2</sub> correction',
+    `Mild inhibition, n = ${S.n.toFixed(2)}: slight undercure`,
+    `Moderate inhibition, n = ${S.n.toFixed(2)}: noticeable cure depth reduction`,
+    `Strong inhibition, n = ${S.n.toFixed(2)}: significant undercure`
+  ];
+  document.getElementById('n-label').textContent = labels[idx];
+  document.getElementById('n-hint').innerHTML = hints[idx];
+  update();
+});
+
+// ── Directions / Details / About panels ────────────────────────────────────────
+const btns = document.querySelectorAll('.info-btn');
+function closeAll() {
+  document.querySelectorAll('.info-panel').forEach(p => p.classList.remove('open'));
+  btns.forEach(b => b.classList.remove('active'));
+}
+btns.forEach(b => b.addEventListener('click', e => {
+  e.stopPropagation();
+  const p = document.getElementById('panel-' + b.dataset.panel);
+  const wasOpen = p.classList.contains('open');
+  closeAll();
+  if (!wasOpen) {
+    p.classList.add('open'); b.classList.add('active');
+    // right edge of the panel lines up with the right edge of the figure below the buttons;
+    // the panel extends to the left (never past the left edge of the window)
+    const a = p.parentElement.getBoundingClientRect();
+    p.style.left = 'auto'; p.style.right = '0px';
+    p.style.maxWidth = Math.max(280, a.right - 12) + 'px';
+    if (b.dataset.panel === 'details') renderLive();
+  }
+}));
+document.querySelectorAll('.close-x').forEach(x => x.addEventListener('click', closeAll));
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAll(); });
+
+window.addEventListener('load', update);
+window.addEventListener('resize', update);
+update();
+</script>
+</body>
+</html>

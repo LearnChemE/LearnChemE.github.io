@@ -1,0 +1,2126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Attenuation: Broadband</title>
+
+<!-- Libraries (only those needed for plot + GUI) -->
+ 
+<!-- Bootstrap -->
+<script src="
+  https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js
+  "></script>
+<link href="
+  https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css
+  " rel="stylesheet">
+
+<!-- P5 -->
+<script src="https://cdn.jsdelivr.net/npm/p5@1.11.13/lib/p5.min.js"></script>
+
+<!-- QuickSettings -->
+<script src="
+  https://cdn.jsdelivr.net/npm/quicksettings@3.0.1/quicksettings.min.js
+  "></script>
+
+<script>
+
+/* p5.gui (subset): createGui() built on QuickSettings */
+(function(){var guis=[];
+p5.prototype.createGui=function(label,x,y,id){var g=new QSGui(label||'GUI',x||20,y||20,id);guis.push(g);return g;};
+p5.prototype.noLoop=function(){this._loop=false;for(var i=0;i<guis.length;i++)guis[i].noLoop();};
+p5.prototype.loop=function(){for(var i=0;i<guis.length;i++)guis[i].loop();this._loop=true;this._draw();};
+function QSGui(label,x,y,id){var qs=QuickSettings.create(x,y,label,document.body,id);this.prototype=qs;
+  this.noLoop=function(){qs.setGlobalChangeHandler(draw);};this.loop=function(){qs.setGlobalChangeHandler(null);};
+  this.show=function(){qs.show();};this.hide=function(){qs.hide();};}
+})();
+
+</script>
+<script>
+
+/* Minimal stand-in for grafica.js / plotFun.js: this simulation draws its own
+   axes and curves with p5, and only uses the PlotCanvas object for bookkeeping. */
+function GPlot(p){this.parent=p;this.mar=[60,70,40,30];
+  const lab=()=>({setText(){},setFontSize(){}});
+  const ax=()=>({getAxisLabel:lab,setFontSize(){}});
+  this.getXAxis=ax;this.getYAxis=ax;this.getTitle=lab;}
+['setFontSize','setOuterDim','setPos','setXLim','setYLim'].forEach(m=>GPlot.prototype[m]=function(){});
+class PlotCanvas{constructor(p){this.GPLOT=new GPlot(p);}plotSetup(){}}
+
+</script>
+
+<!-- MathJax (for equations in the Details modal) -->
+<script>
+MathJax = { svg: { scale: 0.95, displayAlign: 'left', fontCache: 'global' } };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<!-- Custom CSS -->
+<style>
+
+
+/* ─────────────────────────────────────────────
+   CSS Variables for easy adjustments
+───────────────────────────────────────────── */
+:root {
+  --gui-offset-x: 100px;   /* shift left for GUI container */
+  --gui-offset-y: -100px;  /* shift up for GUI container */
+  --menu-z: 1200;
+  --popup-z: 1150;
+  --gui-z: 1000;
+  --panel-font: 17px;      /* font size in the slider panels */
+}
+
+/* ─────────────────────────────────────────────
+   Base Body / Layout
+───────────────────────────────────────────── */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #fdfdfd;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* ─────────────────────────────────────────────
+   Title
+───────────────────────────────────────────── */
+#sim-title {
+  position: absolute;
+  top: 14px;
+  left: 15px;              /* same left margin as the figure */
+  width: 60%;              /* updated in JS to match the canvas width */
+  text-align: center;
+  font-family: Arial, sans-serif;
+  font-size: 22px;
+  font-weight: bold;
+  color: #111;
+  pointer-events: none;
+}
+
+/* ─────────────────────────────────────────────
+   Plot / Canvas Wrapper
+───────────────────────────────────────────── */
+#plot-wrapper {
+  position: absolute;
+  top: 50px;
+  left: 15px;              /* small left margin */
+  right: 300px;
+  bottom: 20px;
+  background-color: transparent;
+  border: none;
+  pointer-events: none;    /* empty part of the wrapper must not block the panels */
+}
+
+#plot-wrapper canvas {
+  pointer-events: auto;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* ─────────────────────────────────────────────
+   Info Popups (Directions, Details, About)
+───────────────────────────────────────────── */
+#info-popups {
+  position: fixed;
+  top: 50px;           /* above hamburger */
+  left: 10px;          /* align left side */
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: var(--popup-z);
+}
+
+.info-box {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
+  width: 240px;
+  max-width: 300px;
+}
+
+/* Modal widths (Bootstrap default is 500px) */
+@media (min-width: 576px) {
+  #directions-modal .modal-dialog { max-width: 750px; }  /* +50% */
+  #details-modal .modal-dialog    { max-width: 750px; }  /* +50% */
+  #advanced-modal .modal-dialog   { max-width: 750px; }  /* +50% */
+  #about-modal .modal-dialog      { max-width: 600px; }  /* +20% */
+}
+
+/* Details panel: no extra blank space around display equations */
+#details-modal .tight mjx-container[display="true"] {
+  margin: 0.25em 0 !important;
+}
+
+/* ─────────────────────────────────────────────
+   Hamburger Menu
+───────────────────────────────────────────── */
+.hamburger-container {
+  position: fixed;
+  top: 5px;
+  left: 5px;
+  z-index: var(--menu-z);
+}
+
+.menu-button {
+  font-size: 1.75rem;
+  background: lightblue;
+  border: 1px solid black;
+  border-radius: 3px;
+  cursor: pointer;
+  padding: 5px 10px;
+  transition: background 0.2s ease;
+}
+
+.menu-button:hover {
+  background-color: rgb(198, 224, 233);
+}
+
+.menu-content {
+  display: none;
+  position: fixed;           /* fixed to viewport */
+  top: 50px;                 /* below button */
+  left: 5px;                 /* align with button */
+  max-height: calc(100vh - 60px); /* never overflow viewport */
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  z-index: calc(var(--menu-z) + 1);
+  min-width: 260px;
+  max-width: 400px;
+  padding: 0.5rem 0;
+}
+
+.menu-content a,
+.menu-content .btn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  color: #111827;
+  text-decoration: none;
+}
+
+.menu-content a:hover,
+.menu-content .btn:hover {
+  background: #f0f0f0;
+}
+
+/* ─────────────────────────────────────────────
+   GUI Panels
+───────────────────────────────────────────── */
+.qs_main, .qs_container {
+  background-color: #f0f8ff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 10px;
+  font-size: var(--panel-font);
+  color: #111;
+  box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+  z-index: var(--gui-z);
+}
+
+/* lighter background behind the slider boxes (was #ccc / #ddd) */
+.qs_main      { background-color: #f5f5f5 !important; padding: 0 !important; }
+.qs_content   { background-color: #f5f5f5 !important; }
+.qs_main .qs_container {
+  padding: 8px !important;
+  background-color: #ffffff !important;
+  border: 1px solid #dddddd !important;
+}
+.qs_title_bar { font-size: var(--panel-font); }
+
+/* 17px text everywhere inside the slider panels */
+.qs_main .qs_label,
+.qs_main select,
+.qs_main input[type="text"],
+.qs_main input[type="file"],
+.qs_main p {
+  font: var(--panel-font) Arial, sans-serif;
+}
+.qs_main .qs_label b { font-weight: bold; }
+.qs_main p { margin: 0; }
+
+/* value box: only as wide as the number (width set in JS) */
+.qs_main .qs_label input[type="text"] {
+  box-sizing: content-box;
+  padding: 1px 3px;
+  text-align: right;
+}
+
+/* ─────────────────────────────────────────────
+   Right-side GUIs container (2x2 grid)
+───────────────────────────────────────────── */
+.gui-right-container {
+  position: fixed;
+  top: calc(20px + var(--gui-offset-y));
+  right: calc(20px + var(--gui-offset-x));
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  z-index: var(--gui-z);
+  max-width: 440px; /* 2 columns x 200px + gap */
+}
+
+.gui-right-container .qs_container {
+  width: 95%;
+}
+
+.gui-right-container .qs_container input[type=range] {
+  width: calc(100% - 10px);
+}
+
+/* Buttons inside GUIs */
+.btn-sm {
+  border-radius: 3px;
+  border: 0.5px solid black;
+  padding: 0px 0.5em;
+}
+
+.btn-wide {
+  width: 100%;
+}
+
+/* ─────────────────────────────────────────────
+   Responsive Adjustments
+───────────────────────────────────────────── */
+@media (max-width: 1200px) {
+  #plot-wrapper {
+    left: 15px;
+    right: 260px;
+  }
+  .qs_main, .qs_container {
+    padding: 8px;
+  }
+}
+
+@media (max-width: 800px) {
+  body {
+    overflow-x: hidden;
+  }
+
+  #sim-title {
+    position: relative;
+    top: auto;
+    width: 100% !important;
+    margin: 8px 0;
+  }
+
+  #plot-wrapper {
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    width: 95%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    margin: 10px auto;
+    border: none;
+  }
+
+  .gui-right-container {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    top: auto;
+    right: auto;
+    gap: 8px;
+    margin: 0 auto 10px;
+    width: 95%;
+    max-width: 500px;
+  }
+
+  .qs_main, .qs_container {
+    position: relative !important;
+    width: 100%;
+    margin: 8px auto;
+  }
+
+  .hamburger-container {
+    position: relative;
+    top: 0;
+    left: 0;
+    margin: 0 auto 10px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .menu-button {
+    font-size: 1.5rem;
+    padding: 5px 8px;
+  }
+
+  .menu-content {
+    position: relative;
+    top: 0;
+    left: 0;
+    max-height: 50vh;
+    overflow-y: auto;
+    width: 100%;
+    margin-top: 5px;
+  }
+
+  #info-popups {
+    position: relative;
+    top: 0;
+    left: 0;
+    flex-direction: column;
+    margin: 0 auto 5px;
+    width: 95%;
+    max-width: 500px;
+  }
+}
+
+</style>
+<style>
+input[type="range"] {
+  width: 100%;
+  height: 5px;
+  border-radius: 3px;
+  background: #d3d3d3;
+  outline: none;
+  opacity: 0.7;
+  margin-bottom: 0.5rem;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #2673cc;
+  cursor: pointer;
+  margin-top: -5px; /* adjust this value */
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #2673cc;
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 5px;
+  border-radius: 3px;
+  background: #d3d3d3;
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 5px;
+  border-radius: 3px;
+  background: #d3d3d3;
+  outline: none;
+  opacity: 0.7;
+  margin-bottom: 0.5rem;
+  transition: opacity .2s;
+  cursor: pointer;
+}
+
+</style>
+
+<!-- Main JS (your cleaned version) -->
+<script>
+/* Embedded spectra (served to fetch() so the page works as a single file) */
+const EMBEDDED_CSV = {"tpoAbs.csv": "320,3044.129729\n321,2971.509737\n322,2849.295605\n323,2713.797329\n324,2569.442956\n325,2410.033218\n326,2267.450065\n327,2072.615941\n328,1902.578888\n329,1734.313055\n330,1596.157949\n331,1439.405041\n332,1290.622619\n333,1180.807023\n334,1057.707281\n335,1012.541189\n336,894.7551053\n337,838.0760876\n338,773.4265831\n339,710.5482978\n340,655.6404995\n341,621.1017231\n342,577.7068502\n343,565.308315\n344,544.9392931\n345,539.6256352\n346,561.7658764\n347,590.9909949\n348,614.0168459\n349,604.2751397\n350,624.6441617\n351,634.3858678\n352,656.5261091\n353,650.3268416\n354,668.9246442\n355,675.1239118\n356,687.5224469\n357,700.8065917\n358,766.3417059\n359,804.4229209\n360,828.3343814\n361,871.7292543\n362,935.4931492\n363,1003.685092\n364,1006.341921\n365,1045.308746\n366,1038.223869\n367,1063.906549\n368,1063.020939\n369,1061.24972\n370,1049.736794\n371,1062.135329\n372,1059.4785\n373,1073.648255\n374,1101.102154\n375,1135.64093\n376,1171.065316\n377,1225.087505\n378,1291.508229\n379,1313.64847\n380,1324.275786\n381,1318.962128\n382,1310.991641\n383,1311.877251\n384,1256.969453\n385,1233.057992\n386,1180.807023\n387,1138.297759\n388,1089.589229\n389,1048.851185\n390,1041.766307\n391,1008.99875\n392,999.2570441\n393,1024.054114\n394,1005.456312\n395,1024.054114\n396,1010.76997\n397,984.20168\n398,962.9470484\n399,936.3787589\n400,911.5816886\n401,838.0760876\n402,784.9395085\n403,696.3785434\n404,621.9873327\n405,558.2234378\n406,507.7436877\n407,433.352477\n408,349.2195602\n409,298.73981\n410,225.234209\n411,209.2932353\n412,154.3854369\n413,126.0459281\n414,105.6769061\n415,86.19349377\n416,57.85398493\n417,54.31154633\n418,47.22666912\n419,42.79862086\n420,34.828134\n421,41.91301121\n422,18.00155063\n423,2.946186562\n424,22.42959889\n425,7.374234818\n426,20.65837959\n427,23.31520854\n428,4.717405865\n429,19.77276993\n430,8.259844469\n431,13.57350238\n432,0.289357609\n433,0\n434,0\n435,0\n436,2.060576911\n437,0\n438,0\n439,0\n440,0\n441,5.603015516\n442,3.831796213\n443,27.74325679\n444,10.03106377\n445,5.603015516\n446,0\n447,0\n448,0\n449,1.17496726\n450,0\n451,0\n452,9.14545412\n453,0\n454,0.289357609\n455,0\n456,9.14545412\n457,10.03106377\n458,5.603015516\n459,18.88716028\n460,10.03106377\n461,0\n462,14.45911203\n463,5.603015516\n464,2.946186562\n465,6.488625167\n466,22.42959889\n467,7.374234818\n468,13.57350238\n469,20.65837959\n470,1.17496726\n471,16.23033133\n472,0.289357609\n473,5.603015516\n474,20.65837959\n475,1.17496726\n476,17.11594098\n477,18.00155063\n478,14.45911203\n479,13.57350238\n480,7.374234818\n481,2.060576911\n482,16.23033133\n483,28.62886645\n484,16.23033133\n485,21.54398924\n486,23.31520854\n487,5.603015516\n488,31.2856954\n489,0\n490,2.946186562\n491,0\n492,1.17496726\n493,9.14545412\n494,20.65837959\n495,2.946186562\n496,6.488625167\n497,11.80228307\n498,2.946186562\n499,4.717405865\n500,27.74325679\n", "I907Abs.csv": "200,50104.58\n202,50635.57\n204,49603.09\n206,44529.21\n208,37272.38\n210,31682.26\n212,27950.6\n214,25841.4\n216,24513.93\n218,23894.44\n220,23732.2\n222,23850.19\n224,24322.18\n226,25295.66\n228,26298.64\n230,26446.13\n232,25856.15\n234,24587.68\n236,23569.95\n238,22434.23\n240,20502.02\n242,17050.6\n244,13702.43\n246,8436.8\n248,5657.72\n250,4181.53\n252,3469.86\n254,3397.34\n256,3707.08\n258,4306.9\n260,5108.3\n262,5930.59\n264,7339.18\n266,9112.83\n268,11843.97\n270,14528.41\n272,17507.84\n274,20561.02\n276,24204.18\n278,27862.1\n280,32036.25\n282,36195.65\n284,40001.07\n286,44263.72\n288,47670.89\n290,51048.56\n292,53762.49\n294,55591.45\n296,57449.91\n298,58644.63\n300,59985\n302,60555\n304,60598\n306,60114\n308,59102\n310,57563\n312,55738.95\n314,52715.27\n316,48821.36\n318,43039.49\n320,37021.64\n322,30458.04\n324,24587.68\n326,19676.04\n328,15206.89\n330,10055.58\n332,7851.73\n334,6064.57\n336,4670.72\n338,3653\n340,2889.7\n342,2299.72\n344,1869.52\n346,1548.71\n348,1266.01\n350,1033.71\n352,855.48\n354,692\n356,544.51\n358,567.86\n360,462.16\n362,341.95\n364,280.33\n366,221.74\n368,173.23\n370,132.13\n372,123.98\n374,101.53\n376,83.42\n378,69\n380,56.13\n382,45.81\n384,37.28\n386,30.4\n388,24.99\n390,20.16\n392,16.47\n394,13.6\n396,11.14\n398,9.1\n400,7.54\n402,6.23\n404,5.33\n406,4.51\n408,3.77\n410,3.36\n412,2.87\n414,2.54\n416,2.29\n418,2.13\n420,1.88\n422,1.72\n424,1.64\n426,1.56\n428,1.47\n430,1.47\n432,1.39\n434,1.39\n436,1.31\n438,1.31\n440,1.23\n442,1.23\n444,1.23\n446,1.23\n448,1.15\n450,1.15\n", "exponentialAbs.csv": "wavelength,absorption\n300,1.0\n301,0.9801986733067553\n302,0.9607894391523232\n303,0.9417645335842487\n304,0.9231163463866358\n305,0.9048374180359595\n306,0.8869204367171575\n307,0.8693582353988059\n308,0.8521437889662113\n309,0.835270211411272\n310,0.8187307530779818\n311,0.8025187979624785\n312,0.7866278610665535\n313,0.7710515858035663\n314,0.7557837414557255\n315,0.7408182206817179\n316,0.7261490370736909\n317,0.7117703227626097\n318,0.697676326071031\n319,0.6838614092123558\n320,0.6703200460356393\n321,0.6570468198150567\n322,0.6440364210831414\n323,0.631283645506926\n324,0.6187833918061408\n325,0.6065306597126334\n326,0.5945205479701944\n327,0.5827482523739896\n328,0.5712090638488149\n329,0.559898366565402\n330,0.5488116360940264\n331,0.5379444375946745\n332,0.5272924240430485\n333,0.5168513344916992\n334,0.5066169923655895\n335,0.4965853037914095\n336,0.4867522559599717\n337,0.4771139155210344\n338,0.46766642700990924\n339,0.4584060113052235\n340,0.44932896411722156\n341,0.4404316545059993\n342,0.43171052342907973\n343,0.4231620823177488\n344,0.4147829116815814\n345,0.4065696597405991\n346,0.39851904108451414\n347,0.39062783535852114\n348,0.38289288597511206\n349,0.37531109885139957\n350,0.36787944117144233\n351,0.3605949401730783\n352,0.35345468195878016\n353,0.3464558103300574\n354,0.3395955256449391\n355,0.33287108369807955\n356,0.32627979462303947\n357,0.31981902181630395\n358,0.3134861808826053\n359,0.30727873860113125\n360,0.30119421191220214\n361,0.2952301669240142\n362,0.2893842179390506\n363,0.2836540264997704\n364,0.27803730045319414\n365,0.2725317930340126\n366,0.26713530196585034\n367,0.261845668580326\n368,0.2566607769535559\n369,0.2515785530597565\n370,0.2465969639416065\n371,0.24171401689703645\n372,0.23692775868212176\n373,0.23223627472975883\n374,0.22763768838381274\n375,0.22313016014842982\n376,0.21871188695221475\n377,0.21438110142697794\n378,0.21013607120076472\n379,0.20597509820488344\n380,0.20189651799465538\n381,0.19789869908361465\n382,0.1939800422908919\n383,0.19013898010152055\n384,0.18637397603940997\n385,0.18268352405273466\n386,0.17906614791149322\n387,0.17552040061699686\n388,0.17204486382305054\n389,0.1686381472685955\n390,0.16529888822158653\n391,0.16202575093388075\n392,0.15881742610692068\n393,0.1556726303679973\n394,0.1525901057568839\n395,0.14956861922263506\n396,0.14660696213035015\n397,0.14370394977770293\n398,0.140858420921045\n399,0.13806923731089282\n400,0.1353352832366127\n401,0.13265546508012172\n402,0.1300287108784259\n403,0.12745396989482075\n404,0.12493021219858241\n405,0.1224564282529819\n406,0.12003162851145673\n407,0.11765484302177918\n408,0.11532512103806251\n409,0.11304153064044985\n410,0.11080315836233387\n411,0.10860910882495796\n412,0.1064585043792528\n413,0.10435048475476504\n414,0.10228420671553748\n415,0.10025884372280375\n416,0.09827358560436154\n417,0.09632763823049303\n418,0.09442022319630235\n419,0.09255057751034329\n420,0.09071795328941251\n421,0.08892161745938634\n422,0.0871608514619813\n423,0.08543495096732123\n424,0.08374322559219596\n425,0.0820849986238988\n426,0.08045960674953244\n427,0.07886639979067495\n428,0.07730474044329974\n429,0.07577400402284548\n430,0.07427357821433388\n431,0.07280286282743559\n432,0.07136126955638605\n433,0.06994822174465536\n434,0.06856315415427791\n435,0.06720551273974976\n436,0.06587475442640295\n437,0.06457034689316847\n438,0.06329176835964073\n439,0.06203850737735832\n440,0.06081006262521797\n441,0.05960594270893937\n442,0.05842566596450083\n443,0.05726876026546736\n444,0.056134762834133725\n445,0.05502322005640723\n446,0.05393368730035602\n447,0.05286572873835037\n448,0.05181891717272583\n449,0.0507928338648985\n450,0.049787068367863944\n451,0.04880121836201296\n452,0.04783488949419837\n453,0.046887695219988486\n454,0.045959256649044204\n455,0.0450492023935578\n456,0.04415716841969286\n457,0.043282797901965896\n458,0.042425741080511385\n459,0.04158565512117316\n460,0.04076220397836621\n461,0.039955058260653896\n462,0.039163895098987066\n463,0.038388398017552075\n464,0.03762825680717622\n465,0.036883167401240015\n466,0.036152831754046426\n467,0.03543695772159864\n468,0.03473525894473856\n469,0.034047454734599344\n470,0.03337326996032608\n471,0.03271243493901982\n472,0.03206468532786077\n473,0.03142976201836771\n474,0.030807411032751076\n475,0.0301973834223185\n476,0.029599435167892\n477,0.029013327082197053\n478,0.028438824714184505\n479,0.027875698255247015\n480,0.02732372244729256\n481,0.026782676492638175\n482,0.02625234396568796\n483,0.02573251272635994\n484,0.025222974835227212\n485,0.024723526470339388\n486,0.024233967845691113\n487,0.023754103131304997\n488,0.02328374037489701\n489,0.02282269142509298\n490,0.0223707718561656\n491,0.02192780089426162\n492,0.021493601345089923\n493,0.021067999523041434\n494,0.020650825181712566\n495,0.02024191144580439\n496,0.019841094744370288\n497,0.01944821474538539\n498,0.019063114291611637\n499,0.018685639337732773\n500,0.01831563888873418\n501,0.017952964939502866\n502,0.017597472415623393\n503,0.01724901911534628\n504,0.01690746565270528\n505,0.016572675401761255\n506,0.01624451444194987\n507,0.015922851504511698\n508,0.01560755791998283\n509,0.015298507566725518\n510,0.014995576820477703\n511,0.014698644504901784\n512,0.01440759184311235\n513,0.014122302410163962\n514,0.013842662086479501\n515,0.013568559012200934\n516,0.013299883542443767\n517,0.013036528203437736\n518,0.01277838764953576\n519,0.012525358621074385\n520,0.012277339903068436\n521,0.012034232284723775\n522,0.011795938519751562\n523,0.011562363287468536\n524,0.011333413154667387\n525,0.011108996538242306\n526,0.01088902366855445\n527,0.010673406553522925\n528,0.010462058943426803\n529,0.010254896296404022\n530,0.010051835744633586\n531,0.009852796061187257\n532,0.009657697627537777\n533,0.009466462401710323\n534,0.009279013887064744\n535,0.009095277101695816\n536,0.008915178548439553\n537,0.00873864618547329\n538,0.00856560939749806\n539,0.00839599896749147\n540,0.00822974704902003\n541,0.008066787139099614\n542,0.007907054051593441\n543,0.007750483891136692\n544,0.007597014027577567\n545,0.007446583070924338\n546,0.007299130846788583\n547,0.007154598372314579\n548,0.007012927832585425\n549,0.006874062557496248\n550,0.006737946999085467\n551,0.006604526709314811\n552,0.006473748318289405\n553,0.006345559512909116\n554,0.006219909015942573\n555,0.006096746565515638\n556,0.005976022895005943\n557,0.0058576897133356225\n558,0.005741699685654202\n559,0.005628006414404065\n560,0.0055165644207607716\n561,0.00540732912644096\n562,0.005300256835870402\n563,0.005195304718705231\n564,0.00509243079269919\n565,0.004991593906910217\n566,0.004892753725239476\n567,0.004795870710296421\n568,0.004700906107583276\n569,0.004607821929992752\n570,0.004516580942612666\n571,0.004427146647831511\n572,0.004339483270738895\n573,0.004253555744815125\n574,0.0041693296979041115\n575,0.004086771438464067\n576,0.00400584794209042\n577,0.003926526838305624\n578,0.003848776397610543\n579,0.0037725655187922052\n580,0.003697863716482932\n581,0.0036246411089657558\n582,0.003552868406221362\n583,0.003482516898211663\n584,0.0034135584433954303\n585,0.003345965457471272\n586,0.003279710902343573\n587,0.00321476827530687\n588,0.0031511115984444414\n589,0.0030887154082367687\n590,0.0030275547453758153\n591,0.002967605144780944\n592,0.002908842625812584\n593,0.0028512436826796323\n594,0.0027947852750368437\n595,0.0027394448187683684\n596,0.0026852001769538205\n597,0.0026320296510131984\n598,0.00257991197202718\n599,0.0025288262922292556\n600,0.0024787521766663585\n", "arcLamp.csv": "378.288,0.001\n378.654,0.001\n379.02,52.43\n379.386,100.52\n379.751,103.74\n380.117,122.83\n380.483,138.63\n380.848,173.22\n381.214,194.47\n381.58,200.87\n381.945,227.2\n382.311,256.13\n382.676,255\n383.042,284.51\n383.407,279.54\n383.773,337.68\n384.138,378.09\n384.504,415.62\n384.869,441.58\n385.234,475.41\n385.6,537.87\n385.965,549.61\n386.33,575.07\n386.695,587.61\n387.06,663.79\n387.426,745.49\n387.791,837.32\n388.156,881.24\n388.521,910.82\n388.886,973.72\n389.251,1011.28\n389.616,1054.69\n389.981,1072.61\n390.346,1121.62\n390.711,1127.98\n391.075,931.34\n391.44,1180.94\n391.805,1273.93\n392.17,1294.93\n392.534,1350.88\n392.899,1366.17\n393.264,1351.76\n393.628,1386.35\n393.993,1363.5\n394.358,1348.98\n394.722,1337.24\n395.087,1306.15\n395.451,1309.66\n395.816,1288.09\n396.18,1288.75\n396.545,1283.81\n396.909,1299.42\n397.273,1304.91\n397.638,1316.91\n398.002,1318.51\n398.366,1310.65\n398.73,1320.12\n399.094,1315.77\n399.459,1317.93\n399.823,1337.35\n400.187,1410.6\n400.551,1455.69\n400.915,1462.53\n401.279,1475.62\n401.643,1448.56\n402.007,1489.41\n402.371,1504\n402.735,1546.61\n403.099,1578.83\n403.462,1655.22\n403.826,1766.95\n404.19,1856.69\n404.554,2171.9\n404.917,2493.02\n405.281,3000.56\n405.645,3923.86\n406.008,5856.45\n406.372,8585.48\n406.736,11422.53\n407.099,14109.51\n407.463,14877.27\n407.826,14643.22\n408.189,13729.97\n408.553,12150.99\n408.916,10309.94\n409.28,8808.59\n409.643,8614.29\n410.006,7931.73\n410.369,6659.4\n410.733,5628.36\n411.096,4811.65\n411.459,4202.09\n411.822,3636.71\n412.185,3181\n412.548,2834.08\n412.911,2624.46\n413.274,2487.17\n413.637,2421.27\n414,2383.82\n414.363,2347.22\n414.726,2291.78\n415.089,2258.2\n415.452,2197.61\n415.814,2124.65\n416.177,2028.94\n416.54,1965.09\n416.903,1890.56\n417.265,1825.86\n417.628,1777.41\n417.99,1727.74\n418.353,1704.7\n418.716,1563.91\n419.078,1677.27\n419.441,1704.89\n419.803,1694.32\n420.165,1724.71\n420.528,1719.44\n420.89,1713.15\n421.252,1694.76\n421.615,1712.97\n421.977,1735.13\n422.339,1761.13\n422.701,1770.06\n423.064,1787.39\n423.426,1809.48\n423.788,1842.28\n424.15,1845.03\n424.512,1848.87\n424.874,1939.09\n425.236,1968.34\n425.598,2015.41\n425.96,2073.26\n426.322,2126.62\n426.683,2173.83\n427.045,2253.56\n427.407,2299.02\n427.769,2386.02\n428.131,2461.98\n428.492,2526.08\n428.854,2601.02\n429.215,2703.93\n429.577,2794.77\n429.939,2876.62\n430.3,3015.59\n430.662,3130.64\n431.023,3250.59\n431.385,3410.66\n431.746,3670.42\n432.107,3901.22\n432.469,4119.15\n432.83,4351.15\n433.191,4503.03\n433.553,4674.92\n433.914,4741.15\n434.275,4925.28\n434.636,5134.32\n434.997,5503.17\n435.358,5944.07\n435.719,6565.92\n436.08,7628.49\n436.441,9166.51\n436.802,11786.89\n437.163,16292.97\n437.524,20646.55\n437.885,21420.94\n438.246,24994.57\n438.607,29082.46\n438.967,30746.07\n439.328,30159\n439.689,29149.68\n440.049,26309.91\n440.41,22704.83\n440.771,19177.83\n441.131,15953.01\n441.492,13560.58\n441.852,11413.25\n442.213,9881.15\n442.573,8776.49\n442.934,7404.24\n443.294,6932.87\n443.654,6407.13\n444.015,5824.23\n444.375,5379.89\n444.735,4992.97\n445.095,4654.84\n445.456,4398.88\n445.816,4234.57\n446.176,3960.32\n446.536,3784.74\n446.896,3642.15\n447.256,3526.04\n447.616,3445.92\n447.976,3367.76\n448.336,3265.62\n448.696,3097.61\n449.056,3091.95\n449.415,3062.07\n449.775,2969.62\n450.135,2953.01\n450.495,2854.45\n450.854,2771.44\n451.214,2680.71\n451.574,2540.05\n451.933,2537.49\n452.293,2470.02\n452.652,2371.87\n453.012,2308.27\n453.371,2254.69\n453.731,2224.23\n454.09,2174.09\n454.449,2099.92\n454.809,2052.89\n455.168,2048.58\n455.527,1958.54\n455.886,1984.51\n456.246,1982.02\n456.605,1967.28\n456.964,1949.51\n457.323,1951.92\n457.682,1959.6\n458.041,1994.89\n458.4,1980.92\n458.759,1944.21\n459.118,1963.26\n459.477,1918.17\n459.836,1916.05\n460.195,1920.07\n460.553,1900.69\n460.912,992.6\n461.271,1671.57\n461.63,1744.6\n461.988,1738.97\n462.347,1705\n462.705,1678.77\n463.064,1652.11\n463.423,1667.69\n463.781,1635.58\n464.14,1649.92\n464.498,1647.25\n464.856,1631.67\n465.215,1342.98\n465.573,1544.01\n465.931,1628.45\n466.29,1637.23\n466.648,1663.34\n467.006,1653.61\n467.364,1647.07\n467.722,1645.39\n468.08,1667.29\n468.438,1686.64\n468.796,1717.83\n469.154,1744.68\n469.512,1767.68\n469.87,1808.67\n470.228,1805.13\n470.586,1833.73\n470.944,1862.21\n471.302,1866.05\n471.659,1911.22\n472.017,1956.68\n472.375,2014.49\n472.732,2043.82\n473.09,2062.99\n473.448,2128.89\n473.805,2155.84\n474.163,2189.78\n474.52,2218.85\n474.878,2272.87\n475.235,2333.76\n475.592,2344.88\n475.95,2398.38\n476.307,2408.62\n476.664,2422.48\n477.022,2432.68\n477.379,2440.07\n477.736,2407.74\n478.093,2367.33\n478.45,2414.18\n478.807,2457.33\n479.164,2474.59\n479.521,2491.6\n479.878,2505.13\n480.235,2534.09\n480.592,2572.46\n480.949,2622.52\n481.306,2587.01\n481.663,2638.32\n482.019,2672.7\n482.376,2732.86\n482.733,2766.72\n483.089,2874.93\n483.446,2932.53\n483.803,2965.59\n484.159,3052.89\n484.516,3106.46\n484.872,3126.87\n485.229,3201.55\n485.585,3279.7\n485.941,3366.89\n486.298,3467.71\n486.654,3503.33\n487.01,3623.32\n487.367,3702.53\n487.723,3799.45\n488.079,3866.66\n488.435,3894.9\n488.791,3837.96\n489.147,3910.77\n489.503,3902.8\n489.859,3924.99\n490.215,3909.12\n490.571,3946.46\n490.927,3875.48\n491.283,3841.76\n491.639,3784.12\n491.995,3806.21\n492.35,3866.04\n492.706,3917.46\n493.062,4024.94\n493.417,4357.3\n493.773,4636.26\n494.129,4660.21\n494.484,4386.04\n494.84,4014.59\n495.195,3604.08\n495.55,3220.46\n495.906,2873.73\n496.261,2634.12\n496.617,2418.09\n496.972,2275.21\n497.327,2308.63\n497.682,2547.08\n498.037,2834.12\n498.393,2752.53\n498.748,2354.57\n499.103,1953.02\n499.458,1618.14\n499.813,1354.57\n500.168,1134.2\n500.523,998.74\n500.878,865.66\n501.233,768.6\n501.587,688.87\n501.942,629.78\n502.297,569.62\n502.652,500.75\n503.006,438.07\n503.361,428.45\n503.716,373.74\n504.07,359.3\n504.425,329.49\n504.779,282.17\n505.134,256.42\n505.488,252.07\n505.843,241.03\n506.197,189.65\n506.551,221.02\n506.906,217.69\n507.26,194.29\n507.614,177.43\n507.968,167.92\n508.322,159.4\n508.677,139.07\n509.031,132.78\n509.385,127.58\n509.739,121.92\n510.093,108.06\n510.447,124.99\n510.8,102.09\n511.154,107.95\n511.508,101.33\n511.862,112.33\n512.216,94.12\n512.569,84.32\n512.923,78.14\n513.277,66.66\n513.63,74.34\n513.984,72.33\n514.337,70.75\n514.691,79.13\n515.044,82.68\n515.398,83.22\n515.751,83.77\n516.105,85.56\n516.458,51.96\n516.811,32.13\n517.164,35.75\n517.518,53.93\n517.871,33.19\n518.224,51.81\n518.577,65.82\n518.93,63.95\n519.283,36.82\n519.636,42.78\n519.989,28.73\n520.342,38.5\n520.695,50.64\n521.048,31.48\n521.401,43.33\n521.753,26.28\n522.106,49.43\n522.459,37.47\n522.811,-25.36\n523.164,10.7\n523.517,24.38\n523.869,40.25\n524.222,43.91\n524.574,32.1\n524.927,-13.84\n525.279,18.86\n525.631,5.88\n525.984,17.8\n526.336,33.89\n526.688,30.82\n527.041,21.35\n527.393,7.89\n527.745,34.11\n528.097,29.54\n528.449,7.27\n528.801,10.19\n529.153,23.17\n529.505,30.42\n529.857,16.56\n530.209,-6.67\n530.561,16.52\n530.913,37.18\n531.264,18.13\n531.616,-23.12\n531.968,-7.62\n532.319,-13.51\n532.671,20.43\n533.023,22.48\n533.374,3.39\n533.726,1.27\n534.077,14.58\n534.429,21.13\n534.78,23.72\n535.131,17.65\n535.483,6.57\n535.834,34.15\n536.185,28.84\n536.537,-2.57\n536.888,19.3\n537.239,-9.26\n537.59,7.81\n537.941,17.62\n538.292,16.01\n538.643,25.66\n538.994,29.61\n539.345,6.72\n539.696,8.88\n540.047,1.71\n540.397,7.71\n540.748,27.31\n541.099,16.74\n541.45,13.3\n541.8,-11.57\n542.151,6.1\n542.501,35.97\n542.852,13.45\n543.202,6.35\n543.553,19.55\n543.903,27.42\n544.254,11.98\n544.604,24.93\n544.954,-22.25\n545.305,14.98\n545.655,28.59\n546.005,18.38\n546.355,13.89\n546.705,18.79\n547.055,17.76\n547.406,47.35\n547.756,32.21\n548.105,48.81\n548.455,50.68\n548.805,28.7\n549.155,20.43\n549.505,44.71\n549.855,69.44\n550.205,51.41\n550.554,39.41\n550.904,40.33\n551.254,28.33\n551.603,41.24\n551.953,43.73\n552.302,36.45\n552.652,36.49\n553.001,-144.61\n553.35,-0.01\n553.7,30.31\n554.049,19.15\n554.398,24.64\n554.748,23.06\n555.097,13.41\n555.446,22.77\n555.795,-4.66\n556.144,-2.53\n556.493,14.47\n556.842,15.13\n557.191,-4.14\n557.54,18.42\n557.889,19.55\n558.238,-121.17\n558.587,-19.39\n558.936,9.17\n559.284,13.08\n559.633,4.05\n559.982,25.52\n560.33,33.27\n560.679,40.73\n561.027,3.24\n561.376,21.68\n561.724,0.35\n562.073,22.3\n562.421,15.49\n562.77,3.24\n563.118,15.75\n563.466,10.96\n563.814,11.91\n564.163,-13.58\n564.511,7.05\n564.859,-107.02\n565.207,-25.61\n565.555,-16.94\n565.903,-6.96\n566.251,13.15\n566.599,19.22\n566.947,26.28\n567.295,0.9\n567.642,-35.3\n567.99,-36.95\n568.338,-7\n568.686,-1.07\n569.033,8.66\n569.381,17.91\n569.728,-58.27\n570.076,4.49\n570.423,6.46\n570.771,20.14\n571.118,-1.18\n571.466,6.61\n571.813,6.64\n572.16,19.63\n572.508,22.52\n572.855,30.16\n573.202,19.52\n573.549,-6.74\n573.896,-6.3\n574.243,2.15\n574.59,21.53\n574.937,18.38\n575.284,28.99\n575.631,-23.67\n575.978,10.45\n576.325,25.22\n576.672,22.41\n577.018,40.98\n577.365,32.68\n577.712,39.63\n578.058,33.67\n578.405,31.81\n578.751,26.28\n579.098,22.66\n579.444,31.11\n579.791,32.35\n580.137,27.01\n580.484,31.4\n580.83,3.39\n581.176,27.27\n581.522,13.12\n581.868,23.36\n582.215,22.55\n582.561,25.92\n582.907,16.01\n583.253,26.83\n583.599,24.67\n583.945,25.33\n584.291,26.32\n584.637,-4.51\n584.982,6.64\n585.328,13.56\n585.674,3.35\n586.02,4.45\n586.365,15.38\n586.711,-9.19\n587.056,0.76\n587.402,16.52\n587.747,14.65\n588.093,26.1\n588.438,19.81\n588.784,0.68\n589.129,19.22\n589.474,16.23\n589.82,27.45\n590.165,13.3\n590.51,29.28\n590.855,12.61\n591.2,8.03\n591.545,-7.51\n591.89,3.43\n592.235,-7.84\n592.58,-12.99\n592.925,8.36\n593.27,12.9\n593.615,25.44\n593.96,14.54\n594.304,25.77\n594.649,-13.65\n594.994,-4.07\n595.338,-11.86\n595.683,8.66\n596.027,8.4\n596.372,-4.99\n596.716,-6.01\n597.061,-2.79\n597.405,4.08\n597.749,-1.04\n598.094,-1.58\n598.438,-13.03\n598.782,17.18\n599.126,4.38\n599.47,10.48\n599.815,3.79\n"};
+(function(){const realFetch = window.fetch ? window.fetch.bind(window) : null;
+  window.fetch = function(url, opts){
+    const name = String(url && url.url ? url.url : url).split('/').pop().split('?')[0];
+    if (Object.prototype.hasOwnProperty.call(EMBEDDED_CSV, name))
+      return Promise.resolve(new Response(EMBEDDED_CSV[name], {status:200, headers:{'Content-Type':'text/csv'}}));
+    return realFetch(url, opts);
+  };})();
+</script>
+
+<script>
+/* jshint esversion: 6 */
+
+let table;
+
+// -------------------- Data Arrays --------------------
+let absX = [];        // absorbance (material)
+let absY = [];
+let lightX = [];      // illumination (light source)
+let lightY = [];
+let gaussY = [];
+let productY = [];
+let attenY = [];
+let attenProductY = [];
+let integral = 0;
+let integralPercent = 0;
+
+// -------------------- Global Params --------------------
+let GausMean = 405;
+let GausFWHM = 35;
+let Depth = 50;
+let Concentration = 335;
+const GAUS_AMP = 1;
+const EXPONENTIAL_SCALE = 4000; // or 5000
+let GraphFS = 17;
+const FIGURE_SCALE = 0.7;       // figure drawn at 70% of the available size
+const PANEL_WIDTH = 316;        // width of the slider panels (px)
+let plotControlsWidth = 0;
+const PLOT_SLIDERS = [];         // sliders in the plot controls panel
+const BASE_PANEL_WIDTH = 220;   // original panel width, used so the figure is 70% of its former size
+const SLIDER_WIDTH = 184;       // width of each range slider (px)
+
+// -------------------- Curve colors / names --------------------
+// (used by the curves, the legend and the mouse-over labels)
+const CURVE_STYLE = {
+  abs:        { rgb: [0, 0, 255],   label: "Napierian absorptivity" },
+  incident:   { rgb: [255, 140, 0], label: "incident light (surface)" },
+  absSurface: { rgb: [220, 0, 0],   label: "absorbed photons (surface)" },
+  transmit:   { rgb: [0, 180, 80],  label: "transmitted light (depth)" },
+  absDepth:   { rgb: [180, 0, 80],  label: "absorbed photons (depth)" }
+};
+const LEGEND_ORDER = ["abs", "incident", "absSurface", "transmit", "absDepth"];
+
+let sliderMean, sliderFWHM;
+let currentLightSpectrum = "LED"; // 'LED' or 'ArcLamp'
+
+
+let currentFile = "tpoAbs.csv";
+let currentAbsSpectrum = "TPO"; // default
+let customTable = null;
+
+let spectrumCache = {
+  "Exponential": null,
+  "TPO": null,
+  "Custom": null
+};
+
+let advancedGui;
+let advSelect;
+let currentAdvSelect = "Photons (Photodiode)";
+let tarWave = 405;
+let mInt = 10;
+const advLabel = document.createElement("div");
+let tInt = 0;
+let advGuiY = 430;
+
+
+// -------------------- Preload CSV --------------------
+function preload() {
+  table = loadTable(currentFile, "csv");   // no "header": several files have no header row
+}
+
+// -------------------- Switch CSV --------------------
+function loadNewCSV(fileName) {
+  loadTable(fileName, "csv", tbl => {
+    table = tbl;
+    parseCSV();
+    updateCurve();
+  }, err => {
+    console.error("Failed to load " + fileName, err);
+  });
+}
+
+// -------------------- Setup --------------------
+function setup() {
+  const wrapper = document.getElementById('plot-wrapper');
+  const cnv = createCanvas(wrapper.clientWidth, wrapper.clientHeight);
+  cnv.parent(wrapper);
+
+  // --- Adjust font size for mobile ---
+  if (window.innerWidth < 600) {
+    GraphFS = 10; // smaller fonts for phones
+  } else if (window.innerWidth < 900) {
+    GraphFS = 13; // medium for tablets
+  } else {
+    GraphFS = 17; // default for desktop
+  }
+  if (window.innerWidth < 801){
+    advGuiY = 20;
+  }
+
+  initPlot();
+  parseCSV();
+  initSliders();
+  initAdvancedGUI();
+
+  setTimeout(windowResized, 50);
+}
+
+
+// -------------------- CSV Parsing --------------------
+function parseCSV() {
+  if (!table) {
+    console.error("CSV failed to load");
+    return;
+  }
+
+  dataX = [];
+  dataY = [];
+
+  const scale = currentAbsSpectrum === "Exponential" ? EXPONENTIAL_SCALE : 1;
+
+  for (let r = 0; r < table.getRowCount(); r++) {
+    const x = float(table.getString(r, 0));
+    const y = float(table.getString(r, 1));
+    if (isNaN(x) || isNaN(y)) continue;   // skips a text header row if present
+    dataX.push(x);
+    dataY.push(y * scale);
+  }
+
+  // Cache the data
+  spectrumCache[currentAbsSpectrum] = { dataX: [...dataX], dataY: [...dataY] };
+}
+
+// -------------------- GUI / Sliders --------------------
+function initSliders() {
+  gui = createGui('Plot controls', 100, 100);
+  const parent = gui.prototype._panel;
+
+  // -------------------- LIGHT SOURCE SECTION --------------------
+  const lightDiv = document.createElement("div");
+  lightDiv.className = "qs_container";
+  lightDiv.innerHTML = `<div class="qs_label">light source:</div>`;
+
+  const lightSelect = document.createElement("select");
+  lightDiv.appendChild(lightSelect);
+
+  const lightOpts = [
+    { label: "LED", value: "LED", desc: "Gaussian" },
+    { label: "Hg lamp", value: "ArcLamp", desc: "400-500 nm filter" },
+    { label: "custom spectrum", value: "CustomLight" }
+  ];
+
+  lightOpts.forEach(opt => {
+    const option = document.createElement("option");
+    option.value = opt.value;
+    option.textContent = opt.label;
+    lightSelect.appendChild(option);
+  });
+
+  const lightDesc = document.createElement("div");
+  lightDesc.style.fontSize = "17px";
+  lightDesc.style.marginTop = "2px";
+  lightDesc.style.whiteSpace = "pre-line";
+  const initOpt = lightOpts.find(o => o.value === currentLightSpectrum);
+  lightDesc.textContent = initOpt?.desc || "";
+  lightDiv.appendChild(lightDesc);
+
+  const lightChooser = makeFileChooser();
+  const lightFileInput = lightChooser.input;
+  const lightFileWrap = lightChooser.wrap;
+  lightFileWrap.style.display = currentLightSpectrum === "CustomLight" ? "block" : "none";
+  lightDiv.appendChild(lightFileWrap);
+
+  parent.appendChild(lightDiv);
+
+  // --- Handle light source change
+  lightSelect.addEventListener("change", e => {
+    const newVal = e.target.value;
+    const selected = lightOpts.find(o => o.value === newVal);
+
+    lightDesc.textContent = selected?.desc || "";
+
+    if (newVal === "ArcLamp") {
+      currentLightSpectrum = "ArcLamp";
+      lightFileWrap.style.display = "none";
+      loadDefaultLightSpectrum("ArcLamp");
+    } else if (newVal === "CustomLight") {
+      currentLightSpectrum = "CustomLight";
+      lightFileWrap.style.display = "block";
+    } else {
+      currentLightSpectrum = "LED";
+      lightFileWrap.style.display = "none";
+    }
+    toggleGaussianControls();
+    updateCurve();
+  });
+
+  // --- Handle custom light CSV upload
+  lightFileInput.addEventListener("change", e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = evt => {
+      try {
+        const parsed = Papa.parse(evt.target.result, {
+          header: true,
+          dynamicTyping: true
+        }).data;
+
+        const newX = [], newY = [];
+        parsed.forEach(row => {
+          const keys = Object.keys(row);
+          if (keys.length >= 2) {
+            const x = parseFloat(row[keys[0]]);
+            const y = parseFloat(row[keys[1]]);
+            if (!isNaN(x) && !isNaN(y)) {
+              newX.push(x);
+              newY.push(y);
+            }
+          }
+        });
+
+        if (newX.length && newY.length) {
+          lightX = newX;
+          lightY = newY;
+          currentLightSpectrum = "CustomLight";
+          updateCurve();
+          console.log(`Custom light CSV loaded (${lightX.length} points).`);
+        }
+      } catch (err) {
+        console.error("Error parsing custom light CSV:", err);
+      }
+    };
+    reader.readAsText(file);
+  });
+
+  // -------------------- LED PARAMETERS --------------------
+  const sliders = [];
+
+  sliderMean = new ProductSlider('mean', 300, 800, GausMean, 1, 'LED center', 'nm');
+  sliderFWHM = new ProductSlider('fwhm', 1, 200, GausFWHM, 1, 'LED FWHM', 'nm');
+  sliders.push(sliderMean, sliderFWHM);
+
+  sliderMean.setCallback(val => { GausMean = val; updateCurve(); });
+  sliderFWHM.setCallback(val => { GausFWHM = val; updateCurve(); });
+
+  sliders.forEach(slider => {
+    slider.attachParent(parent);
+  });
+
+  toggleGaussianControls(); // hide if not LED
+
+  // -------------------- INITIATOR / ABSORBANCE --------------------
+  const spectrumDiv = document.createElement("div");
+  spectrumDiv.className = "qs_container";
+  spectrumDiv.innerHTML = `<div class="qs_label">absorbance spectrum:</div>`;
+
+  const absOptions = ["Exponential", "TPO", "Irgacure 907", "Custom"];
+  const absSelect = document.createElement("select");
+  absOptions.forEach(opt => absSelect.add(new Option((opt === "Exponential" || opt === "Custom") ? opt.toLowerCase() : opt, opt)));   // label lower case; value unchanged
+  absSelect.value = currentAbsSpectrum;
+  spectrumDiv.appendChild(absSelect);
+
+  const absChooser = makeFileChooser();
+  const absFileInput = absChooser.input;
+  const absFileWrap = absChooser.wrap;
+  absFileWrap.style.display = currentAbsSpectrum === "Custom" ? "block" : "none";
+  spectrumDiv.appendChild(absFileWrap);
+
+  parent.appendChild(spectrumDiv);
+
+  // --- Absorbance selection
+  absSelect.addEventListener("change", e => {
+    const newSpec = e.target.value;
+    spectrumCache[currentAbsSpectrum] = { dataX: [...dataX], dataY: [...dataY] };
+    currentAbsSpectrum = newSpec;
+    absFileWrap.style.display = newSpec === "Custom" ? "block" : "none";
+    positionPanels();
+
+    if (spectrumCache[newSpec]) {
+      dataX = [...spectrumCache[newSpec].dataX];
+      dataY = [...spectrumCache[newSpec].dataY];
+      updateCurve();
+    } else if (newSpec !== "Custom") {
+      loadDefaultSpectrum(newSpec);
+    }
+  });
+
+  // --- Absorbance CSV upload
+  absFileInput.addEventListener("change", e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = evt => {
+      try {
+        const parsed = Papa.parse(evt.target.result, {
+          header: true,
+          dynamicTyping: true
+        }).data;
+
+        const newX = [], newY = [];
+        parsed.forEach(row => {
+          const keys = Object.keys(row);
+          if (keys.length >= 2) {
+            const x = parseFloat(row[keys[0]]);
+            const y = parseFloat(row[keys[1]]);
+            if (!isNaN(x) && !isNaN(y)) {
+              newX.push(x);
+              newY.push(y);
+            }
+          }
+        });
+
+        if (newX.length && newY.length) {
+          dataX = newX;
+          dataY = newY;
+          spectrumCache["Custom"] = { dataX: [...dataX], dataY: [...dataY] };
+          updateCurve();
+          console.log(`Custom absorbance CSV loaded (${dataX.length} points).`);
+        }
+      } catch (err) {
+        console.error("Error parsing absorbance CSV:", err);
+      }
+    };
+    reader.readAsText(file);
+  });
+
+  // -------------------- INITIATOR CONCENTRATION & DEPTH --------------------
+  const concSlider = new ProductSlider('conc', 0, 1000, Concentration, 1, 'concentration', 'mM');
+  const depthSlider = new ProductSlider('depth', 0, 500, Depth, 1, 'depth', 'µm');
+
+  concSlider.setCallback(val => { Concentration = val; updateCurve(); });
+  depthSlider.setCallback(val => { Depth = val; updateCurve(); });
+
+  concSlider.attachParent(parent);
+  depthSlider.attachParent(parent);
+
+  PLOT_SLIDERS.push(sliderMean, sliderFWHM, concSlider, depthSlider);
+  fitPlotControlsWidth();
+
+  // -------------------- PANEL & INITIAL UPDATE --------------------
+  setPanelPosition(gui, "right", attPlot.GPLOT.mar[2], 10);
+  updateCurve();
+}
+
+// -------------------- File chooser --------------------
+// A "browse" button with the chosen file name on its own line underneath
+// (the browser's built-in file input text gets cut off in the narrow panel).
+function makeFileChooser() {
+  const wrap = document.createElement("div");
+  wrap.style.marginTop = "4px";
+
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = ".csv";
+  input.style.display = "none";
+
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.textContent = "browse…";
+  btn.style.font = "17px Arial, sans-serif";
+  btn.style.padding = "1px 8px";
+  btn.addEventListener("click", () => input.click());
+
+  const name = document.createElement("div");
+  name.textContent = "no file chosen";
+  name.style.fontSize = "15px";
+  name.style.color = "#333";
+  name.style.overflowWrap = "anywhere";
+  name.style.marginTop = "2px";
+
+  input.addEventListener("change", () => {
+    name.textContent = input.files[0] ? input.files[0].name : "no file chosen";
+    positionPanels();
+  });
+
+  wrap.append(input, btn, name);
+  return { wrap, input };
+}
+
+// -------------------- Load default spectra --------------------
+function loadDefaultSpectrum(name) {
+  let path = "";
+  if (name === "Exponential") path = "exponentialAbs.csv";
+  if (name === "TPO") path = "tpoAbs.csv";
+  if (name === "Irgacure 907") path = "I907Abs.csv";
+
+  loadTable(path, "csv", tbl => {
+    table = tbl;
+    parseCSV();
+    updateCurve();
+  }, err => {
+    console.error("Failed to load " + path, err);
+  });
+}
+
+// -------------------- Parse custom CSV --------------------
+function parseCustomCSV(customData) {
+  const newX = [];
+  const newY = [];
+
+  customData.forEach(row => {
+    const keys = Object.keys(row);
+    if (keys.length >= 2) {
+      const x = parseFloat(row[keys[0]]);
+      const y = parseFloat(row[keys[1]]);
+      if (!isNaN(x) && !isNaN(y)) {
+        newX.push(x);
+        newY.push(y);
+      }
+    }
+  });
+
+  if (newX.length && newY.length) {
+    dataX = newX;
+    dataY = newY;
+
+    // Make sure the current table reference matches custom CSV if needed
+    table = null; // mark that we’re now using custom data
+
+    // Cache custom data
+    spectrumCache["Custom"] = { dataX: [...dataX], dataY: [...dataY] };
+
+    updateCurve();
+    console.log("Custom CSV loaded. Curve updated.");
+  } else {
+    console.warn("Custom CSV is empty or malformed. Keeping previous spectrum.");
+  }
+}
+
+// -------------------- Curve Computation --------------------
+function updateCurve() {
+  if (!dataX.length) return;
+
+  const npts = 400;
+  const minX = 0;
+  const maxX = Math.max(...dataX);
+  const dataMax = Math.max(...dataY);
+
+  let fullGaussY = [];
+  let fullProductY = [];
+  let fullAttenY = [];
+  let fullAttenProductY = [];
+
+  const GausSig = GausFWHM / 2.35482;
+  const useArcLamp = (currentLightSpectrum === "ArcLamp");
+  const useCustomLight = (currentLightSpectrum === "CustomLight");
+
+  // Normalize light spectrum arrays if using ArcLamp or CustomLight
+  if ((useArcLamp || useCustomLight) && lightY && lightY.length > 0) {
+    const maxLight = Math.max(...lightY);
+    if (maxLight > 0) {
+      lightY = lightY.map(y => y / maxLight);
+    }
+  }
+
+  for (let i = 0; i < npts; i++) {
+    const x = lerp(minX, maxX, i / (npts - 1));
+    const yAbs = interp1(dataX, dataY, x, dataMax);
+
+    // --- Light source intensity (LED Gaussian / ArcLamp / CustomLight)
+    let lightYval;
+    if (useArcLamp || useCustomLight) {
+      lightYval = interp1(lightX, lightY, x, 0); // normalized earlier
+    } else {
+      // Clamp GausMean to 300 minimum
+      const safeMean = Math.max(GausMean, 300);
+      lightYval = GAUS_AMP * Math.exp(-Math.pow(x - safeMean, 2) / (2 * GausSig * GausSig));
+    }
+
+    // --- Compute combined effects ---
+    const atten = Math.exp(-yAbs * Concentration/1000 * Depth/10000);
+    const absorbed = lightYval * yAbs * x;
+    const attenuatedLight = lightYval * atten;
+    const attenuatedAbsorbed = attenuatedLight * yAbs * x;
+
+    fullGaussY.push({ x, y: lightYval });
+    fullProductY.push({ x, y: absorbed });
+    fullAttenY.push({ x, y: attenuatedLight });
+    fullAttenProductY.push({ x, y: attenuatedAbsorbed });
+  }
+
+  // Normalize to the peak absorbed value
+  const productMax = Math.max(...fullProductY.map(p => p.y));
+  fullProductY = fullProductY.map(p => ({ x: p.x, y: p.y / productMax }));
+  fullAttenProductY = fullAttenProductY.map(p => ({ x: p.x, y: p.y / productMax }));
+
+  // Integrate over full range
+  const integralProduct = trapz(fullProductY.map(p => p.x), fullProductY.map(p => p.y));
+  const integralAtten = trapz(fullAttenProductY.map(p => p.x), fullAttenProductY.map(p => p.y));
+
+  const percentAtten = 100 * integralAtten / integralProduct;
+  integral = integralProduct;
+  integralPercent = percentAtten;
+
+  // Crop to plot range
+  const plotMinX = Math.min(...dataX);
+  const plotMaxX = Math.max(...dataX);
+
+  gaussY = fullGaussY.filter(p => p.x >= plotMinX && p.x <= plotMaxX);
+  productY = fullProductY.filter(p => p.x >= plotMinX && p.x <= plotMaxX);
+  attenY = fullAttenY.filter(p => p.x >= plotMinX && p.x <= plotMaxX);
+  attenProductY = fullAttenProductY.filter(p => p.x >= plotMinX && p.x <= plotMaxX);
+
+  redraw();
+}
+
+
+// -------------------- Plot geometry --------------------
+// Computes margins (so axis labels never overlap tick numbers), axis ranges,
+// ticks and mapping functions. Shared by the axes, curves, legend and hover.
+function getPlotGeometry() {
+  textSize(GraphFS);
+
+  const minX = Math.min(...dataX);
+  const maxX = Math.max(...dataX);
+  const minYLeft = 0;
+  const maxYLeft = Math.max(
+    ...gaussY.map(p => p.y),
+    ...productY.map(p => p.y),
+    ...attenY.map(p => p.y),
+    ...attenProductY.map(p => p.y)
+  );
+  const minYRight = 0;
+  const maxYRight = Math.max(...dataY);
+
+  const xTicks = getTicks(minX, maxX, 8);
+  const yLeftTicks = getTicks(minYLeft, maxYLeft, 6);
+  const yRightTicks = getTicks(minYRight, maxYRight, 6);
+
+  const leftStep = yLeftTicks.length > 1 ? Math.abs(yLeftTicks[1] - yLeftTicks[0]) : 1;
+  const leftDec = Math.max(0, Math.min(3, -Math.floor(Math.log10(leftStep) + 1e-9)));
+  const leftLabels = yLeftTicks.map(v => (Math.abs(v) < 1e-12 ? 0 : v).toFixed(leftDec));
+  const rightLabels = yRightTicks.map(v => formatSci(v));
+
+  const leftTickW = Math.max(...leftLabels.map(s => textWidth(s)), 0);
+  const rightTickW = Math.max(...rightLabels.map(s => textWidth(s)), 0);
+  const lineH = GraphFS * 1.2;
+
+  const TICK_GAP = 7;       // tick mark + gap before number
+  const LABEL_GAP = 10;     // gap between numbers and axis label
+
+  // left axis label has two lines, right axis label one line
+  const L = 6 + 2 * lineH + LABEL_GAP + leftTickW + TICK_GAP;
+  const R = TICK_GAP + rightTickW + LABEL_GAP + lineH + 6;
+  const T = 2 * lineH + 18;
+  const B = 6 + lineH + 8 + lineH + 4;
+
+  const x0 = L, x1 = width - R, y0 = T, y1 = height - B;
+
+  return {
+    L, R, T, B, x0, x1, y0, y1, lineH, leftTickW, rightTickW, TICK_GAP, LABEL_GAP,
+    minX, maxX, minYLeft, maxYLeft, minYRight, maxYRight,
+    xTicks, yLeftTicks, yRightTicks, leftLabels, rightLabels,
+    mapX: x => map(x, minX, maxX, x0, x1),
+    mapYL: y => map(y, minYLeft, maxYLeft, y1, y0),
+    mapYR: y => map(y, minYRight, maxYRight, y1, y0)
+  };
+}
+
+// Pixel-space polylines of every curve (used for legend placement and hover)
+function getCurvePixels(g) {
+  const toPx = (pts, mapY) => pts.map(p => [g.mapX(p.x), mapY(p.y)]);
+  return {
+    abs:        dataX.map((x, i) => [g.mapX(x), g.mapYR(dataY[i])]),
+    incident:   toPx(gaussY, g.mapYL),
+    absSurface: toPx(productY, g.mapYL),
+    transmit:   toPx(attenY, g.mapYL),
+    absDepth:   toPx(attenProductY, g.mapYL)
+  };
+}
+
+// -------------------- Draw Plot --------------------
+function drawPlot() {
+  if (!dataX.length || !gaussY.length) return;
+
+  const g = getPlotGeometry();
+  const curves = getCurvePixels(g);
+
+  drawAxes(g);
+
+  // LEFT-axis curves, then RIGHT-axis curve
+  ["incident", "absSurface", "transmit", "absDepth", "abs"].forEach(key => {
+    drawPolyline(curves[key], color(...CURVE_STYLE[key].rgb));
+  });
+
+  // Title
+  noStroke(); fill(0);
+  textSize(GraphFS); textAlign(CENTER, TOP);
+  text(`Absorbed photons at depth relative to incident = ${nf(integralPercent, 1, 1)}%`, (g.x0 + g.x1) / 2, 4);
+  text(`(analogous to I/I₀)`, (g.x0 + g.x1) / 2, 4 + g.lineH);
+
+  drawHoverLabel(g, curves);
+}
+
+// -------------------- Legend (moves away from the curves) --------------------
+function drawLegend(g, curves) {
+  textSize(GraphFS);
+  const box = GraphFS * 0.75;
+  const spacing = g.lineH + 2;
+  const pad = 6;
+  const textW = Math.max(...LEGEND_ORDER.map(k => textWidth(CURVE_STYLE[k].label)));
+  const w = box + 6 + textW + 2 * pad;
+  const h = LEGEND_ORDER.length * spacing + 2 * pad - 2;
+  const m = 8; // distance from the plot frame
+
+  const xs = { left: g.x0 + m, center: (g.x0 + g.x1 - w) / 2, right: g.x1 - m - w };
+  const ys = { top: g.y0 + m, middle: (g.y0 + g.y1 - h) / 2, bottom: g.y1 - m - h };
+  // preferred spots first, then a sweep across the plot
+  const candidates = [
+    [xs.right, ys.top], [xs.left, ys.top], [xs.center, ys.top],
+    [xs.right, ys.middle], [xs.left, ys.middle],
+    [xs.right, ys.bottom], [xs.left, ys.bottom], [xs.center, ys.bottom], [xs.center, ys.middle]
+  ];
+  for (let i = 0; i <= 10; i++) {
+    const cx = xs.left + (xs.right - xs.left) * i / 10;
+    [ys.top, ys.middle, ys.bottom].forEach(cy => candidates.push([cx, cy]));
+  }
+
+  // score = number of (densely sampled) curve points inside the legend box
+  const samples = [];
+  Object.values(curves).forEach(poly => {
+    for (let i = 0; i < poly.length - 1; i++) {
+      const [ax, ay] = poly[i], [bx, by] = poly[i + 1];
+      const n = Math.max(1, Math.ceil(Math.hypot(bx - ax, by - ay) / 3));
+      for (let k = 0; k < n; k++) samples.push([ax + (bx - ax) * k / n, ay + (by - ay) * k / n]);
+    }
+  });
+
+  let best = candidates[0], bestScore = Infinity;
+  candidates.forEach(([cx, cy]) => {
+    let s = 0;
+    for (const [px, py] of samples) {
+      if (px >= cx - 3 && px <= cx + w + 3 && py >= cy - 3 && py <= cy + h + 3) s++;
+    }
+    if (s < bestScore) { bestScore = s; best = [cx, cy]; }
+  });
+
+  const [lx, ly] = best;
+  noStroke(); fill(255, 255, 255, 225);
+  rect(lx, ly, w, h);
+
+  textAlign(LEFT, CENTER);
+  LEGEND_ORDER.forEach((key, i) => {
+    const cy = ly + pad + spacing * i + (spacing - 2) / 2;
+    fill(...CURVE_STYLE[key].rgb);
+    rect(lx + pad, cy - box / 2, box, box);
+    fill(0);
+    text(CURVE_STYLE[key].label, lx + pad + box + 6, cy);
+  });
+}
+
+// -------------------- Mouse-over curve label --------------------
+function drawHoverLabel(g, curves) {
+  if (mouseX < g.x0 || mouseX > g.x1 || mouseY < g.y0 || mouseY > g.y1) return;
+
+  let bestKey = null, bestD = 7; // px tolerance
+  for (const key of Object.keys(curves)) {
+    const poly = curves[key];
+    for (let i = 0; i < poly.length - 1; i++) {
+      const d = distToSegment(mouseX, mouseY, poly[i], poly[i + 1]);
+      if (d < bestD) { bestD = d; bestKey = key; }
+    }
+  }
+  if (!bestKey) return;
+
+  const label = CURVE_STYLE[bestKey].label;
+  textSize(GraphFS);
+  const tw = textWidth(label) + 12, th = GraphFS + 10;
+  let tx = mouseX + 14, ty = mouseY - th - 8;
+  if (tx + tw > width - 2) tx = mouseX - 14 - tw;
+  if (ty < 2) ty = mouseY + 14;
+
+  stroke(...CURVE_STYLE[bestKey].rgb); strokeWeight(1); fill(255);
+  rect(tx, ty, tw, th, 4);
+  noStroke(); fill(...CURVE_STYLE[bestKey].rgb);
+  textAlign(LEFT, CENTER);
+  text(label, tx + 6, ty + th / 2);
+}
+
+function distToSegment(px, py, a, b) {
+  const dx = b[0] - a[0], dy = b[1] - a[1];
+  const len2 = dx * dx + dy * dy;
+  let t = len2 ? ((px - a[0]) * dx + (py - a[1]) * dy) / len2 : 0;
+  t = Math.max(0, Math.min(1, t));
+  return Math.hypot(px - (a[0] + t * dx), py - (a[1] + t * dy));
+}
+
+// -------------------- Drawing --------------------
+function draw() {
+  clear();
+  drawPlot();
+  updateText();
+}
+
+// -------------------- Plotting --------------------
+function initPlot() {
+  attPlot = new PlotCanvas(this);
+  attPlot.plotSetup();
+
+  attPlot.GPLOT.getXAxis().getAxisLabel().setText("Depth (μm)");
+  attPlot.GPLOT.getYAxis().getAxisLabel().setText("Intensity (mW/cm²)");
+  attPlot.GPLOT.getTitle().setText("");
+
+  attPlot.GPLOT.getXAxis().getAxisLabel().setFontSize(GraphFS);
+  attPlot.GPLOT.getYAxis().getAxisLabel().setFontSize(GraphFS);
+  attPlot.GPLOT.getXAxis().setFontSize(GraphFS);
+  attPlot.GPLOT.getYAxis().setFontSize(GraphFS);
+  attPlot.GPLOT.getTitle().setFontSize(GraphFS);
+  attPlot.GPLOT.setFontSize(GraphFS);
+}
+
+// -------------------- Axes & Utilities --------------------
+function drawAxes(g) {
+  stroke(0); strokeWeight(1);
+
+  line(g.x0, g.y0, g.x0, g.y1);   // primary Y-axis (left)
+  line(g.x1, g.y0, g.x1, g.y1);   // secondary Y-axis (right)
+  line(g.x0, g.y1, g.x1, g.y1);   // X-axis
+
+  noStroke(); fill(0); textSize(GraphFS);
+
+  // --- X-axis label ---
+  textAlign(CENTER, BOTTOM);
+  text("wavelength (nm)", (g.x0 + g.x1) / 2, height - 4);
+
+  // --- Left Y-axis (primary) label: two lines ---
+  push();
+  translate(6, (g.y0 + g.y1) / 2);
+  rotate(-PI / 2);
+  textAlign(CENTER, TOP);
+  text("light spectrum and absorbed photons", 0, 0);
+  text("(relative to their respective maxima)", 0, g.lineH);
+  pop();
+
+  // --- Right Y-axis (secondary) label ---
+  push();
+  translate(g.x1 + g.TICK_GAP + g.rightTickW + g.LABEL_GAP, (g.y0 + g.y1) / 2);
+  rotate(-PI / 2);
+  textAlign(CENTER, TOP);   // rotated -90°: TOP keeps the text to the right of the anchor
+  text("Napierian absorptivity (L/mol-cm)", 0, 0);
+  pop();
+
+  // --- X ticks ---
+  textAlign(CENTER, TOP);
+  g.xTicks.forEach(xVal => {
+    const px = g.mapX(xVal);
+    stroke(0);
+    line(px, g.y1, px, g.y1 + 5);
+    noStroke();
+    fill(0);
+    text(formatTick(xVal, 1), px, g.y1 + 7);
+  });
+
+  // --- Left Y ticks ---
+  textAlign(RIGHT, CENTER);
+  g.yLeftTicks.forEach((yVal, i) => {
+    const py = g.mapYL(yVal);
+    stroke(0);
+    line(g.x0 - 5, py, g.x0, py);
+    noStroke();
+    fill(0);
+    text(g.leftLabels[i], g.x0 - g.TICK_GAP, py);
+  });
+
+  // --- Right Y ticks (scientific notation) ---
+  textAlign(LEFT, CENTER);
+  g.yRightTicks.forEach((yVal, i) => {
+    const py = g.mapYR(yVal);
+    stroke(0);
+    line(g.x1, py, g.x1 + 5, py);
+    noStroke();
+    fill(0);
+    text(g.rightLabels[i], g.x1 + g.TICK_GAP, py);
+  });
+}
+
+// scientific notation for tick labels, e.g. 2500 -> "2.5×10³"
+function formatSci(val) {
+  if (!isFinite(val)) return "";
+  if (Math.abs(val) < 1e-12) return "0";
+  const SUP = { "-": "⁻", "0": "⁰", "1": "¹", "2": "²", "3": "³", "4": "⁴", "5": "⁵", "6": "⁶", "7": "⁷", "8": "⁸", "9": "⁹" };
+  let exp = Math.floor(Math.log10(Math.abs(val)));
+  let mant = parseFloat((val / Math.pow(10, exp)).toPrecision(3));
+  if (Math.abs(mant) >= 10) { mant /= 10; exp += 1; }
+  const expStr = String(exp).split("").map(c => SUP[c]).join("");
+  return `${mant}×10${expStr}`;
+}
+
+function mapYSecondary(y) {
+  const g = getPlotGeometry();
+  return g.mapYR(y);
+}
+
+function interp1(xs, ys, x) {
+  if (x <= xs[0]) return ys[0];
+  if (x >= xs[xs.length - 1]) return ys[ys.length - 1];
+  for (let i = 0; i < xs.length - 1; i++) {
+    if (x >= xs[i] && x <= xs[i + 1]) {
+      const t = (x - xs[i]) / (xs[i + 1] - xs[i]);
+      return lerp(ys[i], ys[i + 1], t);
+    }
+  }
+}
+
+function trapz(xs, ys) {
+  let area = 0;
+  for (let i = 0; i < xs.length - 1; i++) {
+    area += 0.5 * (ys[i] + ys[i + 1]) * (xs[i + 1] - xs[i]);
+  }
+  return area;
+}
+
+function drawPolyline(pts, col) {
+  stroke(col); strokeWeight(2); noFill();
+  beginShape();
+  pts.forEach(p => vertex(p[0], p[1]));
+  endShape();
+}
+
+function drawLine(xs, ys, mapX, mapY, col) {
+  stroke(col); strokeWeight(2); noFill();
+  beginShape();
+  xs.forEach((x, i) => vertex(mapX(x), mapY(ys[i])));
+  endShape();
+}
+
+// -------------------- ProductSlider --------------------
+class ProductSlider {
+  constructor(key, min, max, init, step, label, units) {
+    this.val = init;
+    this.name = label;
+    this.maxChars = Math.max(...[min, max, init, (min + max) / 2].map(v => formatSigFig(v, 3).length));
+
+    this.div = document.createElement("div");
+    this.div.className = "qs_container";
+
+    this.labelDiv = document.createElement("div");
+    this.labelDiv.className = "qs_label";
+    this.labelDiv.style.whiteSpace = "nowrap";
+    this.labelDiv.textContent = `${label}: `;
+
+    this.valBox = document.createElement("input");
+    this.valBox.type = "text";
+    this.setBoxValue(init);
+
+    this.labelDiv.appendChild(this.valBox);
+    this.labelDiv.append(` ${units}`);
+    this.div.appendChild(this.labelDiv);
+
+    this.sliderDiv = document.createElement("input");
+    this.sliderDiv.type = "range";
+    this.sliderDiv.min = min;
+    this.sliderDiv.max = max;
+    this.sliderDiv.step = step;
+    this.sliderDiv.value = init;
+    this.sliderDiv.style.width = SLIDER_WIDTH + "px";
+    this.div.appendChild(this.sliderDiv);
+
+    this.callback = null;
+
+    // "input" fires while dragging; "change" on release (some browsers only
+    // send "change" for some interactions, so handle both)
+    const onSlide = e => {
+      this.val = Number(e.target.value);
+      this.setBoxValue(this.val);
+      if (this.callback) this.callback(this.val);
+    };
+    this.sliderDiv.addEventListener("input", onSlide);
+    this.sliderDiv.addEventListener("change", onSlide);
+
+    this.valBox.addEventListener("input", e => {
+      this.fitBox();
+      const v = Number(e.target.value);
+      if (!isNaN(v)) {
+        this.val = v;
+        if (this.callback) this.callback(this.val);
+      }
+    });
+  }
+
+  // show the value and make the box just wide enough for it
+  setBoxValue(v) {
+    this.valBox.value = formatSigFig(v, 3);
+    this.fitBox();
+  }
+
+  fitBox() {
+    const n = Math.max(1, this.valBox.value.length);
+    this.valBox.style.width = (n + 0.3) + "ch";
+  }
+
+  attachParent(parent) { parent.appendChild(this.div); }
+  setCallback(cb) { this.callback = cb; }
+}
+
+// -------------------- Formatting --------------------
+// 3 significant figures; scientific notation (e.g. 1.23×10³) above 999
+function formatHTMLNum(v) {
+  if (!isFinite(v)) return "not defined";
+  if (Math.abs(v) <= 999) return formatSigFig(v, 3);
+  let exp = Math.floor(Math.log10(Math.abs(v)));
+  let mant = Number((v / Math.pow(10, exp)).toPrecision(3));
+  if (Math.abs(mant) >= 10) { mant /= 10; exp += 1; }
+  return `${mant.toFixed(2)}×10<sup>${exp}</sup>`;
+}
+// 3 significant figures, but never exponential notation (1000 -> "1000")
+function formatSigFig(num, sigfigs) {
+  const v = Number.parseFloat(num);
+  if (!isFinite(v)) return String(num);
+  if (v === 0) return "0";
+  if (Math.abs(v) >= Math.pow(10, sigfigs)) return String(Math.round(v));
+  return v.toPrecision(sigfigs);
+}
+
+// -------------------- Panel / Canvas Helpers --------------------
+function setGuiWidth(guiObject) {
+  const qs = guiObject?.prototype;
+  if (!qs) return;
+  if (typeof qs.setWidth === "function") qs.setWidth(PANEL_WIDTH);
+  else if (qs._panel) qs._panel.style.width = PANEL_WIDTH + "px";
+}
+
+function setPanelPosition(guiObject, side = "left", offsetTop = 20, pad = 20) {
+  if (!guiObject || !guiObject.prototype || !guiObject.prototype._panel) return;
+
+  const panel = guiObject.prototype._panel;
+  panel.style.position = "fixed";
+  panel.style.top = offsetTop + "px";
+
+  if (side === "left") {
+    panel.style.left = pad + "px";
+    panel.style.right = "auto";
+  } else {
+    panel.style.right = pad + "px";
+    panel.style.left = "auto";
+  }
+}
+
+// Make the plot controls panel just wide enough for its widest line.
+// Each value box is measured at the widest number its slider can show,
+// so the panel does not change width while a slider is dragged.
+function fitPlotControlsWidth() {
+  if (!gui) return;
+  const panel = gui.prototype._panel;
+  const boxes = PLOT_SLIDERS.map(sl => {
+    const old = sl.valBox.style.width;
+    sl.valBox.style.width = (sl.maxChars + 0.3) + "ch";
+    return [sl, old];
+  });
+  const hidden = PLOT_SLIDERS.filter(sl => sl.div.style.display === "none");
+  hidden.forEach(sl => sl.div.style.display = "block");
+
+  panel.style.width = "max-content";
+  const w = Math.ceil(panel.getBoundingClientRect().width) + 2;
+
+  hidden.forEach(sl => sl.div.style.display = "none");
+  boxes.forEach(([sl, old]) => sl.valBox.style.width = old);
+  panel.style.width = w + "px";
+  plotControlsWidth = w;
+}
+
+// Plot controls sit just to the right of the figure; the spectral weighted
+// intensity panel runs horizontally underneath the figure, same width.
+function positionPanels() {
+  if (window.innerWidth < 800) return;
+  const PAD_SIDE = 20, GAP = 12;
+  if (!gui) return;
+  const cnvEl = document.querySelector("#plot-wrapper canvas");
+  const canvasRight = cnvEl ? cnvEl.getBoundingClientRect().right : ((typeof width === "number") ? width : 0);
+  // top of the plot controls level with the "Absorbed photons ..." line
+  const cnvTop = cnvEl ? cnvEl.getBoundingClientRect().top : 50;
+  setPanelPosition(gui, "left", Math.round(cnvTop + 2), canvasRight + GAP);
+
+  if (typeof advGui === "undefined" || !advGui) return;
+  const advPanel = advGui.prototype._panel;
+  const cnv = document.querySelector("#plot-wrapper canvas");
+  const r = cnv ? cnv.getBoundingClientRect() : { left: 0, bottom: 0, width: canvasRight };
+  // left margin: start the panel at the graph's left (y) axis, so it is
+  // indented from the window edge; never wider than the figure
+  let indent = 80;
+  try { if (dataX && dataX.length && gaussY && gaussY.length) indent = getPlotGeometry().x0; } catch (e) {}
+  advPanel.style.position = "absolute";          // scrolls with the page
+  advPanel.style.left = Math.round(r.left + indent + window.scrollX) + "px";
+  advPanel.style.right = "auto";
+  advPanel.style.top = Math.round(r.bottom + window.scrollY + 8) + "px";
+  advPanel.style.width = Math.round(Math.max(200, r.width - indent)) + "px";
+}
+
+
+// Lay out the spectral weighted intensity panel as a horizontal row
+function makePanelHorizontal(guiObject) {
+  const panel = guiObject.prototype._panel;
+  panel.style.display = "flex";
+  panel.style.flexWrap = "wrap";
+  panel.style.alignItems = "stretch";
+  panel.style.boxSizing = "border-box";
+  [...panel.children].forEach(ch => {
+    if (ch.classList.contains("qs_container")) {
+      ch.style.flex = "0 0 auto";             // only as wide as its contents
+    } else {
+      ch.style.flex = "1 1 100%";   // title bar spans the full width
+    }
+  });
+}
+
+function getPanelWidth(guiObject) {
+  const panel = guiObject?.prototype?._panel;
+  if (!panel) return 0;
+
+  let wasHidden = false;
+  if (panel.style.display === "none") {
+    wasHidden = true;
+    panel.style.display = "block";
+  }
+
+  const width = panel.getBoundingClientRect().width;
+  if (wasHidden) panel.style.display = "none";
+  return width;
+}
+
+function computeCanvasSize() {
+  const PAD_SIDE = 20;
+  const aspect = 4 / 3;
+
+  let availableWidth, maxHeight;
+
+  if (window.innerWidth < 800) {
+    availableWidth = window.innerWidth - PAD_SIDE * 2;
+    maxHeight = window.innerHeight * 0.5;
+  } else {
+    const leftWidth = 0;
+    const rightWidth = BASE_PANEL_WIDTH + PAD_SIDE;
+    availableWidth = Math.max(300, window.innerWidth - leftWidth - rightWidth - PAD_SIDE);
+    maxHeight = window.innerHeight * 0.9;
+  }
+
+  let w = availableWidth;
+  let h = w / aspect;
+
+  if (h > maxHeight) {
+    h = maxHeight;
+    w = h * aspect;
+  }
+
+  // figure at 70% of its former size (desktop only)
+  if (window.innerWidth >= 800) {
+    w *= FIGURE_SCALE;
+    h *= FIGURE_SCALE;
+  }
+
+  return { width: w, height: h };
+}
+
+function initPanelPositions() {
+  positionPanels();
+}
+
+function windowResized() {
+  const size = computeCanvasSize();
+  if (typeof resizeCanvas === 'function') resizeCanvas(size.width, size.height);
+
+  if (attPlot && attPlot.GPLOT) {
+    attPlot.GPLOT.setOuterDim(size.width, size.height);
+    attPlot.GPLOT.setPos(0, 0);
+  }
+
+  // keep the title centered over the figure
+  const title = document.getElementById("sim-title");
+  if (title) title.style.width = size.width + "px";
+
+  initPanelPositions();
+  loop();
+}
+
+// -------------------- Misc Helpers --------------------
+function getTicks(minVal, maxVal, targetTicks = 5, spacingFraction = 0.02) {
+  // spacingFraction = fraction of total range that counts as "too close"
+  if (minVal === maxVal) return [minVal];
+
+  if (maxVal < minVal) [minVal, maxVal] = [maxVal, minVal];
+
+  const range = maxVal - minVal;
+  const minSpacing = range * spacingFraction;
+
+  const tickSpacing = niceNumber(range / (targetTicks - 1), true);
+
+  const ticks = [];
+  let val = Math.ceil(minVal / tickSpacing) * tickSpacing;
+
+  while (val <= maxVal + 1e-9) {
+    if (ticks.length === 0 || Math.abs(val - ticks[ticks.length - 1]) > minSpacing) {
+      ticks.push(parseFloat(val.toPrecision(10)));
+    }
+    val += tickSpacing;
+  }
+
+  if (ticks.length && minVal < ticks[0] - minSpacing) ticks.unshift(minVal);
+  if (ticks.length && maxVal > ticks[ticks.length - 1] + minSpacing) ticks.push(maxVal);
+
+  return ticks;
+}
+
+function niceNumber(range, round = true) {
+  if (range === 0) return 0;
+  const exponent = Math.floor(Math.log10(Math.abs(range)));
+  const fraction = range / Math.pow(10, exponent);
+  let niceFraction;
+
+  if (round) {
+    if (fraction < 1.5) niceFraction = 1;
+    else if (fraction < 3) niceFraction = 2;
+    else if (fraction < 7) niceFraction = 5;
+    else niceFraction = 10;
+  } else {
+    if (fraction <= 1) niceFraction = 1;
+    else if (fraction <= 2) niceFraction = 2;
+    else if (fraction <= 5) niceFraction = 5;
+    else niceFraction = 10;
+  }
+
+  return niceFraction * Math.pow(10, exponent);
+}
+
+function formatTick(val, maxDecimals = 6) {
+  // Handle degenerate cases
+  if (!isFinite(val)) return "";
+  if (Math.abs(val) < 1e-12) return "0";
+
+  let decimals = 0;
+  const absVal = Math.abs(val);
+
+  if (absVal >= 1000) decimals = 0;
+  else if (absVal >= 100) decimals = 1;
+  else if (absVal >= 10) decimals = 2;
+  else if (absVal >= 1) decimals = 3;
+  else if (absVal >= 0.1) decimals = 4;
+  else if (absVal >= 0.01) decimals = 5;
+  else decimals = 6;
+
+  // Cap decimals to avoid excessive precision
+  decimals = Math.min(decimals, maxDecimals);
+
+  // Round then remove trailing zeros safely
+  let str = val.toFixed(decimals);
+  str = str.replace(/(\.\d*?[1-9])0+$/, "$1"); // trim trailing zeros
+  str = str.replace(/\.0+$/, ""); // remove ".0"
+
+  return str;
+}
+
+function loadLightCSV(fileName) {
+  loadTable(fileName, "csv", "header", tbl => {
+    lightX = [];
+    lightY = [];
+    for (let r = 0; r < tbl.getRowCount(); r++) {
+      const x = float(tbl.getString(r, 0));
+      const y = float(tbl.getString(r, 1));
+      if (!isNaN(x) && !isNaN(y)) {
+        lightX.push(x);
+        lightY.push(y);
+      }
+    }
+    console.log(`Loaded light source: ${fileName}`);
+    updateCurve();
+  }, err => {
+    console.error("Failed to load light CSV:", err);
+  });
+}
+
+function toggleGaussianControls() {
+  const isLED = currentLightSpectrum === "LED";
+  sliderMean.div.style.display = isLED ? "block" : "none";
+  sliderFWHM.div.style.display = isLED ? "block" : "none";
+  positionPanels();
+}
+
+function loadDefaultLightSpectrum(type) {
+  if (type === "ArcLamp") {
+    fetch("arcLamp.csv")
+      .then(res => res.text())
+      .then(text => {
+        const parsed = Papa.parse(text, { header: false, dynamicTyping: true, skipEmptyLines: true }).data;
+        lightX = [];
+        lightY = [];
+        parsed.forEach(row => {
+          const keys = Object.keys(row);
+          if (keys.length >= 2) {
+            const x = parseFloat(row[keys[0]]);
+            const y = parseFloat(row[keys[1]]);
+            if (!isNaN(x) && !isNaN(y)) {
+              lightX.push(x);
+              lightY.push(y);
+            }
+          }
+        });
+        console.log(`Arc Lamp CSV loaded (${lightX.length} points).`);
+        updateCurve();
+      })
+      .catch(err => console.error("Failed to load arcLamp.csv:", err));
+  }
+}
+
+// -------------- Toggle hamburger menu------------------
+function toggleMenu() {
+  const menu = document.getElementById('menu');
+  menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+}
+
+// Click outside to close
+document.addEventListener('click', e => {
+  const menu = document.getElementById('menu');
+  const btn = document.querySelector('.menu-button');
+  if (!btn.contains(e.target) && !menu.contains(e.target)) {
+    menu.style.display = 'none';
+  }
+});
+
+
+/**
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *           Advanced Gui
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ */
+function initAdvancedGUI() {
+  // Create the advanced GUI panel
+  advGui = createGui('Spectral weighted intensity', 100, 100);
+  const parent = advGui.prototype._panel;
+
+  // -------------------- Sliders --------------------
+  const sliders = [
+    new ProductSlider('tarWave', 320, 500, tarWave, 1, 'target wavelength', 'nm'),
+    new ProductSlider('mInt', 0.1, 100, mInt, 0.1, 'measured intensity', 'mW/cm²')
+  ];
+
+  sliders.forEach(slider => slider.attachParent(parent));
+  // update the results immediately when these sliders move
+  // (don't rely only on the animation loop)
+  sliders.forEach(slider => slider.setCallback(() => { updateText(); redraw(); }));
+  advGui.sliders = sliders; // save reference for later updates
+
+  // Initialize slider values
+  sliders.forEach(slider => {
+    slider.setBoxValue(slider.val);
+    slider.sliderDiv.value = slider.val;
+  });
+
+  // -------------------- Intensity Assessment --------------------
+  const advDiv = document.createElement("div");
+  advDiv.className = "qs_container";
+  advDiv.innerHTML = `<div class="qs_label">intensity assessment:</div>`;
+
+  const advOptions = ["Photons (Photodiode)", "Energy (Thermal)"];
+  const advSelect = document.createElement("select");
+  advOptions.forEach(opt => advSelect.add(new Option(opt.toLowerCase(), opt)));   // shown in lower case; value unchanged
+  advSelect.value = currentAdvSelect;
+  advDiv.appendChild(advSelect);
+  parent.appendChild(advDiv);
+
+  advSelect.addEventListener("change", e => {
+    currentAdvSelect = e.target.value;
+    console.log("Intensity assessment type changed to:", currentAdvSelect);
+    updateCurve(); // recalc curves using new type
+  });
+
+  // -------------------- Embedded Display --------------------
+  const advContainer = document.createElement("div");
+  advContainer.id = `adv-container`;
+  advContainer.className = "qs_container";
+  advContainer.style.flexBasis = "100%";   // results on their own row
+  parent.appendChild(advContainer);
+
+  // Use global advLabel (do NOT redeclare with const)
+  advLabel.id = `adv-label`;
+  advLabel.className = "qs_label";
+  advContainer.appendChild(advLabel);
+
+  // Function to update embedded text
+  function updateTextEmbedded() {
+    advLabel.innerHTML = `
+      <p>
+        observed equivalent incident intensity: ${tInt} mW/cm²
+      </p>
+    `;
+  }
+
+  // Store reference globally so draw() or other functions can update
+  textGui = { updateText: updateTextEmbedded };
+
+  // Initial update so text appears immediately
+  updateTextEmbedded();
+
+  // -------------------- Panel positioning --------------------
+  makePanelHorizontal(advGui);
+  // fix each slider box at the width it needs for its widest number,
+  // so the row does not shift while a slider is dragged
+  sliders.forEach(sl => {
+    const old = sl.valBox.style.width;
+    sl.valBox.style.width = (sl.maxChars + 0.3) + "ch";
+    sl.div.style.minWidth = Math.ceil(sl.div.getBoundingClientRect().width) + "px";
+    sl.valBox.style.width = old;
+  });
+  advContainer.style.flex = "1 1 100%";
+  const topY = advGuiY;
+  setPanelPosition(advGui, "right", topY, 20);
+  positionPanels();
+}
+
+let lastAdvHTML = "";
+function updateText() {
+  if (!dataX.length || (!gaussY.length && !lightX.length)) return;
+
+  // ---------------- Part 0: Pull current GUI values ----------------
+  const tarWaveVal = advGui.sliders.find(s => s.name === "target wavelength")?.val || tarWave;
+  const mIntVal = advGui.sliders.find(s => s.name === "measured intensity")?.val || mInt;
+
+  // Use currently displayed light spectrum (Gaussian, already updated by GUI)
+  const xVals = gaussY.map(p => p.x);
+  const yLight = gaussY.map(p => p.y);
+
+  // ---------------- Part 1: Intensity correction ----------------
+  let intensityCorrection = 1; // default (no correction)
+  if (currentAdvSelect === "Photons (Photodiode)") {
+    // Normalize light spectrum so that integral = 1
+    const integralY = trapz(xVals, yLight);
+    const normLight = yLight.map(y => y / (integralY || 1));
+
+    // Divide by wavelength
+    const normDivLambda = normLight.map((y, i) => y / xVals[i]);
+
+    // Integrate normalized/divided spectrum
+    const integralNorm = trapz(xVals, normDivLambda);
+
+    // Multiply by target wavelength
+    intensityCorrection = integralNorm * tarWaveVal;
+  }
+
+  // ---------------- Part 2: Absorbance correction ----------------
+  // 1) Multiply normalized light spectrum by absorbance/absorptivity spectrum
+  const absorbY = xVals.map(x => interp1(dataX, dataY, x));
+
+  const integralLight = trapz(xVals, yLight);
+  const normLight = yLight.map(y => y / (integralLight || 1)); // normalize to integrate = 1
+
+  const weightedAbs = normLight.map((y, i) => y * absorbY[i]);
+
+  // 2) Integrate to get real absorbance
+  const integralReal = trapz(xVals, weightedAbs);
+
+  // 3) Standard: absorptivity at the target wavelength. This is the limit of
+  //    the narrow (0.1 nm) Gaussian G(λ0) described in the Details; evaluating
+  //    it directly avoids sampling a 0.1 nm peak on a ~1.25 nm grid.
+  const absMin = Math.min(...dataX), absMax = Math.max(...dataX);
+  const inRange = tarWaveVal >= absMin && tarWaveVal <= absMax;
+  const integralStandard = inRange ? interp1(dataX, dataY, tarWaveVal) : NaN;
+
+  // 4) Absorbance factor = real / standard (undefined if ε(λ0) is zero or unknown)
+  const absorbanceFactor = (inRange && integralStandard > 0) ? integralReal / integralStandard : NaN;
+  let factorNote = "";
+  if (!inRange) {
+    factorNote = `target wavelength is outside the absorbance spectrum (${formatSigFig(absMin, 3)}–${formatSigFig(absMax, 3)} nm)`;
+  } else if (!(integralStandard > 0)) {
+    factorNote = "absorptivity is zero at the target wavelength";
+  }
+
+
+  // ---------------- Part 3: Equivalent intensity ----------------
+  tInt = mIntVal * intensityCorrection * absorbanceFactor;
+
+  // ---------------- Part 4: Update display ----------------
+  const html = factorNote ? `
+    <p>
+      <b>observed equivalent incident intensity: not defined</b><br>
+      (${factorNote})&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      intensity correction: ${formatHTMLNum(intensityCorrection)}
+    </p>
+  ` : `
+    <p>
+      <b>observed equivalent incident intensity: ${formatHTMLNum(tInt)} mW/cm²</b><br>
+      (${formatSigFig(tarWaveVal, 3)} nm light results in the same quantity of absorbed photons as ${formatSigFig(mIntVal, 3)} mW/cm² of the selected light source)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      intensity correction: ${formatHTMLNum(intensityCorrection)}&nbsp;&nbsp;&nbsp;&nbsp;
+      absorbance factor: ${formatHTMLNum(absorbanceFactor)}
+    </p>
+  `;
+  if (html !== lastAdvHTML) { advLabel.innerHTML = html; lastAdvHTML = html; }
+}
+
+</script>
+</head>
+
+<body>
+
+<!-- Title -->
+<div id="sim-title">Light attenuation: broadband source</div>
+
+<!-- Canvas wrapper -->
+<div id="plot-wrapper"></div>
+
+<!-- Slider wrapper -->
+<div id="sliders-wrapper" class="sliders-container"></div>
+
+<!-- Hamburger menu (only core items) -->
+<div class="hamburger-container">
+  <button class="menu-button" onclick="toggleMenu()">☰</button>
+  <div id="menu" class="menu-content">
+    <div id="dir-btn" class="btn btn-light btn-wide" data-bs-toggle="modal" data-bs-target="#directions-modal">Directions</div>
+    <div id="det-btn" class="btn btn-light btn-wide" data-bs-toggle="modal" data-bs-target="#details-modal">Details</div>
+    <div id="abt-btn" class="btn btn-light btn-wide" data-bs-toggle="modal" data-bs-target="#about-modal">About</div>
+    <div id="adv-btn" class="btn btn-light btn-wide" data-bs-toggle="modal" data-bs-target="#advanced-modal">Spectral weighted intensity</div>
+  </div>
+</div>
+
+<!-- Modals -->
+<div id="directions-modal" class="modal fade" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">Directions</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    </div>
+    <div class="modal-body">
+      <p>
+        <b><u>Directions for Use</u></b><br>
+This interactive tool allows you to explore how light absorption by a photochemical material depends on wavelength, depth, and chromophore concentration. Follow these steps to investigate the fundamentals of photochemistry:
+
+<ol>
+  <li><b>Select a light source:</b> Choose from LED (Gaussian), Arc Lamp, or upload a custom spectrum using the browse button. Observe how different spectral shapes influence absorption.</li>
+  
+  <li><b>Adjust LED parameters (if applicable):</b> Modify the LED peak wavelength and FWHM to see how the position and width of the spectrum affect photon absorption.</li>
+  
+  <li><b>Choose or upload an absorbance spectrum:</b> Pick a predefined photoinitiator (e.g., TPO, Irgacure 907) or provide a custom spectrum using the browse button. The absorbance spectrum determines how efficiently each wavelength is absorbed.</li>
+  
+  <li><b>Set material properties:</b> Use the sliders to adjust chromophore concentration (mM) and sample thickness (µm). These parameters directly affect the fraction of light absorbed.</li>
+  
+  <li><b>Interpret the curves</b>; move the mouse over a curve in the graph to identify it.
+    <ul>
+      <li><b>Incident light:</b> The initial light intensity as a function of wavelength.</li>
+      <li><b>Absorbance:</b> Napierian absorptivity spectrum of the chromophore.</li>
+      <li><b>Incident absorbed photons:</b> Product of incident light and absorptivity at the surface.</li>
+      <li><b>Attenuated light:</b> Light remaining after passing through the material at the chosen depth.</li>
+      <li><b>Attenuated absorbed photons:</b> Light absorbed at the selected depth; the integral of this curve quantifies photons available for primary photochemical reactions.</li>
+    </ul>
+  </li>
+  
+  <li><b>Compare scenarios:</b> Vary the light source, concentration, and depth to see how these factors influence photon absorption and the availability of light for photochemical processes.</li>
+  
+  <li><b>Remember limitations:</b> This tool shows absorption trends and relative photon availability. It does <i>not</i> account for quantum yield, photobleaching, or secondary reactions. Focus on the primary absorption events.</li>
+</ol>
+
+<p>Use these directions to explore fundamental principles of light-matter interactions and understand how photochemical reactions are initiated by absorbed photons. Mouse over a curve to identify it.</p>
+
+      </p>
+    </div>
+  </div></div>
+</div>
+
+<div id="details-modal" class="modal fade" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">Details</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    </div>
+    <div class="modal-body">
+      <b><u>Light Absorption Fundamentals</u></b><br>
+This tool illustrates how light is absorbed by a material containing a chromophore (e.g., photoinitiator) with a given concentration and thickness.  
+
+For a single wavelength, absorption follows the Beer–Lambert law:
+
+$$
+\frac{dI}{dz} = -I \, \varepsilon(\lambda) \, [C]
+$$
+
+$$
+I(z, \lambda) = I_0(\lambda) \, \exp\big(-\varepsilon(\lambda) \, [C] \, z \big)
+$$
+
+\( I_0(\lambda) \) – incident light intensity at wavelength \( \lambda \) <br>
+\( I(z, \lambda) \) – light intensity at depth \( z \) <br>
+\( \varepsilon(\lambda) \) – Napierian molar absorptivity \((\text{L/mol·cm})\) <br>
+\( [C] \) – chromophore concentration \((\text{mM})\) <br>
+\( z \) – material depth \((\mu\text{m})\) <br>
+<br>
+
+<div class="tight">
+<b><u>Light source spectra</u></b><br>
+The tool allows exploration of different light sources:<br>
+1) LED (Gaussian):
+$$
+I_0(\lambda) = A \exp\Big[-\frac{(\lambda - \lambda_\text{center})^2}{2 \sigma^2}\Big]
+$$
+\( A \) – peak intensity (arbitrary units) <br>
+\( \lambda_\text{center} \) – LED peak wavelength (nm) <br>
+\( \sigma = \text{FWHM}/2.35482 \) – standard deviation of Gaussian (nm) <br>
+2) Mercury arc lamp (EFOS Acticure A4000 with 400-500 nm filter) <br>
+3) Custom spectrum: user-provided spectral shape
+</div>
+<br>
+
+<div class="tight">
+<b><u>Photochemical relevance of absorbed photons</u></b><br>
+The number of photons absorbed at a given depth is:
+$$
+I_\text{abs}(\lambda) = I_0(\lambda) - I(z, \lambda)
+$$
+For a polychromatic light source, the total absorption is the <b>sum over all wavelengths</b>:
+<div style="margin: 0.25em 0 0.25em 0;">total absorbed photons = \( \displaystyle \int I_\text{abs}(\lambda) \, d\lambda \)</div>
+This quantity is directly related to primary photochemical processes*, such as photoinitiator activation, because it represents the photons available to drive reactions.<br>
+*Neglects quantum yield, secondary reactions, diffusion, and photobleaching.
+</div>
+<br>
+
+<b><u>Adjustable parameters</u></b><br>
+Depth (\( \mu\text{m} \)) – thickness of the material <br>
+Concentration (\( \text{mM} \)) – chromophore density <br>
+LED Center & FWHM – shape of the Gaussian light source (nm) <br>
+Light source type – LED, Hg Arc Lamp, or Custom <br>
+Absorber spectrum – predefined or user-provided <br>
+<br>
+
+    </div>
+  </div></div>
+</div>
+
+<div id="about-modal" class="modal fade" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">About</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    </div>
+    <div class="modal-body">
+      <p>
+        This simulation was created in the Department of Chemical and Biological 
+        Engineering at University of Colorado Boulder for LearnChemE.com by 
+        Alexander Osterbaan under the direction of Professor John L. Falconer and 
+        Professor Christopher N. Bowman. 
+        Address any questions or comments to LearnChemE@gmail.com.
+      </p>
+    </div>
+  </div></div>
+</div>
+
+<div id="advanced-modal" class="modal fade" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">Spectral weighted intensity</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    </div>
+    <div class="modal-body">
+
+
+<p>
+This module estimates a <b>monochromatic-equivalent intensity</b> — <i>not</i> the real measured intensity — 
+that would produce the <b>same total photon absorption</b> in a material as the actual broadband light source.
+It converts a measured total irradiance into an <b>effective wavelength-specific value</b> \( I_\text{target} \) (mW/cm²),
+as if all absorbed photons came from a single wavelength \( \lambda_0 \).
+<br><br>
+
+<b><u>Purpose</u></b><br>
+Light sources emit over broad spectral ranges, and both detectors and materials respond differently with wavelength. 
+The <i>Spectral Weighted Intensity</i> bridges that gap by estimating the equivalent monochromatic light intensity that 
+would deposit the same number of absorbed photons as the broadband source.  
+It accounts for: 
+<br>
+1) the lamp’s emission spectrum \( I(\lambda) \),<br>
+2) the detector’s photon or energy response, and<br>
+3) the material’s wavelength-dependent absorptivity \( \varepsilon(\lambda) \). 
+<br><br>
+
+<b><u>Concept</u></b><br>
+The measured total irradiance \( mInt \) represents light distributed across wavelengths.  
+The model applies a <b>spectral correction factor</b> to convert this broadband value into an <b>equivalent monochromatic intensity</b> at \( \lambda_0 \):
+<div style="text-align:left;">
+\( I_\text{target} = mInt \times f_\text{intensity}(\lambda_0) \times f_\text{absorbance}(\lambda_0) \)
+</div>
+Here, \( I_\text{target} \) is <b>not the real irradiance at that wavelength</b>, 
+but the <i>single-wavelength intensity that would yield the same total photon absorption rate</i> in the sample.
+<br><br>
+
+<b><u>1) Intensity Correction</u></b><br>
+The correction depends on whether the detector measures <b>photon flux</b> or <b>energy flux</b>:
+<br><br>
+
+<b>(a) Photon-counting detector (e.g., photodiode):</b><br>
+Photodiodes respond to the <b>number of incident photons</b>, not their energy.  
+Each absorbed photon ideally produces a single electron–hole pair, so the current is proportional to photon flux \( \Phi(\lambda) = I(\lambda) \, \lambda / hc \).  
+Because longer wavelengths carry less energy per photon, the same optical power produces <b>more photons</b> at longer wavelengths.  
+The appropriate correction therefore weights by \( 1/\lambda \):
+<div style="text-align:left;">
+\( f_\text{intensity}(\lambda_0)
+= \lambda_0
+\frac{\displaystyle \int I(\lambda)/\lambda \, d\lambda}
+     {\displaystyle \int I(\lambda) \, d\lambda} \)
+</div>
+
+<b>(b) Energy-measuring detector (thermal, thermopile, bolometer):</b><br>
+Thermal sensors respond to the <b>total absorbed energy</b> as heat, regardless of photon energy.  
+They integrate power directly across wavelengths, giving an effectively flat spectral response (neglecting coating reflectivity).  
+Hence no photon weighting is required:
+<div style="text-align:left;">
+\( f_\text{intensity}(\lambda_0) = 1 \)
+</div>
+
+<b><u>Justification for separate cases:</u></b><br>
+Photodiodes and thermal sensors fundamentally measure different physical quantities.  
+A photodiode converts <i>photon number</i> to current (A ∝ photons/s), while a thermal detector converts <i>energy flux</i> to temperature rise (W/cm²).  
+Because the photon energy \( E_\text{photon} = hc/\lambda \) decreases with wavelength, 
+a broadband lamp will appear relatively stronger to a photodiode than to a thermal sensor at longer wavelengths.  
+The model therefore applies distinct spectral corrections consistent with each detector’s underlying physics.
+<br><br>
+
+<b><u>When intensity correction matters most:</u></b><br>
+For smooth, narrow spectra (e.g., a narrow LED), this correction has only a minor effect.  
+However, for <b>multi-peaked or discontinuous spectra</b> — such as the <b>mercury arc lamp</b>, which emits sharp lines at 405, 436, 546 nm, etc. —  
+the relative photon weighting can shift the effective intensity substantially.  
+In such cases, the correction is <b>critical for meaningful comparison</b> between detectors or for matching experimental and simulated photon absorption.
+<br><br>
+
+<b>Note:</b> This neglects the <b>wavelength-dependent quantum yield (responsivity)</b> of the detector, 
+which in practice can be significant.  
+However, such data are rarely accessible, so a flat responsivity is assumed for simplicity.
+<br><br>
+
+<b><u>2) Absorbance Correction</u></b><br>
+Two spectra with the same total irradiance can drive different absorption rates depending on how light overlaps the 
+material’s absorbance.  
+This correction compares the absorbed photon flux for the actual spectrum versus a narrow monochromatic source:
+<div style="text-align:left;">
+\( f_\text{absorbance}(\lambda_0)
+= 
+\frac{
+\displaystyle \int I(\lambda)\,\varepsilon(\lambda)\,d\lambda
+}{
+\displaystyle \int G_{\lambda_0}(\lambda)\,\varepsilon(\lambda)\,d\lambda
+} \)
+</div>
+where \( G_{\lambda_0}(\lambda) \) is a narrow Gaussian (FWHM ≈ 0.1 nm) centered at \( \lambda_0 \).
+<br><br>
+
+<b><u>Result</u></b><br>
+The <b>Spectral Weighted Intensity</b> is:
+<div style="text-align:left;">
+\( I_\text{target}(\lambda_0)
+= mInt \times
+\lambda_0
+\frac{\displaystyle \int I(\lambda)/\lambda \, d\lambda}{\displaystyle \int I(\lambda)\,d\lambda}
+\times
+\frac{
+\displaystyle \int I(\lambda)\,\varepsilon(\lambda)\,d\lambda
+}{
+\displaystyle \int G_{\lambda_0}(\lambda)\,\varepsilon(\lambda)\,d\lambda
+} \)
+</div>
+
+This represents the <b>monochromatic-equivalent intensity</b> that would produce the 
+<b>same total photon absorption</b> in the material as the real broadband source.  
+It should <b>never be interpreted as the actual irradiance at that wavelength</b>, 
+but rather as a modeling construct useful for comparing spectral power distributions on an equivalent photon-absorption basis.
+<br><br>
+
+<b><u>Adjustable parameters</u></b><br>
+Measured intensity (\( mInt \)) – total irradiance from experiment or datasheet (mW/cm²) <br>
+Target wavelength (\( \lambda_0 \)) – wavelength of interest (nm) <br>
+Detector type – photon-counting (photodiode) or energy-measuring (thermal) <br>
+Light source spectrum – user-defined emission shape \( I(\lambda) \) <br>
+Absorbance spectrum – material-specific molar absorptivity \( \varepsilon(\lambda) \) <br>
+
+</p>
+
+
+    </div>
+  </div></div>
+</div>
+
+</body>
+</html>
