@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Polymerization in a Batch Reactor</title>
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)']],
+      displayMath: [['\\[', '\\]']]
+    },
+    chtml: {
+      displayAlign: 'left',
+      displayIndent: '0'
+    },
+    options: {
+      skipHtmlTags: ['script','noscript','style','textarea','pre','code']
+    }
+  };
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+<style>
+  :root{
+    --accent:#98000D;
+    --accent-dark:#7a000b;
+    --panel-bg:#f4f4f4;
+    --border:#ccc;
+  }
+  *{box-sizing:border-box;}
+  body{
+    font-family:Helvetica, Arial, sans-serif;
+    background:#fff;
+    color:#111;
+    margin:0;
+    padding:14px;
+    display:flex;
+    justify-content:center;
+  }
+  #app{
+    width:100%;
+    max-width:900px;
+  }
+  h1{
+    font-size:19px;
+    font-weight:bold;
+    text-align:center;
+    margin:2px 0 12px 0;
+    font-family:Helvetica, Arial, sans-serif;
+  }
+  .main{
+    display:flex;
+    flex-wrap:wrap;
+    gap:22px;
+    align-items:flex-start;
+    justify-content:center;
+  }
+  .controls{
+    width:290px;
+    flex:0 0 290px;
+    position:relative; /* anchor for flyout panels */
+  }
+  .plotwrap{
+    flex:0 0 auto;
+  }
+  /* Mode toggle - Mathematica SetterBar style */
+  .setterbar{
+    display:flex;
+    border:1px solid #999;
+    border-radius:4px;
+    overflow:hidden;
+    margin-bottom:14px;
+    font-size:15.6px;
+  }
+  .setterbar button{
+    flex:1;
+    border:none;
+    background:#e8e8e8;
+    color:#222;
+    padding:7px 4px;
+    font-family:Helvetica, Arial, sans-serif;
+    font-size:15.6px;
+    cursor:pointer;
+    border-right:1px solid #999;
+  }
+  .setterbar button:last-child{ border-right:none; }
+  .setterbar button.active{
+    background:var(--accent);
+    color:#fff;
+    font-weight:bold;
+  }
+  .section-label{
+    font-weight:bold;
+    font-size:13.5px;
+    margin:12px 0 6px 0;
+  }
+  .slider-row{
+    margin-bottom:10px;
+  }
+  .slider-row .toprow{
+    display:flex;
+    justify-content:space-between;
+    font-size:15.6px;
+    margin-bottom:2px;
+  }
+  .slider-row .toprow .val{
+    font-variant-numeric:tabular-nums;
+    color:#333;
+  }
+  input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+  input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  /* Directions / Details / About - vertical button group with flyout panels */
+  .navbtns{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    margin:16px 0 14px 0;
+  }
+  .navitem{
+    /* panels are anchored to .main so they open near the top of the simulation */
+  }
+  .navitem > button{
+    background:var(--accent);
+    color:#fff;
+    border:none;
+    padding:8.4px 19.2px;
+    border-radius:5px;
+    font-family:Helvetica, Arial, sans-serif;
+    font-size:15.6px;
+    cursor:pointer;
+    width:150px;
+    text-align:center;
+  }
+  .navitem > button:hover{ background:var(--accent-dark); }
+  .navitem > button.open{ background:var(--accent-dark); }
+  .panel{
+    display:none;
+    position:absolute;
+    top:0;
+    left:calc(100% + 22px); /* right of the controls column, near the top of the simulation */
+    width:494px; /* Directions & Details: 30% wider than original 380px */
+    max-width:60vw;
+    z-index:30;
+    background:var(--panel-bg);
+    border:1px solid var(--border);
+    border-radius:5px;
+    box-shadow:0 6px 18px rgba(0,0,0,0.28);
+    padding:14px 16px;
+    font-size:15.5px;
+    line-height:1.55;
+  }
+  .panel.show{ display:block; }
+  #panelAbout{ width:594px; }
+  #panelDirections{ width:593px; left:auto; right:-482px; } /* right edge aligned with right edge of the figure */
+  #panelSteps{ width:593px; }
+  #panelSteps ol{ margin:4px 0 8px 0; padding-left:22px; }
+  #panelSteps li{ margin-bottom:2px; }
+  /* free radical: buttons in a 2 x 2 grid */
+  .navbtns.grid{
+    display:grid;
+    grid-template-columns:repeat(2, 140px);
+    gap:8px 10px;
+  }
+  .navbtns.grid .navitem > button{
+    width:140px;
+    padding-left:6px;
+    padding-right:6px;
+  }
+  #panelDetails{
+    width:741px; /* 50% wider than the base 494px panel */
+    left:40px; /* pulled left so the wider panel overlaps the sliders/controls */
+    max-width:85vw;
+  }
+  .panel-close{
+    position:absolute;
+    top:6px;
+    right:8px;
+    background:none;
+    border:none;
+    color:#555;
+    font-size:20px;
+    line-height:1;
+    padding:2px 6px;
+    cursor:pointer;
+    font-family:Helvetica, Arial, sans-serif;
+  }
+  .panel-close:hover{ color:#000; }
+  .panel h3{
+    margin:10px 0 4px 0;
+    font-size:14px;
+  }
+  .panel h3:first-child{ margin-top:0; }
+  .eq{
+    display:block;
+    margin:6px 0 6px 14px;
+    font-style:italic;
+    font-family:"Times New Roman", Times, serif;
+    font-size:16.7px;
+  }
+  /* Left-justify display equations in the Details panel */
+  #panelDetails mjx-container[display="true"]{
+    text-align:left !important;
+    margin-left:0 !important;
+    margin-right:0 !important;
+  }
+  #panelDetails mjx-container[display="true"] > mjx-math{
+    margin:0 !important;
+    text-align:left !important;
+  }
+  .panel a{ color:var(--accent); }
+  canvas{ display:block; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="main">
+    <div class="controls">
+      <div class="setterbar">
+        <button id="btnStep" class="active">step growth</button>
+        <button id="btnFree">free radical</button>
+      </div>
+
+      <div id="section-initconc" class="section-label">initial concentration:</div>
+      <div id="row-Mo1" class="slider-row">
+        <div class="toprow"><span>monomer initial concentration</span><span class="val" id="val-Mo1">2.0</span></div>
+        <input type="range" id="s-Mo1" min="0.5" max="5" step="0.1" value="2">
+      </div>
+      <div id="row-Mo2" class="slider-row" style="display:none">
+        <div class="toprow"><span>monomer</span><span class="val" id="val-Mo2">0.5</span></div>
+        <input type="range" id="s-Mo2" min="0.5" max="5" step="0.1" value="0.5">
+      </div>
+      <div id="row-Io" class="slider-row" style="display:none">
+        <div class="toprow"><span>initiator</span><span class="val" id="val-Io">0.05</span></div>
+        <input type="range" id="s-Io" min="0.05" max="0.5" step="0.01" value="0.05">
+      </div>
+
+      <div id="section-rateconst" class="section-label">rate constant:</div>
+      <div id="row-kp1" class="slider-row">
+        <div class="toprow"><span>reaction rate constant</span><span class="val" id="val-kp1">0.10</span></div>
+        <input type="range" id="s-kp1" min="0.1" max="1" step="0.01" value="0.1">
+      </div>
+      <div id="row-kp2" class="slider-row" style="display:none">
+        <div class="toprow"><span>reaction</span><span class="val" id="val-kp2">0.50</span></div>
+        <input type="range" id="s-kp2" min="0.05" max="1" step="0.01" value="0.5">
+      </div>
+      <div id="row-ki" class="slider-row" style="display:none">
+        <div class="toprow"><span>initiation</span><span class="val" id="val-ki">0.15</span></div>
+        <input type="range" id="s-ki" min="0.05" max="1" step="0.01" value="0.15">
+      </div>
+      <div id="row-kt" class="slider-row" style="display:none">
+        <div class="toprow"><span>termination</span><span class="val" id="val-kt">0.100</span></div>
+        <input type="range" id="s-kt" min="0.005" max="0.1" step="0.001" value="0.1">
+      </div>
+
+      <div id="row-term" class="slider-row" style="display:none">
+        <div class="toprow"><span>terminator concentration</span><span class="val" id="val-term">0.100</span></div>
+        <input type="range" id="s-term" min="0.005" max="0.1" step="0.001" value="0.1">
+      </div>
+
+      <div id="row-t1" class="slider-row">
+        <div class="toprow"><span>time</span><span class="val" id="val-t1">500</span></div>
+        <input type="range" id="s-t1" min="500" max="5000" step="20" value="500">
+      </div>
+      <div id="row-t2" class="slider-row" style="display:none">
+        <div class="toprow"><span>time</span><span class="val" id="val-t2">1</span></div>
+        <input type="range" id="s-t2" min="1" max="50" step="1" value="1">
+      </div>
+
+      <div class="navbtns">
+        <div class="navitem">
+          <button id="btnDirections">Directions</button>
+          <div id="panelDirections" class="panel">
+            <p>This simulation shows the number fraction N<sub><i>j</i></sub> (blue) and weight fraction W<sub><i>j</i></sub> (green) of polymer chains as functions of the number of monomer units for polymerization in a batch reactor. Select "step growth" or "free radical" polymerization with the buttons, and use the sliders to set reaction rate constants, initial concentrations, and reaction time. The number average chain length N&#772;<sub><i>j</i></sub>, the weight average chain length W&#772;<sub><i>j</i></sub>, and the polydispersity are shown. Distributions are calculated using the Flory&ndash;Schulz model, and the equations used for the calculations are displayed when the Details button is selected. The reaction steps for each type of polymerization are displayed when the Reaction steps button is selected. The <i>x</i> and <i>y</i> axis ranges adjust automatically as the parameters change.</p>
+          </div>
+        </div>
+        <div class="navitem">
+          <button id="btnDetails">Details</button>
+          <div id="panelDetails" class="panel">
+            <p>The number fraction \(N_j\) and weight fraction \(W_j\) of polymer chains for a polymer with \(j\) monomer units are:</p>
+            <p>\[ N_j = \frac{y_j}{\sum y_j}, \qquad W_j = \frac{j\,y_j}{\sum j\,y_j}, \]</p>
+            <p>where \(y_j\) is the mole fraction and \(p\) is the fraction of functional groups that have reacted:</p>
+            <p>\[ y_j = (1-p)\,p^{\,j-1}. \]</p>
+
+            <p>For step-growth polymerization:</p>
+            <p>\[ p = 1 - \left(M_0 k_p t + 1\right)^{-1}, \qquad M = M_0(1-p). \]</p>
+
+            <p>For free-radical polymerization:</p>
+            <p>\[ p = \frac{k_p M}{k_p M + k_t \tau + \sqrt{2 k_t k_i f I_0 e^{-k_i t}}}, \]</p>
+            <p>\[ M = M_0 \exp\!\left[\, 2 k_p \sqrt{\frac{2 f I_0}{k_i k_t}}\,\left(e^{-k_i t/2} - 1\right) \right], \]</p>
+            <p>where \(M_0\) and \(I_0\) are the initial monomer and initiator concentrations; \(M\) is monomer concentration; \(k_p\), \(k_i\) and \(k_t\) are the rate constants for the reaction, initiation and termination; \(t\) is time; \(\tau\) is the terminator concentration and \(f\) is fraction of chains initiated by initiator.</p>
+
+            <p>The number \(\bar{N}_j\) and weight \(\bar{W}_j\) average chain lengths are:</p>
+            <p>\[ \bar{N}_j = \frac{\sum j\,P_j}{\sum P_j}, \qquad \bar{W}_j = \frac{\sum j^{2} P_j}{\sum j\,P_j}, \]</p>
+            <p>where \(P_j = y_j M\) is the polymer concentration.</p>
+
+            <p>The polydispersity \(D\) is:</p>
+            <p>\[ D = \frac{\bar{W}_j}{\bar{N}_j}. \]</p>
+            <p style="margin-bottom:4px"><b>Symbols</b></p>
+            <ul style="margin:0; padding-left:20px">
+              <li><i>N</i><sub><i>j</i></sub> = number fraction of polymer chains with <i>j</i> monomer units</li>
+              <li><i>W</i><sub><i>j</i></sub> = weight fraction of polymer chains with <i>j</i> monomer units</li>
+              <li><i>N&#772;</i><sub><i>j</i></sub> = number average chain length</li>
+              <li><i>W&#772;</i><sub><i>j</i></sub> = weight average chain length</li>
+              <li><i>D</i> = polydispersity</li>
+              <li><i>j</i> = number of monomer units in a chain</li>
+              <li><i>p</i> = fraction of functional groups that have reacted</li>
+              <li><i>M</i><sub>0</sub>, <i>M</i> = initial and current monomer concentrations</li>
+              <li><i>I</i><sub>0</sub> = initial initiator concentration</li>
+              <li><i>k</i><sub>p</sub> = reaction (propagation) rate constant</li>
+              <li><i>k</i><sub>i</sub> = initiation rate constant</li>
+              <li><i>k</i><sub>t</sub> = termination rate constant</li>
+              <li><i>&tau;</i> = terminator concentration</li>
+              <li><i>f</i> = fraction of chains initiated by initiator (0.5)</li>
+              <li><i>t</i> = time</li>
+            </ul>
+          </div>
+        </div>
+        <div class="navitem" id="navSteps">
+          <button id="btnSteps">Reaction steps</button>
+          <div id="panelSteps" class="panel">
+           <div id="stepsStep">
+            <p>In step-growth polymerization, chains grow by reaction between functional groups on any two molecules: monomers, oligomers, or polymers. A typical example is a condensation polymerization, such as a diol reacting with a diacid to form a polyester and water:</p>
+            <p>\[ \mathrm{HO{-}R{-}OH} + \mathrm{HOOC{-}R'{-}COOH} \rightarrow \mathrm{HO{-}R{-}OOC{-}R'{-}COOH} + \mathrm{H_2O} \]</p>
+            <p>The product still has a reactive group at each end, so it continues to react. Typical steps are:</p>
+            <ol>
+              <li>monomer + monomer &rarr; dimer: \(\;M_1 + M_1 \xrightarrow{k_p} P_2\)</li>
+              <li>dimer + monomer &rarr; trimer: \(\;P_2 + M_1 \xrightarrow{k_p} P_3\)</li>
+              <li>dimer + dimer &rarr; tetramer: \(\;P_2 + P_2 \xrightarrow{k_p} P_4\)</li>
+              <li>in general, any two chains combine: \(\;P_i + P_j \xrightarrow{k_p} P_{i+j}\)</li>
+            </ol>
+            <p>Each step also releases a small molecule (H<sub>2</sub>O in this example). Assuming the rate constant \(k_p\) is the same for every step (equal reactivity), the concentration of unreacted functional groups \(M\) decreases as</p>
+            <p>\[ -\frac{dM}{dt} = k_p M^2 \quad\Rightarrow\quad M = \frac{M_0}{1 + k_p M_0 t}, \]</p>
+            <p>which gives the conversion \(p = 1 - M/M_0\) used in Details. Monomer is consumed quickly, but long chains form only at very high conversion: the number average chain length is \(\bar{N}_j = 1/(1-p)\), so \(p = 0.99\) is needed for \(\bar{N}_j = 100\).</p>
+           </div>
+           <div id="stepsFree" style="display:none">
+            <p>Free-radical polymerization is a chain-growth process: a radical adds monomer units one at a time, rapidly building a long chain until the radical is destroyed. Typical steps are:</p>
+            <ol>
+              <li><b>Initiation.</b> The initiator (for example, a peroxide or AIBN) decomposes into two radicals, and a fraction \(f\) of these radicals starts chains by adding to a monomer:
+                <p>\[ I \xrightarrow{k_i} 2R^{\bullet}, \qquad R^{\bullet} + M \rightarrow P_1^{\bullet} \]</p></li>
+              <li><b>Propagation.</b> The growing radical chain adds monomer units, one at a time. This step repeats hundreds to thousands of times for each chain:
+                <p>\[ P_j^{\bullet} + M \xrightarrow{k_p} P_{j+1}^{\bullet} \]</p></li>
+              <li><b>Termination.</b> Two growing radicals react with each other (by combination or disproportionation), or a growing radical reacts with a terminator \(T\), producing "dead" polymer that no longer grows:
+                <p>\[ P_j^{\bullet} + P_k^{\bullet} \xrightarrow{k_t} \text{dead polymer}, \qquad P_j^{\bullet} + T \rightarrow P_j \]</p></li>
+            </ol>
+            <p>The radical concentration is small and nearly constant (quasi-steady state), because radicals are formed and destroyed at about the same rate:</p>
+            <p>\[ [P^{\bullet}] = \sqrt{\frac{2 f k_i I}{k_t}}, \qquad I = I_0\, e^{-k_i t}. \]</p>
+            <p>Monomer is consumed by propagation, \(-dM/dt = k_p M [P^{\bullet}]\), which integrates to the equation for \(M\) in Details. The probability \(p\) that a growing chain adds another monomer instead of terminating is the propagation rate divided by the sum of the propagation and termination rates, which gives the equation for \(p\) in Details. Unlike step-growth polymerization, long chains form right away, even at low monomer conversion.</p>
+           </div>
+          </div>
+        </div>
+        <div class="navitem">
+          <button id="btnAbout">About</button>
+          <div id="panelAbout" class="panel">
+            <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/PolymerizationInABatchReactor/" target="_blank">Mathematica simulation</a> by Rachael L. Baumann and Nathan S. Nelson. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="plotwrap">
+      <canvas id="plot" width="460" height="500"></canvas>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  // ---------- state ----------
+  let mode = 'step'; // 'step' | 'free'
+  const P = {
+    Mo1:2, Mo2:0.5, Io:0.05,
+    kp1:0.1, kp2:0.5, ki:0.15, kt:0.1,
+    t1:500, t2:1, term:0.1
+  };
+
+  const decimals = {
+    Mo1:1, Mo2:1, Io:2, kp1:2, kp2:2, ki:2, kt:3, t1:0, t2:0, term:3
+  };
+
+  function fmt(key){
+    return P[key].toFixed(decimals[key]);
+  }
+
+  // wire up sliders
+  Object.keys(P).forEach(key=>{
+    const el = document.getElementById('s-'+key);
+    const valEl = document.getElementById('val-'+key);
+    el.value = P[key];
+    valEl.textContent = fmt(key);
+    el.addEventListener('input', ()=>{
+      P[key] = parseFloat(el.value);
+      valEl.textContent = fmt(key);
+      draw();
+    });
+  });
+
+  const btnStep = document.getElementById('btnStep');
+  const btnFree = document.getElementById('btnFree');
+
+  function setMode(newMode){
+    mode = newMode;
+    const isStep = mode==='step';
+    btnStep.classList.toggle('active', isStep);
+    btnFree.classList.toggle('active', !isStep);
+
+    document.getElementById('row-Mo1').style.display = isStep ? '' : 'none';
+    document.getElementById('row-Mo2').style.display = isStep ? 'none' : '';
+    document.getElementById('row-Io').style.display  = isStep ? 'none' : '';
+    document.getElementById('section-initconc').style.display = isStep ? 'none' : '';
+
+    document.getElementById('row-kp1').style.display = isStep ? '' : 'none';
+    document.getElementById('row-kp2').style.display = isStep ? 'none' : '';
+    document.getElementById('row-ki').style.display  = isStep ? 'none' : '';
+    document.getElementById('row-kt').style.display  = isStep ? 'none' : '';
+    document.getElementById('section-rateconst').style.display = isStep ? 'none' : '';
+
+    document.getElementById('row-t1').style.display = isStep ? '' : 'none';
+    document.getElementById('row-t2').style.display = isStep ? 'none' : '';
+
+    document.getElementById('row-term').style.display     = isStep ? 'none' : '';
+
+    document.getElementById('stepsStep').style.display = isStep ? '' : 'none';
+    document.getElementById('stepsFree').style.display = isStep ? 'none' : '';
+    document.querySelector('.navbtns').classList.toggle('grid', !isStep);
+
+    draw();
+  }
+  btnStep.addEventListener('click', ()=>setMode('step'));
+  btnFree.addEventListener('click', ()=>setMode('free'));
+
+  // ---------- collapsible bottom panels ----------
+  function closeAllPanels(){
+    ['panelDirections','panelDetails','panelSteps','panelAbout'].forEach(id=>{
+      document.getElementById(id).classList.remove('show');
+    });
+    ['btnDirections','btnDetails','btnSteps','btnAbout'].forEach(id=>{
+      document.getElementById(id).classList.remove('open');
+    });
+  }
+  function wirePanel(btnId, panelId){
+    const btn = document.getElementById(btnId);
+    const panel = document.getElementById(panelId);
+    // add close "x" in upper right corner of panel
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'panel-close';
+    closeBtn.setAttribute('aria-label','Close');
+    closeBtn.innerHTML = '&times;';
+    closeBtn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      closeAllPanels();
+    });
+    panel.insertBefore(closeBtn, panel.firstChild);
+    btn.addEventListener('click', ()=>{
+      const willShow = !panel.classList.contains('show');
+      // close all
+      closeAllPanels();
+      if(willShow){
+        panel.classList.add('show');
+        btn.classList.add('open');
+      }
+    });
+  }
+  wirePanel('btnDirections','panelDirections');
+  wirePanel('btnDetails','panelDetails');
+  wirePanel('btnSteps','panelSteps');
+  wirePanel('btnAbout','panelAbout');
+
+  // ---------- model ----------
+  const percentFracs = [0.01, 0.01667, 0.033, 0.1, 0.5, 1];
+
+  function rangeSnap(func, max){
+    for(let i=0;i<percentFracs.length;i++){
+      if(func <= max*percentFracs[i]) return max*percentFracs[i];
+    }
+    return max;
+  }
+
+  // Smoothly scaling axis: pick a "nice" tick step (1, 2 or 5 x 10^k) so
+  // that about 3-5 ticks span the data, then round the axis maximum up to
+  // the next multiple of that step (e.g. 0.005, 0.010, 0.015, ...).
+  function niceAxis(dataMax){
+    if(!isFinite(dataMax) || dataMax<=0) dataMax = 1;
+    const raw = dataMax/5;
+    const pow = Math.pow(10, Math.floor(Math.log10(raw)));
+    let step = 10*pow;
+    for(const m of [1,2,5,10]){
+      if(m*pow >= raw*(1-1e-9)){ step = m*pow; break; }
+    }
+    step = parseFloat(step.toPrecision(6));
+    let n = Math.ceil(dataMax/step - 1e-9);
+    if(n<1) n = 1;
+    return {step, max: parseFloat((n*step).toPrecision(6))};
+  }
+
+  // Determine how many decimal places are needed to represent a step size
+  // cleanly, so that all tick labels on an axis share the same precision
+  // (e.g. 0.002, 0.004, ..., 0.010 rather than 0.01).
+  function neededDecimals(step){
+    if(!isFinite(step) || step<=0) return 0;
+    for(let d=0; d<=6; d++){
+      const scaled = step*Math.pow(10,d);
+      if(Math.abs(scaled - Math.round(scaled)) < 1e-6) return d;
+    }
+    return 6;
+  }
+
+  function compute(){
+    let Mo, kp, t, L0, p, f, Io=P.Io, ki=P.ki, kt=P.kt, term=P.term, M;
+    if(mode==='step'){
+      Mo=P.Mo1; kp=P.kp1; t=P.t1; L0=1000;
+      p = 1 - 1/(Mo*kp*t + 1);
+      M = Mo*(1-p);
+    } else {
+      Mo=P.Mo2; kp=P.kp2; t=P.t2; f=0.5; L0=3000;
+      M = Mo*Math.exp(Math.sqrt(8*kp*kp*f*Io/(ki*kt)) * (Math.exp(-ki*t/2) - 1));
+      p = kp*M / (kp*M + kt*term + Math.sqrt(2*kt*ki*f*Io*Math.exp(-ki*t)));
+    }
+    if(!isFinite(p) || p<0) p = 0;
+    if(p>=1) p = 0.999999;
+
+    function Ns(j){ return (1-p)*Math.pow(p, j-1); }
+    function Ws(j){ return j*(1-p)*(1-p)*Math.pow(p, j-1); }
+
+    const mu_n = 1/(1-p);
+    const mu_w = (1+p)/(1-p);
+    const PD = mu_w/mu_n;
+
+    // find L1 such that Ns(L1) = 0.0001
+    let L1;
+    if(p<=0){ L1 = 1; }
+    else {
+      L1 = 1 + Math.log(0.0001/(1-p)) / Math.log(p);
+    }
+    if(!isFinite(L1) || L1<1) L1 = 1;
+    if(L1>L0) L1 = L0;
+
+    // x axis: nice integer ticks (step of at least 1 monomer unit)
+    const xAxis = niceAxis(L1);
+    if(xAxis.step < 1){
+      xAxis.step = 1;
+      xAxis.max = Math.max(1, Math.ceil(L1 - 1e-9));
+    }
+    const yAxis = niceAxis(Ns(1));
+
+    return {Ns, Ws, mu_n, mu_w, PD, xmax:xAxis.max, xStep:xAxis.step,
+            ymax:yAxis.max, yStep:yAxis.step, L0};
+  }
+
+  // ---------- drawing ----------
+  const canvas = document.getElementById('plot');
+  const ctx = canvas.getContext('2d');
+  const CSS_W = 460, CSS_H = 500;
+
+  function setupHiDPI(){
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = CSS_W*dpr;
+    canvas.height = CSS_H*dpr;
+    canvas.style.width = CSS_W+'px';
+    canvas.style.height = CSS_H+'px';
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  setupHiDPI();
+
+  // plot frame geometry (within the 460x500 canvas)
+  const PAD_LEFT = 90, PAD_RIGHT = 18, PAD_TOP = 16, PAD_BOTTOM = 50;
+  const plotX0 = PAD_LEFT, plotX1 = CSS_W - PAD_RIGHT;
+  const plotY0 = PAD_TOP, plotY1 = CSS_H - PAD_BOTTOM;
+  const plotW = plotX1 - plotX0, plotH = plotY1 - plotY0;
+
+  function draw(){
+    const r = compute();
+    ctx.clearRect(0,0,CSS_W,CSS_H);
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0,0,CSS_W,CSS_H);
+
+    const xmax = r.xmax, ymax = r.ymax;
+
+    function X(x){ return plotX0 + (x/xmax)*plotW; }
+    function Y(y){ return plotY1 - (y/ymax)*plotH; }
+
+    // ----- frame box -----
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 1.2;
+    ctx.strokeRect(plotX0, plotY0, plotW, plotH);
+
+    // ----- ticks & tick labels -----
+    ctx.fillStyle = '#000';
+    ctx.font = '17.9px Helvetica, Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    const nXTicks = Math.round(xmax/r.xStep);
+    for(let i=0;i<=nXTicks;i++){
+      const xv = r.xStep*i;
+      const px = X(xv);
+      ctx.beginPath();
+      ctx.moveTo(px, plotY1);
+      ctx.lineTo(px, plotY1+6);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(px, plotY0);
+      ctx.lineTo(px, plotY0-6);
+      ctx.stroke();
+      let label = Math.round(xv).toString();
+      ctx.fillText(label, px, plotY1+9);
+    }
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    const yStep = r.yStep;
+    const nYTicks = Math.round(ymax/yStep);
+    const yDecimals = neededDecimals(yStep);
+    for(let i=0;i<=nYTicks;i++){
+      const yv = parseFloat((yStep*i).toPrecision(6));
+      const py = Y(yv);
+      ctx.beginPath();
+      ctx.moveTo(plotX0, py);
+      ctx.lineTo(plotX0-6, py);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(plotX1, py);
+      ctx.lineTo(plotX1+6, py);
+      ctx.stroke();
+      let label = yv.toFixed(yDecimals);
+      ctx.fillText(label, plotX0-8, py);
+    }
+
+    // ----- axis labels -----
+    ctx.fillStyle = '#000';
+    ctx.font = '18px Helvetica, Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText('monomer units', (plotX0+plotX1)/2, CSS_H-8);
+
+    ctx.save();
+    ctx.translate(24, (plotY0+plotY1)/2);
+    ctx.rotate(-Math.PI/2);
+    ctx.fillText('polymer fraction', 0, 0);
+    ctx.restore();
+
+    // ----- curves -----
+    const N = 220;
+    ctx.lineWidth = 2.4;
+    ctx.strokeStyle = '#0000FF';
+    ctx.beginPath();
+    for(let i=0;i<=N;i++){
+      const xv = 1 + (xmax-1)*i/N;
+      const yv = r.Ns(xv);
+      const px = X(xv), py = Y(Math.min(yv,ymax));
+      if(i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+    }
+    ctx.stroke();
+
+    ctx.strokeStyle = '#009900';
+    ctx.beginPath();
+    for(let i=0;i<=N;i++){
+      const xv = 1 + (xmax-1)*i/N;
+      const yv = r.Ws(xv);
+      const px = X(xv), py = Y(Math.min(yv,ymax));
+      if(i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+    }
+    ctx.stroke();
+
+    // clip labels to plot area
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(plotX0, plotY0, plotW, plotH);
+    ctx.clip();
+
+    const xNs = 0.15*xmax;
+    const nsLabelX = X(xNs), nsLabelY = Y(Math.min(r.Ns(xNs), ymax))-12;
+    labelWithBg(ctx, 'N', nsLabelX, nsLabelY, '#0000FF');
+
+    const xWs = 0.82*xmax;
+    const wsLabelX = X(xWs), wsLabelY = Y(Math.min(r.Ws(xWs), ymax))-12;
+    labelWithBg(ctx, 'W', wsLabelX, wsLabelY, '#009900');
+
+    ctx.restore();
+
+    // ----- stats text (just below the top frame line, inside the plot) -----
+    const cx = (plotX0+plotX1)/2;
+    const statsLines = [
+      [{t:'polydispersity = ' + r.PD.toFixed(1)}],
+      [{t:'number average chain length N\u0304'},{t:'j',sub:true},{t:' = ' + r.mu_n.toFixed(0)}],
+      [{t:'weight average chain length W\u0304'},{t:'j',sub:true},{t:' = ' + r.mu_w.toFixed(0)}]
+    ];
+    const statsFont = '16.1px Helvetica, Arial, sans-serif';
+    const statsSub  = 'italic 11.5px Helvetica, Arial, sans-serif';
+    const lineH = 19;
+    const statsY0 = plotY0 + 12;
+    let maxW = 0;
+    statsLines.forEach(runs=>{ maxW = Math.max(maxW, measureRuns(ctx, runs, statsFont, statsSub)); });
+    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    ctx.fillRect(cx - maxW/2 - 6, statsY0 - 2, maxW + 12, lineH*3 + 6);
+    ctx.fillStyle = '#000';
+    statsLines.forEach((runs,i)=>{
+      const w = measureRuns(ctx, runs, statsFont, statsSub);
+      drawRuns(ctx, runs, cx - w/2, statsY0 + 13 + i*lineH, statsFont, statsSub, 4);
+    });
+  }
+
+  // Text made of runs, some drawn as subscripts. y is the alphabetic baseline.
+  function measureRuns(ctx, runs, font, subFont){
+    let w = 0;
+    runs.forEach(rn=>{ ctx.font = rn.sub ? subFont : font; w += ctx.measureText(rn.t).width; });
+    return w;
+  }
+  function drawRuns(ctx, runs, x, y, font, subFont, subDrop){
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+    runs.forEach(rn=>{
+      ctx.font = rn.sub ? subFont : font;
+      ctx.fillText(rn.t, x, rn.sub ? y + subDrop : y);
+      x += ctx.measureText(rn.t).width;
+    });
+  }
+
+  // Curve label: italic letter with italic subscript j, on a white background.
+  // y is the alphabetic baseline of the main letter.
+  function labelWithBg(ctx, letter, x, y, color){
+    const font = 'italic 20.7px Helvetica, Arial, sans-serif';
+    const subFont = 'italic 14.5px Helvetica, Arial, sans-serif';
+    const runs = [{t:letter},{t:'j',sub:true}];
+    const w = measureRuns(ctx, runs, font, subFont);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(x-w/2-3, y-17, w+6, 26);
+    ctx.fillStyle = color;
+    drawRuns(ctx, runs, x-w/2, y, font, subFont, 5);
+  }
+
+  window.addEventListener('resize', ()=>{ setupHiDPI(); draw(); });
+
+  setMode('step');
+})();
+</script>
+</body>
+</html>
