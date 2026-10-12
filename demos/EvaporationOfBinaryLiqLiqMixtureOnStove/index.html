@@ -87,11 +87,28 @@
     text-align:center;
     letter-spacing:0.2px;
   }
+  .toprow{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px 16px;
+    margin-bottom:0;
+    max-width:822px;
+    margin-left:auto;
+    margin-right:auto;
+  }
   .btnrow{
     display:flex;
-    justify-content:center;
+    justify-content:flex-end;
     gap:10px;
     margin-bottom:0;
+  }
+  .playRow{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:10px 16px;
   }
   .btnrow button{
     background:var(--accent);
@@ -117,12 +134,17 @@
   .stage{
     position:relative;
     margin-top:14px;
+    max-width:822px;
+    margin-left:auto;
+    margin-right:auto;
   }
 
   .panel{
     display:none;
     position:absolute;
-    top:0; left:0; right:0;
+    top:0; left:50%;
+    transform:translateX(-50%);
+    width:100%;
     z-index:20;
     background:var(--surface);
     border:1px solid var(--border);
@@ -133,6 +155,9 @@
     overflow-y:auto;
   }
   .panel.open{display:block;}
+  #panelDirections{ width:72%; max-height:none; overflow-y:visible; }
+  #panelAbout{ width:70%; }
+  #panelDetails{ width:70%; }
   .panel h2{
     margin:0 0 10px;
     font-size:17px;
@@ -203,13 +228,22 @@
     font-size:16px;
     font-variant-numeric:tabular-nums;
     color:var(--axis-text);
+    display:grid;
+    grid-template-columns:max-content max-content;
+    justify-content:center;
+    column-gap:10px;
+    row-gap:8px;
   }
   .readouts .row{
-    display:flex;
-    justify-content:space-between;
-    padding:2px 0;
+    display:contents;
   }
-  .readouts .row span:first-child{color:var(--axis-text);}
+  .readouts .row span:first-child{
+    color:var(--axis-text);
+    text-align:right;
+  }
+  .readouts .row span:last-child{
+    text-align:left;
+  }
   .status{
     text-align:center;
     font-weight:600;
@@ -238,17 +272,17 @@
     background:var(--surface);
     border:1px solid var(--border);
     border-radius:8px;
-    padding:16px 20px 18px;
+    padding:16px 18px 18px;
     display:flex;
     flex-wrap:wrap;
-    gap:18px 28px;
+    gap:16px 18px;
   }
   .ctrlGroup{
     display:flex;
     flex-direction:column;
     gap:4px;
-    min-width:190px;
-    flex:1 1 190px;
+    min-width:150px;
+    flex:1 1 150px;
   }
   .ctrlGroup label{
     font-size:16px;
@@ -261,21 +295,49 @@
     color:var(--axis-text);
     font-variant-numeric:tabular-nums;
   }
+  .ctrlGroup.chemGroup{
+    justify-content:center;
+  }
+  .chemStatic{
+    font-size:16px;
+    color:var(--axis-text);
+  }
   select, input[type="range"]{
     width:100%;
   }
   input[type="range"]{
-    accent-color: var(--accent);
+    --grey:#999;
+    -webkit-appearance:none;
+    appearance:none;
+    height:5px;
+    border-radius:3px;
+    outline:none;
+    opacity:.95;
+    margin-bottom:.5rem;
+    -webkit-transition:.2s;
+    transition:opacity .2s;
+    background:var(--grey);
   }
-
-input[type="range"]{
-  margin-top:.7em;
-    --accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:210px;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
-input[type="range"]::-webkit-slider-thumb{
-    -webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
-input[type="range"]::-moz-range-thumb{
-    width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
-
+  input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    appearance:none;
+    width:15px;
+    height:15px;
+    border:2px solid #fff;
+    border-radius:50%;
+    background:var(--accent);
+    cursor:pointer;
+    box-shadow:0 1px 2px rgba(0,0,0,.35);
+  }
+  input[type="range"]::-moz-range-thumb{
+    width:15px;
+    height:15px;
+    border:2px solid #fff;
+    border-radius:50%;
+    background:var(--accent);
+    cursor:pointer;
+    box-shadow:0 1px 2px rgba(0,0,0,.35);
+  }
   select{
     padding:6px 8px;
     border-radius:5px;
@@ -287,7 +349,7 @@ input[type="range"]::-moz-range-thumb{
   }
   .btns{
     display:flex;
-    align-items:flex-end;
+    align-items:center;
     gap:10px;
     flex:0 0 auto;
   }
@@ -311,8 +373,13 @@ input[type="range"]::-moz-range-thumb{
   .btns button.secondary:hover{background:var(--border);}
   .speedGroup{
     display:flex;
-    gap:6px;
-    align-items:flex-end;
+    gap:8px;
+    align-items:center;
+  }
+  .speedGroup .speedLabel{
+    font-size:16px;
+    color:var(--axis-text);
+    margin-right:2px;
   }
   .speedGroup button{
     background:var(--surface-2);
@@ -332,10 +399,26 @@ input[type="range"]::-moz-range-thumb{
 </style>
 
 <div class="app">
-  <div class="btnrow">
-    <button id="btnDirections" aria-pressed="false">Directions</button>
-    <button id="btnDetails" aria-pressed="false">Details</button>
-    <button id="btnAbout" aria-pressed="false">About</button>
+
+  <div class="toprow">
+    <div class="playRow">
+      <div class="speedGroup" id="speedGroup">
+        <span class="speedLabel">speed</span>
+        <button data-speed="1" aria-pressed="true">1&times;</button>
+        <button data-speed="2" aria-pressed="false">2&times;</button>
+        <button data-speed="4" aria-pressed="false">4&times;</button>
+        <button data-speed="8" aria-pressed="false">8&times;</button>
+      </div>
+      <div class="btns">
+        <button id="btnPlay">Play</button>
+        <button id="btnReset" class="secondary">Reset</button>
+      </div>
+    </div>
+    <div class="btnrow">
+      <button id="btnDirections" aria-pressed="false">Directions</button>
+      <button id="btnDetails" aria-pressed="false">Details</button>
+      <button id="btnAbout" aria-pressed="false">About</button>
+    </div>
   </div>
 
   <div class="stage" id="stage">
@@ -343,16 +426,15 @@ input[type="range"]::-moz-range-thumb{
     <div class="panel" id="panelDirections" role="dialog" aria-label="Directions">
       <button class="panel-close" data-close aria-label="Close">&times;</button>
       <h2>Directions</h2>
-      <p>A pot containing a binary liquid mixture sits on a burner that supplies heat at a constant rate. The pot is open to the atmosphere, so as the liquid is heated it eventually boils and vapor escapes &mdash; the amount of liquid remaining in the pot decreases with time.</p>
+      <p>A pot containing a mixture of water and ethanol sits on a burner that supplies heat at a constant rate. The pot is open to the atmosphere, so as the liquid is heated it eventually boils and vapor escapes &mdash; the amount of liquid remaining in the pot decreases with time.</p>
       <ul>
-        <li>Choose a chemical pair from the dropdown menu.</li>
-        <li>Use the sliders to set the constant heat input rate, the initial amount of liquid, and the initial liquid composition (mole fraction of the more volatile component).</li>
+        <li>Use the sliders to set the constant heat input rate, the initial amount of liquid, and the initial liquid composition (mole fraction of ethanol).</li>
         <li>Click <b>Play</b> to start. <b>Reset</b> returns to the chosen initial conditions.</li>
         <li>Watch the pot: the liquid level falls as it evaporates, and bubbles/steam appear once the liquid starts boiling. The thermometer shows the current liquid temperature.</li>
         <li>The top graph plots liquid temperature vs. time; the bottom graph plots the amount of liquid remaining vs. time.</li>
-        <li>The heat input rate can be changed at any time while running. Changing the chemical pair, initial amount, or initial composition resets the simulation.</li>
+        <li>The heat input rate can be changed at any time while running. Changing the initial amount or initial composition resets the simulation.</li>
       </ul>
-      <p>Watch how the temperature first rises quickly (sensible heating), levels off in slope once boiling begins, and then keeps <i>slowly increasing</i> during boiling &mdash; even though the heat input never changes &mdash; because the more volatile component evaporates preferentially, leaving behind a liquid that is richer in the higher-boiling component.</p>
+      <p>Watch how the temperature first rises quickly (sensible heating), levels off in slope once boiling begins, and then keeps <i>slowly increasing</i> during boiling &mdash; even though the heat input never changes &mdash; because ethanol evaporates preferentially, leaving behind a liquid that is richer in water.</p>
     </div>
 
     <div class="panel" id="panelDetails" role="dialog" aria-label="Details">
@@ -383,6 +465,23 @@ input[type="range"]::-moz-range-thumb{
       <div class="eq">\[ V = \frac{\dot Q}{\lambda_{mix}}, \qquad \lambda_{mix} = y\,\lambda_1 + (1-y)\,\lambda_2 \]</div>
       <div class="eq">\[ \frac{dn}{dt} = -V, \qquad \frac{dx}{dt} = \frac{V\,(x - y)}{n} \]</div>
       <p>Because the more volatile component evaporates preferentially (<span class="eqInline">\(y > x\)</span>), <span class="eqInline">\(x\)</span> falls with time, so the bubble point &mdash; and hence <span class="eqInline">\(T(t)\)</span> &mdash; keeps rising during boiling even though <span class="eqInline">\(\dot Q\)</span> is held constant. Once essentially all of the more volatile component is gone, the remaining liquid boils at the normal boiling point of the less volatile component until the pot is empty.</p>
+
+      <p><b>Nomenclature</b></p>
+      <ul>
+        <li><span class="eqInline">\(\dot Q\)</span> &mdash; constant heat input rate from the burner (W)</li>
+        <li><span class="eqInline">\(T\)</span> &mdash; liquid temperature (&deg;C)</li>
+        <li><span class="eqInline">\(t\)</span> &mdash; time</li>
+        <li><span class="eqInline">\(P\)</span> &mdash; total system pressure, 760 mmHg (1 atm)</li>
+        <li><span class="eqInline">\(P_i^{sat}\)</span> &mdash; vapor pressure of pure component <span class="eqInline">\(i\)</span> at temperature <span class="eqInline">\(T\)</span> (mmHg)</li>
+        <li><span class="eqInline">\(A_i\)</span>, <span class="eqInline">\(B_i\)</span>, <span class="eqInline">\(C_i\)</span> &mdash; Antoine equation constants for component <span class="eqInline">\(i\)</span></li>
+        <li><span class="eqInline">\(x\)</span> &mdash; mole fraction of the more volatile component (component 1, ethanol) in the liquid</li>
+        <li><span class="eqInline">\(y\)</span> &mdash; mole fraction of the more volatile component in the vapor in equilibrium with the liquid</li>
+        <li><span class="eqInline">\(n\)</span> &mdash; total moles of liquid remaining in the pot</li>
+        <li><span class="eqInline">\(C_p\)</span> &mdash; molar heat capacity of the liquid mixture; <span class="eqInline">\(C_{p,1}\)</span>, <span class="eqInline">\(C_{p,2}\)</span> &mdash; molar heat capacities of pure components 1 and 2</li>
+        <li><span class="eqInline">\(V\)</span> &mdash; molar rate of vaporization (mol/s)</li>
+        <li><span class="eqInline">\(\lambda_{mix}\)</span> &mdash; molar heat of vaporization of the vapor mixture; <span class="eqInline">\(\lambda_1\)</span>, <span class="eqInline">\(\lambda_2\)</span> &mdash; molar heats of vaporization of pure components 1 and 2</li>
+        <li>subscripts 1, 2 &mdash; the more volatile and less volatile components, respectively</li>
+      </ul>
     </div>
 
     <div class="panel" id="panelAbout" role="dialog" aria-label="About">
@@ -400,7 +499,7 @@ input[type="range"]::-moz-range-thumb{
             <div class="row"><span>temperature, T</span><span id="rT_T">&mdash;</span></div>
             <div class="row"><span>liquid mass</span><span id="rT_n">&mdash;</span></div>
             <div class="row"><span>liquid moles</span><span id="rT_m">&mdash;</span></div>
-            <div class="row"><span>liquid comp., x<sub>1</sub></span><span id="rT_x">&mdash;</span></div>
+            <div class="row"><span>ethanol mole fraction, x<sub>1</sub></span><span id="rT_x">&mdash;</span></div>
           </div>
           <div class="status" id="statusMsg">&nbsp;</div>
         </div>
@@ -411,38 +510,20 @@ input[type="range"]::-moz-range-thumb{
       </div>
 
       <div class="controls">
-        <div class="ctrlGroup">
-          <label for="selChem">chemical pair</label>
-          <select id="selChem">
-            <option value="benzeneToluene">benzene / toluene</option>
-            <option value="hexaneHeptane">n-hexane / n-heptane</option>
-            <option value="pentaneHexane">n-pentane / n-hexane</option>
-          </select>
+        <div class="ctrlGroup chemGroup">
+          <div class="chemStatic">ethanol/water</div>
         </div>
         <div class="ctrlGroup">
           <label for="sldQ">heat input rate, <span class="val" id="valQ">200 W</span></label>
           <input type="range" id="sldQ" min="50" max="500" step="10" value="200">
         </div>
         <div class="ctrlGroup">
-          <label for="sldN0">initial liquid amount, <span class="val" id="valN0">170 g</span></label>
+          <label for="sldN0">liquid amount, <span class="val" id="valN0">170 g</span></label>
           <input type="range" id="sldN0" min="50" max="400" step="5" value="170">
         </div>
         <div class="ctrlGroup">
-          <label for="sldX0">initial mole fraction, <span class="val" id="valX0">x<sub>1</sub> = 0.50</span></label>
+          <label for="sldX0">mole fraction, <span class="val" id="valX0">x<sub>1</sub> = 0.50</span></label>
           <input type="range" id="sldX0" min="0.05" max="0.95" step="0.01" value="0.5">
-        </div>
-        <div class="ctrlGroup">
-          <label>simulation speed</label>
-          <div class="speedGroup" id="speedGroup">
-            <button data-speed="1" aria-pressed="true">1&times;</button>
-            <button data-speed="2" aria-pressed="false">2&times;</button>
-            <button data-speed="4" aria-pressed="false">4&times;</button>
-            <button data-speed="8" aria-pressed="false">8&times;</button>
-          </div>
-        </div>
-        <div class="btns">
-          <button id="btnPlay">Play</button>
-          <button id="btnReset" class="secondary">Reset</button>
         </div>
       </div>
     </div>
@@ -464,21 +545,15 @@ input[type="range"]::-moz-range-thumb{
 
   // ---------- Thermophysical data ----------
   // Antoine: log10(Psat[mmHg]) = A - B/(T[C]+C).  1 = more volatile, 2 = less volatile.
+  // Note: this simulation assumes ideal (Raoult's law) vapor-liquid equilibrium
+  // throughout (see Details). The real water/ethanol system deviates strongly
+  // from ideality and forms a minimum-boiling azeotrope near x(ethanol)=0.89,
+  // T=78.2C, which this ideal-solution model does not reproduce.
   var CHEMICALS = {
-    benzeneToluene: {
-      label: "Benzene / Toluene",
-      c1: { name:"Benzene",   A:6.90565, B:1211.033, C:220.790, Tb:80.1,  dHvap:30.72, Cp:136, MW:78.11 },
-      c2: { name:"Toluene",   A:6.95464, B:1344.800, C:219.482, Tb:110.6, dHvap:33.18, Cp:157, MW:92.14 }
-    },
-    hexaneHeptane: {
-      label: "n-Hexane / n-Heptane",
-      c1: { name:"n-Hexane",  A:6.87776, B:1171.530, C:224.366, Tb:68.7,  dHvap:28.85, Cp:195, MW:86.18 },
-      c2: { name:"n-Heptane", A:6.89677, B:1264.370, C:216.636, Tb:98.4,  dHvap:31.77, Cp:224, MW:100.20 }
-    },
-    pentaneHexane: {
-      label: "n-Pentane / n-Hexane",
-      c1: { name:"n-Pentane", A:6.85296, B:1064.840, C:232.014, Tb:36.1,  dHvap:25.79, Cp:173, MW:72.15 },
-      c2: { name:"n-Hexane",  A:6.87776, B:1171.530, C:224.366, Tb:68.7,  dHvap:28.85, Cp:195, MW:86.18 }
+    waterEthanol: {
+      label: "Water / Ethanol",
+      c1: { name:"Ethanol", A:8.20417, B:1642.89, C:230.300, Tb:78.4,  dHvap:38.56, Cp:112,  MW:46.07 },
+      c2: { name:"Water",   A:8.07131, B:1730.63, C:233.426, Tb:100.0, dHvap:40.65, Cp:75.3, MW:18.02 }
     }
   };
   var P_TOTAL = 760; // mmHg, 1 atm
@@ -507,8 +582,7 @@ input[type="range"]::-moz-range-thumb{
   var state = {};
 
   function resetState(){
-    var key = document.getElementById('selChem').value;
-    var chem = CHEMICALS[key];
+    var chem = CHEMICALS.waterEthanol;
     var Q = parseFloat(document.getElementById('sldQ').value);
     var mass0 = parseFloat(document.getElementById('sldN0').value);
     var x0 = parseFloat(document.getElementById('sldX0').value);
@@ -526,8 +600,9 @@ input[type="range"]::-moz-range-thumb{
     state.running = false;
     state.Tmax = Math.max(chem.c1.Tb, chem.c2.Tb) + 8;
     state.history = [{t:0, T:T_ROOM, n:n0, mass:mass0}];
+    state.lastHistT = 0;
     document.getElementById('btnPlay').textContent = 'Play';
-    document.getElementById('statusMsg').textContent = ' ';
+    document.getElementById('statusMsg').textContent = ' ';
   }
 
   function step(dt){
@@ -565,16 +640,25 @@ input[type="range"]::-moz-range-thumb{
     }
 
     state.t += dt;
+    var justFinished = false;
     if (state.n <= 1e-5){
       state.n = 0;
       state.phase = 'done';
       state.running = false;
+      justFinished = true;
       document.getElementById('btnPlay').textContent = 'Play';
       document.getElementById('statusMsg').textContent = 'pot is empty';
     }
-    var curMass = state.n*(state.x*c1.MW + (1-state.x)*c2.MW);
-    state.history.push({t: state.t, T: state.T, n: state.n, mass: curMass});
-    if (state.history.length > 6000) state.history.shift();
+    // Record a history point every ~0.5 simulated seconds (not every substep) so
+    // long, slow runs (low heat rate / high speed multiplier) don't need an
+    // unbounded or capped array — a fixed cap previously dropped the earliest
+    // points once a run produced more than 6000 substeps, erasing the start of
+    // the curve. Always record the final point so the plot ends exactly at t.
+    if (justFinished || state.t - state.lastHistT >= 0.5){
+      var curMass = state.n*(state.x*c1.MW + (1-state.x)*c2.MW);
+      state.history.push({t: state.t, T: state.T, n: state.n, mass: curMass});
+      state.lastHistT = state.t;
+    }
   }
 
   // ---------- Canvas setup (hi-DPI) ----------
@@ -801,6 +885,17 @@ input[type="range"]::-moz-range-thumb{
     return steps[steps.length-1];
   }
 
+  // Nice, round, evenly-spaced step for a Y axis spanning [0, rawMax].
+  function niceAxisStep(rawMax){
+    var steps = [1,2,5,10,15,20,25,30,40,50,60,75,80,100,120,150,200,250,300,
+                 400,500,600,800,1000,1500,2000,2500,3000,4000,5000];
+    for (var i=0;i<steps.length;i++){
+      if (rawMax/steps[i] <= 5) return steps[i];
+    }
+    var mag = Math.pow(10, Math.ceil(Math.log10(rawMax/5)));
+    return mag;
+  }
+
   function drawPlot(ctx, opts){
     var W = ctx._cssW, H = ctx._cssH;
     ctx.clearRect(0,0,W,H);
@@ -810,16 +905,18 @@ input[type="range"]::-moz-range-thumb{
     var rawMaxMin = Math.max((state.t/60)*1.05, 1);
     var tStep = niceTimeStep(rawMaxMin);
     var tMaxMin = Math.ceil(rawMaxMin/tStep)*tStep;
-    var yMin = opts.yMin, yMax = opts.yMax;
+    var yMin = opts.yMin;
+    var yStep = niceAxisStep(Math.max(opts.yMax - yMin, 1e-6));
+    var nY = Math.max(1, Math.ceil((opts.yMax-yMin)/yStep));
+    var yMax = yMin + yStep*nY;
 
     // grid + axes
     ctx.strokeStyle = cssVar('--grid');
     ctx.fillStyle = cssVar('--axis-text');
-    ctx.font = '15px Helvetica, Arial, sans-serif';
+    ctx.font = '17px Helvetica, Arial, sans-serif';
     ctx.lineWidth = 1;
-    var nY = 4;
     for (var i=0;i<=nY;i++){
-      var yv = yMin + (yMax-yMin)*i/nY;
+      var yv = yMin + yStep*i;
       var py = padT + plotH - plotH*i/nY;
       ctx.strokeStyle = cssVar('--grid');
       ctx.beginPath(); ctx.moveTo(padL,py); ctx.lineTo(padL+plotW,py); ctx.stroke();
@@ -842,13 +939,14 @@ input[type="range"]::-moz-range-thumb{
     ctx.fillStyle = cssVar('--axis-text');
     ctx.save();
     ctx.textAlign='center';
-    ctx.fillText('time (min)', padL+plotW/2, padT+plotH+34);
+    ctx.fillText('time (min)', padL+plotW/2, padT+plotH+30);
     ctx.restore();
 
     ctx.save();
-    ctx.translate(16, padT+plotH/2);
+    ctx.translate(opts.ylabelOffset || 16, padT+plotH/2);
     ctx.rotate(-Math.PI/2);
     ctx.textAlign='center';
+    ctx.textBaseline='middle';
     ctx.fillText(opts.ylabel, 0, 0);
     ctx.restore();
 
@@ -875,14 +973,36 @@ input[type="range"]::-moz-range-thumb{
     }
 
     ctx.fillStyle = cssVar('--text');
-    ctx.font = '15px Helvetica, Arial, sans-serif';
+    ctx.font = 'bold 16.5px Helvetica, Arial, sans-serif';
     ctx.textAlign='left'; ctx.textBaseline='alphabetic';
-    ctx.fillText(opts.title, padL, 16);
+    ctx.fillText(opts.title, padL, 17);
   }
 
   // ---------- Readouts ----------
+  // Format a non-negative number to n significant figures without ever
+  // switching to exponential notation (toPrecision() can do that for
+  // values >= 1000, which we don't want for a plain time readout).
+  function toSigFigs(val, n){
+    if (!isFinite(val)) return String(val);
+    if (val === 0) return (0).toFixed(Math.max(n-1,0));
+    var sign = val < 0 ? '-' : '';
+    val = Math.abs(val);
+    var d = Math.floor(Math.log10(val)) + 1; // # of digits left of decimal
+    var decimals = Math.max(n - d, 0);
+    var factor = Math.pow(10, decimals);
+    var rounded = Math.round(val*factor)/factor;
+    // rounding can bump the digit count (e.g. 99.96 -> 100): recompute once
+    var newD = rounded === 0 ? 1 : Math.floor(Math.log10(rounded)) + 1;
+    if (newD !== d){
+      decimals = Math.max(n - newD, 0);
+      factor = Math.pow(10, decimals);
+      rounded = Math.round(val*factor)/factor;
+    }
+    return sign + rounded.toFixed(decimals);
+  }
+
   function updateReadouts(){
-    document.getElementById('rT_t').textContent = state.t.toFixed(1)+' s';
+    document.getElementById('rT_t').textContent = toSigFigs(state.t,3)+' s';
     document.getElementById('rT_T').textContent = state.T.toFixed(1)+' °C';
     var mass = state.n*(state.x*state.chem.c1.MW + (1-state.x)*state.chem.c2.MW);
     document.getElementById('rT_n').textContent = mass.toFixed(0)+' g';
@@ -909,7 +1029,7 @@ input[type="range"]::-moz-range-thumb{
     drawScene(dtReal*speed);
     drawPlot(plotTCtx, {
       title: 'temperature vs. time',
-      ylabel: 'T (°C)',
+      ylabel: 'temperature, T (°C)',
       color: cssVar('--plot-t'),
       yMin: 0, yMax: state.Tmax,
       yFmt: function(v){return v.toFixed(0);},
@@ -918,6 +1038,7 @@ input[type="range"]::-moz-range-thumb{
     drawPlot(plotNCtx, {
       title: 'liquid mass vs. time',
       ylabel: 'mass (g)',
+      ylabelOffset: 12,
       color: cssVar('--plot-n'),
       yMin: 0, yMax: state.mass0*1.08,
       yFmt: function(v){return v.toFixed(0);},
@@ -961,7 +1082,6 @@ input[type="range"]::-moz-range-thumb{
   var sldQ = document.getElementById('sldQ');
   var sldN0 = document.getElementById('sldN0');
   var sldX0 = document.getElementById('sldX0');
-  var selChem = document.getElementById('selChem');
 
   sldQ.addEventListener('input', function(){
     document.getElementById('valQ').textContent = sldQ.value+' W';
@@ -973,9 +1093,6 @@ input[type="range"]::-moz-range-thumb{
   });
   sldX0.addEventListener('input', function(){
     document.getElementById('valX0').innerHTML = 'x<sub>1</sub> = '+parseFloat(sldX0.value).toFixed(2);
-    if (!state.running) resetState();
-  });
-  selChem.addEventListener('change', function(){
     if (!state.running) resetState();
   });
 
