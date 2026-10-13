@@ -1,0 +1,587 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Non-Newtonian fluids</title>
+<style>
+:root{
+  --bg:#ffffff; --panel:#ffffff; --ink:#000000; --ink2:#000000; --muted:#000000;
+  --line:#b8b8b8; --grid:#e3e3e3; --accent:#1f6feb;
+  --c-newt:#1f6feb; --c-pl:#e8590c; --c-bing:#0e9f8e;
+  --warn:#000000; --chip:#f0f0f0; --red:#cc0000; --red-h:#a80000;
+  --sans:Helvetica,"Helvetica Neue",Arial,sans-serif;
+  --mono:Helvetica,"Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:#000;font-family:var(--sans);font-size:17px;line-height:1.45;padding-inline:16px;padding-block:20px 40px}
+.wrap{max-width:1440px;margin:0 auto}
+.info{margin:0}
+button.red[aria-expanded="true"]{background:var(--red-h);border-color:var(--red-h)}
+h1{font-size:30px;font-weight:400;margin:0 0 10px;text-wrap:balance}
+.info{display:flex;gap:8px;flex-wrap:wrap}
+button.red{background:var(--red);border-color:var(--red);color:#fff;font-weight:400}
+button.red:hover{background:var(--red-h);border-color:var(--red-h)}
+.sub{margin:0 0 18px;max-width:90ch}
+.layout{position:relative;display:grid;grid-template-columns:400px minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:1000px){.layout{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:14px 16px}
+.hrow{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;column-gap:16px}
+.panel h2{font-size:17px;font-weight:400;margin:0 0 10px}
+.stack{display:flex;flex-direction:column;gap:16px}
+.presets{display:flex;flex-wrap:wrap;gap:6px}
+button{font-family:var(--sans);font-size:17px;color:#000;background:var(--chip);border:1px solid #888;border-radius:4px;padding:5px 12px;cursor:pointer}
+button:hover{border-color:#000}
+button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+:focus-visible{outline:2px solid #000;outline-offset:2px}
+.fluid{border-top:1px solid var(--line);padding-top:12px;margin-top:12px}
+.fluid:first-of-type{border-top:0;padding-top:0;margin-top:0}
+.fhead{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.sw{width:22px;height:0;border-top:3px solid;flex:none}
+.fname{font-weight:400}
+.fluid.off .fhead,.fluid.off .ctl{opacity:.5}
+.eq{margin-left:12px}
+.ctl{display:grid;grid-template-columns:34px 1fr 118px;align-items:center;gap:8px;margin-top:6px;font-size:17px}
+.ctl label,.ctl output{font-size:17px}
+.fluid .ctl,.pp .ctl{padding-left:34px}
+.fluid .ctl label,.pp .ctl label{text-align:right}
+.ctl output{text-align:left;font-variant-numeric:tabular-nums}
+input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey);min-width:0}input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+sub{font-size:75%;line-height:0;vertical-align:sub}
+i{font-style:italic;font-family:"Times New Roman","Cambria Math","STIX Two Math",Times,serif;font-size:1.1em;line-height:0}
+i.gd{position:relative;display:inline-block;line-height:1}
+i.gd.dot::after{content:"";position:absolute;width:.1em;height:.1em;border-radius:50%;background:currentColor;left:52%;top:.16em}
+sup{font-size:75%;line-height:0}
+.note{font-size:15px;margin:6px 0 0}
+.charts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+@media (max-width:1250px){.charts{grid-template-columns:minmax(0,1fr)}}
+.chead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+.chead h3{font-size:19px;font-weight:400;margin:0}
+.seg{display:inline-flex;gap:0}
+.seg button{border-radius:0}
+.seg button:first-child{border-radius:4px 0 0 4px}
+.seg button:last-child{border-radius:0 4px 4px 0;border-left:0}
+svg{display:block;width:100%;height:auto;touch-action:pan-y}
+svg text{font-family:var(--sans);font-size:17px;fill:#000}
+svg text.lbl{fill:#000;stroke:#fff;stroke-width:4px;paint-order:stroke;stroke-linejoin:round}
+svg .axl{font-family:var(--sans);font-size:17px;fill:#000}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:17px;margin-bottom:4px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{display:inline-block;width:26px;height:0;border-top:3px solid}
+table{border-collapse:collapse;width:100%;font-size:17px}
+#tbl th:nth-child(2),#tbl th:nth-child(3),#tbl th:nth-child(4),#tbl td:nth-child(2),#tbl td:nth-child(3),#tbl td:nth-child(4){white-space:nowrap}
+th,td{padding:6px 5px;text-align:center;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums;font-size:17px}
+th:first-child,td:first-child{text-align:left;padding-left:2px}
+td.beh{text-align:left;padding-left:4px;line-height:1.25}
+th.beh{text-align:left;padding-left:4px}
+th{font-weight:400}
+.tblwrap{overflow-x:auto}
+.chip{display:inline-block;font-size:17px;padding:0 8px;border-radius:99px;background:var(--chip);border:1px solid #888;white-space:nowrap}
+.cap{font-size:15px;margin:8px 0 0;max-width:90ch}
+.half{width:50%}
+.fit{width:fit-content;max-width:100%}
+@media (max-width:1250px){.half{width:100%}}
+.notice{font-size:17px;margin:6px 0 0;min-height:1.4em}
+.ov{position:absolute;left:0;right:0;top:48px;z-index:20}
+.ov[hidden]{display:none}
+.dlg{position:relative;box-shadow:0 6px 24px rgba(0,0,0,.25);background:#fff;color:#000;border:1px solid var(--line);border-radius:6px;max-width:900px;width:100%;padding:16px 24px}
+.dlg h2{font-size:22px;font-weight:400;margin:0 0 10px}
+.dlg p,.dlg li{font-size:17px;margin:0 0 8px}
+.dlg ul,.dlg ol{margin:0 0 10px;padding-left:22px}
+.dlg .eqn{margin:4px 0 10px 12px}
+.dlg .close{margin-top:8px}
+.dlg h2{padding-right:40px}
+.dlg .x{position:absolute;top:10px;right:10px;width:32px;height:32px;padding:0;line-height:1;font-size:22px;background:#fff;border:0;color:#000}
+.dlg .x:hover{color:var(--red)}
+</style>
+</head><body>
+
+
+<div class="wrap">
+  <div class="layout">
+<div class="ov" id="ov-dir" hidden><div class="dlg" role="dialog" aria-modal="true" aria-labelledby="t-dir">
+<button class="x" data-close aria-label="Close">&times;</button>
+<h2 id="t-dir">Directions</h2>
+<ol>
+<li>Pick an example fluid, or set the parameters of each fluid with the sliders.</li>
+<li>Each example fluid button loads parameter values and plots only the fluid model that matches the example, except default, which plots all three. The text under the plots discusses only the curves that are shown. The values are illustrative, not measurements of real fluids. To compare with another fluid model, move one of its sliders. That curve is added to the plots and to the text, and the example button stays selected. Changing a parameter of the example's own fluid model deselects the button. The examples are:
+<ul>
+<li>default: μ = 0.5 Pa·s, K = 1.5 Pa·sⁿ with n = 0.5, and τ₀ = 15 Pa with μp = 0.4 Pa·s. The three curves cross near 10 s⁻¹, so the differences are easy to compare.</li>
+<li>polymer solution: strongly shear-thinning (n = 0.35) with almost no yield stress. Its viscosity drops steadily as the shear rate increases.</li>
+<li>paste (yield stress): a large yield stress (τ₀ = 45 Pa), like toothpaste. It does not flow in the pipe unless τw exceeds τ₀.</li>
+<li>cornstarch slurry: shear-thickening (n = 1.5). Its viscosity increases as the shear rate increases.</li>
+</ul></li>
+<li>Read the flow curve and the apparent-viscosity plot. Switch the flow curve between linear and log–log axes.</li>
+<li>Hover over or click either plot to move the shear-rate probe, or use the γ̇ slider. The table lists τ, η and pipe velocity at that shear rate.</li>
+<li>Change the wall shear stress τw to see how the velocity profiles in the pipe respond.</li>
+<li>Try n &lt; 1 for shear-thinning and n &gt; 1 for shear-thickening, and raise τ₀ until the Bingham fluid stops flowing.</li>
+</ol></div></div>
+<div class="ov" id="ov-det" hidden><div class="dlg" role="dialog" aria-modal="true" aria-labelledby="t-det">
+<button class="x" data-close aria-label="Close">&times;</button>
+<h2 id="t-det">Details</h2>
+<p>Shear stress τ is related to shear rate γ̇ by a constitutive equation. The apparent viscosity is η = τ / γ̇.</p>
+<ul>
+<li>Newtonian: τ = μ γ̇, so η = μ is constant.</li>
+<li>power-law (Ostwald–de Waele): τ = K γ̇ⁿ, so η = K γ̇ⁿ⁻¹. n &lt; 1 is shear-thinning, n = 1 is Newtonian and n &gt; 1 is shear-thickening.</li>
+<li>Bingham plastic: τ = τ₀ + μp γ̇ for τ &gt; τ₀, and no deformation for τ ≤ τ₀. The apparent viscosity η = τ₀ / γ̇ + μp decreases with shear rate.</li>
+</ul>
+<p>Pipe flow is steady, laminar and fully developed in a pipe of radius R = 1 cm. The shear stress varies linearly, τ = τw r / R, and the velocity profile comes from integrating the constitutive equation with v = 0 at the wall:</p>
+<ul>
+<li>Newtonian: v = τw (R² − r²) / (2 μ R)</li>
+<li>power-law: v = (τw / K R)<sup>1/n</sup> · n/(n+1) · [R<sup>(n+1)/n</sup> − r<sup>(n+1)/n</sup>]</li>
+<li>Bingham: for r ≥ r₀ = τ₀ R / τw, v = τw (R² − r²) / (2 μp R) − τ₀ (R − r) / μp; the core r &lt; r₀ moves as a plug at the velocity at r₀.</li>
+</ul>
+<p>Definition of terms:</p>
+<ul>
+<li>τ: shear stress (Pa)</li>
+<li>γ̇: shear rate (s⁻¹)</li>
+<li>η: apparent viscosity, η = τ / γ̇ (Pa·s)</li>
+<li>μ: viscosity of the Newtonian fluid (Pa·s)</li>
+<li>K: consistency index of the power-law fluid (Pa·sⁿ)</li>
+<li>n: flow behavior index of the power-law fluid (dimensionless)</li>
+<li>τ₀: yield stress of the Bingham plastic (Pa)</li>
+<li>μp: plastic viscosity of the Bingham plastic (Pa·s)</li>
+<li>τw: shear stress at the pipe wall (Pa), τw = ΔP R / 2L</li>
+<li>ΔP: pressure drop over the pipe length (Pa)</li>
+<li>L: pipe length (m)</li>
+<li>R: pipe radius (m), fixed at 1 cm</li>
+<li>r: radial position measured from the pipe centerline (m)</li>
+<li>r₀: radius of the rigid plug in the Bingham plastic (m), r₀ = τ₀ R / τw</li>
+<li>v: local fluid velocity (m/s)</li>
+</ul>
+<p>Mean velocity is found by numerical integration of v over the cross-section. The example fluids use illustrative parameter values, not measured data.</p>
+</div></div>
+<div class="ov" id="ov-abo" hidden><div class="dlg" role="dialog" aria-modal="true" aria-labelledby="t-abo">
+<button class="x" data-close aria-label="Close">&times;</button>
+<h2 id="t-abo">About</h2>
+<p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.</p>
+</div></div>
+
+
+
+    <div class="stack">
+  <div class="info"><button class="red" id="bDir" aria-expanded="false">Directions</button><button class="red" id="bDet" aria-expanded="false">Details</button><button class="red" id="bAbo" aria-expanded="false">About</button></div>
+
+      <div class="panel">
+        <h2>Example fluids</h2>
+        <div class="presets" id="presets"></div>
+        <p class="note" id="presetNote"></p>
+      </div>
+      <div class="panel" id="controls"><h2>Fluid parameters</h2></div>
+      <div class="panel pp">
+        <h2>Pipe &amp; probe</h2>
+        <div class="ctl"><label for="s-tw">τw</label><input type="range" id="s-tw" min="0" max="100" step="0.5"><output id="o-tw"></output></div>
+        <p class="note">Wall shear stress, τw = ΔP·R / 2L. Pipe radius is fixed at R = 1 cm.</p>
+        <div class="ctl"><label for="s-g">γ̇</label><input type="range" id="s-g" min="-2" max="3" step="0.01"><output id="o-g"></output></div>
+        <p class="note">Shear-rate probe (log scale, 0.01 – 1000 s⁻¹).</p>
+      </div>
+    </div>
+
+    <div class="charts">
+      <div class="stack">
+        <div class="panel">
+          <div class="chead"><h3>Flow curve (rheogram)</h3>
+            <div class="seg" role="group" aria-label="Axis scale">
+              <button id="b-lin" aria-pressed="false">linear</button><button id="b-log" aria-pressed="true">log–log</button>
+            </div></div>
+          <svg id="ch1" viewBox="0 0 560 400" role="img" aria-label="Shear stress versus shear rate for the three fluids"></svg>
+          <p class="cap" id="cap1"></p>
+        </div>
+        <div class="panel">
+          <h2 class="hrow"><span>At the probe shear rate</span><span id="tblCap"></span></h2>
+          <div class="tblwrap"><table id="tbl"></table></div>
+        </div>
+      </div>
+      <div class="stack">
+        <div class="panel">
+          <div class="chead"><h3>Apparent viscosity</h3><span class="chip">η = τ / γ̇</span></div>
+          <svg id="ch2" viewBox="0 0 560 400" role="img" aria-label="Apparent viscosity versus shear rate"></svg>
+          <p class="cap" id="cap2"></p>
+        </div>
+        <div class="panel">
+          <div class="chead"><h3>laminar pipe-flow velocity profile</h3>
+</div>
+          <svg id="ch3" viewBox="0 0 560 400" role="img" aria-label="Velocity profiles across the pipe diameter"></svg>
+          <p class="cap" id="cap3"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+var R = 0.01, pipeMsg = '';
+var st = { preset:0, show:{newt:true,pl:true,bing:true}, mu:0.5, K:1.5, n:0.5, t0:15, mup:0.4, tw:30, g:10, scale:'log', norm:false };
+
+var PRESETS = [
+  {name:"default", note:"Values chosen so the three curves cross near 10 s⁻¹.", v:{mu:0.5,K:1.5,n:0.5,t0:15,mup:0.4}, show:["newt","pl","bing"]},
+  {name:"polymer solution", note:"Strongly shear-thinning, no yield stress (n ≈ 0.35).", v:{mu:0.3,K:2.5,n:0.35,t0:2,mup:0.3}, show:["pl"]},
+  {name:"paste (yield stress)", note:"Toothpaste-like: high τ₀ and modest plastic viscosity.", v:{mu:1,K:12,n:0.55,t0:45,mup:0.8}, show:["bing"]},
+  {name:"cornstarch slurry", note:"Shear-thickening power-law fluid, n > 1.", v:{mu:0.2,K:0.05,n:1.5,t0:5,mup:0.2}, show:["pl"]}
+];
+
+var FL = [
+  {id:'newt', name:'Newtonian', eq:'τ = μ γ̇', color:'--c-newt', dash:'', params:[
+    {k:'mu', sym:'μ', unit:'Pa·s', log:[-3,2]}]},
+  {id:'pl', name:'power-law', eq:'τ = K γ̇ⁿ', color:'--c-pl', dash:'9 5', params:[
+    {k:'K', sym:'K', unit:'Pa·sⁿ', log:[-3,2]},
+    {k:'n', sym:'n', unit:'', lin:[0.1,1.8,0.01]}]},
+  {id:'bing', name:'Bingham plastic', eq:'τ = τ₀ + μp γ̇', color:'--c-bing', dash:'2 5', params:[
+    {k:'t0', sym:'τ₀', unit:'Pa', lin:[0,100,0.5]},
+    {k:'mup', sym:'μp', unit:'Pa·s', log:[-3,2]}]}
+];
+
+function tau(id,g){
+  if(id==='newt') return st.mu*g;
+  if(id==='pl') return st.K*Math.pow(g,st.n);
+  return st.t0 + st.mup*g;
+}
+function eta(id,g){ return tau(id,g)/g; }
+
+function fmt(v){
+  if(!isFinite(v)) return '–';
+  var a=Math.abs(v);
+  if(a===0) return '0';
+  if(a>=1e4||a<1e-2) return v.toExponential(2).replace('e+','e').replace(/e(-?)0+(\d)/,'e$1$2');
+  if(a>=100) return v.toFixed(0);
+  if(a>=10) return v.toFixed(1);
+  if(a>=1) return v.toFixed(2);
+  return v.toPrecision(2);
+}
+var SUP={'-':'⁻','0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹'};
+function sup(k){ return String(k).split('').map(function(c){return SUP[c]||c}).join(''); }
+function cv(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+function $(id){ return document.getElementById(id); }
+
+
+/* italic symbols with true subscripts, applied to all text */
+var SYM=/τ[₀w]?|μp?|η|γ̇?|r₀/g;
+function symNodes(text,svg){
+  var out=[],last=0,m;
+  function mk(tag,txt,italic,sub){
+    var e=svg?document.createElementNS(NS,'tspan'):document.createElement(sub?'sub':(italic?'i':'span'));
+    if(svg){ if(italic){ e.setAttribute('font-style','italic'); e.setAttribute('font-family','Times New Roman, Cambria Math, STIX Two Math, Times, serif'); e.setAttribute('font-size','110%'); } if(sub){ e.setAttribute('baseline-shift','sub'); e.setAttribute('font-size','75%'); } }
+    e.textContent=(!svg&&txt[0]==='γ')?'γ':txt; if(!svg&&txt[0]==='γ') e.className='gd'+(txt.length>1?' dot':'');  e.setAttribute('data-sym','1'); return e;
+  }
+  SYM.lastIndex=0;
+  while((m=SYM.exec(text))){
+    var t=m[0]; if(m.index>last) out.push(document.createTextNode(text.slice(last,m.index)));
+    var base,sub;
+    if(t==='r₀'){ base='r'; sub='0'; out.push(document.createTextNode('r')); out.push(mk('',sub,false,true)); }
+    else {
+      if(t[0]==='γ'){ base=t; sub=''; } else { base=t[0]; sub=t.slice(1); }
+      if(svg&&t[0]==='γ'){ out.push(mk('','γ',true,false)); var d=mk('','˙',true,false); d.setAttribute('dx','-0.5em'); out.push(d); var sp=mk('','\u200b',false,false); sp.setAttribute('dx','0.25em'); out.push(sp); }
+      else out.push(mk('',base,true,false));
+      if(sub) out.push(mk('',sub==='₀'?'0':sub,false,true));
+    }
+    last=m.index+t.length;
+  }
+  if(last<text.length) out.push(document.createTextNode(text.slice(last)));
+  return out;
+}
+function symify(root){
+  var w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,null), list=[], n;
+  while((n=w.nextNode())){
+    var par=n.parentNode, tn=par.nodeName.toLowerCase();
+    if(tn==='script'||tn==='style'||tn==='title'||par.hasAttribute&&par.hasAttribute('data-sym')) continue;
+    SYM.lastIndex=0; if(SYM.test(n.nodeValue)) list.push(n);
+  }
+  list.forEach(function(n){
+    var svg=n.parentNode.namespaceURI===NS, nodes=symNodes(n.nodeValue,svg), par=n.parentNode;
+    nodes.forEach(function(x){ par.insertBefore(x,n); }); par.removeChild(n);
+  });
+}
+
+/* ---------- controls ---------- */
+var ctlHost = $('controls');
+FL.forEach(function(f){
+  var d=document.createElement('div'); d.className='fluid';
+  var h='<div class="fhead"><span class="sw" style="border-color:var('+f.color+');'+(f.dash?'border-top-style:dashed':'')+'"></span><span class="fname" style="color:var('+f.color+')">'+f.name+'</span><span class="eq">'+f.eq+'</span></div>';
+  f.params.forEach(function(p){
+    var mn=p.log?p.log[0]:p.lin[0], mx=p.log?p.log[1]:p.lin[1], stp=p.log?0.01:p.lin[2];
+    h+='<div class="ctl"><label for="s-'+p.k+'">'+p.sym+'</label><input type="range" id="s-'+p.k+'" min="'+mn+'" max="'+mx+'" step="'+stp+'"><output id="o-'+p.k+'"></output></div>';
+  });
+  if(f.id==='pl') h+='<p class="note" id="plNote"></p>';
+  if(f.id==='bing') h+='<p class="note">Flows only where τ &gt; τ₀; below that it deforms elastically or stays rigid.</p>';
+  d.innerHTML=h; d.setAttribute('data-id',f.id); ctlHost.appendChild(d);
+});
+function vis(){ return FL.filter(function(f){return st.show[f.id];}); }
+var ALLP=[]; FL.forEach(function(f){ f.params.forEach(function(p){p.fid=f.id;ALLP.push(p);}); });
+function setSliders(){
+  ALLP.forEach(function(p){
+    var el=$('s-'+p.k); el.value = p.log ? Math.log10(st[p.k]) : st[p.k];
+  });
+  $('s-tw').value=st.tw; $('s-g').value=Math.log10(st.g);
+}
+ALLP.forEach(function(p){
+  $('s-'+p.k).addEventListener('input',function(e){
+    var x=parseFloat(e.target.value); st[p.k]=p.log?Math.pow(10,x):x; if(st.preset!==null&&PRESETS[st.preset].show.indexOf(p.fid)>=0) st.preset=null; st.show[p.fid]=true; render();
+  });
+});
+$('s-tw').addEventListener('input',function(e){ st.tw=parseFloat(e.target.value); render(); });
+$('s-g').addEventListener('input',function(e){ st.g=Math.pow(10,parseFloat(e.target.value)); render(); });
+
+var pHost=$('presets');
+PRESETS.forEach(function(p,i){
+  var b=document.createElement('button'); b.textContent=p.name; b.dataset.i=i;
+  b.addEventListener('click',function(){
+    Object.keys(p.v).forEach(function(k){st[k]=p.v[k];}); st.show={}; p.show.forEach(function(id){st.show[id]=true;}); st.preset=i;
+    $('presetNote').textContent=p.note; render();
+  });
+  pHost.appendChild(b);
+});
+$('presetNote').textContent=PRESETS[0].note;
+
+function seg(a,b,fnA,fnB){
+  $(a).addEventListener('click',fnA); $(b).addEventListener('click',fnB);
+}
+seg('b-lin','b-log',function(){st.scale='lin';render();},function(){st.scale='log';render();});
+
+/* ---------- legend ---------- */
+function legend(id){
+  $(id).innerHTML = FL.map(function(f){
+    return '<span><i style="border-color:var('+f.color+');'+(f.dash?'border-top-style:dashed':'')+'"></i>'+f.name+'</span>';
+  }).join('');
+}
+
+
+/* ---------- generic chart ---------- */
+var NS='http://www.w3.org/2000/svg';
+function el(tag,attrs,txt){
+  var e=document.createElementNS(NS,tag);
+  for(var k in attrs) e.setAttribute(k,attrs[k]);
+  if(txt!==undefined) e.textContent=txt;
+  return e;
+}
+function niceStep(range,target){
+  var raw=range/target, mag=Math.pow(10,Math.floor(Math.log10(raw))), r=raw/mag;
+  var s = r<1.5?1:r<3?2:r<7?5:10; return s*mag;
+}
+/* opts: W,H,m{l,r,t,b}, x{min,max,log,label}, y{...}, series[{id,pts}], probeX, dots, tickFmt */
+function chart(svg,o){
+  while(svg.firstChild) svg.removeChild(svg.firstChild);
+  var W=Math.round(svg.clientWidth||o.W),H=Math.round(W*o.H/o.W),m=o.m, pw=W-m.l-m.r, ph=H-m.t-m.b;
+  function lin(a,b,v){return (v-a)/(b-a);}
+  function sx(v){ return m.l+pw*(o.x.log?lin(Math.log10(o.x.min),Math.log10(o.x.max),Math.log10(v)):lin(o.x.min,o.x.max,v)); }
+  function sy(v){ return m.t+ph*(1-(o.y.log?lin(Math.log10(o.y.min),Math.log10(o.y.max),Math.log10(Math.max(v,o.y.min*0.5))):lin(o.y.min,o.y.max,v))); }
+  svg.setAttribute('viewBox','0 0 '+W+' '+H);
+  var grid=cv('--grid'), muted=cv('--muted'), line=cv('--line');
+  function ticks(a){
+    var t=[];
+    if(a.log){ for(var k=Math.ceil(Math.log10(a.min)-1e-9);k<=Math.floor(Math.log10(a.max)+1e-9);k++) t.push(Math.pow(10,k)); }
+    else { var s=a.step||niceStep(a.max-a.min,6); for(var v=Math.ceil(a.min/s-1e-9)*s; v<=a.max+1e-9; v+=s) t.push(+v.toFixed(10)); }
+    return t;
+  }
+  var tx=ticks(o.x), ty=ticks(o.y);
+  ty.forEach(function(v){
+    var y=sy(v);
+    svg.appendChild(el('line',{x1:m.l,x2:m.l+pw,y1:y,y2:y,stroke:grid,'stroke-width':1}));
+    svg.appendChild(el('text',{x:m.l-5,y:y+5,'text-anchor':'end'}, o.y.log?'10'+sup(Math.round(Math.log10(v))):(o.y.fmt?o.y.fmt(v):fmt(v))));
+  });
+  tx.forEach(function(v){
+    var x=sx(v);
+    svg.appendChild(el('line',{x1:x,x2:x,y1:m.t,y2:m.t+ph,stroke:grid,'stroke-width':1}));
+    svg.appendChild(el('text',{x:x,y:m.t+ph+23,'text-anchor':'middle'}, o.x.log?'10'+sup(Math.round(Math.log10(v))):(o.x.fmt?o.x.fmt(v):fmt(v))));
+  });
+  svg.appendChild(el('line',{x1:m.l,x2:m.l+pw,y1:m.t+ph,y2:m.t+ph,stroke:line,'stroke-width':1.5}));
+  svg.appendChild(el('line',{x1:m.l,x2:m.l,y1:m.t,y2:m.t+ph,stroke:line,'stroke-width':1.5}));
+  svg.appendChild(el('text',{x:m.l+pw/2,y:H-4,'text-anchor':'middle',class:'axl'},o.x.label));
+  var yl=el('text',{x:0,y:0,'text-anchor':'middle',class:'axl',transform:'translate(16,'+(m.t+ph/2)+') rotate(-90)'},o.y.label);
+  svg.appendChild(yl);
+  if(o.vline){ o.vline.forEach(function(v){
+    var x=sx(v.x); svg.appendChild(el('line',{x1:x,x2:x,y1:m.t,y2:m.t+ph,stroke:v.color||muted,'stroke-width':v.w||1,'stroke-dasharray':v.dash||''}));
+  });}
+  o.series.forEach(function(s){
+    var c=cv(s.color), d='';
+    s.pts.forEach(function(p,i){ d+=(i?'L':'M')+sx(p[0]).toFixed(1)+' '+sy(p[1]).toFixed(1); });
+    svg.appendChild(el('path',{d:d,fill:'none',stroke:c,'stroke-width':2.5,'stroke-linejoin':'round','stroke-linecap':s.dash?'butt':'round','stroke-dasharray':s.dash||''}));
+  });
+  var surf=cv('--panel');
+  if(o.dots) o.dots.forEach(function(p){
+    svg.appendChild(el('circle',{cx:sx(p.x),cy:sy(p.y),r:5,fill:cv(p.color),stroke:surf,'stroke-width':2}));
+  });
+  /* direct labels on the curves */
+  (function(){
+    var P=o.series.map(function(s){ return s.pts.map(function(p){return [sx(p[0]),sy(p[1])];}); });
+    var samples=[];
+    P.forEach(function(pts){ for(var i=0;i<pts.length-1;i++){ for(var k=0;k<4;k++){ var t=k/4; samples.push([pts[i][0]+(pts[i+1][0]-pts[i][0])*t, pts[i][1]+(pts[i+1][1]-pts[i][1])*t]); } } });
+    var placed=[], px0=m.l+4, px1=m.l+pw-4, py0=m.t+4, py1=m.t+ph-4;
+    var probeX=(o.vline&&o.vline.length)?sx(o.vline[0].x):null;
+    var order=[]; for(var f=1;f<=19;f++) order.push(f/20); order.sort(function(a,c){return Math.abs(a-0.5)-Math.abs(c-0.5);});
+    o.series.forEach(function(s,si){
+      var pts=P[si]; if(!pts.length||!s.name) return;
+      var tx=el('text',{class:'lbl',style:'fill:'+cv(s.color)},s.name); svg.appendChild(tx);
+      var bb=tx.getBBox(), w=bb.width, h=bb.height, best=null, bestPen=1e12;
+      for(var oi=0;oi<order.length;oi++){
+        var p=pts[Math.min(pts.length-1,Math.round(order[oi]*(pts.length-1)))];
+        var cands=[[p[0]-w/2,p[1]-7-h],[p[0]-w/2,p[1]+7],[p[0]+8,p[1]-h/2],[p[0]-w-8,p[1]-h/2]];
+        for(var ci=0;ci<cands.length;ci++){
+          var x=cands[ci][0], y=cands[ci][1], pen=oi*0.5+ci*0.2;
+          if(x<px0) pen+=2000+(px0-x); if(x+w>px1) pen+=2000+(x+w-px1);
+          if(y<py0) pen+=2000+(py0-y); if(y+h>py1) pen+=2000+(y+h-py1);
+          if(probeX!==null&&probeX>x-4&&probeX<x+w+4) pen+=15;
+          for(var q=0;q<samples.length;q++){ var a=samples[q]; if(a[0]>x-2&&a[0]<x+w+2&&a[1]>y-1&&a[1]<y+h+1) pen+=6; }
+          for(var r=0;r<placed.length;r++){ var c=placed[r]; if(x<c[0]+c[2]+6&&x+w>c[0]-6&&y<c[1]+c[3]+4&&y+h>c[1]-4) pen+=5000; }
+          if(pen<bestPen){ bestPen=pen; best=[x,y]; }
+        }
+      }
+      tx.setAttribute('x',best[0]); tx.setAttribute('y',best[1]+h-4);
+      placed.push([best[0],best[1],w,h]);
+    });
+  })();
+  if(o.hit){
+    var hit=el('rect',{x:m.l,y:m.t,width:pw,height:ph,fill:'transparent',style:'cursor:crosshair'});
+    function move(e){
+      var r=svg.getBoundingClientRect(), vx=(e.clientX-r.left)/r.width*W;
+      var f=(vx-m.l)/pw; f=Math.max(0,Math.min(1,f));
+      var v=o.x.log?Math.pow(10,Math.log10(o.x.min)+f*(Math.log10(o.x.max)-Math.log10(o.x.min))):o.x.min+f*(o.x.max-o.x.min);
+      o.hit(v);
+    }
+    hit.addEventListener('pointermove',move);
+    hit.addEventListener('pointerdown',move);
+    svg.appendChild(hit);
+  }
+  return {sx:sx,sy:sy};
+}
+function geom(a,b,n){ var o=[],la=Math.log10(a),lb=Math.log10(b); for(var i=0;i<=n;i++) o.push(Math.pow(10,la+(lb-la)*i/n)); return o; }
+function setProbe(g){
+  g=Math.max(0.01,Math.min(1000,g)); st.g=g; $('s-g').value=Math.log10(g); render();
+}
+
+/* ---------- renders ---------- */
+function rheogram(){
+  var log=st.scale==='log', gs, xmin,xmax;
+  if(log){ xmin=0.01;xmax=1000; gs=geom(xmin,xmax,160); } else { xmin=0;xmax=100; gs=[]; for(var i=0;i<=200;i++) gs.push(xmax*i/200); }
+  var series=vis().map(function(f){ return {color:f.color,dash:f.dash,name:f.name,id:f.id,pts:gs.filter(function(g){return g>0||!log;}).map(function(g){ return [g, g===0?(f.id==='bing'?st.t0:0):tau(f.id,g)]; })}; });
+  var ymin,ymax,yo;
+  var all=[]; series.forEach(function(s){s.pts.forEach(function(p){all.push(p[1]);});});
+  if(log){
+    var pos=all.filter(function(v){return v>0;});
+    ymin=Math.pow(10,Math.floor(Math.log10(Math.min.apply(null,pos))));
+    ymax=Math.pow(10,Math.ceil(Math.log10(Math.max.apply(null,pos))));
+    if(ymax/ymin<100) ymax=ymin*100;
+    yo={min:ymin,max:ymax,log:true,label:'Shear stress τ (Pa)'};
+  } else {
+    var mx=Math.max.apply(null,all); var s=niceStep(mx*1.05,5);
+    yo={min:0,max:Math.ceil(mx*1.05/s)*s,log:false,step:s,label:'Shear stress τ (Pa)',fmt:function(v){ if(v===0||Math.abs(yo.max)<1000) return String(+v.toPrecision(6)); var e=Math.floor(Math.log10(Math.abs(v)+1e-9)); return (+(v/Math.pow(10,e)).toFixed(2))+'×10'+sup(e); }};
+  }
+  /* clip in log mode: series that fall outside get pruned to the plot */
+  if(log) series.forEach(function(s){ s.pts=s.pts.filter(function(p){return p[1]>=yo.min&&p[1]<=yo.max;}); });
+  var g=st.g, dots=[];
+  if(g>=xmin&&g<=xmax) vis().forEach(function(f){ dots.push({x:g,y:tau(f.id,g),color:f.color}); });
+  chart($('ch1'),{W:560,H:400,m:{l:74,r:16,t:12,b:54},
+    x:{min:log?xmin:0,max:xmax,log:log,label:'Shear rate γ̇ (s⁻¹)',step:log?undefined:20,fmt:function(v){return String(+v.toPrecision(6));}},y:yo,
+    series:series,dots:dots,vline:(g>=xmin&&g<=xmax)?[{x:g,dash:'3 4'}]:[],hit:setProbe});
+}
+function viscosity(){
+  var gs=geom(0.01,1000,160);
+  var series=vis().map(function(f){ return {color:f.color,dash:f.dash,name:f.name,pts:gs.map(function(g){return [g,eta(f.id,g)];})}; });
+  var all=[]; series.forEach(function(s){s.pts.forEach(function(p){all.push(p[1]);});});
+  var lo=Math.min.apply(null,all), hi=Math.max.apply(null,all);
+  var ymin=Math.pow(10,Math.floor(Math.log10(lo))), ymax=Math.pow(10,Math.ceil(Math.log10(hi)));
+  if(ymax/ymin<100) ymax=ymin*100;
+  if(ymax/ymin>1e7){ ymin=ymax/1e7; }
+  series.forEach(function(s){ s.pts=s.pts.filter(function(p){return p[1]>=ymin&&p[1]<=ymax;}); });
+  var dots=vis().map(function(f){ return {x:st.g,y:eta(f.id,st.g),color:f.color}; }).filter(function(d){return d.y>=ymin&&d.y<=ymax;});
+  chart($('ch2'),{W:560,H:400,m:{l:74,r:16,t:12,b:54},
+    x:{min:0.01,max:1000,log:true,label:'Shear rate γ̇ (s⁻¹)'},y:{min:ymin,max:ymax,log:true,label:'Apparent viscosity η (Pa·s)'},
+    series:series,dots:dots,vline:[{x:st.g,dash:'3 4'}],hit:setProbe});
+}
+function vel(id,r){
+  var tw=st.tw, a=Math.abs(r);
+  if(id==='newt') return tw/(2*st.mu*R)*(R*R-a*a);
+  if(id==='pl'){ var n=st.n, e=(n+1)/n; return Math.pow(tw/(st.K*R),1/n)*n/(n+1)*(Math.pow(R,e)-Math.pow(a,e)); }
+  if(tw<=st.t0) return 0;
+  var r0=st.t0*R/tw, rc=Math.max(a,r0);
+  return tw/(st.mup*R)*(R*R-rc*rc)/2 - st.t0*(R-rc)/st.mup;
+}
+function vmean(id){
+  var N=400,s=0,h=R/N;
+  for(var i=0;i<=N;i++){ var r=i*h, w=(i===0||i===N)?1:(i%2?4:2); s+=w*vel(id,r)*r; }
+  return (2/(R*R))*s*h/3;
+}
+function pipe(){
+  var rs=[]; for(var i=-100;i<=100;i++) rs.push(R*i/100);
+  var means={}, notes=[];
+  FL.forEach(function(f){ means[f.id]=vmean(f.id); });
+  var series=vis().map(function(f){
+    var k=st.norm?(means[f.id]>0?1/means[f.id]:0):1;
+    return {color:f.color,dash:f.dash,name:f.name,pts:rs.map(function(r){return [r/R,vel(f.id,r)*k];})};
+  });
+  var mx=0; series.forEach(function(s){s.pts.forEach(function(p){mx=Math.max(mx,p[1]);});});
+  if(mx<=0) mx=1;
+  var step=niceStep(mx*1.05,5), ymax=Math.ceil(mx*1.05/step)*step;
+  chart($('ch3'),{W:560,H:400,m:{l:74,r:16,t:12,b:54},
+    x:{min:-1,max:1,log:false,step:0.5,label:'radial position r / R',fmt:function(v){return (+v.toFixed(2)).toString();}},
+    y:{min:0,max:ymax,log:false,step:step,label:st.norm?'v / mean v':'velocity v (m/s)',fmt:function(v){ var s=+v.toPrecision(6); var dec=Math.abs(step-Math.round(step))>1e-9; return (dec&&s!==0&&Number.isInteger(s))?s.toFixed(1):String(s); }},
+    series:series});
+  var parts=[];
+  if(!st.show.bing){}
+  else if(st.tw<=st.t0) parts.push('τw ('+fmt(st.tw)+' Pa) ≤ τ₀ ('+fmt(st.t0)+' Pa): the Bingham plastic does not flow.');
+  else if(st.t0>0) parts.push('Bingham plug radius r₀/R = '+(st.t0/st.tw).toFixed(2)+'.');
+  pipeMsg=parts.join(' ');
+  return means;
+}
+
+function updateCaps(){
+  var S=st.show, n=st.n, many=vis().length>1, thin=n<0.99, thick=n>1.01;
+  var pl1= thin?'The power-law curve bends toward the shear-rate axis because n = '+fmt(n)+' is less than 1 (shear-thinning).':thick?'The power-law curve bends away from the shear-rate axis because n = '+fmt(n)+' is greater than 1 (shear-thickening).':'With n = 1 the power-law curve is a straight line, the same as a Newtonian fluid.';
+  var c1=['These statements all refer to the linear plot.'];
+  if(S.newt) c1.push('The Newtonian curve is a straight line through the origin, and its slope is the viscosity μ.');
+  if(S.pl){ c1.push(pl1); if(st.scale==='log') c1.push('On log–log axes the slope of the power-law curve is n.'); }
+  if(S.bing) c1.push('The Bingham curve starts at the yield stress τ₀ at low shear rate and then rises linearly with slope μp.');
+  $('cap1').textContent=c1.join(' ');
+  var c2=[];
+  if(S.pl) c2.push(thin?'The power-law fluid is shear-thinning: its apparent viscosity decreases as the shear rate increases.':thick?'The power-law fluid is shear-thickening: its apparent viscosity increases as the shear rate increases.':'With n = 1 the power-law apparent viscosity is constant, K.');
+  if(S.bing) c2.push('The Bingham plastic thins because its apparent viscosity decreases with shear rate and approaches μp at high shear rate.');
+  $('cap2').textContent=c2.join(' ');
+  var c3=[];
+  if(many) c3.push('All fluids are compared at the same wall shear stress τw.'); else c3.push('The profile is for the wall shear stress τw set in Pipe & probe.');
+  if(S.bing) c3.push('The Bingham plastic moves as a rigid plug wherever the local shear stress τw·r/R is below τ₀.');
+  $('cap3').textContent=(pipeMsg?pipeMsg+' ':'')+c3.join(' ');
+}
+function sci(v){
+  if(!isFinite(v)||v===0) return '0';
+  if(Math.abs(v)>=0.1&&Math.abs(v)<100) return String(+v.toPrecision(3));
+  var ex=Math.floor(Math.log10(Math.abs(v))), m=v/Math.pow(10,ex);
+  if(Math.abs(+m.toFixed(2))>=10){ m/=10; ex+=1; }
+  return m.toFixed(2)+'×10<sup>'+ex+'</sup>';
+}
+function table(means){
+  var g=st.g, rows='<tr><th>fluid</th><th>τ (Pa)</th><th>η (Pa·s)</th><th>mean v in<br>pipe (m/s)</th><th class="beh">behavior</th></tr>';
+  var beh={
+    newt:'constant viscosity',
+    pl: st.n<0.99?'shear-thinning':st.n>1.01?'shear-thickening':'Newtonian (n = 1)',
+    bing:'yield stress '+fmt(st.t0)+' Pa'
+  };
+  vis().forEach(function(f){
+    rows+='<tr><td style="color:var('+f.color+')">'+f.name+'</td><td>'+sci(tau(f.id,g))+'</td><td>'+fmt(eta(f.id,g))+'</td><td>'+(means[f.id]>0?fmt(means[f.id]):'0 (no flow)')+'</td><td class="beh">'+beh[f.id]+'</td></tr>';
+  });
+  $('tblCap').innerHTML='γ̇ = '+fmt(g)+' s⁻¹ &nbsp;·&nbsp; τw = '+fmt(st.tw)+' Pa';
+  $('tbl').innerHTML=rows;
+}
+function render(){
+  ALLP.forEach(function(p){ $('o-'+p.k).textContent=fmt(st[p.k])+(p.unit?' '+p.unit:''); });
+  $('o-tw').textContent=fmt(st.tw)+' Pa'; $('o-g').textContent=fmt(st.g)+' s⁻¹';
+  $('plNote').textContent = st.n<0.99?'n < 1: shear-thinning':st.n>1.01?'n > 1: shear-thickening':'n = 1: reduces to Newtonian';
+  setSliders();
+  Array.prototype.forEach.call(document.querySelectorAll('.fluid'),function(d){ d.classList.toggle('off',!st.show[d.getAttribute('data-id')]); });
+  Array.prototype.forEach.call(pHost.children,function(btn,i){
+    btn.setAttribute('aria-pressed',st.preset===i);
+  });
+  $('b-lin').setAttribute('aria-pressed',st.scale==='lin'); $('b-log').setAttribute('aria-pressed',st.scale==='log');
+  rheogram(); viscosity(); var m=pipe(); table(m); updateCaps(); symify(document.body);
+}
+var OVS=[['bDir','ov-dir'],['bDet','ov-det'],['bAbo','ov-abo']];
+function closeOvs(){ OVS.forEach(function(a){ $(a[1]).hidden=true; $(a[0]).setAttribute('aria-expanded','false'); }); }
+OVS.forEach(function(a){ $(a[0]).addEventListener('click',function(){
+  var wasOpen=!$(a[1]).hidden; closeOvs();
+  if(!wasOpen){ $(a[1]).hidden=false; $(a[0]).setAttribute('aria-expanded','true'); }
+}); });
+Array.prototype.forEach.call(document.querySelectorAll('.ov [data-close]'),function(x){ x.addEventListener('click',closeOvs); });
+document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeOvs(); });
+window.addEventListener('resize',function(){ render(); });
+render();
+})();
+</script>
+
+</body></html>

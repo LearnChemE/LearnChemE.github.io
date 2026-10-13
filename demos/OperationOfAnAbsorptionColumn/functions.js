@@ -489,7 +489,7 @@ function equilibLines(){
             push();
             translate(x+45,y); rotate(theta);
             noStroke(); textSize(16); fill(g.orange);
-            text('operating line',0,0);
+            text('equilibrium line',0,0);
             pop();
         }
 
@@ -504,7 +504,7 @@ function equilibLines(){
             push();
             translate(x-10,y-2); rotate(theta);
             noStroke(); textSize(16); fill(g.pink);
-            text('equilibrium line',0,0);
+            text('operating line',0,0);
             pop();
         }
 
