@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nonisothermal Effectiveness Factor</title>
+<script>
+window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},chtml:{displayAlign:'left',displayIndent:'0em'}};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<style>
+:root{
+  --bg:#fff; --panel:#ffffff; --fg:#000; --muted:#333; --grid:#e3e7ed; --axis:#555; --border:#d6dce4;
+  --accent:#1f6feb; --iso:#555; --red:#98000D;
+  --c-hi:#d95f02; --c-mid:#7b3fc4; --c-lo:#0f8a6a; --c-one:#1f6feb;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:#000;font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:1250px;margin:0 auto;padding:16px}
+h1{font-size:1.35rem;margin:0 0 2px}
+.sub{color:var(--muted);margin:0 0 14px;font-size:.92rem}
+.layout{display:grid;grid-template-columns:330px 1fr;gap:14px;align-items:start}
+@media (max-width:900px){.layout{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px}
+.card h2{font-size:17px;color:#000;margin:0 0 10px;font-weight:400}
+.btnrow{display:flex;gap:8px;margin-bottom:10px;position:relative}
+.pb{position:relative}
+.rb{font:inherit;font-size:16px;font-weight:400;background:var(--red);color:#fff;border:1px solid var(--red);border-radius:6px;padding:6px 14px;cursor:pointer}
+.rb:hover{filter:brightness(1.15)}
+.panel{display:none;position:absolute;top:calc(100% + 6px);left:0;width:min(700px,92vw);max-height:75vh;overflow:auto;background:#fff;color:#000;border:1px solid #999;border-radius:8px;box-shadow:0 6px 24px rgba(0,0,0,.3);padding:16px 44px 16px 18px;z-index:100;font-size:16px}
+.panel.open{display:block}
+.panel h3{font-size:17px;margin:14px 0 4px}
+.panel h3:first-child{margin-top:0}
+.panel p{margin:6px 0}
+.x{position:absolute;top:6px;right:8px;width:30px;height:30px;padding:0;border:none;background:none;color:#000;font-size:24px;line-height:28px;cursor:pointer;border-radius:4px}
+.x:hover{background:#eee}
+.ctl{margin-bottom:14px}
+.ctl label{display:flex;flex-wrap:wrap;gap:4px;justify-content:space-between;align-items:baseline;font-size:17px;margin-bottom:2px}
+.ctl .val{font-size:17px;font-weight:400;color:#000;font-variant-numeric:tabular-nums}
+.gm{font-family:"Times New Roman",Times,serif;font-style:italic;font-size:1.2em;line-height:1}
+.ctl .hint{font-size:16px;color:#000;margin-top:0}
+input[type="range"]{--accent:#98000D;--grey:#999;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+input[type=number]{width:80px;font-size:17px;padding:2px 6px;border:1px solid var(--border);border-radius:6px;background:#fff;color:#000}
+.presets{display:flex;flex-wrap:wrap;gap:6px}
+button[data-p]{font:inherit;font-size:15px;padding:5px 9px;border-radius:7px;border:1px solid var(--border);background:var(--bg);color:#000;cursor:pointer}
+button[data-p]:hover{border-color:var(--red)}
+.chk{display:flex;gap:6px;align-items:center;font-size:15px;margin-top:6px}
+.plots{display:grid;gap:14px}
+.toprow{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:760px){.toprow,.two{grid-template-columns:1fr}}
+canvas{width:100%;display:block}
+.cv-main{height:420px}
+.cv-small{height:320px}
+.ptitle{font-size:17px;font-weight:400;margin:0 0 4px}
+.read{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:12px}
+.stat{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:6px 10px}
+.stat .k{font-size:17px;color:#333}
+.stat .v{font-size:17px;font-variant-numeric:tabular-nums}
+table{border-collapse:collapse;width:100%;font-size:17px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:4px 6px;border-bottom:1px solid var(--border)}
+th{font-weight:400;font-size:17px;color:#333}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:middle}
+.msg{font-size:17px;color:#333;margin:8px 0 0}
+ol.q{padding-left:22px;margin:6px 0}
+ol.q li{margin-bottom:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="layout">
+    <div>
+      <div class="btnrow">
+        <div class="pb"><button class="rb" data-open="pDir">Directions</button>
+          <div class="panel" id="pDir"><button class="x" aria-label="Close">&times;</button>
+            <h3>Directions</h3>
+            <p>For reaction in a porous catalyst pellet, the reactant concentration in the pellet can be lower than the reactant concentration at the external surface because of diffusion; this lowers the reaction rate. However, the temperature within the catalyst pellet can be higher than the temperature at the external surface; this increases the reaction rate. The effectiveness factor \(\eta\) is the ratio of the rate of reaction within the pellet volume divided by the rate if the concentration of reactant and the temperature in the pellet were the same as the concentration and temperature at the external surface of the pellet.</p>
+            <p>The effectiveness factor \(\eta\) is plotted versus the Thiele modulus \(\phi\), which can be changed with the slider or by clicking or dragging in the Effectiveness factor plot. The square of the Thiele modulus \(\phi^2\) can be viewed as the surface reaction rate over the diffusion rate.</p>
+            <p>The Arrhenius number \(\gamma\), which can be changed with a slider, is a measure of how strongly a reaction rate depends on temperature.</p>
+            <p>The Prater number \(\beta\), which can be changed with a slider, is approximately the heat generated by reaction divided by the ability of the pellet to conduct heat.</p>
+            <p>The dashed vertical line and the dots show the current \(\phi\) and the steady-state effectiveness factor(s) there. The two lower plots show the concentration and temperature profiles inside the pellet for each steady state.</p>
+            <p>The preset buttons load typical cases. &ldquo;Compare curves for several &beta;&rdquo; overlays curves at the same <span class="gm">&gamma;</span>, and the isothermal curve can be hidden.</p>
+            <h3>Things to try</h3>
+            <ol class="q">
+              <li>Set &beta; = 0. Confirm &eta; &approx; 1 for \(\phi\) &lt; 0.3 and &eta; &approx; 3/\(\phi\) for \(\phi\) &gt; 3. How does the concentration profile change between these limits?</li>
+              <li>Choose <span class="gm">&gamma;</span> = 20, &beta; = 0.2 and sweep \(\phi\). Why can &eta; exceed 1? Compare the pellet-center temperature with the surface temperature.</li>
+              <li>With <span class="gm">&gamma;</span> = 20, increase &beta; from 0 to 0.5. At what &beta; does the curve become S-shaped? What does it mean physically when three &eta; values exist at one \(\phi\)?</li>
+              <li>Use the &ldquo;Multiple steady states&rdquo; preset. Which of the three states would you expect to be unstable, and why?</li>
+              <li>Make &beta; negative (endothermic). Why is &eta; always below the isothermal value? Could &eta; exceed 1?</li>
+              <li>At fixed &beta;, lower <span class="gm">&gamma;</span> toward 0. Why does the heat effect disappear even though &beta; is not zero?</li>
+              <li>At large \(\phi\) all curves become straight lines on the log&ndash;log plot. What is the slope, and how does the apparent activation energy compare with the intrinsic one?</li>
+            </ol>
+          </div></div>
+        <div class="pb"><button class="rb" data-open="pDet">Details</button>
+          <div class="panel" id="pDet"><button class="x" aria-label="Close">&times;</button>
+            <h3>Model and equations</h3>
+            <p>A first-order, irreversible reaction occurs in a spherical catalyst pellet of radius \(R\) at steady state. Dimensionless variables are \(c=C/C_s\), \(\theta=T/T_s\) and \(x=r/R\), where \(C_s\) and \(T_s\) are the concentration and temperature at the pellet surface (external gradients are neglected).</p>
+            <p>Mass balance:</p>
+            \[ \frac{d^2c}{dx^2}+\frac{2}{x}\frac{dc}{dx}=\phi^2\,c\,\exp\!\left[\gamma\left(1-\frac{1}{\theta}\right)\right] \]
+            <p>Energy balance (Prater relation):</p>
+            \[ \theta = 1+\beta\,(1-c) \]
+            <p>Combining the two:</p>
+            \[ \frac{d^2c}{dx^2}+\frac{2}{x}\frac{dc}{dx}=\phi^2\,c\,\exp\!\left[\frac{\gamma\beta(1-c)}{1+\beta(1-c)}\right] \]
+            <p>Boundary conditions:</p>
+            \[ \left.\frac{dc}{dx}\right|_{x=0}=0,\qquad c(1)=1 \]
+            <p>Effectiveness factor (actual rate divided by the rate at surface conditions):</p>
+            \[ \eta=\frac{3}{\phi^2}\left.\frac{dc}{dx}\right|_{x=1} \]
+            <p>Isothermal limit (\(\beta=0\) or \(\gamma=0\)):</p>
+            \[ \eta=\frac{3}{\phi}\left(\coth\phi-\frac{1}{\phi}\right) \]
+            <h3>Definitions of symbols</h3>
+            <p>\(\phi = R\sqrt{k_s/D_e}\) &nbsp;Thiele modulus, where \(k_s\) is the rate constant at \(T_s\) and \(D_e\) the effective diffusivity.</p>
+            <p>\(\gamma = E/(R_g T_s)\) &nbsp;Arrhenius number, where \(E\) is the activation energy and \(R_g\) the gas constant.</p>
+            <p>\(\beta = (-\Delta H)\,D_e C_s/(k_e T_s)\) &nbsp;Prater number, where \(-\Delta H\) is the heat of reaction and \(k_e\) the effective thermal conductivity. \(\beta&gt;0\) is exothermic and \(\beta&lt;0\) endothermic.</p>
+            <p>\(\eta\) &nbsp;effectiveness factor; \(c\) &nbsp;dimensionless concentration; \(\theta\) &nbsp;dimensionless temperature; \(x\) &nbsp;dimensionless radial position.</p>
+            <h3>Numerical method</h3>
+            <p>With \(s=\phi x\) the equation no longer contains \(\phi\). Integrating outward from a chosen center concentration \(c_0\) until \(c=1\) gives \(\phi=s^*\) and \(\eta=3\,c'(s^*)/s^*\) directly. Sweeping \(c_0\) from 0 to 1 traces the entire \(\eta\)&ndash;\(\phi\) curve, including S-shaped regions with multiple steady states. The middle solution of three is unstable. For large \(\gamma\) and \(\beta\) (roughly \(\gamma\ge 30\), \(\beta\ge 0.6\)) the curve can fold more than twice, so five or more steady states exist over a narrow range of \(\phi\); they alternate stable and unstable. The equation is integrated with an adaptive Runge&ndash;Kutta method with error control.</p>
+            <p>Assumptions: constant \(D_e\) and \(k_e\), and no external heat or mass transfer resistance.</p>
+          </div></div>
+        <div class="pb"><button class="rb" data-open="pAbt">About</button>
+          <div class="panel" id="pAbt"><button class="x" aria-label="Close">&times;</button>
+            <h3>About</h3>
+            <p>This simulation was created in the Department of Chemical and Biological Engineering at University of Colorado Boulder for LearnChemE.com by John L. Falconer using Claude AI. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.</p>
+          </div></div>
+      </div>
+
+      <div class="card">
+        <div class="ctl">
+          <label><span>Thiele modulus \(\phi\)</span><span class="val" id="phiV"></span></label>
+          <input type="range" id="phi" min="-1" max="2" step="0.005" value="0.3">
+          <div class="hint">\(\phi = R\sqrt{k_s/D_e}\)</div>
+        </div>
+        <div class="ctl">
+          <label><span>Arrhenius number <span class="gm">&gamma;</span></span><span class="val" id="gV"></span></label>
+          <input type="range" id="gam" min="0" max="40" step="0.5" value="20">
+          <div class="hint">\(\gamma = E/(R_g T_s)\)</div>
+        </div>
+        <div class="ctl">
+          <label><span>Prater number &beta;</span><span class="val" id="bV"></span></label>
+          <input type="range" id="bet" min="-0.5" max="1" step="0.01" value="0.2">
+          <div class="hint">\(\beta = (-\Delta H)\, D_e C_s\,/\,(k_e T_s)\)</div>
+        </div>
+        <div class="ctl">
+          <label><span>Surface temperature T<sub>s</sub></span><span><input type="number" id="Ts" value="500" min="200" max="1500" step="10"> K</span></label>
+        </div>
+
+        <h2 style="margin-top:16px">Presets</h2>
+        <div class="presets">
+          <button data-p="0.3,0,0">Isothermal</button>
+          <button data-p="0.8,20,0.2">Mild exotherm</button>
+          <button data-p="0.55,20,0.5">Multiple steady states</button>
+          <button data-p="1.5,20,-0.3">Endothermic</button>
+        </div>
+        <label class="chk"><input type="checkbox" id="fam"><span>Compare curves for several &beta; (same <span class="gm">&gamma;</span>)</span></label>
+        <label class="chk"><input type="checkbox" id="showIso" checked> Show isothermal curve</label>
+      </div>
+    </div>
+
+    <div class="plots">
+      <div class="toprow">
+        <div class="card">
+          <p class="ptitle">Effectiveness factor</p>
+          <canvas id="cvEta" class="cv-main"></canvas>
+        </div>
+        <div class="card">
+          <h2>Steady states at this \(\phi\)</h2>
+          <div class="read">
+            <div class="stat"><div class="k">Solutions</div><div class="v" id="nSol">–</div></div>
+            <div class="stat"><div class="k">Isothermal &eta;</div><div class="v" id="etaIso">–</div></div>
+            <div class="stat"><div class="k">Activation energy</div><div class="v" id="Ev">–</div></div>
+            <div class="stat"><div class="k">Max &Delta;T (&beta;T<sub>s</sub>)</div><div class="v" id="dTmax">–</div></div>
+          </div>
+          <table>
+            <thead><tr><th>State</th><th>&eta;</th><th>C<sub>ctr</sub>/C<sub>s</sub></th><th>T<sub>ctr</sub></th></tr></thead>
+            <tbody id="tbody"></tbody>
+          </table>
+          <p class="msg" id="note"></p>
+        </div>
+      </div>
+      <div class="two">
+        <div class="card"><p class="ptitle">Concentration profile</p><canvas id="cvC" class="cv-small"></canvas></div>
+        <div class="card"><p class="ptitle">Temperature profile</p><canvas id="cvT" class="cv-small"></canvas></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* ---------------- Physics ---------------- */
+// rate factor  f(c) = c * exp(gamma*beta(1-c)/(1+beta(1-c)))
+function kEff(c,g,b){ const d=b*(1-c); return Math.exp(g*d/(1+d)); }
+
+// Integrate in w = ln c (robust when the pellet center is essentially empty):
+//   w_ss + w_s^2 + 2 w_s/s = kEff(e^w),  start w(0)=w0<0, until w = 0 (c = 1 at the surface).
+// s = phi*x, so the surface is s* = phi and eta = 3 c_s(s*)/s* = 3 w_s(s*)/s*.
+function shoot(w0,g,b,record,smax){
+  smax = smax||160;
+  if(w0>=-1e-12) return {phi:0,eta:1,s:[0],c:[1]};
+  const c0=Math.exp(w0), k0=kEff(c0,g,b);
+  // series start, well inside the region where w = w0 + k0 s^2/6 holds
+  let s=1e-4/Math.sqrt(Math.max(k0,1)), w=w0+k0*s*s/6, v=k0*s/3;
+  if(w0<-40){
+    // While c < e^-30 the rate constant equals its c = 0 value, so c = c0 sinh(a s)/(a s) exactly
+    // (a = sqrt(k0)). Jump analytically to where c reaches e^-30.
+    const a=Math.sqrt(k0), L=-30-w0;           // need ln(sinh(as)/(as)) = L
+    let z=L+Math.log(2*L+2);                    // z = a s
+    for(let it=0;it<50;it++){
+      const f=(z>30?z-Math.log(2):Math.log(Math.sinh(z)))-Math.log(z)-L;
+      const df=(z>30?1:1/Math.tanh(z))-1/z;
+      const dz=f/df; z-=dz; if(Math.abs(dz)<1e-12*z) break;
+    }
+    s=z/a; w=-30; v=a*(z>30?1:1/Math.tanh(z))-1/s;
+  }
+  const S=record?[0,s]:null, Cc=record?[c0,Math.exp(w)]:null;
+  const F=(s_,w_,v_)=>[v_, kEff(Math.exp(Math.min(w_,0)),g,b)-v_*v_-2*v_/s_];
+  // adaptive Cash-Karp RK45 with error control on w and w'
+  const RT=1e-7, AT=1e-9;
+  let h=s, n=0;
+  const step=(s,w,v,h)=>{
+    const k1=F(s,w,v);
+    const k2=F(s+h/5,w+h*k1[0]/5,v+h*k1[1]/5);
+    const k3=F(s+3*h/10,w+h*(3*k1[0]+9*k2[0])/40,v+h*(3*k1[1]+9*k2[1])/40);
+    const k4=F(s+3*h/5,w+h*(3*k1[0]-9*k2[0]+12*k3[0])/10,v+h*(3*k1[1]-9*k2[1]+12*k3[1])/10);
+    const k5=F(s+h,w+h*(-11*k1[0]/54+5*k2[0]/2-70*k3[0]/27+35*k4[0]/27),v+h*(-11*k1[1]/54+5*k2[1]/2-70*k3[1]/27+35*k4[1]/27));
+    const k6=F(s+7*h/8,w+h*(1631*k1[0]/55296+175*k2[0]/512+575*k3[0]/13824+44275*k4[0]/110592+253*k5[0]/4096),
+                       v+h*(1631*k1[1]/55296+175*k2[1]/512+575*k3[1]/13824+44275*k4[1]/110592+253*k5[1]/4096));
+    const c=[37/378,0,250/621,125/594,0,512/1771], d=[2825/27648,0,18575/48384,13525/55296,277/14336,1/4];
+    const K=[k1,k2,k3,k4,k5,k6];
+    let w5=w,v5=v,w4=w,v4=v;
+    for(let i=0;i<6;i++){ w5+=h*c[i]*K[i][0]; v5+=h*c[i]*K[i][1]; w4+=h*d[i]*K[i][0]; v4+=h*d[i]*K[i][1]; }
+    const err=Math.max(Math.abs(w5-w4)/(AT+RT*Math.max(Math.abs(w),Math.abs(w5))),
+                       Math.abs(v5-v4)/(AT+RT*Math.max(Math.abs(v),Math.abs(v5))));
+    return {w:w5,v:v5,err};
+  };
+  while(s<smax && n++<200000){
+    h=Math.min(h,smax-s);
+    const r=step(s,w,v,h);
+    if(!(r.err<=1)||!isFinite(r.w)){ h*=Math.max(0.1,0.9*Math.pow(r.err||1e6,-0.25)); if(h<1e-300) return null; continue; }
+    if(r.w>=0){
+      // overshot the surface (c = 1): shrink the step to land on w = 0
+      let lo=0, hi=h;
+      for(let it=0;it<60;it++){ const hm=0.5*(lo+hi), q=step(s,w,v,hm); if(q.w>=0) hi=hm; else lo=hm; }
+      const q=step(s,w,v,hi), ss=s+hi;
+      if(record){S.push(ss);Cc.push(1);}
+      return {phi:ss,eta:3*q.v/ss,s:S,c:Cc};
+    }
+    s+=h; w=r.w; v=r.v;
+    if(record){S.push(s);Cc.push(Math.exp(w));}
+    h*=Math.min(5,0.9*Math.pow(Math.max(r.err,1e-10),-0.2));
+  }
+  return null;
+}
+
+// Full curve: sweep w0 = ln(c_center) from ~0 down to very negative values.
+function buildCurve(g,b,perDecade){
+  perDecade=perDecade||10;
+  // w0 = -10^e; sweep from the pellet-center concentration near 1 toward ~0 and keep going
+  // until the ignited branch is past the right edge of the plot (phi > 150)
+  const pts=[];
+  let past=0;
+  for(let e=-3.5;e<=16;e+=1/perDecade){
+    const w0=-Math.pow(10,e);
+    const r=shoot(w0,g,b,false,400);
+    if(r && r.phi>0 && isFinite(r.eta)){
+      pts.push({w0,c0:Math.exp(w0),phi:r.phi,eta:r.eta});
+      if(e>1 && r.phi>150){ if(++past>=2) break; } else past=0;
+    } else if(e>1) break;
+  }
+  pts.reverse();                       // ascending w0 (most negative first)
+  pts.push({w0:0,c0:1,phi:1e-4,eta:1});
+  return pts;
+}
+
+// Find all steady states at given phi (crossings of phi(w0)=phi), refine by bisection
+function solveAt(phi,g,b,pts){
+  const out=[];
+  for(let i=0;i<pts.length-1;i++){
+    const a=pts[i], d=pts[i+1];
+    const fa=a.phi-phi, fd=d.phi-phi;
+    if(fa*fd<0){
+      let lo=a.w0, hi=d.w0, flo=fa;
+      for(let it=0;it<45;it++){
+        const mid=0.5*(lo+hi);
+        const r=shoot(mid,g,b,false,200);
+        if(!r){hi=mid;continue;}
+        const fm=r.phi-phi;
+        if(fm*flo<=0) hi=mid; else {lo=mid;flo=fm;}
+      }
+      const w0=0.5*(lo+hi);
+      const r=shoot(w0,g,b,true,200);
+      if(r){
+        out.push({w0,c0:Math.exp(w0),eta:r.eta,x:r.s.map(v=>v/r.phi),c:r.c,phiAct:r.phi});
+      }
+    }
+  }
+  const uniq=[];
+  for(const o of out){ if(!uniq.some(u=>Math.abs(u.w0-o.w0)<1e-7*Math.max(1,Math.abs(o.w0)))) uniq.push(o); }
+  uniq.sort((p,q)=>p.w0-q.w0);
+  return uniq;
+}
+
+function etaIso(phi){
+  if(phi<1e-3) return 1-phi*phi/15;
+  return 3/phi*(1/Math.tanh(phi)-1/phi);
+}
+
+/* ---------------- Plot helper ---------------- */
+function css(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+const fmtTick=v=>{
+  if(v===0) return "0";
+  const a=Math.abs(v);
+  if(a>=1000||a<0.001) return v.toExponential(0).replace("e+","e");
+  return (+v.toPrecision(3)).toString();
+};
+// draw a tick label; values >= 1000 (or < 0.001) are written as 10 with a superscript exponent
+function drawTick(ctx,v,x,y,align,fmt){
+  const a=Math.abs(v);
+  if(!fmt && v!==0 && (a>=1000||a<0.001)){
+    const e=Math.round(Math.log10(a));
+    if(Math.abs(Math.pow(10,e)-a)<1e-9*a){
+      const base=(v<0?"−":"")+"10", ex=String(e).replace("-","−");
+      ctx.font=FONT; const wb=ctx.measureText(base).width;
+      ctx.font=SUPFONT; const we=ctx.measureText(ex).width;
+      const w=wb+we+1;
+      const x0=align==="right"?x-w:x-w/2;
+      const save=ctx.textAlign; ctx.textAlign="left";
+      ctx.font=FONT; ctx.fillText(base,x0,y);
+      const dy=ctx.textBaseline==="top"?-5:-8;
+      ctx.font=SUPFONT; ctx.fillText(ex,x0+wb+1,y+dy);
+      ctx.font=FONT; ctx.textAlign=save;
+      return;
+    }
+  }
+  ctx.fillText(fmt?fmt(v):fmtTick(v),x,y);
+}
+// x-axis label: plain text followed by the TeX-style italic phi (same glyph MathJax uses)
+function drawRichLabel(ctx,parts,cx,y){
+  const mf=mathFont();
+  const fonts=parts.map(p=>p.math?mf.font:FONT);
+  let w=0; parts.forEach((p,i)=>{ctx.font=fonts[i]; w+=ctx.measureText(p.t).width;});
+  let x=cx-w/2; const save=ctx.textAlign; ctx.textAlign="left";
+  parts.forEach((p,i)=>{ctx.font=fonts[i]; ctx.fillText(p.t,x,y); x+=ctx.measureText(p.t).width;});
+  ctx.font=FONT; ctx.textAlign=save;
+}
+function mathFont(){
+  try{ for(const ff of document.fonts){ if(ff.family.replace(/["']/g,"")==="MJXTEX-I"&&ff.status==="loaded") return {font:"21px MJXTEX-I",mj:true}; } }catch(e){}
+  return {font:"italic 21px 'Times New Roman',Times,serif",mj:false};
+}
+function niceStep(range,n){
+  const raw=range/n, p=Math.pow(10,Math.floor(Math.log10(raw))), f=raw/p;
+  return (f<1.5?1:f<3?2:f<7?5:10)*p;
+}
+const FONT="17px system-ui,-apple-system,'Segoe UI',Roboto,sans-serif";
+const SUPFONT="12px system-ui,-apple-system,'Segoe UI',Roboto,sans-serif";
+function drawPlot(cv,o){
+  const dpr=window.devicePixelRatio||1;
+  const W=cv.clientWidth, H=cv.clientHeight;
+  cv.width=W*dpr; cv.height=H*dpr;
+  const ctx=cv.getContext("2d"); ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,W,H);
+  const m={l:66,r:26,t:12,b:54};
+  const pw=W-m.l-m.r, ph=H-m.t-m.b;
+  const X=v=>m.l+((o.xlog?Math.log10(v)-Math.log10(o.xr[0]):v-o.xr[0])/(o.xlog?Math.log10(o.xr[1]/o.xr[0]):o.xr[1]-o.xr[0]))*pw;
+  const Y=v=>m.t+ph-((o.ylog?Math.log10(Math.max(v,1e-300))-Math.log10(o.yr[0]):v-o.yr[0])/(o.ylog?Math.log10(o.yr[1]/o.yr[0]):o.yr[1]-o.yr[0]))*ph;
+  const grid=css("--grid"), axis=css("--axis");
+  ctx.font=FONT; ctx.lineWidth=1;
+  const ticks=(r,log)=>{
+    const t=[];
+    if(log){ for(let e=Math.ceil(Math.log10(r[0])-1e-9);e<=Math.floor(Math.log10(r[1])+1e-9);e++) t.push(Math.pow(10,e)); }
+    else { const st=niceStep(r[1]-r[0],4); for(let v=Math.ceil(r[0]/st-1e-9)*st;v<=r[1]+1e-9;v+=st) t.push(+v.toFixed(10)); }
+    return t;
+  };
+  const xt=ticks(o.xr,o.xlog), yt=ticks(o.yr,o.ylog);
+  ctx.strokeStyle=grid; ctx.fillStyle="#000"; ctx.textAlign="center"; ctx.textBaseline="top";
+  xt.forEach(v=>{const px=X(v); ctx.beginPath();ctx.moveTo(px,m.t);ctx.lineTo(px,m.t+ph);ctx.stroke(); drawTick(ctx,v,px,m.t+ph+4,"center",o.xfmt);});
+  ctx.textAlign="right"; ctx.textBaseline="middle";
+  yt.forEach(v=>{const py=Y(v); ctx.beginPath();ctx.moveTo(m.l,py);ctx.lineTo(m.l+pw,py);ctx.stroke(); drawTick(ctx,v,m.l-6,py,"right",o.yfmt);});
+  ctx.strokeStyle=axis; ctx.strokeRect(m.l,m.t,pw,ph);
+  ctx.fillStyle="#000"; ctx.textAlign="center"; ctx.textBaseline="alphabetic";
+  if(Array.isArray(o.xlabel)) drawRichLabel(ctx,o.xlabel,m.l+pw/2,H-6); else ctx.fillText(o.xlabel,m.l+pw/2,H-6);
+  ctx.save(); ctx.translate(17,m.t+ph/2); ctx.rotate(-Math.PI/2); ctx.fillText(o.ylabel,0,0); ctx.restore();
+  ctx.save(); ctx.beginPath(); ctx.rect(m.l,m.t,pw,ph); ctx.clip();
+  (o.vlines||[]).forEach(v=>{ctx.strokeStyle=v.color;ctx.setLineDash([4,4]);ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(X(v.x),m.t);ctx.lineTo(X(v.x),m.t+ph);ctx.stroke();});
+  (o.hlines||[]).forEach(v=>{ctx.strokeStyle=v.color;ctx.setLineDash([4,4]);ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(m.l,Y(v.y));ctx.lineTo(m.l+pw,Y(v.y));ctx.stroke();});
+  (o.series||[]).forEach(s=>{
+    ctx.strokeStyle=s.color; ctx.lineWidth=s.width||2; ctx.setLineDash(s.dash||[]);
+    ctx.beginPath(); let pen=false;
+    for(let i=0;i<s.x.length;i++){
+      const xv=s.x[i], yv=s.y[i];
+      if(!isFinite(xv)||!isFinite(yv)||(o.xlog&&xv<=0)){pen=false;continue;}
+      const px=X(xv), py=Y(yv);
+      if(!pen){ctx.moveTo(px,py);pen=true;} else ctx.lineTo(px,py);
+    }
+    ctx.stroke();
+  });
+  ctx.setLineDash([]);
+  (o.marks||[]).forEach(mk=>{
+    ctx.fillStyle=mk.color; ctx.strokeStyle="#fff"; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.arc(X(mk.x),Y(mk.y),6,0,7); ctx.fill(); ctx.stroke();
+  });
+  ctx.font=FONT; ctx.textBaseline="middle";
+  const allL=o.labels||[], autoL=allL.filter(l=>l.auto);
+  allL.filter(l=>!l.auto).forEach(l=>{
+    ctx.fillStyle=l.color; ctx.textAlign=l.align||"center";
+    ctx.fillText(l.text,X(l.x)+(l.dx||0),Y(l.y)+(l.dy||0));
+  });
+  if(autoL.length) placeLabels(ctx,o,autoL,m,pw,ph,X,Y);
+  ctx.restore();
+  return {m,pw,ph,X,Y,W,H,inv:px=>{
+    const f=(px-m.l)/pw; return o.xlog?Math.pow(10,Math.log10(o.xr[0])+f*Math.log10(o.xr[1]/o.xr[0])):o.xr[0]+f*(o.xr[1]-o.xr[0]);
+  }};
+}
+
+
+// Place labels in empty space (not on any curve, dot or other label) as close as
+// possible to their anchor point, then join label and anchor with a leader line.
+function placeLabels(ctx,o,labels,m,pw,ph,X,Y){
+  const CS=4, gw=Math.ceil(pw/CS)+1, gh=Math.ceil(ph/CS)+1;
+  const occ=new Uint8Array(gw*gh), sat=new Int32Array((gw+1)*(gh+1));
+  const mark=(px,py,r)=>{
+    const cx=Math.floor((px-m.l)/CS), cy=Math.floor((py-m.t)/CS);
+    for(let j=cy-r;j<=cy+r;j++) for(let i=cx-r;i<=cx+r;i++) if(i>=0&&j>=0&&i<gw&&j<gh) occ[j*gw+i]=1;
+  };
+  const markSeg=(x0,y0,x1,y1,r)=>{
+    const n=Math.min(3000,Math.max(1,Math.ceil(Math.hypot(x1-x0,y1-y0)/2)));
+    for(let t=0;t<=n;t++) mark(x0+(x1-x0)*t/n,y0+(y1-y0)*t/n,r);
+  };
+  (o.series||[]).forEach(s=>{
+    let prev=null;
+    for(let k=0;k<s.x.length;k++){
+      const xv=s.x[k], yv=s.y[k];
+      if(!isFinite(xv)||!isFinite(yv)||(o.xlog&&xv<=0)){prev=null;continue;}
+      const p=[X(xv),Y(yv)];
+      if(prev) markSeg(prev[0],prev[1],p[0],p[1],1);
+      prev=p;
+    }
+  });
+  (o.marks||[]).forEach(mk=>mark(X(mk.x),Y(mk.y),2));
+  const build=()=>{
+    for(let j=0;j<gh;j++){ let row=0;
+      for(let i=0;i<gw;i++){ row+=occ[j*gw+i]; sat[(j+1)*(gw+1)+i+1]=sat[j*(gw+1)+i+1]+row; } }
+  };
+  const boxSum=(x0,y0,x1,y1)=>{
+    const i0=Math.max(0,Math.floor((x0-m.l)/CS)), j0=Math.max(0,Math.floor((y0-m.t)/CS));
+    const i1=Math.min(gw,Math.ceil((x1-m.l)/CS)), j1=Math.min(gh,Math.ceil((y1-m.t)/CS));
+    if(i1<=i0||j1<=j0) return 0;
+    return sat[j1*(gw+1)+i1]-sat[j0*(gw+1)+i1]-sat[j1*(gw+1)+i0]+sat[j0*(gw+1)+i0];
+  };
+  const isOcc=(px,py)=>{
+    const i=Math.floor((px-m.l)/CS), j=Math.floor((py-m.t)/CS);
+    return i>=0&&j>=0&&i<gw&&j<gh&&occ[j*gw+i]===1;
+  };
+  build();
+  const placed=[];
+  labels.forEach(l=>{
+    // candidate attachment points: anywhere along the labelled curve (or one point)
+    const src=l.anchors||[[l.x,l.y]];
+    const A=[];
+    src.forEach(([xv,yv])=>{ if(!isFinite(xv)||!isFinite(yv)||(o.xlog&&xv<=0)) return;
+      const ax=X(xv), ay=Y(yv);
+      if(ax>=m.l+4&&ax<=m.l+pw-4&&ay>=m.t+4&&ay<=m.t+ph-4) A.push([ax,ay]); });
+    if(!A.length) return;
+    const bw=ctx.measureText(l.text).width+8, bh=22;
+    let best=null, bs=Infinity;
+    for(let by=m.t+2; by+bh<=m.t+ph-2; by+=4){
+      for(let bx=m.l+2; bx+bw<=m.l+pw-2; bx+=4){
+        if(boxSum(bx,by,bx+bw,by+bh)>0) continue;
+        for(const [ax,ay] of A){
+          const nx=Math.max(bx,Math.min(ax,bx+bw)), ny=Math.max(by,Math.min(ay,by+bh));
+          const d=Math.hypot(nx-ax,ny-ay);
+          let sc=d+(d<14?40:0);
+          if(sc>=bs) continue;
+          // count crossings of other curves/labels by the leader line
+          let inside=false;
+          for(let t=0;t<d-9 && sc<bs;t+=2){
+            const o2=isOcc(nx+(ax-nx)*t/d,ny+(ay-ny)*t/d);
+            if(o2&&!inside) sc+=150;
+            inside=o2;
+          }
+          if(sc<bs){ bs=sc; best={bx,by,nx,ny,ax,ay}; }
+        }
+      }
+    }
+    if(!best) return;
+    placed.push({l,bw,bh,...best});
+    for(let y=best.by;y<=best.by+bh;y+=CS) for(let x=best.bx;x<=best.bx+bw;x+=CS) mark(x,y,1);
+    markSeg(best.nx,best.ny,best.ax,best.ay,0);
+    build();
+  });
+  placed.forEach(p=>{
+    ctx.strokeStyle=p.l.line||p.l.color; ctx.lineWidth=1.3; ctx.setLineDash([]);
+    ctx.beginPath(); ctx.moveTo(p.nx,p.ny); ctx.lineTo(p.ax,p.ay); ctx.stroke();
+    ctx.fillStyle=p.l.line||p.l.color; ctx.beginPath(); ctx.arc(p.ax,p.ay,3,0,7); ctx.fill();
+  });
+  placed.forEach(p=>{
+    ctx.fillStyle="rgba(255,255,255,0.9)"; ctx.fillRect(p.bx,p.by,p.bw,p.bh);
+    ctx.fillStyle=p.l.color; ctx.textAlign="center"; ctx.textBaseline="middle";
+    ctx.fillText(p.l.text,p.bx+p.bw/2,p.by+p.bh/2+1);
+  });
+}
+
+/* ---------------- App state ---------------- */
+const $=id=>document.getElementById(id);
+const S={phi:2,g:20,b:0.2,Ts:500,fam:false,iso:true};
+const FAM=[-0.3,0,0.2,0.4,0.6,0.8];
+let curve=null, curveKey="", famCurves=null, famKey="", plotInfo=null;
+
+function readInputs(){
+  S.phi=Math.pow(10,+$("phi").value);
+  S.g=+$("gam").value; S.b=+$("bet").value;
+  S.Ts=Math.max(1,+$("Ts").value||500);
+  S.fam=$("fam").checked; S.iso=$("showIso").checked;
+  $("phiV").textContent=S.phi<10?S.phi.toFixed(2):S.phi.toFixed(1);
+  $("gV").textContent=S.g.toFixed(1);
+  $("bV").textContent=(S.b>0?"+":"")+S.b.toFixed(2);
+}
+// States are ordered from highest eta (ignited) to lowest (extinguished); along the
+// solution branch they alternate stable / unstable, so even positions are unstable.
+const STATE_COLS=["#d95f02","#7b3fc4","#c2185b","#0f8a6a","#1f6feb","#8a6d0f","#455a64"];
+function stateColors(n){
+  if(n===1) return [css("--c-one")];
+  if(n===2) return [css("--c-hi"),css("--c-lo")];
+  if(n===3) return [css("--c-hi"),css("--c-mid"),css("--c-lo")];
+  return Array.from({length:n},(_,i)=>STATE_COLS[i%STATE_COLS.length]);
+}
+function stateNames(n){
+  if(n===1) return ["Unique"];
+  if(n===2) return ["Ignited","Extinguished"];
+  if(n===3) return ["Ignited","Middle (unstable)","Extinguished"];
+  return Array.from({length:n},(_,i)=>i===0?"1 (ignited)":i===n-1?n+" (extinguished)":(i+1)+(i%2?" (unstable)":""));
+}
+// point of curve nearest (in log phi) to a target phi, restricted to phi>=pmin
+function nearestPt(pts,target,pmin){
+  let best=null,bd=1e9;
+  pts.forEach(p=>{ if(p.phi>=pmin){ const d=Math.abs(Math.log(p.phi/target)); if(d<bd){bd=d;best=p;} } });
+  return best;
+}
+
+let pending=false;
+function schedule(){ if(!pending){pending=true;requestAnimationFrame(()=>{pending=false;update();});} }
+
+function update(){
+  readInputs();
+  const key=S.g+"|"+S.b;
+  if(key!==curveKey){ curve=buildCurve(S.g,S.b,10); curveKey=key; }
+  if(S.fam){
+    const fk=""+S.g;
+    if(fk!==famKey){ famCurves=FAM.map(b=>({b,pts:buildCurve(S.g,b,10)})); famKey=fk; }
+  }
+  const sols=solveAt(S.phi,S.g,S.b,curve);
+  const cols=stateColors(sols.length), names=stateNames(sols.length);
+
+  /* ---- eta plot ---- */
+  let ymax=1;
+  curve.forEach(p=>{ if(p.phi>=0.1&&p.phi<=100) ymax=Math.max(ymax,p.eta); });
+  if(S.fam) famCurves.forEach(f=>f.pts.forEach(p=>{ if(p.phi>=0.1&&p.phi<=100) ymax=Math.max(ymax,p.eta); }));
+  ymax=Math.min(Math.pow(10,Math.ceil(Math.log10(ymax*1.05))),1e6);
+  const series=[], vlines=[{x:S.phi,color:css("--axis")}], labels=[];
+  const phis=[]; for(let e=-1;e<=2.0001;e+=0.02) phis.push(Math.pow(10,e));
+  const exo=S.b>=0;
+  if(S.iso){
+    series.push({x:phis,y:phis.map(etaIso),color:css("--iso"),dash:[6,4],width:1.8});
+  }
+  const famLabels=[];
+  if(S.fam){
+    const shades=["#8fa4c4","#7fae9a","#b9a56b","#c4846f","#a77fc4","#c47f9f"];
+    famCurves.forEach((f,i)=>{
+      if(Math.abs(f.b-S.b)<0.005) return;
+      if(S.iso && f.b===0) return;
+      series.push({x:f.pts.map(p=>p.phi),y:f.pts.map(p=>p.eta),color:shades[i%shades.length],width:1.4});
+      famLabels.push({anchors:f.pts.filter(p=>p.phi>=1.5).map(p=>[p.phi,p.eta]),text:"β = "+f.b.toFixed(1),color:"#000",line:shades[i%shades.length],auto:true});
+    });
+  }
+  series.push({x:curve.map(p=>p.phi),y:curve.map(p=>p.eta),color:css("--accent"),width:2.6});
+  const qn=nearestPt(curve,exo?5:12,3);
+  labels.push({anchors:curve.filter(p=>p.phi>=1.5).map(p=>[p.phi,p.eta]),
+    text:S.fam?"β = "+S.b.toFixed(2)+" (current)":"nonisothermal",color:css("--accent"),line:css("--accent"),auto:true});
+  if(S.iso){ labels.push({anchors:phis.filter(v=>v>=1.5).map(v=>[v,etaIso(v)]),
+    text:S.fam?"β = 0 (isothermal)":"isothermal",color:"#000",line:css("--iso"),auto:true}); }
+  labels.push(...famLabels);
+  const marks=sols.map((s,i)=>({x:S.phi,y:s.eta,color:cols[i]}));
+  plotInfo=drawPlot($("cvEta"),{xlog:true,ylog:true,xr:[0.1,100],yr:[0.01,ymax],
+    xlabel:[{t:"Thiele modulus, "},{t:"\u03D5",math:true}],ylabel:"effectiveness factor, η",series,vlines,marks,labels});
+
+  /* ---- profiles ---- */
+  const cSeries=[],tSeries=[],Tunit=S.Ts;
+  const xg=[]; for(let i=0;i<=100;i++) xg.push(i/100);
+  const interp=(xs,ys,x)=>{
+    let lo=0,hi=xs.length-1;
+    while(hi-lo>1){const m=(lo+hi)>>1; if(xs[m]<=x) lo=m; else hi=m;}
+    const t=(x-xs[lo])/((xs[hi]-xs[lo])||1); return ys[lo]+t*(ys[hi]-ys[lo]);
+  };
+  sols.forEach((s,i)=>{
+    const cy=xg.map(x=>interp(s.x,s.c,x));
+    const dash=(sols.length>=3&&i%2===1)?[6,4]:[];
+    cSeries.push({x:xg,y:cy,color:cols[i],width:2.4,dash});
+    tSeries.push({x:xg,y:cy.map(c=>Tunit*(1+S.b*(1-c))),color:cols[i],width:2.4,dash});
+  });
+  const nm=["ignited","middle","extinguished"];
+  const lab=(ser,xs,dys,als)=>{ const out=[]; if(sols.length<2||sols.length>3) return out;
+    sols.forEach((_,i)=>{ const k=(sols.length===2&&i===1)?2:i; const xv=xs[k]; const y=ser[i].y[Math.round(xv*100)];
+      out.push({x:xv,y,text:nm[k],color:"#000",dy:dys[k],align:als[k]}); }); return out; };
+  drawPlot($("cvC"),{xlog:false,ylog:false,xr:[0,1],yr:[0,1],xlabel:"radial position, r/R",ylabel:"concentration, C/Cₛ",yfmt:v=>v===1?"1.0":fmtTick(v),series:cSeries,
+    labels:lab(cSeries,[0.3,0.02,0.3],[-14,-30,16],["center","left","center"])});
+  let tmin=Tunit,tmax=Tunit;
+  tSeries.forEach(s=>s.y.forEach(v=>{tmin=Math.min(tmin,v);tmax=Math.max(tmax,v);}));
+  const pad=Math.max((tmax-tmin)*0.15,1);
+  drawPlot($("cvT"),{xlog:false,ylog:false,xr:[0,1],yr:[tmin-pad,tmax+pad],xlabel:"radial position, r/R",ylabel:"temperature (K)",series:tSeries,
+    labels:lab(tSeries,[0.15,0.42,0.3],[-14,-22,-14],["center","center","center"]),
+    hlines:[{y:Tunit,color:css("--axis")}]});
+
+  /* ---- readouts ---- */
+  $("nSol").textContent=sols.length||"–";
+  $("etaIso").textContent=etaIso(S.phi).toFixed(3);
+  $("Ev").textContent=(S.g*8.314*S.Ts/1000).toFixed(0)+" kJ/mol";
+  $("dTmax").textContent=Math.round(S.b*S.Ts)+" K";
+  $("tbody").innerHTML=sols.map((s,i)=>{
+    const Tc=S.Ts*(1+S.b*(1-s.c0));
+    return `<tr><td><span class="dot" style="background:${cols[i]}"></span>${names[i]}</td><td>${(+s.eta.toPrecision(3)).toString()}</td><td>${s.c0<1e-3?"≈ 0":s.c0.toFixed(3)}</td><td>${Math.round(Tc)} K</td></tr>`;
+  }).join("");
+  $("note").textContent = sols.length===0 ? "No solution found in the computed range."
+    : (S.b>0 && sols[0].eta>1.001 ? "η > 1: the hotter pellet interior reacts faster than it would at surface temperature, outweighing the diffusion limitation." : "");
+}
+
+/* ---------------- Events ---------------- */
+["phi","gam","bet","Ts","fam","showIso"].forEach(id=>{
+  $(id).addEventListener("input",schedule);
+  $(id).addEventListener("change",schedule);
+});
+document.querySelectorAll("button[data-p]").forEach(btn=>btn.addEventListener("click",()=>{
+  const [p,g,b]=btn.dataset.p.split(",").map(Number);
+  $("phi").value=Math.log10(p); $("gam").value=g; $("bet").value=b;
+  schedule();
+}));
+// panels
+function closeAll(){ document.querySelectorAll(".panel").forEach(p=>p.classList.remove("open")); }
+document.querySelectorAll("button[data-open]").forEach(b=>b.addEventListener("click",()=>{
+  const p=$(b.dataset.open), was=p.classList.contains("open");
+  closeAll();
+  if(!was){ p.classList.add("open"); if(window.MathJax&&MathJax.typesetPromise&&!p.dataset.t){p.dataset.t=1;MathJax.typesetPromise([p]);} }
+}));
+document.querySelectorAll(".panel .x").forEach(x=>x.addEventListener("click",closeAll));
+// click / drag on the eta plot to set phi
+const cvEta=$("cvEta"); let drag=false;
+function setFromPointer(e){
+  if(!plotInfo) return;
+  const r=cvEta.getBoundingClientRect();
+  let v=plotInfo.inv(e.clientX-r.left); v=Math.min(100,Math.max(0.1,v));
+  $("phi").value=Math.log10(v); schedule();
+}
+cvEta.addEventListener("pointerdown",e=>{drag=true;cvEta.setPointerCapture(e.pointerId);setFromPointer(e);});
+cvEta.addEventListener("pointermove",e=>{if(drag)setFromPointer(e);});
+cvEta.addEventListener("pointerup",()=>{drag=false;});
+window.addEventListener("resize",schedule);
+update();
+(function waitMJ(){
+  if(window.MathJax&&MathJax.startup&&MathJax.startup.promise){
+    MathJax.startup.promise.then(()=>document.fonts?document.fonts.load("21px MJXTEX-I","\u03D5"):null).then(schedule).catch(()=>{});
+  } else setTimeout(waitMJ,200);
+})();
+</script>
+</body>
+</html>
