@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ponchon&ndash;Savarit Diagram for an Ethanol&ndash;Water Binary Mixture</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.min.js"></script>
+<style>
+  :root{
+    --panel-bg:#fff;
+    --panel-border:#b9b9b9;
+    --accent:#5E81B5;
+    --accent2:#E19C24;
+    --text:#222;
+  }
+  *{ box-sizing:border-box; }
+  html,body{
+    margin:0; padding:0;
+    background:#fff;
+    font-family:Arial, Helvetica, sans-serif;
+    color:var(--text);
+  }
+  #page{
+    max-width:1000px;
+    margin:0 auto;
+    padding:18px 18px 40px 18px;
+  }
+  h1{
+    font-size:22px;
+    font-weight:normal;
+    text-align:center;
+    margin:6px 0 18px 0;
+    color:#111;
+  }
+  #main{
+    background:#ffffff;
+    border:1px solid var(--panel-border);
+    border-radius:4px;
+    padding:16px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:10px;
+  }
+  #plotWrap{
+    background:#ffffff;
+  }
+  canvas#plot{
+    display:block;
+  }
+  #setterBar{
+    display:flex;
+    border:1px solid #8a8a8a;
+    border-radius:4px;
+    overflow:hidden;
+  }
+  .setter-btn{
+    font-family:Arial, Helvetica, sans-serif;
+    font-size:15px;
+    padding:6px 16px;
+    background:linear-gradient(#fbfbfb,#e7e7e7);
+    border:none;
+    border-right:1px solid #8a8a8a;
+    cursor:pointer;
+    color:#222;
+  }
+  #setterBar > button:last-child{ border-right:none; }
+  .setter-btn.active{
+    background:linear-gradient(#5E81B5,#4a6a99);
+    color:#fff;
+  }
+  .setter-btn:hover:not(.active){
+    background:linear-gradient(#f2f2f2,#dcdcdc);
+  }
+  .download-btn{
+    font-family:Arial, Helvetica, sans-serif;
+    font-size:15px;
+    padding:6px 16px;
+    background:linear-gradient(#fbfbfb,#e7e7e7);
+    border:none;
+    border-right:1px solid #8a8a8a;
+    cursor:pointer;
+    color:#222;
+  }
+  .download-btn:hover{
+    background:linear-gradient(#f2f2f2,#dcdcdc);
+  }
+  .download-btn:disabled{
+    cursor:default;
+    opacity:.6;
+  }
+  #controlRow{
+    width:100%;
+    position:relative;
+    display:flex;
+    align-items:center;
+    padding-top:4px;
+    min-height:40px;
+  }
+  #sliderGroup{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:var(--panel-bg);
+    border:1px solid var(--panel-border);
+    border-radius:4px;
+    padding:8px 14px;
+  }
+  .slider-label{
+    font-size:15px;
+    color:#333;
+    white-space:nowrap;
+  }
+  input[type="range"]{
+    --accent:#98000D;
+    --grey:#999;
+    --fill:50%;
+    -webkit-appearance:none;
+    appearance:none;
+    width:195px;
+    height:5px;
+    border-radius:3px;
+    outline:none;
+    opacity:.95;
+    margin-bottom:.5rem;
+    -webkit-transition:.2s;
+    transition:opacity .2s;
+    background:var(--grey);
+  }
+  input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    appearance:none;
+    width:15px;
+    height:15px;
+    border:2px solid #fff;
+    border-radius:50%;
+    background:var(--accent);
+    cursor:pointer;
+    box-shadow:0 1px 2px rgba(0,0,0,.35);
+  }
+  input[type="range"]::-moz-range-thumb{
+    width:15px;
+    height:15px;
+    border:2px solid #fff;
+    border-radius:50%;
+    background:var(--accent);
+    cursor:pointer;
+    box-shadow:0 1px 2px rgba(0,0,0,.35);
+  }
+  input#pValue{
+    width:62px;
+    font-family:Arial, Helvetica, sans-serif;
+    font-size:13px;
+    padding:3px 5px;
+    border:1px solid #999;
+    border-radius:3px;
+    text-align:center;
+    background:#fff;
+  }
+  #navButtons{
+    position:absolute;
+    top:50%;
+    right:0;
+    transform:translateY(-50%);
+    display:flex;
+    gap:8px;
+  }
+  .nav-btn{
+    font-family:Arial, Helvetica, sans-serif;
+    font-size:16px;
+    padding:8px 15px;
+    background:linear-gradient(#e33,#c00);
+    border:1px solid #900;
+    border-radius:4px;
+    cursor:pointer;
+    color:#fff;
+    font-weight:normal;
+  }
+  .nav-btn:hover{
+    background:linear-gradient(#f44,#d00);
+  }
+  .nav-btn:active{
+    background:linear-gradient(#b00,#900);
+  }
+
+  /* Modal */
+  .modal-overlay{
+    display:none;
+    position:fixed; inset:0;
+    background:rgba(0,0,0,0.45);
+    align-items:center;
+    justify-content:center;
+    z-index:1000;
+    padding:20px;
+  }
+  .modal-overlay.open{ display:flex; }
+  .modal-box{
+    background:#fff;
+    max-width:640px;
+    width:100%;
+    max-height:82vh;
+    overflow:hidden;
+    border-radius:6px;
+    box-shadow:0 8px 30px rgba(0,0,0,0.35);
+    padding:0;
+    position:relative;
+    display:flex;
+    flex-direction:column;
+  }
+  .modal-header{
+    padding:22px 40px 12px 26px;
+    flex:0 0 auto;
+  }
+  .modal-box h2{
+    margin:0;
+    font-size:19px;
+    font-weight:bold;
+    color:#111;
+    border-bottom:1px solid #ddd;
+    padding-bottom:8px;
+  }
+  .modal-body{
+    flex:1 1 auto;
+    overflow-y:auto;
+    padding:2px 26px 24px 26px;
+  }
+  .modal-box p{
+    font-size:14px;
+    line-height:1.55;
+    margin:0 0 12px 0;
+    color:#222;
+  }
+  .modal-box .eqn{
+    margin:6px 0;
+    text-align:left;
+  }
+  .modal-box h3{
+    font-size:14px;
+    font-weight:bold;
+    color:#111;
+    margin:18px 0 8px 0;
+    border-top:1px solid #ddd;
+    padding-top:12px;
+  }
+  .nomenclature{
+    font-size:13.5px;
+    color:#222;
+  }
+  .nomenclature dl{
+    margin:0;
+    display:grid;
+    grid-template-columns:auto 1fr;
+    column-gap:12px;
+    row-gap:5px;
+  }
+  .nomenclature dt{
+    font-weight:bold;
+    white-space:nowrap;
+  }
+  .nomenclature dd{
+    margin:0;
+  }
+  .modal-close{
+    position:absolute;
+    top:12px; right:14px;
+    background:none;
+    border:none;
+    font-size:20px;
+    line-height:1;
+    cursor:pointer;
+    color:#666;
+    z-index:2;
+  }
+  .modal-close:hover{ color:#000; }
+  .refs{
+    font-size:12.5px;
+    color:#333;
+    margin-top:6px;
+    line-height:1.5;
+  }
+  .refs p{ font-size:12.5px; margin:0 0 6px 0; }
+  footer{
+    text-align:center;
+    font-size:11px;
+    color:#888;
+    margin-top:14px;
+  }
+</style>
+</head>
+<body>
+<div id="page">
+  <div id="main">
+    <div id="plotWrap">
+      <canvas id="plot" width="700" height="430"></canvas>
+    </div>
+
+    <div id="setterBar">
+      <button class="setter-btn active" data-view="1">Ponchon-Savarit diagram</button>
+      <button class="setter-btn" data-view="2">equilibrium curve</button>
+      <button class="download-btn" id="btnDownload">download</button>
+    </div>
+
+    <div id="controlRow">
+      <div id="sliderGroup">
+        <span class="slider-label">pressure in mmHg</span>
+        <input type="range" id="pSlider" min="50" max="1200" step="10" value="760">
+        <input type="number" id="pValue" min="50" max="1200" step="10" value="760">
+      </div>
+      <div id="navButtons">
+        <button class="nav-btn" id="btnBasis">mole/mass</button>
+        <button class="nav-btn" id="btnDirections">Directions</button>
+        <button class="nav-btn" id="btnDetails">Details</button>
+        <button class="nav-btn" id="btnAbout">About</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>LearnChemE.com &mdash; Department of Chemical and Biological Engineering, University of Colorado Boulder</footer>
+</div>
+
+<!-- Directions Modal -->
+<div class="modal-overlay" id="overlayDirections">
+  <div class="modal-box">
+    <button class="modal-close" data-close>&times;</button>
+    <div class="modal-header"><h2>Directions</h2></div>
+    <div class="modal-body">
+    <p>This simulation computes and displays the Ponchon&ndash;Savarit (enthalpy&ndash;composition) diagram for a nonideal ethanol&ndash;water mixture at a pressure <i>P</i> that you select with the slider (50&ndash;1200 mmHg). The gas phase is assumed ideal; the liquid phase is nonideal. Enthalpy is expressed in kcal/kg and composition is expressed in mole fraction of ethanol.</p>
+    <p>Click <b>"Ponchon-Savarit diagram"</b> to show the saturated-liquid and saturated-vapor enthalpy curves together with tie lines (green) that connect the liquid and vapor compositions that are in equilibrium at a given temperature; each tie line is labeled with the boiling temperature in &deg;C. The tie line at the azeotropic composition is shown in red and is vertical, since the equilibrium liquid and vapor compositions are equal there.</p>
+    <p>Click <b>"equilibrium curve"</b> to show the ethanol vapor&ndash;liquid equilibrium (x&ndash;y) curve on a mole-fraction basis, together with the y&nbsp;=&nbsp;x diagonal (green) and the azeotrope (red point).</p>
+    <p>Click <b>"mole/mass"</b> to toggle both graphs between expressing ethanol composition as a mole fraction and as a mass fraction; the composition axis labels update to match whichever basis is selected.</p>
+    <p>Click <b>"download"</b> to save a PDF with the Ponchon-Savarit diagram on top and the equilibrium curve below it, both drawn for the currently selected pressure and composition basis (mole or mass fraction).</p>
+    <p>Move the pressure slider to see how the enthalpy curves, the tie lines, the equilibrium curve, and the azeotrope change with pressure.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Details Modal -->
+<div class="modal-overlay" id="overlayDetails">
+  <div class="modal-box">
+    <button class="modal-close" data-close>&times;</button>
+    <div class="modal-header"><h2>Details</h2></div>
+    <div class="modal-body">
+    <p>The Ponchon&ndash;Savarit diagram provides a graphical method for solving coupled material and energy balances in separation processes involving binary mixtures. This simulation illustrates how the Ponchon&ndash;Savarit diagram can be computed for a nonideal binary mixture that has an azeotrope.</p>
+    <p>Consider a binary mixture of ethanol and water at a low to moderate pressure, <i>P</i>, to be selected by the user. The gas phase is assumed ideal, but the liquid phase is nonideal. The simulation plots the Ponchon&ndash;Savarit diagram, which is also called the enthalpy&ndash;composition diagram. Enthalpy is expressed in kcal/kg and composition is expressed in mole fraction of ethanol. Also shown is the vapor equilibrium curve for ethanol&ndash;water.</p>
+    <p>Enthalpies for the liquid and vapor phases are computed using the following equations:</p>
+    <div class="eqn">\[ \begin{aligned} H_L(x_{ethanol},T) = {}& x_{ethanol}\,C_{P,L,ethanol}(T-T_{ref}) \\ & {}+ (1-x_{ethanol})\,C_{P,L,water}(T-T_{ref}) + H^E \end{aligned} \]</div>
+    <div class="eqn">\[ \begin{aligned} H_V(y_{ethanol},T) = {}& y_{ethanol}\left[\lambda_{ethanol}+C_{P,V,ethanol}(T-T_{ref})\right] \\ & {}+ (1-y_{ethanol})\left[\lambda_{water}+C_{P,V,water}(T-T_{ref})\right] \end{aligned} \]</div>
+    <p>where <i>T</i> is the mixture temperature and <i>x<sub>ethanol</sub></i> is the ethanol mole fraction. Here, <i>&lambda;<sub>i</sub></i> is the latent heat of vaporization of chemical species <i>i</i> at <i>T<sub>ref</sub></i>&nbsp;=&nbsp;273.15&nbsp;K, and <i>C<sub>P,L,i</sub></i> and <i>C<sub>P,V,i</sub></i> are the heat capacities for the liquid and gas phases of species <i>i</i>, respectively; <i>&lambda;<sub>i</sub></i> is a slowly-varying function of temperature and can be assumed constant [3]. The mole fractions of ethanol in the liquid and gas phases are denoted by <i>x<sub>ethanol</sub></i> and <i>y<sub>ethanol</sub></i>, respectively. Finally, <i>H<sup>E</sup></i> is the excess enthalpy, which accounts for the nonideal behavior of the liquid mixture. The following correlation from [2] is used to compute the excess enthalpy as a function of composition and temperature:</p>
+    <div class="eqn">\[ \begin{aligned} H^E = {}& x_{ethanol}(1-x_{ethanol})\Big(a_0(T)+a_{0.5}(T)\,x_{ethanol}^{0.5}+a_{1.5}(T)\,x_{ethanol}^{1.5} \\ & {}+a_{2.5}(T)\,x_{ethanol}^{2.5}+a_{4.5}(T)\,x_{ethanol}^{4.5}\Big) \end{aligned} \]</div>
+    <p>Here, <i>a<sub>m</sub></i>(T)&nbsp;=&nbsp;<i>b<sub>m</sub></i>&nbsp;+&nbsp;<i>c<sub>m</sub>T</i>&nbsp;+&nbsp;<i>d<sub>m</sub>T</i><sup>2</sup>, where m&nbsp;=&nbsp;0, 0.5, 1.5, 2.5, 4.5 and <i>b<sub>m</sub></i>, <i>c<sub>m</sub></i>, and <i>d<sub>m</sub></i> are appropriate constants tabulated in [2].</p>
+    <p>The Ponchon&ndash;Savarit diagram for P&nbsp;=&nbsp;760&nbsp;mmHg is in full agreement with Figure 2-4 in [1].</p>
+    <p>The "tie lines", displayed in green, show the composition of the two phases that exist in equilibrium at the specified temperature. At the azeotropic composition the tie line is shown in red; it is vertical, confirming that <i>x<sub>ethanol</sub></i>&nbsp;=&nbsp;<i>y<sub>ethanol</sub></i> at the azeotrope. At P&nbsp;=&nbsp;760&nbsp;mmHg, the azeotrope composition in terms of ethanol mole fraction is 90.5% and the boiling temperature is T&nbsp;=&nbsp;78.16&nbsp;&deg;C.</p>
+    <p>The vapor&ndash;liquid equilibrium data used to build both curves are obtained from a modified Raoult's law, with vapor pressures from the Antoine equation and liquid-phase activity coefficients from the van&nbsp;Laar model, solved at each liquid composition for the bubble-point temperature at the selected pressure.</p>
+    <div class="refs">
+      <p>[1] P.&nbsp;C.&nbsp;Wankat, <i>Separation Process Engineering</i>, 3rd&nbsp;ed., Upper Saddle River, NJ: Pearson, 2012.</p>
+      <p>[2] J.&nbsp;A.&nbsp;Larkin, "Thermodynamic Properties of Aqueous Non-Electrolyte Mixtures I. Excess Enthalpy for Water&nbsp;+&nbsp;Ethanol at 298.15 to 383.15&nbsp;K," <i>Journal of Chemical Thermodynamics</i>, <b>7</b>(2), 1975, pp.&nbsp;137&ndash;148.</p>
+      <p>[3] R.&nbsp;H.&nbsp;Perry and D.&nbsp;W.&nbsp;Green, <i>Perry's Chemical Engineers' Handbook</i>, 7th&nbsp;ed., New York: McGraw&ndash;Hill, 1997.</p>
+    </div>
+    <h3>Nomenclature</h3>
+    <div class="nomenclature">
+      <dl>
+        <dt>x<sub>ethanol</sub></dt><dd>ethanol mole fraction in the liquid phase</dd>
+        <dt>y<sub>ethanol</sub></dt><dd>ethanol mole fraction in the vapor phase</dd>
+        <dt>T</dt><dd>mixture (bubble-point) temperature</dd>
+        <dt>T<sub>ref</sub></dt><dd>reference temperature, 273.15&nbsp;K</dd>
+        <dt>P</dt><dd>system pressure, selected with the slider</dd>
+        <dt>H<sub>L</sub></dt><dd>specific enthalpy of the saturated liquid</dd>
+        <dt>H<sub>V</sub></dt><dd>specific enthalpy of the saturated vapor</dd>
+        <dt>H<sup>E</sup></dt><dd>excess enthalpy of the liquid mixture, from the nonideal (van&nbsp;Laar/Larkin) correction</dd>
+        <dt>C<sub>P,L,i</sub></dt><dd>liquid-phase heat capacity of species <i>i</i></dd>
+        <dt>C<sub>P,V,i</sub></dt><dd>vapor-phase heat capacity of species <i>i</i></dd>
+        <dt>&lambda;<sub>i</sub></dt><dd>latent heat of vaporization of species <i>i</i> at <i>T<sub>ref</sub></i></dd>
+        <dt>a<sub>m</sub>(T)</dt><dd>temperature-dependent coefficient in the excess-enthalpy correlation (<i>m</i>&nbsp;=&nbsp;0, 0.5, 1.5, 2.5, 4.5)</dd>
+        <dt>b<sub>m</sub>, c<sub>m</sub>, d<sub>m</sub></dt><dd>constants such that a<sub>m</sub>(T)&nbsp;=&nbsp;b<sub>m</sub>&nbsp;+&nbsp;c<sub>m</sub>T&nbsp;+&nbsp;d<sub>m</sub>T<sup>2</sup></dd>
+      </dl>
+    </div>
+    </div>
+  </div>
+</div>
+
+<!-- About Modal -->
+<div class="modal-overlay" id="overlayAbout">
+  <div class="modal-box">
+    <button class="modal-close" data-close>&times;</button>
+    <div class="modal-header"><h2>About</h2></div>
+    <div class="modal-body">
+    <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/PonchonSavaritDiagramForAnEthanolWaterBinaryMixture/" target="_blank" rel="noopener">Mathematica simulation</a> by Housam Binous, Nadhir A. Al-Baghli, and Brian G. Higgins. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ==================== Thermodynamic model ==================== */
+function psatEth(T){ return Math.pow(10, 7.68117 - 1332.04/(T+199.200)); } // mmHg, T in C
+function psatWat(T){ return Math.pow(10, 8.07131 - 1730.63/(T+233.426)); }
+var A12=1.66480, A21=0.94010;
+function gamma1(x){ var r = A21*(1-x)/(A12*x + A21*(1-x)); return Math.exp(A12*r*r); }
+function gamma2(x){ var r = A12*x/(A21*(1-x) + A12*x); return Math.exp(A21*r*r); }
+
+function bubbleT(x, P){
+  var g1 = gamma1(x), g2 = gamma2(x);
+  function f(T){ return psatEth(T)*x*g1 + psatWat(T)*(1-x)*g2 - P; }
+  var lo=-30, hi=140, flo=f(lo), fhi=f(hi);
+  if (flo*fhi>0){ return NaN; }
+  for (var i=0;i<70;i++){
+    var mid=(lo+hi)/2, fm=f(mid);
+    if ((flo<0)===(fm<0)) { lo=mid; flo=fm; } else { hi=mid; fhi=fm; }
+  }
+  return (lo+hi)/2;
+}
+function yFromX(x, T, P){ return psatEth(T)*x*gamma1(x)/P; }
+
+function buildEquilibrium(P, n){
+  var xs=[], ys=[], Ts=[];
+  for (var i=0;i<=n;i++){
+    var x = i/n;
+    var xc = (x===0)?1e-6:((x===1)?1-1e-6:x);
+    var T = bubbleT(xc, P);
+    var y = yFromX(xc, T, P);
+    xs.push(x); ys.push(y); Ts.push(T);
+  }
+  return {xs:xs, ys:ys, Ts:Ts};
+}
+
+function interp1(xsSorted, vals){
+  return function(xq){
+    var n = xsSorted.length;
+    if (xq<=xsSorted[0]) return vals[0];
+    if (xq>=xsSorted[n-1]) return vals[n-1];
+    var lo=0, hi=n-1;
+    while (hi-lo>1){ var mid=(lo+hi)>>1; if (xsSorted[mid]<=xq) lo=mid; else hi=mid; }
+    var x0=xsSorted[lo], x1=xsSorted[hi], f=(xq-x0)/(x1-x0);
+    return vals[lo] + f*(vals[hi]-vals[lo]);
+  };
+}
+
+function findAzeotrope(xyFunc){
+  function g(t){ return xyFunc(t)-t; }
+  var lo=0.5, hi=0.995, glo=g(lo), ghi=g(hi);
+  if (glo*ghi>0) return 0.9;
+  for (var i=0;i<70;i++){
+    var mid=(lo+hi)/2, gm=g(mid);
+    if ((glo<0)===(gm<0)) { lo=mid; glo=gm; } else { hi=mid; ghi=gm; }
+  }
+  return (lo+hi)/2;
+}
+
+function MW(x){ return 18*(1-x)+46*x; }
+
+// Composition display basis. The thermodynamic model (VLE, bubble-point
+// temperatures, enthalpies) is always computed in ethanol mole fraction --
+// only the "mole/mass" button changes what's plotted on the composition
+// axes, by remapping each mole-fraction composition value to the
+// corresponding mass fraction at the moment it's plotted.
+var BASIS = 'mole'; // 'mole' or 'mass'
+function moleToMassFrac(x){ return 46*x/MW(x); }
+function dispX(x){ return BASIS==='mass' ? moleToMassFrac(x) : x; }
+
+function latentHeats(){
+  var Ti2=273.15;
+  var C1A=5.6900e7, C2A=0.3359, C3A=0, C4A=0, TcA=513.92;
+  var C1B=5.2053e7, C2B=0.3199, C3B=-0.212, C4B=0.25795, TcB=647.13;
+  var TrA=Ti2/TcA, TrB=Ti2/TcB;
+  var lamA = 1e-3*C1A*Math.pow(1-TrA, C2A+C3A*TrA+C4A*TrA*TrA);
+  var lamB = 1e-3*C1B*Math.pow(1-TrB, C2B+C3B*TrB+C4B*TrB*TrB);
+  return {lamA:lamA, lamB:lamB};
+}
+var LAT = latentHeats();
+
+function aCoeffs(TK){
+  var a0 = -3.63868e5 + 1.83829e3*TK - 2.32763*TK*TK;
+  var a1 =  9.25982e5 - 4.83586e3*TK + 6.37228*TK*TK;
+  var a2 = -14.04894e5 + 7.51661e3*TK - 10.11280*TK*TK;
+  var a3 =  10.91318e5 - 5.89498e3*TK + 7.98868*TK*TK;
+  var a4 = -2.79986e5 + 1.50557e3*TK - 2.03127*TK*TK;
+  return [a0,a1,a2,a3,a4];
+}
+function HE(x, TK){
+  var a = aCoeffs(TK);
+  return x*(1-x)*(a[0] + a[1]*Math.pow(x,0.5) + a[2]*Math.pow(x,1.5) + a[3]*Math.pow(x,2.5) + a[4]*Math.pow(x,4.5));
+}
+
+/* ==================== Model state, recomputed when P changes ==================== */
+var MODEL = null;
+function recompute(P){
+  var N = 500;
+  var eq = buildEquilibrium(P, N);
+  var Tx = interp1(eq.xs, eq.Ts);
+  var Ty = interp1(eq.ys, eq.Ts);
+  var xy = interp1(eq.xs, eq.ys);
+  var az = findAzeotrope(xy);
+
+  function hLiquid(x){ var T=Tx(x); var TK=T+273.15; return x*163.8*T+(1-x)*75.66*T+HE(x,TK); }
+  function HVapor(y){ var T=Ty(y); return y*(LAT.lamA+73.98*T)+(1-y)*(LAT.lamB+38.29*T); }
+  // Both the liquid and vapor saturation curves are plotted directly against
+  // ethanol mole fraction (x for the liquid curve, y for the vapor curve),
+  // matching the mole-fraction basis already used by the equilibrium curve.
+  function hx(x){ return hLiquid(x)/MW(x)/4.18; }
+  function Hx(x){ return HVapor(x)/MW(x)/4.18; }
+
+  return { Tx:Tx, Ty:Ty, xy:xy, az:az, hx:hx, Hx:Hx };
+}
+
+/* ==================== Rendering ==================== */
+var canvas = document.getElementById('plot');
+var ctx = canvas.getContext('2d');
+var controlRow = document.getElementById('controlRow');
+var navButtons = document.getElementById('navButtons');
+var sliderGroupEl = document.getElementById('sliderGroup');
+var DIAGRAM_CW = null;
+var DPR = window.devicePixelRatio || 1;
+var CW = 700, CH = 430;
+canvas.width = CW*DPR; canvas.height = CH*DPR;
+canvas.style.width = CW+'px'; canvas.style.height = CH+'px';
+ctx.scale(DPR, DPR);
+
+var MARGIN = { left:78, right:24, top:20, bottom:64 };
+var PLOTW = CW - MARGIN.left - MARGIN.right;
+var PLOTH = CH - MARGIN.top - MARGIN.bottom;
+
+// font sizes: tick numbers and axis titles are 20% larger than the original design;
+// tie-line temperature labels are 15% larger than the original design.
+var TICK_FONT = Math.round(13*1.2*10)/10;   // 15.6
+var AXIS_LABEL_FONT = Math.round(14*1.2*10)/10; // 16.8
+var TEMP_LABEL_FONT = Math.round(10.5*1.15*10)/10; // 12.1
+var CURVE_LABEL_FONT = Math.round(13*1.2*10)/10; // 15.6
+
+// plot-box (interior) sizes: the Ponchon-Savarit diagram is 30% bigger (both
+// dimensions) than the equilibrium-curve plot.
+var PLOTBOX_DIAGRAM = { w: Math.round(598*1.3), h: Math.round(346*1.3) };
+var PLOTBOX_EQUIL   = { w: 598, h: 346 };
+
+var COLOR_LIQ = '#5E81B5';
+var COLOR_VAP = '#E19C24';
+var COLOR_TIE = '#00A600';
+var COLOR_AZ  = '#E00000';
+var COLOR_GRID = '#dddddd';
+var COLOR_FRAME = '#000000';
+
+function xPix(x, xmin, xmax){ return MARGIN.left + (x-xmin)/(xmax-xmin)*PLOTW; }
+function yPix(y, ymin, ymax){ return MARGIN.top + (1-(y-ymin)/(ymax-ymin))*PLOTH; }
+
+// Computes the margins needed so the axis titles sit close to the tick
+// numbers (which sit close to the frame), resizes the canvas to fit the
+// requested plot-box size, and updates the global layout variables.
+function layoutCanvas(plotbox, yticks, yfmt){
+  ctx.font = TICK_FONT+'px Arial, Helvetica, sans-serif';
+  var maxYW = 0;
+  yticks.forEach(function(v){
+    var w = ctx.measureText(yfmt(v)).width;
+    if (w>maxYW) maxYW = w;
+  });
+  var tickGap = 6;      // gap between tick numbers and axis line
+  var tickMark = 5;     // tick mark length
+  var labelGap = 5;     // gap between axis title and tick numbers
+  var edgePad = 4;       // small pad to canvas edge
+
+  var left = edgePad + AXIS_LABEL_FONT + labelGap + maxYW + tickGap + tickMark;
+  var bottom = tickMark + tickGap + TICK_FONT + labelGap + AXIS_LABEL_FONT + edgePad;
+  var right = 20;
+  var top = 16;
+
+  MARGIN = { left:Math.round(left), right:right, top:top, bottom:Math.round(bottom) };
+  PLOTW = plotbox.w;
+  PLOTH = plotbox.h;
+  CW = MARGIN.left + PLOTW + MARGIN.right;
+  CH = MARGIN.top + PLOTH + MARGIN.bottom;
+  canvas.width = CW*DPR; canvas.height = CH*DPR;
+  canvas.style.width = CW+'px'; canvas.style.height = CH+'px';
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+
+  // #controlRow is centered in #main the same way the canvas is, so giving
+  // it the same width lines its edges up with the graph: the slider panel's
+  // left edge lands at the plot's left edge (where the y-axis label sits)
+  // and the nav-button group's right edge lands at the plot's right edge.
+  // Pinned to the (wider) Ponchon-Savarit diagram's width specifically --
+  // not whichever view is currently showing -- so switching to the
+  // narrower equilibrium-curve view never shrinks it enough to wrap the
+  // slider panel and nav buttons onto separate lines.
+  if (plotbox === PLOTBOX_DIAGRAM) DIAGRAM_CW = CW;
+  if (controlRow && DIAGRAM_CW) controlRow.style.width = DIAGRAM_CW+'px';
+
+  // The equilibrium-curve plot is narrower than the Ponchon-Savarit diagram,
+  // but both are centered on the same axis within #main. So pulling the
+  // nav-button group in from controlRow's (diagram-width) right edge by
+  // half the width difference lands "About"'s right edge back on the
+  // *current* plot's actual right edge -- on the diagram view the two
+  // widths are equal and this is simply zero. Clamped so the nav-button
+  // group never gets pulled far enough left to overlap the slider panel:
+  // with four nav buttons now (mole/mass, Directions, Details, About)
+  // there isn't always room to fully flush it with the narrower
+  // equilibrium-curve plot, so it stops at the closest it can get while
+  // still leaving a clear gap.
+  if (navButtons && DIAGRAM_CW){
+    var idealShift = Math.max(0,(DIAGRAM_CW-CW)/2);
+    var minGap = 16;
+    var sgWidth = sliderGroupEl ? sliderGroupEl.getBoundingClientRect().width : 0;
+    var nbWidth = navButtons.getBoundingClientRect().width;
+    var maxShift = Math.max(0, DIAGRAM_CW - sgWidth - nbWidth - minGap);
+    navButtons.style.right = Math.min(idealShift, maxShift)+'px';
+  }
+}
+
+function drawFrame(plotbox,xmin,xmax,ymin,ymax,xticks,yticks,xlabel,ylabel,xfmt,yfmt){
+  layoutCanvas(plotbox, yticks, yfmt);
+
+  ctx.clearRect(0,0,CW,CH);
+  ctx.font = TICK_FONT+'px Arial, Helvetica, sans-serif';
+  ctx.fillStyle = '#000';
+
+  // gridlines
+  ctx.strokeStyle = COLOR_GRID;
+  ctx.lineWidth = 1;
+  xticks.forEach(function(xt){
+    var px = xPix(xt,xmin,xmax);
+    ctx.beginPath(); ctx.moveTo(px, MARGIN.top); ctx.lineTo(px, MARGIN.top+PLOTH); ctx.stroke();
+  });
+  yticks.forEach(function(yt){
+    var py = yPix(yt,ymin,ymax);
+    ctx.beginPath(); ctx.moveTo(MARGIN.left, py); ctx.lineTo(MARGIN.left+PLOTW, py); ctx.stroke();
+  });
+
+  // frame
+  ctx.strokeStyle = COLOR_FRAME;
+  ctx.lineWidth = 1.3;
+  ctx.strokeRect(MARGIN.left, MARGIN.top, PLOTW, PLOTH);
+
+  // ticks + labels
+  ctx.fillStyle = '#000';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  xticks.forEach(function(xt){
+    var px = xPix(xt,xmin,xmax);
+    ctx.beginPath(); ctx.moveTo(px, MARGIN.top+PLOTH); ctx.lineTo(px, MARGIN.top+PLOTH+5); ctx.stroke();
+    ctx.fillText(xfmt(xt), px, MARGIN.top+PLOTH+6);
+  });
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'middle';
+  yticks.forEach(function(yt){
+    var py = yPix(yt,ymin,ymax);
+    ctx.beginPath(); ctx.moveTo(MARGIN.left-5, py); ctx.lineTo(MARGIN.left, py); ctx.stroke();
+    ctx.fillText(yfmt(yt), MARGIN.left-6, py);
+  });
+
+  // axis labels (kept close to the tick numbers)
+  ctx.font = AXIS_LABEL_FONT+'px Arial, Helvetica, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'bottom';
+  ctx.fillText(xlabel, MARGIN.left+PLOTW/2, CH-2);
+
+  ctx.save();
+  ctx.translate(AXIS_LABEL_FONT+2, MARGIN.top+PLOTH/2);
+  ctx.rotate(-Math.PI/2);
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillText(ylabel, 0, 0);
+  ctx.restore();
+}
+
+// xMap/yMap (both optional, default identity) let a curve be sampled and
+// evaluated in one coordinate system (always ethanol mole fraction, so the
+// physics stays correct) while being plotted in another (mass fraction,
+// when the "mole/mass" toggle is set to mass) -- see dispX above.
+function plotCurve(fn, xmin, xmax, ymin, ymax, color, npts, xMap, yMap){
+  xMap = xMap || function(v){ return v; };
+  yMap = yMap || function(v){ return v; };
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(MARGIN.left, MARGIN.top, PLOTW, PLOTH);
+  ctx.clip();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2.6;
+  ctx.beginPath();
+  for (var i=0;i<=npts;i++){
+    var x = xmin + (xmax-xmin)*i/npts;
+    var y = fn(x);
+    var px = xPix(xMap(x),xmin,xmax), py = yPix(yMap(y),ymin,ymax);
+    if (i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+  }
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawLineSeg(x1,y1,x2,y2,xmin,xmax,ymin,ymax,color,width){
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(MARGIN.left, MARGIN.top, PLOTW, PLOTH);
+  ctx.clip();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = width || 1.6;
+  ctx.beginPath();
+  ctx.moveTo(xPix(x1,xmin,xmax), yPix(y1,ymin,ymax));
+  ctx.lineTo(xPix(x2,xmin,xmax), yPix(y2,ymin,ymax));
+  ctx.stroke();
+  ctx.restore();
+}
+
+// Formats a number to 3 significant figures (e.g. 78.16 -> "78.2",
+// 100.00 -> "100", 23.47 -> "23.5") for the tie-line temperature labels.
+function fmt3sig(num){
+  if (!isFinite(num)) return String(num);
+  var s = num.toPrecision(3);
+  if (s.indexOf('e')!==-1) s = String(Math.round(Number(s))); // guard, not expected in this range
+  return s;
+}
+
+// Used only for the azeotrope tie line and the regular tie line right next
+// to it, where the two temperatures are close together and the extra digit
+// makes it clear they're genuinely different values, not a rounding
+// coincidence.
+function fmt4sig(num){
+  if (!isFinite(num)) return String(num);
+  var s = num.toPrecision(4);
+  if (s.indexOf('e')!==-1) s = String(Math.round(Number(s))); // guard, not expected in this range
+  return s;
+}
+
+// Draws a tie-line temperature label rotated to be parallel to the tie line
+// itself (matching the original Mathematica Demonstration), offset a few
+// pixels to the side of the line so it doesn't overlap it.
+function drawTieLabel(text, xData1,yData1, xData2,yData2, xmin,xmax,ymin,ymax){
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(MARGIN.left, MARGIN.top, PLOTW, PLOTH);
+  ctx.clip();
+
+  var px1 = xPix(xData1,xmin,xmax), py1 = yPix(yData1,ymin,ymax);
+  var px2 = xPix(xData2,xmin,xmax), py2 = yPix(yData2,ymin,ymax);
+  var mx = (px1+px2)/2, my = (py1+py2)/2;
+  var angle = Math.atan2(py2-py1, px2-px1);
+  // keep text upright (never draw it upside-down)
+  if (angle > Math.PI/2) angle -= Math.PI;
+  if (angle < -Math.PI/2) angle += Math.PI;
+
+  ctx.translate(mx, my);
+  ctx.rotate(angle);
+  ctx.font = TEMP_LABEL_FONT+'px Arial, Helvetica, sans-serif';
+  ctx.fillStyle = '#000';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'bottom';
+  ctx.fillText(text, 0, -4);
+  ctx.restore();
+}
+
+// Labels a curve (e.g. "saturated liquid" / "saturated vapor") in the curve's
+// own color, anchored just above or below the curve at a given x, in an open
+// stretch of the plot away from the tie lines. If there isn't enough room
+// between the curve and the bottom of the plot to show the label in full
+// (e.g. at low pressure, where the curve sits close to the bottom), the
+// label flips above the curve instead and gets a white background so it
+// stays legible over any tie lines passing behind it.
+function drawCurveLabel(text, xData, curveFn, xmin,xmax,ymin,ymax, color, dyPix, xMap){
+  xMap = xMap || function(v){ return v; };
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(MARGIN.left, MARGIN.top, PLOTW, PLOTH);
+  ctx.clip();
+
+  var px = xPix(xMap(xData),xmin,xmax);
+  var py = yPix(curveFn(xData),ymin,ymax);
+  ctx.font = 'bold '+CURVE_LABEL_FONT+'px Arial, Helvetica, sans-serif';
+
+  var useDy = dyPix, needsBG = false;
+  if (dyPix > 0){
+    var roomBelow = (MARGIN.top+PLOTH) - py;
+    var needed = dyPix + CURVE_LABEL_FONT + 4;
+    if (roomBelow < needed){
+      useDy = -10;
+      needsBG = true;
+    }
+  }
+
+  ctx.textAlign = 'center';
+  ctx.textBaseline = useDy<0 ? 'bottom' : 'top';
+
+  if (needsBG){
+    var tw = ctx.measureText(text).width;
+    var padX = 4, padY = 2;
+    var textY = py+useDy;
+    var boxTop = useDy<0 ? textY-CURVE_LABEL_FONT : textY;
+    ctx.fillStyle = 'rgba(255,255,255,0.9)';
+    ctx.fillRect(px-tw/2-padX, boxTop-padY, tw+2*padX, CURVE_LABEL_FONT+2*padY);
+  }
+
+  ctx.fillStyle = color;
+  ctx.fillText(text, px, py+useDy);
+  ctx.restore();
+}
+
+// Labels a curve rotated to follow the curve's local slope (tangent), offset
+// perpendicular to the curve by offsetPix so the text clears the line
+// instead of sitting on top of it. offsetPix>0 offsets to the "upper" side.
+function drawCurveLabelRotated(text, xData, curveFn, xmin,xmax,ymin,ymax, color, offsetPix, xMap, yMap){
+  xMap = xMap || function(v){ return v; };
+  yMap = yMap || function(v){ return v; };
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(MARGIN.left, MARGIN.top, PLOTW, PLOTH);
+  ctx.clip();
+
+  var eps = (xmax-xmin)*0.01;
+  var x1 = Math.max(xmin, xData-eps), x2 = Math.min(xmax, xData+eps);
+  var px1 = xPix(xMap(x1),xmin,xmax), py1 = yPix(yMap(curveFn(x1)),ymin,ymax);
+  var px2 = xPix(xMap(x2),xmin,xmax), py2 = yPix(yMap(curveFn(x2)),ymin,ymax);
+  var px0 = xPix(xMap(xData),xmin,xmax), py0 = yPix(yMap(curveFn(xData)),ymin,ymax);
+
+  var angle = Math.atan2(py2-py1, px2-px1);
+  if (angle > Math.PI/2) angle -= Math.PI;
+  if (angle < -Math.PI/2) angle += Math.PI;
+
+  // unit normal to the tangent, oriented to the "upper" (smaller canvas-y) side
+  var dx = px2-px1, dy = py2-py1;
+  var len = Math.sqrt(dx*dx+dy*dy) || 1;
+  var nx = -dy/len, ny = dx/len;
+  if (ny > 0) { nx = -nx; ny = -ny; }
+
+  ctx.translate(px0 + nx*offsetPix, py0 + ny*offsetPix);
+  ctx.rotate(angle);
+  ctx.font = 'bold '+CURVE_LABEL_FONT+'px Arial, Helvetica, sans-serif';
+  ctx.fillStyle = color;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, 0, 0);
+  ctx.restore();
+}
+
+// The mole-fraction azeotrope sits around x=0.89-0.91 (vs. 0.96 on a weight-
+// fraction basis), so the last regular tie line stops at 0.85 to keep a
+// visible gap from the red azeotrope tie line instead of overlapping it.
+var TIE_X = [0.01,0.02,0.03,0.04,0.06,0.08,0.12,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.85];
+
+function renderDiagram(P){
+  var m = MODEL;
+  var xmin=0, xmax=1, ymin=0, ymax=700;
+  var xticks=[0,0.2,0.4,0.6,0.8,1.0];
+  var yticks=[0,100,200,300,400,500,600,700];
+  var compWord = (BASIS==='mass') ? 'mass' : 'mole';
+  drawFrame(PLOTBOX_DIAGRAM,xmin,xmax,ymin,ymax,xticks,yticks,
+    'ethanol '+compWord+' fraction','enthalpy kcal/kg',
+    function(v){ return v.toFixed(1); }, function(v){ return v.toFixed(0); });
+
+  plotCurve(m.hx, xmin, xmax, ymin, ymax, COLOR_LIQ, 260, dispX);
+  plotCurve(m.Hx, xmin, xmax, ymin, ymax, COLOR_VAP, 260, dispX);
+
+  TIE_X.forEach(function(x0, i){
+    var isNextToAz = (i === TIE_X.length-1);
+    // On a mass-fraction basis the azeotrope sits much further right
+    // (~96% by mass vs. ~90% by mole), which squeezes this last regular
+    // tie line right up against the red azeotrope tie line -- so it's
+    // skipped entirely in that basis to avoid the cramped overlap.
+    if (isNextToAz && BASIS==='mass') return;
+    var y0 = m.xy(x0);
+    var hL = m.hx(x0), hV = m.Hx(y0);
+    var x0d = dispX(x0), y0d = dispX(y0);
+    drawLineSeg(x0d,hL, y0d,hV, xmin,xmax,ymin,ymax, COLOR_TIE, 1.8);
+    var T = m.Tx(x0);
+    // the last regular tie line sits right next to the azeotrope tie line,
+    // so it gets the same extra digit of precision for the comparison.
+    var Tlabel = isNextToAz ? fmt4sig(T) : fmt3sig(T);
+    drawTieLabel(Tlabel+'°C', x0d,hL, y0d,hV, xmin,xmax,ymin,ymax);
+  });
+
+  // azeotrope tie line (vertical, red) -- liquid and vapor mole fractions
+  // are equal at the azeotrope, so both ends share the same x position
+  // (mapping both ends through the same dispX keeps the line vertical in
+  // the mass-fraction display too)
+  var hLaz = m.hx(m.az), hVaz = m.Hx(m.az);
+  var azD = dispX(m.az);
+  drawLineSeg(azD,hLaz, azD,hVaz, xmin,xmax,ymin,ymax, COLOR_AZ, 2.0);
+  var Taz = m.Tx(m.az);
+  drawTieLabel(fmt4sig(Taz)+'°C', azD,hLaz, azD,hVaz, xmin,xmax,ymin,ymax);
+
+  // "azeotrope" label in red, above the top of the red tie line (which
+  // always has open space above it, since every tie line ends at the
+  // saturated-vapor curve and nothing is plotted above that curve), with a
+  // short leader line pointing straight down to it.
+  (function(){
+    var pxAz = xPix(azD,xmin,xmax);
+    var pyTop = yPix(hVaz,ymin,ymax);
+    var labelY = pyTop - 26;
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(MARGIN.left, MARGIN.top, PLOTW, PLOTH);
+    ctx.clip();
+    ctx.strokeStyle = COLOR_AZ;
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.moveTo(pxAz, pyTop-3);
+    ctx.lineTo(pxAz, labelY+3);
+    ctx.stroke();
+    ctx.font = 'bold '+CURVE_LABEL_FONT+'px Arial, Helvetica, sans-serif';
+    ctx.fillStyle = COLOR_AZ;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+    // On a mass-fraction basis the azeotrope sits further right (~96%
+    // ethanol by mass, vs. ~90% by mole), close enough to the right edge
+    // that the centered label can overflow the frame -- so the text is
+    // nudged left just enough to stay inside the plot, independently of
+    // the leader line, which still points straight at the azeotrope point.
+    var halfW = ctx.measureText('azeotrope').width/2;
+    var textX = pxAz;
+    var rightLimit = MARGIN.left+PLOTW-4, leftLimit = MARGIN.left+4;
+    if (textX+halfW > rightLimit) textX = rightLimit-halfW;
+    if (textX-halfW < leftLimit) textX = leftLimit+halfW;
+    ctx.fillText('azeotrope', textX, labelY);
+    ctx.restore();
+  })();
+
+  // curve labels, placed in the open gap between the x0=0.5 and x0=0.6 tie
+  // lines, just outside the two-phase envelope so they stay clear of the
+  // tie lines and their temperature labels. Drawn last (after the tie
+  // lines) so that when "saturated liquid" flips above the curve at low
+  // pressure, its white background sits on top of the tie lines instead
+  // of being painted over by them.
+  drawCurveLabel('saturated liquid', 0.55, m.hx, xmin,xmax,ymin,ymax, COLOR_LIQ, 16, dispX);
+  drawCurveLabelRotated('saturated vapor', 0.55, m.Hx, xmin,xmax,ymin,ymax, COLOR_VAP, 12, dispX);
+}
+
+function renderEquilibrium(P){
+  var m = MODEL;
+  var xmin=0, xmax=1, ymin=0, ymax=1;
+  var xticks=[0,0.2,0.4,0.6,0.8,1.0];
+  var yticks=[0,0.2,0.4,0.6,0.8,1.0];
+  var compWord = (BASIS==='mass') ? 'mass' : 'mole';
+  drawFrame(PLOTBOX_EQUIL,xmin,xmax,ymin,ymax,xticks,yticks,
+    'ethanol '+compWord+' fraction in liquid phase','ethanol '+compWord+' fraction in vapor phase',
+    function(v){ return v.toFixed(1); }, function(v){ return v.toFixed(1); });
+
+  // both axes here are compositions, so the diagonal and curve need dispX
+  // applied on both x and y (the diagonal's endpoints, (0,0) and (1,1), map
+  // to themselves under dispX, so it stays the straight line y=x either way)
+  drawLineSeg(0,0,1,1, xmin,xmax,ymin,ymax, COLOR_TIE, 1.8);
+  plotCurve(m.xy, xmin, xmax, ymin, ymax, COLOR_LIQ, 260, dispX, dispX);
+
+  // Curve labels, in the same colors as the lines they name. "equilibrium"
+  // sits above the curve (open space all the way to the top frame there);
+  // "x = y" sits below the diagonal (open space all the way to the bottom
+  // frame there) -- both far from the azeotrope point and its label near
+  // the top-right corner.
+  drawCurveLabelRotated('equilibrium', 0.65, m.xy, xmin,xmax,ymin,ymax, COLOR_LIQ, 12, dispX, dispX);
+  drawCurveLabelRotated('x = y', 0.5, function(x){ return x; }, xmin,xmax,ymin,ymax, COLOR_TIE, -12, dispX, dispX);
+
+  var azD = dispX(m.az);
+  var px = xPix(azD,xmin,xmax), py = yPix(azD,ymin,ymax);
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(MARGIN.left, MARGIN.top, PLOTW, PLOTH);
+  ctx.clip();
+  ctx.fillStyle = COLOR_AZ;
+  ctx.beginPath();
+  ctx.arc(px,py,4.5,0,2*Math.PI);
+  ctx.fill();
+  ctx.restore();
+
+  // "azeotrope" label, placed above and to the left of the point, ending
+  // just shy of it. The point sits close to the plot's top-right corner, so
+  // there isn't room to its right before the frame; below-left crowds the
+  // curve, which descends steeply there; and the curve keeps climbing past
+  // the point on its way to (1,1), so above-right isn't clear either.
+  // Above-left is the one open quadrant: both the curve and the y=x
+  // diagonal are well below the point's height for x less than the
+  // azeotrope composition, so the label has real clearance there. Drawn
+  // without clipping to the plot box (only the dot is clipped to it) since
+  // on a mass-fraction basis the azeotrope sits close enough to y=1 (around
+  // 96 mass% vs. ~90 mol%) that the label can need a little of the blank
+  // margin above the frame; it's clamped so it never goes past the canvas's
+  // own top edge.
+  ctx.save();
+  ctx.font = 'bold '+CURVE_LABEL_FONT+'px Arial, Helvetica, sans-serif';
+  ctx.fillStyle = COLOR_AZ;
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'bottom';
+  // Prefer 7px above the point, but never let the text's bottom edge drop
+  // low enough to cross the plot's top frame line (it would otherwise read
+  // as struck through); above the frame it's just blank canvas margin.
+  var textY = Math.min(py-7, MARGIN.top-3);
+  ctx.fillText('azeotrope', px-7, textY);
+  ctx.restore();
+}
+
+var currentView = 1;
+function render(){
+  var P = parseFloat(document.getElementById('pSlider').value);
+  MODEL = recompute(P);
+  if (currentView===1) renderDiagram(P); else renderEquilibrium(P);
+}
+
+/* ==================== UI wiring ==================== */
+var pSlider = document.getElementById('pSlider');
+var pValue = document.getElementById('pValue');
+
+pSlider.addEventListener('input', function(){
+  pValue.value = pSlider.value;
+  render();
+});
+pValue.addEventListener('change', function(){
+  var v = Math.round(parseFloat(pValue.value)/10)*10;
+  if (isNaN(v)) v = 760;
+  v = Math.max(50, Math.min(1200, v));
+  pValue.value = v;
+  pSlider.value = v;
+  render();
+});
+
+document.querySelectorAll('.setter-btn').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    document.querySelectorAll('.setter-btn').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    currentView = parseInt(btn.getAttribute('data-view'),10);
+    render();
+  });
+});
+
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(el){ el.classList.remove('open'); }
+
+document.getElementById('btnBasis').addEventListener('click', function(){
+  BASIS = (BASIS==='mole') ? 'mass' : 'mole';
+  render();
+});
+
+// "download" renders both views onto the shared canvas in turn (off-screen,
+// from the browser's perspective -- the whole thing happens synchronously
+// so neither intermediate frame is ever painted), captures each as a PNG,
+// and lays them out on one PDF page -- diagram on top, equilibrium curve
+// below -- for whichever pressure and composition basis are current, then
+// restores the view that was showing before the click.
+document.getElementById('btnDownload').addEventListener('click', function(){
+  var btn = document.getElementById('btnDownload');
+  if (!window.jspdf || !window.jspdf.jsPDF){
+    alert('The PDF library could not be loaded (check your internet connection), so the download is unavailable right now.');
+    return;
+  }
+  var origText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'preparing…';
+
+  try {
+    var savedView = currentView;
+    var P = parseFloat(pSlider.value);
+    var compWord = (BASIS==='mass') ? 'mass' : 'mole';
+
+    currentView = 1;
+    renderDiagram(P);
+    var diagramImg = canvas.toDataURL('image/png');
+    var diagramCW = CW, diagramCH = CH;
+
+    currentView = 2;
+    renderEquilibrium(P);
+    var equilImg = canvas.toDataURL('image/png');
+    var equilCW = CW, equilCH = CH;
+
+    // put the on-screen view back the way the user had it
+    currentView = savedView;
+    render();
+
+    var jsPDFCtor = window.jspdf.jsPDF;
+    var pdf = new jsPDFCtor({ orientation:'portrait', unit:'pt', format:'letter' });
+    var pageW = pdf.internal.pageSize.getWidth();
+    var pageH = pdf.internal.pageSize.getHeight();
+    var margin = 36;
+    var contentW = pageW - margin*2;
+
+    pdf.setFont('helvetica','bold');
+    pdf.setFontSize(14);
+    pdf.text('Ponchon-Savarit Diagram and Equilibrium Curve', pageW/2, margin, { align:'center' });
+    pdf.setFont('helvetica','normal');
+    pdf.setFontSize(11);
+    pdf.text('P = '+P+' mmHg, ethanol '+compWord+' fraction basis', pageW/2, margin+18, { align:'center' });
+
+    var gap = 16;
+    var bottomMargin = 30;
+    var y0 = margin + 34;
+
+    var diagramW = contentW, diagramH = diagramW*(diagramCH/diagramCW);
+    var equilW = contentW, equilH = equilW*(equilCH/equilCW);
+
+    var availH = pageH - y0 - bottomMargin;
+    var totalH = diagramH + gap + equilH;
+    if (totalH > availH){
+      var scale = availH/totalH;
+      diagramW *= scale; diagramH *= scale;
+      equilW *= scale; equilH *= scale;
+      gap *= scale;
+    }
+
+    var diagramX = margin + (contentW-diagramW)/2;
+    var equilX = margin + (contentW-equilW)/2;
+    pdf.addImage(diagramImg, 'PNG', diagramX, y0, diagramW, diagramH);
+    pdf.addImage(equilImg, 'PNG', equilX, y0+diagramH+gap, equilW, equilH);
+
+    pdf.save('ponchon_savarit_P'+P+'_'+compWord+'.pdf');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = origText;
+  }
+});
+
+document.getElementById('btnDirections').addEventListener('click', function(){ openModal('overlayDirections'); });
+document.getElementById('btnDetails').addEventListener('click', function(){
+  openModal('overlayDetails');
+  if (window.MathJax && window.MathJax.typesetPromise) { window.MathJax.typesetPromise(); }
+});
+document.getElementById('btnAbout').addEventListener('click', function(){ openModal('overlayAbout'); });
+
+document.querySelectorAll('.modal-overlay').forEach(function(ov){
+  ov.addEventListener('click', function(e){ if (e.target===ov) closeModal(ov); });
+});
+document.querySelectorAll('[data-close]').forEach(function(btn){
+  btn.addEventListener('click', function(){ closeModal(btn.closest('.modal-overlay')); });
+});
+document.addEventListener('keydown', function(e){
+  if (e.key==='Escape'){
+    document.querySelectorAll('.modal-overlay.open').forEach(closeModal);
+  }
+});
+
+/* initial render */
+render();
+</script>
+</body>
+</html>

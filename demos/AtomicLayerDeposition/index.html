@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Atomic Layer Deposition</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(', '\\)']], displayMath: [['$$', '$$']] },
+  chtml: { displayAlign: 'left', displayIndent: '1em' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js" async></script>
+<style>
+  :root {
+    --red: #98000D;
+    --red-hover: #7a000a;
+    --ink: #1d1d1f;
+    --muted: #5b5b63;
+    --line: #d4d4da;
+    --bg: #ffffff;
+    --panel: #fbfbfc;
+    color-scheme: light;
+  }
+  [hidden] { display: none !important; }
+  html, body { background: var(--bg); color: var(--ink); }
+  body {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    padding-inline: 16px;
+    padding-block: 12px 24px;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; position: relative; }
+  h1 { font-size: 22px; margin: 4px 0 10px; font-weight: 700; text-wrap: balance; }
+  .topbar {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px;
+    padding: 10px 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel);
+    position: relative;
+  }
+  .group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .spacer { flex: 1 1 auto; }
+  button {
+    font-family: inherit; font-size: 15.4px; color: #fff; background: var(--red);
+    border: none; border-radius: 4px; padding: 7px 14px; cursor: pointer; min-width: 64px;
+  }
+  button:hover { background: var(--red-hover); }
+  button:focus-visible, input:focus-visible { outline: 2px solid #2a6fdb; outline-offset: 2px; }
+  label.slider { display: flex; align-items: center; gap: 8px; white-space: nowrap; font-size: 16px; color: #000; }
+  label.slider .track { display: inline-flex; align-items: center; width: 130px; padding-top: .5rem; }
+  label.slider span.val { font-variant-numeric: tabular-nums; min-width: 3.2em; display: inline-block; }
+  input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  input[type=checkbox] { accent-color: var(--red); width: 16px; height: 16px; }
+  .chk { display: flex; align-items: center; gap: 6px; white-space: nowrap; font-size: 16px; color: #000; }
+  .main { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 18px; margin-top: 14px; }
+  @media (max-width: 860px) { .main { grid-template-columns: 1fr; } }
+  .card { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+  canvas { width: 100%; height: auto; display: block; border: 1px solid var(--line); border-radius: 4px; background: #fff; }
+  .readout { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 6px 16px; font-size: 17px; color: #000; }
+  .readout div { font-variant-numeric: tabular-nums; }
+  .readout b { font-weight: normal; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 16px; color: #000; }
+  .legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .dot { width: 11px; height: 11px; border-radius: 50%; display: inline-block; border: 1px solid rgba(0,0,0,.35); }
+  .note { font-size: 17px; color: #000; margin: 0; line-height: 1.45; max-width: 65ch; }
+  .flyout {
+    position: absolute; z-index: 20; top: 100%; margin-top: 6px; background: #fff; border: 1px solid #999;
+    border-radius: 6px; box-shadow: 0 6px 24px rgba(0,0,0,.18); padding: 14px 36px 14px 16px;
+    width: min(620px, calc(100vw - 40px)); line-height: 1.5; font-size: 14.5px;
+  }
+  .flyout.scroll { max-height: 70vh; overflow: hidden; display: flex; flex-direction: column; padding-right: 8px; }
+  .flyout.scroll .inner { overflow-y: auto; padding-right: 26px; }
+  .flyout .close {
+    position: absolute; top: 6px; right: 8px; background: none; color: #444; font-size: 22px; min-width: 0;
+    padding: 0 6px; line-height: 1;
+  }
+  .flyout .close:hover { background: #eee; }
+  .flyout p { margin: 0 0 9px; }
+  .flyout table.sym { border-collapse: collapse; margin: 0 0 6px; }
+  .flyout table.sym td { padding: 3px 14px 3px 0; vertical-align: top; }
+  .flyout table.sym td:first-child { white-space: nowrap; min-width: 2.5em; }
+  .flyout h2 { font-size: 18px; margin: 0 0 10px; color: #000; }
+  .flyout h3 { font-size: 15px; margin: 12px 0 6px; }
+  .flyout a { color: var(--red); }
+  @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <h1>Atomic Layer Deposition of Al<sub>2</sub>O<sub>3</sub></h1>
+
+  <div class="topbar" id="topbar">
+    <div class="group">
+      <button id="play">Play</button>
+      <button id="reset">Reset</button>
+    </div>
+    <div class="group">
+      <label class="slider" for="pulse">pulse time <span class="track"><input id="pulse" type="range" min="0.3" max="4" step="0.1" value="2.5"></span><span class="val" id="pulseVal">2.5 s</span></label>
+      <label class="slider" for="cycles">cycles <span class="track"><input id="cycles" type="range" min="1" max="8" step="1" value="4"></span><span class="val" id="cyclesVal">4</span></label>
+      <label class="slider" for="speed">speed <span class="track"><input id="speed" type="range" min="0.25" max="3" step="0.25" value="1"></span><span class="val" id="speedVal">1×</span></label>
+    </div>
+    <div class="group">
+      <label class="chk" for="purge"><input id="purge" type="checkbox" checked> N₂ purge</label>
+      <label class="chk" for="stepmode"><input id="stepmode" type="checkbox"> pause after each step</label>
+    </div>
+    <div class="spacer"></div>
+    <div class="group">
+      <button id="bDir">Directions</button>
+      <button id="bDet">Details</button>
+      <button id="bAbout">About</button>
+    </div>
+
+    <div class="flyout" id="pDir" hidden>
+      <button class="close" aria-label="Close">×</button>
+      <h2>Directions</h2>
+      <p>This simulation shows atomic layer deposition (ALD) of aluminum oxide from trimethylaluminum (TMA, Al(CH<sub>3</sub>)<sub>3</sub>) and water on a flat, hydroxyl-terminated silicon surface. The view is a cross section of the reactor; each column on the surface is one reactive site.</p>
+      <p>Press <b>Play</b> to run the sequence TMA pulse → N<sub>2</sub> purge → H<sub>2</sub>O pulse → N<sub>2</sub> purge, repeated for the number of cycles you choose. Gas molecules enter from the inlet on the left and leave to the pump on the right. The plot shows the mass gained per surface site (as a quartz crystal microbalance would measure it), with the pulses and purges shaded.</p>
+      <p>Use the <b>pulse time</b> slider to see self-limiting growth: long pulses saturate every site and extra precursor bounces off; short pulses leave unreacted sites and the film grows less per cycle. Uncheck <b>N<sub>2</sub> purge</b> to see what happens when TMA and water meet in the gas phase: they react to form particles that land randomly (CVD-like growth, shown in darker gray). Check <b>pause after each step</b> to stop after every pulse and purge; press Play to continue. When the run finishes, you can increase the number of cycles and press Play to keep growing the same film; press Reset to start over with a clean surface.</p>
+    </div>
+
+    <div class="flyout scroll" id="pDet" hidden>
+      <button class="close" aria-label="Close">×</button>
+      <div class="inner">
+        <h2>Details</h2>
+        <p>ALD grows a film by exposing the surface to two precursors one at a time, separated by inert-gas purges. Each precursor reacts only with the surface groups left by the other, so each half-reaction stops by itself once those groups are used up.</p>
+        <h3>Half-reactions for Al<sub>2</sub>O<sub>3</sub> from TMA and water</h3>
+        <p>A (TMA pulse):</p>
+        $$\|\!-\!\mathrm{OH} + \mathrm{Al(CH_3)_3(g)} \rightarrow \|\!-\!\mathrm{O\!-\!Al(CH_3)_2} + \mathrm{CH_4(g)}$$
+        <p>B (H<sub>2</sub>O pulse), which occurs twice per aluminum atom:</p>
+        $$\|\!-\!\mathrm{Al\!-\!CH_3} + \mathrm{H_2O(g)} \rightarrow \|\!-\!\mathrm{Al\!-\!OH} + \mathrm{CH_4(g)}$$
+        <p>Overall:</p>
+        $$2\,\mathrm{Al(CH_3)_3} + 3\,\mathrm{H_2O} \rightarrow \mathrm{Al_2O_3} + 6\,\mathrm{CH_4}$$
+        <p>TMA does not react with a methyl-terminated surface and water does not react with a hydroxyl-terminated surface, which is why growth is self-limiting.</p>
+        <h3>Self-limiting kinetics</h3>
+        <p>If each molecule that strikes an unreacted site reacts with probability \(s\), the fraction of sites that have reacted, \(\theta\), follows Langmuir-type kinetics:</p>
+        $$\frac{d\theta}{dt} = \frac{s\,F}{n_0}\,(1-\theta)$$
+        $$\theta = 1 - \exp\!\left(-\frac{t}{\tau}\right), \qquad \tau = \frac{n_0}{s\,F}$$
+        <p>where \(F\) is the flux of precursor to the surface and \(n_0\) is the number of reactive sites per area. Pulses much longer than \(\tau\) saturate the surface. The simulation uses \(s = 0.8\) for both precursors and treats each molecule's motion as a random walk. During a pulse the flow to the pump is throttled so the precursor has time to reach the surface; during a purge a fast N<sub>2</sub> flow carries gas to the pump.</p>
+        <h3>Mass gain per site</h3>
+        <p>The plot uses the mass of the surface group on each site. Starting from –OH (17 amu), TMA adds –Al(CH<sub>3</sub>)<sub>2</sub> minus H, a gain of 56 amu. Each CH<sub>3</sub> → OH exchange in the water pulse adds 2 amu. One complete cycle adds 60 amu per site in this idealized model; the large step comes from TMA and the small step from water, as in QCM measurements.</p>
+        <h3>Simplifications</h3>
+        <p>Each drawn layer is one cycle of growth, about 1.1 Å for Al<sub>2</sub>O<sub>3</sub> at 150–300 °C. In real films, the bulky methyl groups block neighboring sites (steric hindrance), so one cycle deposits roughly a third of a monolayer. The gas-phase particles formed without a purge are drawn as whole layers on one site; real CVD deposits are rough and nonuniform and amorphous unless grown at 800 to 900 °C. The drawing is not to scale: the gas region is compressed and molecules are enlarged.</p>
+        <h3>Symbols</h3>
+        <table class="sym">
+          <tr><td>\(F\)</td><td>flux of precursor molecules to the surface (molecules/(cm<sup>2</sup>·s))</td></tr>
+          <tr><td>\(n_0\)</td><td>surface density of reactive sites (sites/cm<sup>2</sup>)</td></tr>
+          <tr><td>\(s\)</td><td>reaction probability: fraction of collisions with an unreacted site that react</td></tr>
+          <tr><td>\(t\)</td><td>exposure (pulse) time (s)</td></tr>
+          <tr><td>\(\theta\)</td><td>fraction of surface sites that have reacted</td></tr>
+          <tr><td>\(\tau\)</td><td>characteristic time to saturate the surface (s)</td></tr>
+          <tr><td>\(\|\!-\)</td><td>surface-bound species</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="flyout" id="pAbout" hidden>
+      <button class="close" aria-label="Close">×</button>
+      <h2>About</h2>
+      <p>This simulation was created in the <a href="https://www.colorado.edu/chbe/" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="https://learncheme.com/" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.</p>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="card">
+      <canvas id="reactor"></canvas>
+      <div class="legend">
+        <span><i class="dot" style="background:#9c86c9"></i>Al</span>
+        <span><i class="dot" style="background:#d9302c"></i>O</span>
+        <span><i class="dot" style="background:#5a5a5a"></i>C (CH₃, CH₄)</span>
+        <span><i class="dot" style="background:#ffffff"></i>H</span>
+        <span><i class="dot" style="background:#3f7fd6"></i>N</span>
+        <span><i class="dot" style="background:#c9ced6"></i>Si substrate</span>
+      </div>
+    </div>
+    <div class="card">
+      <canvas id="plot"></canvas>
+      <div class="readout">
+        <div>cycle: <b id="rCycle">0 of 4</b></div>
+        <div>step: <b id="rPhase">ready</b></div>
+        <div id="rSites">OH sites: <b>20 of 20</b></div>
+        <div>film thickness: <b id="rThick">0.0 Å</b></div>
+        <div>last-cycle growth: <b id="rGpc">–</b></div>
+        <div>time: <b id="rTime">0.0 s</b></div>
+      </div>
+      <p class="note" id="status"></p>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  // ---------- constants ----------
+  const W = 680, H = 470;           // reactor canvas logical size
+  const PW = 540, PH = 400;         // plot canvas logical size
+  const CX0 = 72, CX1 = 650;        // chamber x range
+  const TOPWALL = 56;               // chamber ceiling
+  const Y0 = 420;                   // substrate surface y
+  const NS = 20;                    // sites
+  const COLW = (CX1 - CX0) / NS;    // 31
+  const L = 13;                     // px per layer
+  const TPURGE = 2.0;
+  const S_TMA = 0.8, S_H2O = 0.8;
+  const MASS_LAYER = 60, MASS_TOP = { OH: 17, Me2: 73, Me1: 75 };
+  const GPC = 1.1;                  // Å per cycle
+  const COL = { Al: '#9c86c9', O: '#d9302c', C: '#5a5a5a', H: '#ffffff', N: '#3f7fd6', Si: '#c9ced6' };
+  const PHCOL = { TMA: '#f7d9dd', H2O: '#b3d3f5', purge: '#f5e9b8' };
+  const PHNAME = { TMA: 'TMA pulse', H2O: 'H₂O pulse', purge: 'N₂ purge' };
+
+  // ---------- canvases ----------
+  function setup(c, w, h) {
+    const dpr = Math.max(1, window.devicePixelRatio || 1);
+    c.width = w * dpr; c.height = h * dpr;
+    c.style.aspectRatio = w + ' / ' + h;
+    const ctx = c.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return ctx;
+  }
+  const rc = document.getElementById('reactor'), pc = document.getElementById('plot');
+  const ctx = setup(rc, W, H), pctx = setup(pc, PW, PH);
+
+  // ---------- controls ----------
+  const $ = id => document.getElementById(id);
+  const ui = { pulse: $('pulse'), cycles: $('cycles'), speed: $('speed'), purge: $('purge'), step: $('stepmode') };
+  const p = () => ({ tp: +ui.pulse.value, nc: +ui.cycles.value, sp: +ui.speed.value, purge: ui.purge.checked, step: ui.step.checked });
+  function syncLabels() {
+    $('pulseVal').textContent = (+ui.pulse.value).toFixed(1) + ' s';
+    $('cyclesVal').textContent = ui.cycles.value;
+    $('speedVal').textContent = (+ui.speed.value) + '×';
+  }
+
+  // ---------- state ----------
+  let S;
+  function reset() {
+    S = {
+      t: 0, running: false, done: false,
+      cycle: 0, phaseIdx: -1, phase: null, tPhase: 0, phaseDur: 0,
+      sites: Array.from({ length: NS }, () => ({ layers: [], top: 'OH', flash: 0 })),
+      mols: [], parts: [], bursts: [],
+      inject: 0, n2inject: 0,
+      hist: [{ t: 0, m: MASS_TOP.OH }], bands: [], histTimer: 0,
+      cycleStartMass: [], gpcList: []
+    };
+    $('play').textContent = 'Play';
+    $('status').textContent = '';
+    updateReadout(); draw(); drawPlot();
+  }
+
+  function seq() { return p().purge ? ['TMA', 'purge', 'H2O', 'purge'] : ['TMA', 'H2O']; }
+
+  function startNextPhase() {
+    const s = seq();
+    if (S.phaseIdx === -1 || S.phaseIdx >= s.length - 1) {
+      // new cycle
+      if (S.cycle >= p().nc) { finish(); return false; }
+      S.cycle++; S.phaseIdx = 0;
+      S.cycleStartMass.push(avgHeight());
+    } else S.phaseIdx++;
+    S.phase = s[S.phaseIdx];
+    S.tPhase = 0;
+    S.phaseDur = S.phase === 'purge' ? TPURGE : p().tp;
+    S.bands.push({ t0: S.t, t1: S.t, type: S.phase, dur: S.phaseDur });
+    return true;
+  }
+
+  function finish() {
+    S.running = false; S.done = true; S.phase = null;
+    $('play').textContent = 'Play';
+    const g = S.gpcList.length ? (S.gpcList.reduce((a, b) => a + b, 0) / S.gpcList.length) : 0;
+    $('status').textContent = `Finished ${S.cycle} cycle${S.cycle > 1 ? 's' : ''}. Average growth ${g.toFixed(2)} Å per cycle` +
+      (g > GPC * 1.05 ? ' — more than the 1.1 Å of ideal ALD because gas-phase (CVD) reactions added material.' :
+       g < GPC * 0.95 ? ' — less than the ideal 1.1 Å because the pulses were too short to saturate the surface.' :
+       ', the ideal self-limiting value.');
+  }
+
+  const avgHeight = () => S.sites.reduce((a, s) => a + s.layers.length, 0) / NS;
+  const avgMass = () => S.sites.reduce((a, s) => a + MASS_LAYER * s.layers.length + MASS_TOP[s.top], 0) / NS;
+  const siteTopY = s => Y0 - s.layers.length * L;
+  const groupH = top => top === 'OH' ? 15 : 31;
+
+  // ---------- molecules ----------
+  const RAD = { TMA: 11, H2O: 7, CH4: 7, N2: 7 };
+  function spawn(type, x, y, vx, vy) {
+    S.mols.push({ type, x, y, vx, vy, a: Math.random() * 6.28, va: (Math.random() - .5) * 4 });
+  }
+  function thermal(v0) {
+    const a = Math.random() * Math.PI * 2, v = v0 * (0.6 + 0.8 * Math.random());
+    return [v * Math.cos(a), v * Math.sin(a)];
+  }
+  function injectAtInlet(type) {
+    const a = 0.35 + Math.random() * 1.0, v = 850 * (0.7 + 0.6 * Math.random());
+    spawn(type, CX0 + 6, 72 + Math.random() * 34, v * Math.cos(a), v * Math.sin(a));
+  }
+
+  function burst(x, y) { S.bursts.push({ x, y, life: 0.5 }); }
+
+  function react(m, s, i) {
+    const cx = CX0 + (i + .5) * COLW, ty = siteTopY(s);
+    if (m.type === 'TMA' && s.top === 'OH') {
+      s.top = 'Me2'; s.flash = 0.6; spawn('CH4', cx, ty - 34, (Math.random() - .5) * 120, -160); burst(cx, ty - 22); return true;
+    }
+    if (m.type === 'H2O' && s.top === 'Me2') {
+      s.top = 'Me1'; s.flash = 0.6; spawn('CH4', cx + 8, ty - 38, 60, -160); burst(cx, ty - 22); return true;
+    }
+    if (m.type === 'H2O' && s.top === 'Me1') {
+      if (s.layers.length < 18) s.layers.push('ald'); s.top = 'OH'; s.flash = 0.6; spawn('CH4', cx - 8, ty - 38, -60, -160); burst(cx, ty - 10); return true;
+    }
+    return false;
+  }
+
+  function stepPhysics(dt) {
+    const ph = S.phase;
+    const drift = ph === 'purge' ? 1300 : 12;
+    // injection
+    if (ph === 'TMA') { S.inject += 85 * dt; while (S.inject >= 1) { S.inject--; injectAtInlet('TMA'); } }
+    if (ph === 'H2O') { S.inject += 95 * dt; while (S.inject >= 1) { S.inject--; injectAtInlet('H2O'); } }
+    if (ph === 'purge') { S.n2inject += 40 * dt; while (S.n2inject >= 1) { S.n2inject--; injectAtInlet('N2'); } }
+
+    const rand = 1 - Math.exp(-1.2 * dt);
+    const keep = [];
+    for (const m of S.mols) {
+      if (Math.random() < rand) { const v = thermal(850); m.vx = v[0]; m.vy = v[1]; }
+      m.x += (m.vx + drift) * dt; m.y += m.vy * dt; m.a += m.va * dt;
+      const r = RAD[m.type];
+      if (m.y - r < TOPWALL) { m.y = TOPWALL + r; m.vy = Math.abs(m.vy); }
+      if (m.x - r < CX0) { m.x = CX0 + r; m.vx = Math.abs(m.vx); }
+      if (ph === 'purge' || !p().purge) { if (m.x > CX1 + 10) continue; } // pumped away
+      else if (m.x + r > CX1) { m.x = CX1 - r; m.vx = -Math.abs(m.vx); }
+      const i = Math.min(NS - 1, Math.max(0, Math.floor((m.x - CX0) / COLW)));
+      const s = S.sites[i];
+      const surf = siteTopY(s) - groupH(s.top);
+      if (m.y + r > surf) {
+        const prob = m.type === "TMA" ? S_TMA : m.type === 'H2O' ? S_H2O : 0;
+        if (prob > 0 && Math.random() < prob && react(m, s, i)) continue;
+        m.y = surf - r; m.vy = -Math.abs(m.vy) - 40;
+      }
+      keep.push(m);
+    }
+    S.mols = keep.length > 260 ? keep.slice(keep.length - 260) : keep;
+
+    // gas-phase reaction (only possible when TMA and water coexist)
+    const tma = S.mols.filter(m => m.type === 'TMA'), wat = S.mols.filter(m => m.type === 'H2O');
+    if (tma.length && wat.length) {
+      const dead = new Set();
+      for (const a of tma) for (const b of wat) {
+        if (dead.has(a) || dead.has(b)) continue;
+        const dx = a.x - b.x, dy = a.y - b.y;
+        if (dx * dx + dy * dy < 17 * 17 && Math.random() < 0.05) {
+          dead.add(a); dead.add(b);
+          S.parts.push({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2, vx: (Math.random() - .5) * 30, vy: 40 });
+          spawn('CH4', a.x, a.y, 0, -150); burst(a.x, a.y);
+        }
+      }
+      if (dead.size) S.mols = S.mols.filter(m => !dead.has(m));
+    }
+    // particles fall and stick
+    const pk = [];
+    for (const q of S.parts) {
+      q.vy += 260 * dt; q.x += (q.vx + drift * 0.15) * dt; q.y += q.vy * dt;
+      q.x = Math.min(CX1 - 4, Math.max(CX0 + 4, q.x));
+      const i = Math.min(NS - 1, Math.floor((q.x - CX0) / COLW)), s = S.sites[i];
+      if (q.y + 7 > siteTopY(s) - groupH(s.top) * 0.4) {
+        if (s.layers.length < 10) { s.layers.push('cvd'); s.top = 'OH'; s.flash = 0.6; }
+        continue;
+      }
+      pk.push(q);
+    }
+    S.parts = pk;
+    for (const b of S.bursts) b.life -= dt;
+    S.bursts = S.bursts.filter(b => b.life > 0);
+    for (const s of S.sites) s.flash = Math.max(0, s.flash - dt);
+  }
+
+  // ---------- main loop ----------
+  let last = null;
+  function tick(now) {
+    if (last === null) last = now;
+    let real = Math.min(0.05, (now - last) / 1000); last = now;
+    if (S.running) {
+      let dt = real * p().sp;
+      while (dt > 1e-6 && S.running) {
+        const h = Math.min(dt, 1 / 120);
+        advance(h); dt -= h;
+      }
+      updateReadout(); drawPlot();
+    } else if (S.bursts.length || S.sites.some(s => s.flash > 0)) {
+      stepVisualOnly(real);
+    }
+    draw();
+    requestAnimationFrame(tick);
+  }
+  function stepVisualOnly(dt) {
+    for (const b of S.bursts) b.life -= dt; S.bursts = S.bursts.filter(b => b.life > 0);
+    for (const s of S.sites) s.flash = Math.max(0, s.flash - dt);
+  }
+
+  function advance(h) {
+    if (!S.phase) { if (!startNextPhase()) return; }
+    S.t += h; S.tPhase += h;
+    stepPhysics(h);
+    const band = S.bands[S.bands.length - 1]; band.t1 = S.t;
+    S.histTimer += h;
+    if (S.histTimer >= 0.04) { S.histTimer = 0; S.hist.push({ t: S.t, m: avgMass() }); }
+    if (S.tPhase >= S.phaseDur) {
+      const s = seq();
+      const endOfCycle = S.phaseIdx === s.length - 1;
+      if (endOfCycle) {
+        const start = S.cycleStartMass[S.cycleStartMass.length - 1];
+        S.gpcList.push((avgHeight() - start) * GPC);
+      }
+      S.hist.push({ t: S.t, m: avgMass() });
+      const finished = endOfCycle && S.cycle >= p().nc;
+      if (finished) { finish(); return; }
+      if (p().step) {
+        S.running = false; $('play').textContent = 'Play';
+        const next = endOfCycle ? 'TMA pulse (cycle ' + (S.cycle + 1) + ')' : PHNAME[s[S.phaseIdx + 1]];
+        $('status').textContent = PHNAME[S.phase] + ' finished. Next: ' + next + '.';
+      }
+      S.phase = null;
+      if (S.running) startNextPhase();
+    }
+  }
+
+  // ---------- readout ----------
+  function updateReadout() {
+    $('rCycle').textContent = S.cycle + ' of ' + p().nc;
+    $('rPhase').textContent = S.phase ? PHNAME[S.phase] + '  ' + S.tPhase.toFixed(1) + ' / ' + S.phaseDur.toFixed(1) + ' s' : (S.done ? 'done' : (S.t > 0 ? 'paused' : 'ready'));
+    const nOH = S.sites.filter(s => s.top === 'OH').length;
+    const nMe = S.sites.reduce((a, s) => a + (s.top === 'Me2' ? 2 : s.top === 'Me1' ? 1 : 0), 0);
+    const showMe = S.phase === 'H2O' || (S.phase === 'purge' && S.phaseIdx === 1) || (!S.phase && nMe > 0);
+    $('rSites').innerHTML = showMe ? 'CH<sub>3</sub> groups left: <b>' + nMe + ' of ' + (2 * NS) + '</b>' : 'OH sites: <b>' + nOH + ' of ' + NS + '</b>';
+    $('rThick').textContent = (avgHeight() * GPC).toFixed(1) + ' Å';
+    $('rGpc').textContent = S.gpcList.length ? S.gpcList[S.gpcList.length - 1].toFixed(2) + ' Å' : '–';
+    $('rTime').textContent = S.t.toFixed(1) + ' s';
+    if (S.running && S.phase) {
+      let msg = '';
+      if (S.phase === 'TMA') msg = nOH === 0 ? 'Every OH site has reacted. Additional TMA bounces off the methyl-covered surface: the reaction is self-limiting.' : 'TMA reacts with surface OH groups: –OH + Al(CH₃)₃ → –O–Al(CH₃)₂ + CH₄.';
+      else if (S.phase === 'H2O') msg = nMe === 0 ? 'All methyl groups have been replaced by OH. Additional water does not react.' : 'Water replaces surface methyl groups: –Al–CH₃ + H₂O → –Al–OH + CH₄.';
+      else msg = 'N₂ sweeps unreacted precursor and CH₄ product to the pump so the two precursors never meet in the gas phase.';
+      if (!p().purge && S.parts.length) msg = 'No purge: TMA and water react in the gas phase and form particles that land at random (dark gray), so growth is no longer self-limiting.';
+      $('status').textContent = msg;
+    }
+  }
+
+  // ---------- drawing helpers ----------
+  function ball(x, y, r, c) {
+    ctx.beginPath(); ctx.arc(x, y, r, 0, 6.2832);
+    const g = ctx.createRadialGradient(x - r * .35, y - r * .35, r * .15, x, y, r);
+    g.addColorStop(0, '#ffffff'); g.addColorStop(0.35, c); g.addColorStop(1, shade(c, -0.35));
+    ctx.fillStyle = g; ctx.fill();
+    ctx.lineWidth = 0.7; ctx.strokeStyle = 'rgba(0,0,0,.45)'; ctx.stroke();
+  }
+  function shade(hex, f) {
+    const n = parseInt(hex.slice(1), 16); let r = n >> 16, g = (n >> 8) & 255, b = n & 255;
+    r = Math.round(r * (1 + f)); g = Math.round(g * (1 + f)); b = Math.round(b * (1 + f));
+    const cl = v => Math.max(0, Math.min(255, v));
+    return 'rgb(' + cl(r) + ',' + cl(g) + ',' + cl(b) + ')';
+  }
+  function bond(x1, y1, x2, y2) { ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.strokeStyle = '#666'; ctx.lineWidth = 2; ctx.stroke(); }
+  function methyl(x, y, ang) {
+    ball(x, y, 5, COL.C);
+    for (let k = -1; k <= 1; k++) { const a = ang + k * 0.9; ball(x + 6.5 * Math.cos(a), y + 6.5 * Math.sin(a), 2.4, COL.H); }
+  }
+  function hydroxyl(x, y, ang) {
+    ball(x, y, 5, COL.O); ball(x + 6.5 * Math.cos(ang), y + 6.5 * Math.sin(ang), 2.6, COL.H);
+  }
+
+  function drawMol(m) {
+    const { x, y, a } = m;
+    if (m.type === 'TMA') {
+      for (let k = 0; k < 3; k++) { const b = a + k * 2.094; bond(x, y, x + 11 * Math.cos(b), y + 11 * Math.sin(b)); }
+      ball(x, y, 6, COL.Al);
+      for (let k = 0; k < 3; k++) { const b = a + k * 2.094; methyl(x + 11 * Math.cos(b), y + 11 * Math.sin(b), b); }
+    } else if (m.type === 'H2O') {
+      ball(x + 6 * Math.cos(a), y + 6 * Math.sin(a), 2.8, COL.H);
+      ball(x + 6 * Math.cos(a + 1.82), y + 6 * Math.sin(a + 1.82), 2.8, COL.H);
+      ball(x, y, 5, COL.O);
+    } else if (m.type === 'CH4') {
+      for (let k = 0; k < 4; k++) { const b = a + k * 1.5708; ball(x + 6 * Math.cos(b), y + 6 * Math.sin(b), 2.3, COL.H); }
+      ball(x, y, 4.5, COL.C);
+    } else {
+      ball(x - 3.5 * Math.cos(a), y - 3.5 * Math.sin(a), 4, COL.N);
+      ball(x + 3.5 * Math.cos(a), y + 3.5 * Math.sin(a), 4, COL.N);
+    }
+  }
+
+  function drawSite(i, s) {
+    const x0 = CX0 + i * COLW, cx = x0 + COLW / 2;
+    // film layers
+    s.layers.forEach((t, k) => {
+      const yb = Y0 - k * L, yt = yb - L;
+      ctx.fillStyle = t === 'cvd' ? '#8f8a96' : '#e3ddef';
+      ctx.fillRect(x0, yt, COLW, L);
+      const off = (k % 2) ? 0 : COLW / 2;
+      const ax = x0 + ((8 + off) % COLW), ox = x0 + ((23 + off) % COLW);
+      ball(ax, yt + L / 2, 3.6, t === 'cvd' ? '#6f6480' : COL.Al);
+      ball(ox, yt + L / 2, 3.6, t === 'cvd' ? '#8a3a38' : COL.O);
+    });
+    const ty = siteTopY(s);
+    if (s.flash > 0) {
+      ctx.fillStyle = 'rgba(255,200,0,' + (0.45 * s.flash / 0.6) + ')';
+      ctx.fillRect(x0 + 1, ty - 36, COLW - 2, 36);
+    }
+    if (s.top === 'OH') {
+      bond(cx, ty, cx, ty - 7);
+      hydroxyl(cx, ty - 7, -1.1);
+    } else {
+      bond(cx, ty, cx, ty - 17);
+      ball(cx, ty - 6, 4.6, COL.O);
+      bond(cx, ty - 17, cx - 8, ty - 26); bond(cx, ty - 17, cx + 8, ty - 26);
+      ball(cx, ty - 17, 5.6, COL.Al);
+      methyl(cx - 8, ty - 26, -2.2);
+      if (s.top === 'Me2') methyl(cx + 8, ty - 26, -0.95);
+      else hydroxyl(cx + 8, ty - 26, -0.6);
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H);
+    // phase timeline strip
+    const s = seq(), bw = 150, gap = 8;
+    const x0 = (W - (s.length * bw + (s.length - 1) * gap)) / 2;
+    ctx.font = '13px Helvetica, Arial, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    s.forEach((ph, k) => {
+      const active = S.phase && S.phaseIdx === k && S.phase === ph;
+      const x = x0 + k * (bw + gap);
+      ctx.fillStyle = active ? (ph === 'TMA' ? '#e8a9b1' : ph === 'H2O' ? '#86b8ee' : '#e8d27a') : PHCOL[ph];
+      ctx.fillRect(x, 6, bw, 28);
+      if (active) {
+        ctx.fillStyle = 'rgba(0,0,0,.18)';
+        ctx.fillRect(x, 30, bw * Math.min(1, S.tPhase / S.phaseDur), 4);
+        ctx.strokeStyle = '#333'; ctx.lineWidth = 1.2; ctx.strokeRect(x + .5, 6.5, bw - 1, 27);
+      }
+      ctx.fillStyle = '#000'; ctx.font = (active ? 'bold ' : '') + '16px Helvetica, Arial, sans-serif';
+      ctx.fillText((k + 1) + '. ' + PHNAME[ph], x + bw / 2, 20);
+    });
+
+    // chamber
+    ctx.fillStyle = '#f7f9fb'; ctx.fillRect(CX0, TOPWALL, CX1 - CX0, Y0 - TOPWALL);
+    ctx.fillStyle = '#b9bec6';
+    ctx.fillRect(CX0 - 6, TOPWALL - 6, CX1 - CX0 + 6, 6);            // ceiling
+    ctx.fillRect(CX0 - 6, TOPWALL, 6, 10); ctx.fillRect(CX0 - 6, 112, 6, Y0 - 112); // left wall with inlet gap
+    // inlet pipe
+    ctx.fillStyle = '#dfe3e8'; ctx.fillRect(0, 66, CX0 - 6, 46);
+    ctx.fillStyle = '#b9bec6'; ctx.fillRect(0, 62, CX0 - 6, 4); ctx.fillRect(0, 112, CX0 - 6, 4);
+    // valve labels
+    const src = [['TMA', S.phase === 'TMA'], ['H₂O', S.phase === 'H2O'], ['N₂', S.phase === 'purge']];
+    ctx.font = '16px Helvetica, Arial, sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    src.forEach(([lab, on], k) => {
+      const y = 138 + k * 24;
+      ctx.beginPath(); ctx.arc(10, y, 5.5, 0, 6.28); ctx.fillStyle = on ? '#2fb44a' : '#c9ccd2'; ctx.fill();
+      ctx.strokeStyle = '#777'; ctx.lineWidth = 0.7; ctx.stroke();
+      ctx.fillStyle = '#000'; ctx.fillText(lab, 20, y + 1);
+    });
+    // outlet
+    ctx.fillStyle = '#000'; ctx.font = '18.4px Helvetica, Arial, sans-serif'; ctx.textAlign = 'right'; ctx.textBaseline = 'alphabetic';
+    ctx.fillText('to pump', W - 4, 46);
+    for (let y = 80; y < 380; y += 60) {
+      ctx.beginPath(); ctx.moveTo(CX1 + 8, y); ctx.lineTo(CX1 + 22, y); ctx.lineTo(CX1 + 17, y - 4); ctx.moveTo(CX1 + 22, y); ctx.lineTo(CX1 + 17, y + 4);
+      ctx.strokeStyle = '#9aa0a8'; ctx.lineWidth = 1.5; ctx.stroke();
+    }
+
+    // substrate
+    ctx.fillStyle = COL.Si; ctx.fillRect(CX0 - 6, Y0, CX1 - CX0 + 6, H - Y0);
+    for (let r = 0; r < 3; r++) for (let c = 0; c < NS * 2; c++) {
+      const x = CX0 + 7.75 + c * COLW / 2 + (r % 2 ? COLW / 4 : 0), y = Y0 + 9 + r * 15;
+      if (x < CX1 - 3) { ctx.beginPath(); ctx.arc(x, y, 4, 0, 6.28); ctx.fillStyle = '#aab1bb'; ctx.fill(); }
+    }
+    ctx.font = '16px Helvetica, Arial, sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = 'rgba(255,255,255,.8)'; ctx.fillRect(CX0 + 4, H - 25, ctx.measureText('Si substrate').width + 10, 22);
+    ctx.fillStyle = '#000'; ctx.fillText('Si substrate', CX0 + 9, H - 13);
+
+    // sites
+    S.sites.forEach((s, i) => drawSite(i, s));
+    // particles
+    for (const q of S.parts) {
+      ball(q.x - 3, q.y, 4.5, '#6f6480'); ball(q.x + 3, q.y + 2, 4.5, '#8a3a38'); ball(q.x, q.y - 4, 4, '#6f6480');
+    }
+    // molecules
+    for (const m of S.mols) drawMol(m);
+    // reaction bursts
+    for (const b of S.bursts) {
+      const k = 1 - b.life / 0.5;
+      ctx.beginPath(); ctx.arc(b.x, b.y, 6 + 14 * k, 0, 6.28);
+      ctx.strokeStyle = 'rgba(240,160,0,' + (1 - k) + ')'; ctx.lineWidth = 2; ctx.stroke();
+    }
+    // inlet/outlet caption
+    ctx.fillStyle = '#000'; ctx.font = '18.4px Helvetica, Arial, sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+    ctx.fillText('inlet', 2, 57);
+  }
+
+  // ---------- plot ----------
+  function niceStep(range, n) {
+    const raw = range / n, mag = Math.pow(10, Math.floor(Math.log10(raw))), f = raw / mag;
+    return (f < 1.5 ? 1 : f < 3 ? 2 : f < 7 ? 5 : 10) * mag;
+  }
+  function drawPlot() {
+    const c = pctx, L0 = 76, R0 = 18, T0 = 36, B0 = 56;
+    const w = PW - L0 - R0, h = PH - T0 - B0;
+    c.clearRect(0, 0, PW, PH); c.fillStyle = '#fff'; c.fillRect(0, 0, PW, PH);
+    const q = p();
+    const planned = q.nc * (2 * q.tp + (q.purge ? 2 * TPURGE : 0));
+    const tmax = Math.max(planned, S.t, 1);
+    const mmax = Math.max(q.nc * MASS_LAYER + MASS_TOP.Me1, ...S.hist.map(d => d.m)) * 1.05;
+    const X = t => L0 + w * t / tmax, Y = m => T0 + h * (1 - m / mmax);
+    // bands
+    for (const b of S.bands) {
+      c.fillStyle = PHCOL[b.type]; c.fillRect(X(b.t0), T0, Math.max(0.5, X(b.t1) - X(b.t0)), h);
+    }
+    // grid + ticks
+    c.font = '16px Helvetica, Arial, sans-serif'; c.fillStyle = '#000'; c.strokeStyle = '#e2e2e6'; c.lineWidth = 1;
+    const ys = niceStep(mmax, 6);
+    c.textAlign = 'right'; c.textBaseline = 'middle';
+    let tickW = 0;
+    for (let v = 0; v <= mmax + 1e-9; v += ys) {
+      const y = Y(v); c.beginPath(); c.moveTo(L0, y); c.lineTo(L0 + w, y); c.stroke();
+      const lab = String(Math.round(v)); tickW = Math.max(tickW, c.measureText(lab).width);
+      c.fillText(lab, L0 - 7, y);
+    }
+    const xs = niceStep(tmax, 6);
+    c.textAlign = 'center'; c.textBaseline = 'top';
+    for (let v = 0; v <= tmax + 1e-9; v += xs) {
+      const x = X(v); c.beginPath(); c.moveTo(x, T0 + h); c.lineTo(x, T0 + h + 5); c.strokeStyle = '#333'; c.stroke();
+      c.fillText((Math.round(v * 10) / 10).toString(), x, T0 + h + 8);
+    }
+    c.strokeStyle = '#333'; c.lineWidth = 1.2; c.strokeRect(L0, T0, w, h);
+    // vertical band labels, offset by type and kept clear of the curve
+    const BLAB = { TMA: ['TMA', 0.2], H2O: ['H₂O', 0.5], purge: ['N₂ purge', 0.8] };
+    c.fillStyle = '#000'; c.textAlign = 'center'; c.textBaseline = 'middle';
+    let hi = 0;
+    for (const b of S.bands) {
+      const bw = X(b.t1) - X(b.t0);
+      const full = Math.max(bw, X(b.t0 + (b.dur || 0)) - X(b.t0));   // width once the step is complete
+      const fs = Math.min(16, Math.floor(full));
+      if (fs < 10 || bw < fs) continue;
+      // vertical extent of the curve inside this band
+      while (hi < S.hist.length - 1 && S.hist[hi + 1].t < b.t0) hi++;
+      let ymin = Infinity, ymax = -Infinity;
+      for (let k = hi; k < S.hist.length && S.hist[k].t <= b.t1 + 1e-9; k++) {
+        const y = Y(S.hist[k].m); ymin = Math.min(ymin, y); ymax = Math.max(ymax, y);
+      }
+      const [lab, fy] = BLAB[b.type];
+      c.font = fs + 'px Helvetica, Arial, sans-serif';
+      const half = c.measureText(lab).width / 2 + 4;
+      let cy = T0 + h * fy;
+      if (ymin <= ymax && cy + half > ymin - 6 && cy - half < ymax + 6) {
+        // move into the free space above or below the curve, nearest to the preferred spot
+        const above = Math.min(cy, ymin - 6 - half), below = Math.max(cy, ymax + 6 + half);
+        const okA = above - half >= T0 + 2, okB = below + half <= T0 + h - 2;
+        if (okA && (!okB || cy - above <= below - cy)) cy = above;
+        else if (okB) cy = below;
+        else cy = above >= T0 + half ? above : T0 + half + 2;
+      }
+      c.save(); c.translate(X(b.t0) + bw / 2, cy); c.rotate(-Math.PI / 2);
+      c.fillText(lab, 0, 1); c.restore();
+    }
+    // data
+    c.beginPath();
+    S.hist.forEach((d, k) => { const x = X(d.t), y = Y(d.m); k ? c.lineTo(x, y) : c.moveTo(x, y); });
+    c.strokeStyle = '#98000D'; c.lineWidth = 2.2; c.stroke();
+    // labels
+    c.fillStyle = '#000'; c.textAlign = 'center'; c.textBaseline = 'alphabetic';
+    c.font = '16px Helvetica, Arial, sans-serif';
+    c.fillText('time (s)', L0 + w / 2, PH - 10);
+    c.save(); c.translate(L0 - 7 - tickW - 14, T0 + h / 2); c.rotate(-Math.PI / 2);
+    c.fillText('mass gain per site (amu)', 0, 0); c.restore();
+    c.font = 'bold 16px Helvetica, Arial, sans-serif';
+    c.fillText('Mass gain during ALD (QCM view)', L0 + w / 2, 22);
+  }
+
+  // ---------- events ----------
+  $('play').addEventListener('click', () => {
+    if (S.done) {
+      if (p().nc > S.cycle) { S.done = false; S.phaseIdx = -1; S.phase = null; }  // continue with added cycles
+      else reset();
+    }
+    S.running = !S.running;
+    $('play').textContent = S.running ? 'Pause' : 'Play';
+    if (!S.running) $('status').textContent = 'Paused.';
+    last = null;
+  });
+  $('reset').addEventListener('click', reset);
+  ['pulse', 'cycles', 'speed'].forEach(k => ui[k].addEventListener('input', () => { syncLabels(); updateReadout(); drawPlot(); }));
+  ui.purge.addEventListener('change', () => { drawPlot(); draw(); });
+
+  // flyouts
+  const panels = { bDir: 'pDir', bDet: 'pDet', bAbout: 'pAbout' };
+  function placePanel(btn, pan) {
+    const bar = $('topbar').getBoundingClientRect(), b = btn.getBoundingClientRect();
+    pan.style.left = '0px';
+    const pw = pan.getBoundingClientRect().width;
+    let left = b.right - bar.left - pw;
+    left = Math.max(0, Math.min(left, bar.width - pw));
+    pan.style.left = left + 'px';
+  }
+  Object.entries(panels).forEach(([bid, pid]) => {
+    const btn = $(bid), pan = $(pid);
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const open = !pan.hidden;
+      Object.values(panels).forEach(id => $(id).hidden = true);
+      if (!open) {
+        pan.hidden = false; placePanel(btn, pan);
+        if (pid === 'pDet' && window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([pan]).catch(() => {});
+      }
+    });
+    pan.querySelector('.close').addEventListener('click', () => pan.hidden = true);
+    pan.addEventListener('click', e => e.stopPropagation());
+  });
+  document.addEventListener('click', () => Object.values(panels).forEach(id => $(id).hidden = true));
+
+  syncLabels(); reset(); requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>
