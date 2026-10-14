@@ -1,0 +1,677 @@
+<title>Laminar Flow Reactor</title>
+<style>
+:root{
+  --bg:#FFF; --panel:#FFFFFF; --soft:#F0ECE9; --ink:#000000; --muted:#000000; --line:#DAD4D1; --grid:#EBE6E3;
+  --accent:#98000D; --on-accent:#FFFFFF; --ctl:#98000D;
+  --lfr:#98000D; --pfr:#17627F; --cstr:#7B6A4B; --wall:#8C8386;
+  --ramp0:#F6EBDD; --ramp1:#E2955A; --ramp2:#5A0712;
+}
+/* @media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#161213; --panel:#211A1C; --soft:#2C2426; --ink:#F1EAE6; --muted:#F1EAE6; --line:#3A3134; --grid:#2E2629;
+    --ctl:#E5535B; --lfr:#F0676F; --pfr:#6CB8D6; --cstr:#C4B08A; --wall:#6E6467;
+    --ramp0:#221A1D; --ramp1:#B8402E; --ramp2:#FFD9A8;
+  }
+} */
+/* :root[data-theme="dark"]{
+  --bg:#161213; --panel:#211A1C; --soft:#2C2426; --ink:#F1EAE6; --muted:#F1EAE6; --line:#3A3134; --grid:#2E2629;
+  --ctl:#E5535B; --lfr:#F0676F; --pfr:#6CB8D6; --cstr:#C4B08A; --wall:#6E6467;
+  --ramp0:#221A1D; --ramp1:#B8402E; --ramp2:#FFD9A8;
+} */
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font:14px/1.45 "Helvetica Neue",Helvetica,Arial,sans-serif;margin:0;padding-inline:16px;padding-block:18px}
+.app{max-width:1200px;margin:0 auto}
+h1{font-size:22px;letter-spacing:-.01em;margin:0 0 2px}
+.sub{margin:0 0 14px;color:var(--muted);max-width:75ch}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 350px;gap:14px;align-items:start}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+@media (max-width:900px){
+  .grid{display:flex;flex-direction:column}
+  .col{display:contents}
+  #barRow{order:0}#cReactor{order:1}#cControls{order:2}#cChart{order:3}#cResults{order:4}
+}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px 14px;min-width:0}
+.head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+h2{font-size:17px;color:var(--ink);margin:0;font-weight:400}
+canvas{display:block;width:100%}
+#cvReactor{height:clamp(230px,30vw,290px);cursor:ew-resize;touch-action:pan-y}
+#cChart{width:70%}
+@media (max-width:900px){#cChart{width:100%}}
+#cvChart{height:clamp(270px,34vw,320px)}
+.head-l{justify-content:flex-start;gap:16px}
+#btnPlay{font-size:17px}
+.tabs{display:flex;gap:4px;flex-wrap:wrap}
+.tab,.chip,.mini{border:1px solid var(--line);background:transparent;color:var(--ink);padding:5px 10px;border-radius:5px;font:inherit;font-size:12.5px;cursor:pointer}
+.tab[aria-selected="true"],.chip[aria-checked="true"]{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.note{color:var(--muted);font-size:12.5px;margin:8px 0 0;max-width:75ch}
+.btn{background:var(--accent);color:var(--on-accent);border:0;border-radius:5px;padding:8px 14px;font:inherit;font-weight:400;cursor:pointer}
+.btn:hover{filter:brightness(1.18)}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.ctl{margin-bottom:14px}
+.ctl:last-child{margin-bottom:0}
+.ctl-h{display:flex;justify-content:flex-start;align-items:baseline;gap:12px}
+.ctl-h label,.ctl-h span{font-size:17px;font-weight:400}
+output{font-variant-numeric:tabular-nums;font-weight:400;font-size:17px}
+.sl{display:flex;align-items:center;gap:12px;margin-top:6px}
+.sl output{min-width:5.2ch;text-align:left}
+input[type=range]{--accent:var(--ctl);--grey:var(--line);--fill:50%;-webkit-appearance:none;appearance:none;width:220px;flex:none;height:5px;border-radius:3px;outline:none;opacity:.95;margin:0;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid var(--panel);border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+input[type=range]::-moz-range-thumb{width:15px;height:15px;border:2px solid var(--panel);border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+.hint{font-size:15px;color:var(--muted)}
+.scale{width:220px;max-width:100%;display:flex;justify-content:space-between;font-size:17px;color:var(--muted);font-variant-numeric:tabular-nums}
+.seg{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap}
+.chip{font-size:17px;min-width:44px;font-variant-numeric:tabular-nums}
+.tau{font-family:"Times New Roman",Times,serif;font-size:1.1em}
+.tbl{width:auto;border-collapse:collapse;font-size:17px}
+.tbl th,.tbl td{padding:7px 6px;text-align:left;font-weight:400;border-bottom:1px solid var(--line)}
+.tbl tbody tr:last-child td{border-bottom:0}
+.tbl .num{text-align:center;padding-left:14px;padding-right:6px;font-variant-numeric:tabular-nums}
+.tbl .nm{color:var(--c)}
+.insight{margin:12px 0 0;padding-top:10px;border-top:1px solid var(--line);font-size:13px}
+.bar-row{position:relative;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.panel{position:absolute;top:calc(100% + 8px);right:0;width:min(760px,calc(100vw - 32px));background:var(--panel);border:1px solid var(--line);border-radius:8px;box-shadow:0 8px 28px rgba(0,0,0,.28);display:flex;flex-direction:column;z-index:20}
+.panel-head{display:flex;justify-content:space-between;align-items:center;padding:8px 8px 8px 16px;border-bottom:1px solid var(--line)}
+.panel-head h3{margin:0;font-size:15px}
+.x{background:transparent;border:0;color:var(--ink);font-size:24px;line-height:1;width:34px;height:34px;border-radius:5px;cursor:pointer}
+.x:hover{background:var(--soft)}
+.panel-body{overflow:auto;padding:12px 16px 14px}
+.panel-body p{margin:0 0 10px;max-width:70ch}
+.panel-body p:last-child{margin-bottom:0}
+.panel-body mjx-container[display="true"]{margin:.5em 0 !important}
+.panel-body a{color:var(--lfr)}
+.nom{display:grid;grid-template-columns:max-content 1fr;gap:5px 14px;margin:0;font-size:14px}
+.nom dt{font-weight:400;white-space:nowrap}
+.nom dd{margin:0;color:var(--muted)}
+</style>
+
+<div class="app">
+  <div class="grid">
+    <div class="col">
+      <section class="card" id="cReactor">
+        <div class="head head-l"><h2>reactor cross-section</h2><button class="mini" id="btnPlay" type="button">pause flow</button></div>
+        <canvas id="cvReactor" role="img" aria-label="Conversion map inside the tube. Drag the dashed marker to choose an axial position."></canvas>
+        <p class="note">Drag the marker along the tube (or use the position slider). Dots are illustrative fluid elements: fluid on the axis moves fastest, fluid at the wall barely moves.</p>
+      </section>
+
+      <section class="card" id="cChart">
+        <div class="head">
+          <h2>analysis</h2>
+          <div class="tabs" role="tablist" aria-label="Analysis view">
+            <button class="tab" role="tab" id="tabProfile" data-tab="profile" aria-selected="true" type="button">radial profile</button>
+            <button class="tab" role="tab" id="tabConv" data-tab="conv" aria-selected="false" type="button">conversion vs Da</button>
+            <button class="tab" role="tab" id="tabRtd" data-tab="rtd" aria-selected="false" type="button">residence times</button>
+          </div>
+        </div>
+        <canvas id="cvChart" role="img" aria-label="Chart"></canvas>
+        <p class="note" id="chartNote"></p>
+      </section>
+    </div>
+
+    <div class="col">
+      <div class="bar-row" id="barRow">
+    <button class="btn" id="btnDir" type="button" aria-expanded="false">Directions</button>
+    <button class="btn" id="btnDet" type="button" aria-expanded="false">Details</button>
+    <button class="btn" id="btnAbout" type="button" aria-expanded="false">About</button>
+    <button class="btn" id="btnReset" type="button">Reset</button>
+
+    <div class="panel" id="pDir" hidden role="dialog" aria-label="Directions">
+      <div class="panel-head"><h3>Directions</h3><button class="x" type="button" data-close aria-label="Close">×</button></div>
+      <div class="panel-body">
+        <p>Isothermal tubular reactor in laminar flow with a parabolic velocity profile. Reaction A → products, rate = k C<sub>A</sub><sup>n</sup>. Compare with a plug flow reactor (PFR) and a CSTR of the same residence time <i class="tau">τ</i>.</p>
+        <p><b>Damköhler number (Da)</b> sets how much reaction happens during the average residence time. Try Da = 1, then raise it toward 10 and watch the conversion of the laminar reactor fall behind the PFR.</p>
+        <p><b>reaction order</b> changes how strongly the slow-moving wall fluid and the fast-moving centerline fluid respond to the concentration they see.</p>
+        <p><b>radial diffusion (Φ)</b> is off by default, so every streamline is its own batch reactor. Increase Φ to let molecules move across streamlines; the laminar reactor approaches plug flow behavior.</p>
+        <p><b>Velocity and conversion.</b> Fluid near the wall moves slowly, stays in the reactor longest, and is most converted. Fluid near the axis leaves in about half the average residence time. Radial diffusion (Φ &gt; 0) flattens the profile.</p>
+        <p><b>Marker.</b> Drag the dashed line in the reactor, or use the axial position slider, to see the radial concentration profile at that location.</p>
+        <p><b>Analysis tabs.</b> “Conversion vs Da” compares the reactors over four decades of Da. “Residence times” shows why laminar flow is different from plug flow: the exit-age distribution E(θ).</p>
+      </div>
+    </div>
+
+    <div class="panel" id="pDet" hidden role="dialog" aria-label="Details">
+      <div class="panel-head"><h3>Details</h3><button class="x" type="button" data-close aria-label="Close">×</button></div>
+      <div class="panel-body">
+        <p>Fully developed laminar flow in a tube of radius \(R\) and length \(L\) has the parabolic velocity profile</p>
+        \[ v(r) = 2\bar v\left[1-\left(\tfrac{r}{R}\right)^{2}\right], \qquad \tau = \frac{L}{\bar v} \]
+        <p>For steady, isothermal, constant-density flow with radial diffusion and no axial diffusion, the mole balance for A with rate \(-r_A = kC_A^{\,n}\) is</p>
+        \[ v(r)\frac{\partial C_A}{\partial z} = \frac{D}{r}\frac{\partial}{\partial r}\!\left(r\frac{\partial C_A}{\partial r}\right) - kC_A^{\,n} \]
+        <p>In dimensionless form, with \(c = C_A/C_{A0}\), \(\rho = r/R\) and \(\zeta = z/L\):</p>
+        \[ 2(1-\rho^{2})\frac{\partial c}{\partial \zeta} = \Phi\,\frac{1}{\rho}\frac{\partial}{\partial\rho}\!\left(\rho\frac{\partial c}{\partial\rho}\right) - \mathrm{Da}\,c^{\,n}, \qquad \mathrm{Da}=k\tau C_{A0}^{\,n-1},\quad \Phi=\frac{D\tau}{R^{2}} \]
+        <p>The equation is solved numerically (finite volumes in \(\rho\), implicit marching in \(\zeta\)). The outlet conversion is the flow-weighted (mixing-cup) average:</p>
+        \[ X = 1-\frac{\int_0^1 c\,(1-\rho^2)\,\rho\,d\rho}{\int_0^1 (1-\rho^2)\,\rho\,d\rho} \]
+        <p><b>No radial diffusion (Φ = 0).</b> Each streamline behaves as a batch reactor whose reaction time is its residence time, \(t = \tau/[2(1-\rho^2)] \ge \tau/2\). The exit-age distribution is</p>
+        \[ E(t)=\frac{\tau^{2}}{2t^{3}}\quad (t\ge \tau/2), \qquad X = 1-\int_{\tau/2}^{\infty} c_{\text{batch}}(t)\,E(t)\,dt \]
+        <p>Without radial diffusion, no fluid leaves before \(\tau/2\), and the tail of slow wall fluid extends far past \(\tau\). Conversion is \(1-\int C_{\text{batch}}(\theta)\,E(\theta)\,d\theta\), where \(\theta = t/\tau\).</p>
+        <p><b>Radial diffusion (Φ &gt; 0).</b> There is no closed form for \(E(\theta)\) once molecules can cross streamlines, so the curve shown is built by tracking several thousand tracer particles: each advects along its streamline at \(v(r)/\bar v\) and takes a random radial step every \(d\theta\) with variance \(2\Phi\,d\theta\), reflecting at the wall, until it exits at \(\zeta=1\). As Φ increases, fluid that would have been trapped near the wall mixes toward the centerline, so the distribution narrows and shifts toward the plug-flow spike at \(\theta=1\).</p>
+        <p><b>Reference reactors.</b> Plug flow: \(c_{\text{PFR}}\) is the batch solution evaluated at \(t=\tau\). CSTR: \(1-c = \mathrm{Da}\,c^{\,n}\). Very large Φ makes the concentration uniform across the tube, so the laminar reactor approaches the PFR result.</p>
+        <p>Assumptions: constant density and temperature, fully developed laminar flow (Re below about 2100), no axial dispersion, no reaction volume change.</p>
+        <p><b>Nomenclature.</b></p>
+        <dl class="nom">
+          <dt>\(C_A\)</dt><dd>concentration of A</dd>
+          <dt>\(C_{A0}\)</dt><dd>inlet concentration of A</dd>
+          <dt>\(c\)</dt><dd>dimensionless concentration, \(C_A/C_{A0}\)</dd>
+          <dt>\(c_{\text{batch}}\)</dt><dd>dimensionless batch-reactor concentration at time \(t\)</dd>
+          <dt>\(D\)</dt><dd>radial diffusion coefficient</dd>
+          <dt>\(\mathrm{Da}\)</dt><dd>Damköhler number, \(k\tau C_{A0}^{\,n-1}\)</dd>
+          <dt>\(E(\theta)\)</dt><dd>exit-age (residence-time) distribution</dd>
+          <dt>\(k\)</dt><dd>reaction rate constant</dd>
+          <dt>\(L\)</dt><dd>tube length</dd>
+          <dt>\(n\)</dt><dd>reaction order</dd>
+          <dt>\(r\)</dt><dd>radial position</dd>
+          <dt>\(R\)</dt><dd>tube radius</dd>
+          <dt>\(t\)</dt><dd>time</dd>
+          <dt>\(v(r)\)</dt><dd>local axial velocity at radius \(r\)</dd>
+          <dt>\(\bar v\)</dt><dd>average (mean) velocity</dd>
+          <dt>\(X\)</dt><dd>conversion</dd>
+          <dt>\(z\)</dt><dd>axial position</dd>
+          <dt>\(\zeta\)</dt><dd>dimensionless axial position, \(z/L\)</dd>
+          <dt>\(\theta\)</dt><dd>dimensionless time, \(t/\tau\)</dd>
+          <dt>\(\rho\)</dt><dd>dimensionless radial position, \(r/R\)</dd>
+          <dt>\(\tau\)</dt><dd>mean residence time, \(L/\bar v\)</dd>
+          <dt>\(\Phi\)</dt><dd>dimensionless radial diffusion, \(D\tau/R^{2}\)</dd>
+        </dl>
+      </div>
+    </div>
+
+    <div class="panel" id="pAbout" hidden role="dialog" aria-label="About">
+      <div class="panel-head"><h3>About</h3><button class="x" type="button" data-close aria-label="Close">×</button></div>
+      <div class="panel-body">
+        <p>This simulation was created in the <a href="https://www.colorado.edu/chbe/" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="https://learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.</p>
+      </div>
+    </div>
+  </div>
+      <section class="card" id="cControls">
+
+        <div class="ctl">
+          <div class="ctl-h"><label for="da">Damköhler number, Da</label></div>
+          <div class="sl"><input id="da" type="range" min="-2" max="2" step="0.01" value="0"><output id="daOut" for="da">1.00</output></div>
+          <div class="scale" aria-hidden="true"><span>0.01</span><span>0.1</span><span>1</span><span>10</span><span>100</span></div>
+          <div class="hint">Da = k<i class="tau">τ</i>C<sub>A0</sub><sup>n−1</sup>: reaction rate relative to flow rate</div>
+        </div>
+
+        <div class="ctl">
+          <div class="ctl-h"><span id="nLabel">reaction order, n</span><output id="nOut">1</output></div>
+          <div class="seg" role="radiogroup" aria-labelledby="nLabel" id="nSeg">
+            <button class="chip" role="radio" aria-checked="false" data-n="0" type="button">0</button>
+            <button class="chip" role="radio" aria-checked="false" data-n="0.5" type="button">½</button>
+            <button class="chip" role="radio" aria-checked="true" data-n="1" type="button">1</button>
+            <button class="chip" role="radio" aria-checked="false" data-n="2" type="button">2</button>
+            <button class="chip" role="radio" aria-checked="false" data-n="3" type="button">3</button>
+          </div>
+        </div>
+
+        <div class="ctl">
+          <div class="ctl-h"><label for="phi">radial diffusion, Φ</label></div>
+          <div class="sl"><input id="phi" type="range" min="0" max="100" step="1" value="0"><output id="phiOut" for="phi">0 (off)</output></div>
+          <div class="scale" aria-hidden="true"><span>off</span><span>0.001</span><span>0.01</span><span>0.1</span><span>1</span><span>10</span></div>
+          <div class="hint">Φ = D<i class="tau">τ</i>/R²: how far molecules diffuse across the tube during one residence time</div>
+        </div>
+
+        <div class="ctl">
+          <div class="ctl-h"><label for="zpos">axial position, z/L</label></div>
+          <div class="sl"><input id="zpos" type="range" min="0" max="1" step="0.005" value="1"><output id="zOut" for="zpos">1.00</output></div>
+        </div>
+      </section>
+
+      <section class="card" id="cResults">
+        <div class="head"><h2>outlet conversion of A</h2></div>
+        <table class="tbl">
+          <thead><tr><th>reactor</th><th class="num">X</th></tr></thead>
+          <tbody>
+            <tr id="rowSeg" class="dash" style="--c:var(--lfr)"><td class="nm">laminar flow, Φ = 0<br>(no mixing)</td><td class="num" id="vSeg"></td></tr>
+            <tr id="rowLfr" style="--c:var(--lfr)" hidden><td class="nm" id="labLfr">laminar flow reactor</td><td class="num" id="vLfr"></td></tr>
+            <tr id="rowPfr" style="--c:var(--pfr)"><td class="nm">plug flow reactor</td><td class="num" id="vPfr"></td></tr>
+            <tr id="rowCstr" class="dot" style="--c:var(--cstr)"><td class="nm">CSTR</td><td class="num" id="vCstr"></td></tr>
+          </tbody>
+        </table>
+      </section>
+    </div>
+  </div>
+</div>
+
+<script>
+window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},svg:{fontCache:'local',displayAlign:'left',displayIndent:'0'},startup:{typeset:false}};
+</script>
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.min.js"></script>
+
+<script>
+(function(){
+'use strict';
+var $=function(id){return document.getElementById(id);};
+var SANS='"Helvetica Neue",Helvetica,Arial,sans-serif', SERIF='"Times New Roman",Times,serif';
+var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+var S={logDa:0,n:1,phiIdx:0,zeta:1,tab:'profile',play:!reduce};
+var N=80, M=200;
+
+/* ---------- model ---------- */
+var rho=new Float64Array(N), vel=new Float64Array(N), wt=new Float64Array(N), wsum=0;
+for(var i=0;i<N;i++){rho[i]=(i+0.5)/N; vel[i]=2*(1-rho[i]*rho[i]); wt[i]=vel[i]*rho[i]/N; wsum+=wt[i];}
+function phiFromIdx(k){return k<=0?0:Math.pow(10,-3+4*(k-1)/99);}
+function batchC(Da,n,s){
+  if(Math.abs(n-1)<1e-9) return Math.exp(-Da*s);
+  var b=1+(n-1)*Da*s; if(!(b>0)) return 0;
+  return Math.pow(b,1/(1-n));
+}
+function cstrC(Da,n){
+  if(1-Da*Math.pow(0,n)<=0) return 0;
+  var a=0,b=1;
+  for(var k=0;k<60;k++){var m=(a+b)/2; if(1-m-Da*Math.pow(m,n)>0)a=m; else b=m;}
+  return (a+b)/2;
+}
+function segX(Da,n){
+  var K=1000,s=0;
+  for(var j=0;j<=K;j++){
+    var w=j/K, f=(j===0)?0:2*w*batchC(Da,n,1/(2*w));
+    var c=(j===0||j===K)?1:(j%2?4:2); s+=c*f;
+  }
+  return 1-s/(3*K);
+}
+var T_lo=new Float64Array(N), T_up=new Float64Array(N), T_a=new Float64Array(N);
+var T_d=new Float64Array(N), T_cp=new Float64Array(N), T_dp=new Float64Array(N);
+function solve(Da,n,Phi,store){
+  var C=new Float64Array(N), slices=null, i,j;
+  for(i=0;i<N;i++)C[i]=1;
+  if(store){slices=new Float32Array((M+1)*N); for(i=0;i<N;i++)slices[i]=1;}
+  if(Phi<=1e-12){
+    for(j=1;j<=M;j++){
+      for(i=0;i<N;i++){C[i]=batchC(Da,n,(j/M)/vel[i]); if(store)slices[j*N+i]=C[i];}
+    }
+  } else {
+    var dz=1/M, Cold=new Float64Array(N), Cit=new Float64Array(N), it,k;
+    for(i=0;i<N;i++){T_a[i]=vel[i]*rho[i]/N/dz; T_lo[i]=Phi*i; T_up[i]=(i<N-1)?Phi*(i+1):0;}
+    for(j=1;j<=M;j++){
+      for(i=0;i<N;i++){Cold[i]=C[i];Cit[i]=C[i];}
+      for(it=0;it<2;it++){
+        for(i=0;i<N;i++){
+          var kk=Da*rho[i]/N*(n===1?1:Math.pow(Math.max(Cit[i],1e-9),n-1));
+          T_d[i]=T_a[i]+T_lo[i]+T_up[i]+kk;
+        }
+        // Thomas: sub=-lo, sup=-up
+        T_cp[0]=-T_up[0]/T_d[0]; T_dp[0]=T_a[0]*Cold[0]/T_d[0];
+        for(i=1;i<N;i++){
+          var m=T_d[i]+T_lo[i]*T_cp[i-1];
+          T_cp[i]=-T_up[i]/m;
+          T_dp[i]=(T_a[i]*Cold[i]+T_lo[i]*T_dp[i-1])/m;
+        }
+        C[N-1]=T_dp[N-1];
+        for(i=N-2;i>=0;i--)C[i]=T_dp[i]-T_cp[i]*C[i+1];
+        for(i=0;i<N;i++){if(C[i]<0)C[i]=0; Cit[i]=C[i];}
+      }
+      if(store)for(i=0;i<N;i++)slices[j*N+i]=C[i];
+    }
+  }
+  var mix=0; for(i=0;i<N;i++)mix+=wt[i]*C[i];
+  return {slices:slices,mix:mix/wsum};
+}
+function mixAt(sl,j){var s=0;for(var i=0;i<N;i++)s+=wt[i]*sl[j*N+i];return s/wsum;}
+
+var Da=1,Phi=0,sim=null,X={lfr:0,seg:0,pfr:0,cstr:0};
+function recompute(){
+  Da=Math.pow(10,S.logDa); Phi=phiFromIdx(S.phiIdx);
+  sim=solve(Da,S.n,Phi,true);
+  X.seg=segX(Da,S.n);
+  X.lfr=Phi>0?1-sim.mix:X.seg;
+  X.pfr=1-batchC(Da,S.n,1);
+  X.cstr=1-cstrC(Da,S.n);
+}
+var curve=null;
+function getCurve(){
+  var key=S.n+'|'+S.phiIdx; if(curve&&curve.key===key)return curve;
+  var P=phiFromIdx(S.phiIdx), K=60, o={key:key,x:[],pfr:[],cstr:[],seg:[],lfr:[]};
+  for(var k=0;k<=K;k++){
+    var lg=-2+4*k/K, d=Math.pow(10,lg);
+    o.x.push(lg); o.pfr.push(1-batchC(d,S.n,1)); o.cstr.push(1-cstrC(d,S.n)); o.seg.push(segX(d,S.n));
+    o.lfr.push(P>0?1-solve(d,S.n,P,false).mix:o.seg[k]);
+  }
+  curve=o; return o;
+}
+
+/* ---------- RTD by particle tracking (Φ > 0, no closed form) ---------- */
+function gRand(){return (Math.random()+Math.random()+Math.random()-1.5)*2;}
+function exitTheta(Phi,thetaMax,dth){
+  var u=Math.random(), rho0=Math.sqrt(1-Math.sqrt(1-u)), ang=Math.random()*6.283185307179586;
+  var X=rho0*Math.cos(ang), Y=rho0*Math.sin(ang), zeta=0, theta=0, sd=Math.sqrt(2*Phi*dth);
+  while(theta<thetaMax){
+    var v=2*(1-X*X-Y*Y); if(v<0)v=0;
+    var zn=zeta+v*dth;
+    if(zn>=1){var frac=v>1e-9?(1-zeta)/(zn-zeta):0; return theta+frac*dth;}
+    zeta=zn; theta+=dth;
+    if(sd>0){
+      X+=sd*gRand(); Y+=sd*gRand();
+      var r=Math.sqrt(X*X+Y*Y); if(r>1){var sc=(2-r)/r; X*=sc; Y*=sc;}
+    }
+  }
+  return -1;
+}
+var rtdCache=null;
+function getRtdCurve(){
+  var key=S.phiIdx; if(rtdCache&&rtdCache.key===key)return rtdCache;
+  var P=phiFromIdx(S.phiIdx), NP=6000, thetaMax=4, dth=Math.min(0.014,0.02/Math.max(1,P));
+  var t=new Float64Array(NP), cnt=0, i;
+  for(i=0;i<NP;i++){var e=exitTheta(P,thetaMax,dth); if(e>=0)t[cnt++]=e;}
+  var K=120, h=0.035, norm=1/(NP*h*2.5066282746310002), pts=[];
+  for(var k=0;k<=K;k++){
+    var th=3*k/K, s=0;
+    for(i=0;i<cnt;i++){var d=(th-t[i])/h; if(d>-4&&d<4)s+=Math.exp(-0.5*d*d);}
+    pts.push({x:th,y:s*norm});
+  }
+  rtdCache={key:key,pts:pts}; return rtdCache;
+}
+
+/* ---------- colors ---------- */
+var col={}, lut=null;
+function hex(h){h=h.trim();return [parseInt(h.substr(1,2),16),parseInt(h.substr(3,2),16),parseInt(h.substr(5,2),16)];}
+function readColors(){
+  var cs=getComputedStyle(document.documentElement);
+  ['ink','muted','line','grid','panel','lfr','pfr','cstr','wall','ramp0','ramp1','ramp2'].forEach(function(k){col[k]=cs.getPropertyValue('--'+k).trim();});
+  var a=hex(col.ramp0),b=hex(col.ramp1),c=hex(col.ramp2); lut=[];
+  for(var i=0;i<256;i++){
+    var x=i/255,p,q,t; if(x<0.5){p=a;q=b;t=x/0.5;}else{p=b;q=c;t=(x-0.5)/0.5;}
+    lut.push([Math.round(p[0]+(q[0]-p[0])*t),Math.round(p[1]+(q[1]-p[1])*t),Math.round(p[2]+(q[2]-p[2])*t)]);
+  }
+}
+
+/* ---------- canvas helpers ---------- */
+function setup(cv){
+  var dpr=Math.min(window.devicePixelRatio||1,3), r=cv.getBoundingClientRect();
+  var w=Math.max(240,Math.round(r.width)), h=Math.round(r.height);
+  if(cv.width!==Math.round(w*dpr)||cv.height!==Math.round(h*dpr)){cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);}
+  var g=cv.getContext('2d'); g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,w,h);
+  return {g:g,w:w,h:h};
+}
+function parseRich(s){
+  var out=[],re=/([_^])\{([^}]*)\}/g,last=0,m;
+  while((m=re.exec(s))){if(m.index>last)out.push({t:s.slice(last,m.index),k:0});out.push({t:m[2],k:m[1]==='_'?1:2});last=re.lastIndex;}
+  if(last<s.length)out.push({t:s.slice(last),k:0}); return out;
+}
+function layout(g,s,size){
+  var runs=[],w=0;
+  parseRich(s).forEach(function(p){
+    var sz=p.k?size*0.72:size, dy=p.k===1?size*0.22:(p.k===2?-size*0.4:0);
+    p.t.split(/(τ)/).forEach(function(r){
+      if(!r)return; var f=(r==='τ')?(sz*1.1)+'px '+SERIF:sz+'px '+SANS; g.font=f;
+      var rw=g.measureText(r).width; runs.push({t:r,f:f,dy:dy,w:rw}); w+=rw;
+    });
+  });
+  return {runs:runs,w:w};
+}
+function rich(g,s,x,y,size,color,align,halo){
+  var L=layout(g,s,size), cx=align==='center'?x-L.w/2:(align==='right'?x-L.w:x);
+  g.fillStyle=color; g.textAlign='left'; g.textBaseline='alphabetic';
+  L.runs.forEach(function(r){g.font=r.f;if(halo){g.save();g.lineJoin='round';g.lineWidth=5;g.strokeStyle=col.panel;g.strokeText(r.t,cx,y+r.dy);g.restore();}g.fillText(r.t,cx,y+r.dy);cx+=r.w;});
+  return L.w;
+}
+function line(g,pts,color,lw,dash){
+  g.save(); g.strokeStyle=color; g.lineWidth=lw; g.setLineDash(dash||[]); g.lineJoin='round'; g.lineCap='round';
+  g.beginPath(); pts.forEach(function(p,i){if(i)g.lineTo(p[0],p[1]);else g.moveTo(p[0],p[1]);}); g.stroke(); g.restore();
+}
+function legend(g,items,x,y,maxW){
+  var cx=x,cy=y;
+  items.forEach(function(it){
+    var lw=layout(g,it.label,12).w, tot=28+lw+16;
+    if(cx+tot>x+maxW&&cx>x){cx=x;cy+=17;}
+    line(g,[[cx,cy-4],[cx+22,cy-4]],it.color,it.lw||2,it.dash);
+    rich(g,it.label,cx+28,cy,12,col.ink,'left'); cx+=tot;
+  });
+}
+function axes(g,W,H,m,tx,ty,X_,Y_,xlabel,ylabel){
+  g.save(); g.lineWidth=1; g.strokeStyle=col.grid; g.beginPath();
+  ty.forEach(function(t){var y=Math.round(Y_(t.v))+0.5;g.moveTo(m.l,y);g.lineTo(W-m.r,y);});
+  tx.forEach(function(t){var x=Math.round(X_(t.v))+0.5;g.moveTo(x,m.t);g.lineTo(x,H-m.b);});
+  g.stroke();
+  g.strokeStyle=col.muted; g.beginPath(); g.moveTo(m.l+0.5,m.t);g.lineTo(m.l+0.5,H-m.b+0.5);g.lineTo(W-m.r,H-m.b+0.5);g.stroke();
+  g.restore();
+  tx.forEach(function(t){rich(g,t.l,X_(t.v),H-m.b+21,15,col.ink,'center');});
+  ty.forEach(function(t){rich(g,t.l,m.l-8,Y_(t.v)+5,15,col.ink,'right');});
+  rich(g,xlabel,(m.l+W-m.r)/2,H-8,15,col.ink,'center');
+  g.save(); g.translate(m.l-46,(m.t+H-m.b)/2); g.rotate(-Math.PI/2); rich(g,ylabel,0,0,15,col.ink,'center'); g.restore();
+}
+function fmt(x,d){return x.toFixed(d);}
+function fmtDa(d){return d<0.1?d.toFixed(3):(d<10?d.toFixed(2):d.toFixed(1));}
+function fmtPhi(p){return p<=0?'0 (off)':(p<0.01?p.toFixed(4):(p<1?p.toFixed(3):p.toFixed(2))).replace(/0+$/,'').replace(/\.$/,'');}
+
+/* ---------- reactor drawing ---------- */
+var cv1=$('cvReactor'), cv2=$('cvChart'), heat=document.createElement('canvas');
+var ML=70, MR=44, MT=42, MB=60;
+function buildHeat(){
+  if(!sim)return;
+  heat.width=M+1; heat.height=2*N;
+  var hc=heat.getContext('2d'), img=hc.createImageData(M+1,2*N), d=img.data, y,j;
+  for(y=0;y<2*N;y++){
+    var i=y<N?N-1-y:y-N;
+    for(j=0;j<=M;j++){
+      var x=1-sim.slices[j*N+i]; x=x<0?0:(x>1?1:x); var c=lut[Math.round(x*255)], o=(y*(M+1)+j)*4;
+      d[o]=c[0];d[o+1]=c[1];d[o+2]=c[2];d[o+3]=255;
+    }
+  }
+  hc.putImageData(img,0,0);
+}
+var parts=[];
+function rndFlux(){for(;;){var y=Math.random()*2-1; if(Math.random()<1-y*y)return y;}}
+function initParts(){parts=[];for(var k=0;k<70;k++)parts.push({x:Math.random(),y:Math.random()*2-1});}
+function stepParts(dt){
+  var T=8, s=dt/T, jit=Math.sqrt(2*phiFromIdx(S.phiIdx)*s);
+  parts.forEach(function(p){
+    p.x+=2*(1-p.y*p.y)*s;
+    if(jit>0){p.y+=jit*(Math.random()+Math.random()+Math.random()-1.5)*2;
+      if(p.y>1)p.y=2-p.y; if(p.y<-1)p.y=-2-p.y; p.y=Math.max(-1,Math.min(1,p.y));}
+    if(p.x>1){p.x=0;p.y=rndFlux();}
+  });
+}
+function drawReactor(){
+  var o=setup(cv1), g=o.g, w=o.w, h=o.h;
+  var tx=ML, tw=w-ML-MR, ty=MT, th=h-MT-MB;
+  if(heat.width){g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';g.drawImage(heat,0,0,heat.width,heat.height,tx,ty,tw,th);}
+  g.fillStyle=col.wall; g.fillRect(tx,ty-6,tw,6); g.fillRect(tx,ty+th,tw,6);
+  // header
+  var hw=rich(g,'local conversion X(r, z) of A',tx,25,17,col.ink,'left');
+  var cbw=96, cbx=tx+hw+34, cby=11, showCb=(cbx+cbw+20<tx+tw);
+  if(showCb)for(var k=0;k<cbw;k++){var c=lut[Math.round(k/(cbw-1)*255)];g.fillStyle='rgb('+c[0]+','+c[1]+','+c[2]+')';g.fillRect(cbx+k,cby,1.5,9);}
+  if(showCb){g.strokeStyle=col.line;g.lineWidth=1;g.strokeRect(cbx+0.5,cby+0.5,cbw,9);
+  rich(g,'0',cbx-4,cby+10,15,col.ink,'right'); rich(g,'1',cbx+cbw+4,cby+10,15,col.ink,'left');}
+  // velocity profile at inlet
+  var xb=tx-9, A=xb-16, yy;
+  g.save(); g.strokeStyle=col.muted; g.fillStyle=col.muted; g.lineWidth=1.2;
+  for(yy=-0.9;yy<=0.91;yy+=0.225){
+    var L=A*(1-yy*yy), py=ty+th/2+yy*th/2; if(L<3)continue;
+    g.beginPath();g.moveTo(xb-L,py);g.lineTo(xb,py);g.stroke();
+    if(L>9){g.beginPath();g.moveTo(xb,py);g.lineTo(xb-5,py-3);g.lineTo(xb-5,py+3);g.closePath();g.fill();}
+  }
+  var env=[];for(yy=-1;yy<=1.001;yy+=0.05)env.push([xb-A*(1-yy*yy),ty+th/2+yy*th/2]);
+  g.restore(); line(g,env,col.muted,1.4);
+  rich(g,'v(r)',xb-A/2,ty+th+27,17,col.ink,'center');
+  // ticks
+  [0,0.25,0.5,0.75,1].forEach(function(z){var x=tx+z*tw;g.strokeStyle=col.muted;g.lineWidth=1;g.beginPath();g.moveTo(x+.5,ty+th+6);g.lineTo(x+.5,ty+th+10);g.stroke();
+    rich(g,(z===0||z===1)?String(z):z.toFixed(2).replace(/0$/,''),x,ty+th+26,15,col.ink,'center');});
+  rich(g,'axial position, z/L',tx+tw/2,h-8,15,col.ink,'center');
+  [['1',-1],['0',0],['−1',1]].forEach(function(t){rich(g,t[0],tx+tw+8,ty+th/2+t[1]*th/2+5,15,col.ink,'left');});
+  rich(g,'r/R',tx+tw+8,ty-10,17,col.ink,'left');
+  // particles
+  g.save();
+  parts.forEach(function(p){var px=tx+p.x*tw,py=ty+th/2+p.y*th/2;
+    g.beginPath();g.arc(px,py,2.3,0,6.2832);g.fillStyle=col.ink;g.globalAlpha=0.85;g.fill();
+    g.globalAlpha=0.9;g.lineWidth=1;g.strokeStyle=col.panel;g.stroke();});
+  g.restore();
+  // marker
+  var xm=tx+S.zeta*tw;
+  g.save(); g.lineWidth=4; g.strokeStyle=col.panel; g.globalAlpha=0.75; g.beginPath();g.moveTo(xm,ty-4);g.lineTo(xm,ty+th+4);g.stroke();
+  g.globalAlpha=1;g.lineWidth=1.8;g.strokeStyle=col.ink;g.setLineDash([5,3]);g.beginPath();g.moveTo(xm,ty-4);g.lineTo(xm,ty+th+4);g.stroke();
+  g.setLineDash([]);g.fillStyle=col.ink;g.beginPath();g.moveTo(xm,ty-3);g.lineTo(xm-6,ty-13);g.lineTo(xm+6,ty-13);g.closePath();g.fill();g.restore();
+}
+
+/* ---------- charts ---------- */
+var notes={
+  profile:'',
+  conv:'Because residence times are unequal, the laminar reactor converts less than a plug flow reactor of the same average residence time. Increasing Φ moves the laminar curve up toward the PFR curve.',
+  rtd:'Radial diffusion lets fluid cross streamlines, smoothing the sharp cutoff at θ = ½ and narrowing the distribution toward the plug-flow spike as Φ increases.'
+};
+var curW=400;
+function callout(g,text,ax,ay,lx,ly,color,mode){
+  var w=layout(g,text,15).w, x0=Math.max(4,Math.min(lx,curW-22-w));
+  if(ax!==null){
+    var top=ly-14,bot=ly+3,ex,ey;
+    if(mode==='side'){ex=(ax<x0)?x0-4:x0+w+4;ey=ly-5;}
+    else if(ay<top){ex=Math.max(x0,Math.min(ax,x0+w));ey=top-1;}
+    else if(ay>bot){ex=Math.max(x0,Math.min(ax,x0+w));ey=bot+1;}
+    else{ex=(ax<x0)?x0-4:x0+w+4;ey=ay;}
+    g.save();g.strokeStyle=color;g.lineWidth=1.4;g.beginPath();g.moveTo(ax,ay);g.lineTo(ex,ey);g.stroke();
+    g.beginPath();g.arc(ax,ay,3,0,6.2832);g.fillStyle=color;g.fill();g.restore();
+  }
+  rich(g,text,x0,ly,15,col.ink,'left',true);
+}
+function drawChart(){
+  var o=setup(cv2), g=o.g, W=o.w, H=o.h, m={l:62,r:22,t:24,b:60}; curW=W;
+  var pw=W-m.l-m.r, ph=H-m.t-m.b, tab=S.tab, j=Math.round(S.zeta*M), k;
+  if(tab==='profile'){
+    var Xf=function(x){return m.l+x*pw;}, Yf=function(y){return m.t+(1-y)*ph;};
+    var tk=[0,0.2,0.4,0.6,0.8,1].map(function(v){return {v:v,l:v.toFixed(1)};});
+    axes(g,W,H,m,tk,tk,Xf,Yf,'radial position, r/R','C_{A} / C_{A0}');
+    var vp=[],cp=[],cpo=[];
+    for(k=0;k<=50;k++){var r=k/50;vp.push([Xf(r),Yf(1-r*r)]);}
+    line(g,vp,col.muted,1.6,[2,4]);
+    var mix=(j===M)?1-X.lfr:mixAt(sim.slices,j);
+    g.save();g.strokeStyle=col.pfr;g.lineWidth=1.6;g.setLineDash([6,4]);g.beginPath();g.moveTo(m.l,Yf(mix));g.lineTo(W-m.r,Yf(mix));g.stroke();g.restore();
+    if(j<M){for(k=0;k<N;k++)cpo.push([Xf(rho[k]),Yf(sim.slices[M*N+k])]); line(g,cpo,col.lfr,1.4,[3,3]);}
+    cp.push([Xf(0),Yf(sim.slices[j*N])]);
+    for(k=0;k<N;k++)cp.push([Xf(rho[k]),Yf(sim.slices[j*N+k])]);
+    cp.push([Xf(1),Yf(sim.slices[j*N+N-1])]);
+    line(g,cp,col.lfr,2.8);
+    var ka=Math.round(0.2*N), kb=Math.round(0.5*N), kv=Math.round(0.65*N);
+    var ya=Yf(sim.slices[j*N+ka]), lyA=Math.max(m.t+8,ya-22);
+    callout(g,'C_{A}/C_{A0} at z/L = '+S.zeta.toFixed(2),Xf(rho[ka]),ya,Xf(rho[ka])+6,lyA,col.lfr);
+    if(j<M){var yb=Yf(sim.slices[M*N+kb]);callout(g,'at outlet',Xf(rho[kb]),yb,Xf(rho[kb])+14,Math.min(yb+34,H-m.b-6),col.lfr);}
+    var yv=Yf(1-rho[kv]*rho[kv]);callout(g,'velocity, v/v_{max}',Xf(rho[kv]),yv,Xf(rho[kv])+18,yv-24,col.muted);
+    rich(g,'mixing-cup C̄_{A} = '+mix.toFixed(3),Xf(0.3),Yf(mix)+20,15,col.ink,'center',true);
+  } else if(tab==='conv'){
+    var cu=getCurve(), P=phiFromIdx(S.phiIdx);
+    var Xc=function(lg){return m.l+(lg+2)/4*pw;}, Yc=function(y){return m.t+(1-y)*ph;};
+    var tx=[[-2,'0.01'],[-1,'0.1'],[0,'1'],[1,'10'],[2,'100']].map(function(a){return {v:a[0],l:a[1]};});
+    var ty=[0,0.2,0.4,0.6,0.8,1].map(function(v){return {v:v,l:v.toFixed(1)};});
+    axes(g,W,H,m,tx,ty,Xc,Yc,'Damköhler number, Da','conversion, X');
+    var mk=function(arr){return cu.x.map(function(lg,i){return [Xc(lg),Yc(arr[i])];});};
+    line(g,mk(cu.cstr),col.cstr,2,[2,4]);
+    line(g,mk(cu.pfr),col.pfr,2.2);
+    if(P>0)line(g,mk(cu.seg),col.lfr,1.6,[7,4]);
+    line(g,mk(cu.lfr),col.lfr,3);
+    var xm=Xc(S.logDa);
+    g.save();g.strokeStyle=col.muted;g.lineWidth=1;g.setLineDash([2,3]);g.beginPath();g.moveTo(xm,m.t);g.lineTo(xm,H-m.b);g.stroke();g.restore();
+    [[X.cstr,col.cstr],[X.pfr,col.pfr],[X.lfr,col.lfr]].forEach(function(a){g.beginPath();g.arc(xm,Yc(a[0]),4.2,0,6.2832);g.fillStyle=a[1];g.fill();g.lineWidth=1.5;g.strokeStyle=col.panel;g.stroke();});
+    var q=Math.round((0.3+2)/4*60);
+    var items=[{t:'PFR',a:cu.pfr,c:col.pfr,gap:32,side:'left'},{t:'laminar flow'+(P>0?', Φ = '+fmtPhi(P):''),a:cu.lfr,c:col.lfr,gap:32,side:'left'},{t:'CSTR',a:cu.cstr,c:col.cstr,gap:24,side:'right'}];
+    if(P>0)items.splice(2,0,{t:'laminar, Φ = 0',a:cu.seg,c:col.lfr,gap:40,side:'left'});
+    items.forEach(function(it){it.ax=Xc(cu.x[q]);it.ay=Yc(it.a[q]);it.ly=it.ay;it.w=layout(g,it.t,15).w;});
+    items.sort(function(u,v){return u.ay-v.ay;});
+    var minGap=17;
+    for(var i2=1;i2<items.length;i2++){if(items[i2].ly-items[i2-1].ly<minGap)items[i2].ly=items[i2-1].ly+minGap;}
+    var maxLy=H-m.b-6;
+    if(items[items.length-1].ly>maxLy){var shift=items[items.length-1].ly-maxLy;items.forEach(function(it){it.ly-=shift;});}
+    var minLy=m.t+8;
+    if(items[0].ly<minLy){var shift2=minLy-items[0].ly;items.forEach(function(it){it.ly+=shift2;});}
+    items.forEach(function(it){var lx=(it.side==='right')?it.ax+it.gap:it.ax-it.gap-it.w;callout(g,it.t,it.ax,it.ay,lx,it.ly,it.c,'side');});
+  } else {
+    var Xr=function(t){return m.l+t/3*pw;}, YM=4.5, Yr=function(y){return m.t+(1-Math.min(y,YM)/YM)*ph;};
+    var tx3=[0,0.5,1,1.5,2,2.5,3].map(function(v){return {v:v,l:v.toFixed(1)};});
+    var ty3=[0,1,2,3,4].map(function(v){return {v:v,l:String(v)};});
+    axes(g,W,H,m,tx3,ty3,Xr,Yr,'dimensionless time, θ = t/τ','E(θ)');
+    var P=phiFromIdx(S.phiIdx), k2;
+    var pl0=[[Xr(0.5),Yr(0)],[Xr(0.5),Yr(4)]];
+    for(k2=0;k2<=120;k2++){var th=0.5+2.5*k2/120;pl0.push([Xr(th),Yr(1/(2*th*th*th))]);}
+    var ce=[];
+    for(k2=0;k2<=120;k2++){var t2=3*k2/120;ce.push([Xr(t2),Yr(Math.exp(-t2))]);}
+    line(g,ce,col.cstr,2,[2,4]);
+    g.save();g.strokeStyle=col.pfr;g.fillStyle=col.pfr;g.lineWidth=2.2;g.beginPath();g.moveTo(Xr(1),Yr(0));g.lineTo(Xr(1),m.t+7);g.stroke();
+    g.beginPath();g.moveTo(Xr(1),m.t);g.lineTo(Xr(1)-4.5,m.t+9);g.lineTo(Xr(1)+4.5,m.t+9);g.closePath();g.fill();g.restore();
+    var lfrAx,lfrAy,lfrText;
+    if(P>0){
+      line(g,pl0,col.lfr,1.6,[7,4]);
+      var rc=getRtdCurve(), pl=rc.pts.map(function(p){return [Xr(p.x),Yr(p.y)];});
+      line(g,pl,col.lfr,3);
+      var qi=Math.round(0.7/3*(rc.pts.length-1));
+      lfrAx=Xr(rc.pts[qi].x); lfrAy=Yr(rc.pts[qi].y);
+      lfrText='laminar flow, Φ = '+fmtPhi(P);
+      callout(g,'laminar, Φ = 0',Xr(0.5),Yr(4),Xr(0.1),Yr(3.4),col.lfr,'left');
+    } else {
+      line(g,pl0,col.lfr,3);
+      lfrAx=Xr(0.7); lfrAy=Yr(1/(2*0.7*0.7*0.7));
+      lfrText='laminar flow';
+    }
+    callout(g,lfrText,lfrAx,lfrAy,Xr(1.15),Yr(2.07),col.lfr,'side');
+    rich(g,'PFR',Xr(1)+9,m.t+16,15,col.ink,'left',true);
+    callout(g,'CSTR',Xr(0.15),Yr(Math.exp(-0.15)),Xr(0.02),Yr(1.15),col.cstr,'left');
+  }
+  var cn=$('chartNote');cn.textContent=notes[tab];cn.hidden=!notes[tab];
+}
+
+/* ---------- readout ---------- */
+function setRow(v,b,x){$(v).textContent=x.toFixed(3);}
+function readout(){
+  var P=phiFromIdx(S.phiIdx);
+  $('labLfr').textContent='laminar flow, Φ = '+fmtPhi(P);
+  $('rowLfr').hidden=!(P>0);
+  setRow('vLfr','bLfr',X.lfr); setRow('vSeg','bSeg',X.seg); setRow('vPfr','bPfr',X.pfr); setRow('vCstr','bCstr',X.cstr);
+}
+
+/* ---------- state & events ---------- */
+function updateOutputs(){
+  $('daOut').textContent=fmtDa(Da); $('nOut').textContent=(S.n===0.5?'½':String(S.n));
+  $('phiOut').textContent=fmtPhi(Phi); $('zOut').textContent=S.zeta.toFixed(2);
+}
+function fullUpdate(){recompute();buildHeat();updateOutputs();readout();drawReactor();drawChart();}
+function setZeta(z){S.zeta=Math.max(0,Math.min(1,Math.round(z*200)/200));$('zpos').value=S.zeta;$('zOut').textContent=S.zeta.toFixed(2);drawReactor();if(S.tab==='profile')drawChart();}
+$('da').addEventListener('input',function(){S.logDa=parseFloat(this.value);fullUpdate();});
+$('phi').addEventListener('input',function(){S.phiIdx=parseInt(this.value,10);fullUpdate();});
+$('zpos').addEventListener('input',function(){setZeta(parseFloat(this.value));});
+$('nSeg').addEventListener('click',function(e){
+  var b=e.target.closest('.chip'); if(!b)return; S.n=parseFloat(b.getAttribute('data-n'));
+  Array.prototype.forEach.call(this.children,function(c){c.setAttribute('aria-checked',c===b?'true':'false');}); fullUpdate();
+});
+Array.prototype.forEach.call(document.querySelectorAll('.tab'),function(t){
+  t.addEventListener('click',function(){S.tab=t.getAttribute('data-tab');
+    Array.prototype.forEach.call(document.querySelectorAll('.tab'),function(x){x.setAttribute('aria-selected',x===t?'true':'false');});drawChart();});
+});
+var drag=false;
+function dragTo(e){var r=cv1.getBoundingClientRect();setZeta((e.clientX-r.left-ML)/(r.width-ML-MR));}
+cv1.addEventListener('pointerdown',function(e){drag=true;cv1.setPointerCapture(e.pointerId);dragTo(e);});
+cv1.addEventListener('pointermove',function(e){if(drag)dragTo(e);});
+['pointerup','pointercancel'].forEach(function(n){cv1.addEventListener(n,function(){drag=false;});});
+$('btnPlay').addEventListener('click',function(){S.play=!S.play;this.textContent=S.play?'pause flow':'play flow';});
+$('btnReset').addEventListener('click',function(){
+  S.logDa=0;S.n=1;S.phiIdx=0;S.zeta=1;S.tab='profile';
+  $('da').value=0;$('phi').value=0;$('zpos').value=1;
+  Array.prototype.forEach.call($('nSeg').children,function(c){c.setAttribute('aria-checked',c.getAttribute('data-n')==='1'?'true':'false');});
+  Array.prototype.forEach.call(document.querySelectorAll('.tab'),function(x){x.setAttribute('aria-selected',x.getAttribute('data-tab')==='profile'?'true':'false');});
+  fullUpdate();
+});
+
+/* panels */
+var panels={btnDir:'pDir',btnDet:'pDet',btnAbout:'pAbout'};
+function closeAll(){Object.keys(panels).forEach(function(b){$(panels[b]).hidden=true;$(b).setAttribute('aria-expanded','false');});}
+Object.keys(panels).forEach(function(b){
+  $(b).addEventListener('click',function(){
+    var p=$(panels[b]), was=!p.hidden; closeAll(); if(was)return;
+    p.hidden=false; $(b).setAttribute('aria-expanded','true');
+    var avail=window.innerHeight-$('barRow').getBoundingClientRect().bottom-24;
+    p.style.maxHeight=Math.max(240,Math.min(avail,window.innerHeight*0.85))+'px';
+    p.querySelector('.panel-body').style.maxHeight='calc('+p.style.maxHeight+' - 52px)';
+    if(b==='btnDet'&&window.MathJax&&MathJax.typesetPromise&&!p.getAttribute('data-typeset')){p.setAttribute('data-typeset','1');MathJax.typesetPromise([p]).catch(function(){});}
+  });
+});
+Array.prototype.forEach.call(document.querySelectorAll('[data-close]'),function(x){x.addEventListener('click',closeAll);});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeAll();});
+
+/* theme + resize + loop */
+function restyle(){readColors();buildHeat();drawReactor();drawChart();}
+new MutationObserver(restyle).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+if(window.matchMedia)window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',restyle);
+if(window.ResizeObserver){var ro=new ResizeObserver(function(){drawReactor();drawChart();});ro.observe(cv1);ro.observe(cv2);}
+else window.addEventListener('resize',function(){drawReactor();drawChart();});
+var last=0;
+function loop(t){
+  var dt=Math.min(0.05,(t-last)/1000||0.016); last=t;
+  if(S.play&&!document.hidden){stepParts(dt);drawReactor();}
+  requestAnimationFrame(loop);
+}
+readColors(); initParts(); fullUpdate(); requestAnimationFrame(loop);
+window.__lfr={S:S,X:X,solve:solve,segX:segX,batchC:batchC};
+})();
+</script>
