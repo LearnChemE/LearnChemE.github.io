@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bioseparations: Ion-Exchange Chromatography Simulator</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$'], ['\\(','\\)']], displayMath: [['$$','$$'], ['\\[','\\]']] },
+  chtml: { displayAlign: 'left', displayIndent: '0' }
+};
+</script>
+<script id="MathJax-script" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-chtml.js"></script>
+<style>
+  :root{
+    --bg:#fff; --card:#ffffff; --line:#dde2e8; --accent:#98000D;
+    --A:#2a9d8f; --B:#e4572e; --C:#6a4c93;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:#000;font:21px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-weight:400}
+  header{padding:16px 20px 4px}
+  h1{margin:0;font-size:26px;font-weight:600;color:#000}
+  .app{position:relative;display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;padding:12px 20px 24px;max-width:1300px;margin:0 auto}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+  .card h2{margin:0 0 8px;font-size:21px;font-weight:400;color:#000}
+  h3.subhead{margin:16px 0 6px;font-size:18.9px;font-weight:700;color:#000}
+  h3.subhead:first-of-type{margin-top:0}
+  .subrows{padding-left:16px}
+  .row{margin:7px 0 3px}
+  .row label{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:18.9px;color:#000;font-weight:400;line-height:1.15;margin-bottom:0}
+  .row label>span:first-child{white-space:nowrap;flex-shrink:0}
+  .row label b{font-variant-numeric:tabular-nums;font-weight:400}
+  .row .val{margin-right:19.5%;white-space:nowrap;flex-shrink:0}
+  .unit-sm{font-size:17px}
+  label[for="in_load"]>span:first-child{font-size:17px}
+  input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:80.5%;height:5px;border-radius:3px;outline:none;opacity:.95;margin:-10px 0 4px;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+  input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  input[type=range]:disabled{opacity:.5}
+  .btns{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  button{font:inherit;font-size:18px;font-weight:400;padding:6px 12px;border-radius:7px;border:1px solid var(--line);background:#fff;color:#000;cursor:pointer}
+  button.primary{background:#2563eb;border-color:#2563eb;color:#fff}
+  button.tabbtn{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:400}
+  button:hover{filter:brightness(.95)}
+  select{font:inherit;font-size:18px;padding:5px;border-radius:7px;border:1px solid var(--line);color:#000}
+  #controls .card button, #controls .card select{font-size:16.2px}
+  canvas{display:block;width:100%}
+  #col{height:114px}
+  #chrom{height:400px;margin-top:-38px}
+  #kplot{height:320px}
+  .statsrow{display:flex;gap:14px;align-items:flex-start;margin-top:12px}
+  .kcard{flex:1;min-width:0}
+  .stats{display:grid;grid-template-columns:max-content max-content;column-gap:12px;row-gap:6px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;flex:0 0 auto;white-space:nowrap}
+  .stats .lbl{font-size:18px;color:#000;text-align:left}
+  .stats b{font-size:18px;font-variant-numeric:tabular-nums;font-weight:400;color:#000;text-align:left}
+  .alert{margin-top:8px;padding:6px 10px;border-radius:7px;background:#fef2f2;color:#000;font-size:18px;display:none}
+  .hint{margin:6px 0 0;font-size:17px;color:#000}
+
+  #simcol{position:relative}
+  .panel{position:absolute;left:0;right:0;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 28px rgba(0,0,0,.2);padding:18px 22px;max-height:calc(100vh - 120px);overflow-y:auto;display:none;z-index:30;color:#000;font-size:18.9px;line-height:1.55}
+  .panel.open{display:block}
+  .panel .close{position:absolute;top:8px;right:10px;background:none;border:none;font-size:23.4px;line-height:1;cursor:pointer;color:#000;padding:6px 9px;font-weight:400}
+  .panel h2{margin:0 26px 12px 0;font-size:20.7px;font-weight:600;color:#000}
+  .panel h3{margin:18px 0 6px;font-size:18.9px;font-weight:600;color:#000}
+  .panel h3:first-of-type{margin-top:0}
+  .panel p, .panel li{margin:6px 0}
+  .panel ol, .panel ul{padding-left:22px;margin:6px 0}
+  .panel .challenge{margin:14px 0;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:#faf7f0}
+  .panel a{color:#000}
+  #panelDirections, #panelAbout, #panelProcedure{font-size:17px}
+  #panelDirections h2, #panelAbout h2, #panelProcedure h2{font-size:18.6px}
+  #panelDirections h3, #panelAbout h3, #panelProcedure h3{font-size:17px}
+  .eq{text-align:left;margin:0 0 4px}
+  mjx-container{text-align:left !important;margin:0 !important}
+  @media (max-width:900px){
+    .app{grid-template-columns:1fr}
+    .panel{position:relative;max-height:none}
+    .statsrow{flex-direction:column}
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="controls" id="controls">
+    <div id="tabsrow" style="margin-bottom:12px">
+      <div class="btns" style="margin-bottom:8px">
+        <button class="tabbtn" id="btnDirections">Directions</button>
+        <button class="tabbtn" id="btnDetails">Details</button>
+        <button class="tabbtn" id="btnAbout">About</button>
+      </div>
+      <div class="btns">
+        <button class="tabbtn" id="btnProcedure">Separation procedure</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="btns" style="margin-bottom:6px">
+        <button class="primary" id="btnRun">&#9654; run</button>
+        <button id="btnFull">show full result</button>
+      </div>
+
+      <h3 class="subhead">column</h3>
+      <div class="subrows" id="secColumn"></div>
+
+      <h3 class="subhead">salt gradient (NaCl)</h3>
+      <div class="subrows" id="secGrad"></div>
+
+      <h3 class="subhead">sample</h3>
+      <div class="subrows" id="secSample"></div>
+
+      <h3 class="subhead">fraction collection</h3>
+      <div class="subrows" id="secWin"></div>
+      <div class="btns"><button id="btnCenter">center on protein B</button></div>
+    </div>
+  </div>
+
+  <div id="simcol">
+    <div class="card">
+      <canvas id="col"></canvas>
+      <h2 style="margin-top:10px">chromatogram</h2>
+      <canvas id="chrom"></canvas>
+      <div class="alert" id="alert"></div>
+    </div>
+
+    <div class="statsrow">
+      <div class="stats" id="stats"></div>
+      <div class="card kcard"><canvas id="kplot"></canvas>
+        <p class="hint">Shaded = salt range swept by the gradient. Each protein elutes where its k&prime; drops to roughly 0.1&ndash;1.</p></div>
+    </div>
+
+    <div class="panel" id="panelDirections">
+      <button class="close" data-close aria-label="close">&times;</button>
+      <h2>Directions</h2>
+      <p>Load a three-protein mixture onto an anion-exchange column and elute it with a NaCl gradient. Adjust the column, flow rate, gradient and load, then choose a fraction-collection window to purify the target protein B.</p>
+
+      <h3>How to Use</h3>
+      <ol>
+        <li><b>Column</b> &ndash; set the column length, particle diameter, and flow rate.</li>
+        <li><b>Salt gradient (NaCl)</b> &ndash; set the starting and ending NaCl concentration and how many column volumes (CV) the gradient runs over.</li>
+        <li><b>Sample</b> &ndash; set how much protein is loaded, relative to the column's binding capacity.</li>
+        <li><b>Fraction collection</b> &ndash; set the start and end time of the window used to collect protein B, or click "center on protein B" to center the window on its peak automatically.</li>
+        <li>Click <b>run</b> to animate the separation, or <b>show full result</b> to jump straight to the finished chromatogram.</li>
+      </ol>
+
+      <div class="challenge"><b>Challenge:</b> Collect protein B at &ge; 95% purity and &ge; 90% yield in the shortest run time.</div>
+
+      <h3>Guided Exploration Questions</h3>
+      <ol>
+        <li>Set the flow rate to 5 mL/min. What happens to N and to the resolution between B and C? Use the van Deemter equation in Details to explain which term dominates for proteins in porous particles.</li>
+        <li>With the default settings, make the gradient much steeper (shorter length, i.e. fewer CV). How do run time and resolution change? Why does a gentler gradient give better resolution but broader, more dilute peaks?</li>
+        <li>Increase the sample load above 100% of column capacity. Where does the missing protein go, and what happens to peak width?</li>
+        <li>Shrink the particle diameter from 90 &micro;m to 15 &micro;m. What do you gain and what is the practical cost (pressure drop, not modeled here)?</li>
+        <li>Meet the challenge above. Then explain the trade-off between purity and yield as you widen or narrow the collection window.</li>
+      </ol>
+    </div>
+
+    <div class="panel" id="panelDetails">
+      <button class="close" data-close aria-label="close">&times;</button>
+      <h2>Details</h2>
+
+      <h3>Equations</h3>
+      <p>Retention factor (stoichiometric displacement model):</p>
+      <div class="eq">\[ k' = \left(\dfrac{c}{c^*}\right)^{-z} \]</div>
+
+      <p>Column dead time and volume:</p>
+      <div class="eq">\[ t_0 = \dfrac{\varepsilon_T V}{Q}, \qquad V = \dfrac{\pi}{4}D^2L \]</div>
+
+      <p>Peak standard deviation in gradient elution, with overload broadening:</p>
+      <div class="eq">\[ \sigma_t = \dfrac{t_0\left(1+k'_e\right)}{\sqrt{N}}\left(1+1.2\,\varphi\right), \qquad N=\dfrac{L}{H} \]</div>
+
+      <p>Van Deemter plate height:</p>
+      <div class="eq">\[ H = 2d_p + \dfrac{1.2\,D_m}{u} + \dfrac{d_p^{\,2}}{30\,D_{pore}}\,u, \qquad u=\dfrac{Q}{A} \]</div>
+
+      <p>Resolution between two adjacent peaks:</p>
+      <div class="eq">\[ R_s = \dfrac{t_{R,2}-t_{R,1}}{2\left(\sigma_1+\sigma_2\right)} \]</div>
+
+      <p>Mass of species $i$ collected between times $a$ and $b$ (peaks treated as Gaussian, $\Phi$ the standard normal CDF), and the resulting purity and yield of protein B:</p>
+      <div class="eq">\[ m_i(a,b) = m_i\left[\Phi\!\left(\dfrac{b-t_{R,i}}{\sigma_i}\right)-\Phi\!\left(\dfrac{a-t_{R,i}}{\sigma_i}\right)\right] \]</div>
+      <div class="eq">\[ \text{purity} = \dfrac{m_B(a,b)}{\sum_i m_i(a,b)}, \qquad \text{yield} = \dfrac{m_B(a,b)}{m_{B,\text{feed}}} \]</div>
+
+      <h3>Symbols</h3>
+      <ul>
+        <li>$k'$ &ndash; retention factor</li>
+        <li>$c$ &ndash; NaCl concentration at the protein's position (M)</li>
+        <li>$c^*$ &ndash; characteristic salt concentration at which $k'=1$ (M)</li>
+        <li>$z$ &ndash; characteristic charge, the slope of log&nbsp;$k'$ vs. log&nbsp;$c$</li>
+        <li>$t_0$ &ndash; column dead time, the residence time of an unretained species (min)</li>
+        <li>$\varepsilon_T$ &ndash; total column porosity</li>
+        <li>$V$ &ndash; column volume (mL), $D$ &ndash; column diameter (cm), $L$ &ndash; column length (cm)</li>
+        <li>$Q$ &ndash; volumetric flow rate (mL/min)</li>
+        <li>$N$ &ndash; number of theoretical plates, $H$ &ndash; plate height (cm)</li>
+        <li>$d_p$ &ndash; particle diameter</li>
+        <li>$D_m$ &ndash; free (bulk) diffusivity of the protein</li>
+        <li>$D_{pore}$ &ndash; effective intraparticle (pore) diffusivity</li>
+        <li>$u$ &ndash; superficial velocity, $A$ &ndash; column cross-sectional area</li>
+        <li>$\varphi$ &ndash; sample load as a fraction of the column's binding capacity</li>
+        <li>$\sigma_t,\,\sigma_i$ &ndash; standard deviation (width) of a peak in time</li>
+        <li>$t_R$ &ndash; retention time, the time of the peak maximum</li>
+        <li>$R_s$ &ndash; resolution between two adjacent peaks</li>
+        <li>$m_i(a,b)$ &ndash; mass of species $i$ collected between times $a$ and $b$</li>
+        <li>$\Phi$ &ndash; cumulative distribution function of the standard normal distribution</li>
+      </ul>
+
+      <h3>Model Assumptions</h3>
+      <p>Band migration is integrated through the salt gradient, with the salt front traveling at the mobile-phase velocity. Peaks are Gaussian. Overload is approximated: peaks broaden by $(1+1.2\varphi)$ and any load above 100% of capacity passes through unbound. Column: 1&nbsp;cm i.d., total porosity 0.8, capacity 40&nbsp;mg/mL resin. Pressure drop, dispersion outside the column, and non-linear isotherm effects are not modeled. Intended for teaching, not design.</p>
+    </div>
+
+    <div class="panel" id="panelProcedure">
+      <button class="close" data-close aria-label="close">&times;</button>
+      <h2>Separation procedure</h2>
+      <ol style="font-family:system-ui,sans-serif">
+        <li><b>Equilibration and load.</b> The column is packed with anion-exchange resin and equilibrated with a low-salt buffer (the "start salt" value). The three-protein mixture is loaded at the inlet. At this low salt concentration, all three proteins bind tightly to the resin (high retention factor k&prime;), so they stick near the top of the column rather than washing straight through &ndash; unless more protein is loaded than the resin's capacity, in which case the excess breaks through unbound (the "flow-through" peak).</li>
+        <li><b>Low-salt wash (hold period).</b> After loading, buffer continues to flow at the same low starting salt concentration for a short while before the gradient begins. This washes out anything not actually bound to the resin, without yet displacing the bound proteins.</li>
+        <li><b>Salt gradient (elution).</b> The feed salt concentration then ramps up linearly, from the start salt to the end salt, over however many column volumes are set as the gradient length. As salt increases, it competitively displaces the bound proteins &ndash; each protein's retention factor k&prime; falls as salt rises. A protein elutes once its k&prime; has dropped to roughly the 1 to 0.1 range.</li>
+        <li><b>Differential elution.</b> Because each protein has its own characteristic charge and binding strength, their k&prime; values fall off at different salt concentrations, so they elute at different times &ndash; that is the separation. The weaker-binding protein comes off first, at lower salt; the strongest binder comes off last.</li>
+        <li><b>Detection and collection.</b> A detector at the outlet records the elution profile as the chromatogram. A time window is chosen to "collect" &ndash; everything eluting outside that window goes to waste &ndash; and the purity and yield of protein B in the collected fraction are reported.</li>
+      </ol>
+    </div>
+
+    <div class="panel" id="panelAbout">
+      <button class="close" data-close aria-label="close">&times;</button>
+      <h2>About</h2>
+      <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+
+/* ---------- Model parameters ---------- */
+const PROT = [
+  {name:'protein A', color:'#2a9d8f', cstar:0.100, z:4.0, frac:0.30},
+  {name:'protein B', color:'#e4572e', cstar:0.125, z:5.0, frac:0.40},
+  {name:'protein C', color:'#6a4c93', cstar:0.150, z:6.0, frac:0.30},
+];
+const COL_D = 1.0;                              // cm
+const A_X = Math.PI * COL_D * COL_D / 4;        // cm^2
+const EPS_T = 0.8, CAP = 40;                    // total porosity, mg/mL
+const D_EFF = 1e-7 * 60;                        // cm^2/min (pore diffusivity)
+const D_M   = 6e-7 * 60;                        // cm^2/min (free diffusivity)
+const T_HOLD_CV = 1.5;                          // CV of low-salt wash after load
+
+const S = {L:10, dp:30, Q:2.0, c0:0.02, c1:0.40, G:15, load:40, wa:0, wb:0, auto:true};
+
+const DEFS = [
+  {sec:'secColumn', id:'L',  label:'column length',     min:5,    max:30,  step:1,     unit:'cm',    fmt:v=>v.toFixed(0)},
+  {sec:'secColumn', id:'dp', label:'particle diameter', min:10,   max:100, step:5,     unit:'µm', fmt:v=>v.toFixed(0)},
+  {sec:'secColumn', id:'Q',  label:'flow rate',         min:0.5,  max:5,   step:0.1,   unit:'mL/min',fmt:v=>v.toFixed(1)},
+  {sec:'secGrad',   id:'c0', label:'start salt',        min:0.01, max:0.10,step:0.005, unit:'M',     fmt:v=>v.toFixed(3)},
+  {sec:'secGrad',   id:'c1', label:'end salt',          min:0.15, max:0.60,step:0.01,  unit:'M',     fmt:v=>v.toFixed(2)},
+  {sec:'secGrad',   id:'G',  label:'gradient length',   min:2,    max:40,  step:1,     unit:'CV',    fmt:v=>v.toFixed(0)},
+  {sec:'secSample', id:'load',label:'sample load',      min:10,   max:150, step:5,     unit:'% of capacity', fmt:v=>v.toFixed(0)},
+  {sec:'secWin',    id:'wa', label:'collect from',      min:0, max:100, step:0.1, unit:'min', fmt:v=>v.toFixed(1), win:true},
+  {sec:'secWin',    id:'wb', label:'collect until',     min:0, max:100, step:0.1, unit:'min', fmt:v=>v.toFixed(1), win:true},
+];
+for (const d of DEFS){
+  const row = document.createElement('div'); row.className='row';
+  const valHtml = d.id==='load'
+    ? `<b id="val_${d.id}"></b><span class="unit-sm">${d.unit}</span>`
+    : `<b id="val_${d.id}"></b> ${d.unit}`;
+  row.innerHTML = `<label for="in_${d.id}"><span>${d.label}</span><span class="val">${valHtml}</span></label>
+    <input type="range" id="in_${d.id}" min="${d.min}" max="${d.max}" step="${d.step}">`;
+  $(d.sec).appendChild(row);
+  const inp = row.querySelector('input');
+  inp.value = S[d.id];
+  inp.addEventListener('input', () => {
+    S[d.id] = +inp.value;
+    if (d.win) S.auto = false;
+    if (d.id==='c0' && S.c1 < S.c0+0.05) S.c1 = S.c0+0.05;
+    if (d.id==='c1' && S.c1 < S.c0+0.05) S.c0 = Math.max(0.01, S.c1-0.05);
+    syncInputs(); recalc();
+  });
+}
+function syncInputs(){
+  for (const d of DEFS){
+    const inp=$('in_'+d.id); if(inp.value!=S[d.id]) inp.value=S[d.id];
+    $('val_'+d.id).textContent = d.fmt(S[d.id]);
+  }
+}
+
+/* ---------- Numerics ---------- */
+const erf = x => { const s=Math.sign(x); x=Math.abs(x); const t=1/(1+0.3275911*x);
+  return s*(1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x)); };
+const Phi = z => 0.5*(1+erf(z/Math.SQRT2));
+const kprime = (p,c) => Math.pow(Math.max(c,0.003)/p.cstar, -p.z);
+const plateH = (dpCm,u) => 2*dpCm + 2*0.6*D_M/u + dpCm*dpCm/(30*D_EFF)*u;   // cm
+
+let R = null;
+function compute(s){
+  const V = A_X*s.L, tCV = V/s.Q, t0 = EPS_T*tCV;
+  const u = s.Q/A_X, dpCm = s.dp*1e-4;
+  const H = plateH(dpCm,u), N = s.L/H;
+  const tHold = T_HOLD_CV*tCV, tG = s.G*tCV;
+  const cs = t => t<tHold ? s.c0 : (t<tHold+tG ? s.c0+(s.c1-s.c0)*(t-tHold)/tG : s.c1);
+  const phi = s.load/100, bound = Math.min(1, 1/phi);
+  const broad = 1 + 1.2*Math.min(phi,1.5);
+  const feed = V*CAP*phi;                        // mg of protein loaded
+  const tSim = tHold + tG + 10*tCV;
+  const dt = t0/25, n = Math.ceil(tSim/dt);
+  const X = PROT.map(()=>new Float32Array(n+1));
+  const peaks = PROT.map((p,i)=>{
+    let x=0, tR=NaN;
+    for (let j=1;j<=n;j++){
+      const t=(j-1)*dt;
+      const k = kprime(p, cs(t - x*t0));
+      const xn = x + dt/(t0*(1+k));
+      if (xn>=1 && isNaN(tR)) { tR = t + dt*(1-x)/(xn-x); }
+      x = xn; X[i][j] = x;
+    }
+    if (isNaN(tR)) return {p, tR:NaN, ok:false, m:feed*p.frac*bound};
+    const ke = kprime(p, cs(tR - t0));
+    const sigma = t0*(1+ke)/Math.sqrt(N)*broad;
+    return {p, tR, sigma, ke, m:feed*p.frac*bound, ok:true, ce:cs(tR-t0)};
+  });
+  const ft = {mu:t0, sigma:0.2*t0, m:feed*(1-bound)};
+  let tEnd = tHold + tG + tCV;
+  for (const pk of peaks) if (pk.ok) tEnd = Math.max(tEnd, pk.tR + 5*pk.sigma);
+  tEnd *= 1.03;
+  return {V,tCV,t0,u,H,N,tHold,tG,cs,phi,bound,broad,feed,peaks,ft,X,dt,tEnd};
+}
+
+function windowMass(pk, a, b){           // mass of a Gaussian species inside [a,b]
+  return pk.m * (Phi((b-pk.mu)/pk.sigma) - Phi((a-pk.mu)/pk.sigma));
+}
+function performance(){
+  const [pa,pb,pc] = R.peaks;
+  if (!pb.ok) return {purity:0, yield:0};
+  const a=S.wa, b=S.wb;
+  const sp = R.peaks.filter(q=>q.ok).map(q=>windowMass({m:q.m,mu:q.tR,sigma:q.sigma},a,b));
+  const mB = windowMass({m:pb.m,mu:pb.tR,sigma:pb.sigma},a,b);
+  const mFt = windowMass(R.ft,a,b);
+  const tot = sp.reduce((x,y)=>x+y,0) + mFt;
+  const feedB = R.feed*PROT[1].frac;
+  return {purity: tot>0 ? mB/tot : 0, yield: mB/feedB, mB, tot};
+}
+
+/* ---------- Canvas helpers ---------- */
+function setup(cv){
+  const r = window.devicePixelRatio||1, w=cv.clientWidth, h=cv.clientHeight;
+  if (cv.width!==Math.round(w*r) || cv.height!==Math.round(h*r)){ cv.width=Math.round(w*r); cv.height=Math.round(h*r); }
+  const ctx=cv.getContext('2d'); ctx.setTransform(r,0,0,r,0,0); ctx.clearRect(0,0,w,h);
+  ctx.font='21px system-ui,sans-serif'; ctx.fillStyle='#000'; return ctx;
+}
+function niceStep(range, n){
+  const raw=range/n, p=Math.pow(10,Math.floor(Math.log10(raw))), f=raw/p;
+  return (f<1.5?1:f<3?2:f<7?5:10)*p;
+}
+function rgba(hex,a){ const n=parseInt(hex.slice(1),16); return `rgba(${n>>16},${(n>>8)&255},${n&255},${a})`; }
+function rrect(ctx,x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+function inWindow(t){ return t>=S.wa && t<=S.wb; }
+function hArrow(ctx,x1,x2,y){
+  ctx.strokeStyle='#000'; ctx.fillStyle='#000'; ctx.lineWidth=1.3;
+  ctx.beginPath(); ctx.moveTo(x1,y); ctx.lineTo(x2,y); ctx.stroke();
+  const ah=5;
+  ctx.beginPath(); ctx.moveTo(x1,y); ctx.lineTo(x1+ah,y-4); ctx.lineTo(x1+ah,y+4); ctx.closePath(); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(x2,y); ctx.lineTo(x2-ah,y-4); ctx.lineTo(x2-ah,y+4); ctx.closePath(); ctx.fill();
+}
+
+/* ---------- Drawing: column schematic ---------- */
+const DOTS = Array.from({length:260},(_,i)=>{ let s=(i+1)*9301+49297; const r=()=>{s=(s*9301+49297)%233280;return s/233280}; return {x:r(),y:r(),r:1+r()*1.6}; });
+function flowArrow(ctx,cx,cy,size,color){
+  ctx.fillStyle=color;
+  ctx.beginPath();
+  ctx.moveTo(cx-size,cy-size*0.75);
+  ctx.lineTo(cx+size,cy);
+  ctx.lineTo(cx-size,cy+size*0.75);
+  ctx.closePath(); ctx.fill();
+}
+function drawColumn(){
+  const cv=$('col'), ctx=setup(cv), W=cv.clientWidth;
+  const x0=94, x1=W-124, y0=28, h=44, y1=y0+h, mid=y0+h/2, cw=x1-x0;
+  const j = Math.min(R.X[0].length-1, Math.floor(tNow/R.dt));
+  ctx.fillStyle='#cbd5e1'; ctx.fillRect(28,mid-4,x0-28,8);
+  ctx.fillStyle = (running||tNow<R.tEnd) && inWindow(tNow) ? '#4ade80' : '#cbd5e1';
+  ctx.fillRect(x1,mid-4,W-x1-60,8);
+  ctx.fillStyle='#000'; ctx.textAlign='left';
+  ctx.fillText('feed / buffer', 4, y0-8); ctx.fillText('salt in: '+R.cs(tNow).toFixed(3)+' M', 4, y1+24);
+  ctx.textAlign='right'; ctx.fillText('UV detector', W-4, y0-8);
+  ctx.fillText(inWindow(tNow)?'collecting':'to waste', W-70, y1+22);
+  flowArrow(ctx, (28+x0)/2, mid, 5, '#475569');
+  flowArrow(ctx, x1+(W-x1-60)/2, mid, 5, '#334155');
+  rrect(ctx,x0,y0,cw,h,8); ctx.fillStyle='#faf7f0'; ctx.fill();
+  ctx.save(); rrect(ctx,x0,y0,cw,h,8); ctx.clip();
+  ctx.fillStyle='rgba(120,113,108,.35)';
+  for (const d of DOTS){ ctx.beginPath(); ctx.arc(x0+d.x*cw, y0+d.y*h, d.r, 0, 6.283); ctx.fill(); }
+  console.log(R)
+  R.peaks.forEach((pk,i)=>{
+    const x = R.X[i][j]; //if (x>=1) return;
+    const sx = Math.max(0.015, Math.sqrt(Math.max(x,0.001)/R.N)*R.broad) * cw;
+    const xc = x0 + x*cw;
+    const g = ctx.createLinearGradient(xc-3*sx,0,xc+3*sx,0);
+    for (let q=0;q<=12;q++){ 
+      const u=q/12, 
+        z=3*(2*u-1); 
+      g.addColorStop(u, rgba(pk.p.color, 0.8*Math.exp(-0.5*z*z))); 
+    }
+    ctx.fillStyle=g; ctx.fillRect(xc-3*sx, y0, 6*sx, h);
+  });
+  ctx.restore();
+  rrect(ctx,x0,y0,cw,h,8); ctx.strokeStyle='#475569'; ctx.lineWidth=1.5; ctx.stroke();
+  ctx.font='15px system-ui,sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  const label='column', tw=ctx.measureText(label).width, padX=8, padY=4, lx=x0+cw/2, ly=mid;
+  ctx.fillStyle='#fff'; rrect(ctx, lx-tw/2-padX, ly-9-padY, tw+2*padX, 18+2*padY, 5); ctx.fill();
+  ctx.fillStyle='#000'; ctx.fillText(label, lx, ly+1);
+  ctx.textBaseline='alphabetic';
+}
+
+/* ---------- Drawing: chromatogram ---------- */
+function drawChrom(){
+  const cv=$('chrom'), ctx=setup(cv), W=cv.clientWidth, Ht=cv.clientHeight;
+  const ml=96, mr=84, mt=44, mb=60, pw=W-ml-mr, ph=Ht-mt-mb;
+  const te=R.tEnd, X=t=>ml+t/te*pw;
+  const n=600, ts=Array.from({length:n+1},(_,i)=>i/n*te);
+  const gauss=(t,mu,s)=>Math.exp(-0.5*((t-mu)/s)**2)/(s*2.5066283);
+  const curves = R.peaks.map(pk=>ts.map(t=>pk.ok? pk.m*gauss(t,pk.tR,pk.sigma):0));
+  const ftc = ts.map(t=>R.ft.m>0? R.ft.m*gauss(t,R.ft.mu,R.ft.sigma):0);
+  const tot = ts.map((t,i)=>curves[0][i]+curves[1][i]+curves[2][i]+ftc[i]);
+  const ymaxRaw = Math.max(...tot,1e-6)*1.08, ys=niceStep(ymaxRaw,5), ymax=Math.ceil(ymaxRaw/ys)*ys;
+  const Y=v=>mt+ph-(v/ymax)*ph;
+  const cmax=Math.max(0.1, Math.ceil(S.c1*1.1*10)/10), YC=c=>mt+ph-(c/cmax)*ph;
+  // grid + axes
+  ctx.strokeStyle='#eef1f4'; ctx.fillStyle='#000'; ctx.lineWidth=1; ctx.textAlign='right';
+  for (let v=0; v<=ymax+1e-9; v+=ys){ ctx.beginPath(); ctx.moveTo(ml,Y(v)); ctx.lineTo(ml+pw,Y(v)); ctx.stroke(); ctx.fillText(+v.toFixed(3),ml-8,Y(v)+5); }
+  const cs_=niceStep(cmax,5); ctx.textAlign='left';
+  for (let c=0;c<=cmax+1e-9;c+=cs_){ ctx.fillText(+c.toFixed(2),ml+pw+8,YC(c)+5); }
+  const xs=niceStep(te,8); ctx.textAlign='center';
+  for (let t=0;t<=te;t+=xs){ ctx.fillText(+t.toFixed(1),X(t),mt+ph+22); ctx.beginPath(); ctx.moveTo(X(t),mt+ph); ctx.lineTo(X(t),mt+ph+4); ctx.strokeStyle='#94a3b8'; ctx.stroke(); }
+  // collection window
+  if (S.wb>S.wa){ ctx.fillStyle='rgba(34,197,94,.16)'; ctx.fillRect(X(S.wa),mt,X(S.wb)-X(S.wa),ph);
+    ctx.strokeStyle='rgba(22,163,74,.7)'; ctx.setLineDash([4,3]);
+    for (const t of [S.wa,S.wb]){ ctx.beginPath(); ctx.moveTo(X(t),mt); ctx.lineTo(X(t),mt+ph); ctx.stroke(); } ctx.setLineDash([]);
+    const ax1=X(S.wa), ax2=X(S.wb), ay=mt-14;
+    if (ax2-ax1>18) hArrow(ctx,ax1,ax2,ay);
+    ctx.fillStyle='#000'; ctx.textAlign='center'; ctx.fillText('collected fraction',(ax1+ax2)/2,ay-8);
+  }
+  // curves, revealed up to tNow
+  ctx.save(); ctx.beginPath(); ctx.rect(ml,0,Math.max(0,X(Math.min(tNow,te))-ml),Ht); ctx.clip();
+  const fill=(arr,col)=>{ ctx.beginPath(); ctx.moveTo(X(0),Y(0)); ts.forEach((t,i)=>ctx.lineTo(X(t),Y(arr[i]))); ctx.lineTo(X(te),Y(0)); ctx.closePath(); ctx.fillStyle=rgba(col,.35); ctx.fill(); ctx.strokeStyle=col; ctx.lineWidth=1.2; ctx.stroke(); };
+  if (R.ft.m>0) fill(ftc,'#9ca3af');
+  curves.forEach((c,i)=>fill(c,PROT[i].color));
+  ctx.beginPath(); ts.forEach((t,i)=>{ i?ctx.lineTo(X(t),Y(tot[i])):ctx.moveTo(X(t),Y(tot[i])); }); ctx.strokeStyle='#000'; ctx.lineWidth=1.6; ctx.stroke();
+  ctx.setLineDash([6,4]); ctx.beginPath(); ts.forEach((t,i)=>{ const c=R.cs(t); i?ctx.lineTo(X(t),YC(c)):ctx.moveTo(X(t),YC(c)); }); ctx.strokeStyle='#000'; ctx.lineWidth=1.3; ctx.stroke(); ctx.setLineDash([]);
+  ctx.restore();
+  if (tNow<te){ ctx.strokeStyle='#2563eb'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(X(tNow),mt); ctx.lineTo(X(tNow),mt+ph); ctx.stroke(); }
+  // NaCl dashed-line label (placed on the flat hold segment, clear of the rising line)
+  { const tl = R.tHold*0.5, xl=X(tl), yl=YC(R.cs(tl)); ctx.fillStyle='#000'; ctx.textAlign='left'; ctx.fillText('NaCl', xl, yl-16); }
+  // peak labels
+  ctx.textAlign='center'; ctx.font='21px system-ui,sans-serif';
+  R.peaks.forEach((pk,i)=>{ if(pk.ok && tNow>=pk.tR){ ctx.fillStyle=PROT[i].color; ctx.fillText('ABC'[i], X(pk.tR), Y(curves[i][Math.round(pk.tR/te*n)])-8); } });
+  if (R.ft.m>0 && tNow>=R.ft.mu){
+    const jft = Math.max(0, Math.min(n, Math.round(R.ft.mu/te*n)));
+    ctx.fillStyle='#4b5563'; ctx.textAlign='center';
+    ctx.fillText('flow-through', X(R.ft.mu), Y(ftc[jft])-10);
+  }
+  ctx.fillStyle='#000';
+  ctx.strokeStyle='#94a3b8'; ctx.strokeRect(ml,mt,pw,ph);
+  ctx.textAlign='center'; ctx.fillText('time (min)',ml+pw/2,Ht-8);
+  ctx.save(); ctx.translate(ml-56,mt+ph/2); ctx.rotate(-Math.PI/2); ctx.textAlign='center'; ctx.fillText('protein elution rate (mg/min)',0,0); ctx.restore();
+  ctx.save(); ctx.translate(W-32,mt+ph/2); ctx.rotate(Math.PI/2); ctx.textAlign='center'; ctx.fillText('NaCl (M)',0,0); ctx.restore();
+}
+
+/* ---------- Drawing: k' vs salt ---------- */
+function drawSupLabelRight(ctx, xRight, y, base, sup){
+  const prevAlign=ctx.textAlign, prevFont=ctx.font;
+  const m=/(\d+(?:\.\d+)?)px\s*(.*)/.exec(prevFont);
+  const size=m?parseFloat(m[1]):21, fam=m?m[2]:'system-ui,sans-serif';
+  const baseFont=size+'px '+fam, supFont=Math.round(size*0.68)+'px '+fam;
+  ctx.textAlign='left';
+  ctx.font=baseFont; const bw=ctx.measureText(base).width;
+  let sw=0; if (sup){ ctx.font=supFont; sw=ctx.measureText(sup).width; }
+  const x0=xRight-bw-sw;
+  ctx.font=baseFont; ctx.fillText(base,x0,y);
+  if (sup){ ctx.font=supFont; ctx.fillText(sup,x0+bw,y-size*0.32); }
+  ctx.textAlign=prevAlign; ctx.font=prevFont;
+}
+function drawK(){
+  const cv=$('kplot'), ctx=setup(cv), W=cv.clientWidth, Ht=cv.clientHeight;
+  const ml=88, mr=18, mt=18, mb=54, pw=W-ml-mr, ph=Ht-mt-mb;
+  const lx0=Math.log10(0.005), lx1=0, ly0=-2, ly1=4;
+  const X=c=>ml+(Math.log10(c)-lx0)/(lx1-lx0)*pw, Y=k=>mt+ph-(Math.log10(k)-ly0)/(ly1-ly0)*ph;
+  ctx.fillStyle='rgba(37,99,235,.10)'; ctx.fillRect(X(S.c0),mt,X(S.c1)-X(S.c0),ph);
+  ctx.strokeStyle='#eef1f4'; ctx.fillStyle='#000'; ctx.textAlign='right';
+  for (let e=ly0;e<=ly1;e++){
+    ctx.beginPath(); ctx.moveTo(ml,Y(10**e)); ctx.lineTo(ml+pw,Y(10**e)); ctx.stroke();
+    if (e===0) drawSupLabelRight(ctx,ml-8,Y(1)+5,'1','');
+    else if (e===1) drawSupLabelRight(ctx,ml-8,Y(10)+5,'10','');
+    else drawSupLabelRight(ctx,ml-8,Y(10**e)+5,'10',String(e));
+  }
+  ctx.textAlign='center';
+  for (const c of [0.01,0.02,0.05,0.1,0.2,0.5,1]){ ctx.beginPath(); ctx.moveTo(X(c),mt+ph); ctx.lineTo(X(c),mt+ph+4); ctx.strokeStyle='#94a3b8'; ctx.stroke(); ctx.fillText(c,X(c),mt+ph+22); }
+  ctx.strokeStyle='#94a3b8'; ctx.setLineDash([3,3]); ctx.beginPath(); ctx.moveTo(ml,Y(1)); ctx.lineTo(ml+pw,Y(1)); ctx.stroke(); ctx.setLineDash([]);
+  PROT.forEach(p=>{ ctx.beginPath(); let first=true;
+    for (let i=0;i<=120;i++){ const c=Math.pow(10,lx0+(lx1-lx0)*i/120), k=Math.min(1e4,Math.max(1e-2,kprime(p,c)));
+      first?ctx.moveTo(X(c),Y(k)):ctx.lineTo(X(c),Y(k)); first=false; }
+    ctx.strokeStyle=p.color; ctx.lineWidth=2; ctx.stroke(); });
+  const cc = R.cs(Math.min(tNow,R.tEnd)); ctx.strokeStyle='#2563eb'; ctx.lineWidth=1.2; ctx.beginPath(); ctx.moveTo(X(cc),mt); ctx.lineTo(X(cc),mt+ph); ctx.stroke();
+  ctx.strokeStyle='#94a3b8'; ctx.lineWidth=1; ctx.strokeRect(ml,mt,pw,ph);
+  ctx.fillStyle='#000'; ctx.textAlign='center'; ctx.fillText('NaCl concentration (M)',ml+pw/2,Ht-6);
+  ctx.save(); ctx.translate(ml-64,mt+ph/2); ctx.rotate(-Math.PI/2); ctx.textAlign='center'; ctx.fillText("retention factor, k′",0,0); ctx.restore();
+}
+
+/* ---------- Readouts ---------- */
+const TILES = [
+  {id:'N',   label:'plates, N'},
+  {id:'H',   label:'plate height, H'},
+  {id:'RAB', label:'resolution A&ndash;B'},
+  {id:'RBC', label:'resolution B&ndash;C'},
+  {id:'pur', label:'purity of B in fraction'},
+  {id:'yld', label:'yield of B in fraction'},
+];
+$('stats').innerHTML = TILES.map(t=>`<span class="lbl">${t.label}</span><b id="t_${t.id}">&ndash;</b>`).join('');
+function setTile(id,text){ $('t_'+id).textContent=text; }
+function updateReadouts(){
+  const [a,b,c]=R.peaks;
+  setTile('N', Math.round(R.N).toString());
+  setTile('H', (R.H*10).toFixed(2)+' mm');
+  const rs=(p,q)=> (p.ok&&q.ok)? (q.tR-p.tR)/(2*(p.sigma+q.sigma)) : NaN;
+  const rab=rs(a,b), rbc=rs(b,c);
+  setTile('RAB', isFinite(rab)?rab.toFixed(2):'n/a');
+  setTile('RBC', isFinite(rbc)?rbc.toFixed(2):'n/a');
+  const pf=performance();
+  setTile('pur', (pf.purity*100).toFixed(1)+' %');
+  setTile('yld', (pf.yield*100).toFixed(1)+' %');
+  const al=$('alert'), msgs=[];
+  if (S.load>100) msgs.push(`column overloaded: ${(100-100/S.load*100).toFixed(0)}% of the protein passes through unbound and peaks broaden.`);
+  const lost = R.peaks.filter(p=>!p.ok).map(p=>p.p.name);
+  if (lost.length) msgs.push(`${lost.join(', ')} did not elute: raise the end salt or lengthen the gradient.`);
+  al.style.display=msgs.length?'block':'none'; al.textContent=msgs.join(' ');
+}
+
+/* ---------- Control flow ---------- */
+let tNow=0, running=false, lastTs=0;
+function centerWindow(){
+  const b=R.peaks[1]; if(!b.ok) return;
+  S.wa=Math.max(0,b.tR-2*b.sigma); S.wb=b.tR+2*b.sigma;
+}
+function recalc(){
+  R=compute(S);
+  if (S.auto) centerWindow();
+  for (const id of ['wa','wb']){ const inp=$('in_'+id); inp.max=R.tEnd.toFixed(1); }
+  S.wa=Math.min(S.wa,R.tEnd); S.wb=Math.min(Math.max(S.wb,S.wa),R.tEnd);
+  syncInputs();
+  if (!running) tNow=R.tEnd; else tNow=Math.min(tNow,R.tEnd);
+  updateReadouts(); render();
+}
+function render(){ drawColumn(); drawChrom(); drawK(); }
+function frame(ts){
+  if (running){
+    const dt=Math.min(0.05,(ts-lastTs)/1000)*R.tEnd/14;
+    tNow+=dt; if (tNow>=R.tEnd){ tNow=R.tEnd; running=false; $('btnRun').innerHTML='&#9654; run'; }
+    render();
+  }
+  lastTs=ts; requestAnimationFrame(frame);
+}
+$('btnRun').addEventListener('click',()=>{
+  if (running){ running=false; $('btnRun').innerHTML='&#9654; resume'; return; }
+  if (tNow>=R.tEnd-1e-6) tNow=0;
+  running=true; $('btnRun').innerHTML='&#10074;&#10074; pause';
+});
+$('btnFull').addEventListener('click',()=>{ running=false; tNow=R.tEnd; $('btnRun').innerHTML='&#9654; run'; render(); });
+$('btnCenter').addEventListener('click',()=>{ S.auto=true; recalc(); });
+window.addEventListener('resize',()=>{ if(R) render(); positionPanels(); });
+
+/* ---------- Panels (directions / details / about) ---------- */
+const tabsrow=$('tabsrow'), simcol=$('simcol');
+function positionPanels(){
+  const top = Math.round(tabsrow.getBoundingClientRect().bottom - simcol.getBoundingClientRect().top + 10);
+  document.querySelectorAll('.panel').forEach(p=>p.style.top = top+'px');
+}
+function togglePanel(id){
+  const p=$(id), wasOpen=p.classList.contains('open');
+  document.querySelectorAll('.panel').forEach(q=>q.classList.remove('open'));
+  if (!wasOpen){ p.classList.add('open'); positionPanels(); }
+}
+$('btnDirections').addEventListener('click',()=>togglePanel('panelDirections'));
+$('btnDetails').addEventListener('click',()=>togglePanel('panelDetails'));
+$('btnProcedure').addEventListener('click',()=>togglePanel('panelProcedure'));
+$('btnAbout').addEventListener('click',()=>togglePanel('panelAbout'));
+document.querySelectorAll('.panel [data-close]').forEach(b=>b.addEventListener('click',()=>b.closest('.panel').classList.remove('open')));
+positionPanels();
+
+syncInputs(); recalc(); requestAnimationFrame(frame);
+window.__sim = {S, get R(){return R}, recalc, performance};
+</script>
+</body>
+</html>
