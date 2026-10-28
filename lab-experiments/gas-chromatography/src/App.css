@@ -4,6 +4,7 @@
   /* padding: 2rem; */
   text-align: center;
   position: relative;
+  width: 95%;
 }
 
 .clickable {
@@ -70,6 +71,13 @@ p {
   src: url("./assets/digital-7.ttf") format("truetype");
 }
 
+.canvas-container {
+  position: relative;
+  width: 100%;
+  height: auto;
+  max-width: 1800px;
+  max-height: max(0px, calc(95vh - 50px));
+}
 .digital-label {
   font-family: "digital" !important;
   font-weight: 100;
@@ -101,4 +109,13 @@ p {
   font-optical-sizing: auto;
   font-weight: 400;
   font-style: normal;
+}
+
+.sim-wrapper {
+  display: grid;
+  grid-template-columns: 50% 50%;
+  grid-template-rows: max-content auto;
+  grid-auto-flow: column;
+  width: 100%;
+  min-width: 320px;
 }

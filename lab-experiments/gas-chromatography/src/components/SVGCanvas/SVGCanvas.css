@@ -5,3 +5,10 @@ svg {
   user-select: none;
   touch-action: none;
 }
+
+.svg-canvas {
+  width: 100%;
+  height: auto;
+  max-width: 1800px;
+  max-height: max(0px, calc(95vh - 50px));
+}

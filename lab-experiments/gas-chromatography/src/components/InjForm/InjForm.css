@@ -1,0 +1,21 @@
+.inj-form {
+    display: flex;
+    flex-direction: column;
+    /* border: 2px solid black; */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,.2),
+        0 6px 20px 0 rgba(0,0,0,.19);
+    padding: 1em ;
+    text-align: left;
+}
+
+h5 {
+    font-size: 12pt;
+    font-weight: 500;
+    margin: .5em;
+}
+
+.prep-btn {
+    margin-top: 1em;
+    background-color: rgb(35, 118, 35);
+}

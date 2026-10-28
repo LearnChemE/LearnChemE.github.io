@@ -1,6 +1,6 @@
 import { onMount, type Accessor, type Component } from "solid-js";
 import "./SVGCanvas.css";
-import { enableWindowResize, initSvgDrag, initSvgZoom, resolveProperty } from "../../globals/";
+import { initSvgDrag, initSvgZoom, resolveProperty } from "../../globals/";
 
 type SVGCanvasProps = {
     width?: number | Accessor<number>;
@@ -21,12 +21,11 @@ export const SVGCanvas: Component<SVGCanvasProps> = (props) => {
         initSvgZoom();
         // Initialize SVG dragging with exempt element IDs
         initSvgDrag();
-        // Add the resizing handler
-        enableWindowResize();
     });
 
     return (
         <svg
+            class="svg-canvas"
             width={width()}
             height={height()}
             viewBox={`0 0 ${defaultWidth} ${defaultHeight}`}

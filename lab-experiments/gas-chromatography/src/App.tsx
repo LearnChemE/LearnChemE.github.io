@@ -10,6 +10,8 @@ import { AnimationTimer, aniSeqDescriptors, injectDuration, resetSignal } from '
 import { createMemo, createSignal } from 'solid-js';
 import { GCFront } from './components/GCFront/GCFront';
 import { Slider } from './components/Slider/Slider';
+import { InjForm } from './components/InjForm/InjForm';
+import { ResultsList } from './components/ResultsList/ResultsList';
 
 function App() {
   const [injReady, setInjReady] = createSignal(false);
@@ -57,11 +59,8 @@ function App() {
       <SVGCanvas width={203} height={186} defs={Defs}>
         <GCFront prepTimer={prepTimer} injTimer={injectionTimer} />
       </SVGCanvas>
-      <div class="inj-form">
-        <Slider value={() => 1} label='option 1' />
-        <Slider value={() => 2} label='option 2' />
-        <button class="prep-btn" disabled={prepping() || injecting()} onclick={startPrepping}>Prep</button>
-      </div>
+      <InjForm prepBtnDisabled={() => prepping() || injecting()} startPrepping={startPrepping}  />
+      <ResultsList />
     </div>
 
   </div>
