@@ -18,7 +18,7 @@ export const prepDesc: Partial<AnimationSegmentDescriptor> = {
     easing: easeOutQuad
 };
 
-export const injectDuration = 1;
+export const injectDuration = 2;
 
 export const InjectionState = {
     Idle: 0,
