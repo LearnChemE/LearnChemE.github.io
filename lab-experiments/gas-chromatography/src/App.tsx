@@ -1,5 +1,6 @@
 import './App.css'
 import { AppContextProvider } from './components/Context';
+import type { GCResult } from './globals';
 import { HamburgerMenu } from './components/Hamburger/Hamburger';
 
 import worksheet from "./assets/worksheet.pdf";
@@ -14,6 +15,8 @@ import { ResultsList } from './components/ResultsList/ResultsList';
 import { Syringe } from './components/Syringe/Syringe';
 
 function App() {
+  const [results, setResults] = createSignal<Array<GCResult>>([]);
+
   const [injReady, setInjReady] = createSignal(false);
   const [syringeFill, setSyringeFill] = createSignal(0); 
   const injectionTimer = new EasedAnimation(easeInOutQuad, injectDuration);
@@ -36,6 +39,7 @@ function App() {
     setPrepTimer(null);
     setInjReady(true);
     setSyringeFill(1);
+    injectionTimer.reset();
   }
   const startPrepping = () => {
     console.log("prepping")
@@ -76,7 +80,7 @@ function App() {
         <Syringe fill={syringeFill} />
       </SVGCanvas>
       <InjForm prepBtnDisabled={() => prepping() || injecting()} startPrepping={startPrepping} prepProgress={prepProgress}  />
-      <ResultsList />
+      <ResultsList results={results} />
     </div>
 
   </div>

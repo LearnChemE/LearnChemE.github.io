@@ -27,3 +27,9 @@ export const InjectionState = {
     Injecting: 3,
     Finished: 4
 } as const;
+
+export const minInjection = 0.5; // uL
+export const maxInjection = 2.0; // uL
+export const injectionErr = 0.15; // uL
+export const deadTime = 60; // s
+export const N_GC = 10000;

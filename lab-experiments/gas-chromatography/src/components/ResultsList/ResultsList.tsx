@@ -1,35 +1,16 @@
 import { createSignal, For, type Accessor, type Component } from "solid-js";
 import "./ResultsList.css";
+import type { GCResult } from "../../globals";
 
 type ResultsListProps = {
-    // results: Accessor<Array<GCResult>>
+    results: Accessor<Array<GCResult>>
 };
 
-// later calcs
-type GCResult = {
-    t: Array<number>,
-    y: Array<number>,
-    progress: Accessor<number>,
-};
 
-// later props
-const results = (): Array<GCResult> => [{
-    t: [0, 1, 2],
-    y: [0, 4, 2],
-    progress: () => 3
-}, {
-    t: [0, 1, 2],
-    y: [0, 4, 2],
-    progress: () => 2
-}, {
-    t: [0, 1, 2],
-    y: [0, 4, 2],
-    progress: () => 0
-}];
-
-export const ResultsList: Component<ResultsListProps> = ({}) => {
+export const ResultsList: Component<ResultsListProps> = (props) => {
     return (<div id="results-wrapper">
-        <For each={results()}>{(res, index) => {
+        <For each={props.results()} fallback={<div class="empty-results"><span>No results available.</span></div>}>
+            {(res, index) => {
             const [expanded, setExpanded] = createSignal(true);
             const panelId = `result-panel-${index()}`;
 

@@ -11,9 +11,16 @@ type InjFormProps = {
 export const InjForm: Component<InjFormProps> = (props) => {
     return (<>
       <div class="inj-form">
-        <h5>sample settings</h5>
-        <Slider value={() => 1} label='option 1' />
-        <Slider value={() => 2} label='option 2' />
+        <h5>sample settings</h5> 
+        <select></select>
+
+
+        <Slider value={() => 1} label='ethanol concentration' />
+        <Slider value={() => 2} label='acetic acid concentration' />
+        <Slider value={() => 1} label='ethyl acetate concentration' />
+        <Slider value={() => 2} label='water concentration' />
+        
+
         <button
           class="prep-btn"
           classList={{
