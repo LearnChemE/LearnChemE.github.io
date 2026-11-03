@@ -1,56 +1,84 @@
 const ul = document.getElementById("list");
-
-let sorted_list = simulation_list.sort((a, b) => {
-  if (a.title > b.title) { return 1 } else if (a.title < b.title) { return -1 } else { return 0 }
-});
-
-sorted_list = sorted_list.filter(sim => {
-  return !sim.title.includes("PhET");
-});
-
 const grid = document.getElementById('simulations-grid');
 
-sorted_list.forEach(sim => {
-  const card = document.createElement('div');
-  card.classList.add('card');
+(async () => {
+  let experiments = [];
+  let demos = [];
 
-  const img = document.createElement('img');
-  img.src = sim.image;
-  img.alt = sim.title;
-  img.setAttribute('loading', 'lazy');
+  try {
+    const response = await fetch('./home_page/output/lab-experiments.json');
+    if (!response.ok) {
+      throw new Error(`Failed to load lab experiments: ${response.status}`);
+    }
 
-  const title = document.createElement('h2');
-  title.textContent = sim.title;
+    const data = await response.json();
+    experiments = Array.isArray(data) ? data : Array.isArray(data.experiments) ? data.experiments : [];
+  } catch (error) {
+    console.error(error);
+  }
 
-  const img_container = document.createElement('div');
-  img_container.classList.add('img-container');
-  img_container.appendChild(img);
+  try {
+    const response = await fetch('./home_page/output/demos.json');
+    if (!response.ok) {
+      throw new Error(`Failed to load demos: ${response.status}`);
+    }
 
-  const link = document.createElement('a');
-  link.href = sim.href;
-  link.target = "_blank";
-  link.appendChild(img_container);
-  link.appendChild(title);
+    const data = await response.json();
+    demos = Array.isArray(data) ? data : Array.isArray(data.demos) ? data.demos : [];
+  } catch (error) {
+    console.error(error);
+  }
 
-  const source = document.createElement('a');
-  source.href = sim.src;
-  source.target = "_blank";
-  source.classList.add('source');
-  source.title = 'View source code on GitHub';
+  let sorted_list = [...experiments, ...demos, ...simulation_list].sort((a, b) => {
+    if (a.title > b.title) { return 1; }
+    if (a.title < b.title) { return -1; }
+    return 0;
+  });
 
-  const source_img = document.createElement('img');
-  source_img.src = './home_page/github.svg';
-  source_img.alt = 'GitHub';
-  source_img.classList.add('source-img');
-  source.appendChild(source_img);
+  sorted_list = sorted_list.filter(sim => !sim.title.includes("PhET"));
 
-  card.appendChild(link);
-  card.appendChild(source);
-  grid.appendChild(card);
+  sorted_list.forEach(sim => {
+    const card = document.createElement('div');
+    card.classList.add('card');
 
-  card.addEventListener('mouseover', () => showTooltip(card, sim));
-  card.addEventListener('mouseleave', () => removeTooltip(card));
-});
+    const img = document.createElement('img');
+    img.src = sim.image;
+    img.alt = sim.title;
+    img.setAttribute('loading', 'lazy');
+
+    const title = document.createElement('h2');
+    title.textContent = sim.title;
+
+    const img_container = document.createElement('div');
+    img_container.classList.add('img-container');
+    img_container.appendChild(img);
+
+    const link = document.createElement('a');
+    link.href = sim.href;
+    link.target = "_blank";
+    link.appendChild(img_container);
+    link.appendChild(title);
+
+    const source = document.createElement('a');
+    source.href = sim.src;
+    source.target = "_blank";
+    source.classList.add('source');
+    source.title = 'View source code on GitHub';
+
+    const source_img = document.createElement('img');
+    source_img.src = './home_page/github.svg';
+    source_img.alt = 'GitHub';
+    source_img.classList.add('source-img');
+    source.appendChild(source_img);
+
+    card.appendChild(link);
+    card.appendChild(source);
+    grid.appendChild(card);
+
+    card.addEventListener('mouseover', () => showTooltip(card, sim));
+    card.addEventListener('mouseleave', () => removeTooltip(card));
+  });
+})();
 
 function showTooltip(card, sim) {
   if (!document.getElementById('tooltip')) {

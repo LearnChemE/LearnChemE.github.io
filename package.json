@@ -14,7 +14,8 @@
   "author": "Neil Hendren",
   "license": "MIT",
   "devDependencies": {
-    "prettier": "3.5.3"
+    "prettier": "3.5.3",
+    "vite-plugin-singlefile": "^2.3.3"
   },
   "repository": {
     "type": "git",
