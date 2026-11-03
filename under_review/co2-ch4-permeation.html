@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Separation of Carbon Dioxide and Methane Using Well-Mixed Gas Permeation</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+<style>
+  :root {
+    --maroon: #98000D;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    font-family: Helvetica, Arial, sans-serif;
+    background: #ffffff;
+    color: #222222;
+  }
+  #app {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 14px 16px 20px 16px;
+  }
+  h1 {
+    text-align: center;
+    font-size: 1.28em;
+    font-weight: bold;
+    margin: 4px 0 14px 0;
+    color: #222;
+  }
+  .main-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 22px;
+    align-items: flex-start;
+    justify-content: center;
+  }
+  .controls {
+    width: 260px;
+    flex: 0 0 260px;
+    padding-top: 8px;
+    display: flex;
+    flex-direction: column;
+  }
+  .control {
+    margin-bottom: 22px;
+  }
+  .control label {
+    display: block;
+    font-size: 1.0925em;
+    margin-bottom: 4px;
+  }
+  .control .value-badge {
+    font-weight: normal;
+    color: #000000;
+  }
+  input[type="range"] {
+    --accent: #98000D;
+    --grey: #999;
+    --fill: 50%;
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 5px;
+    border-radius: 3px;
+    outline: none;
+    opacity: .95;
+    margin-bottom: .5rem;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+    background: var(--grey);
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(0,0,0,.35);
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 15px;
+    height: 15px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(0,0,0,.35);
+  }
+  .plot-wrap {
+    flex: 0 0 auto;
+    position: relative;
+  }
+  canvas#plot {
+    border: 1px solid #333;
+    background: #ffffff;
+  }
+  .buttons-col {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 8px;
+    width: 120px;
+  }
+  .btn-wrap {
+    position: relative;
+  }
+  .buttons-col > .btn-wrap > button {
+    width: 100%;
+    background: var(--maroon);
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    padding: 7px 10px;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 1.045em;
+    font-weight: normal;
+    cursor: pointer;
+    text-align: center;
+  }
+  .buttons-col > .btn-wrap > button:hover {
+    background: #7a000a;
+  }
+  .panel {
+    display: none;
+    position: fixed;
+    top: 14px;
+    width: 460px;
+    max-width: 70vw;
+    max-height: calc(100vh - 28px);
+    overflow-y: auto;
+    padding: 14px 18px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: #fdfdfd;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+    font-size: 0.95em;
+    line-height: 1.5;
+    z-index: 1000;
+  }
+  .panel.open {
+    display: block;
+  }
+  #panelDirections {
+    width: 635px;
+  }
+  #panelDetails {
+    width: 621px;
+  }
+  #panelAbout {
+    width: 582px;
+  }
+  .panel h2 {
+    margin-top: 0;
+    font-size: 1.05em;
+    color: var(--maroon);
+    padding-right: 22px;
+  }
+  .panel a {
+    color: var(--maroon);
+  }
+  .panel ul {
+    padding-left: 20px;
+  }
+  .panel-close {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    width: 22px;
+    height: 22px;
+    border: none;
+    background: transparent;
+    color: #888;
+    font-size: 1.15em;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+  }
+  .panel-close:hover {
+    color: #222;
+  }
+  .panel mjx-container[display="true"] {
+    text-align: left !important;
+    margin: 0.2em 0 !important;
+  }
+  .panel p.eq {
+    margin: 0;
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <h1>Separation of Carbon Dioxide and Methane Using Well-Mixed Gas Permeation</h1>
+
+  <div class="main-row">
+    <div class="controls">
+      <div class="control">
+        <label for="theta">stage cut <span class="value-badge" id="thetaVal">0.4</span></label>
+        <input type="range" id="theta" min="0.05" max="0.95" step="0.01" value="0.4">
+      </div>
+      <div class="control">
+        <label for="yin">feed composition <span class="value-badge" id="yinVal">0.4</span></label>
+        <input type="range" id="yin" min="0.1" max="0.9" step="0.05" value="0.4">
+      </div>
+
+      <div class="buttons-col">
+        <div class="btn-wrap">
+          <button id="btnDirections">Directions</button>
+          <div class="panel" id="panelDirections">
+            <button class="panel-close" data-panel="panelDirections" aria-label="Close">&times;</button>
+            <h2>Directions</h2>
+            <p>A mixture of carbon dioxide and methane are to be separated by a cellulose acetate membrane at 35&deg;C. The permeability of carbon dioxide and methane are 15.0&times;10<sup>&minus;10</sup> and 0.48&times;10<sup>&minus;10</sup> cm<sup>3</sup>(STP)&middot;cm/(cm<sup>2</sup>&middot;s&middot;cmHg), respectively, so the selectivity is &alpha;<sub>CO2&minus;CH4</sub> = 31. The high (retentate side) and low (permeate side) pressures are 20.0 and 1.1 atm, respectively. The plot shows (1) the RT curve, which relates the CO<sub>2</sub> mole fractions on both sides of the membrane, and (2) the operating line, whose slope depends on the stage cut, &theta;; assuming that both the retentate and permeate sides are well mixed, the graphical solution of this gas permeation problem is given by the intersection point shown in cyan in the figure. Use the sliders to set the value of the feed composition (mole fraction of CO<sub>2</sub>) as well as the stage cut.</p>
+          </div>
+        </div>
+
+        <div class="btn-wrap">
+          <button id="btnDetails">Details</button>
+          <div class="panel" id="panelDetails">
+            <button class="panel-close" data-panel="panelDetails" aria-label="Close">&times;</button>
+            <h2>Details</h2>
+            <p>For a well-mixed permeator, the CO<sub>2</sub> mole fraction on the permeate side, $y_p$, is related to the mole fraction on the retentate side, $y_r$, through the RT curve:</p>
+            <p class="eq">\[ y_p\Big[(\alpha-1)\frac{p_p}{p_r}(1-y_p)+1\Big] = y_r\big[\alpha-(\alpha-1)y_p\big] \]</p>
+            <p>where $\alpha$ is the membrane selectivity and $p_p$ and $p_r$ are the permeate- and retentate-side pressures:</p>
+            <p class="eq">\[ \alpha = \frac{P_{CO_2}}{P_{CH_4}} = \frac{15.0\times10^{-10}}{0.48\times10^{-10}} = 31.25 \]</p>
+            <p>An overall mole balance on CO<sub>2</sub> around the membrane module, in terms of the feed composition $y_{in}$ and the stage cut $\theta$ (the fraction of the feed that permeates), gives the operating line:</p>
+            <p class="eq">\[ y_{in} = \theta\,y_p + (1-\theta)\,y_r \qquad \Longrightarrow \qquad y_p = \frac{y_{in}}{\theta} - \frac{1-\theta}{\theta}\,y_r \]</p>
+            <p>The operating line is plotted for $0\le y_r\le y_{in}$. The simultaneous solution of the RT-curve equation and the operating-line equation, found numerically, gives the operating point (shown as the cyan point), from which the retentate and permeate compositions are read.</p>
+            <p>Parameter values used: $p_r = 20.0$ atm, $p_p = 1.1$ atm, $P_{CO_2} = 15.0\times10^{-10}$, $P_{CH_4} = 0.48\times10^{-10}$ cm<sup>3</sup>(STP)&middot;cm/(cm<sup>2</sup>&middot;s&middot;cmHg).</p>
+            <p><strong>Symbols</strong></p>
+            <ul>
+              <li>$y_{in}$ = mole fraction of CO<sub>2</sub> in the feed</li>
+              <li>$y_r$ = mole fraction of CO<sub>2</sub> on the retentate (high-pressure) side</li>
+              <li>$y_p$ = mole fraction of CO<sub>2</sub> on the permeate (low-pressure) side</li>
+              <li>$\theta$ = stage cut (fraction of the feed that permeates the membrane)</li>
+              <li>$\alpha$ = membrane selectivity for CO<sub>2</sub> relative to CH<sub>4</sub></li>
+              <li>$p_r$ = retentate-side pressure (atm)</li>
+              <li>$p_p$ = permeate-side pressure (atm)</li>
+              <li>$P_{CO_2}$, $P_{CH_4}$ = permeabilities of CO<sub>2</sub> and CH<sub>4</sub> in the membrane (cm<sup>3</sup>(STP)&middot;cm/(cm<sup>2</sup>&middot;s&middot;cmHg))</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="btn-wrap">
+          <button id="btnAbout">About</button>
+          <div class="panel" id="panelAbout">
+            <button class="panel-close" data-panel="panelAbout" aria-label="Close">&times;</button>
+            <h2>About</h2>
+            <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/SeparationOfCarbonDioxideAndMethaneUsingWellMixedGasPermeati/" target="_blank" rel="noopener">Mathematica simulation</a> by Housam Binous and Ahmed Bellagi. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="plot-wrap">
+      <canvas id="plot" width="440" height="440"></canvas>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  // Physical parameters (fixed)
+  var pp = 1.1;      // permeate side pressure, atm
+  var pr = 20.0;     // retentate side pressure, atm
+  var PCO2 = 15.0e-10;
+  var PCH4 = 0.48e-10;
+  var alpha = PCO2 / PCH4; // 31.25
+
+  var thetaSlider = document.getElementById('theta');
+  var yinSlider = document.getElementById('yin');
+  var thetaVal = document.getElementById('thetaVal');
+  var yinVal = document.getElementById('yinVal');
+  var canvas = document.getElementById('plot');
+  var ctx = canvas.getContext('2d');
+
+  // RT curve: given yp in [0,1], returns yr
+  function yrOfYp(yp) {
+    var num = yp * ((alpha - 1) * (pp / pr) * (1 - yp) + 1);
+    var den = alpha - (alpha - 1) * yp;
+    return num / den;
+  }
+
+  // Operating line: given yr, theta, yin -> yp
+  function ypOfYr(yr, theta, yin) {
+    return yin / theta - (1 - theta) / theta * yr;
+  }
+
+  // Solve for intersection of RT curve and operating line within yr in (0, yin)
+  function solveIntersection(theta, yin) {
+    function f(yr) {
+      var yp = ypOfYr(yr, theta, yin);
+      if (yp <= 0 || yp >= 1) return null;
+      var lhs = yp * ((alpha - 1) * (pp / pr) * (1 - yp) + 1);
+      var rhs = yr * (alpha - (alpha - 1) * yp);
+      return lhs - rhs;
+    }
+
+    var lo = 1e-6, hi = yin - 1e-6;
+    var n = 400;
+    var prevX = null, prevV = null;
+    var found = null;
+    for (var i = 0; i <= n; i++) {
+      var x = lo + (hi - lo) * i / n;
+      var v = f(x);
+      if (v === null) { prevX = null; prevV = null; continue; }
+      if (prevV !== null && prevV * v < 0) {
+        // bisection refine between prevX and x
+        var a = prevX, b = x, fa = prevV, fb = v;
+        for (var k = 0; k < 60; k++) {
+          var m = 0.5 * (a + b);
+          var fm = f(m);
+          if (fm === null) { break; }
+          if (fa * fm <= 0) { b = m; fb = fm; } else { a = m; fa = fm; }
+        }
+        var yr = 0.5 * (a + b);
+        var yp = ypOfYr(yr, theta, yin);
+        found = { yr: yr, yp: yp };
+        break;
+      }
+      prevX = x; prevV = v;
+    }
+    return found;
+  }
+
+  // Plot geometry
+  var dpr = window.devicePixelRatio || 1;
+  var cssSize = 440;
+  var margin = { left: 58, right: 18, top: 18, bottom: 52 };
+  var plotSize = cssSize - margin.left - margin.right - (margin.top === margin.bottom ? 0 : 0);
+
+  function setupCanvas() {
+    canvas.style.width = cssSize + 'px';
+    canvas.style.height = cssSize + 'px';
+    canvas.width = Math.round(cssSize * dpr);
+    canvas.height = Math.round(cssSize * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  var plotW = cssSize - margin.left - margin.right;
+  var plotH = cssSize - margin.top - margin.bottom;
+
+  function toPx(x, y) {
+    return {
+      x: margin.left + x * plotW,
+      y: margin.top + (1 - y) * plotH
+    };
+  }
+
+  function fmt3(v) {
+    return v.toFixed(3);
+  }
+
+  function draw() {
+    var theta = parseFloat(thetaSlider.value);
+    var yin = parseFloat(yinSlider.value);
+
+    ctx.clearRect(0, 0, cssSize, cssSize);
+
+    // frame background
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, cssSize, cssSize);
+
+    // gridlines
+    ctx.strokeStyle = '#dddddd';
+    ctx.lineWidth = 1;
+    var nGrid = 10;
+    for (var i = 0; i <= nGrid; i++) {
+      var frac = i / nGrid;
+      var p1 = toPx(frac, 0);
+      var p2 = toPx(frac, 1);
+      ctx.beginPath();
+      ctx.moveTo(p1.x, p1.y);
+      ctx.lineTo(p2.x, p2.y);
+      ctx.stroke();
+      var q1 = toPx(0, frac);
+      var q2 = toPx(1, frac);
+      ctx.beginPath();
+      ctx.moveTo(q1.x, q1.y);
+      ctx.lineTo(q2.x, q2.y);
+      ctx.stroke();
+    }
+
+    // frame border
+    ctx.strokeStyle = '#333333';
+    ctx.lineWidth = 1.4;
+    var tl = toPx(0, 1), br = toPx(1, 0);
+    ctx.strokeRect(tl.x, tl.y, br.x - tl.x, br.y - tl.y);
+
+    // tick labels
+    ctx.fillStyle = '#222222';
+    ctx.font = '14.5px Helvetica, Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    for (var t = 0; t <= 10; t += 2) {
+      var frac2 = t / 10;
+      var pt = toPx(frac2, 0);
+      ctx.fillText(frac2.toFixed(1), pt.x, pt.y + 6);
+    }
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    for (var t2 = 0; t2 <= 10; t2 += 2) {
+      var frac3 = t2 / 10;
+      var pt2 = toPx(0, frac3);
+      ctx.fillText(frac3.toFixed(1), pt2.x - 6, pt2.y);
+    }
+
+    // axis titles
+    ctx.fillStyle = '#222222';
+    ctx.font = '15.8px Helvetica, Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText('retentate mole fraction', margin.left + plotW / 2, cssSize - 14);
+
+    ctx.save();
+    ctx.translate(16, margin.top + plotH / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.textAlign = 'center';
+    ctx.fillText('permeate mole fraction', 0, 0);
+    ctx.restore();
+
+    // diagonal y = x (green)
+    ctx.strokeStyle = '#2e8b2e';
+    ctx.lineWidth = 2;
+    var d1 = toPx(0, 0), d2 = toPx(1, 1);
+    ctx.beginPath();
+    ctx.moveTo(d1.x, d1.y);
+    ctx.lineTo(d2.x, d2.y);
+    ctx.stroke();
+
+    // RT curve (dark red)
+    ctx.strokeStyle = '#7a0000';
+    ctx.lineWidth = 2.4;
+    ctx.beginPath();
+    var nCurve = 300;
+    for (var j = 0; j <= nCurve; j++) {
+      var yp = j / nCurve;
+      var yr = yrOfYp(yp);
+      if (yr < 0) yr = 0;
+      if (yr > 1) yr = 1;
+      var pxy = toPx(yr, yp);
+      if (j === 0) ctx.moveTo(pxy.x, pxy.y); else ctx.lineTo(pxy.x, pxy.y);
+    }
+    ctx.stroke();
+
+    // operating line (dark blue), yr from 0 to yin, only where 0 <= yp <= 1
+    ctx.strokeStyle = '#00007a';
+    ctx.lineWidth = 2.4;
+    ctx.beginPath();
+    var nOp = 200;
+    var penDown = false;
+    for (var k = 0; k <= nOp; k++) {
+      var yrv = yin * k / nOp;
+      var ypv = ypOfYr(yrv, theta, yin);
+      if (ypv < 0 || ypv > 1) {
+        penDown = false;
+        continue;
+      }
+      var pxy2 = toPx(yrv, ypv);
+      if (!penDown) {
+        ctx.moveTo(pxy2.x, pxy2.y);
+        penDown = true;
+      } else {
+        ctx.lineTo(pxy2.x, pxy2.y);
+      }
+    }
+    ctx.stroke();
+
+    // intersection point
+    var sol = solveIntersection(theta, yin);
+    if (sol) {
+      var pxy3 = toPx(sol.yr, sol.yp);
+      ctx.fillStyle = '#00e5e5';
+      ctx.strokeStyle = '#008888';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(pxy3.x, pxy3.y, 6, 0, 2 * Math.PI);
+      ctx.fill();
+      ctx.stroke();
+
+      // labels
+      ctx.fillStyle = '#0000cc';
+      ctx.font = '14.4px Helvetica, Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'alphabetic';
+      var labelP = toPx(0.62, 0.16);
+      var labelR = toPx(0.62, 0.05);
+      ctx.fillText('permeate mole fraction : ' + fmt3(sol.yp), labelP.x, labelP.y);
+      ctx.fillText('retentate mole fraction : ' + fmt3(sol.yr), labelR.x, labelR.y);
+    }
+  }
+
+  function updateReadouts() {
+    thetaVal.textContent = parseFloat(thetaSlider.value).toFixed(2);
+    yinVal.textContent = parseFloat(yinSlider.value).toFixed(2);
+  }
+
+  function refresh() {
+    updateReadouts();
+    draw();
+  }
+
+  thetaSlider.addEventListener('input', refresh);
+  yinSlider.addEventListener('input', refresh);
+
+  setupCanvas();
+  refresh();
+
+  // Panel toggle logic
+  function setupPanelButton(btnId, panelId) {
+    var btn = document.getElementById(btnId);
+    var panel = document.getElementById(panelId);
+    btn.addEventListener('click', function () {
+      var isOpen = panel.classList.contains('open');
+      document.querySelectorAll('.panel').forEach(function (p) { p.classList.remove('open'); });
+      if (!isOpen) {
+        var rect = btn.getBoundingClientRect();
+        panel.style.left = (rect.right + 14) + 'px';
+        panel.classList.add('open');
+        if (window.MathJax && window.MathJax.typesetPromise) {
+          window.MathJax.typesetPromise([panel]).catch(function () {});
+        }
+      }
+    });
+  }
+  setupPanelButton('btnDirections', 'panelDirections');
+  setupPanelButton('btnDetails', 'panelDetails');
+  setupPanelButton('btnAbout', 'panelAbout');
+
+  document.querySelectorAll('.panel-close').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var panel = document.getElementById(btn.getAttribute('data-panel'));
+      if (panel) panel.classList.remove('open');
+    });
+  });
+})();
+</script>
+</body>
+</html>

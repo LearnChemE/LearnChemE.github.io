@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2D Heat Distribution Simulator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .control-panel {
+            background-color: #f8fafc;
+        }
+        .btn {
+            transition: all 0.3s ease;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #3b82f6;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #3b82f6;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+        #status {
+            transition: color 0.5s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900">2D Heat Distribution Simulator</h1>
+            <p class="text-md text-gray-600 mt-2">Visualize steady-state heat conduction in a 2D slab with boundary energy balances.</p>
+        </header>
+
+        <div class="flex flex-col lg:flex-row gap-8">
+            <!-- Control Panel -->
+            <div class="control-panel w-full lg:w-5/12 p-6 rounded-2xl shadow-lg border border-gray-200 flex flex-col justify-between">
+                <div>
+                    <h2 class="text-2xl font-semibold mb-6 border-b pb-3 flex items-center justify-between">
+                        <span>Simulation Config</span>
+                        <span id="status" class="text-sm font-semibold bg-gray-200 px-3 py-1 rounded-full text-gray-700">Status: Idle</span>
+                    </h2>
+
+                    <!-- Material Settings -->
+                    <div class="space-y-4 mb-6 p-4 bg-blue-50/50 rounded-xl border border-blue-100">
+                        <h3 class="text-lg font-semibold text-blue-900">Material Properties</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label for="materialPreset" class="block text-sm font-medium text-gray-700">Preset Material</label>
+                                <select id="materialPreset" class="mt-1 block w-full rounded-md border-gray-300 bg-white p-2 border shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                    <option value="copper">Copper (k = 401 W/m·K)</option>
+                                    <option value="aluminum">Aluminum (k = 237 W/m·K)</option>
+                                    <option value="iron">Iron (k = 80 W/m·K)</option>
+                                    <option value="glass">Glass (k = 1.3 W/m·K)</option>
+                                    <option value="wood" selected>Wood (k = 0.15 W/m·K)</option>
+                                    <option value="custom">Custom Material</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="conductivity" class="block text-sm font-medium text-gray-700">Conductivity (k) <span class="text-xs text-gray-500">[W/m·K]</span></label>
+                                <input type="number" id="conductivity" value="0.15" step="0.01" min="0.01" class="mt-1 block w-full rounded-md border-gray-300 p-2 border shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Boundary Conditions (Interactive Grid) -->
+                    <div class="space-y-4 mb-6">
+                        <h3 class="text-lg font-medium text-gray-700">Boundary Heat Transfer & Ambient Temp</h3>
+                        
+                        <!-- Top Boundary -->
+                        <div class="p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
+                            <span class="text-sm font-bold text-gray-700 block mb-2 border-b pb-1">Top Boundary</span>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <div>
+                                    <label class="block text-xs text-gray-500">Type</label>
+                                    <select id="topBC" class="mt-1 block w-full rounded-md border-gray-300 p-1 border text-sm">
+                                        <option value="fixed">Fixed Temp</option>
+                                        <option value="convective">Convective</option>
+                                        <option value="insulated">Insulated</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-gray-500">Value (°C)</label>
+                                    <input type="number" id="topVal" value="100" class="mt-1 block w-full rounded-md border-gray-300 p-1 border text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-gray-500">h (W/m²·K)</label>
+                                    <input type="number" id="toph" value="20" class="mt-1 block w-full rounded-md border-gray-300 p-1 border text-sm" disabled>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bottom Boundary -->
+                        <div class="p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
+                            <span class="text-sm font-bold text-gray-700 block mb-2 border-b pb-1">Bottom Boundary</span>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <div>
+                                    <label class="block text-xs text-gray-500">Type</label>
+                                    <select id="bottomBC" class="mt-1 block w-full rounded-md border-gray-300 p-1 border text-sm">
+                                        <option value="fixed" selected>Fixed Temp</option>
+                                        <option value="convective">Convective</option>
+                                        <option value="insulated">Insulated</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-gray-500">Value (°C)</label>
+                                    <input type="number" id="bottomVal" value="0" class="mt-1 block w-full rounded-md border-gray-300 p-1 border text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-gray-500">h (W/m²·K)</label>
+                                    <input type="number" id="bottomh" value="20" class="mt-1 block w-full rounded-md border-gray-300 p-1 border text-sm" disabled>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Left Boundary -->
+                        <div class="p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
+                            <span class="text-sm font-bold text-gray-700 block mb-2 border-b pb-1">Left Boundary</span>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <div>
+                                    <label class="block text-xs text-gray-500">Type</label>
+                                    <select id="leftBC" class="mt-1 block w-full rounded-md border-gray-300 p-1 border text-sm">
+                                        <option value="fixed">Fixed Temp</option>
+                                        <option value="convective" selected>Convective</option>
+                                        <option value="insulated">Insulated</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-gray-500">Value (°C)</label>
+                                    <input type="number" id="leftVal" value="20" class="mt-1 block w-full rounded-md border-gray-300 p-1 border text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-gray-500">h (W/m²·K)</label>
+                                    <input type="number" id="lefth" value="45" class="mt-1 block w-full rounded-md border-gray-300 p-1 border text-sm">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Boundary -->
+                        <div class="p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
+                            <span class="text-sm font-bold text-gray-700 block mb-2 border-b pb-1">Right Boundary</span>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <div>
+                                    <label class="block text-xs text-gray-500">Type</label>
+                                    <select id="rightBC" class="mt-1 block w-full rounded-md border-gray-300 p-1 border text-sm">
+                                        <option value="fixed">Fixed Temp</option>
+                                        <option value="convective">Convective</option>
+                                        <option value="insulated" selected>Insulated</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-gray-500">Value (°C)</label>
+                                    <input type="number" id="rightVal" value="50" class="mt-1 block w-full rounded-md border-gray-300 p-1 border text-sm" disabled>
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-gray-500">h (W/m²·K)</label>
+                                    <input type="number" id="righth" value="20" class="mt-1 block w-full rounded-md border-gray-300 p-1 border text-sm" disabled>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Simulation Parameters -->
+                    <div class="space-y-4 mb-6">
+                        <h3 class="text-lg font-medium text-gray-700">Mesh & Initial State</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label for="gridSize" class="block text-sm font-medium text-gray-600">Grid Mesh: <span id="gridSizeLabel" class="font-bold">50</span>x<span id="gridSizeLabel2" class="font-bold">50</span></label>
+                                <input type="range" id="gridSize" min="15" max="80" value="45" class="slider w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer mt-2">
+                            </div>
+                            <div>
+                                <label for="initialTemp" class="block text-sm font-medium text-gray-600">Slab Init Temperature (°C)</label>
+                                <input type="number" id="initialTemp" value="25" class="mt-1 block w-full rounded-md border-gray-300 p-1.5 border shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-gray-200">
+                    <button id="startButton" class="btn w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-xl shadow-md hover:bg-blue-700">
+                        Start Simulation
+                    </button>
+                    <button id="resetButton" class="btn w-full bg-gray-600 text-white font-semibold py-3 px-4 rounded-xl shadow-md hover:bg-gray-700">
+                        Reset Grid
+                    </button>
+                </div>
+            </div>
+
+            <!-- Simulation Canvas -->
+            <div class="w-full lg:w-7/12 flex flex-col items-center">
+                <div class="w-full bg-white rounded-2xl shadow-lg border border-gray-200 p-6 flex flex-col items-center">
+                    <div class="relative w-full aspect-square max-w-[500px] border border-gray-300 rounded overflow-hidden">
+                        <!-- Compass Boundary Type Overlays for clarity -->
+                        <div id="topBCTag" class="absolute top-0 left-1/2 transform -translate-x-1/2 bg-black/60 text-white text-[10px] px-2 py-0.5 rounded-b pointer-events-none">Top: Fixed</div>
+                        <div id="leftBCTag" class="absolute left-0 top-1/2 transform -translate-y-1/2 -rotate-90 origin-left translate-x-1 bg-black/60 text-white text-[10px] px-2 py-0.5 rounded-b pointer-events-none">Left: Fixed</div>
+                        <div id="rightBCTag" class="absolute right-0 top-1/2 transform -translate-y-1/2 rotate-90 origin-right -translate-x-1 bg-black/60 text-white text-[10px] px-2 py-0.5 rounded-b pointer-events-none">Right: Fixed</div>
+                        <div id="bottomBCTag" class="absolute bottom-0 left-1/2 transform -translate-x-1/2 bg-black/60 text-white text-[10px] px-2 py-0.5 rounded-t pointer-events-none">Bottom: Fixed</div>
+                        
+                        <canvas id="simulationCanvas" class="w-full h-full block"></canvas>
+                    </div>
+                    
+                    <div id="color-legend" class="mt-6 w-full max-w-[500px] p-3 bg-gray-50 rounded-lg shadow-sm border border-gray-200 flex items-center justify-center">
+                        <!-- Legend is generated dynamically here -->
+                    </div>
+                    
+                    <div class="mt-4 text-xs text-gray-500 text-center max-w-[500px]">
+                        <p class="font-semibold text-gray-600 mb-1">Energy Balance Convective Node Model:</p>
+                        $$ T_{i,j} = \frac{T_{neighbor} + \text{Bi} \cdot T_{\infty}}{2 + \text{Bi}} \quad \text{where} \quad \text{Bi} = \frac{h \cdot \Delta x}{k} $$
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MathJax to render LaTeX neatly -->
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <script>
+        // Material presets database (Thermal Conductivity k in W/m·K)
+        const materials = {
+            copper: 401,
+            aluminum: 237,
+            iron: 80,
+            glass: 1.3,
+            wood: 0.15,
+            custom: 1.0
+        };
+
+        // --- DOM Element References ---
+        const canvas = document.getElementById('simulationCanvas');
+        const ctx = canvas.getContext('2d');
+        const materialPreset = document.getElementById('materialPreset');
+        const conductivityInput = document.getElementById('conductivity');
+        
+        // Boundaries
+        const topBC = document.getElementById('topBC');
+        const topVal = document.getElementById('topVal');
+        const toph = document.getElementById('toph');
+        
+        const bottomBC = document.getElementById('bottomBC');
+        const bottomVal = document.getElementById('bottomVal');
+        const bottomh = document.getElementById('bottomh');
+        
+        const leftBC = document.getElementById('leftBC');
+        const leftVal = document.getElementById('leftVal');
+        const lefth = document.getElementById('lefth');
+        
+        const rightBC = document.getElementById('rightBC');
+        const rightVal = document.getElementById('rightVal');
+        const righth = document.getElementById('righth');
+        
+        // Overlays
+        const topBCTag = document.getElementById('topBCTag');
+        const bottomBCTag = document.getElementById('bottomBCTag');
+        const leftBCTag = document.getElementById('leftBCTag');
+        const rightBCTag = document.getElementById('rightBCTag');
+
+        // Mesh
+        const gridSizeInput = document.getElementById('gridSize');
+        const gridSizeLabel = document.getElementById('gridSizeLabel');
+        const gridSizeLabel2 = document.getElementById('gridSizeLabel2');
+        const initialTempInput = document.getElementById('initialTemp');
+        
+        // Controls
+        const startButton = document.getElementById('startButton');
+        const resetButton = document.getElementById('resetButton');
+        const statusEl = document.getElementById('status');
+        const legendContainer = document.getElementById('color-legend');
+
+        // --- Simulation State ---
+        let gridSize = 45;
+        let tempGrid;
+        let isRunning = false;
+        let animationFrameId;
+        let minTemp = 0;
+        let maxTemp = 100;
+        
+        // --- Setup Material preset handers ---
+        materialPreset.addEventListener('change', () => {
+            const val = materialPreset.value;
+            if (val !== 'custom') {
+                conductivityInput.value = materials[val];
+                conductivityInput.disabled = true;
+            } else {
+                conductivityInput.disabled = false;
+            }
+            triggerAutoReset();
+        });
+
+        conductivityInput.addEventListener('input', () => {
+            materialPreset.value = 'custom';
+            triggerAutoReset();
+        });
+
+        // Set initial state of conductivity input
+        conductivityInput.disabled = true;
+
+        // Ensure boundary fields enable/disable depending on the mode selection
+        function handleBCFieldStates() {
+            const setups = [
+                { select: topBC, val: topVal, h: toph, tag: topBCTag, label: "Top" },
+                { select: bottomBC, val: bottomVal, h: bottomh, tag: bottomBCTag, label: "Bottom" },
+                { select: leftBC, val: leftVal, h: lefth, tag: leftBCTag, label: "Left" },
+                { select: rightBC, val: rightVal, h: righth, tag: rightBCTag, label: "Right" }
+            ];
+
+            setups.forEach(setup => {
+                const mode = setup.select.value;
+                if (mode === 'fixed') {
+                    setup.val.disabled = false;
+                    setup.h.disabled = true;
+                    setup.tag.textContent = `${setup.label}: ${setup.val.value}°C`;
+                } else if (mode === 'convective') {
+                    setup.val.disabled = false;
+                    setup.h.disabled = false;
+                    setup.tag.textContent = `${setup.label} Conv: T∞=${setup.val.value}°C, h=${setup.h.value}`;
+                } else if (mode === 'insulated') {
+                    setup.val.disabled = true;
+                    setup.h.disabled = true;
+                    setup.tag.textContent = `${setup.label}: Insulated`;
+                }
+            });
+        }
+
+        // --- Core Simulation Logic ---
+
+        function initializeGrid() {
+            gridSize = parseInt(gridSizeInput.value);
+            const initialTemp = parseFloat(initialTempInput.value);
+
+            // Populate starting interior temperatures
+            tempGrid = Array(gridSize).fill(0).map(() => Array(gridSize).fill(initialTemp));
+
+            // Populate baseline temperatures at borders
+            applyBoundaries();
+            determineColorRange();
+        }
+
+        /**
+         * Sets initial boundary temperatures based on inputs (primarily for Dirichlet edges)
+         */
+        function applyBoundaries() {
+            // Apply Fixed boundary conditions immediately to edges
+            const topT = parseFloat(topVal.value);
+            const bottomT = parseFloat(bottomVal.value);
+            const leftT = parseFloat(leftVal.value);
+            const rightT = parseFloat(rightVal.value);
+
+            for (let i = 0; i < gridSize; i++) {
+                if (topBC.value === 'fixed') tempGrid[0][i] = topT;
+                if (bottomBC.value === 'fixed') tempGrid[gridSize - 1][i] = bottomT;
+                if (leftBC.value === 'fixed') tempGrid[i][0] = leftT;
+                if (rightBC.value === 'fixed') tempGrid[i][gridSize - 1] = rightT;
+            }
+        }
+
+        /**
+         * Computes the global minimum/maximum temperature to dynamically set the color map range.
+         */
+        function determineColorRange() {
+            let min = Infinity;
+            let max = -Infinity;
+            
+            // Check boundary temperatures
+            const boundaryValues = [
+                topBC.value !== 'insulated' ? parseFloat(topVal.value) : null,
+                bottomBC.value !== 'insulated' ? parseFloat(bottomVal.value) : null,
+                leftBC.value !== 'insulated' ? parseFloat(leftVal.value) : null,
+                rightBC.value !== 'insulated' ? parseFloat(rightVal.value) : null,
+                parseFloat(initialTempInput.value)
+            ].filter(v => v !== null);
+
+            minTemp = Math.min(...boundaryValues);
+            maxTemp = Math.max(...boundaryValues);
+
+            // Guard against divide by zero if all values are equal
+            if (minTemp === maxTemp) {
+                minTemp -= 5;
+                maxTemp += 5;
+            }
+        }
+
+        /**
+         * Solves the heat transfer equations on every node inside and on the boundaries.
+         * Modeled with physical energy balances: conduction, convection, and adiabatic states.
+         */
+        function updateGrid() {
+            let maxChange = 0;
+            const newGrid = tempGrid.map(arr => arr.slice());
+            
+            const kVal = parseFloat(conductivityInput.value) || 0.1;
+            const dx = 1.0 / gridSize; // normalized width of slab is 1 meter
+
+            // --- 1. Compute Interior Nodes ---
+            for (let i = 1; i < gridSize - 1; i++) {
+                for (let j = 1; j < gridSize - 1; j++) {
+                    const newTemp = (tempGrid[i - 1][j] + tempGrid[i + 1][j] + tempGrid[i][j - 1] + tempGrid[i][j + 1]) / 4;
+                    const change = Math.abs(newTemp - tempGrid[i][j]);
+                    if (change > maxChange) maxChange = change;
+                    newGrid[i][j] = newTemp;
+                }
+            }
+
+            // --- 2. Energy Balances on Non-Fixed Edges ---
+            // Top Edge (excluding corners)
+            if (topBC.value !== 'fixed') {
+                const isConv = topBC.value === 'convective';
+                const h = isConv ? parseFloat(toph.value) : 0;
+                const T_inf = isConv ? parseFloat(topVal.value) : 0;
+                const Bi = (h * dx) / kVal;
+
+                for (let j = 1; j < gridSize - 1; j++) {
+                    // Top boundary node balance equation
+                    const newTemp = (tempGrid[1][j] + 0.5 * (tempGrid[0][j - 1] + tempGrid[0][j + 1]) + Bi * T_inf) / (2 + Bi);
+                    const change = Math.abs(newTemp - tempGrid[0][j]);
+                    if (change > maxChange) maxChange = change;
+                    newGrid[0][j] = newTemp;
+                }
+            }
+
+            // Bottom Edge (excluding corners)
+            if (bottomBC.value !== 'fixed') {
+                const isConv = bottomBC.value === 'convective';
+                const h = isConv ? parseFloat(bottomh.value) : 0;
+                const T_inf = isConv ? parseFloat(bottomVal.value) : 0;
+                const Bi = (h * dx) / kVal;
+
+                for (let j = 1; j < gridSize - 1; j++) {
+                    const newTemp = (tempGrid[gridSize - 2][j] + 0.5 * (tempGrid[gridSize - 1][j - 1] + tempGrid[gridSize - 1][j + 1]) + Bi * T_inf) / (2 + Bi);
+                    const change = Math.abs(newTemp - tempGrid[gridSize - 1][j]);
+                    if (change > maxChange) maxChange = change;
+                    newGrid[gridSize - 1][j] = newTemp;
+                }
+            }
+
+            // Left Edge (excluding corners)
+            if (leftBC.value !== 'fixed') {
+                const isConv = leftBC.value === 'convective';
+                const h = isConv ? parseFloat(lefth.value) : 0;
+                const T_inf = isConv ? parseFloat(leftVal.value) : 0;
+                const Bi = (h * dx) / kVal;
+
+                for (let i = 1; i < gridSize - 1; i++) {
+                    const newTemp = (tempGrid[i][1] + 0.5 * (tempGrid[i - 1][0] + tempGrid[i + 1][0]) + Bi * T_inf) / (2 + Bi);
+                    const change = Math.abs(newTemp - tempGrid[i][0]);
+                    if (change > maxChange) maxChange = change;
+                    newGrid[i][0] = newTemp;
+                }
+            }
+
+            // Right Edge (excluding corners)
+            if (rightBC.value !== 'fixed') {
+                const isConv = rightBC.value === 'convective';
+                const h = isConv ? parseFloat(righth.value) : 0;
+                const T_inf = isConv ? parseFloat(rightVal.value) : 0;
+                const Bi = (h * dx) / kVal;
+
+                for (let i = 1; i < gridSize - 1; i++) {
+                    const newTemp = (tempGrid[i][gridSize - 2] + 0.5 * (tempGrid[i - 1][gridSize - 1] + tempGrid[i + 1][gridSize - 1]) + Bi * T_inf) / (2 + Bi);
+                    const change = Math.abs(newTemp - tempGrid[i][gridSize - 1]);
+                    if (change > maxChange) maxChange = change;
+                    newGrid[i][gridSize - 1] = newTemp;
+                }
+            }
+
+            // --- 3. Compute Corner Nodes ---
+            // Set corner nodes to the simple average of their adjacent boundary values
+            newGrid[0][0] = (newGrid[0][1] + newGrid[1][0]) / 2;
+            newGrid[0][gridSize - 1] = (newGrid[0][gridSize - 2] + newGrid[1][gridSize - 1]) / 2;
+            newGrid[gridSize - 1][0] = (newGrid[gridSize - 1][1] + newGrid[gridSize - 2][0]) / 2;
+            newGrid[gridSize - 1][gridSize - 1] = (newGrid[gridSize - 1][gridSize - 2] + newGrid[gridSize - 2][gridSize - 1]) / 2;
+
+            tempGrid = newGrid;
+            return maxChange;
+        }
+        
+        /**
+         * Main execution frame loop. Run multiple substeps for immediate visualization fluidness.
+         */
+        function simulationLoop() {
+            // Speed up calculation visually by iterating 15 times per animation frame
+            for (let k = 0; k < 15; k++) {
+                const maxChange = updateGrid();
+                if (maxChange < 0.0005) {
+                    setStatus('Converged', '#22c55e');
+                    stopSimulation();
+                    draw();
+                    return;
+                }
+            }
+            draw();
+
+            if (isRunning) {
+                animationFrameId = requestAnimationFrame(simulationLoop);
+            }
+        }
+        
+        // --- Drawing and Graphical Render Engine ---
+        
+        function getTemperatureColor(temp) {
+            const normalized = Math.min(Math.max((temp - minTemp) / (maxTemp - minTemp), 0), 1);
+            // Dynamic color map: blue (coldest) -> green (moderate) -> red (hottest)
+            const hue = 240 * (1 - normalized);
+            return `hsl(${hue}, 100%, 45%)`;
+        }
+
+        function draw() {
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+            
+            const cellWidth = canvas.width / gridSize;
+            const cellHeight = canvas.height / gridSize;
+
+            for (let i = 0; i < gridSize; i++) {
+                for (let j = 0; j < gridSize; j++) {
+                    ctx.fillStyle = getTemperatureColor(tempGrid[i][j]);
+                    ctx.fillRect(j * cellWidth, i * cellHeight, cellWidth + 0.5, cellHeight + 0.5);
+                }
+            }
+        }
+        
+        function drawLegend() {
+            legendContainer.innerHTML = '';
+            const legendLabelMin = document.createElement('span');
+            legendLabelMin.className = 'font-semibold text-sm';
+            legendLabelMin.textContent = `${minTemp.toFixed(1)}°C`;
+            
+            const legendGradient = document.createElement('div');
+            legendGradient.className = 'h-5 flex-grow mx-4 rounded-md shadow-inner border border-gray-300';
+            legendGradient.style.background = `linear-gradient(to right, 
+                ${getTemperatureColor(minTemp)}, 
+                ${getTemperatureColor(minTemp + (maxTemp - minTemp) * 0.25)}, 
+                ${getTemperatureColor(minTemp + (maxTemp - minTemp) * 0.5)}, 
+                ${getTemperatureColor(minTemp + (maxTemp - minTemp) * 0.75)}, 
+                ${getTemperatureColor(maxTemp)})`;
+
+            const legendLabelMax = document.createElement('span');
+            legendLabelMax.className = 'font-semibold text-sm';
+            legendLabelMax.textContent = `${maxTemp.toFixed(1)}°C`;
+            
+            legendContainer.appendChild(legendLabelMin);
+            legendContainer.appendChild(legendGradient);
+            legendContainer.appendChild(legendLabelMax);
+        }
+
+        // --- Controls & Trigger Listeners ---
+        
+        function startSimulation() {
+            if (isRunning) return;
+            isRunning = true;
+            startButton.disabled = true;
+            resetButton.disabled = true;
+            setStatus('Simulating...', '#3b82f6');
+            simulationLoop();
+        }
+
+        function stopSimulation() {
+            isRunning = false;
+            startButton.disabled = false;
+            resetButton.disabled = false;
+            cancelAnimationFrame(animationFrameId);
+        }
+        
+        function resetSimulation() {
+            stopSimulation();
+            setStatus('Idle', '#6b7280');
+            handleBCFieldStates();
+            initializeGrid();
+            draw();
+            drawLegend();
+        }
+
+        function triggerAutoReset() {
+            if (!isRunning) {
+                resetSimulation();
+            }
+        }
+
+        function setStatus(text, color) {
+            statusEl.textContent = `Status: ${text}`;
+            statusEl.style.backgroundColor = color;
+            statusEl.style.color = '#fff';
+        }
+
+        // --- Connect Interactivities ---
+        
+        startButton.addEventListener('click', () => {
+            resetSimulation();
+            startSimulation();
+        });
+        
+        resetButton.addEventListener('click', resetSimulation);
+
+        gridSizeInput.addEventListener('input', (e) => {
+            const size = e.target.value;
+            gridSizeLabel.textContent = size;
+            gridSizeLabel2.textContent = size;
+            triggerAutoReset();
+        });
+
+        const inputsToAutoTrigger = [
+            topBC, topVal, toph,
+            bottomBC, bottomVal, bottomh,
+            leftBC, leftVal, lefth,
+            rightBC, rightVal, righth,
+            initialTempInput
+        ];
+
+        inputsToAutoTrigger.forEach(el => {
+            el.addEventListener('change', () => {
+                handleBCFieldStates();
+                triggerAutoReset();
+            });
+            el.addEventListener('input', () => {
+                handleBCFieldStates();
+                triggerAutoReset();
+            });
+        });
+        
+        window.addEventListener('resize', () => {
+            if (tempGrid) {
+                draw();
+            }
+        });
+        
+        // --- Init App ---
+        window.onload = () => {
+            resetSimulation();
+        };
+
+    </script>
+</body>
+</html>

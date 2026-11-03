@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simple Linear Regression</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.min.js"></script>
+<style>
+  body {
+    font-family: Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 15px 10px 40px 10px;
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  #container {
+    width: 720px;
+    max-width: 100%;
+  }
+  #plotCanvas {
+    display: block;
+    margin: 0 auto;
+    cursor: default;
+  }
+  /* slider row */
+  #sliderRow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 4px;
+    gap: 10px;
+  }
+  #sliderRow .endLabel {
+    font-size: 18px;
+    color: #000;
+  }
+  /* slider styling */
+  input[type="range"] {
+    --accent: #98000D;
+    --grey: #999;
+    --fill: 50%;
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 5px;
+    border-radius: 3px;
+    outline: none;
+    opacity: .95;
+    margin-bottom: .5rem;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+    background: var(--grey);
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(0,0,0,.35);
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 15px;
+    height: 15px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(0,0,0,.35);
+  }
+  #noiseSlider {
+    width: 420px;
+  }
+  #noiseLabel {
+    text-align: center;
+    font-size: 18px;
+    margin-top: 2px;
+  }
+  /* panel buttons */
+  #buttonArea {
+    position: relative;
+    margin-top: 22px;
+  }
+  #buttonRow {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+  }
+  .panelButton {
+    background-color: #98000D;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 22px;
+    font-size: 16px;
+    font-family: Helvetica, Arial, sans-serif;
+    cursor: pointer;
+  }
+  .panelButton:hover {
+    background-color: #7a000a;
+  }
+  .panel {
+    display: none;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 100%;
+    margin-bottom: 12px;
+    border: 1px solid #999;
+    border-radius: 6px;
+    background-color: #fdfdfd;
+    padding: 14px 34px 14px 20px;
+    font-size: 15px;
+    line-height: 1.55;
+    color: #000;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.25);
+    z-index: 10;
+  }
+  .panelClose {
+    position: absolute;
+    top: 6px;
+    right: 10px;
+    font-size: 20px;
+    line-height: 1;
+    font-weight: bold;
+    color: #555;
+    cursor: pointer;
+    user-select: none;
+    padding: 2px 5px;
+  }
+  .panelClose:hover {
+    color: #98000D;
+  }
+  .panel a { color: #0b5394; }
+  .panel h2 { margin: 2px 0 8px 0; font-size: 19px; color: #98000D; }
+  .panel h3 { margin: 12px 0 6px 0; font-size: 16px; }
+  .panel mjx-container[display="true"] {
+    text-align: left !important;
+    margin-left: 0 !important;
+  }
+  .symbolList {
+    margin: 0;
+    padding-left: 0;
+    list-style: none;
+  }
+  .symbolList li { margin: 2px 0; }
+</style>
+</head>
+<body>
+<div id="container">
+  <canvas id="plotCanvas"></canvas>
+
+  <div id="sliderRow">
+    <span class="endLabel">a lot</span>
+    <input type="range" id="noiseSlider" min="0" max="2" step="0.004" value="2">
+    <span class="endLabel">a little</span>
+  </div>
+  <div id="noiseLabel">noise</div>
+
+  <div id="buttonArea">
+  <div id="buttonRow">
+    <button class="panelButton" id="btnDirections">Directions</button>
+    <button class="panelButton" id="btnDetails">Details</button>
+    <button class="panelButton" id="btnAbout">About</button>
+  </div>
+
+  <div class="panel" id="panelDirections">
+    <span class="panelClose" data-close="panelDirections" title="Close">&times;</span>
+    <h2>Directions</h2>
+    <p>This simulation shows the effect of noise and outliers in linear regression. The line
+    \( y = x + 1 \) is shown in the top plot (dashed black line). Experimental data are generated
+    from this equation by adding white Gaussian noise and are shown on the same plot (blue
+    circles). These data are fit with a linear model (solid green line). The residuals of that
+    fitting are shown in the lower plot. Change the amount of noise in the data using the slider
+    bar and observe the change in the equation of best fit, the \( r^{2} \) value, and the
+    residuals plot. To add an outlier, click any location on the top plot to add the point. The
+    point will replace the middle point of the original data set. The fit to the original data and
+    the data with the outlier will both be shown in the upper plot. The residuals of the original
+    and new fits are shown in the lower plot. Observe the change in the equation of best fit, the
+    \( r^{2} \) value, and the residuals plot. Moving the noise slider generates a new data set and
+    removes the outlier.</p>
+  </div>
+
+  <div class="panel" id="panelDetails">
+    <span class="panelClose" data-close="panelDetails" title="Close">&times;</span>
+    <h2>Details</h2>
+    <p>Experimental data \( (x_{i},\, y_{i}) \) are generated from the line \( y = x + 1 \) by
+    adding zero-mean white Gaussian noise. The noise slider sets the signal-to-noise ratio
+    (SNR, in dB), so the standard deviation of the added noise is</p>
+    \[ \sigma = \sqrt{10^{-\mathrm{SNR}/10}}. \]
+    <p>The data are fit with the linear model</p>
+    \[ \hat{y} = \hat{\beta}_{0} + \hat{\beta}_{1}\,x, \]
+    <p>where the least-squares estimates of the slope \( \hat{\beta}_{1} \) and intercept
+    \( \hat{\beta}_{0} \) are</p>
+    \[ \hat{\beta}_{1} = \frac{\displaystyle\sum_{i=1}^{n}(x_{i}-\bar{x})(y_{i}-\bar{y})}
+    {\displaystyle\sum_{i=1}^{n}(x_{i}-\bar{x})^{2}}, \qquad
+    \hat{\beta}_{0} = \bar{y} - \hat{\beta}_{1}\,\bar{x}, \]
+    <p>and \( \bar{x} \) and \( \bar{y} \) are the means of the \( x_{i} \) and \( y_{i} \) data
+    and \( n \) is the number of data points. The correlation coefficient \( r \) is</p>
+    \[ r = \frac{\displaystyle\sum_{i=1}^{n}(x_{i}-\bar{x})(y_{i}-\bar{y})}
+    {\sqrt{\displaystyle\sum_{i=1}^{n}(x_{i}-\bar{x})^{2}}\;
+    \sqrt{\displaystyle\sum_{i=1}^{n}(y_{i}-\bar{y})^{2}}}, \]
+    <p>and \( r^{2} \) is the coefficient of determination. The residual for each data point is
+    the difference between the measured value and the value predicted by the fit,</p>
+    \[ e_{i} = y_{i} - \hat{y}_{i}, \qquad \hat{y}_{i} = \hat{\beta}_{0} + \hat{\beta}_{1}\,x_{i}, \]
+    <p>and the lower plot shows the residuals \( y_{i} - \hat{y}_{i} \) versus the predicted
+    values \( \hat{y}_{i} \). For a good fit, the residuals scatter randomly about zero with no
+    trend; an outlier produces a large residual and can significantly change the best-fit line
+    and lower \( r^{2} \).</p>
+    <h3>Symbols</h3>
+    <ul class="symbolList">
+      <li>\( x_{i},\, y_{i} \) = \( x \) and \( y \) values of data point \( i \)</li>
+      <li>\( \bar{x},\, \bar{y} \) = means of the \( x_{i} \) and \( y_{i} \) data</li>
+      <li>\( n \) = number of data points</li>
+      <li>\( \hat{y} \) = value predicted by the linear fit</li>
+      <li>\( \hat{y}_{i} \) = predicted value at \( x_{i} \)</li>
+      <li>\( \hat{\beta}_{0} \) = least-squares estimate of the intercept</li>
+      <li>\( \hat{\beta}_{1} \) = least-squares estimate of the slope</li>
+      <li>\( e_{i} \) = residual of data point \( i \)</li>
+      <li>\( r \) = correlation coefficient</li>
+      <li>\( r^{2} \) = coefficient of determination</li>
+      <li>\( \sigma \) = standard deviation of the added noise</li>
+      <li>SNR = signal-to-noise ratio (dB)</li>
+    </ul>
+  </div>
+
+  <div class="panel" id="panelAbout">
+    <span class="panelClose" data-close="panelAbout" title="Close">&times;</span>
+    <h2>About</h2>
+    <p>This simulation was created in the
+    <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a>
+    at University of Colorado Boulder for
+    <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by
+    John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a MATLAB
+    simulation by Keith Regner. It was prepared with financial support from the National Science
+    Foundation (DUE 2336987 and 2336988).
+    Address any questions or comments to
+    <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.</p>
+  </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ---------------------------------------------------------------
+  // Canvas setup (hi-DPI)
+  // ---------------------------------------------------------------
+  var canvas = document.getElementById('plotCanvas');
+  var ctx = canvas.getContext('2d');
+  var CW = 700, CH = 730;               // CSS pixels
+  var DPR = window.devicePixelRatio || 1;
+  canvas.width = CW * DPR;
+  canvas.height = CH * DPR;
+  canvas.style.width = CW + 'px';
+  canvas.style.height = CH + 'px';
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+
+  // plot regions (CSS px)
+  var ax1 = { L: 80, T: 30, W: 560, H: 330, xmin: 0, xmax: 12, ymin: 0, ymax: 15 };
+  var ax2 = { L: 80, T: 445, W: 560, H: 235, xmin: 0, xmax: 12, ymin: -4, ymax: 4 };
+
+  // colors (from the MATLAB source)
+  var COL_DATA    = 'rgb(0,112,189)';   // [0 0.44 0.74]
+  var COL_FIT     = 'rgb(0,190,0)';     // [0 1 0], darkened slightly for visibility
+  var COL_OUTFIT  = 'rgb(128,0,128)';   // [0.5 0 0.5]
+  var COL_OLDPT   = 'rgb(255,255,0)';   // [1 1 0]
+  var COL_NEWPT   = 'rgb(255,0,0)';     // [1 0 0]
+
+  // top-plot legend fonts (15% larger than original 14px / 16px)
+  var LEG_FONT = '16.1px Helvetica, Arial, sans-serif';
+  var LEG_EQ_SIZE = 18.4;
+
+  // ---------------------------------------------------------------
+  // Model
+  // ---------------------------------------------------------------
+  // x data 1:0.25:10, true line y = x + 1
+  var xData = [], yTrue = [];
+  for (var xv = 1; xv <= 10 + 1e-9; xv += 0.25) {
+    xData.push(+xv.toFixed(2));
+    yTrue.push(+(xv + 1).toFixed(2));
+  }
+  var n = xData.length;                       // 37 points
+  var midIdx = Math.round(n / 2) - 1;         // MATLAB round(length/2) = 19 -> index 18
+
+  // Gaussian noise (Box-Muller)
+  function randn() {
+    var u = 0, v = 0;
+    while (u === 0) u = Math.random();
+    while (v === 0) v = Math.random();
+    return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+  }
+
+  // awgn(y, snr) with default 0 dBW signal power: noise variance = 10^(-snr/10)
+  function makeNoisyData(snrdB) {
+    var sigma = Math.sqrt(Math.pow(10, -snrdB / 10));
+    var y = new Array(n);
+    for (var i = 0; i < n; i++) y[i] = yTrue[i] + sigma * randn();
+    return y;
+  }
+
+  // simple linear regression (same as simp_lin_reg in the MATLAB source)
+  function simpLinReg(xs, ys) {
+    var i, xbar = 0, ybar = 0, m = xs.length;
+    for (i = 0; i < m; i++) { xbar += xs[i]; ybar += ys[i]; }
+    xbar /= m; ybar /= m;
+    var sxy = 0, sxx = 0, syy = 0;
+    for (i = 0; i < m; i++) {
+      var dx = xs[i] - xbar, dy = ys[i] - ybar;
+      sxy += dx * dy; sxx += dx * dx; syy += dy * dy;
+    }
+    var b1 = sxy / sxx;
+    var b0 = ybar - b1 * xbar;
+    var r = sxy / (Math.sqrt(sxx) * Math.sqrt(syy));
+    var yhat = new Array(m), res = new Array(m);
+    for (i = 0; i < m; i++) {
+      yhat[i] = b0 + b1 * xs[i];
+      res[i] = ys[i] - yhat[i];
+    }
+    return { b0: b0, b1: b1, r: r, yhat: yhat, res: res };
+  }
+
+  // number formatting: mimic MATLAB num2str (max 5 significant digits)
+  function fmt(v) {
+    if (!isFinite(v)) return '\u2013';
+    return String(Number(v.toPrecision(5)));
+  }
+
+  // ---------------------------------------------------------------
+  // State
+  // ---------------------------------------------------------------
+  var state = {
+    snrdB: 100,
+    yData: null,          // current noisy data (no outlier)
+    fit: null,            // fit to yData
+    outlier: null         // {x, y, oldX, oldY, xs, ys, fit} or null
+  };
+
+  function regenerate() {
+    state.yData = makeNoisyData(state.snrdB);
+    state.fit = simpLinReg(xData, state.yData);
+    state.outlier = null;
+  }
+
+  function addOutlier(px, py) {
+    var xs = xData.slice();
+    var ys = state.yData.slice();
+    var oldX = xs[midIdx], oldY = ys[midIdx];
+    xs[midIdx] = px;
+    ys[midIdx] = py;
+    state.outlier = {
+      x: px, y: py, oldX: oldX, oldY: oldY,
+      xs: xs, ys: ys,
+      fit: simpLinReg(xs, ys)
+    };
+  }
+
+  regenerate();
+
+  // ---------------------------------------------------------------
+  // Drawing helpers
+  // ---------------------------------------------------------------
+  function x2px(ax, x) { return ax.L + (x - ax.xmin) / (ax.xmax - ax.xmin) * ax.W; }
+  function y2px(ax, y) { return ax.T + ax.H - (y - ax.ymin) / (ax.ymax - ax.ymin) * ax.H; }
+
+  function drawAxes(ax, xticks, yticks) {
+    ctx.save();
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(ax.L, ax.T, ax.W, ax.H);
+
+    ctx.fillStyle = '#000';
+    ctx.font = '15px Helvetica, Arial, sans-serif';
+    ctx.lineWidth = 1.5;
+
+    var i, t, p;
+    // x ticks
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    for (i = 0; i < xticks.length; i++) {
+      t = xticks[i]; p = x2px(ax, t);
+      ctx.beginPath();
+      ctx.moveTo(p, ax.T + ax.H);
+      ctx.lineTo(p, ax.T + ax.H - 6);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(p, ax.T);
+      ctx.lineTo(p, ax.T + 6);
+      ctx.stroke();
+      ctx.fillText(String(t), p, ax.T + ax.H + 6);
+    }
+    // y ticks
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    for (i = 0; i < yticks.length; i++) {
+      t = yticks[i]; p = y2px(ax, t);
+      ctx.beginPath();
+      ctx.moveTo(ax.L, p);
+      ctx.lineTo(ax.L + 6, p);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(ax.L + ax.W, p);
+      ctx.lineTo(ax.L + ax.W - 6, p);
+      ctx.stroke();
+      ctx.fillText(String(t), ax.L - 8, p);
+    }
+    ctx.restore();
+  }
+
+  function clipTo(ax) {
+    ctx.beginPath();
+    ctx.rect(ax.L, ax.T, ax.W, ax.H);
+    ctx.clip();
+  }
+
+  function drawLine(ax, x1, y1, x2, y2, color, width, dashed) {
+    ctx.save();
+    clipTo(ax);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    if (dashed) ctx.setLineDash([7, 5]);
+    ctx.beginPath();
+    ctx.moveTo(x2px(ax, x1), y2px(ax, y1));
+    ctx.lineTo(x2px(ax, x2), y2px(ax, y2));
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawMarker(ax, x, y, fill, radius) {
+    var px = x2px(ax, x), py = y2px(ax, y);
+    if (px < ax.L - 1 || px > ax.L + ax.W + 1 || py < ax.T - 1 || py > ax.T + ax.H + 1) return;
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(px, py, radius || 5, 0, 2 * Math.PI);
+    ctx.fillStyle = fill;
+    ctx.fill();
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawMarkerAtPx(px, py, fill, radius) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(px, py, radius || 5, 0, 2 * Math.PI);
+    ctx.fillStyle = fill;
+    ctx.fill();
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // draw an italic "y" with a hat above it; returns width used
+  function drawYHat(px, py, size, sub) {
+    ctx.save();
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+    ctx.font = 'italic ' + size + 'px "Times New Roman", Times, serif';
+    ctx.fillText('y', px, py);
+    var w = ctx.measureText('y').width;
+    ctx.font = (size * 0.85) + 'px "Times New Roman", Times, serif';
+    ctx.fillText('\u02C6', px + w * 0.18, py - size * 0.42);
+    var total = w;
+    if (sub) {
+      ctx.font = 'italic ' + (size * 0.7) + 'px "Times New Roman", Times, serif';
+      ctx.fillText(sub, px + w, py + size * 0.18);
+      total += ctx.measureText(sub).width;
+    }
+    ctx.restore();
+    return total;
+  }
+
+  // draw an italic serif string; returns width
+  function drawIt(px, py, size, s) {
+    ctx.save();
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+    ctx.font = 'italic ' + size + 'px "Times New Roman", Times, serif';
+    ctx.fillText(s, px, py);
+    var w = ctx.measureText(s).width;
+    ctx.restore();
+    return w;
+  }
+
+  // draw a plain serif string; returns width
+  function drawRm(px, py, size, s) {
+    ctx.save();
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+    ctx.font = size + 'px "Times New Roman", Times, serif';
+    ctx.fillText(s, px, py);
+    var w = ctx.measureText(s).width;
+    ctx.restore();
+    return w;
+  }
+
+  // legend label in sans-serif; returns width
+  function drawLegText(px, py, s) {
+    ctx.save();
+    ctx.font = LEG_FONT;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillStyle = '#000';
+    ctx.fillText(s, px, py);
+    var w = ctx.measureText(s).width;
+    ctx.restore();
+    return w;
+  }
+
+  // "y-hat = <b1>x + <b0>,  r^2 = <r2>" rendered at baseline (px,py); returns width
+  function drawFitEq(px, py, size, b1, b0, r2) {
+    var x = px;
+    ctx.fillStyle = '#000';
+    x += drawYHat(x, py, size);
+    x += drawRm(x, py, size, ' = ' + fmt(b1));
+    x += drawIt(x, py, size, 'x');
+    if (b0 >= 0) x += drawRm(x, py, size, ' + ' + fmt(b0) + ',   ');
+    else         x += drawRm(x, py, size, ' \u2212 ' + fmt(Math.abs(b0)) + ',   ');
+    x += drawIt(x, py, size, 'r');
+    ctx.save();
+    ctx.font = (size * 0.7) + 'px "Times New Roman", Times, serif';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText('2', x, py - size * 0.35);
+    x += ctx.measureText('2').width;
+    ctx.restore();
+    x += drawRm(x, py, size, ' = ' + fmt(r2));
+    return x - px;
+  }
+
+  // ---------------------------------------------------------------
+  // Main render
+  // ---------------------------------------------------------------
+  function render() {
+    ctx.clearRect(0, 0, CW, CH);
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, CW, CH);
+
+    // ============ top plot ============
+    drawAxes(ax1, [0, 2, 4, 6, 8, 10, 12], [0, 5, 10, 15]);
+
+    // axis labels
+    ctx.save();
+    ctx.fillStyle = '#000';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'alphabetic';
+    ctx.font = 'italic 22px "Times New Roman", Times, serif';
+    ctx.fillText('x', ax1.L + ax1.W / 2, ax1.T + ax1.H + 44);
+    ctx.save();
+    ctx.translate(ax1.L - 45, ax1.T + ax1.H / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText('y', 0, 0);
+    ctx.restore();
+    ctx.restore();
+
+    // actual line (dashed black), y = x + 1
+    drawLine(ax1, ax1.xmin, ax1.xmin + 1, ax1.xmax, ax1.xmax + 1, '#000', 1, true);
+
+    // fit to data without outlier (green)
+    var f = state.fit;
+    drawLine(ax1, ax1.xmin, f.b0 + f.b1 * ax1.xmin, ax1.xmax, f.b0 + f.b1 * ax1.xmax, COL_FIT, 2.2, false);
+
+    // fit with outlier (purple)
+    var o = state.outlier;
+    if (o) {
+      drawLine(ax1, ax1.xmin, o.fit.b0 + o.fit.b1 * ax1.xmin,
+                    ax1.xmax, o.fit.b0 + o.fit.b1 * ax1.xmax, COL_OUTFIT, 2.2, false);
+    }
+
+    // data points
+    var i;
+    if (!o) {
+      for (i = 0; i < n; i++) drawMarker(ax1, xData[i], state.yData[i], COL_DATA);
+    } else {
+      for (i = 0; i < n; i++) {
+        if (i === midIdx) continue;
+        drawMarker(ax1, o.xs[i], o.ys[i], COL_DATA);
+      }
+      drawMarker(ax1, o.oldX, o.oldY, COL_OLDPT);   // replaced point (yellow)
+      drawMarker(ax1, o.x, o.y, COL_NEWPT);         // outlier (red)
+    }
+
+    // ---- legend / annotations (upper left of top plot) ----
+    var lx = ax1.L + 18, ly = ax1.T + 27, rowH = 29, size = LEG_EQ_SIZE;
+    var textX = lx + 40;
+    ctx.fillStyle = '#000';
+
+    // data marker
+    drawMarkerAtPx(lx + 16, ly - 6, COL_DATA, 5);
+    drawLegText(textX, ly, 'data');
+
+    // actual line
+    ly += rowH;
+    ctx.save();
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([7, 5]);
+    ctx.beginPath();
+    ctx.moveTo(lx, ly - 6);
+    ctx.lineTo(lx + 32, ly - 6);
+    ctx.stroke();
+    ctx.restore();
+    drawLegText(textX, ly, 'actual');
+
+    // green fit + equation
+    ly += rowH;
+    ctx.save();
+    ctx.strokeStyle = COL_FIT;
+    ctx.lineWidth = 2.2;
+    ctx.beginPath();
+    ctx.moveTo(lx, ly - 6);
+    ctx.lineTo(lx + 32, ly - 6);
+    ctx.stroke();
+    ctx.restore();
+    var wFit = drawLegText(textX, ly, 'fit,');
+    drawFitEq(textX + wFit + 7, ly, size, f.b1, f.b0, f.r * f.r);
+
+    // purple fit + equation (with outlier)
+    if (o) {
+      ly += rowH;
+      ctx.save();
+      ctx.strokeStyle = COL_OUTFIT;
+      ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      ctx.moveTo(lx, ly - 6);
+      ctx.lineTo(lx + 32, ly - 6);
+      ctx.stroke();
+      ctx.restore();
+      var wFit2 = drawLegText(textX, ly, 'fit,');
+      drawFitEq(textX + wFit2 + 7, ly, size, o.fit.b1, o.fit.b0, o.fit.r * o.fit.r);
+    }
+
+    // ============ bottom plot (residuals) ============
+    drawAxes(ax2, [0, 2, 4, 6, 8, 10, 12], [-4, -2, 0, 2, 4]);
+
+    // axis labels
+    ctx.save();
+    ctx.fillStyle = '#000';
+    // x label: y-hat_i
+    var xlWidth = 25;
+    var xlx = ax2.L + ax2.W / 2 - xlWidth / 2;
+    var xly = ax2.T + ax2.H + 46;
+    drawYHat(xlx, xly, 22, 'i');
+    // y label: y_i - y-hat_i (rotated)
+    ctx.save();
+    ctx.translate(ax2.L - 44, ax2.T + ax2.H / 2 + 40);
+    ctx.rotate(-Math.PI / 2);
+    var tx = 0, ty = 0, ls = 21;
+    tx += drawIt(tx, ty, ls, 'y');
+    ctx.save();
+    ctx.font = 'italic ' + (ls * 0.7) + 'px "Times New Roman", Times, serif';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText('i', tx, ty + ls * 0.18);
+    tx += ctx.measureText('i').width;
+    ctx.restore();
+    tx += drawRm(tx, ty, ls, ' \u2212 ');
+    tx += drawYHat(tx, ty, ls, 'i');
+    ctx.restore();
+    ctx.restore();
+
+    // zero reference line
+    drawLine(ax2, ax2.xmin, 0, ax2.xmax, 0, '#000', 1.5, false);
+
+    // residuals: plotted versus the predicted values y-hat_i
+    ctx.save();
+    clipTo(ax2);
+    if (!o) {
+      for (i = 0; i < n; i++) drawMarker(ax2, f.yhat[i], f.res[i], COL_DATA);
+    } else {
+      // residuals of the fit without the outlier (yellow)
+      for (i = 0; i < n; i++) drawMarker(ax2, f.yhat[i], f.res[i], COL_OLDPT);
+      // residuals of the fit with the outlier (red)
+      for (i = 0; i < n; i++) drawMarker(ax2, o.fit.yhat[i], o.fit.res[i], COL_NEWPT);
+    }
+    ctx.restore();
+
+    // residual legend (only when outlier shown)
+    if (o) {
+      var l2x = ax2.L + 18, l2y = ax2.T + 22;
+      ctx.save();
+      ctx.font = '14px Helvetica, Arial, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'alphabetic';
+      ctx.fillStyle = '#000';
+      drawMarkerAtPx(l2x + 16, l2y - 5, COL_OLDPT, 5);
+      ctx.fillText('without outlier', l2x + 38, l2y);
+      drawMarkerAtPx(l2x + 16, l2y + 22 - 5, COL_NEWPT, 5);
+      ctx.fillText('with outlier', l2x + 38, l2y + 22);
+      ctx.restore();
+    }
+  }
+
+  // ---------------------------------------------------------------
+  // Interaction
+  // ---------------------------------------------------------------
+  var slider = document.getElementById('noiseSlider');
+  slider.addEventListener('input', function () {
+    state.snrdB = Math.pow(10, parseFloat(slider.value));   // SNR in dB, 1 to 100
+    regenerate();
+    render();
+  });
+
+  function canvasCoords(evt) {
+    var rect = canvas.getBoundingClientRect();
+    return {
+      x: (evt.clientX - rect.left) * (CW / rect.width),
+      y: (evt.clientY - rect.top) * (CH / rect.height)
+    };
+  }
+
+  function inTopPlot(p) {
+    return p.x >= ax1.L && p.x <= ax1.L + ax1.W && p.y >= ax1.T && p.y <= ax1.T + ax1.H;
+  }
+
+  canvas.addEventListener('mousemove', function (evt) {
+    canvas.style.cursor = inTopPlot(canvasCoords(evt)) ? 'crosshair' : 'default';
+  });
+
+  canvas.addEventListener('click', function (evt) {
+    var p = canvasCoords(evt);
+    if (!inTopPlot(p)) return;
+    var dx = ax1.xmin + (p.x - ax1.L) / ax1.W * (ax1.xmax - ax1.xmin);
+    var dy = ax1.ymax - (p.y - ax1.T) / ax1.H * (ax1.ymax - ax1.ymin);
+    addOutlier(dx, dy);
+    render();
+  });
+
+  // ---------------------------------------------------------------
+  // Panels
+  // ---------------------------------------------------------------
+  function setupPanel(btnId, panelId, needsMathJax) {
+    var btn = document.getElementById(btnId);
+    var panel = document.getElementById(panelId);
+    btn.addEventListener('click', function () {
+      var opening = panel.style.display !== 'block';
+      // close all panels first
+      ['panelDirections', 'panelDetails', 'panelAbout'].forEach(function (id) {
+        document.getElementById(id).style.display = 'none';
+      });
+      if (opening) {
+        panel.style.display = 'block';
+        if (needsMathJax && window.MathJax && MathJax.typesetPromise) {
+          MathJax.typesetPromise([panel]).catch(function () {});
+        }
+      }
+    });
+  }
+  setupPanel('btnDirections', 'panelDirections', true);
+  setupPanel('btnDetails', 'panelDetails', true);
+  setupPanel('btnAbout', 'panelAbout', false);
+
+  // close buttons
+  Array.prototype.forEach.call(document.querySelectorAll('.panelClose'), function (el) {
+    el.addEventListener('click', function () {
+      document.getElementById(el.getAttribute('data-close')).style.display = 'none';
+    });
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

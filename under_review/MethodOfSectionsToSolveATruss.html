@@ -1,0 +1,1523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Method of Sections to Solve a Truss</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+  svg: { fontCache: 'global', displayAlign: 'left', displayIndent: '0' }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.min.js"></script>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    font-family: Helvetica, Arial, sans-serif;
+    background-color: #ffffff;
+  }
+  #appContainer {
+    width: 780px;
+    margin: 0 auto;
+    padding: 10px 0 30px 0;
+    position: relative;
+  }
+  h1.simTitle {
+    font-size: 22px;
+    font-weight: normal;
+    text-align: center;
+    margin: 8px 0 10px 0;
+  }
+  /* ---------- controls ---------- */
+  #controlsArea {
+    width: 100%;
+  }
+  .ctrlRow {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    margin: 4px 0;
+    min-height: 30px;
+  }
+  .setterGroup {
+    display: inline-flex;
+    border: 1px solid #ababab;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .setterGroup button {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    padding: 4px 10px;
+    border: none;
+    border-right: 1px solid #ababab;
+    background: linear-gradient(#fdfdfd, #ececec);
+    cursor: pointer;
+    color: #000;
+    white-space: nowrap;
+  }
+  .setterGroup button:last-child { border-right: none; }
+  .setterGroup button.selected {
+    background: #b5cfe8;
+  }
+  .setterGroup button:hover:not(.selected) {
+    background: #f2f7fb;
+  }
+  .ctrlLabel {
+    font-size: 14px;
+    margin-right: 8px;
+    white-space: nowrap;
+  }
+  .checkWrap {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 18px;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+  .checkWrap input { margin-left: 6px; transform: scale(1.1); cursor: pointer; }
+  .sliderWrap {
+    display: inline-flex;
+    align-items: center;
+    margin: 0 14px;
+    font-size: 16px;
+    white-space: nowrap;
+  }
+  .sliderWrap input[type=range] {
+    width: 130px;
+    margin: 0 8px;
+    cursor: pointer;
+  }
+  input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+  input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  .sliderVal {
+    display: inline-block;
+    width: 34px;
+    font-size: 16px;
+    text-align: left;
+  }
+  .spacer30 { display: inline-block; width: 30px; }
+  /* ---------- canvas ---------- */
+  #simCanvas {
+    display: block;
+    margin: 6px auto 0 auto;
+  }
+  /* ---------- panel buttons & flyout panels ---------- */
+  #panelButtons {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin: 6px 0 0 0;
+  }
+  #panelButtons button {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    font-weight: normal;
+    color: #ffffff;
+    background-color: #98000D;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 22px;
+    margin: 0 10px 0 0;
+    cursor: pointer;
+  }
+  #panelButtons button:hover { background-color: #7a000a; }
+  .infoPanel {
+    display: none;
+    position: absolute;
+    box-sizing: border-box;
+    z-index: 50;
+    background: #ffffff;
+    border: 1px solid #ababab;
+    border-radius: 5px;
+    padding: 12px 34px 12px 18px;
+    font-size: 15px;
+    line-height: 1.5;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.25);
+  }
+  #detPanel mjx-container[display="true"] { text-align: left !important; margin-left: 0 !important; }
+  #detPanel .panelScroll {
+    max-height: 456px;
+    overflow-y: auto;
+  }
+  .infoPanel p { margin: 8px 0; }
+  .infoPanel h2.panelHeading {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 0 0 6px 0;
+  }
+  #symbolsTable { border-collapse: collapse; margin: 4px 0 6px 0; }
+  #symbolsTable td { padding: 2px 14px 2px 0; vertical-align: top; }
+  .infoPanel a { color: #0645ad; }
+  .panelClose {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    width: 22px;
+    height: 22px;
+    line-height: 22px;
+    text-align: center;
+    font-size: 18px;
+    font-family: Helvetica, Arial, sans-serif;
+    color: #555;
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    padding: 0;
+    cursor: pointer;
+  }
+  .panelClose:hover { background: #e5e5e5; color: #000; }
+  #figure1Wrap { text-align: center; margin: 10px 0 4px 0; }
+</style>
+</head>
+<body>
+<div id="appContainer">
+  <h1 class="simTitle">Method of Sections to Solve a Truss</h1>
+
+  <div id="controlsArea">
+    <div class="ctrlRow">
+      <span class="setterGroup" id="stepsSetter">
+        <button data-val="1" class="selected">solve for reaction forces</button>
+        <button data-val="2">make cuts</button>
+      </span>
+      <span class="spacer30"></span>
+      <span id="optArea">
+        <span class="setterGroup" id="optSetter">
+          <button data-val="1" class="selected">calculate moment</button>
+          <button data-val="2">force balance</button>
+          <button data-val="3">reactions</button>
+        </span>
+      </span>
+      <span id="cutsArea" style="display:none;">
+        <span class="ctrlLabel">cut sections</span>
+        <span class="setterGroup" id="cutsSetter">
+          <button data-val="1" class="selected">1</button>
+          <button data-val="2">2</button>
+          <button data-val="3">3</button>
+          <button data-val="4">4</button>
+          <button data-val="5">5</button>
+          <button data-val="6">6</button>
+          <button data-val="7">solved</button>
+        </span>
+        <span class="checkWrap" id="zoomWrap">make cut<input type="checkbox" id="zoomCheck"></span>
+        <span class="checkWrap" id="momentWrap" style="display:none;">solve moment<input type="checkbox" id="momentCheck"></span>
+      </span>
+    </div>
+    <div class="ctrlRow">
+      <span class="sliderWrap" id="wSliderWrap">
+        member width (m)
+        <input type="range" id="wSlider" min="6" max="8" step="0.1" value="8">
+        <span class="sliderVal" id="wVal">8</span>
+      </span>
+      <span class="sliderWrap">
+        member height (m)
+        <input type="range" id="hSlider" min="6" max="8" step="0.1" value="8">
+        <span class="sliderVal" id="hVal">8</span>
+      </span>
+      <span class="checkWrap" id="labelsWrap">show joint labels<input type="checkbox" id="labelsCheck"></span>
+    </div>
+    <div id="panelButtons">
+      <button id="dirBtn">Directions</button>
+      <button id="detBtn">Details</button>
+      <button id="aboutBtn">About</button>
+    </div>
+  </div>
+
+  <canvas id="simCanvas"></canvas>
+
+  <div class="infoPanel" id="dirPanel">
+    <h2 class="panelHeading">Directions</h2>
+    <p>This simulation solves a truss using the method of sections, which involves "cutting" along several selected members and taking the sum of the <i>x</i> forces, <i>y</i> forces and moment about a point.</p>
+    <p>Select "solve for reaction forces" to see how the reaction forces <i>R</i><sub>A</sub> and <i>R</i><sub>G</sub> are calculated. Use buttons to calculate the moment about A, do a force balance, and see the solved forces. When "calculate moment" is selected, move the mouse over the equations to see an explanation of the moment balance. Select "make cuts" to make cuts along members. See the entire truss and use buttons to select which section to make a cut along. Check "make cut" to see an isolated structure of the supports to the left of the selected cut.</p>
+    <p>Force and moment balances are shown with the solved member forces. When making cuts, the sign on all of the forces is positive because we assume we can determine which members are under tension and which are under compression before solving the truss. This is done by starting at joint A, seeing that the reaction force is pointing upward, and knowing that the member force must be pointing downward for the truss to remain stationary.</p>
+  </div>
+
+  <div class="infoPanel" id="detPanel">
+    <h2 class="panelHeading">Details</h2>
+    <p>The method of sections is used to calculate the forces in each member of the truss. This is done by making a "cut" along three selected members. First, calculate the reactions at the supports. Taking the sum of the moments at the left support:</p>
+    <p>\[ \sum M_\mathrm{A} = 3 \, w \, F_\mathrm{D} + 5 \, w \, F_\mathrm{F} - 6 \, w \, R_\mathrm{G} = 0. \]</p>
+    <p>Next do a force balance of the \(y\) forces:</p>
+    <p>\[ \sum F_y = R_\mathrm{A} + R_\mathrm{G} - F_\mathrm{D} - F_\mathrm{F} = 0, \]</p>
+    <p>where \(R_\mathrm{A}\) and \(R_\mathrm{G}\) are the reaction forces, and \(F_\mathrm{D}\) and \(F_\mathrm{F}\) are the point load forces in the negative \(y\) direction.</p>
+    <p>Begin solving for the forces of the members by making cuts. The order of the balances listed here is the order in which they should be solved. Force balances are done assuming we can figure out which members are under tension and which are under compression. A labeled truss is shown in Figure 1.</p>
+    <p>Cut 1, to the right of joint A:</p>
+    <p>\[ \sum F_y = 0 = -F_0 \sin\theta + R_\mathrm{A}, \]</p>
+    <p>\[ \sum F_x = 0 = -F_0 \cos\theta + F_2. \]</p>
+    <p>Cut 2, to the right of joints B and L:</p>
+    <p>\[ \sum F_y = 0 = -F_7 \sin\theta + R_\mathrm{A}, \]</p>
+    <p>\[ \sum M_\mathrm{B} = 0 = w \, R_\mathrm{A} - h \, F_3, \]</p>
+    <p>\[ \sum F_x = 0 = F_3 - F_5 + F_7 \cos\theta. \]</p>
+    <p>Cut 3, to the right of joints C and K:</p>
+    <p>\[ \sum F_y = 0 = -F_{12} \sin\theta + R_\mathrm{A}, \]</p>
+    <p>\[ \sum M_\mathrm{K} = 0 = 2 \, w \, R_\mathrm{A} - h \, F_8, \]</p>
+    <p>\[ \sum F_x = 0 = F_4 - F_8 - F_{12} \cos\theta. \]</p>
+    <p>Cut 4, to the right of joints D and J:</p>
+    <p>\[ \sum F_y = 0 = F_{10} \sin\theta + R_\mathrm{A} - F_\mathrm{D}, \]</p>
+    <p>\[ \sum M_\mathrm{D} = 0 = 3 \, w \, R_\mathrm{A} - h \, F_{11}, \]</p>
+    <p>\[ \sum F_x = 0 = -F_{10} \cos\theta + F_{11} - F_{13}. \]</p>
+    <p>Cut 5, to the right of joints E and I:</p>
+    <p>\[ \sum F_y = 0 = F_{16} \sin\theta + R_\mathrm{A} - F_\mathrm{D}, \]</p>
+    <p>\[ \sum M_\mathrm{I} = 0 = 4 \, w \, R_\mathrm{A} + w \, F_\mathrm{D} - h \, F_{15}, \]</p>
+    <p>\[ \sum F_x = 0 = -F_{15} + F_{16} \cos\theta + F_{17}. \]</p>
+    <p>Cut 6, to the right of joints F and H:</p>
+    <p>\[ \sum F_y = 0 = F_{19} \sin\theta + R_\mathrm{A} - F_\mathrm{D} - F_\mathrm{F}, \]</p>
+    <p>\[ \sum F_x = 0 = -F_{19} \cos\theta + F_{20}. \]</p>
+    <p>Note that all the vertical members are zero members, which means they exert a force of 0 kN and are neither a tension nor a compression force; instead they are at rest.</p>
+    <div id="figure1Wrap">
+      <canvas id="figCanvas"></canvas>
+      <div style="font-size:15px;">Figure 1.</div>
+    </div>
+    <p><b>Symbols</b></p>
+    <table id="symbolsTable">
+      <tr><td>A&ndash;L</td><td>joints of the truss (Figure 1)</td></tr>
+      <tr><td>\(F_i\)</td><td>force in member \(i\) (\(i\) = 0 to 20) (kN)</td></tr>
+      <tr><td>\(F_{i,x}, \; F_{i,y}\)</td><td>\(x\) and \(y\) components of the force in member \(i\) (kN)</td></tr>
+      <tr><td>\(F_\mathrm{D}, \; F_\mathrm{F}\)</td><td>point loads applied at joints D and F (kN)</td></tr>
+      <tr><td>\(R_\mathrm{A}, \; R_\mathrm{G}\)</td><td>reaction forces at supports A and G (kN)</td></tr>
+      <tr><td>\(M_j\)</td><td>moment about joint \(j\) (kN&middot;m)</td></tr>
+      <tr><td>\(w\)</td><td>member width (horizontal length of each bay) (m)</td></tr>
+      <tr><td>\(h\)</td><td>member height (m)</td></tr>
+      <tr><td>\(\theta\)</td><td>angle between a diagonal member and the horizontal, \(\theta = \tan^{-1}(h/w)\) (&deg;)</td></tr>
+    </table>
+  </div>
+
+  <div class="infoPanel" id="aboutPanel">
+    <h2 class="panelHeading">About</h2>
+    <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/MethodOfSectionsToSolveATruss/" target="_blank" rel="noopener">Mathematica simulation</a> by Rachael L. Baumann. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.</p>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* =========================================================================
+   Method of Sections to Solve a Truss
+   JavaScript/HTML5 port of the Mathematica CDF demonstration.
+   ========================================================================= */
+
+// ------------------------- state -------------------------
+const state = {
+  steps: 1,      // 1 = solve for reaction forces, 2 = make cuts
+  opt: 1,        // 1 = calculate moment, 2 = force balance, 3 = reactions
+  cuts: 1,       // 1..6 = cut sections, 7 = solved
+  zoom: false,   // "make cut" checkbox
+  moment: false, // "solve moment" checkbox
+  labels: false, // "show joint labels" checkbox
+  w: 8,
+  h: 8,
+  hoverMember: null, // member number under the mouse
+  mouseX: 0, mouseY: 0,
+  hoverEqs: false  // mouse over the moment-balance equations (steps=1, opt=1)
+};
+
+// ------------------------- colors -------------------------
+const BLUE    = "rgb(0,0,255)";
+const MAGENTA = "rgb(255,0,255)";
+const ORANGE  = "rgb(255,102,0)";     // RGBColor[1, 0.4, 0]
+const REDRG   = "rgb(230,0,0)";       // RGBColor[0.9, 0, 0]
+const GREEN07 = "rgb(0,178,0)";       // RGBColor[0, 0.7, 0]
+const COLC    = "rgb(0,153,0)";       // compression, RGBColor[0, 0.6, 0]
+const COLT    = "rgb(255,0,64)";      // tension, RGBColor[1, 0, 0.25]
+const GRAY55  = "rgb(140,140,140)";
+const GRAY6   = "rgb(153,153,153)";
+
+// blend color 50% toward white (used when "solve moment" is checked)
+function blendWhite(rgbStr, f) {
+  const m = rgbStr.match(/(\d+),\s*(\d+),\s*(\d+)/);
+  const r = Math.round((+m[1]) * (1 - f) + 255 * f);
+  const g = Math.round((+m[2]) * (1 - f) + 255 * f);
+  const b = Math.round((+m[3]) * (1 - f) + 255 * f);
+  return `rgb(${r},${g},${b})`;
+}
+function colorFaded(col) { return state.moment ? blendWhite(col, 0.5) : col; }
+function colY()  { return state.moment ? MAGENTA : BLUE; }   // coly
+function colY2() { return state.moment ? "rgb(255,0,0)" : BLUE; } // coly2
+function colX()  { return state.moment ? ORANGE : BLUE; }    // colx
+
+// ------------------------- physics -------------------------
+const FD = 10, FF = 15;
+function solveTruss() {
+  const w = state.w, h = state.h;
+  const th = Math.atan(h / w), s = Math.sin(th), c = Math.cos(th);
+  const RG = (3 * w * FD + 5 * w * FF) / (6 * w);
+  const RA = FD + FF - RG;
+  const F0  = -RA / s,        F2  = -F0 * c;
+  const F7  =  RA / s,        F3  =  w * RA / h,       F5  = -F3 - F7 * c;
+  const F12 = -RA / s,        F8  = -2 * w * RA / h,   F4  = -F8 - F12 * c;
+  const F10 = (RA - FD) / s,  F11 =  3 * w * RA / h,   F13 = -F10 * c - F11;
+  const F16 = (FD - RA) / s,  F15 = (w * FD - 4 * w * RA) / h, F17 = -F15 - F16 * c;
+  const F19 = (RA - FD - FF) / s, F20 = -F19 * c;
+  return { th, s, c, RA, RG, F0, F2, F3, F4, F5, F7, F8, F10, F11, F12, F13, F15, F16, F17, F19, F20 };
+}
+// NumberForm[x, {3, 1}] equivalent: one digit after the decimal point
+function nf(x) { return Math.abs(x).toFixed(1); }
+function nfs(x) { return x.toFixed(1); }   // signed, 1 decimal
+
+// zoomed plot ranges per cut (from the CDF interpolation tables)
+const XMIN = [null, -2.6, -3, -3.2, -3.8, -3.8, -5.3];
+const XMAX = [null, 14.1, 15.7, 24.4, 32.8, 40.9, 48.8];
+const YMIN = [null, -5.4, -5.65, -6.4, -6, -6, -6.2];
+const YMAX = [null, 9.1, 9.6, 10.3, 15.5, 15.6, 18.5];
+
+// ------------------------- canvas setup -------------------------
+const canvas = document.getElementById("simCanvas");
+const ctx = canvas.getContext("2d");
+const LOGW = 605, LOGH = 470;          // logical (Mathematica-point) space
+const DISPW = 760;                     // CSS pixels
+const KSCALE = DISPW / LOGW;
+const DISPH = Math.round(LOGH * KSCALE);
+const DPR = window.devicePixelRatio || 1;
+canvas.width  = Math.round(DISPW * DPR);
+canvas.height = Math.round(DISPH * DPR);
+canvas.style.width  = DISPW + "px";
+canvas.style.height = DISPH + "px";
+
+// data -> logical-pixel transform (set per frame)
+let T = { s: 1, ox: 0, oy: 0 };
+function X(x) { return T.ox + T.s * x; }
+function Y(y) { return T.oy - T.s * y; }
+function P(pt) { return [X(pt[0]), Y(pt[1])]; }
+
+function fitTransform(x0, x1, y0, y1, boxX, boxY, boxW, boxH) {
+  const s = Math.min(boxW / (x1 - x0), boxH / (y1 - y0));
+  const ox = boxX + (boxW - s * (x1 - x0)) / 2 - s * x0;
+  const oy = boxY + (boxH - s * (y1 - y0)) / 2 + s * y1;
+  return { s, ox, oy };
+}
+
+// ------------------------- rich text (canvas) -------------------------
+// token: { t: text, italic: bool, sub: bool, color: str, size: px }
+function tok(t, o) { return Object.assign({ t: t }, o || {}); }
+// italic letter with subscript, e.g. F_D  -> var("F","D",color)
+function varT(v1, v2, color, size) {
+  return [tok(v1, { italic: true, color, size }), tok(String(v2), { sub: true, color, size })];
+}
+function measureRich(tokens, baseSize) {
+  let wsum = 0;
+  for (const tk of tokens) {
+    const sz = (tk.size || baseSize) * (tk.sub || tk.sup ? 0.72 : 1);
+    ctx.font = (tk.italic ? "italic " : "") + sz + "px Helvetica, Arial, sans-serif";
+    wsum += ctx.measureText(tk.t).width;
+  }
+  return wsum;
+}
+// draw tokens; (x, y) is the anchor of the text baseline-center block.
+// halign: -1 left, 0 center, 1 right (of the block relative to x)
+function drawRich(tokens, x, y, baseSize, halign, bg, bgPad) {
+  const total = measureRich(tokens, baseSize);
+  let sx = x;
+  if (halign === 0) sx = x - total / 2;
+  else if (halign === 1) sx = x - total;
+  if (bg) {
+    ctx.save();
+    ctx.fillStyle = bg;
+    const pad = bgPad === undefined ? 2 : bgPad;
+    ctx.fillRect(sx - pad, y - baseSize * 0.78 - pad, total + 2 * pad, baseSize * 1.0 + 2 * pad);
+    ctx.restore();
+  }
+  for (const tk of tokens) {
+    const isSmall = tk.sub || tk.sup;
+    const sz = (tk.size || baseSize) * (isSmall ? 0.72 : 1);
+    ctx.font = (tk.italic ? "italic " : "") + sz + "px Helvetica, Arial, sans-serif";
+    ctx.fillStyle = tk.color || "#000";
+    const dy = tk.sub ? baseSize * 0.18 : (tk.sup ? -baseSize * 0.38 : 0);
+    ctx.textAlign = "left";
+    ctx.textBaseline = "alphabetic";
+    ctx.fillText(tk.t, sx, y + dy);
+    sx += ctx.measureText(tk.t).width;
+  }
+  return { x: (halign === 0 ? x - total / 2 : (halign === 1 ? x - total : x)), y: y - baseSize * 0.8, w: total, h: baseSize * 1.15 };
+}
+// draw multi-line rich text centered at (x, y) (block centered), lineH in px
+function drawRichLines(lines, x, y, baseSize, lineH, colorAll) {
+  const n = lines.length;
+  const y0 = y - ((n - 1) / 2) * lineH + baseSize * 0.35;
+  let bbox = null;
+  for (let i = 0; i < n; i++) {
+    const tks = colorAll ? lines[i].map(tk => Object.assign({}, tk, { color: tk.color || colorAll })) : lines[i];
+    const b = drawRich(tks, x, y0 + i * lineH, baseSize, 0);
+    if (!bbox) bbox = { x: b.x, y: b.y, x2: b.x + b.w, y2: b.y + b.h };
+    else {
+      bbox.x = Math.min(bbox.x, b.x); bbox.y = Math.min(bbox.y, b.y);
+      bbox.x2 = Math.max(bbox.x2, b.x + b.w); bbox.y2 = Math.max(bbox.y2, b.y + b.h);
+    }
+  }
+  return bbox;
+}
+
+// ------------------------- drawing primitives -------------------------
+function line(p1, p2, color, lw, dash) {
+  ctx.save();
+  ctx.strokeStyle = color || "#000";
+  ctx.lineWidth = lw || 2;
+  if (dash) ctx.setLineDash(dash);
+  ctx.beginPath();
+  ctx.moveTo(X(p1[0]), Y(p1[1]));
+  ctx.lineTo(X(p2[0]), Y(p2[1]));
+  ctx.stroke();
+  ctx.restore();
+}
+function polyline(pts, color, lw, dash, close) {
+  ctx.save();
+  ctx.strokeStyle = color || "#000";
+  ctx.lineWidth = lw || 2;
+  if (dash) ctx.setLineDash(dash);
+  ctx.beginPath();
+  ctx.moveTo(X(pts[0][0]), Y(pts[0][1]));
+  for (let i = 1; i < pts.length; i++) ctx.lineTo(X(pts[i][0]), Y(pts[i][1]));
+  if (close) ctx.closePath();
+  ctx.stroke();
+  ctx.restore();
+}
+function head(px, py, ang, size, color) {
+  ctx.save();
+  ctx.translate(px, py);
+  ctx.rotate(ang);
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(-size, size * 0.42);
+  ctx.lineTo(-size * 0.8, 0);
+  ctx.lineTo(-size, -size * 0.42);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+// arrow from p1 to p2 with head at p2
+function arrow(p1, p2, color, lw, headSize, dash) {
+  const x1 = X(p1[0]), y1 = Y(p1[1]), x2 = X(p2[0]), y2 = Y(p2[1]);
+  const ang = Math.atan2(y2 - y1, x2 - x1);
+  const hs = headSize || 13;
+  ctx.save();
+  ctx.strokeStyle = color; ctx.lineWidth = lw || 2.2;
+  if (dash) ctx.setLineDash(dash);
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2 - Math.cos(ang) * hs * 0.55, y2 - Math.sin(ang) * hs * 0.55);
+  ctx.stroke();
+  ctx.restore();
+  head(x2, y2, ang, hs, color);
+}
+// compression member: heads at both ends pointing outward
+function memberCompression(p1, p2, color, lw) {
+  const x1 = X(p1[0]), y1 = Y(p1[1]), x2 = X(p2[0]), y2 = Y(p2[1]);
+  const ang = Math.atan2(y2 - y1, x2 - x1);
+  ctx.save();
+  ctx.strokeStyle = color; ctx.lineWidth = lw;
+  ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+  ctx.restore();
+  head(x2, y2, ang, 15, color);
+  head(x1, y1, ang + Math.PI, 15, color);
+}
+// tension member: heads at 32.5% (forward) and 67.5% (backward) pointing at each other
+function memberTension(p1, p2, color, lw) {
+  const x1 = X(p1[0]), y1 = Y(p1[1]), x2 = X(p2[0]), y2 = Y(p2[1]);
+  const ang = Math.atan2(y2 - y1, x2 - x1);
+  ctx.save();
+  ctx.strokeStyle = color; ctx.lineWidth = lw;
+  ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+  ctx.restore();
+  head(x1 + (x2 - x1) * 0.325, y1 + (y2 - y1) * 0.325, ang, 15, color);
+  head(x1 + (x2 - x1) * 0.675, y1 + (y2 - y1) * 0.675, ang + Math.PI, 15, color);
+}
+function point(pt, rOuter, rInner) {
+  ctx.save();
+  ctx.fillStyle = "#000";
+  ctx.beginPath(); ctx.arc(X(pt[0]), Y(pt[1]), rOuter, 0, 2 * Math.PI); ctx.fill();
+  if (rInner) {
+    ctx.fillStyle = "#fff";
+    ctx.beginPath(); ctx.arc(X(pt[0]), Y(pt[1]), rInner, 0, 2 * Math.PI); ctx.fill();
+  }
+  ctx.restore();
+}
+// rounded framed label (joint names)
+function framedLabel(text, pt, size, txtColor, frameColor, frameLw, dx, dy) {
+  const px = X(pt[0]) + (dx || 0), py = Y(pt[1]) + (dy || 0);
+  ctx.save();
+  ctx.font = size + "px Helvetica, Arial, sans-serif";
+  const tw = ctx.measureText(text).width;
+  const padX = 6, hH = size * 0.72;
+  const rx = tw / 2 + padX;
+  const r = Math.min(hH + 3, 14);
+  ctx.fillStyle = "#fff";
+  ctx.strokeStyle = frameColor || "#000";
+  ctx.lineWidth = frameLw || 1;
+  roundRect(px - rx, py - hH - 3, 2 * rx, 2 * (hH + 3), r);
+  ctx.fill(); ctx.stroke();
+  ctx.fillStyle = txtColor || "#000";
+  ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  ctx.fillText(text, px, py + 1);
+  ctx.restore();
+}
+function roundRect(x, y, w, h, r) {
+  r = Math.min(r, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+// wavy dashed red cut line: x = xc + sin(1.5 y)/2, y from ya to yb
+function cutLine(xc, ya, yb) {
+  ctx.save();
+  ctx.strokeStyle = "red";
+  ctx.lineWidth = 2;
+  ctx.setLineDash([8, 6]);
+  ctx.beginPath();
+  let first = true;
+  for (let y = ya; y <= yb + 1e-9; y += (yb - ya) / 120) {
+    const x = xc + Math.sin(1.5 * y) / 2;
+    if (first) { ctx.moveTo(X(x), Y(y)); first = false; }
+    else ctx.lineTo(X(x), Y(y));
+  }
+  ctx.stroke();
+  ctx.restore();
+}
+// pin support (gray) at data point (x, 0)
+function support(xc) {
+  const g = GRAY6;
+  ctx.save();
+  ctx.fillStyle = g; ctx.strokeStyle = g;
+  // disks
+  ctx.beginPath(); ctx.arc(X(xc), Y(0), T.s * 0.65, 0, 2 * Math.PI); ctx.fill();
+  ctx.beginPath(); ctx.arc(X(xc), Y(-0.8), T.s * 0.8, 0, 2 * Math.PI); ctx.fill();
+  // trapezoid
+  ctx.beginPath();
+  ctx.moveTo(X(xc - 0.65), Y(0));
+  ctx.lineTo(X(xc - 0.8), Y(-0.8));
+  ctx.lineTo(X(xc + 0.8), Y(-0.8));
+  ctx.lineTo(X(xc + 0.65), Y(0));
+  ctx.closePath(); ctx.fill();
+  // outline arcs (drawn in black-ish gray like the original thick edges)
+  ctx.strokeStyle = g; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.arc(X(xc), Y(0), T.s * 0.65, Math.PI, 2 * Math.PI); ctx.stroke();
+  ctx.beginPath(); ctx.arc(X(xc), Y(-0.8), T.s * 0.8, 0, Math.PI); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(X(xc - 0.65), Y(0)); ctx.lineTo(X(xc - 0.8), Y(-0.8)); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(X(xc + 0.65), Y(0)); ctx.lineTo(X(xc + 0.8), Y(-0.8)); ctx.stroke();
+  // pin
+  ctx.fillStyle = "#000";
+  ctx.beginPath(); ctx.arc(X(xc), Y(0), 4.7, 0, 2 * Math.PI); ctx.fill();
+  ctx.fillStyle = "#fff";
+  ctx.beginPath(); ctx.arc(X(xc), Y(0), 2.2, 0, 2 * Math.PI); ctx.fill();
+  ctx.restore();
+}
+
+// ------------------------- truss geometry helpers -------------------------
+function jointCoords() {
+  const w = state.w, h = state.h;
+  return {
+    A: [0, 0], B: [w, h], C: [2 * w, h], D: [3 * w, h], E: [4 * w, h], F: [5 * w, h],
+    G: [6 * w, 0], H: [5 * w, 0], I: [4 * w, 0], J: [3 * w, 0], K: [2 * w, 0], L: [w, 0]
+  };
+}
+// draw the base truss (thick outline, diagonals, verticals) + supports if steps==1
+function drawTruss(sol) {
+  const w = state.w, h = state.h;
+  // outline polygon
+  polyline([[0, 0], [w, h], [5 * w, h], [6 * w, 0]], "#000", 3, null, true);
+  // zig-zag diagonals
+  polyline([[w, h], [2 * w, 0], [3 * w, h], [4 * w, 0], [5 * w, h]], "#000", 3);
+  // vertical members
+  for (let i = 1; i <= 5; i++) line([i * w, 0], [i * w, h], "#000", 3);
+  if (state.steps === 1) { support(0); support(6 * w); }
+}
+function drawJoints() {
+  const w = state.w, h = state.h;
+  const pts = [[0, 0], [w, 0], [w, h], [2 * w, 0], [2 * w, h], [3 * w, 0], [3 * w, h],
+               [4 * w, 0], [4 * w, h], [5 * w, 0], [5 * w, h], [6 * w, 0]];
+  for (const p of pts) point(p, 4.7, 3.1);
+}
+// optional joint labels ("show joint labels" checkbox)
+function drawJointLabels() {
+  const J = jointCoords();
+  const w = state.w;
+  let names = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"];
+  if (state.steps === 2 && state.zoom && state.cuts < 7) {
+    // isolated section: only joints to the left of the cut, and skip the
+    // moment-point joint that the cut view already labels
+    const L = (state.cuts > 5 ? 6 : state.cuts) - 1;
+    const skip = { 2: "B", 3: "K", 4: "D", 5: "I" }[state.cuts];
+    names = names.filter(nm => J[nm][0] <= L * w + 1e-9 && nm !== skip);
+  }
+  // the calculate-moment view already labels A and G in blue
+  if (state.steps === 1 && state.opt === 1) names = names.filter(nm => nm !== "A" && nm !== "G");
+  // place each label just off its joint so joint dots and arrowheads stay visible:
+  // top-chord joints above-left, bottom-chord joints below-left, A left, G right
+  for (const nm of names) {
+    let dx = -15, dy = J[nm][1] > 0 ? -17 : 17;
+    if (nm === "A") { dx = -20; dy = 0; }
+    if (nm === "G") { dx = 20; dy = 0; }
+    framedLabel(nm, J[nm], 15, "#000", "#000", 1, dx, dy);
+  }
+}
+
+// member endpoints, by member number
+function memberEnds() {
+  const J = jointCoords();
+  const m = [["A","B"],["L","B"],["A","L"],["L","K"],["K","J"],["B","C"],["K","C"],["B","K"],
+             ["C","D"],["J","D"],["D","I"],["J","I"],["K","D"],["D","E"],["I","E"],["E","F"],
+             ["I","F"],["I","H"],["H","F"],["F","G"],["H","G"]];
+  return m.map(([a, b], n) => [n, J[a], J[b]]);
+}
+// member under the mouse (canvas coords), or null
+function memberAt(mx, my) {
+  // full-truss cut view already labels every member
+  if (state.steps === 2 && !state.zoom && state.cuts < 7) return null;
+  let list = memberEnds();
+  if (state.steps === 2 && state.zoom && state.cuts < 7) {
+    const L = (state.cuts > 5 ? 6 : state.cuts) - 1;
+    list = list.filter(([, p, q]) => Math.max(p[0], q[0]) <= L * state.w + 1e-9);
+  }
+  let best = null, bestD = 7;
+  for (const [n, p, q] of list) {
+    const ax = X(p[0]), ay = Y(p[1]), bx = X(q[0]), by = Y(q[1]);
+    const dx = bx - ax, dy = by - ay;
+    let t = ((mx - ax) * dx + (my - ay) * dy) / (dx * dx + dy * dy);
+    t = Math.max(0, Math.min(1, t));
+    const d = Math.hypot(mx - (ax + t * dx), my - (ay + t * dy));
+    if (d < bestD) { bestD = d; best = n; }
+  }
+  return best;
+}
+// tooltip with the member number next to the mouse
+function drawMemberHover() {
+  if (state.hoverMember === null) return;
+  const toks = [tok("member " + state.hoverMember + "  ("), tok("F", { italic: true }),
+                tok(String(state.hoverMember), { sub: true }), tok(")")];
+  const size = 15, tw = measureRich(toks, size);
+  let x = state.mouseX + 14, y = state.mouseY - 14;
+  if (x + tw + 8 > LOGW) x = state.mouseX - 14 - tw;
+  if (y - size < 2) y = state.mouseY + 28;
+  ctx.save();
+  ctx.fillStyle = "#fff"; ctx.strokeStyle = "#555"; ctx.lineWidth = 1;
+  roundRect(x - 6, y - size - 2, tw + 12, size + 10, 4);
+  ctx.fill(); ctx.stroke();
+  ctx.restore();
+  drawRich(toks, x, y, size, -1);
+}
+
+// ------------------------- steps = 1 views -------------------------
+function viewCalculateMoment(sol) {
+  const w = state.w, h = state.h;
+  // thick dashed reference lines (drawn first so the colored arrows sit on top;
+  // none at G, where the red R_G arrow already marks the 6 w distance)
+  line([0, 0], [0, -0.5 * h], "#000", 2.6, [9, 6]);
+  line([3 * w, 0], [3 * w, -0.25 * h], "#000", 2.6, [9, 6]);
+  line([5 * w, 0], [5 * w, -0.4 * h], "#000", 2.6, [9, 6]);
+  // magenta: FD moment arm + load
+  arrow([0, -0.25 * h], [3 * w, -0.25 * h], MAGENTA, 2.2);
+  arrow([3 * w, 1.85 * h], [3 * w, h], MAGENTA, 2.2);
+  drawRich([...varT("F", "D", MAGENTA), tok(" = " + FD + " kN", { color: MAGENTA })],
+           X(3 * w), Y(1.85 * h) - 8, 17, 0);
+  // orange: FF
+  arrow([0, -0.4 * h], [5 * w, -0.4 * h], ORANGE, 2.2);
+  arrow([5 * w, 2.3 * h], [5 * w, h], ORANGE, 2.2);
+  drawRich([...varT("F", "F", ORANGE), tok(" = " + FF + " kN", { color: ORANGE })],
+           X(5 * w), Y(2.3 * h) - 8, 17, 0);
+  // red: RG
+  arrow([0, -0.55 * h], [6 * w, -0.55 * h], REDRG, 2.2);
+  arrow([6 * w, -1.5 * h], [6 * w, 0], REDRG, 2.2);
+  drawRich(varT("R", "G", REDRG), X(6 * w), Y(-1.5 * h) + 20, 17, 0);
+  // blue point A
+  ctx.fillStyle = BLUE;
+  ctx.beginPath(); ctx.arc(X(0), Y(0), 4.7, 0, 2 * Math.PI); ctx.fill();
+  drawRich([tok("A", { color: BLUE })], X(0) - 9, Y(0) + 6, 17, 1, "#fff", 2);
+  // G labeled the same way, to the right of the joint
+  drawRich([tok("G", { color: BLUE })], X(6 * w) + 9, Y(0) + 6, 17, -1, "#fff", 2);
+  // distance labels on white
+  drawRich([tok(" 3 "), tok("w ", { italic: true })], X(1.5 * w), Y(-0.25 * h) + 5, 17, 0, "#fff");
+  drawRich([tok(" 5 "), tok("w ", { italic: true })], X(2.5 * w), Y(-0.4 * h) + 5, 17, 0, "#fff");
+  drawRich([tok(" 6 "), tok("w ", { italic: true })], X(3 * w), Y(-0.55 * h) + 5, 17, 0, "#fff");
+  // equations (mouseover swaps to explanation)
+  let bbox;
+  if (!state.hoverEqs) {
+    bbox = drawRichLines([
+      [tok("sum of moments about A: \u2211 "), ...varT("M", "A", "#000"),
+       tok(" = 0 = 3 "), tok("w ", { italic: true }), ...varT("F", "D", MAGENTA),
+       tok(" + 5 "), tok("w ", { italic: true }), ...varT("F", "F", ORANGE),
+       tok(" - 6 "), tok("w ", { italic: true }), ...varT("R", "G", REDRG)],
+      [tok("reaction force G: 6 "), ...varT("R", "G", REDRG), tok(" = 3"),
+       ...varT(" F", "D", MAGENTA), tok(" + 5"), ...varT(" F", "F", ORANGE)],
+      [...varT("R", "G", REDRG), tok(" = " + nf(sol.RG) + " kN", { color: REDRG })]
+    ], X(3 * w), Y(-9.5), 17, 24);
+  } else {
+    bbox = drawRichLines([
+      [tok("the first two terms are positive because they would")],
+      [tok("cause a clockwise rotation and the third term is negative")],
+      [tok("because it would cause a counterclockwise rotation")]
+    ], X(3 * w), Y(-9.5), 18, 25);
+  }
+  eqsHoverBox = bbox;
+}
+function viewForceBalance(sol) {
+  const w = state.w, h = state.h;
+  arrow([3 * w, 1.85 * h], [3 * w, h], BLUE, 2.2);
+  arrow([5 * w, 2.3 * h], [5 * w, h], BLUE, 2.2);
+  drawRich([...varT("F", "D", BLUE), tok(" = " + FD + " kN", { color: BLUE })],
+           X(3 * w), Y(1.85 * h) - 8, 16, 0);
+  drawRich([...varT("F", "F", BLUE), tok(" = " + FF + " kN", { color: BLUE })],
+           X(5 * w), Y(2.3 * h) - 8, 16, 0);
+  arrow([6 * w, -1.5 * h], [6 * w, 0], BLUE, 2.2);
+  drawRich([...varT("R", "G", BLUE), tok(" = " + nf(sol.RG) + " kN", { color: BLUE })],
+           X(6 * w), Y(-1.5 * h) + 20, 16, 0);
+  arrow([0, -0.64 * h], [0, 0], BLUE, 2.2);
+  drawRich(varT("R", "A", BLUE), X(0) + 14, Y(-0.64 * h) + 20, 17, 0);
+  drawRichLines([
+    [tok("sum of the "), tok("y", { italic: true }), tok(" forces: \u2211 "),
+     tok("F", { italic: true }), tok("y", { sub: true, italic: true }), tok(" = 0 = "),
+     ...varT("R", "A", BLUE), tok(" + "), ...varT("R", "G", BLUE), tok(" - "),
+     ...varT("F", "D", BLUE), tok(" - "), ...varT("F", "F", BLUE)],
+    [tok("reaction force A: "), ...varT("R", "A", BLUE), tok(" = "),
+     ...varT("F", "D", BLUE), tok(" + "), ...varT("F", "F", BLUE), tok(" - "), ...varT("R", "G", BLUE)],
+    [...varT("R", "A", BLUE), tok(" = " + nf(sol.RA) + " kN", { color: BLUE })]
+  ], X(3 * w), Y(-8), 17, 24);
+}
+function viewReactionsSolved(sol) {
+  const w = state.w, h = state.h;
+  arrow([3 * w, 1.85 * h], [3 * w, h], BLUE, 2.2);
+  arrow([5 * w, 2.3 * h], [5 * w, h], BLUE, 2.2);
+  drawRich([tok("F", { italic: true }), tok("D", { sub: true }), tok(" = " + FD + " kN")],
+           X(3 * w), Y(1.85 * h) - 8, 16, 0);
+  drawRich([tok("F", { italic: true }), tok("F", { sub: true }), tok(" = " + FF + " kN")],
+           X(5 * w), Y(2.3 * h) - 8, 16, 0);
+  arrow([0, -0.64 * h], [0, 0], BLUE, 2.2);
+  arrow([6 * w, -1.5 * h], [6 * w, 0], BLUE, 2.2);
+  drawRich([tok("R", { italic: true }), tok("A", { sub: true }), tok(" = " + sol.RA + " kN")],
+           X(0), Y(-0.64 * h) + 20, 16, 0);
+  drawRich([tok("R", { italic: true }), tok("G", { sub: true }), tok(" = " + sol.RG + " kN")],
+           X(6 * w), Y(-1.5 * h) + 20, 16, 0);
+}
+
+// ------------------------- steps = 2, full structure -------------------------
+function viewFullStructure(sol) {
+  const w = state.w, h = state.h;
+  // member force labels (white background, framed style: plain white bg)
+  const mem = [
+    [0, [w / 2, h / 2]], [1, [w, h / 2]], [2, [w / 2, 0]], [3, [1.5 * w, 0]],
+    [4, [2.5 * w, 0]], [5, [1.5 * w, h]], [6, [2 * w, h / 2]], [7, [1.5 * w, h / 2]],
+    [8, [2.5 * w, h]], [9, [3 * w, h / 2]], [10, [3.5 * w, h / 2]], [11, [3.5 * w, 0]],
+    [12, [2.5 * w, h / 2]], [13, [3.5 * w, h]], [14, [4 * w, h / 2]], [15, [4.5 * w, h]],
+    [16, [4.5 * w, h / 2]], [17, [4.5 * w, 0]], [18, [5 * w, h / 2]], [19, [5.5 * w, h / 2]],
+    [20, [5.5 * w, 0]]
+  ];
+  for (const [n, p] of mem) {
+    drawRich([tok("F", { italic: true }), tok(String(n), { sub: true })],
+             X(p[0]), Y(p[1]) + 5, 15, 0, "#fff", 2);
+  }
+  // joint labels in rounded frames
+  const J = jointCoords();
+  for (const nm of ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"]) {
+    framedLabel(nm, J[nm], 15, "#000", "#000", 1);
+  }
+  // red dashed wavy cut line at (cuts - 0.25) w
+  cutLine((state.cuts - 0.25) * w, -0.25 * h, 1.25 * h);
+  // blue loads and reactions with plain numeric values
+  loadsWithValues(sol, false);
+}
+// blue load/reaction arrows with plain numeric labels ("10 kN" etc.)
+function loadsWithValues(sol, toEdge) {
+  const w = state.w, h = state.h;
+  const dTop = toEdge ? h : 1.1 * h;
+  arrow([3 * w, 1.85 * h], [3 * w, dTop], BLUE, 2.2);
+  arrow([5 * w, 2.3 * h], [5 * w, toEdge ? h : 1.1 * h], BLUE, 2.2);
+  drawRich([tok(FD + " kN", { color: "#000" })], X(3 * w), Y(1.85 * h) - 8, 16, 0);
+  drawRich([tok(FF + " kN", { color: "#000" })], X(5 * w), Y(2.3 * h) - 8, 16, 0);
+  arrow([0, -0.64 * h], [0, toEdge ? 0 : -0.05 * h], BLUE, 2.2);
+  arrow([6 * w, -1.5 * h], [6 * w, toEdge ? 0 : -0.05 * h], BLUE, 2.2);
+  drawRich([tok(String(sol.RA) + " kN", { color: "#000" })], X(0), Y(-0.64 * h) + 20, 16, 0);
+  drawRich([tok(String(sol.RG) + " kN", { color: "#000" })], X(6 * w), Y(-1.5 * h) + 20, 16, 0);
+}
+
+// ------------------------- steps = 2, solved (cuts = 7) -------------------------
+function viewCutSolved(sol) {
+  const w = state.w, h = state.h;
+  // vertical zero members (plain thick lines)
+  for (let i = 1; i <= 5; i++) line([i * w, 0], [i * w, h], "#000", 3);
+  // loads
+  loadsWithValues(sol, true);
+  // member arrows: [value, p1, p2, labelPos, labelRotation]
+  const th = sol.th;
+  const members = [
+    [sol.F0,  [0, 0], [w, h], [w / 2, h / 2], th],
+    [sol.F2,  [0, 0], [w, 0], [0.5 * w, 0], 0],
+    [sol.F3,  [w, 0], [2 * w, 0], [1.5 * w, 0], 0],
+    [sol.F4,  [2 * w, 0], [3 * w, 0], [2.5 * w, 0], 0],
+    [sol.F5,  [w, h], [2 * w, h], [1.5 * w, h], 0],
+    [sol.F7,  [w, h], [2 * w, 0], [1.5 * w, 0.5 * h], -th],
+    [sol.F8,  [2 * w, h], [3 * w, h], [2.5 * w, h], 0],
+    [sol.F10, [3 * w, h], [4 * w, 0], [3.5 * w, 0.5 * h], -th],
+    [sol.F11, [3 * w, 0], [4 * w, 0], [3.5 * w, 0], 0],
+    [sol.F12, [2 * w, 0], [3 * w, h], [2.5 * w, 0.5 * h], th],
+    [sol.F13, [3 * w, h], [4 * w, h], [3.5 * w, h], 0],
+    [sol.F15, [4 * w, h], [5 * w, h], [4.5 * w, h], 0],
+    [sol.F16, [4 * w, 0], [5 * w, h], [4.5 * w, 0.5 * h], th],
+    [sol.F17, [4 * w, 0], [5 * w, 0], [4.5 * w, 0], 0],
+    [sol.F19, [5 * w, h], [6 * w, 0], [5.5 * w, 0.5 * h], -th],
+    [sol.F20, [5 * w, 0], [6 * w, 0], [5.5 * w, 0], 0]
+  ];
+  for (const [F, p1, p2, lp, rot] of members) {
+    const col = F < 0 ? COLC : COLT;
+    if (F < 0) memberCompression(p1, p2, col, 3);
+    else memberTension(p1, p2, col, 3);
+  }
+  // labels drawn after all arrows so they sit on top
+  for (const [F, p1, p2, lp, rot] of members) {
+    ctx.save();
+    ctx.translate(X(lp[0]), Y(lp[1]));
+    ctx.rotate(-rot);
+    ctx.font = "18px Helvetica, Arial, sans-serif";
+    const t = nf(F);
+    const tw = ctx.measureText(t).width;
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(-tw / 2 - 3, -11, tw + 6, 20);
+    ctx.fillStyle = "#000";
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText(t, 0, 1);
+    ctx.restore();
+  }
+  drawJoints();
+  drawRich([tok("all "), tok("compression", { color: COLC }), tok(" and "),
+            tok("tension", { color: COLT }), tok(" forces are in kN")],
+           X(3 * w), Y(-4.5), 17, 0);
+}
+
+// ------------------------- steps = 2, zoomed partial structure -------------------------
+function viewPartialStructure(sol) {
+  const w = state.w, h = state.h, cuts = state.cuts;
+  const L = (cuts > 5 ? 6 : cuts) - 1;
+  // theta label near A
+  if (cuts < 4) {
+    drawRich([tok("\u03B8 = " + nfs(sol.th * 180 / Math.PI) + "\u00B0")],
+             X(0) + 58, Y(0) + 26, 18, 0);
+  } else {
+    drawRich([tok(nfs(sol.th * 180 / Math.PI) + "\u00B0")],
+             X(0) + 55, Y(0) + 19, 18, 0);
+  }
+  // RA arrow
+  const cRA = (cuts > 1 && cuts < 6) ? colY() : BLUE;
+  arrow([0, -0.5 * h], [0, 0], cRA, 2.2);
+  drawRich([...varT("R", "A", cRA), tok(" = " + nf(sol.RA) + " kN", { color: cRA })],
+           X(0), Y(-0.5 * h) + 22, 18, 0);
+  // FD load (cuts >= 4)
+  if (cuts >= 4) {
+    arrow([3 * w, 1.75 * h], [3 * w, (cuts === 4 ? 1.1 : 1) * h], BLUE, 2.2);
+    drawRich([...varT("F", "D", BLUE), tok(" = " + FD + " kN", { color: BLUE })],
+             X(3 * w), Y(1.75 * h) - 8, 16, 0);
+  }
+  // FF load (cuts == 6)
+  if (cuts === 6) {
+    arrow([5 * w, 2 * h], [5 * w, h], BLUE, 2.2);
+    drawRich([...varT("F", "F", BLUE), tok(" = " + FF + " kN", { color: BLUE })],
+             X(5 * w), Y(2 * h) - 8, 16, 0);
+  }
+  // partial truss to the left of the cut
+  if (cuts > 1) {
+    polyline([[L * w, h], [w, h], [0, 0], [L * w, 0]], "#000", 3);
+    for (let i = 1; i <= L; i++) line([i * w, 0], [i * w, h], "#000", 3);
+    // zig-zag diagonals, keeping segments up to L
+    const zig = [[w, h], [2 * w, 0], [3 * w, h], [4 * w, 0], [5 * w, h]];
+    const kept = zig.slice(0, L);
+    if (kept.length >= 2) polyline(kept, "#000", 3);
+  }
+  // exposed cut-member arrows (black)
+  const cutArrows = [
+    [[[0, 0], [w, 0]], [[w, h], [0, 0]]],
+    [[[1.9 * w, h], [1.05 * w, h]], [[w, h], [1.9 * w, 0.1 * h]], [[w, 0], [1.9 * w, 0]]],
+    [[[2.9 * w, h], [2 * w, h]], [[2 * w, 0], [2.9 * w, 0]], [[2.9 * w, 0.9 * h], [2.05 * w, 0.05 * h]]],
+    [[[3.9 * w, h], [3.05 * w, h]], [[3 * w, 0], [3.9 * w, 0]], [[3.9 * w, 0.1 * h], [3.05 * w, 0.95 * h]]],
+    [[[4.9 * w, h], [4 * w, h]], [[4 * w, 0], [4.9 * w, 0]], [[4 * w, 0], [4.9 * w, 0.9 * h]]],
+    [[[5 * w, 0], [5.9 * w, 0]], [[5.9 * w, 0.1 * h], [5 * w, h]]]
+  ][cuts - 1];
+  for (const [p1, p2] of cutArrows) arrow(p1, p2, "#000", 3, 14);
+}
+
+// green dashed component arrows + labels used by the cut views
+function componentArrows(a1, a2, col) {
+  arrow(a1[0], a1[1], col, 2.2, 12, [7, 6]);
+  arrow(a2[0], a2[1], col, 2.2, 12, [7, 6]);
+}
+
+function viewCut1(sol) {
+  const w = state.w, h = state.h;
+  cutLine(w, -0.1 * h, 1.1 * h);
+  const g = GREEN07;
+  componentArrows([[w, 0.5 * h], [0.5 * w, 0.5 * h]], [[0.5 * w, h], [0.5 * w, 0.5 * h]], g);
+  drawRich([...varT("F", "", g), tok("0, ", { sub: true, color: g }), tok("x", { sub: true, italic: true, color: g }),
+            tok(" = ", { color: "#000" }), ...varT("F", "0", BLUE), tok(" cos \u03B8", { color: "#000" })],
+           X(w) + 8, Y(0.5 * h) + 6, 18, -1, "#fff");
+  drawRich([...varT("F", "", g), tok("0, ", { sub: true, color: g }), tok("y", { sub: true, italic: true, color: g }),
+            tok(" = ", { color: "#000" }), ...varT("F", "0", BLUE), tok(" sin \u03B8", { color: "#000" })],
+           X(0.5 * w), Y(h) - 12, 18, 0);
+  drawRich(varT("F", "0", BLUE), X(0.75 * w), Y(0.75 * h) + 6, 18, 0, "#fff");
+  drawRich(varT("F", "2", BLUE), X(0.75 * w), Y(0) + 6, 18, 0, "#fff");
+}
+function viewCut2(sol) {
+  const w = state.w, h = state.h;
+  cutLine(1.9 * w, -0.1 * h, 1.1 * h);
+  if (state.moment) {
+    // gray arrows for the two members not in the moment balance
+    arrow([1.9 * w, h], [1.05 * w, h], GRAY55, 3, 14);
+    arrow([w, h], [1.9 * w, 0.1 * h], GRAY55, 3, 14);
+    // thick black bottom member, magenta dimension, orange member/arrow
+    line([0, 0], [w, 0], "#000", 5);
+    line([0, -0.1 * h], [w, -0.1 * h], MAGENTA, 2.2);
+    line([0, -0.15 * h], [0, -0.05 * h], MAGENTA, 2.6);
+    line([w, -0.15 * h], [w, -0.05 * h], MAGENTA, 2.6);
+    arrow([w, 0], [1.9 * w, 0], ORANGE, 3, 14);
+    line([w, 0], [w, h], ORANGE, 2.6);
+    drawRich([tok(" w ", { italic: true })], X(0.5 * w), Y(-0.1 * h) + 6, 18, 0, "#fff");
+    drawRich([tok("h", { italic: true })], X(w), Y(0.5 * h) + 6, 18, 0, "#fff", 4);
+  }
+  const g = colorFaded(GREEN07);
+  componentArrows([[1.25 * w, 0.75 * h], [1.75 * w, 0.75 * h]], [[1.25 * w, 0.75 * h], [1.25 * w, 0.25 * h]], g);
+  drawRich([...varT("F", "", g), tok("7, ", { sub: true, color: g }), tok("x", { sub: true, italic: true, color: g })],
+           X(1.75 * w) + 8, Y(0.75 * h) + 6, 18, -1, "#fff");
+  drawRich([...varT("F", "", g), tok("7, ", { sub: true, color: g }), tok("y", { sub: true, italic: true, color: g })],
+           X(1.25 * w), Y(0.25 * h) + 22, 18, 0);
+  const bl = colorFaded(BLUE);
+  drawRich(varT("F", "5", bl), X(1.6 * w), Y(h) + 6, 18, 0, "#fff");
+  drawRich(varT("F", "7", bl), X(1.6 * w), Y(0.4 * h) + 6, 18, 0, "#fff");
+  drawRich(varT("F", "3", colX()), X(1.6 * w), Y(0) + 6, 18, 0, "#fff");
+  framedLabel(" B ", [w, h], 15, "rgb(102,102,102)", state.moment ? "#000" : "#999", state.moment ? 2.4 : 1);
+}
+function viewCut3(sol) {
+  const w = state.w, h = state.h;
+  cutLine(2.9 * w, -0.1 * h, 1.1 * h);
+  if (state.moment) {
+    arrow([2 * w, 0], [2.9 * w, 0], GRAY55, 3, 14);
+    arrow([2.9 * w, 0.9 * h], [2.05 * w, 0.05 * h], GRAY55, 3, 14);
+    line([0, 0], [2 * w, 0], "#000", 5);
+    line([2 * w, 0], [2 * w, h], ORANGE, 2.6);
+    arrow([2.9 * w, h], [2 * w, h], ORANGE, 3, 14);
+    line([0, -0.1 * h], [2 * w, -0.1 * h], MAGENTA, 2.2);
+    line([0, -0.15 * h], [0, -0.05 * h], MAGENTA, 2.6);
+    line([2 * w, -0.15 * h], [2 * w, -0.05 * h], MAGENTA, 2.6);
+    drawRich([tok(" 2 "), tok("w ", { italic: true })], X(w), Y(-0.1 * h) + 6, 18, 0, "#fff");
+    drawRich([tok("h", { italic: true })], X(2 * w), Y(0.5 * h) + 6, 18, 0, "#fff", 4);
+  }
+  const g = colorFaded(GREEN07);
+  componentArrows([[2.75 * w, 0.25 * h], [2.25 * w, 0.25 * h]], [[2.25 * w, 0.75 * h], [2.25 * w, 0.25 * h]], g);
+  drawRich([...varT("F", "", g), tok("12, ", { sub: true, color: g }), tok("x", { sub: true, italic: true, color: g })],
+           X(2.75 * w) + 12, Y(0.25 * h) + 6, 18, -1, "#fff");
+  drawRich([...varT("F", "", g), tok("12, ", { sub: true, color: g }), tok("y", { sub: true, italic: true, color: g })],
+           X(2.25 * w), Y(0.75 * h) - 14, 18, 0);
+  const bl = colorFaded(BLUE);
+  drawRich(varT("F", "4", bl), X(2.6 * w), Y(0) + 6, 18, 0, "#fff");
+  drawRich(varT("F", "12", bl), X(2.6 * w), Y(0.6 * h) + 6, 18, 0, "#fff");
+  drawRich(varT("F", "8", colX()), X(2.6 * w), Y(h) + 6, 18, 0, "#fff");
+  framedLabel(" K ", [2 * w, 0], 15, "rgb(102,102,102)", state.moment ? "#000" : "#999", state.moment ? 2.4 : 1);
+  drawRichLines([
+    [tok("\u2211 "), tok("F", { italic: true }), tok("x", { sub: true, italic: true }), tok(" = 0 = "),
+     ...varT("F", "4", BLUE), tok(" - "), ...varT("F", "8", BLUE), tok(" - "),
+     ...varT("F", "12", BLUE), tok(" cos \u03B8")],
+    [...varT("F", "4", BLUE), tok(" = "), ...varT("F", "8", BLUE), tok(" + "),
+     ...varT("F", "12", BLUE), tok(" cos \u03B8")],
+    [...varT("F", "4", BLUE), tok(" = " + nf(sol.F4) + " kN", { color: BLUE })]
+  ], X(12), Y(-3.5), 17, 23);
+}
+function viewCut4(sol) {
+  const w = state.w, h = state.h;
+  cutLine(3.9 * w, -0.1 * h, 1.1 * h);
+  if (state.moment) {
+    arrow([3.9 * w, h], [3.05 * w, h], GRAY55, 3, 14);
+    arrow([3.9 * w, 0.1 * h], [3.05 * w, 0.95 * h], GRAY55, 3, 14);
+    line([0, 0], [3 * w, 0], "#000", 5);
+    line([3 * w, h], [3 * w, 0], ORANGE, 2.6);
+    arrow([3 * w, 0], [3.9 * w, 0], ORANGE, 3, 14);
+    line([0, -0.1 * h], [3 * w, -0.1 * h], MAGENTA, 2.2);
+    line([0, -0.15 * h], [0, -0.05 * h], MAGENTA, 2.6);
+    line([3 * w, -0.15 * h], [3 * w, -0.05 * h], MAGENTA, 2.6);
+    drawRich([tok(" 3 "), tok("w ", { italic: true })], X(1.5 * w), Y(-0.1 * h) + 6, 18, 0, "#fff");
+    drawRich([tok("h", { italic: true })], X(3 * w), Y(0.5 * h) + 6, 18, 0, "#fff", 4);
+  }
+  const g = colorFaded(GREEN07);
+  componentArrows([[3.75 * w, 0.75 * h], [3.25 * w, 0.75 * h]], [[3.25 * w, 0.25 * h], [3.25 * w, 0.75 * h]], g);
+  drawRich([...varT("F", "", g), tok("10, ", { sub: true, color: g }), tok("x", { sub: true, italic: true, color: g })],
+           X(3.75 * w) + 12, Y(0.75 * h) + 6, 18, -1, "#fff");
+  drawRich([...varT("F", "", g), tok("10, ", { sub: true, color: g }), tok("y", { sub: true, italic: true, color: g })],
+           X(3.25 * w), Y(0.25 * h) - 8, 18, 0);
+  const bl = colorFaded(BLUE);
+  drawRich(varT("F", "10", bl), X(3.6 * w), Y(0.4 * h) + 6, 18, 0, "#fff");
+  drawRich(varT("F", "13", bl), X(3.6 * w), Y(h) + 6, 18, 0, "#fff");
+  drawRich(varT("F", "11", colX()), X(3.6 * w), Y(0) + 6, 18, 0, "#fff");
+  framedLabel(" D ", [3 * w, h], 15, "rgb(102,102,102)", state.moment ? "#000" : "#999", state.moment ? 2.4 : 1);
+  drawRichLines([
+    [tok("\u2211 "), tok("F", { italic: true }), tok("x", { sub: true, italic: true }), tok(" = 0 = -"),
+     ...varT("F", "10", BLUE), tok(" cos \u03B8 + "), ...varT("F", "11", BLUE), tok(" - "),
+     ...varT("F", "13", BLUE)],
+    [...varT("F", "13", BLUE), tok(" = -"), ...varT("F", "10", BLUE), tok(" cos \u03B8 + "),
+     ...varT("F", "11", BLUE)],
+    [...varT("F", "13", BLUE), tok(" = " + nf(sol.F13) + " kN", { color: BLUE })]
+  ], X(8), Y(11), 17, 23);
+}
+function viewCut5(sol) {
+  const w = state.w, h = state.h;
+  cutLine(4.9 * w, -0.1 * h, 1.1 * h);
+  if (state.moment) {
+    arrow([4 * w, 0], [4.9 * w, 0], GRAY55, 3, 14);
+    arrow([4 * w, 0], [4.9 * w, 0.9 * h], GRAY55, 3, 14);
+    line([0, 0], [4 * w, 0], "#000", 5);
+    line([4 * w, h], [4 * w, 0], ORANGE, 2.6);
+    arrow([4.9 * w, h], [4 * w, h], ORANGE, 3, 14);
+    line([0, -0.1 * h], [4 * w, -0.1 * h], MAGENTA, 2.2);
+    line([0, -0.15 * h], [0, -0.05 * h], MAGENTA, 2.6);
+    line([4 * w, -0.15 * h], [4 * w, -0.05 * h], MAGENTA, 2.6);
+    line([3 * w, -0.25 * h], [4 * w, -0.25 * h], "red", 2.2);
+    line([3 * w, -0.2 * h], [3 * w, -0.3 * h], "red", 2.6);
+    line([4 * w, -0.2 * h], [4 * w, -0.3 * h], "red", 2.6);
+    drawRich([tok(" 4 "), tok("w", { italic: true })], X(2 * w), Y(-0.1 * h) + 6, 18, 0, "#fff");
+    drawRich([tok(" w ", { italic: true })], X(3.5 * w), Y(-0.25 * h) + 6, 18, 0, "#fff");
+    drawRich([tok("h", { italic: true })], X(4 * w), Y(0.5 * h) + 6, 18, 0, "#fff", 4);
+  }
+  const g = colorFaded(GREEN07);
+  componentArrows([[4.25 * w, 0.25 * h], [4.25 * w, 0.75 * h]], [[4.25 * w, 0.25 * h], [4.75 * w, 0.25 * h]], g);
+  drawRich([...varT("F", "", g), tok("16, ", { sub: true, color: g }), tok("x", { sub: true, italic: true, color: g })],
+           X(4.75 * w) + 12, Y(0.25 * h) + 6, 18, -1, "#fff");
+  drawRich([...varT("F", "", g), tok("16, ", { sub: true, color: g }), tok("y", { sub: true, italic: true, color: g })],
+           X(4.25 * w), Y(0.75 * h) - 14, 18, 0);
+  const bl = colorFaded(BLUE);
+  drawRich(varT("F", "16", bl), X(4.6 * w), Y(0.6 * h) + 6, 18, 0, "#fff");
+  drawRich(varT("F", "17", bl), X(4.5 * w), Y(0) + 6, 18, 0, "#fff");
+  drawRich(varT("F", "15", colX()), X(4.5 * w), Y(h) + 6, 18, 0, "#fff");
+  framedLabel(" I ", [4 * w, 0], 15, "rgb(102,102,102)", state.moment ? "#000" : "#999", state.moment ? 2.4 : 1);
+  drawRichLines([
+    [tok("\u2211 "), tok("F", { italic: true }), tok("x", { sub: true, italic: true }), tok(" = 0 = -"),
+     ...varT("F", "15", BLUE), tok(" + "), ...varT("F", "16", BLUE), tok(" cos \u03B8 + "),
+     ...varT("F", "17", BLUE)],
+    [...varT("F", "17", BLUE), tok(" = "), ...varT("F", "15", BLUE), tok(" - "),
+     ...varT("F", "16", BLUE), tok(" cos \u03B8")],
+    [...varT("F", "17", BLUE), tok(" = " + nf(sol.F17) + " kN", { color: BLUE })]
+  ], X(8), Y(11), 17, 23);
+}
+function viewCut6(sol) {
+  const w = state.w, h = state.h;
+  cutLine(5.9 * w, -0.5 * h, 0.75 * h);
+  const g = GREEN07;
+  componentArrows([[5.65 * w, 0.85 * h], [5.15 * w, 0.85 * h]], [[5.15 * w, 0.35 * h], [5.15 * w, 0.85 * h]], g);
+  drawRich([...varT("F", "", g), tok("19, ", { sub: true, color: g }), tok("x", { sub: true, italic: true, color: g })],
+           X(5.65 * w) + 12, Y(0.85 * h) + 6, 18, -1, "#fff");
+  drawRich([...varT("F", "", g), tok("19, ", { sub: true, color: g }), tok("y", { sub: true, italic: true, color: g })],
+           X(5.15 * w), Y(0.35 * h) + 20, 18, 0);
+  drawRich(varT("F", "19", BLUE), X(5.6 * w), Y(0.4 * h) + 6, 18, 0, "#fff");
+  drawRich(varT("F", "20", BLUE), X(5.5 * w), Y(0) + 6, 18, 0, "#fff");
+}
+
+// ------------------------- equations panel (below graph, zoomed cuts 1-6) -------------------------
+function sumF(sub) {
+  return [tok("\u2211 "), tok("F", { italic: true }), tok(sub, { sub: true, italic: true })];
+}
+function sumM(sub) {
+  return [tok("\u2211 "), tok("M", { italic: true }), tok(sub, { sub: true })];
+}
+function drawEquationsPanel(sol, boxY, boxH) {
+  const cuts = state.cuts;
+  const cy = colY(), cy2 = colY2(), cx = colX();
+  let cols;   // each column = array of 3 rich-text lines
+  if (cuts === 1) {
+    cols = [
+      [
+        [...sumF("y"), tok(" = 0 = "), ...varT("R", "A", BLUE), tok(" - "), ...varT("F", "0", BLUE), tok(" sin \u03B8")],
+        [...varT("F", "0", BLUE), tok(" = "), ...varT("R", "A", BLUE), tok("/sin \u03B8")],
+        [...varT("F", "0", BLUE), tok(" = " + nf(sol.F0) + " kN", { color: BLUE })]
+      ],
+      [
+        [...sumF("x"), tok(" = 0 = -"), ...varT("F", "0", BLUE), tok(" cos \u03B8 + "), ...varT("F", "2", BLUE)],
+        [...varT("F", "2", BLUE), tok(" = "), ...varT("F", "0", BLUE), tok(" cos \u03B8")],
+        [...varT("F", "2", BLUE), tok(" = " + nf(sol.F2) + " kN", { color: BLUE })]
+      ]
+    ];
+  } else if (cuts === 2) {
+    cols = [
+      [
+        [...sumF("y"), tok(" = 0 = "), ...varT("R", "A", BLUE), tok(" - "), ...varT("F", "7", BLUE), tok(" sin \u03B8")],
+        [...varT("F", "7", BLUE), tok(" = "), ...varT("R", "A", BLUE), tok("/sin \u03B8")],
+        [...varT("F", "7", BLUE), tok(" = " + nf(sol.F7) + " kN", { color: BLUE })]
+      ],
+      [
+        [...sumM("B"), tok(" = 0 = "), tok("w ", { italic: true }), ...varT("R", "A", cy), tok(" - "), tok("h ", { italic: true }), ...varT("F", "3", cx)],
+        [...varT("F", "3", cx), tok(" = "), tok("w", { italic: true }), tok("/"), tok("h", { italic: true }), ...varT(" R", "A", cy)],
+        [...varT("F", "3", cx), tok(" = " + nf(sol.F3) + " kN", { color: cx })]
+      ],
+      [
+        [...sumF("x"), tok(" = 0 = "), ...varT("F", "3", BLUE), tok(" - "), ...varT("F", "5", BLUE), tok(" + "), ...varT("F", "7", BLUE), tok(" cos \u03B8")],
+        [...varT("F", "5", BLUE), tok(" = "), ...varT("F", "3", BLUE), tok(" + "), ...varT("F", "7", BLUE), tok(" cos \u03B8")],
+        [...varT("F", "5", BLUE), tok(" = " + nf(sol.F5) + " kN", { color: BLUE })]
+      ]
+    ];
+  } else if (cuts === 3) {
+    cols = [
+      [
+        [...sumF("y"), tok(" = 0 = "), ...varT("R", "A", BLUE), tok(" - "), ...varT("F", "12", BLUE), tok(" sin \u03B8")],
+        [...varT("F", "12", BLUE), tok(" = "), ...varT("R", "A", BLUE), tok("/sin \u03B8")],
+        [...varT("F", "12", BLUE), tok(" = " + nf(sol.F12) + " kN", { color: BLUE })]
+      ],
+      [
+        [...sumM("K"), tok(" = 0 = 2 "), tok("w ", { italic: true }), ...varT("R", "A", cy), tok(" - "), tok("h ", { italic: true }), ...varT("F", "8", cx)],
+        [...varT("F", "8", cx), tok(" = 2 "), tok("w", { italic: true }), tok("/"), tok("h", { italic: true }), ...varT(" R", "A", cy)],
+        [...varT("F", "8", cx), tok(" = " + nf(sol.F8) + " kN", { color: cx })]
+      ]
+    ];
+  } else if (cuts === 4) {
+    cols = [
+      [
+        [...sumF("y"), tok(" = 0 = "), ...varT("R", "A", BLUE), tok(" - "), ...varT("F", "D", BLUE), tok(" + "), ...varT("F", "10", BLUE), tok(" sin \u03B8")],
+        [...varT("F", "10", BLUE), tok(" = (-"), ...varT("R", "A", BLUE), tok(" + "), ...varT("F", "D", BLUE), tok(")/sin \u03B8")],
+        [...varT("F", "10", BLUE), tok(" = " + nf(sol.F10) + " kN", { color: BLUE })]
+      ],
+      [
+        [...sumM("D"), tok(" = 0 = 3 "), tok("w ", { italic: true }), ...varT("R", "A", cy), tok(" - "), tok("h ", { italic: true }), ...varT("F", "11", cx)],
+        [...varT("F", "11", cx), tok(" = 3 "), tok("w", { italic: true }), tok("/"), tok("h", { italic: true }), ...varT(" R", "A", cy)],
+        [...varT("F", "11", cx), tok(" = " + nf(sol.F11) + " kN", { color: cx })]
+      ]
+    ];
+  } else if (cuts === 5) {
+    cols = [
+      [
+        [...sumF("y"), tok(" = 0 = "), ...varT("R", "A", BLUE), tok(" - "), ...varT("F", "D", BLUE), tok(" + "), ...varT("F", "16", BLUE), tok(" sin \u03B8")],
+        [...varT("F", "16", BLUE), tok(" = (-"), ...varT("R", "A", BLUE), tok(" + "), ...varT("F", "D", BLUE), tok(")/sin \u03B8")],
+        [...varT("F", "16", BLUE), tok(" = " + nf(sol.F16) + " kN", { color: BLUE })]
+      ],
+      [
+        [...sumM("I"), tok(" = 0 = 4 "), tok("w ", { italic: true }), ...varT("R", "A", cy), tok(" + "), tok("w ", { italic: true }), ...varT("F", "D", cy2), tok(" - "), tok("h ", { italic: true }), ...varT("F", "15", cx)],
+        [...varT("F", "15", cx), tok(" = "), tok("w", { italic: true }), tok("/"), tok("h", { italic: true }), tok(" (4 "), ...varT("R", "A", cy), tok(" - "), ...varT("F", "D", cy2), tok(")")],
+        [...varT("F", "15", cx), tok(" = " + nf(sol.F15) + " kN", { color: cx })]
+      ]
+    ];
+  } else {
+    cols = [
+      [
+        [...sumF("y"), tok(" = 0 = "), ...varT("R", "A", BLUE), tok(" - "), ...varT("F", "D", BLUE), tok(" - "), ...varT("F", "F", BLUE), tok(" + "), ...varT("F", "19", BLUE), tok(" sin \u03B8")],
+        [...varT("F", "19", BLUE), tok(" = (-"), ...varT("R", "A", BLUE), tok(" + "), ...varT("F", "D", BLUE), tok(" + "), ...varT("F", "F", BLUE), tok(")/sin \u03B8")],
+        [...varT("F", "19", BLUE), tok(" = " + nf(sol.F19) + " kN", { color: BLUE })]
+      ],
+      [
+        [...sumF("x"), tok(" = 0 = -"), ...varT("F", "19", BLUE), tok(" cos \u03B8 + "), ...varT("F", "20", BLUE)],
+        [...varT("F", "20", BLUE), tok(" = "), ...varT("F", "19", BLUE), tok(" cos \u03B8")],
+        [...varT("F", "20", BLUE), tok(" = " + nf(sol.F20) + " kN", { color: BLUE })]
+      ]
+    ];
+  }
+  // lay out columns evenly across the panel
+  const n = cols.length;
+  const cw = LOGW / n;
+  const midY = boxY + boxH / 2;
+  for (let i = 0; i < n; i++) {
+    drawRichLines(cols[i], cw * (i + 0.5), midY, 15, 21);
+  }
+}
+
+// ------------------------- main draw -------------------------
+let eqsHoverBox = null;
+function draw() {
+  const sol = solveTruss();
+  const w = state.w, h = state.h;
+  ctx.setTransform(DPR * KSCALE, 0, 0, DPR * KSCALE, 0, 0);
+  ctx.clearRect(0, 0, LOGW, LOGH);
+  eqsHoverBox = null;
+  ctx.lineJoin = "round";
+  ctx.lineCap = "round";
+
+  const zoomedCut = state.steps === 2 && state.zoom && state.cuts < 7;
+  const graphH = zoomedCut ? 300 : 375;
+  // graph transform
+  if (state.steps === 2 && state.zoom) {
+    if (state.cuts === 7) {
+      T = fitTransform(-0.1, 6 * w, -14.4, 20.7, 0, 0, LOGW, 375);
+    } else {
+      T = fitTransform(XMIN[state.cuts], XMAX[state.cuts], YMIN[state.cuts], YMAX[state.cuts], 0, 0, LOGW, 300);
+    }
+  } else {
+    const R = 6 * w + 0.85;
+    T = fitTransform(-0.85 - 0.05 * R, 6 * w + 0.09 * R, -14.4, 20.7, 0, 0, LOGW, 375);
+  }
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(0, 0, LOGW, graphH);
+  ctx.clip();
+
+  if (state.steps === 1) {
+    drawTruss(sol);
+    if (state.opt === 1) viewCalculateMoment(sol);
+    else if (state.opt === 2) viewForceBalance(sol);
+    else viewReactionsSolved(sol);
+    drawJoints();
+  } else {
+    if (!state.zoom) {
+      if (state.cuts === 7) {
+        drawTruss(sol);
+        viewCutSolved(sol);
+      } else {
+        drawTruss(sol);
+        viewFullStructure(sol);   // already labels every joint
+      }
+    } else {
+      if (state.cuts === 7) {
+        viewCutSolved(sol);
+      } else {
+        viewPartialStructure(sol);
+        [viewCut1, viewCut2, viewCut3, viewCut4, viewCut5, viewCut6][state.cuts - 1](sol);
+      }
+    }
+  }
+  const fullCutView = state.steps === 2 && !state.zoom && state.cuts < 7;
+  if (state.labels && !fullCutView) drawJointLabels();
+  ctx.restore();
+  drawMemberHover();
+
+  if (zoomedCut) drawEquationsPanel(sol, 310, 70);
+}
+
+// ------------------------- Figure 1 (Details panel) -------------------------
+function drawFigure1() {
+  const fig = document.getElementById("figCanvas");
+  const fw = 560, fh = 300;
+  const dpr = window.devicePixelRatio || 1;
+  fig.width = fw * dpr; fig.height = fh * dpr;
+  fig.style.width = fw + "px"; fig.style.height = fh + "px";
+  const fc = fig.getContext("2d");
+  fc.setTransform(dpr, 0, 0, dpr, 0, 0);
+  fc.lineJoin = "round"; fc.lineCap = "round";
+  // data range: x -1..31, y -4..9.5 -> fit
+  const s = Math.min(fw / 34, fh / 15);
+  const ox = (fw - s * 34) / 2 + s * 2, oy = (fh - s * 15) / 2 + s * 10;
+  const FX = x => ox + s * x, FY = y => oy - s * y;
+  function fhead(px, py, ang, size, color) {
+    fc.save(); fc.translate(px, py); fc.rotate(ang); fc.fillStyle = color;
+    fc.beginPath(); fc.moveTo(0, 0); fc.lineTo(-size, size * 0.42);
+    fc.lineTo(-size * 0.8, 0); fc.lineTo(-size, -size * 0.42);
+    fc.closePath(); fc.fill(); fc.restore();
+  }
+  function fline(p1, p2, lw) {
+    fc.strokeStyle = "#000"; fc.lineWidth = lw;
+    fc.beginPath(); fc.moveTo(FX(p1[0]), FY(p1[1])); fc.lineTo(FX(p2[0]), FY(p2[1])); fc.stroke();
+  }
+  function farrow(p1, p2, headFracs) {
+    // headFracs: list of [frac, dir] with dir=+1 forward, -1 backward
+    fline(p1, p2, 2.4);
+    const x1 = FX(p1[0]), y1 = FY(p1[1]), x2 = FX(p2[0]), y2 = FY(p2[1]);
+    const ang = Math.atan2(y2 - y1, x2 - x1);
+    for (const [f, d] of headFracs) {
+      fhead(x1 + (x2 - x1) * f, y1 + (y2 - y1) * f, d > 0 ? ang : ang + Math.PI, 10, "#000");
+    }
+  }
+  function fsub(main, sub, x, y, size, bg) {
+    fc.font = "italic " + size + "px Helvetica, Arial, sans-serif";
+    const w1 = fc.measureText(main).width;
+    fc.font = size * 0.72 + "px Helvetica, Arial, sans-serif";
+    const w2 = fc.measureText(sub).width;
+    const tot = w1 + w2;
+    if (bg) { fc.fillStyle = "#fff"; fc.fillRect(x - tot / 2 - 2, y - size * 0.75, tot + 4, size * 1.05); }
+    fc.fillStyle = "#000"; fc.textAlign = "left"; fc.textBaseline = "alphabetic";
+    fc.font = "italic " + size + "px Helvetica, Arial, sans-serif";
+    fc.fillText(main, x - tot / 2, y);
+    fc.font = size * 0.72 + "px Helvetica, Arial, sans-serif";
+    fc.fillText(sub, x - tot / 2 + w1, y + size * 0.18);
+  }
+  // vertical members
+  for (const x of [5, 10, 15, 20, 25]) fline([x, 0], [x, 5], 2.8);
+  // loads
+  farrow([15, 8], [15, 5.5], [[1, 1]]);
+  farrow([25, 8], [25, 5.5], [[1, 1]]);
+  fsub("F", "D", FX(15), FY(8) - 8, 15);
+  fsub("F", "F", FX(25), FY(8) - 8, 15);
+  farrow([0, -3], [0, -0.5], [[1, 1]]);
+  farrow([30, -3], [30, -0.5], [[1, 1]]);
+  fsub("R", "A", FX(0), FY(-3) + 16, 15);
+  fsub("R", "G", FX(30), FY(-3) + 16, 15);
+  // compression members (heads at 10% backward, 90% forward -> outward)
+  const comp = [[[0, 0], [5, 5]], [[5, 5], [10, 5]], [[10, 5], [15, 5]], [[15, 5], [20, 5]],
+                [[20, 5], [25, 5]], [[25, 5], [30, 0]], [[10, 0], [15, 5]], [[15, 5], [20, 0]]];
+  for (const [p1, p2] of comp) farrow(p1, p2, [[0.1, -1], [0.9, 1]]);
+  // tension members (heads at 40% forward, 60% backward -> inward)
+  const tens = [[[0, 0], [5, 0]], [[5, 0], [10, 0]], [[10, 0], [15, 0]], [[15, 0], [20, 0]],
+                [[20, 0], [25, 0]], [[25, 0], [30, 0]], [[5, 5], [10, 0]], [[20, 0], [25, 5]]];
+  for (const [p1, p2] of tens) farrow(p1, p2, [[0.4, 1], [0.6, -1]]);
+  // member labels
+  const labels = [["0", 2.5, 2.5], ["2", 2.5, 0], ["3", 7.5, 0], ["4", 12.5, 0], ["5", 7.5, 5],
+                  ["7", 7.5, 2.5], ["8", 12.5, 5], ["10", 17.5, 2.5], ["11", 17.5, 0],
+                  ["12", 12.5, 2.5], ["13", 17.5, 5], ["15", 22.5, 5], ["16", 22.5, 2.5],
+                  ["17", 22.5, 0], ["19", 27.5, 2.5], ["20", 27.5, 0]];
+  for (const [n, x, y] of labels) fsub("F", n, FX(x), FY(y) + 5, 15, true);
+  // joint labels
+  const joints = [["A", 0, 0], ["B", 5, 5], ["C", 10, 5], ["D", 15, 5], ["E", 20, 5], ["F", 25, 5],
+                  ["G", 30, 0], ["H", 25, 0], ["I", 20, 0], ["J", 15, 0], ["K", 10, 0], ["L", 5, 0]];
+  for (const [n, x, y] of joints) {
+    const px = FX(x), py = FY(y);
+    fc.font = "14px Helvetica, Arial, sans-serif";
+    const tw = Math.max(fc.measureText(n).width, 9);
+    fc.fillStyle = "#fff"; fc.strokeStyle = "#000"; fc.lineWidth = 1;
+    fc.beginPath();
+    const rx = tw / 2 + 6, ry = 11;
+    fc.ellipse(px, py, rx, ry, 0, 0, 2 * Math.PI);
+    fc.fill(); fc.stroke();
+    fc.fillStyle = "#000"; fc.textAlign = "center"; fc.textBaseline = "middle";
+    fc.fillText(n, px, py + 1);
+  }
+}
+
+// ------------------------- controls wiring -------------------------
+function setterWire(id, key, after) {
+  const grp = document.getElementById(id);
+  grp.querySelectorAll("button").forEach(btn => {
+    btn.addEventListener("click", () => {
+      grp.querySelectorAll("button").forEach(b => b.classList.remove("selected"));
+      btn.classList.add("selected");
+      state[key] = parseInt(btn.dataset.val, 10);
+      if (after) after();
+      updateControlVisibility();
+      draw();
+    });
+  });
+}
+function updateControlVisibility() {
+  document.getElementById("optArea").style.display = state.steps === 1 ? "" : "none";
+  document.getElementById("cutsArea").style.display = state.steps === 2 ? "" : "none";
+  document.getElementById("zoomWrap").style.display = (state.steps === 2 && state.cuts < 7) ? "" : "none";
+  document.getElementById("momentWrap").style.display =
+    (state.steps === 2 && state.zoom && state.cuts >= 2 && state.cuts <= 5) ? "" : "none";
+}
+setterWire("stepsSetter", "steps");
+setterWire("optSetter", "opt");
+setterWire("cutsSetter", "cuts");
+document.getElementById("zoomCheck").addEventListener("change", e => {
+  state.zoom = e.target.checked;
+  updateControlVisibility();
+  draw();
+});
+document.getElementById("labelsCheck").addEventListener("change", e => {
+  state.labels = e.target.checked;
+  draw();
+});
+document.getElementById("momentCheck").addEventListener("change", e => {
+  state.moment = e.target.checked;
+  draw();
+});
+document.getElementById("wSlider").addEventListener("input", e => {
+  state.w = parseFloat(e.target.value);
+  document.getElementById("wVal").textContent = formatSlider(state.w);
+  draw();
+});
+document.getElementById("hSlider").addEventListener("input", e => {
+  state.h = parseFloat(e.target.value);
+  document.getElementById("hVal").textContent = formatSlider(state.h);
+  draw();
+});
+function formatSlider(v) {
+  return (Math.abs(v - Math.round(v)) < 1e-9) ? String(Math.round(v)) : v.toFixed(1);
+}
+// mouseover on the moment-balance equations (steps=1, opt=1)
+canvas.addEventListener("mousemove", e => {
+  const rect = canvas.getBoundingClientRect();
+  const mx = (e.clientX - rect.left) / KSCALE;
+  const my = (e.clientY - rect.top) / KSCALE;
+  let redraw = false;
+  // member number tooltip
+  const m = memberAt(mx, my);
+  if (m !== state.hoverMember || m !== null) {
+    state.hoverMember = m; state.mouseX = mx; state.mouseY = my; redraw = true;
+  }
+  canvas.style.cursor = m !== null ? "pointer" : "";
+  // moment-balance equations (steps=1, opt=1)
+  if (state.steps === 1 && state.opt === 1) {
+    const b = eqsHoverBox;
+    let over = false;
+    if (b) over = mx >= b.x - 6 && mx <= b.x2 + 6 && my >= b.y - 6 && my <= b.y2 + 6;
+    if (over !== state.hoverEqs) { state.hoverEqs = over; redraw = true; }
+  }
+  if (redraw) draw();
+});
+canvas.addEventListener("mouseleave", () => {
+  const was = state.hoverEqs || state.hoverMember !== null;
+  state.hoverEqs = false; state.hoverMember = null;
+  canvas.style.cursor = "";
+  if (was) draw();
+});
+
+// ------------------------- panels -------------------------
+const panels = { dirBtn: "dirPanel", detBtn: "detPanel", aboutBtn: "aboutPanel" };
+let mathTypeset = false;
+
+// align the Directions/Details/About button row with the left edge of the member width slider
+function alignPanelButtons() {
+  const row = document.getElementById("panelButtons");
+  const wrap = document.getElementById("wSliderWrap");
+  const cont = document.getElementById("controlsArea");
+  const off = wrap.getBoundingClientRect().left - cont.getBoundingClientRect().left;
+  row.style.paddingLeft = Math.max(0, off) + "px";
+}
+
+// place a panel: Directions opens just to the right of its button; About and
+// Details open under the button row (About 25% wider, Details 50% wider)
+function positionPanel(btn, p) {
+  const cont = document.getElementById("appContainer");
+  const cRect = cont.getBoundingClientRect();
+  const bRect = btn.getBoundingClientRect();
+  if (p.id === "aboutPanel" || p.id === "detPanel") {
+    const row = document.getElementById("panelButtons");
+    const rRect = row.getBoundingClientRect();
+    const firstBtn = document.getElementById("dirBtn").getBoundingClientRect();
+    const width = Math.min(p.id === "aboutPanel" ? 534 : 726, cRect.width - 8);
+    let left = firstBtn.left - cRect.left;
+    if (left + width > cRect.width - 4) left = Math.max(4, cRect.width - width - 4);
+    p.style.left = left + "px";
+    p.style.top = (rRect.bottom - cRect.top + 4) + "px";
+    p.style.width = width + "px";
+  } else {
+    const left = bRect.right - cRect.left + 8;
+    const top = bRect.bottom - cRect.top + 4;
+    p.style.left = left + "px";
+    p.style.top = top + "px";
+    p.style.width = Math.max(300, cRect.width - left - 6) + "px";
+  }
+}
+
+for (const [btnId, panelId] of Object.entries(panels)) {
+  // add an x close button in the upper right corner of each panel
+  const panelEl = document.getElementById(panelId);
+  const closeBtn = document.createElement("button");
+  closeBtn.className = "panelClose";
+  closeBtn.innerHTML = "&#215;";
+  closeBtn.setAttribute("aria-label", "Close");
+  closeBtn.addEventListener("click", () => { panelEl.style.display = "none"; });
+  if (panelId === "detPanel") {
+    // scroll the content inside an inner wrapper so the x stays fixed at the top
+    const scroller = document.createElement("div");
+    scroller.className = "panelScroll";
+    while (panelEl.firstChild) scroller.appendChild(panelEl.firstChild);
+    panelEl.appendChild(scroller);
+  }
+  panelEl.insertBefore(closeBtn, panelEl.firstChild);
+
+  document.getElementById(btnId).addEventListener("click", (e) => {
+    const btn = e.currentTarget;
+    const p = document.getElementById(panelId);
+    const opening = p.style.display !== "block";
+    // close all
+    for (const pid of Object.values(panels)) document.getElementById(pid).style.display = "none";
+    if (opening) {
+      positionPanel(btn, p);
+      p.style.display = "block";
+      if (panelId === "detPanel") {
+        drawFigure1();
+        if (window.MathJax && MathJax.typesetPromise) {
+          MathJax.typesetPromise([p]).catch(() => {});
+        }
+      }
+    }
+  });
+}
+window.addEventListener("resize", alignPanelButtons);
+alignPanelButtons();
+
+// ------------------------- init -------------------------
+updateControlVisibility();
+draw();
+</script>
+</body>
+</html>

@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Electrophoretic Mobility</title>
+<script>
+  window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']] } };
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+<style>
+  :root{
+    --bg:#fafafa;
+    --panel-bg:#ffffff;
+    --text:#20201f;
+    --text-dim:#65625d;
+    --border:#e0ddd7;
+    --accent:#98000d;
+    --accent-dark:#780009;
+    --accent-soft:#98000d1a;
+    --canvas-bg:#eef1f0;
+    --grid-line:#d3d8d6;
+    --particleA:#98000d;
+    --particleB:#1c5d78;
+    --readout-bg:#f4f1ec;
+    --track-bg:#e3e0da;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#161513;
+      --panel-bg:#211f1c;
+      --text:#f1efe9;
+      --text-dim:#b3aea5;
+      --border:#3a362f;
+      --accent:#d8404c;
+      --accent-dark:#e8707a;
+      --accent-soft:#d8404c26;
+      --canvas-bg:#1c1b18;
+      --grid-line:#37342d;
+      --particleA:#e8707a;
+      --particleB:#5fb3d9;
+      --readout-bg:#26241f;
+      --track-bg:#2f2c26;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#161513;
+    --panel-bg:#211f1c;
+    --text:#f1efe9;
+    --text-dim:#b3aea5;
+    --border:#3a362f;
+    --accent:#d8404c;
+    --accent-dark:#e8707a;
+    --accent-soft:#d8404c26;
+    --canvas-bg:#1c1b18;
+    --grid-line:#37342d;
+    --particleA:#e8707a;
+    --particleB:#5fb3d9;
+    --readout-bg:#26241f;
+    --track-bg:#2f2c26;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:Helvetica, Arial, sans-serif;
+    padding:20px 16px 28px;
+    max-width:1180px;
+    margin:0 auto;
+  }
+  h1{
+    font-size:22px;
+    font-weight:700;
+    margin:0;
+    letter-spacing:0.2px;
+  }
+  .subtitle{
+    font-size:17px;
+    color:var(--text-dim);
+    margin-top:3px;
+  }
+  header{
+    margin-bottom:14px;
+  }
+  .controls-col{
+    display:flex;
+    flex-direction:column;
+  }
+  .header-right{
+    position:relative;
+    margin-bottom:8px;
+  }
+  .btn-row{
+    display:flex;
+    gap:8px;
+    flex-shrink:0;
+    justify-content:flex-end;
+  }
+  button.top-btn{
+    background:var(--accent);
+    color:#fff;
+    border:none;
+    border-radius:5px;
+    padding:7px 14px;
+    font-family:Helvetica, Arial, sans-serif;
+    font-size:15px;
+    font-weight:400;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  button.top-btn:hover{ background:var(--accent-dark); }
+
+  .panel{
+    position:absolute;
+    top:calc(100% + 8px);
+    right:0;
+    width:min(440px, 92vw);
+    max-height:min(70vh, 560px);
+    overflow-y:auto;
+    background:var(--panel-bg);
+    border:1px solid var(--border);
+    border-radius:8px;
+    box-shadow:0 8px 28px rgba(0,0,0,0.18);
+    padding:16px 18px 18px;
+    z-index:50;
+    font-size:13.5px;
+    line-height:1.55;
+  }
+  #panelDirections{ width:min(572px, 92vw); }
+  #panelDetails{ width:min(686px, 92vw); }
+  #panelAbout{ width:min(528px, 92vw); }
+  .panel[hidden]{ display:none; }
+  .panel h3{
+    margin:0 0 8px;
+    font-size:15px;
+    color:var(--accent);
+  }
+  .panel-close{
+    position:sticky;
+    top:-16px;
+    float:right;
+    background:none;
+    border:none;
+    color:var(--text-dim);
+    font-size:20px;
+    line-height:1;
+    cursor:pointer;
+    margin-left:8px;
+  }
+  .panel-close:hover{ color:var(--accent); }
+  .panel p{ margin:0 0 10px; }
+  .panel .eq{ margin:4px 0; text-align:left; overflow-x:auto; }
+  .panel .eq mjx-container{ margin:0 !important; text-align:left !important; }
+  .panel a{ color:var(--accent); }
+  .panel .limits{ margin:8px 0 12px 18px; }
+  .panel .limits li{ margin-bottom:6px; }
+  .panel h4{ margin:14px 0 6px; font-size:14px; color:#000; }
+  .panel .symbols{ border-collapse:collapse; }
+  .panel .symbols td{ padding:2px 0; vertical-align:top; }
+  .panel .symbols td:first-child{ padding-right:14px; white-space:nowrap; }
+
+  main{
+    display:grid;
+    grid-template-columns:706px auto;
+    width:fit-content;
+    gap:18px;
+  }
+  @media (max-width:860px){
+    main{ grid-template-columns:1fr; }
+  }
+
+  .card{
+    background:var(--panel-bg);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:14px 16px 16px;
+  }
+  .card h2{
+    font-size:17px;
+    text-transform:none;
+    letter-spacing:normal;
+    color:var(--text-dim);
+    margin:0 0 10px;
+    font-weight:700;
+  }
+
+  .stack{ display:flex; flex-direction:column; gap:16px; }
+
+  canvas{ display:block; width:100%; height:auto; border-radius:6px; }
+  #channelCanvas{ background:var(--canvas-bg); }
+  #fkaCanvas{ background:var(--canvas-bg); }
+
+  .anim-note{
+    font-size:16px;
+    color:var(--text-dim);
+    margin-top:6px;
+    font-style:italic;
+  }
+
+  .readouts{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+    margin-top:12px;
+  }
+  .ro.full{ grid-column:1 / -1; }
+  .ro{
+    background:var(--readout-bg);
+    border-radius:6px;
+    padding:8px 10px;
+    font-size:17px;
+  }
+  .ro .lbl{ color:var(--text-dim); display:block; margin-bottom:2px; }
+  .ro .val{ font-weight:400; font-variant-numeric:tabular-nums; }
+  .ro.a .val{ color:var(--particleA); }
+  .ro.b .val{ color:var(--particleB); }
+
+  .ctrl-group{ margin-bottom:16px; }
+  .ctrl-group:last-child{ margin-bottom:0; }
+  .card h2.controls-title{ color:#000; }
+  .ctrl-group-title.keep-case{ text-transform:none; }
+  .ctrl-group-title{
+    font-size:17px;
+    font-weight:700;
+    text-transform:lowercase;
+    margin-bottom:8px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .swatch{
+    width:10px; height:10px; border-radius:50%; display:inline-block;
+  }
+  .legend-row .swatch{ width:12px; height:12px; }
+  .swatch.a{ background:var(--particleA); }
+  .swatch.b{ background:var(--particleB); }
+
+  .ctrl-group .slider-row{ margin-left:24px; margin-bottom:10px; }
+  .ctrl-group .slider-row:last-child{ margin-bottom:0; }
+  .slider-label{
+    display:flex;
+    justify-content:flex-start;
+    align-items:baseline;
+    gap:10px;
+    font-size:17px;
+    margin-bottom:2px;
+  }
+  .slider-label .name{ color:var(--text); text-transform:lowercase; }
+  .slider-label .name sub{ text-transform:none; }
+  .slider-label .value{ color:#000; font-weight:400; font-variant-numeric:tabular-nums; }
+  input[type="range"]{
+    --accent:#98000D;
+    --grey:#999;
+    --fill:50%;
+    -webkit-appearance:none;
+    appearance:none;
+    width:260px;
+    max-width:100%;
+    height:5px;
+    border-radius:3px;
+    outline:none;
+    opacity:.95;
+    margin-bottom:.5rem;
+    -webkit-transition:.2s;
+    transition:opacity .2s;
+    background:var(--grey);
+  }
+  input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    appearance:none;
+    width:15px;
+    height:15px;
+    border:2px solid #fff;
+    border-radius:50%;
+    background:var(--accent);
+    cursor:pointer;
+    box-shadow:0 1px 2px rgba(0,0,0,.35);
+  }
+  input[type="range"]::-moz-range-thumb{
+    width:15px;
+    height:15px;
+    border:2px solid #fff;
+    border-radius:50%;
+    background:var(--accent);
+    cursor:pointer;
+    box-shadow:0 1px 2px rgba(0,0,0,.35);
+  }
+
+  .card-header-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-bottom:10px;
+  }
+  .card-header-row h2{ margin:0; }
+  .card-header-row .legend-row{ margin-top:0; }
+
+  .legend-row{
+    display:flex;
+    gap:16px;
+    font-size:15px;
+    color:var(--text-dim);
+    margin-top:8px;
+    flex-wrap:wrap;
+  }
+  .legend-item{ display:flex; align-items:center; gap:5px; }
+
+  footer{
+    margin-top:18px;
+    font-size:11.5px;
+    color:var(--text-dim);
+    text-align:center;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Electrophoretic Mobility</h1>
+    <div class="subtitle">Migration of charged spheres in a uniform electric field</div>
+  </div>
+</header>
+
+<main>
+  <div class="stack">
+    <div class="card">
+      <div class="card-header-row">
+        <h2>migration channel</h2>
+        <div class="legend-row">
+          <span class="legend-item"><span class="swatch a"></span>Particle A</span>
+          <span class="legend-item"><span class="swatch b"></span>Particle B</span>
+        </div>
+      </div>
+      <canvas id="channelCanvas" width="680" height="210"></canvas>
+      <div class="anim-note">Animation speed is exaggerated for visibility &mdash; see real computed values below.</div>
+      <div class="readouts" id="channelReadouts"></div>
+    </div>
+
+    <div class="card">
+      <h2>Henry's function f(&kappa;a)</h2>
+      <canvas id="fkaCanvas" width="680" height="230"></canvas>
+      <div class="readouts" id="fkaReadouts"></div>
+    </div>
+  </div>
+
+  <div class="controls-col">
+    <div class="header-right">
+      <div class="btn-row">
+        <button class="top-btn" id="btnDirections">Directions</button>
+        <button class="top-btn" id="btnDetails">Details</button>
+        <button class="top-btn" id="btnAbout">About</button>
+      </div>
+
+      <div class="panel" id="panelDirections" hidden>
+        <button class="panel-close" data-close>&times;</button>
+        <h3>Directions</h3>
+        <p>Two charged spheres (A and B) sit in an electrolyte solution between two electrodes. Each migrates toward the electrode of opposite sign, at a speed set by its size, its surface (zeta) potential, the field strength, and how compressed its surrounding ion cloud is.</p>
+        <p>Use the sliders to change the electric field, the ionic strength of the solution, and each particle's radius and zeta potential. Watch:</p>
+        <ul class="limits">
+          <li>Which electrode each particle heads toward &mdash; set by the <em>sign</em> of its zeta potential.</li>
+          <li>How its speed changes with field strength, size, and zeta potential.</li>
+          <li>Where each particle's <span style="white-space:nowrap">&kappa;a</span> falls on the f(&kappa;a) curve at right &mdash; near &kappa;a &rarr; 0 it behaves by the H&uuml;ckel limit; at large &kappa;a it approaches the Smoluchowski limit.</li>
+        </ul>
+        <p>The channel animation is sped up for clarity; the real, computed velocity and crossing time for a 1&nbsp;cm gap are reported below the animation.</p>
+      </div>
+
+      <div class="panel" id="panelDetails" hidden>
+        <button class="panel-close" data-close>&times;</button>
+        <h3>Details</h3>
+        <p>A charged particle in an electric field <em>E</em> moves at a terminal velocity <em>v</em> = &mu;<em>E</em>, where &mu; is the electrophoretic mobility. For a sphere of radius <em>a</em> with zeta potential &zeta;, immersed in an electrolyte of permittivity &epsilon; and viscosity &eta;, Henry's equation gives:</p>
+        <div class="eq">$$\mu = \dfrac{2\,\varepsilon\,\zeta}{3\,\eta}\,f(\kappa a)$$</div>
+        <p>where &kappa; is the inverse Debye length, so &kappa;<sup>&minus;1</sup> is the Debye length &mdash; the thickness of the diffuse ion cloud around the particle &mdash; and the dimensionless group &kappa;a compares the particle's radius <em>a</em> to that ion-cloud thickness. f(&kappa;a) is Henry's function, which interpolates between two limits:</p>
+        <ul class="limits">
+          <li><strong>H&uuml;ckel limit</strong> (&kappa;a &laquo; 1, thick double layer &mdash; small particles or dilute solution): f &rarr; 1, so $\mu = \tfrac{2}{3}\varepsilon\zeta/\eta$.</li>
+          <li><strong>Smoluchowski limit</strong> (&kappa;a &raquo; 1, thin double layer &mdash; large particles or concentrated solution): f &rarr; 1.5, so $\mu = \varepsilon\zeta/\eta$.</li>
+        </ul>
+        <p>This simulation uses Ohshima's closed-form approximation to Henry's function:</p>
+        <div class="eq">$$f(\kappa a) = 1 + \dfrac{1}{2\left[\,1 + \dfrac{2.5}{\kappa a\left(1+2e^{-\kappa a}\right)}\,\right]^{3}}$$</div>
+        <p>The Debye length is computed from the ionic strength <em>I</em> (mol/L) of a 1:1 electrolyte in water at 25&deg;C:</p>
+        <div class="eq">$$\kappa^{-1}\ (\text{nm}) = \dfrac{0.304}{\sqrt{I}}$$</div>
+        <p>Fixed properties used: water at 25&deg;C, &epsilon; = &epsilon;<sub>r</sub>&epsilon;<sub>0</sub> = 78.5 &times; 8.854&times;10<sup>&minus;12</sup>&nbsp;F/m, &eta; = 8.9&times;10<sup>&minus;4</sup>&nbsp;Pa&middot;s.</p>
+        <p>Direction: the force on the particle is <strong>F</strong> = q<strong>E</strong>, so a particle with negative &zeta; migrates toward the anode (+) and one with positive &zeta; migrates toward the cathode (&minus;) &mdash; the same convention that carries DNA and most proteins toward the positive electrode in gel electrophoresis.</p>
+        <h4>Symbols</h4>
+        <table class="symbols">
+          <tr><td>\(a\)</td><td>particle radius (nm)</td></tr>
+          <tr><td>\(E\)</td><td>electric field strength (V/cm)</td></tr>
+          <tr><td>\(\mathbf{F}\)</td><td>electrostatic force on the particle (N)</td></tr>
+          <tr><td>\(f(\kappa a)\)</td><td>Henry's function (dimensionless)</td></tr>
+          <tr><td>\(I\)</td><td>ionic strength of the solution (mol/L)</td></tr>
+          <tr><td>\(q\)</td><td>particle charge (C)</td></tr>
+          <tr><td>\(v\)</td><td>terminal migration velocity of the particle (&micro;m/s)</td></tr>
+          <tr><td>\(\varepsilon\)</td><td>permittivity of the solution (F/m)</td></tr>
+          <tr><td>\(\varepsilon_0\)</td><td>permittivity of free space (F/m)</td></tr>
+          <tr><td>\(\varepsilon_r\)</td><td>relative permittivity (dielectric constant) of water (dimensionless)</td></tr>
+          <tr><td>\(\zeta\)</td><td>zeta potential of the particle surface (mV)</td></tr>
+          <tr><td>\(\eta\)</td><td>viscosity of the solution (Pa&middot;s)</td></tr>
+          <tr><td>\(\kappa\)</td><td>inverse Debye length (nm<sup>&minus;1</sup>)</td></tr>
+          <tr><td>\(\kappa^{-1}\)</td><td>Debye length, thickness of the diffuse ion cloud (nm)</td></tr>
+          <tr><td>\(\kappa a\)</td><td>ratio of particle radius to Debye length (dimensionless)</td></tr>
+          <tr><td>\(\mu\)</td><td>electrophoretic mobility (&micro;m&middot;cm/(V&middot;s))</td></tr>
+        </table>
+      </div>
+
+      <div class="panel" id="panelAbout" hidden>
+        <button class="panel-close" data-close>&times;</button>
+        <h3>About</h3>
+        <p>This simulation was created in the <a href="https://www.colorado.edu/chbe/" target="_blank" rel="noopener">Department of Chemical and Biological Engineering at University of Colorado Boulder</a> for <a href="https://learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.</p>
+      </div>
+    </div>
+
+  <div class="card controls-card">
+    <h2 class="controls-title">Controls</h2>
+
+    <div class="ctrl-group">
+      <div class="ctrl-group-title">Solution &amp; Field</div>
+      <div class="slider-row">
+        <div class="slider-label"><span class="name">Electric field, E</span><span class="value" id="valE">100 V/cm</span></div>
+        <input type="range" id="sldE" min="10" max="300" step="1" value="100">
+      </div>
+      <div class="slider-row">
+        <div class="slider-label"><span class="name">Ionic strength, I</span><span class="value" id="valI">10.0 mM</span></div>
+        <input type="range" id="sldI" min="-10" max="230" step="1" value="135">
+      </div>
+    </div>
+
+    <div class="ctrl-group">
+      <div class="ctrl-group-title keep-case"><span class="swatch a"></span>particle A</div>
+      <div class="slider-row">
+        <div class="slider-label"><span class="name">Radius, a<sub>A</sub></span><span class="value" id="valAa">50 nm</span></div>
+        <input type="range" id="sldAa" min="5" max="1000" step="1" value="50">
+      </div>
+      <div class="slider-row">
+        <div class="slider-label"><span class="name">Zeta potential, &zeta;<sub>A</sub></span><span class="value" id="valAz">&minus;40 mV</span></div>
+        <input type="range" id="sldAz" min="-100" max="100" step="1" value="-40">
+      </div>
+    </div>
+
+    <div class="ctrl-group">
+      <div class="ctrl-group-title keep-case"><span class="swatch b"></span>particle B</div>
+      <div class="slider-row">
+        <div class="slider-label"><span class="name">Radius, a<sub>B</sub></span><span class="value" id="valBa">300 nm</span></div>
+        <input type="range" id="sldBa" min="5" max="1000" step="1" value="300">
+      </div>
+      <div class="slider-row">
+        <div class="slider-label"><span class="name">Zeta potential, &zeta;<sub>B</sub></span><span class="value" id="valBz">&minus;15 mV</span></div>
+        <input type="range" id="sldBz" min="-100" max="100" step="1" value="-15">
+      </div>
+    </div>
+  </div>
+  </div>
+</main>
+
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- physics ----------
+  const EPS0 = 8.854e-12, EPSR = 78.5, EPS = EPSR*EPS0; // F/m
+  const ETA = 8.9e-4; // Pa s
+
+  function ohshimaF(ka){
+    if(ka <= 0) return 1;
+    const inner = 1 + 2.5/(ka*(1+2*Math.exp(-ka)));
+    return 1 + 1/(2*Math.pow(inner,3));
+  }
+  function debyeInvNM(I_mM){
+    const I_M = Math.max(I_mM,1e-4)/1000;
+    return 0.304/Math.sqrt(I_M);
+  }
+  function mobility(a_nm, zeta_mV, kInvNM){
+    const ka = a_nm/kInvNM;
+    const f = ohshimaF(ka);
+    const zetaV = zeta_mV/1000;
+    const mu = (2/3)*EPS*zetaV/ETA*f; // m^2/(V s)
+    return {ka, f, mu};
+  }
+  function fmt(x, d){ return Number(x).toFixed(d); }
+  // 3 significant figures, without switching to exponential notation
+  function sig3(x){
+    const v = Number(x);
+    if(!isFinite(v) || v===0) return "0.00";
+    const neg = v<0;
+    const av = Math.abs(v);
+    const digitsBeforeDecimal = Math.floor(Math.log10(av))+1;
+    let out;
+    if(digitsBeforeDecimal>=3){
+      const magnitude = Math.pow(10, digitsBeforeDecimal-3);
+      out = (Math.round(av/magnitude)*magnitude).toString();
+    } else {
+      const decimals = Math.max(3-digitsBeforeDecimal, 0);
+      out = av.toFixed(decimals);
+    }
+    return (neg?"-":"")+out;
+  }
+  function fmtTime(s){
+    const as = Math.abs(s);
+    if(as < 60) return sig3(s)+" s";
+    if(as < 3600) return sig3(s/60)+" min";
+    if(as < 86400) return sig3(s/3600)+" hr";
+    return sig3(s/86400)+" days";
+  }
+
+  // ---------- state / elements ----------
+  const sldE = document.getElementById('sldE');
+  const sldI = document.getElementById('sldI');
+  const sldAa = document.getElementById('sldAa');
+  const sldAz = document.getElementById('sldAz');
+  const sldBa = document.getElementById('sldBa');
+  const sldBz = document.getElementById('sldBz');
+
+  const valE = document.getElementById('valE');
+  const valI = document.getElementById('valI');
+  const valAa = document.getElementById('valAa');
+  const valAz = document.getElementById('valAz');
+  const valBa = document.getElementById('valBa');
+  const valBz = document.getElementById('valBz');
+
+  const channelReadouts = document.getElementById('channelReadouts');
+  const fkaReadouts = document.getElementById('fkaReadouts');
+
+  // ionic strength slider mapped log-scale: slider -10..230 -> I from 0.1 to 200 mM
+  function sliderToI(s){
+    const t = (Number(s)+10)/240; // 0..1
+    const logMin = Math.log10(0.1), logMax = Math.log10(200);
+    return Math.pow(10, logMin + t*(logMax-logMin));
+  }
+
+  let model = {};
+
+  function recompute(){
+    const E_Vcm = Number(sldE.value);
+    const I_mM = sliderToI(sldI.value);
+    const aA = Number(sldAa.value), zA = Number(sldAz.value);
+    const aB = Number(sldBa.value), zB = Number(sldBz.value);
+
+    const kInv = debyeInvNM(I_mM);
+    const mA = mobility(aA, zA, kInv);
+    const mB = mobility(aB, zB, kInv);
+
+    const E_Vm = E_Vcm*100;
+    const vA_ms = mA.mu*E_Vm, vB_ms = mB.mu*E_Vm; // m/s, signed
+    const vA_ums = vA_ms*1e6, vB_ums = vB_ms*1e6;
+    const muA_disp = mA.mu*1e8, muB_disp = mB.mu*1e8; // um*cm/(V s)
+
+    const tA_s = (1e4)/Math.max(Math.abs(vA_ums),1e-9); // time to cross 1 cm
+    const tB_s = (1e4)/Math.max(Math.abs(vB_ums),1e-9);
+
+    model = {
+      E_Vcm, I_mM, aA, zA, aB, zB, kInv,
+      kaA: mA.ka, fA: mA.f, muA_disp,
+      kaB: mB.ka, fB: mB.f, muB_disp,
+      vA_ums, vB_ums, tA_s, tB_s
+    };
+    updateLabels();
+    updateReadouts();
+  }
+
+  function updateLabels(){
+    valE.textContent = model.E_Vcm + " V/cm";
+    valI.textContent = (model.I_mM<1? fmt(model.I_mM,2) : fmt(model.I_mM,1)) + " mM";
+    valAa.textContent = model.aA + " nm";
+    valAz.textContent = (model.zA>0?"+":"−") + Math.abs(model.zA) + " mV";
+    valBa.textContent = model.aB + " nm";
+    valBz.textContent = (model.zB>0?"+":"−") + Math.abs(model.zB) + " mV";
+  }
+
+  function updateReadouts(){
+    channelReadouts.innerHTML =
+      `<div class="ro a"><span class="lbl">velocity of A, v<sub>A</sub> (toward ${model.vA_ums<0?'anode +':'cathode −'})</span><span class="val">${sig3(Math.abs(model.vA_ums))} µm/s</span></div>`+
+      `<div class="ro b"><span class="lbl">velocity of B, v<sub>B</sub> (toward ${model.vB_ums<0?'anode +':'cathode −'})</span><span class="val">${sig3(Math.abs(model.vB_ums))} µm/s</span></div>`+
+      `<div class="ro a"><span class="lbl">electrophoretic mobility of A, μ<sub>A</sub></span><span class="val">${sig3(model.muA_disp)} µm·cm/(V·s)</span></div>`+
+      `<div class="ro b"><span class="lbl">electrophoretic mobility of B, μ<sub>B</sub></span><span class="val">${sig3(model.muB_disp)} µm·cm/(V·s)</span></div>`+
+      `<div class="ro a"><span class="lbl">time to cross 1 cm</span><span class="val">${fmtTime(model.tA_s)}</span></div>`+
+      `<div class="ro b"><span class="lbl">time to cross 1 cm</span><span class="val">${fmtTime(model.tB_s)}</span></div>`;
+
+    fkaReadouts.innerHTML =
+      `<div class="ro full"><span class="lbl">Debye length, &kappa;<sup>&minus;1</sup></span><span class="val">${sig3(model.kInv)} nm</span></div>`+
+      `<div class="ro a"><span class="lbl">radius/Debye length of A, &kappa;a<sub>A</sub></span><span class="val">${sig3(model.kaA)}</span></div>`+
+      `<div class="ro b"><span class="lbl">radius/Debye length of B, &kappa;a<sub>B</sub></span><span class="val">${sig3(model.kaB)}</span></div>`+
+      `<div class="ro a"><span class="lbl">Henry's function of A, f(&kappa;a<sub>A</sub>)</span><span class="val">${sig3(model.fA)}</span></div>`+
+      `<div class="ro b"><span class="lbl">Henry's function of B, f(&kappa;a<sub>B</sub>)</span><span class="val">${sig3(model.fB)}</span></div>`;
+  }
+
+  [sldE,sldI,sldAa,sldAz,sldBa,sldBz].forEach(el=>el.addEventListener('input', recompute));
+
+  // ---------- hi-DPI canvas helper ----------
+  function setupCanvas(canvas){
+    const cssW = canvas.width, cssH = canvas.height;
+    const dpr = window.devicePixelRatio || 1;
+    canvas.style.width = cssW+"px";
+    canvas.style.height = cssH+"px";
+    canvas.width = cssW*dpr;
+    canvas.height = cssH*dpr;
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr,dpr);
+    return {ctx, w:cssW, h:cssH};
+  }
+
+  const channelCanvas = document.getElementById('channelCanvas');
+  const fkaCanvas = document.getElementById('fkaCanvas');
+  const ch = setupCanvas(channelCanvas);
+  const fk = setupCanvas(fkaCanvas);
+
+  function getVar(name){
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  }
+
+  // ---------- channel animation ----------
+  const plateMargin = 46;
+  let posA = 0.5, posB = 0.5; // fraction along channel, 0=anode(left) .. 1=cathode(right)
+  let lastT = null;
+
+  function particlePxRadius(a_nm){
+    const r = 5 + 11*Math.log10(a_nm/5 + 1);
+    return Math.min(Math.max(r,5),22);
+  }
+
+  function drawChannel(dt){
+    const {ctx,w,h} = ch;
+    ctx.clearRect(0,0,w,h);
+
+    const left = plateMargin, right = w-plateMargin;
+    const fieldY0 = 14, fieldY1 = h-14;
+
+    // field arrows
+    ctx.strokeStyle = getVar('--grid-line');
+    ctx.fillStyle = getVar('--grid-line');
+    ctx.lineWidth = 1;
+    const rows = 5;
+    for(let i=0;i<rows;i++){
+      const y = fieldY0 + (fieldY1-fieldY0)*(i+0.5)/rows;
+      for(let x=left+18; x<right-10; x+=54){
+        ctx.beginPath();
+        ctx.moveTo(x,y);
+        ctx.lineTo(x+30,y);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x+30,y);
+        ctx.lineTo(x+24,y-4);
+        ctx.lineTo(x+24,y+4);
+        ctx.closePath();
+        ctx.fill();
+      }
+    }
+
+    // electrodes
+    ctx.fillStyle = "#000000";
+    ctx.fillRect(left-10,6,8,h-32);
+    ctx.fillRect(right+2,6,8,h-32);
+
+    ctx.font = "17px Helvetica, Arial, sans-serif";
+    ctx.fillStyle = "#000000";
+    ctx.textAlign = "left";
+    ctx.fillText("anode (+)", 4, h-2);
+    ctx.textAlign = "right";
+    ctx.fillText("cathode (−)", w-4, h-2);
+
+    // particle lanes
+    const laneA = h*0.34, laneB = h*0.66;
+
+    // advance positions based on model velocities, normalized so faster particle
+    // crosses the visible channel in ~4.5s
+    if(dt>0){
+      const vA = model.vA_ums, vB = model.vB_ums;
+      const maxAbs = Math.max(Math.abs(vA),Math.abs(vB),1e-9);
+      const targetSeconds = 4.5;
+      const dposA = (vA/maxAbs)/targetSeconds*dt;
+      const dposB = (vB/maxAbs)/targetSeconds*dt;
+      posA += dposA;
+      posB += dposB;
+      if(posA<0||posA>1) posA = 0.5;
+      if(posB<0||posB>1) posB = 0.5;
+    }
+
+    function drawParticle(pos, lane, radius_nm, color, label){
+      const x = left + pos*(right-left);
+      const r = particlePxRadius(radius_nm);
+      ctx.beginPath();
+      ctx.arc(x, lane, r, 0, Math.PI*2);
+      ctx.fillStyle = color;
+      ctx.globalAlpha = 0.92;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+      ctx.font = "bold 11px Helvetica, Arial, sans-serif";
+      ctx.fillStyle = "#fff";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(label, x, lane+0.5);
+      ctx.textBaseline = "alphabetic";
+    }
+
+    drawParticle(posA, laneA, model.aA, getVar('--particleA'), model.zA<0?'−':'+');
+    drawParticle(posB, laneB, model.aB, getVar('--particleB'), model.zB<0?'−':'+');
+  }
+
+  function channelLoop(t){
+    if(lastT===null) lastT = t;
+    const dt = Math.min((t-lastT)/1000, 0.05);
+    lastT = t;
+    drawChannel(dt);
+    requestAnimationFrame(channelLoop);
+  }
+
+  // ---------- f(ka) plot ----------
+  function drawFka(){
+    const {ctx,w,h} = fk;
+    ctx.clearRect(0,0,w,h);
+
+    const padL = 60, padR = 18, padT = 16, padB = 40;
+    const plotW = w-padL-padR, plotH = h-padT-padB;
+    const kaMin = 0.1, kaMax = 100;
+    const fMin = 0.95, fMax = 1.6;
+
+    function xForKa(ka){ return padL + (Math.log10(ka)-Math.log10(kaMin))/(Math.log10(kaMax)-Math.log10(kaMin))*plotW; }
+    function yForF(f){ return padT + (1-(f-fMin)/(fMax-fMin))*plotH; }
+
+    // axes / grid
+    ctx.strokeStyle = getVar('--grid-line');
+    ctx.fillStyle = getVar('--text-dim');
+    ctx.font = "17px Helvetica, Arial, sans-serif";
+    ctx.lineWidth = 1;
+
+    const kaTicks = [0.1,1,10,100];
+    ctx.textAlign = "center";
+    kaTicks.forEach(ka=>{
+      const x = xForKa(ka);
+      ctx.beginPath();
+      ctx.moveTo(x,padT);
+      ctx.lineTo(x,padT+plotH);
+      ctx.stroke();
+      ctx.fillText(ka<1?ka.toString():ka.toFixed(0), x, h-padB+16);
+    });
+    ctx.save();
+    ctx.textAlign = "center";
+    ctx.fillText("κa", padL+plotW/2, h-4);
+    ctx.restore();
+
+    const fTicks = [1.0,1.1,1.2,1.3,1.4,1.5];
+    ctx.textAlign = "right";
+    fTicks.forEach(fv=>{
+      if(fv<fMin||fv>fMax) return;
+      const y = yForF(fv);
+      ctx.beginPath();
+      ctx.moveTo(padL,y);
+      ctx.lineTo(padL+plotW,y);
+      ctx.stroke();
+      ctx.fillText(fv.toFixed(1), padL-6, y+3);
+    });
+    ctx.save();
+    ctx.translate(18, padT+plotH/2);
+    ctx.rotate(-Math.PI/2);
+    ctx.textAlign = "center";
+    ctx.fillText("f(κa)", 0, 0);
+    ctx.restore();
+
+    // limit lines
+    ctx.setLineDash([4,3]);
+    ctx.strokeStyle = getVar('--text-dim');
+    [1.0,1.5].forEach(fv=>{
+      const y = yForF(fv);
+      ctx.beginPath();
+      ctx.moveTo(padL,y);
+      ctx.lineTo(padL+plotW,y);
+      ctx.stroke();
+    });
+    ctx.setLineDash([]);
+    ctx.textAlign = "left";
+    ctx.fillText("Hückel (f→1)", padL+4, yForF(1.0)-4);
+    ctx.fillText("Smoluchowski (f→1.5)", padL+4, yForF(1.5)-4);
+
+    // curve
+    ctx.strokeStyle = getVar('--accent');
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    const N = 120;
+    for(let i=0;i<=N;i++){
+      const logKa = Math.log10(kaMin) + (Math.log10(kaMax)-Math.log10(kaMin))*i/N;
+      const ka = Math.pow(10, logKa);
+      const f = ohshimaF(ka);
+      const x = xForKa(ka), y = yForF(f);
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+
+    // markers
+    function marker(ka,f,color){
+      const x = xForKa(Math.min(Math.max(ka,kaMin),kaMax));
+      const y = yForF(f);
+      ctx.beginPath();
+      ctx.moveTo(x,padT+plotH);
+      ctx.lineTo(x,y);
+      ctx.strokeStyle = color;
+      ctx.globalAlpha = 0.5;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+      ctx.beginPath();
+      ctx.arc(x,y,5,0,Math.PI*2);
+      ctx.fillStyle = color;
+      ctx.fill();
+      ctx.strokeStyle = getVar('--panel-bg');
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+    if(model.kaA!==undefined){
+      marker(model.kaA, model.fA, getVar('--particleA'));
+      marker(model.kaB, model.fB, getVar('--particleB'));
+    }
+  }
+
+  function fkaLoop(){
+    drawFka();
+    requestAnimationFrame(fkaLoop);
+  }
+
+  // ---------- panels ----------
+  const panels = {
+    btnDirections: document.getElementById('panelDirections'),
+    btnDetails: document.getElementById('panelDetails'),
+    btnAbout: document.getElementById('panelAbout')
+  };
+  Object.keys(panels).forEach(btnId=>{
+    document.getElementById(btnId).addEventListener('click', ()=>{
+      const target = panels[btnId];
+      const isOpen = !target.hidden;
+      Object.values(panels).forEach(p=>p.hidden = true);
+      target.hidden = isOpen;
+    });
+  });
+  document.querySelectorAll('.panel [data-close]').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{ e.target.closest('.panel').hidden = true; });
+  });
+  document.addEventListener('click', (e)=>{
+    if(e.target.closest('.panel') || e.target.closest('.top-btn')) return;
+    Object.values(panels).forEach(p=>p.hidden = true);
+  });
+
+  // ---------- boot ----------
+  recompute();
+  requestAnimationFrame(channelLoop);
+  requestAnimationFrame(fkaLoop);
+})();
+</script>
+</body>
+</html>

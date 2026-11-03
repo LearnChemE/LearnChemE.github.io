@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Batch Reactors at Constant Volume or Constant Pressure</title>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] },
+    svg: { fontCache: 'global' },
+    options: { enableMenu: false }
+  };
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:Helvetica,Arial,sans-serif;
+    color:#000;
+    background:#fff;
+    -webkit-font-smoothing:antialiased;
+  }
+  #app{
+    width:600px;
+    margin:16px auto;
+    padding:0 8px;
+  }
+  .title{
+    font-size:19px;
+    font-weight:bold;
+    text-align:center;
+    margin:4px 0 10px 0;
+  }
+  /* control panel */
+  .controls{
+    border:1px solid #b0b0b0;
+    background:#f7f7f7;
+    border-radius:3px;
+    padding:12px 14px 10px 14px;
+    margin-bottom:6px;
+  }
+  .ctrl-row{
+    display:flex;
+    gap:14px;
+    flex-wrap:nowrap;
+  }
+  .ctrl{
+    display:flex;
+    align-items:center;
+    margin:4px 0;
+    font-size:14px;
+  }
+  .ctrl label{
+    display:inline-block;
+    text-align:right;
+    margin-right:6px;
+    white-space:nowrap;
+  }
+  .ctrl .lab-order{width:96px;}
+  .ctrl .lab-conv{width:112px;}
+  .ctrl .lab-stoich{width:230px;}
+  .ctrl input[type=range]{
+    width:105px;
+    vertical-align:middle;
+    accent-color:#98000D;
+  }
+  .val{
+    display:inline-block;
+    min-width:30px;
+    margin-left:6px;
+    font-variant-numeric:tabular-nums;
+  }
+  /* plot */
+  #plotwrap{text-align:center;}
+  canvas{display:block;margin:0 auto;}
+  /* bottom buttons */
+  .btns{
+    text-align:center;
+    margin:14px 0 6px 0;
+  }
+  .btns button{
+    font-family:Helvetica,Arial,sans-serif;
+    font-size:16.8px;
+    color:#fff;
+    background:#98000D;
+    border:none;
+    border-radius:3px;
+    padding:7.2px 19.2px;
+    margin:0 4px;
+    cursor:pointer;
+  }
+  .btns button:hover{background:#7a0009;}
+  .btns button.active{background:#5f0007;}
+  .panel{
+    display:none;
+    border:1px solid #b0b0b0;
+    background:#fbfbfb;
+    border-radius:3px;
+    padding:12px 16px;
+    margin:8px 2px 0 2px;
+    font-size:14px;
+    line-height:1.5;
+    text-align:left;
+  }
+  .panel.show{display:block;}
+  .panel p{margin:8px 0;}
+  .panel .eq{
+    margin:8px 0 8px 18px;
+    line-height:1.35;
+  }
+  .panel .eq mjx-container{margin:0 !important;}
+  .panel a{color:#98000D;}
+  i{font-style:italic;}
+  sub{font-size:0.75em;}
+  sup{font-size:0.75em;}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="title">Batch Reactors at Constant Volume or Constant Pressure</div>
+
+  <div class="controls">
+    <div class="ctrl-row">
+      <div class="ctrl">
+        <label class="lab-order">reaction order</label>
+        <input type="range" id="s_n" min="0.5" max="3" step="0.5" value="1.5">
+        <span class="val" id="v_n">1.5</span>
+      </div>
+      <div class="ctrl">
+        <label class="lab-conv">final conversion</label>
+        <input type="range" id="s_c" min="0.2" max="0.99" step="0.01" value="0.5">
+        <span class="val" id="v_c">0.50</span>
+      </div>
+    </div>
+    <div class="ctrl-row">
+      <div class="ctrl">
+        <label class="lab-stoich">product stoichiometric coefficient</label>
+        <input type="range" id="s_r" min="0.5" max="4" step="0.5" value="2">
+        <span class="val" id="v_r">2.0</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="plotwrap">
+    <canvas id="plot" width="600" height="440"></canvas>
+  </div>
+
+  <div class="btns">
+    <button id="b_dir">Directions</button>
+    <button id="b_det">Details</button>
+    <button id="b_abt">About</button>
+  </div>
+
+  <div class="panel" id="p_dir">
+    <p>Fractional conversion versus dimensionless time is plotted for an irreversible,
+    gas-phase reaction <i>A</i> &rarr; <i>r</i> <i>B</i> in two isothermal batch reactors.
+    Both reactors start at the same initial conditions, but one is at constant volume and
+    the other is at constant pressure. Select the final conversion in both reactors with a
+    slider. Use sliders to change the stoichiometric coefficient (<i>r</i>) and the reaction
+    order. If the reaction order is one or if the stoichiometric coefficient is one, the two
+    curves are identical, so only one curve is seen. In the constant-pressure reactor, the
+    reactant concentration changes because of reaction, but it also changes when the
+    stoichiometric coefficient is not one because of the reactor volume change due to the
+    mole change.</p>
+  </div>
+
+  <div class="panel" id="p_det">
+    <p>The reaction is \(A \rightarrow r\,B\), follows the rate equation
+    \(\dfrac{dC_A}{dt} = -k\,C_A^{\,n}\).</p>
+
+    <p>The mole balance for a constant-volume batch reactor is given by:</p>
+    <p class="eq">\(\dfrac{dN_A}{dt} = \dfrac{d(C_A V)}{dt} = V\dfrac{dC_A}{dt} = -k\,C_A^{\,n} V\),
+      which simplifies to \(\dfrac{dC_A}{dt} = -k\,C_A^{\,n}\),</p>
+    <p class="eq">\(\dfrac{dN_B}{dt} = \dfrac{d(C_B V)}{dt} = V\dfrac{dC_B}{dt} = r\,k\,C_A^{\,n} V\),
+      which simplifies to \(\dfrac{dC_B}{dt} = r\,k\,C_A^{\,n}\),</p>
+    <p class="eq">\(C_A = \dfrac{N_{A,0}\,(1-x)}{V_0}\).</p>
+
+    <p>The mole balance for a constant-pressure batch reactor is given by:</p>
+    <p class="eq">\(\dfrac{dN_A}{dt} = -k\,C_A^{\,n} V\),</p>
+    <p class="eq">\(\dfrac{dN_B}{dt} = r\,k\,C_A^{\,n} V\),</p>
+    <p class="eq">\(N_{A,0} = \dfrac{V_0\,P_0}{R\,T}\),</p>
+    <p class="eq">\(V = \dfrac{V_0\,(N_A + N_B)}{N_{A,0}}\),</p>
+    <p class="eq">\(C_A = \dfrac{N_A}{N_A + N_B}\cdot\dfrac{P}{R\,T}\),</p>
+    <p class="eq">\(C_B = \dfrac{N_B}{N_A + N_B}\cdot\dfrac{P}{R\,T}\),</p>
+
+    <p>where \(C_A\) and \(C_B\) are the concentrations of the reactant
+    and product (mol/L), \(N_A\) and \(N_B\) are moles of reactant and
+    product (mol), \(V\) is reactor volume (L), \(k\) is the rate constant, \(T\) is
+    reactor temperature (K), \(R\) is the ideal gas constant (J/[mol K]), \(P\) is the
+    pressure inside the reactor (bar), \(n\) is the reaction order, and \(r\) is the
+    stoichiometric coefficient of \(B\).</p>
+
+    <p>For a first-order isothermal reaction, the time to reach a given conversion is the same
+    for constant-pressure and constant-volume reactors. Also, the time is the same for a
+    reaction of any order if there is no change in the number of moles. If the number of moles
+    increases and the reaction order is greater than 1, then it takes longer to reach the same
+    conversion point in the constant-pressure reactor, because the volume increases as the
+    reaction proceeds, thus decreasing the reactant concentration and lowering the reaction
+    rate.</p>
+  </div>
+
+  <div class="panel" id="p_abt">
+    <p>This simulation was created in the
+    <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a>
+    at University of Colorado Boulder for
+    <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a>
+    by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a
+    <a href="https://demonstrations.wolfram.com/BatchReactorsAtConstantVolumeOrConstantPressure/" target="_blank">Mathematica simulation</a>
+    by Rachael L. Baumann. It was prepared with financial support from the National Science
+    Foundation (DUE 2336987 and 2336988) in collaboration with Washington State University.
+    Address any questions or comments to LearnChemE@gmail.com.</p>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+// ---- physical constants (from Mathematica source) ----
+const Vo = 0.15, k1 = 1.0, T = 140.0, Rgas = 0.73, Po = 1.5;
+const Nao = Vo * Po / (Rgas * T);
+
+// dt/dx for the two reactors (pure quadratures in conversion x)
+function dtdx_cv(x, n){
+  return 1.0 / (k1 * Math.pow(Nao, n - 1) * Math.pow(Vo, 1 - n) * Math.pow(1 - x, n));
+}
+function dtdx_cp(x, n, r){
+  const CA = ((1 - x) / (1 - x + r * x)) * (Po / (Rgas * T));
+  const V  = Vo * (1 - x + r * x);
+  return Nao / (k1 * Math.pow(CA, n) * V);
+}
+
+// cumulative integral t(x) sampled at x = 0, 0.01, ..., c  (Simpson sub-stepping)
+function solve(n, c, r){
+  const dx = 0.01;
+  const N = Math.round(c / dx);
+  const xs = [], tcv = [], tcp = [];
+  let accCV = 0, accCP = 0;
+  xs.push(0); tcv.push(0); tcp.push(0);
+  const m = 20;
+  for (let i = 1; i <= N; i++){
+    const a = (i - 1) * dx;
+    const b = i * dx;
+    const h = (b - a) / m;
+    let sCV = 0, sCP = 0;
+    for (let j = 0; j < m; j++){
+      const xa = a + j * h, xb = a + (j + 1) * h, xm = (xa + xb) / 2;
+      sCV += h / 6 * (dtdx_cv(xa, n)     + 4 * dtdx_cv(xm, n)     + dtdx_cv(xb, n));
+      sCP += h / 6 * (dtdx_cp(xa, n, r)  + 4 * dtdx_cp(xm, n, r)  + dtdx_cp(xb, n, r));
+    }
+    accCV += sCV; accCP += sCP;
+    xs.push(+(i * dx).toFixed(4)); tcv.push(accCV); tcp.push(accCP);
+  }
+  return { xs, tcv, tcp };
+}
+
+function interpAtX(xs, tarr, xq){
+  // xs is uniform 0..c step 0.01
+  if (xq <= 0) return tarr[0];
+  if (xq >= xs[xs.length - 1]) return tarr[tarr.length - 1];
+  const idx = xq / 0.01;
+  const i0 = Math.floor(idx);
+  const f = idx - i0;
+  return tarr[i0] * (1 - f) + tarr[i0 + 1] * f;
+}
+
+// ---- nice axis ticks ----
+function niceTicks(max, target){
+  if (max <= 0) return [0, 1];
+  const raw = max / target;
+  const mag = Math.pow(10, Math.floor(Math.log10(raw)));
+  const norm = raw / mag;
+  let step;
+  if (norm < 1.5) step = 1;
+  else if (norm < 3) step = 2;
+  else if (norm < 7) step = 5;
+  else step = 10;
+  step *= mag;
+  const last = Math.ceil(max / step - 1e-9) * step;   // extend to cover data max
+  const ticks = [];
+  const nT = Math.round(last / step);
+  for (let i = 0; i <= nT; i++) ticks.push(i * step);
+  return ticks;
+}
+function fmtTick(v, step){
+  if (v === 0) return "0";
+  const abs = Math.abs(v);
+  if (abs >= 1e4 || abs < 1e-3){
+    const exp = Math.floor(Math.log10(abs));
+    let mant = v / Math.pow(10, exp);
+    // trim float error and trailing zeros
+    let ms = mant.toFixed(3).replace(/\.?0+$/, "");
+    return ms + "\u00D7" + "10" + supExp(exp);
+  }
+  let dec = 0;
+  if (step < 1) dec = Math.max(0, -Math.floor(Math.log10(step)));
+  return v.toFixed(dec).replace(/\.?0+$/,"") || "0";
+}
+function supExp(e){
+  const map = {"-":"\u207B","0":"\u2070","1":"\u00B9","2":"\u00B2","3":"\u00B3",
+    "4":"\u2074","5":"\u2075","6":"\u2076","7":"\u2077","8":"\u2078","9":"\u2079"};
+  return String(e).split("").map(ch => map[ch] || ch).join("");
+}
+
+// ---- title r formatting ----
+function fmtR(r){
+  return Number.isInteger(r) ? String(r) : String(r);
+}
+
+// ---- drawing ----
+const canvas = document.getElementById("plot");
+const ctx = canvas.getContext("2d");
+const CSS_W = 600, CSS_H = 440;
+
+function setupHiDPI(){
+  const dpr = window.devicePixelRatio || 1;
+  canvas.style.width = CSS_W + "px";
+  canvas.style.height = CSS_H + "px";
+  canvas.width = Math.round(CSS_W * dpr);
+  canvas.height = Math.round(CSS_H * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+function draw(){
+  const n = parseFloat(document.getElementById("s_n").value);
+  const c = parseFloat(document.getElementById("s_c").value);
+  const r = parseFloat(document.getElementById("s_r").value);
+
+  const sol = solve(n, c, r);
+  const tmaxCV = sol.tcv[sol.tcv.length - 1];
+  const tmaxCP = sol.tcp[sol.tcp.length - 1];
+  const xmaxTime = Math.max(tmaxCV, tmaxCP);
+
+  ctx.clearRect(0, 0, CSS_W, CSS_H);
+
+  // plot geometry
+  const mL = 78, mR = 18, mT = 44, mB = 56;
+  const pW = CSS_W - mL - mR;
+  const pH = CSS_H - mT - mB;
+  const x0 = mL, y0 = mT;
+
+  const xTicks = niceTicks(xmaxTime, 6);
+  const xAxisMax = xTicks[xTicks.length - 1];
+  const xStep = xTicks.length > 1 ? xTicks[1] - xTicks[0] : xAxisMax;
+  const yTicks = [0, 0.2, 0.4, 0.6, 0.8, 1.0];
+  const yAxisMax = 1.0;
+
+  const sx = t => x0 + (t / xAxisMax) * pW;
+  const sy = xv => y0 + pH - (xv / yAxisMax) * pH;
+
+  // grid + ticks
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = "#c9c9c9";
+  ctx.fillStyle = "#000";
+  ctx.font = "15px Helvetica, Arial, sans-serif";
+
+  // y ticks
+  ctx.textAlign = "right";
+  ctx.textBaseline = "middle";
+  for (const yt of yTicks){
+    const yy = sy(yt);
+    ctx.beginPath();
+    ctx.strokeStyle = "#dddddd";
+    ctx.moveTo(x0, yy); ctx.lineTo(x0 + pW, yy); ctx.stroke();
+    ctx.beginPath();
+    ctx.strokeStyle = "#000";
+    ctx.moveTo(x0, yy); ctx.lineTo(x0 - 6, yy); ctx.stroke();
+    ctx.fillText(yt.toFixed(1), x0 - 10, yy);
+  }
+  // x ticks
+  ctx.textAlign = "center";
+  ctx.textBaseline = "top";
+  for (const xt of xTicks){
+    const xx = sx(xt);
+    ctx.beginPath();
+    ctx.strokeStyle = "#dddddd";
+    ctx.moveTo(xx, y0); ctx.lineTo(xx, y0 + pH); ctx.stroke();
+    ctx.beginPath();
+    ctx.strokeStyle = "#000";
+    ctx.moveTo(xx, y0 + pH); ctx.lineTo(xx, y0 + pH + 6); ctx.stroke();
+    ctx.fillText(fmtTick(xt, xStep), xx, y0 + pH + 9);
+  }
+
+  // frame
+  ctx.strokeStyle = "#000";
+  ctx.lineWidth = 1.2;
+  ctx.strokeRect(x0, y0, pW, pH);
+
+  // clip to plot area for curves
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(x0, y0, pW, pH);
+  ctx.clip();
+
+  // constant-volume curve: solid black
+  ctx.lineWidth = 2.4;
+  ctx.strokeStyle = "#000";
+  ctx.setLineDash([]);
+  ctx.beginPath();
+  for (let i = 0; i < sol.xs.length; i++){
+    const X = sx(sol.tcv[i]), Y = sy(sol.xs[i]);
+    if (i === 0) ctx.moveTo(X, Y); else ctx.lineTo(X, Y);
+  }
+  ctx.stroke();
+
+  // constant-pressure curve: dashed blue
+  ctx.strokeStyle = "#0000ff";
+  ctx.setLineDash([9, 6]);
+  ctx.beginPath();
+  for (let i = 0; i < sol.xs.length; i++){
+    const X = sx(sol.tcp[i]), Y = sy(sol.xs[i]);
+    if (i === 0) ctx.moveTo(X, Y); else ctx.lineTo(X, Y);
+  }
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
+
+  // curve labels (Epilog positions from the original)
+  function drawLabel(text, tval, xconv, color){
+    let px = sx(tval), py = sy(xconv);
+    ctx.font = "15px Helvetica, Arial, sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    const w = ctx.measureText(text).width;
+    // keep label inside the frame
+    px = Math.min(Math.max(px, x0 + w/2 + 4), x0 + pW - w/2 - 4);
+    py = Math.min(Math.max(py, y0 + 10), y0 + pH - 10);
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(px - w/2 - 3, py - 10, w + 6, 20);
+    ctx.fillStyle = color;
+    ctx.fillText(text, px, py);
+  }
+  const tcp_half = interpAtX(sol.xs, sol.tcp, c/2);
+  const tcv_85   = interpAtX(sol.xs, sol.tcv, 0.85*c);
+  drawLabel("constant pressure", tcp_half, 0.45*c, "#0000ff");
+  drawLabel("constant volume",   tcv_85,   0.90*c, "#000");
+
+  // plot title  A -> r B
+  ctx.fillStyle = "#000";
+  ctx.font = "18px Helvetica, Arial, sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "alphabetic";
+  ctx.fillText("A \u27F6 " + fmtR(r) + " B", x0 + pW/2, y0 - 18);
+
+  // axis labels
+  const AXIS_FONT = "17px Helvetica, Arial, sans-serif";
+  ctx.font = AXIS_FONT;
+  ctx.fillStyle = "#000";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "alphabetic";
+  ctx.fillText("time", x0 + pW/2, CSS_H - 10);
+  // y-axis label: render horizontally to an offscreen canvas, then rotate the
+  // bitmap so the glyphs match the x-axis exactly (no rotated-text overlap)
+  drawRotatedLabel("conversion", 24, y0 + pH/2, AXIS_FONT);
+}
+
+function drawRotatedLabel(text, cx, cy, font){
+  const dpr = window.devicePixelRatio || 1;
+  const pad = 4;
+  const off = document.createElement("canvas");
+  const octx = off.getContext("2d");
+  octx.font = font;
+  const w = Math.ceil(octx.measureText(text).width) + pad * 2;
+  const h = 24;
+  off.width = Math.ceil(w * dpr);
+  off.height = Math.ceil(h * dpr);
+  octx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  octx.font = font;
+  octx.fillStyle = "#000";
+  octx.textAlign = "center";
+  octx.textBaseline = "middle";
+  octx.fillText(text, w / 2, h / 2);
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(-Math.PI / 2);
+  ctx.drawImage(off, -w / 2, -h / 2, w, h);
+  ctx.restore();
+}
+
+// ---- slider readouts ----
+function fmt1(v){ return v.toFixed(1); }
+function fmt2(v){ return v.toFixed(2); }
+
+const sN = document.getElementById("s_n"), vN = document.getElementById("v_n");
+const sC = document.getElementById("s_c"), vC = document.getElementById("v_c");
+const sR = document.getElementById("s_r"), vR = document.getElementById("v_r");
+
+function update(){
+  vN.textContent = fmt1(parseFloat(sN.value));
+  vC.textContent = fmt2(parseFloat(sC.value));
+  vR.textContent = fmt1(parseFloat(sR.value));
+  draw();
+}
+sN.addEventListener("input", update);
+sC.addEventListener("input", update);
+sR.addEventListener("input", update);
+
+// ---- bottom panel toggles ----
+const panels = {
+  b_dir: "p_dir",
+  b_det: "p_det",
+  b_abt: "p_abt"
+};
+const btnEls = {};
+Object.keys(panels).forEach(bid => {
+  const btn = document.getElementById(bid);
+  btnEls[bid] = btn;
+  btn.addEventListener("click", () => {
+    const pid = panels[bid];
+    const panel = document.getElementById(pid);
+    const isOpen = panel.classList.contains("show");
+    // close all
+    Object.values(panels).forEach(p => document.getElementById(p).classList.remove("show"));
+    Object.values(btnEls).forEach(b => b.classList.remove("active"));
+    if (!isOpen){
+      panel.classList.add("show");
+      btn.classList.add("active");
+    }
+  });
+});
+
+// ---- init ----
+setupHiDPI();
+update();
+window.addEventListener("resize", () => { setupHiDPI(); draw(); });
+</script>
+</body>
+</html>

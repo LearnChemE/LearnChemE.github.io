@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The 14 3D Bravais Lattices</title>
+<style>
+  :root{
+    /* base UI font size increased by 15% (15px -> ~17.25px) */
+    --fs: 17.25px;
+    --red: #98000D;
+    --red-soft: #b23241;
+    --ink: #1c1c1c;
+    --line: #cfcfcf;
+    --setter-off-bg: #ececec;
+    --setter-border: #bcbcbc;
+    --panel-bg: #fbfaf8;
+  }
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background:#f2f2f0;
+    color:var(--ink);
+    font-family: Helvetica, Arial, "Liberation Sans", sans-serif;
+    font-size:var(--fs);
+    line-height:1.4;
+    -webkit-font-smoothing:antialiased;
+    padding:18px;
+  }
+  .wrap{
+    max-width:600px;
+    margin:0 auto;
+    background:#ffffff;
+    border:1px solid #d7d7d4;
+    border-radius:4px;
+    box-shadow:0 1px 4px rgba(0,0,0,.08);
+    overflow:hidden;
+  }
+  .title{
+    color:var(--red);
+    font-weight:700;
+    font-size:1.34em;
+    text-align:center;
+    padding:14px 16px 8px;
+    letter-spacing:.1px;
+  }
+  .controls{
+    position:relative;
+    padding:4px 16px 12px;
+    border-bottom:1px solid #ededed;
+  }
+  .row{
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:10px;
+    margin:9px 0;
+  }
+  .ctl-label{
+    font-size:.94em;
+    color:#333;
+    min-width:98px;
+  }
+  .ctl-label.small{ min-width:auto; }
+  .var{ font-weight:700; font-style:normal; }
+  .ivar{ font-style:italic; }
+
+  /* custom dropdown (crystal system) */
+  .dropdown{ position:relative; flex:1 1 240px; min-width:220px; }
+  .dd-button{
+    width:100%;
+    text-align:left;
+    background:#f7f7f7;
+    border:1px solid var(--setter-border);
+    border-radius:4px;
+    padding:6px 30px 6px 10px;
+    font:inherit;
+    color:var(--ink);
+    cursor:pointer;
+    position:relative;
+  }
+  .dd-button:after{
+    content:"";
+    position:absolute; right:11px; top:50%;
+    width:0;height:0;
+    border-left:5px solid transparent;
+    border-right:5px solid transparent;
+    border-top:6px solid #666;
+    transform:translateY(-40%);
+  }
+  .dd-menu{
+    position:absolute; left:0; right:0; top:calc(100% + 3px);
+    background:#fff;
+    border:1px solid var(--setter-border);
+    border-radius:4px;
+    box-shadow:0 6px 18px rgba(0,0,0,.16);
+    z-index:40;
+    max-height:340px; overflow:auto;
+    display:none;
+  }
+  .dd-menu.open{ display:block; }
+  .dd-item{
+    padding:7px 11px;
+    cursor:pointer;
+    font-size:.92em;
+    border-bottom:1px solid #f0f0f0;
+  }
+  .dd-item:last-child{ border-bottom:none; }
+  .dd-item:hover{ background:#f3ede0; }
+  .dd-item.sel{ background:#f6e9ea; }
+  .dd-item .sysname{ font-weight:700; }
+
+  /* setter bars (P/I/F/C and i/j/k) */
+  .setter{ display:inline-flex; border:1px solid var(--setter-border); border-radius:4px; overflow:hidden; }
+  .setter button{
+    font:inherit;
+    font-size:.92em;
+    padding:5px 13px;
+    background:var(--setter-off-bg);
+    border:none;
+    border-left:1px solid var(--setter-border);
+    color:#333;
+    cursor:pointer;
+    min-width:34px;
+  }
+  .setter button:first-child{ border-left:none; }
+  .setter button.on{ background:var(--red); color:#fff; }
+  .setter button:disabled{ opacity:.45; cursor:default; }
+
+  .shift-group{ display:flex; align-items:center; gap:16px; }
+  .shift-item{ display:flex; align-items:center; gap:7px; }
+
+  /* nav buttons: Directions / Details / About */
+  .nav{ display:flex; gap:7px; margin-left:auto; }
+  .nav button{
+    font:inherit;
+    font-size:.88em;
+    padding:5px 10px;
+    background:var(--red);
+    border:1px solid var(--red);
+    border-radius:4px;
+    color:#fff;
+    cursor:pointer;
+    font-weight:400;
+  }
+  .nav button:hover{ background:#7f000b; border-color:#7f000b; }
+  .nav button.active{ background:#7f000b; color:#fff; border-color:#7f000b; }
+
+  /* info panels — absolute overlay so the figure never moves */
+  .panel{
+    position:absolute;
+    top:calc(100% - 2px);
+    left:16px;
+    right:16px;
+    z-index:30;
+    display:none;
+    background:var(--panel-bg);
+    border:1px solid #e2ddd3;
+    border-radius:4px;
+    margin:0;
+    padding:14px 40px 15px 16px;
+    font-size:.96em;
+    line-height:1.5;
+    max-height:min(470px,66vh);
+    overflow-y:auto;
+    box-shadow:0 10px 26px rgba(0,0,0,.20);
+  }
+  .panel.open{ display:block; }
+  .panel h4{
+    margin:0 0 2px;
+    color:var(--red);
+    font-size:1em;
+  }
+  .panel p{ margin:0 0 8px; }
+  .panel .refs{ margin:6px 0 0; font-size:.92em; color:#444; }
+  .panel .refs div{ margin:3px 0; padding-left:1.4em; text-indent:-1.4em; }
+  .panel a{ color:var(--red); text-decoration:none; border-bottom:1px solid rgba(152,0,13,.35); }
+  .panel a:hover{ border-bottom-color:var(--red); }
+  .panel .close{
+    position:sticky;
+    float:right;
+    top:0;
+    margin:-4px -30px 0 6px;
+    width:24px; height:24px;
+    border:none; background:transparent;
+    color:#8a8a8a; font-size:20px; line-height:1;
+    cursor:pointer; border-radius:4px;
+  }
+  .panel .close:hover{ color:var(--red); background:#f0e6e6; }
+
+  .stage{ padding:6px 10px 8px; }
+  .canvas-hold{ position:relative; }
+  canvas{ display:block; width:100%; height:auto; touch-action:none; cursor:grab; }
+  canvas:active{ cursor:grabbing; }
+  .hint{
+    text-align:center;
+    font-size:.943em;
+    color:#000;
+    padding:2px 0 10px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="title">The 14 3D Bravais Lattices</div>
+
+  <div class="controls">
+    <div class="row">
+      <span class="ctl-label">crystal system</span>
+      <div class="dropdown">
+        <button class="dd-button" id="ddButton" aria-haspopup="listbox"></button>
+        <div class="dd-menu" id="ddMenu" role="listbox"></div>
+      </div>
+    </div>
+
+    <div class="row">
+      <span class="ctl-label">lattice system</span>
+      <div class="setter" id="centeringSetter"></div>
+      <div class="nav">
+        <button data-panel="directions">Directions</button>
+        <button data-panel="details">Details</button>
+        <button data-panel="about">About</button>
+      </div>
+    </div>
+
+    <div class="row">
+      <span class="ctl-label">shift cell</span>
+      <div class="shift-group">
+        <div class="shift-item"><span class="ivar">i</span><div class="setter" data-shift="0"></div></div>
+        <div class="shift-item"><span class="ivar">j</span><div class="setter" data-shift="1"></div></div>
+        <div class="shift-item"><span class="ivar">k</span><div class="setter" data-shift="2"></div></div>
+      </div>
+    </div>
+
+    <!-- Info panels -->
+    <div class="panel" id="panel-directions">
+      <button class="close" aria-label="Close">&times;</button>
+      <h4>Directions</h4>
+      <p>This simulation shows the characteristics of 3D Bravais lattices arranged according to seven crystal systems: cubic, tetragonal, orthorhombic, monoclinic, triclinic, rhombohedral and hexagonal. Each crystal system can be further associated with between one and four lattices by adding to the primitive cell (click &ldquo;P&rdquo;): a point in the center of the cell volume (click &ldquo;I&rdquo;), a point at the center of each face (click &ldquo;F&rdquo;) or a point just at the center of the base faces (click &ldquo;C&rdquo;). The primitive cell of the Rhombohedral Crystal System is a special case; its primitive cell is labelled as R not P as for the other cases. The explanation depends on the fact that the hexagonal and the rhombohedral systems both belong to the hexagonal crystal family, so to separate the cases the second one is labeled with the R letter instead of the P letter. The points located at the center/faces are highlighted in blue; each point is also a vertex or center of the cell/face, therefore each point is equivalent to every other point. Crystal systems are determined by the relative lengths of the basis vectors <span class="var">a</span>, <span class="var">b</span>, <span class="var">c</span> and the angles (&alpha;,&nbsp;&beta;,&nbsp;&gamma;) between them [1]. It is possible to shift the cell by one unit along a basis vector by selecting the <span class="ivar">i</span>, <span class="ivar">j</span>, <span class="ivar">k</span> values. When repeated, this can generate the entire lattice.</p>
+    </div>
+
+    <div class="panel" id="panel-details">
+      <button class="close" aria-label="Close">&times;</button>
+      <h4>Details</h4>
+      <p>The Bravais lattice theory establishes that crystal structures can be generated starting from a primitive cell and translating along integer multiples of its basis vectors, in all directions.</p>
+      <div class="refs">
+        <div><b>References</b></div>
+        <div>[1]&nbsp;&nbsp;M. de Graef and M. E. McHenry, <i>Structure of Materials: An Introduction to Crystallography, Diffraction and Symmetry</i>, Cambridge: Cambridge University Press, 2007.</div>
+        <div>[2]&nbsp;&nbsp;W. B. Pearson, <i>A Handbook of Lattice Spacings and Structures of Metals and Alloys</i>, New York: Pergamon Press, 1958.</div>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-about">
+      <button class="close" aria-label="Close">&times;</button>
+      <h4>About</h4>
+      <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/The143DBravaisLattices/" target="_blank" rel="noopener">Mathematica simulation</a> by D. Meliga and S. Z. Lavagnino. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.</p>
+    </div>
+  </div>
+
+  <div class="stage">
+    <div class="canvas-hold">
+      <canvas id="scene"></canvas>
+    </div>
+    <div class="hint">drag to rotate &bull; scroll to zoom</div>
+  </div>
+</div>
+
+<script>
+"use strict";
+const D2R = Math.PI/180;
+const SQ3 = Math.sqrt(3);
+
+/* ---------- Crystal-system data (from the Mathematica demonstration) ---------- */
+const SYSTEMS = [
+  { name:"Cubic",        cond:"a = b = c, \u03b1 = \u03b2 = \u03b3 = 90\u00b0",
+    a1:[1,0,0], a2:[0,1,0], a3:[0,0,1],                       centerings:["P","I","F"] },
+  { name:"Tetragonal",   cond:"a = b \u2260 c, \u03b1 = \u03b2 = \u03b3 = 90\u00b0",
+    a1:[1,0,0], a2:[0,1,0], a3:[0,0,1.3],                     centerings:["P","I"] },
+  { name:"Orthorhombic", cond:"a \u2260 b \u2260 c, \u03b1 = \u03b2 = \u03b3 = 90\u00b0",
+    a1:[1,0,0], a2:[0,1.3,0], a3:[0,0,1.5],                   centerings:["P","I","F","C"] },
+  { name:"Monoclinic",   cond:"a \u2260 b \u2260 c, \u03b1 = \u03b3 = 90\u00b0, \u03b2 \u2260 90\u00b0",
+    a1:[1,0,0], a2:[0,1.5,0], a3:[0,0.4,1.8],                 centerings:["P","C"] },
+  { name:"Triclinic",    cond:"a \u2260 b \u2260 c, \u03b1 \u2260 \u03b2 \u2260 \u03b3 \u2260 90\u00b0",
+    a1:[1,0,0], a2:[0.2,1.3,0], a3:[0.4,0.2,1.6],             centerings:["P"] },
+  { name:"Rhombohedral", cond:"a = b = c, \u03b1 = \u03b2 = \u03b3 \u2260 90\u00b0",
+    a1:[1,0,0], a2:[Math.cos(50*D2R),Math.sin(50*D2R),0],
+    a3:[Math.cos(50*D2R),0.29973678496397943,0.704969466411789], centerings:["R"] },
+  { name:"Hexagonal",    cond:"a = b \u2260 c, \u03b1 = \u03b2 = 90\u00b0, \u03b3 = 120\u00b0",
+    a1:[1,0,0], a2:[-0.5,SQ3/2,0], a3:[0,0,1.8],              centerings:["P"], hexagonal:true }
+];
+
+/* ---------- vector helpers ---------- */
+const add=(a,b)=>[a[0]+b[0],a[1]+b[1],a[2]+b[2]];
+const sub=(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]];
+const mul=(a,s)=>[a[0]*s,a[1]*s,a[2]*s];
+const dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+const len=a=>Math.hypot(a[0],a[1],a[2]);
+const unit=a=>{const l=len(a)||1;return [a[0]/l,a[1]/l,a[2]/l];};
+function combo(sys,i,j,k){ return add(add(mul(sys.a1,i),mul(sys.a2,j)),mul(sys.a3,k)); }
+function rotZ(p,ang){const c=Math.cos(ang),s=Math.sin(ang);return [c*p[0]-s*p[1], s*p[0]+c*p[1], p[2]];}
+function slerp(u,v,t){
+  const d=Math.min(1,Math.max(-1,dot(u,v)));
+  const om=Math.acos(d);
+  if(om<1e-4) return u;
+  const s=Math.sin(om);
+  const a=Math.sin((1-t)*om)/s, b=Math.sin(t*om)/s;
+  return [a*u[0]+b*v[0], a*u[1]+b*v[1], a*u[2]+b*v[2]];
+}
+
+/* ---------- colors ---------- */
+const COL = {
+  corner:"#8d99a6",   // ordinary lattice points (steel gray)
+  origin:"#d21f1f",   // origin point (red)
+  center:"#1b64e6",   // centering points highlighted in blue
+  baseFace:"rgba(150,160,172,0.16)",
+  baseEdge:"#6d7681",
+  yellowFace:"rgba(240,196,25,0.30)",
+  yellowEdge:"#c99a12",
+  redFace:"rgba(210,60,60,0.14)",
+  redEdge:"#c15555",
+  extraFace:"rgba(60,110,220,0.12)",
+  extraEdge:"#5f86d6",
+  label:"#141414",
+  arc:"#333333"
+};
+
+/* ---------- state ---------- */
+let sysIndex = 0;         // default Cubic
+let centering = "F";      // default matches original demo (b=3 -> F)
+let shift = [0,0,0];
+let yaw = -0.62, pitch = 0.36;   // pleasing 3/4 view
+let userScale = 1;
+
+/* ---------- build the scene for current state ---------- */
+function buildScene(){
+  const sys = SYSTEMS[sysIndex];
+  const spheres=[], faces=[], edges=[], arcs=[], labels=[];
+
+  if(sys.hexagonal){
+    buildHexagonal(sys, spheres, faces, edges, arcs, labels);
+  } else {
+    buildGeneral(sys, spheres, faces, edges, arcs, labels);
+  }
+  return {sys, spheres, faces, edges, arcs, labels};
+}
+
+/* parallelepiped (cell) from an origin frac-offset; pushes 6 faces + 12 edges */
+function pushCell(sys, org, faceCol, edgeCol, faces, edges){
+  // 8 corners in world coords, org given in fractional (i,j,k)
+  const V=[];
+  for(let a=0;a<2;a++)for(let b=0;b<2;b++)for(let c=0;c<2;c++){
+    V.push(combo(sys, org[0]+a, org[1]+b, org[2]+c));
+  }
+  // index: (a*4 + b*2 + c)
+  const idx=(a,b,c)=>a*4+b*2+c;
+  const quad=(p0,p1,p2,p3)=>faces.push({v:[V[p0],V[p1],V[p2],V[p3]], fill:faceCol});
+  quad(idx(0,0,0),idx(0,0,1),idx(0,1,1),idx(0,1,0)); // a=0 face
+  quad(idx(1,0,0),idx(1,0,1),idx(1,1,1),idx(1,1,0)); // a=1
+  quad(idx(0,0,0),idx(0,0,1),idx(1,0,1),idx(1,0,0)); // b=0
+  quad(idx(0,1,0),idx(0,1,1),idx(1,1,1),idx(1,1,0)); // b=1
+  quad(idx(0,0,0),idx(0,1,0),idx(1,1,0),idx(1,0,0)); // c=0
+  quad(idx(0,0,1),idx(0,1,1),idx(1,1,1),idx(1,0,1)); // c=1
+  const E=[[0,1],[0,2],[0,4],[1,3],[1,5],[2,3],[2,6],[3,7],[4,5],[4,6],[5,7],[6,7]];
+  const map=[idx(0,0,0),idx(0,0,1),idx(0,1,0),idx(0,1,1),idx(1,0,0),idx(1,0,1),idx(1,1,0),idx(1,1,1)];
+  for(const [p,q] of E) edges.push({p0:V[map[p]], p1:V[map[q]], col:edgeCol, w:1.6});
+}
+
+/* angle arcs + a,b,c edge labels around the origin corner */
+function pushAnnotations(sys, arcs, labels){
+  const u1=unit(sys.a1), u2=unit(sys.a2), u3=unit(sys.a3);
+  const R=0.34;
+  const arc=(u,v,txt)=>{
+    const pts=[];
+    for(let t=0;t<=1.0001;t+=1/18) pts.push(mul(slerp(u,v,t),R));
+    arcs.push({pts});
+    const mid=mul(slerp(u,v,0.5),R*1.28);
+    labels.push({p:mid, text:txt, font:"italic 700 15px Georgia, serif"});
+  };
+  arc(u1,u3,"\u03b1"); // alpha  (a\u2013c)
+  arc(u2,u3,"\u03b2"); // beta   (b\u2013c)
+  arc(u1,u2,"\u03b3"); // gamma  (a\u2013b)
+  labels.push({p:add(mul(sys.a1,0.5),[0,-0.14,-0.05]), text:"a", font:"700 16px Helvetica, Arial, sans-serif"});
+  labels.push({p:add(mul(sys.a2,0.5),[-0.14,0,-0.05]), text:"b", font:"700 16px Helvetica, Arial, sans-serif"});
+  labels.push({p:add(mul(sys.a3,0.5),[-0.16,-0.02,0]), text:"c", font:"700 16px Helvetica, Arial, sans-serif"});
+}
+
+function buildGeneral(sys, spheres, faces, edges, arcs, labels){
+  // ---- corner lattice points on a 2x2x2 block (i,j,k in 0..2) ----
+  for(let i=0;i<3;i++)for(let j=0;j<3;j++)for(let k=0;k<3;k++){
+    const p=combo(sys,i,j,k);
+    const isOrigin=(i===0&&j===0&&k===0);
+    spheres.push({p, col:isOrigin?COL.origin:COL.corner, r:0.1});
+  }
+  // ---- centering points (highlighted blue) ----
+  const addC=(fi,fj,fk)=>spheres.push({p:combo(sys,fi,fj,fk), col:COL.center, r:0.1});
+  if(centering==="I"){
+    for(let i=0;i<2;i++)for(let j=0;j<2;j++)for(let k=0;k<2;k++) addC(i+0.5,j+0.5,k+0.5);
+  } else if(centering==="F"){
+    for(let i=0;i<2;i++)for(let j=0;j<2;j++)for(let k=0;k<3;k++) addC(i+0.5,j+0.5,k);   // ab faces
+    for(let i=0;i<2;i++)for(let j=0;j<3;j++)for(let k=0;k<2;k++) addC(i+0.5,j,k+0.5);   // ac faces
+    for(let i=0;i<3;i++)for(let j=0;j<2;j++)for(let k=0;k<2;k++) addC(i,j+0.5,k+0.5);   // bc faces
+  } else if(centering==="C"){
+    for(let i=0;i<2;i++)for(let j=0;j<2;j++)for(let k=0;k<3;k++) addC(i+0.5,j+0.5,k);   // ab base faces
+  }
+  // ---- base primitive cell + red "second cell" for centered types ----
+  pushCell(sys,[0,0,0],COL.baseFace,COL.baseEdge,faces,edges);
+  if(centering==="I") pushCell(sys,[0.5,0.5,0.5],COL.redFace,COL.redEdge,faces,edges);
+  else if(centering==="F") pushCell(sys,[0,0.5,0.5],COL.redFace,COL.redEdge,faces,edges);
+  else if(centering==="C") pushCell(sys,[0.5,0.5,0],COL.redFace,COL.redEdge,faces,edges);
+  // ---- shifted (yellow) cell ----
+  pushCell(sys,[shift[0],shift[1],shift[2]],COL.yellowFace,COL.yellowEdge,faces,edges);
+  // ---- annotations ----
+  pushAnnotations(sys, arcs, labels);
+}
+
+/* Hexagonal: build a hexagonal prism from 3 rhombic primitive cells sharing the central axis */
+function buildHexagonal(sys, spheres, faces, edges, arcs, labels){
+  const c = sys.a3;                    // vertical stacking vector
+  const layers = [0,1];                // two z levels
+  // hexagon vertices at radius 1: angles 0,60,...,300 ; plus center
+  const hexPts = [];
+  for(let m=0;m<6;m++){
+    const ang=m*60*D2R;
+    hexPts.push([Math.cos(ang),Math.sin(ang),0]);
+  }
+  const origin=[0,0,0];
+  for(const L of layers){
+    const zoff=mul(c,L);
+    spheres.push({p:add(origin,zoff), col:(L===0?COL.origin:COL.corner), r:0.1}); // center
+    for(const hp of hexPts) spheres.push({p:add(hp,zoff), col:COL.corner, r:0.1});
+  }
+  // three rhombic prisms (rotate primitive rhombus by 0,120,240 about z through origin)
+  const drawRhomb=(rotDeg, faceCol, edgeCol, sh)=>{
+    const a1r=rotZ(sys.a1, rotDeg*D2R);
+    const a2r=rotZ(sys.a2, rotDeg*D2R);
+    const base = sh ? combo(sys, sh[0], sh[1], sh[2]) : [0,0,0];
+    // 8 corners
+    const corners=[];
+    for(let a=0;a<2;a++)for(let b=0;b<2;b++)for(let cc=0;cc<2;cc++){
+      corners.push(add(base, add(add(mul(a1r,a), mul(a2r,b)), mul(c,cc))));
+    }
+    const idx=(a,b,cc)=>a*4+b*2+cc;
+    const quad=(p0,p1,p2,p3)=>faces.push({v:[corners[p0],corners[p1],corners[p2],corners[p3]], fill:faceCol});
+    quad(idx(0,0,0),idx(0,0,1),idx(0,1,1),idx(0,1,0));
+    quad(idx(1,0,0),idx(1,0,1),idx(1,1,1),idx(1,1,0));
+    quad(idx(0,0,0),idx(0,0,1),idx(1,0,1),idx(1,0,0));
+    quad(idx(0,1,0),idx(0,1,1),idx(1,1,1),idx(1,1,0));
+    quad(idx(0,0,0),idx(0,1,0),idx(1,1,0),idx(1,0,0));
+    quad(idx(0,0,1),idx(0,1,1),idx(1,1,1),idx(1,0,1));
+    const E=[[0,1],[0,2],[0,4],[1,3],[1,5],[2,3],[2,6],[3,7],[4,5],[4,6],[5,7],[6,7]];
+    const map=[idx(0,0,0),idx(0,0,1),idx(0,1,0),idx(0,1,1),idx(1,0,0),idx(1,0,1),idx(1,1,0),idx(1,1,1)];
+    for(const [p,q] of E) edges.push({p0:corners[map[p]], p1:corners[map[q]], col:edgeCol, w:1.6});
+  };
+  // base primitive rhombus (gray) + two completing rhombi (light blue)
+  drawRhomb(0,   COL.baseFace,  COL.baseEdge, null);
+  drawRhomb(120, COL.extraFace, COL.extraEdge, null);
+  drawRhomb(240, COL.extraFace, COL.extraEdge, null);
+  // shifted (yellow) primitive rhombus
+  drawRhomb(0,   COL.yellowFace, COL.yellowEdge, shift);
+  // annotations
+  pushAnnotations(sys, arcs, labels);
+}
+
+/* ---------- renderer ---------- */
+const canvas=document.getElementById("scene");
+const ctx=canvas.getContext("2d");
+let CW=460, CH=460, cx=230, cy=230, baseScale=120, sceneCenter=[0,0,0], sceneRadius=2;
+
+function resize(){
+  const cssW=Math.min(canvas.parentElement.clientWidth, 480);
+  CW=cssW; CH=cssW;
+  const dpr=window.devicePixelRatio||1;
+  canvas.style.width=CW+"px";
+  canvas.style.height=CH+"px";
+  canvas.width=Math.round(CW*dpr);
+  canvas.height=Math.round(CH*dpr);
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  cx=CW/2; cy=CH/2;
+  draw();
+}
+
+function project(p){
+  const q=[p[0]-sceneCenter[0], p[1]-sceneCenter[1], p[2]-sceneCenter[2]];
+  // yaw about z
+  const cy1=Math.cos(yaw), sy1=Math.sin(yaw);
+  let x=cy1*q[0]-sy1*q[1];
+  let y=sy1*q[0]+cy1*q[1];
+  let z=q[2];
+  // pitch about x
+  const cp=Math.cos(pitch), sp=Math.sin(pitch);
+  let y2=cp*y-sp*z;
+  let z2=sp*y+cp*z;
+  const s=baseScale*userScale;
+  return { x:cx + s*x, y:cy - s*z2, depth:y2 };
+}
+
+function draw(){
+  const scene=buildScene();
+  // scene center = centroid of all displayed lattice points (keeps every system framed)
+  const sys=scene.sys;
+  let cxs=0,cys=0,czs=0;
+  for(const s of scene.spheres){ cxs+=s.p[0]; cys+=s.p[1]; czs+=s.p[2]; }
+  const n=scene.spheres.length||1;
+  sceneCenter=[cxs/n, cys/n, czs/n];
+  // radius for autoscale
+  let maxR=0;
+  for(const s of scene.spheres){ const d=len(sub(s.p,sceneCenter)); if(d>maxR)maxR=d; }
+  sceneRadius=maxR||2;
+  baseScale=(0.42*Math.min(CW,CH))/sceneRadius;
+
+  ctx.clearRect(0,0,CW,CH);
+
+  // assemble depth-sorted primitives
+  const prims=[];
+  for(const f of scene.faces){
+    const pv=f.v.map(project);
+    const depth=(pv[0].depth+pv[1].depth+pv[2].depth+pv[3].depth)/4;
+    prims.push({depth, kind:"face", pv, fill:f.fill});
+  }
+  for(const e of scene.edges){
+    const a=project(e.p0), b=project(e.p1);
+    prims.push({depth:(a.depth+b.depth)/2 + 0.001, kind:"edge", a, b, col:e.col, w:e.w});
+  }
+  for(const s of scene.spheres){
+    const c=project(s.p);
+    prims.push({depth:c.depth, kind:"sphere", c, col:s.col, r:s.r*baseScale*userScale});
+  }
+  for(const ar of scene.arcs){
+    const pv=ar.pts.map(project);
+    let dd=0; for(const q of pv) dd+=q.depth; dd/=pv.length;
+    prims.push({depth:dd+0.02, kind:"arc", pv});
+  }
+  prims.sort((p,q)=>p.depth-q.depth);
+
+  for(const pr of prims){
+    if(pr.kind==="face"){
+      ctx.beginPath();
+      ctx.moveTo(pr.pv[0].x,pr.pv[0].y);
+      for(let i=1;i<4;i++) ctx.lineTo(pr.pv[i].x,pr.pv[i].y);
+      ctx.closePath();
+      ctx.fillStyle=pr.fill;
+      ctx.fill();
+    } else if(pr.kind==="edge"){
+      ctx.beginPath();
+      ctx.moveTo(pr.a.x,pr.a.y);
+      ctx.lineTo(pr.b.x,pr.b.y);
+      ctx.strokeStyle=pr.col;
+      ctx.lineWidth=pr.w;
+      ctx.stroke();
+    } else if(pr.kind==="arc"){
+      ctx.beginPath();
+      ctx.moveTo(pr.pv[0].x,pr.pv[0].y);
+      for(let i=1;i<pr.pv.length;i++) ctx.lineTo(pr.pv[i].x,pr.pv[i].y);
+      ctx.strokeStyle=COL.arc;
+      ctx.lineWidth=1.3;
+      ctx.stroke();
+      // small arrowheads at both ends
+      drawArrowHead(pr.pv[1],pr.pv[0]);
+      drawArrowHead(pr.pv[pr.pv.length-2],pr.pv[pr.pv.length-1]);
+    } else if(pr.kind==="sphere"){
+      drawSphere(pr.c.x,pr.c.y,pr.r,pr.col);
+    }
+  }
+
+  // labels on top
+  ctx.textAlign="center";
+  ctx.textBaseline="middle";
+  for(const lb of scene.labels){
+    const p=project(lb.p);
+    ctx.font=lb.font;
+    ctx.lineWidth=3;
+    ctx.strokeStyle="rgba(255,255,255,0.9)";
+    ctx.strokeText(lb.text,p.x,p.y);
+    ctx.fillStyle=COL.label;
+    ctx.fillText(lb.text,p.x,p.y);
+  }
+}
+
+function drawArrowHead(from,to){
+  const ang=Math.atan2(to.y-from.y,to.x-from.x);
+  const s=5;
+  ctx.beginPath();
+  ctx.moveTo(to.x,to.y);
+  ctx.lineTo(to.x-s*Math.cos(ang-0.4), to.y-s*Math.sin(ang-0.4));
+  ctx.moveTo(to.x,to.y);
+  ctx.lineTo(to.x-s*Math.cos(ang+0.4), to.y-s*Math.sin(ang+0.4));
+  ctx.strokeStyle=COL.arc;
+  ctx.lineWidth=1.3;
+  ctx.stroke();
+}
+
+function shade(hex,f){ // lighten(+)/darken(-) a hex color
+  const n=parseInt(hex.slice(1),16);
+  let r=(n>>16)&255,g=(n>>8)&255,b=n&255;
+  if(f>=0){ r=r+(255-r)*f; g=g+(255-g)*f; b=b+(255-b)*f; }
+  else { r=r*(1+f); g=g*(1+f); b=b*(1+f); }
+  return `rgb(${Math.round(r)},${Math.round(g)},${Math.round(b)})`;
+}
+function drawSphere(x,y,r,col){
+  const g=ctx.createRadialGradient(x-r*0.35,y-r*0.4,r*0.1, x,y,r);
+  g.addColorStop(0, shade(col,0.55));
+  g.addColorStop(0.55, col);
+  g.addColorStop(1, shade(col,-0.4));
+  ctx.beginPath();
+  ctx.arc(x,y,r,0,Math.PI*2);
+  ctx.fillStyle=g;
+  ctx.fill();
+  ctx.lineWidth=0.6;
+  ctx.strokeStyle=shade(col,-0.5);
+  ctx.stroke();
+}
+
+/* ---------- UI: dropdown ---------- */
+const ddButton=document.getElementById("ddButton");
+const ddMenu=document.getElementById("ddMenu");
+function renderDropdownButton(){
+  const s=SYSTEMS[sysIndex];
+  ddButton.innerHTML=`<span class="sysname" style="font-weight:700">${s.name}</span> &nbsp;<span style="color:#555">${withBold(s.cond)}</span>`;
+}
+function withBold(str){
+  // bold the standalone a,b,c variables
+  return str.replace(/\b([abc])\b/g,'<b>$1</b>');
+}
+function buildDropdownMenu(){
+  ddMenu.innerHTML="";
+  SYSTEMS.forEach((s,i)=>{
+    const it=document.createElement("div");
+    it.className="dd-item"+(i===sysIndex?" sel":"");
+    it.setAttribute("role","option");
+    it.innerHTML=`<span class="sysname">${s.name}</span> &nbsp;<span style="color:#555">${withBold(s.cond)}</span>`;
+    it.addEventListener("click",()=>{
+      sysIndex=i;
+      const sys=SYSTEMS[i];
+      if(!sys.centerings.includes(centering)) centering=sys.centerings[0];
+      shift=[0,0,0];
+      ddMenu.classList.remove("open");
+      renderDropdownButton();
+      buildDropdownMenu();
+      buildCentering();
+      buildShift();
+      draw();
+    });
+    ddMenu.appendChild(it);
+  });
+}
+ddButton.addEventListener("click",(e)=>{ e.stopPropagation(); ddMenu.classList.toggle("open"); });
+document.addEventListener("click",()=>ddMenu.classList.remove("open"));
+
+/* ---------- UI: centering setter (P/I/F/C) ---------- */
+const centeringSetter=document.getElementById("centeringSetter");
+function buildCentering(){
+  const sys=SYSTEMS[sysIndex];
+  centeringSetter.innerHTML="";
+  sys.centerings.forEach(c=>{
+    const b=document.createElement("button");
+    b.textContent=c;
+    if(c===centering) b.classList.add("on");
+    b.addEventListener("click",()=>{ centering=c; shift=[0,0,0]; buildCentering(); buildShift(); draw(); });
+    centeringSetter.appendChild(b);
+  });
+}
+
+/* ---------- UI: shift setters (i/j/k, 0/1) ---------- */
+function buildShift(){
+  document.querySelectorAll('[data-shift]').forEach(box=>{
+    const axis=+box.getAttribute("data-shift");
+    box.innerHTML="";
+    [0,1].forEach(v=>{
+      const b=document.createElement("button");
+      b.textContent=v;
+      if(shift[axis]===v) b.classList.add("on");
+      b.addEventListener("click",()=>{ shift[axis]=v; buildShift(); draw(); });
+      box.appendChild(b);
+    });
+  });
+}
+
+/* ---------- UI: info panels ---------- */
+const navButtons=document.querySelectorAll(".nav button");
+const panels={
+  directions:document.getElementById("panel-directions"),
+  details:document.getElementById("panel-details"),
+  about:document.getElementById("panel-about")
+};
+let openPanel=null;
+function setPanel(name){
+  navButtons.forEach(b=>b.classList.toggle("active", b.dataset.panel===name && name!==null));
+  Object.entries(panels).forEach(([k,el])=>el.classList.toggle("open", k===name));
+  openPanel=name;
+}
+navButtons.forEach(b=>{
+  b.addEventListener("click",()=>{
+    const n=b.dataset.panel;
+    setPanel(openPanel===n?null:n);
+  });
+});
+document.querySelectorAll(".panel .close").forEach(c=>{
+  c.addEventListener("click",()=>setPanel(null));
+});
+
+/* ---------- pointer rotate + wheel zoom ---------- */
+let dragging=false, lastX=0, lastY=0;
+canvas.addEventListener("pointerdown",e=>{ dragging=true; lastX=e.clientX; lastY=e.clientY; canvas.setPointerCapture(e.pointerId); });
+canvas.addEventListener("pointermove",e=>{
+  if(!dragging)return;
+  const dx=e.clientX-lastX, dy=e.clientY-lastY;
+  lastX=e.clientX; lastY=e.clientY;
+  yaw += dx*0.01;
+  pitch += dy*0.01;
+  pitch=Math.max(-1.45,Math.min(1.45,pitch));
+  draw();
+});
+canvas.addEventListener("pointerup",e=>{ dragging=false; });
+canvas.addEventListener("pointercancel",()=>{ dragging=false; });
+canvas.addEventListener("wheel",e=>{
+  e.preventDefault();
+  userScale *= Math.exp(-e.deltaY*0.0012);
+  userScale=Math.max(0.4,Math.min(3.5,userScale));
+  draw();
+},{passive:false});
+
+/* ---------- init ---------- */
+renderDropdownButton();
+buildDropdownMenu();
+buildCentering();
+buildShift();
+window.addEventListener("resize",resize);
+resize();
+</script>
+</body>
+</html>

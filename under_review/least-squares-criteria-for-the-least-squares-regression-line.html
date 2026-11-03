@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Least Squares Criteria for the Least Squares Regression Line</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+  svg: { fontCache: 'global', displayAlign: 'left' }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.min.js"></script>
+<style>
+  body {
+    font-family: Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 15px;
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  #container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  #simTitle {
+    font-size: 21px;
+    font-weight: bold;
+    text-align: left;
+    white-space: nowrap;
+    margin: 5px 0 12px 0;
+  }
+  #topArea {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 40px;
+    margin-bottom: 6px;
+  }
+  #controls {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .controlRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 17px;
+  }
+  .controlRow label {
+    width: 70px;
+    text-align: right;
+    font-weight: normal;
+  }
+  .controlRow label.dataLabel {
+    width: auto;
+    text-align: left;
+  }
+  .controlRow input[type="range"] {
+    width: 240px;
+    margin: 0;
+  }
+  #sliderArea {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  #sliderRows {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  #sumBox {
+    font-size: 17px;
+    white-space: nowrap;
+  }
+  .controlRow .val {
+    width: 60px;
+    font-size: 17px;
+  }
+  select {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    padding: 2px 4px;
+  }
+  canvas {
+    display: block;
+  }
+  #lsButton, .panelBtn {
+    background-color: #98000D;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    padding: 9px 12px;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    cursor: pointer;
+    width: auto;
+    white-space: nowrap;
+  }
+  #lsButton { margin-left: 4px; }
+  #lsButton:hover, .panelBtn:hover { background-color: #7a000a; }
+  .panel {
+    display: none;
+    position: absolute;
+    top: 44px;
+    right: 0;
+    width: 469px;
+    z-index: 10;
+    border: 1px solid #bbbbbb;
+    border-radius: 6px;
+    padding: 12px 18px;
+    font-size: 16px;
+    line-height: 1.45;
+    background-color: #ffffff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  .panel a { color: #98000D; }
+  .panelClose {
+    position: absolute;
+    top: 6px;
+    right: 10px;
+    font-size: 20px;
+    line-height: 1;
+    color: #555555;
+    cursor: pointer;
+    font-family: Helvetica, Arial, sans-serif;
+    user-select: none;
+  }
+  .panelClose:hover { color: #98000D; }
+  #panelDetails {
+    width: 508px;
+  }
+  .panel h3 {
+    margin: 2px 0 6px 0;
+    font-size: 18px;
+    color: #98000D;
+  }
+  .symbolList {
+    margin: 4px 0 0 0;
+    padding-left: 0;
+    list-style: none;
+  }
+  .symbolList li { margin: 2px 0; }
+
+  /* slider styling */
+  input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+  input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  .controlRow input[type="range"] { width: 240px; margin: 0; }
+</style>
+</head>
+<body>
+
+<div id="container">
+
+<div id="simTitle">Least Squares Criteria for the Least Squares Regression Line</div>
+
+<div id="topArea">
+  <div id="controls">
+    <div class="controlRow">
+      <label for="dataSelect" class="dataLabel">data</label>
+      <select id="dataSelect">
+        <option value="0" selected>dataset 1</option>
+        <option value="1">dataset 2</option>
+        <option value="2">dataset 3</option>
+      </select>
+      <button id="lsButton">show least squares line</button>
+      <button class="panelBtn" id="btnDirections">Directions</button>
+      <button class="panelBtn" id="btnDetails">Details</button>
+      <button class="panelBtn" id="btnAbout">About</button>
+    </div>
+    <div id="sliderArea">
+      <div id="sliderRows">
+        <div class="controlRow">
+          <label for="slopeSlider">slope</label>
+          <input type="range" id="slopeSlider" min="-1.5" max="1.5" step="0.001" value="0.9">
+          <span class="val" id="slopeVal">0.90</span>
+        </div>
+        <div class="controlRow">
+          <label for="interceptSlider">intercept</label>
+          <input type="range" id="interceptSlider" min="-1" max="7" step="0.001" value="0.6">
+          <span class="val" id="interceptVal">0.60</span>
+        </div>
+      </div>
+      <div id="sumBox">sum of squares: <span id="sumVal"></span></div>
+    </div>
+  </div>
+
+<div class="panel" id="panelDirections">
+  <span class="panelClose" title="close">&#215;</span>
+  <h3>Directions</h3>
+  <p>The least squares regression line is commonly used as the best fitting line
+  to a fixed collection of points. This simulation provides a visualization of
+  the squares used in determining this line. For each of three datasets, the
+  residuals from the points to a line are shown as dashed vertical segments.
+  The squares of the residuals are shown with a red border. You can adjust the
+  slope and intercept of the line in an effort to find the line for which the
+  sum of the areas of these squared residuals is least. Click the button to
+  obtain the least squares regression line.</p>
+</div>
+
+<div class="panel" id="panelDetails">
+  <span class="panelClose" title="close">&#215;</span>
+  <h3>Details</h3>
+  <p>For a set of \(n\) data points \((x_i,\,y_i)\) and a line
+  \(y = m x + b\), the residual at each point is the vertical distance between
+  the observed value and the value predicted by the line:</p>
+  \[ r_i = y_i - (m x_i + b) \]
+  <p>The least squares criterion selects the slope \(m\) and intercept \(b\)
+  that minimize the sum of the squared residuals:</p>
+  \[ S = \sum_{i=1}^{n} \left[\, y_i - (m x_i + b) \,\right]^2 \]
+  <p>Setting \(\partial S / \partial m = 0\) and \(\partial S / \partial b = 0\)
+  yields the least squares regression line, with:</p>
+  \[ m = \frac{n \sum x_i y_i - \sum x_i \sum y_i}{n \sum x_i^2 - \left(\sum x_i\right)^2},
+  \qquad b = \bar{y} - m\,\bar{x} \]
+  <p>where \(\bar{x}\) and \(\bar{y}\) are the means of the \(x_i\) and
+  \(y_i\) values. In the plot, each shaded square has a side length equal to
+  the magnitude of a residual \(|r_i|\), so its area equals the squared
+  residual \(r_i^2\); the sum of the areas of these squares is the quantity
+  minimized by the least squares regression line.</p>
+  <p><b>Symbols</b></p>
+  <ul class="symbolList">
+    <li>\(n\) = number of data points</li>
+    <li>\(x_i\) = \(x\) value of data point \(i\)</li>
+    <li>\(y_i\) = observed \(y\) value of data point \(i\)</li>
+    <li>\(m\) = slope of the line</li>
+    <li>\(b\) = intercept of the line</li>
+    <li>\(r_i\) = residual of data point \(i\)</li>
+    <li>\(S\) = sum of the squared residuals</li>
+    <li>\(\bar{x}\) = mean of the \(x_i\) values</li>
+    <li>\(\bar{y}\) = mean of the \(y_i\) values</li>
+  </ul>
+</div>
+
+<div class="panel" id="panelAbout">
+  <span class="panelClose" title="close">&#215;</span>
+  <h3>About</h3>
+  <p>This simulation was created in the
+  <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department
+  of Chemical and Biological Engineering</a> at University of Colorado Boulder
+  for <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a>
+  by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a
+  <a href="https://demonstrations.wolfram.com/LeastSquaresCriteriaForTheLeastSquaresRegressionLine/"
+  target="_blank" rel="noopener">Mathematica simulation</a> by Mariel Maughan and
+  Bruce Torrence. It was prepared with financial support from the National Science
+  Foundation (DUE 2336987 and 2336988) in collaboration with Washington State
+  University. Address any questions or comments to LearnChemE@gmail.com.</p>
+</div>
+
+</div><!-- end topArea -->
+
+<canvas id="plotCanvas"></canvas>
+
+</div><!-- end container -->
+
+<script>
+"use strict";
+
+/* ---------------- data (from the original CDF) ---------------- */
+const datasets = [
+  [[1,2],[2,1],[3,3],[4,5],[5,4]],
+  [[0,6.2976],[0.5,5.7641],[1,5.2908],[1.5,4.0183],[2,4.2557],[2.5,3.6905],
+   [3,2.9592],[3.5,2.1034],[4,1.6559],[4.5,1.4655],[5,0.7389],[5.5,0.0577],
+   [6,0.0656],[6.5,-0.8195]],
+  [[0.5,1.7922],[1,2.3155],[1.5,2.1009],[2,2.8311],[2.5,4.1318],[3,4.2082],
+   [3.5,4.629],[4,3.7121],[4.5,4.7722],[5,4.4567],[5.5,5.5291],[6,5.3574]]
+];
+
+/* least squares fits (values from the original CDF initialization) */
+const fits = [
+  { m: 0.7999999999999997,  b: 0.6000000000000003 },
+  { m: -1.0820663736263738, b: 6.198408571428573 },
+  { m: 0.6538279720279722,  b: 1.6947424242424238 }
+];
+
+/* ---------------- state ---------------- */
+let dataIndex = 0;
+let m = 0.9;
+let b = 0.6;
+
+/* ---------------- canvas setup (hi-DPI) ---------------- */
+const canvas = document.getElementById("plotCanvas");
+const ctx = canvas.getContext("2d");
+const cssW = 505, cssH = 494;
+const dpr = window.devicePixelRatio || 1;
+canvas.width = cssW * dpr;
+canvas.height = cssH * dpr;
+canvas.style.width = cssW + "px";
+canvas.style.height = cssH + "px";
+ctx.scale(dpr, dpr);
+
+/* plot region: equal aspect, range -5..10 on both axes */
+const xMin = -5, xMax = 10, yMin = -5, yMax = 10;
+const margin = { left: 25, right: 40, top: 30, bottom: 20 };
+const plotSize = Math.min(cssW - margin.left - margin.right,
+                          cssH - margin.top - margin.bottom); /* 440 */
+const px0 = margin.left, py0 = margin.top;
+
+function toX(x) { return px0 + (x - xMin) / (xMax - xMin) * plotSize; }
+function toY(y) { return py0 + (yMax - y) / (yMax - yMin) * plotSize; }
+
+/* ---------------- drawing ---------------- */
+function draw() {
+  ctx.clearRect(0, 0, cssW, cssH);
+  const data = datasets[dataIndex];
+
+  /* predicted values and residuals (as in the CDF) */
+  const pred = data.map(p => (m === 0 ? b : b + m * p[0]));
+  const resid = data.map((p, i) => (m > 0 ? p[1] - pred[i] : pred[i] - p[1]));
+  const ss = resid.reduce((s, r) => s + r * r, 0);
+
+  /* clip everything in the plot to the plot region */
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(px0, py0, plotSize, plotSize);
+  ctx.clip();
+
+  /* squares: gray fill (opacity 0.2) */
+  ctx.fillStyle = "rgba(0,0,0,0.2)";
+  data.forEach((p, i) => {
+    const x1 = toX(p[0] - resid[i]), x2 = toX(p[0]);
+    const y1 = toY(pred[i]), y2 = toY(p[1]);
+    ctx.fillRect(Math.min(x1, x2), Math.min(y1, y2),
+                 Math.abs(x2 - x1), Math.abs(y2 - y1));
+  });
+
+  /* red edges: three sides of each square */
+  ctx.strokeStyle = "#FF0000";
+  ctx.lineWidth = 1.5;
+  data.forEach((p, i) => {
+    ctx.beginPath();
+    ctx.moveTo(toX(p[0]), toY(pred[i]));
+    ctx.lineTo(toX(p[0] - resid[i]), toY(pred[i]));
+    ctx.lineTo(toX(p[0] - resid[i]), toY(p[1]));
+    ctx.lineTo(toX(p[0]), toY(p[1]));
+    ctx.stroke();
+  });
+
+  /* dashed vertical residual segments */
+  ctx.strokeStyle = "#000000";
+  ctx.lineWidth = 1.2;
+  ctx.setLineDash([5, 5]);
+  data.forEach((p, i) => {
+    ctx.beginPath();
+    ctx.moveTo(toX(p[0]), toY(p[1]));
+    ctx.lineTo(toX(p[0]), toY(pred[i]));
+    ctx.stroke();
+  });
+  ctx.setLineDash([]);
+
+  /* regression line, plotted for x from 0 to 7 (as in the CDF) */
+  ctx.strokeStyle = "#3300FF";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(toX(0), toY(b));
+  ctx.lineTo(toX(7), toY(b + m * 7));
+  ctx.stroke();
+
+  /* data points */
+  ctx.fillStyle = "#000000";
+  data.forEach(p => {
+    ctx.beginPath();
+    ctx.arc(toX(p[0]), toY(p[1]), 3.5, 0, 2 * Math.PI);
+    ctx.fill();
+  });
+
+  ctx.restore();
+
+  /* axes through the origin */
+  ctx.strokeStyle = "#000000";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(toX(xMin), toY(0));
+  ctx.lineTo(toX(xMax), toY(0));
+  ctx.moveTo(toX(0), toY(yMin));
+  ctx.lineTo(toX(0), toY(yMax));
+  ctx.stroke();
+
+  /* ticks and tick labels */
+  ctx.font = "14.3px Helvetica, Arial, sans-serif";
+  ctx.fillStyle = "#000000";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "top";
+  for (let t = -4; t <= 10; t += 2) {
+    if (t === 0) continue;
+    ctx.beginPath();
+    ctx.moveTo(toX(t), toY(0));
+    ctx.lineTo(toX(t), toY(0) - 5);
+    ctx.stroke();
+    ctx.fillText(String(t), toX(t), toY(0) + 4);
+  }
+  ctx.textAlign = "right";
+  ctx.textBaseline = "middle";
+  for (let t = -4; t <= 10; t += 2) {
+    if (t === 0) continue;
+    ctx.beginPath();
+    ctx.moveTo(toX(0), toY(t));
+    ctx.lineTo(toX(0) + 5, toY(t));
+    ctx.stroke();
+    ctx.fillText(String(t), toX(0) - 4, toY(t));
+  }
+
+  /* axis labels */
+  ctx.font = "italic 18.48px Helvetica, Arial, sans-serif";
+  ctx.textAlign = "left";
+  ctx.textBaseline = "middle";
+  ctx.fillText("x", toX(xMax) + 6, toY(0));
+  ctx.textAlign = "center";
+  ctx.textBaseline = "bottom";
+  ctx.fillText("y", toX(0), toY(yMax) - 6);
+
+  /* sum of squares to 3 decimal places (as in the CDF) */
+  document.getElementById("sumVal").textContent = ss.toFixed(3);
+}
+
+/* ---------------- controls ---------------- */
+const dataSelect = document.getElementById("dataSelect");
+const slopeSlider = document.getElementById("slopeSlider");
+const interceptSlider = document.getElementById("interceptSlider");
+const slopeVal = document.getElementById("slopeVal");
+const interceptVal = document.getElementById("interceptVal");
+
+function updateReadouts() {
+  slopeVal.textContent = m.toFixed(2);
+  interceptVal.textContent = b.toFixed(2);
+}
+
+dataSelect.addEventListener("change", () => {
+  dataIndex = parseInt(dataSelect.value, 10);
+  draw();
+});
+
+slopeSlider.addEventListener("input", () => {
+  m = parseFloat(slopeSlider.value);
+  updateReadouts();
+  draw();
+});
+
+interceptSlider.addEventListener("input", () => {
+  b = parseFloat(interceptSlider.value);
+  updateReadouts();
+  draw();
+});
+
+document.getElementById("lsButton").addEventListener("click", () => {
+  m = fits[dataIndex].m;
+  b = fits[dataIndex].b;
+  slopeSlider.value = m;
+  interceptSlider.value = b;
+  updateReadouts();
+  draw();
+});
+
+/* ---------------- collapsible panels ---------------- */
+const panels = {
+  btnDirections: "panelDirections",
+  btnDetails: "panelDetails",
+  btnAbout: "panelAbout"
+};
+Object.keys(panels).forEach(btnId => {
+  document.getElementById(btnId).addEventListener("click", () => {
+    const target = document.getElementById(panels[btnId]);
+    const show = target.style.display !== "block";
+    Object.values(panels).forEach(id => {
+      document.getElementById(id).style.display = "none";
+    });
+    if (show) {
+      target.style.display = "block";
+      if (panels[btnId] === "panelDetails" && window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise([target]);
+      }
+    }
+  });
+});
+
+document.querySelectorAll(".panelClose").forEach(x => {
+  x.addEventListener("click", () => {
+    x.parentElement.style.display = "none";
+  });
+});
+
+updateReadouts();
+draw();
+</script>
+
+</body>
+</html>

@@ -1,6 +1,7 @@
-import type { Accessor, Component } from "solid-js";
+import { createSignal, type Accessor, type Component } from "solid-js";
 import { Slider } from "../Slider/Slider";
 import "./InjForm.css";
+import { injConcStep, maxInjConc, minInjConc } from "../../globals";
 
 type InjFormProps = {
     prepBtnDisabled: Accessor<boolean>;
@@ -9,16 +10,21 @@ type InjFormProps = {
 };
 
 export const InjForm: Component<InjFormProps> = (props) => {
+    const [etOH, setEtOH] = createSignal(1);
+    const [acOH, setAcOH] = createSignal(2);
+    const [eaOH, setEaOH] = createSignal(1);
+    const [wOH, setWOH] = createSignal(2);
+
     return (<>
       <div class="inj-form">
         <h5>sample settings</h5> 
         <select></select>
 
 
-        <Slider value={() => 1} label='ethanol concentration' />
-        <Slider value={() => 2} label='acetic acid concentration' />
-        <Slider value={() => 1} label='ethyl acetate concentration' />
-        <Slider value={() => 2} label='water concentration' />
+        <Slider value={etOH} setValue={setEtOH} min={minInjConc} max={maxInjConc} step={injConcStep} unit='M' label='ethanol concentration' />
+        <Slider value={acOH} setValue={setAcOH} min={minInjConc} max={maxInjConc} step={injConcStep} unit='M' label='acetic acid concentration' />
+        <Slider value={eaOH} setValue={setEaOH} min={minInjConc} max={maxInjConc} step={injConcStep} unit='M' label='ethyl acetate concentration' />
+        <Slider value={wOH}  setValue={setWOH}  min={minInjConc} max={maxInjConc} step={injConcStep} unit='M' label='water concentration' />
         
 
         <button

@@ -1,0 +1,436 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body>
+<title>Two-Site Ion Exchange Isotherm</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: title + button row, slider row, then hi-DPI canvas plot; LearnChemE house style, light only */
+:root{
+  --red:#98000D; --fg:#000; --bg:#fff; --track:#c8c8c8; --grid:#ececec;
+  --c-tot:#000000; --c-1:#c25a00; --c-2:#1a7f37; --c-diag:#8a8a8a;
+  --font:Helvetica, Arial, sans-serif;
+  color-scheme:light;
+}
+[hidden]{display:none!important}
+html,body{background:var(--bg);color:var(--fg)}
+body{font:17px var(--font);margin:0;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:48px 24px}
+#app{max-width:960px;margin:0 auto;position:relative}
+.toprow{display:flex;flex-direction:column;align-items:flex-start;gap:12px}
+.btns{display:flex;gap:10px;flex-wrap:wrap}
+h1{font:bold 19px var(--font);margin:0;color:#000}
+.btn{background:var(--red);color:#fff;border:0;border-radius:4px;padding:6px 14px;
+  font:17px var(--font);font-weight:normal;cursor:pointer}
+.btn:focus-visible{outline:2px solid #000;outline-offset:2px}
+.controls{display:flex;flex-direction:column;align-items:flex-start;gap:14px;margin-top:22px}
+.line2{display:flex;flex-wrap:wrap;align-items:center;gap:14px 34px}
+.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.row label{min-width:0}
+.kpair{display:flex;flex-wrap:wrap;align-items:center;gap:14px 18px}
+.kpair .row{gap:6px}
+.num{font-variant-numeric:tabular-nums;min-width:52px}
+.frac-ends{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.frac-ends input[type=range]{width:120px}
+.plotwrap{margin-top:16px;min-width:0}
+canvas{display:block;touch-action:none;cursor:default;max-width:100%}
+input[type=checkbox]{width:17px;height:17px;accent-color:var(--red);margin:0}
+
+/* range slider */
+input[type=range]{-webkit-appearance:none;appearance:none;width:140px;height:20px;background:transparent;margin:0}
+input[type=range]::-webkit-slider-runnable-track{height:5px;background:var(--track);border-radius:3px}
+input[type=range]::-moz-range-track{height:5px;background:var(--track);border-radius:3px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;
+  background:var(--red);border:0;margin-top:-5.5px;cursor:pointer}
+input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--red);border:0;cursor:pointer}
+input[type=range]:focus-visible{outline:2px solid #000;outline-offset:2px}
+
+/* flyout panels */
+.panel{position:absolute;top:76px;left:0;z-index:20;background:#fff;color:#000;
+  border:1px solid #999;border-radius:6px;box-shadow:0 6px 24px rgba(0,0,0,.18);
+  width:max-content;max-width:min(640px,100%);max-height:72vh;display:flex;flex-direction:column}
+.panel-head{display:flex;justify-content:space-between;align-items:center;gap:16px;
+  padding:10px 14px 6px 16px;flex:none}
+.panel-head h2{font:17px var(--font);margin:0;color:#000}
+.close{background:none;border:0;font:24px var(--font);line-height:1;cursor:pointer;color:#000;padding:0 4px}
+.panel-body{overflow-y:auto;padding:0 16px 14px;line-height:1.45}
+.panel-body p{margin:0 0 6px;max-width:60ch}
+.panel-body a{color:var(--red)}
+.panel-body mjx-container[display="true"]{text-align:left!important;margin:0 0 4px!important}
+.symbols{margin:4px 0 0;padding-left:0;list-style:none}
+.symbols li{margin:2px 0}
+</style>
+
+<div id="app">
+  <div class="toprow">
+    <h1>Cs<sup>+</sup> ion exchange isotherm with two types of sites</h1>
+    <div class="btns">
+      <button class="btn" id="b-dir" type="button">Directions</button>
+      <button class="btn" id="b-det" type="button">Details</button>
+      <button class="btn" id="b-abt" type="button">About</button>
+    </div>
+  </div>
+
+  <div class="panel" id="p-dir" hidden>
+    <div class="panel-head"><h2>Directions</h2><button class="close" type="button" aria-label="Close">×</button></div>
+    <div class="panel-body">
+      <p>This simulation plots the equilibrium isotherm for ion exchange of Cs<sup>+</sup> in solution with Na<sup>+</sup> on crystalline silicotitanate (CST), an inorganic ion exchanger used to remove radioactive cesium from nuclear waste. The solid has two types of exchange sites, and each site has its own selectivity coefficient K<sub>C</sub>. The solid black curve is the overall isotherm; it is the sum of the contributions of the two sites (dashed curves).</p>
+      <p>Use the K<sub>C1</sub> and K<sub>C2</sub> sliders to set the selectivity coefficient of each site (log scale from 0.01 to 1000). The third slider sets how the exchange capacity is split between the sites: the left end is only site 1, the right end is only site 2, and the fraction of capacity in site 2 is shown beside the slider.</p>
+      <p>The grey dashed line is the isotherm for K<sub>C</sub> = 1 (no preference for either ion). Click or drag on the plot to move the red point; hold the mouse over the point to show the liquid and solid equivalent fractions there. The initial slope of the isotherm (the Henry's law constant) is shown on the plot. Uncheck "show site contributions" to show only the overall isotherm.</p>
+    </div>
+  </div>
+
+  <div class="panel" id="p-det" hidden>
+    <div class="panel-head"><h2>Details</h2><button class="close" type="button" aria-label="Close">×</button></div>
+    <div class="panel-body" id="det-body">
+      <p>Cesium in solution exchanges with sodium in the solid (both ions have a +1 charge):</p>
+      \[ \mathrm{Cs^+} + \overline{\mathrm{Na^+}} \rightleftharpoons \overline{\mathrm{Cs^+}} + \mathrm{Na^+} \]
+      <p>where the overbar denotes the solid phase. The selectivity coefficient of a site, written with equivalent fractions, is</p>
+      \[ K_C = \frac{Q_{Cs}\,C_{Na}}{Q_{Na}\,C_{Cs}} = \frac{\bar{X}_{Cs}\,(1-X_{Cs})}{(1-\bar{X}_{Cs})\,X_{Cs}} \]
+      <p>The equivalent fractions in the liquid and solid are</p>
+      \[ X_{Cs} = \frac{C_{Cs}}{C_0}, \qquad \bar{X}_{Cs} = \frac{Q_{Cs}}{Q_0} \]
+      <p>For a single type of site with an ideal solid phase, solving for the solid fraction gives the isotherm</p>
+      \[ \bar{X}_{Cs} = \frac{K_C\,X_{Cs}}{1+(K_C-1)\,X_{Cs}} \]
+      <p>which is concave for K<sub>C</sub> &gt; 1, a straight line for K<sub>C</sub> = 1, and convex for K<sub>C</sub> &lt; 1. When two types of sites exchange independently, the isotherm is the capacity-weighted sum of the two single-site isotherms (eq 21 in Zheng et al.):</p>
+      \[ \bar{X}_{Cs} = \bar{X}_{01}\,\frac{K_{C1}\,X_{Cs}}{1+(K_{C1}-1)\,X_{Cs}} + \bar{X}_{02}\,\frac{K_{C2}\,X_{Cs}}{1+(K_{C2}-1)\,X_{Cs}} \]
+      \[ \bar{X}_{01} + \bar{X}_{02} = 1 \]
+      <p>Each dashed curve in the plot is one term of this sum. At low cesium concentration the isotherm reduces to Henry's law, with an initial slope equal to the capacity-weighted average selectivity:</p>
+      \[ \bar{X}_{Cs} \approx \left(\bar{X}_{01}K_{C1} + \bar{X}_{02}K_{C2}\right) X_{Cs} \]
+      <p>When one site has K<sub>C</sub> &gt; 1 and the other has K<sub>C</sub> &lt; 1, the isotherm can have an inflection: the selective site fills first, and the other site loads only at high liquid-phase cesium fractions. For CST, the measured K<sub>C</sub> for Cs<sup>+</sup>/Na<sup>+</sup> is about 10<sup>4</sup>, so cesium is strongly removed even from waste that is about 5 M in sodium, where X<sub>Cs</sub> is around 10<sup>−4</sup>.</p>
+      <p>Reference: Z. Zheng, C. V. Philip, R. G. Anthony, J. L. Krumhansl, D. E. Trudell, and J. E. Miller, "Ion exchange of group I metals by hydrous crystalline silicotitanates," <i>Ind. Eng. Chem. Res.</i> <b style="font-weight:normal">35</b> (1996) 4246–4256.</p>
+      <p>Symbols:</p>
+      <ul class="symbols">
+        <li>\(C_{Cs}, C_{Na}\) = liquid-phase concentrations (equiv/L)</li>
+        <li>\(C_0\) = total liquid-phase concentration, \(C_{Cs}+C_{Na}\) (equiv/L)</li>
+        <li>\(Q_{Cs}, Q_{Na}\) = solid-phase concentrations (equiv/kg)</li>
+        <li>\(Q_0\) = total exchange capacity of the solid (equiv/kg)</li>
+        <li>\(X_{Cs}\) = equivalent fraction of Cs<sup>+</sup> in the liquid</li>
+        <li>\(\bar{X}_{Cs}\) = equivalent fraction of Cs<sup>+</sup> in the solid</li>
+        <li>\(\bar{X}_{01}, \bar{X}_{02}\) = fraction of exchange capacity in site 1 and site 2</li>
+        <li>\(K_C, K_{C1}, K_{C2}\) = selectivity coefficient (overall, site 1, site 2)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="panel" id="p-abt" hidden>
+    <div class="panel-head"><h2>About</h2><button class="close" type="button" aria-label="Close">×</button></div>
+    <div class="panel-body">
+      <p>This simulation was created in the <a href="https://www.colorado.edu/chbe/" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="https://learncheme.com/" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.</p>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="kpair">
+    <div class="row">
+      <label for="k1">K<sub>C1</sub></label>
+      <input type="range" id="k1" min="-2" max="3" step="0.01" value="1">
+      <span class="num" id="k1v"></span>
+    </div>
+    <div class="row">
+      <label for="k2">K<sub>C2</sub></label>
+      <input type="range" id="k2" min="-2" max="3" step="0.01" value="-0.30103">
+      <span class="num" id="k2v"></span>
+    </div>
+    </div>
+    <div class="line2">
+    <div class="frac-ends">
+      <span>site 1</span>
+      <input type="range" id="fr" min="0" max="1" step="0.01" value="0.3" aria-label="fraction of capacity in site 2">
+      <span>site 2</span>
+      <span id="frv" style="margin-left:8px"></span>
+    </div>
+    <label class="row" for="show" style="gap:8px">
+      <input type="checkbox" id="show" checked> show site contributions
+    </label>
+    </div>
+  </div>
+  <div class="plotwrap"><canvas id="plot" aria-label="Ion exchange isotherm plot"></canvas></div>
+</div>
+
+<script>
+window.MathJax = { tex:{inlineMath:[['\\(','\\)']]}, chtml:{displayAlign:'left'}, startup:{typeset:false} };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js" async></script>
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const k1 = $('k1'), k2 = $('k2'), fr = $('fr'), show = $('show');
+  const cv = $('plot'), ctx = cv.getContext('2d');
+  const FONT = 'Helvetica, Arial, sans-serif';
+  const W = 660, H = 560, M = {l:88, r:20, t:16, b:70};
+  const pw = W - M.l - M.r, ph = H - M.t - M.b;
+  const N = 400;
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  let scale = 1, probeX = 0.2, K1, K2, f2, labels = null, hover = false;
+  const LF = 18.4, SF = 13.8; // curve-label fonts (15% larger)
+
+  const px = x => M.l + x * pw;
+  const py = y => M.t + (1 - y) * ph;
+  const term = (K, X) => K * X / (1 + (K - 1) * X);
+
+  function fmtK(v){
+    if (v >= 100) return v.toFixed(0);
+    if (v >= 10) return v.toFixed(1);
+    if (v >= 1) return v.toFixed(2);
+    return v.toPrecision(2);
+  }
+  function readState(){
+    K1 = Math.pow(10, +k1.value); K2 = Math.pow(10, +k2.value); f2 = +fr.value;
+    $('k1v').textContent = fmtK(K1);
+    $('k2v').textContent = fmtK(K2);
+    $('frv').textContent = 'fraction of site 2 = ' + f2.toFixed(2);
+  }
+
+  // ---- rich text (subscripts) on canvas ----
+  function richWidth(parts){
+    let w = 0;
+    for (const p of parts){ ctx.font = (p.sub ? SF + 'px ' : LF + 'px ') + FONT; w += ctx.measureText(p.t).width; }
+    return w;
+  }
+  function drawRich(parts, x, y){ // y = baseline
+    for (const p of parts){
+      ctx.font = (p.sub ? SF + 'px ' : LF + 'px ') + FONT;
+      ctx.fillText(p.t, x, p.sub ? y + 5 : y);
+      x += ctx.measureText(p.t).width;
+    }
+  }
+
+  // ---- curves ----
+  function buildCurves(){
+    const tot = [], s1 = [], s2 = [], dg = [];
+    for (let i = 0; i <= N; i++){
+      const X = i / N, a = (1 - f2) * term(K1, X), b = f2 * term(K2, X);
+      tot.push([px(X), py(a + b)]); s1.push([px(X), py(a)]); s2.push([px(X), py(b)]); dg.push([px(X), py(X)]);
+    }
+    return {tot, s1, s2, dg};
+  }
+  function densify(pts){ // points no more than ~3 px apart, for label collision tests
+    const out = [];
+    for (let i = 0; i < pts.length - 1; i++){
+      const [x0,y0] = pts[i], [x1,y1] = pts[i+1];
+      const n = Math.max(1, Math.ceil(Math.hypot(x1-x0, y1-y0) / 3));
+      for (let j = 0; j < n; j++) out.push([x0 + (x1-x0)*j/n, y0 + (y1-y0)*j/n]);
+    }
+    out.push(pts[pts.length-1]);
+    return out;
+  }
+  function boxDist(bx, by, w, h, pts){
+    let d = Infinity;
+    for (const [x,y] of pts){
+      const dx = Math.max(bx - x, 0, x - (bx + w)), dy = Math.max(by - y, 0, y - (by + h));
+      const e = Math.hypot(dx, dy); if (e < d) d = e;
+    }
+    return d;
+  }
+  function placeLabels(items, obstacles){
+    const placed = [], h = 19;
+    for (const it of items){
+      const w = richWidth(it.parts);
+      const offs = [[8,-8-h],[-w-8,-8-h],[8,8],[-w-8,8],[-w/2,-h-10],[-w/2,10],[10,-h/2],[-w-10,-h/2]];
+      let best = null;
+      for (let t = 0.04; t <= 0.961; t += 0.02){
+        const [ax, ay] = it.pts[Math.round(t * N)];
+        for (const [ox, oy] of offs){
+          const bx = ax + ox, by = ay + oy;
+          if (bx < M.l + 4 || bx + w > M.l + pw - 4 || by < M.t + 4 || by + h > M.t + ph - 4) continue;
+          let ok = true;
+          for (const pts of obstacles){
+            for (const [qx, qy] of pts){
+              if (qx > bx - 4 && qx < bx + w + 4 && qy > by - 4 && qy < by + h + 4){ ok = false; break; }
+            }
+            if (!ok) break;
+          }
+          if (!ok) continue;
+          for (const p of placed){
+            if (bx < p.x + p.w + 6 && bx + w + 6 > p.x && by < p.y + p.h + 6 && by + h + 6 > p.y){ ok = false; break; }
+          }
+          if (!ok) continue;
+          const score = boxDist(bx, by, w, h, it.dense) + 12 * Math.abs(t - it.pref);
+          if (!best || score < best.score) best = {x:bx, y:by, w, h, score};
+        }
+      }
+      if (best) placed.push(Object.assign(best, {parts: it.parts, color: it.color}));
+    }
+    return placed;
+  }
+
+  function showSites(){ return show.checked && f2 > 0 && f2 < 1; }
+
+  function computeLabels(c){
+    const sites = showSites();
+    const D = {tot: densify(c.tot), dg: densify(c.dg)};
+    const obstacles = [D.tot, D.dg];
+    if (sites){ D.s1 = densify(c.s1); D.s2 = densify(c.s2); obstacles.push(D.s1, D.s2); }
+    const items = [{parts:[{t:'total'}], color:css('--c-tot'), pts:c.tot, dense:D.tot, pref:0.45}];
+    if (sites){
+      items.push({parts:[{t:'site 1'}], color:css('--c-1'), pts:c.s1, dense:D.s1, pref:0.6});
+      items.push({parts:[{t:'site 2'}], color:css('--c-2'), pts:c.s2, dense:D.s2, pref:0.6});
+    }
+    items.push({parts:[{t:'K'},{t:'C',sub:true},{t:' = 1'}], color:css('--c-diag'), pts:c.dg, dense:D.dg, pref:0.75});
+    const placed = placeLabels(items, obstacles);
+    // initial-slope label: first free spot among open regions of the plot
+    const slope = (1 - f2) * K1 + f2 * K2;
+    const sv = slope >= 100 ? slope.toFixed(0) : slope >= 10 ? slope.toFixed(1) : slope.toFixed(2);
+    const parts = [{t:'initial slope = ' + sv}], w = richWidth(parts), h = 19;
+    const spots = [];
+    for (const fy of [0.04, 0.14, 0.24, 0.36, 0.5, 0.64, 0.76, 0.88, 0.97]) for (const fx of [0.98, 0.5, 0.02])
+      spots.push([M.l + 8 + fx * (pw - 16 - w), M.t + ph - 8 - h - fy * (ph - 16 - h)]);
+    const allPts = obstacles.flat();
+    for (const [bx, by] of spots){
+      let ok = !placed.some(p => bx < p.x + p.w + 6 && bx + w + 6 > p.x && by < p.y + p.h + 6 && by + h + 6 > p.y);
+      if (ok) for (const [qx, qy] of allPts){ if (qx > bx - 6 && qx < bx + w + 6 && qy > by - 6 && qy < by + h + 6){ ok = false; break; } }
+      if (ok){ placed.push({x:bx, y:by, w, h, parts, color:'#000'}); break; }
+    }
+    return placed;
+  }
+
+  // y label: drawn horizontally on an offscreen canvas, then rotated, so it renders like the x label
+  function drawYLabel(text, cx, cy){
+    ctx.font = '18.5px ' + FONT;
+    const w = Math.ceil(ctx.measureText(text).width) + 6, h = 26;
+    const off = document.createElement('canvas');
+    off.width = Math.ceil(w * scale); off.height = Math.ceil(h * scale);
+    const o = off.getContext('2d');
+    o.scale(off.width / w, off.height / h);
+    o.fillStyle = '#000'; o.font = '18.5px ' + FONT; o.textAlign = 'center'; o.textBaseline = 'middle';
+    o.fillText(text, w / 2, h / 2 + 1);
+    ctx.save(); ctx.translate(cx, cy); ctx.rotate(-Math.PI / 2);
+    ctx.drawImage(off, -w / 2, -h / 2, w, h); ctx.restore();
+  }
+
+  function stroke(pts, color, width, dash){
+    ctx.beginPath(); ctx.moveTo(pts[0][0], pts[0][1]);
+    for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
+    ctx.strokeStyle = color; ctx.lineWidth = width; ctx.setLineDash(dash || []); ctx.stroke(); ctx.setLineDash([]);
+  }
+
+  function draw(relabel){
+    ctx.setTransform(scale, 0, 0, scale, 0, 0);
+    ctx.fillStyle = css('--bg'); ctx.fillRect(0, 0, W, H);
+
+    // grid
+    ctx.strokeStyle = css('--grid'); ctx.lineWidth = 1;
+    for (let i = 1; i < 5; i++){
+      const v = i * 0.2;
+      ctx.beginPath(); ctx.moveTo(px(v), M.t); ctx.lineTo(px(v), M.t + ph); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(M.l, py(v)); ctx.lineTo(M.l + pw, py(v)); ctx.stroke();
+    }
+
+    const c = buildCurves();
+    if (relabel || !labels) labels = computeLabels(c);
+
+    ctx.save(); ctx.beginPath(); ctx.rect(M.l, M.t, pw, ph); ctx.clip();
+    stroke(c.dg, css('--c-diag'), 1.5, [6, 5]);
+    if (showSites()){
+      stroke(c.s1, css('--c-1'), 2.5, [9, 6]);
+      stroke(c.s2, css('--c-2'), 2.5, [9, 6]);
+    }
+    stroke(c.tot, css('--c-tot'), 3);
+
+    // probe
+    const yP = (1 - f2) * term(K1, probeX) + f2 * term(K2, probeX);
+    ctx.strokeStyle = '#555'; ctx.lineWidth = 1; ctx.setLineDash([3, 4]);
+    ctx.beginPath(); ctx.moveTo(px(probeX), M.t + ph); ctx.lineTo(px(probeX), py(yP)); ctx.lineTo(M.l, py(yP)); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.beginPath(); ctx.arc(px(probeX), py(yP), 6, 0, 2*Math.PI);
+    ctx.fillStyle = css('--red'); ctx.fill();
+    ctx.restore();
+
+    // frame and ticks
+    ctx.strokeStyle = '#000'; ctx.lineWidth = 1.5; ctx.strokeRect(M.l, M.t, pw, ph);
+    ctx.lineWidth = 1.2; ctx.fillStyle = '#000'; ctx.font = '17.6px ' + FONT;
+    for (let i = 0; i <= 10; i++){
+      const v = i / 10, major = i % 2 === 0, L = major ? 8 : 4;
+      ctx.beginPath(); ctx.moveTo(px(v), M.t + ph); ctx.lineTo(px(v), M.t + ph - L);
+      ctx.moveTo(px(v), M.t); ctx.lineTo(px(v), M.t + L);
+      ctx.moveTo(M.l, py(v)); ctx.lineTo(M.l + L, py(v));
+      ctx.moveTo(M.l + pw, py(v)); ctx.lineTo(M.l + pw - L, py(v)); ctx.stroke();
+      if (major){
+        ctx.textAlign = 'center'; ctx.textBaseline = 'top'; ctx.fillText(v.toFixed(1), px(v), M.t + ph + 7);
+        ctx.textAlign = 'right'; ctx.textBaseline = 'middle'; ctx.fillText(v.toFixed(1), M.l - 8, py(v));
+      }
+    }
+    // axis labels (17px)
+    ctx.fillStyle = '#000'; ctx.font = '18.5px ' + FONT; ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+    ctx.fillText('Cs⁺ equivalent fraction in liquid', M.l + pw/2, H - 16);
+    drawYLabel('Cs⁺ equivalent fraction in solid', M.l - 58, M.t + ph/2);
+
+    // curve labels
+    ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+    for (const L of labels){ ctx.fillStyle = L.color; drawRich(L.parts, L.x, L.y + 15); }
+
+    // label at the red point while the mouse is over it
+    if (hover){
+      ctx.font = '17px ' + FONT;
+      const l1 = 'liquid fraction = ' + probeX.toFixed(3), l2 = 'solid fraction = ' + yP.toFixed(3);
+      const bw = Math.max(ctx.measureText(l1).width, ctx.measureText(l2).width) + 16, bh = 50;
+      let bx = px(probeX) + 14, by = py(yP) + 12;
+      if (bx + bw > M.l + pw - 4) bx = px(probeX) - 14 - bw;
+      if (by + bh > M.t + ph - 4) by = py(yP) - 12 - bh;
+      bx = Math.max(M.l + 4, bx); by = Math.max(M.t + 4, by);
+      ctx.fillStyle = 'rgba(255,255,255,0.94)'; ctx.strokeStyle = '#888'; ctx.lineWidth = 1;
+      ctx.fillRect(bx, by, bw, bh); ctx.strokeRect(bx, by, bw, bh);
+      ctx.fillStyle = '#000'; ctx.textBaseline = 'middle';
+      ctx.fillText(l1, bx + 8, by + 14); ctx.fillText(l2, bx + 8, by + 36);
+    }
+
+  }
+
+  function resize(){
+    const avail = cv.parentElement.clientWidth;
+    const cssW = Math.min(W, avail), cssH = cssW * H / W;
+    const dpr = window.devicePixelRatio || 1;
+    cv.style.width = cssW + 'px'; cv.style.height = cssH + 'px';
+    cv.width = Math.round(cssW * dpr); cv.height = Math.round(cssH * dpr);
+    scale = cv.width / W;
+    draw(false);
+  }
+
+  // probe dragging
+  function setProbe(e){
+    const r = cv.getBoundingClientRect();
+    const x = (e.clientX - r.left) * W / r.width;
+    probeX = Math.min(1, Math.max(0, (x - M.l) / pw));
+    draw(false);
+  }
+  function overPoint(e){
+    const r = cv.getBoundingClientRect();
+    const x = (e.clientX - r.left) * W / r.width, y = (e.clientY - r.top) * H / r.height;
+    const yP = (1 - f2) * term(K1, probeX) + f2 * term(K2, probeX);
+    return Math.hypot(x - px(probeX), y - py(yP)) < 12;
+  }
+  cv.addEventListener('pointerdown', e => { cv.setPointerCapture(e.pointerId); hover = true; setProbe(e); });
+  cv.addEventListener('pointermove', e => {
+    if (cv.hasPointerCapture(e.pointerId)){ hover = true; setProbe(e); return; }
+    const h = overPoint(e);
+    cv.style.cursor = h ? 'pointer' : 'default';
+    if (h !== hover){ hover = h; draw(false); }
+  });
+  cv.addEventListener('pointerup', e => { hover = e.pointerType === 'mouse' ? overPoint(e) : false; draw(false); });
+  cv.addEventListener('pointerleave', () => { if (hover){ hover = false; draw(false); } });
+
+  for (const el of [k1, k2, fr]) el.addEventListener('input', () => { readState(); draw(true); });
+  show.addEventListener('change', () => draw(true));
+  window.addEventListener('resize', resize);
+
+  // panels: opening one closes others; clicking an open panel's button closes it
+  const pairs = [['b-dir','p-dir'],['b-det','p-det'],['b-abt','p-abt']];
+  let typeset = false;
+  for (const [b, p] of pairs){
+    $(b).addEventListener('click', () => {
+      const open = !$(p).hidden;
+      for (const [, q] of pairs) $(q).hidden = true;
+      if (!open){
+        $(p).hidden = false;
+        if (p === 'p-det' && !typeset && window.MathJax && MathJax.typesetPromise){
+          typeset = true; MathJax.typesetPromise([$('det-body')]).catch(() => { typeset = false; });
+        }
+      }
+    });
+    $(p).querySelector('.close').addEventListener('click', () => { $(p).hidden = true; });
+  }
+
+  readState();
+  resize();
+})();
+</script>
+</body></html>

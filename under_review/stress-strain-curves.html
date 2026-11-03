@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stress–Strain Curves</title>
+<style>
+/* Layout: LearnChemE sim — title + flyout buttons row, control strip, plot beside specimen (stacks on phones). Single light theme by design, matching the LearnChemE house style. */
+:root{
+  --bg:#ffffff; --fg:#1d1d1f; --muted:#5b5b62; --line:#d9d6d6; --panel:#fbfafa;
+  --accent:#98000D; --accent-hover:#b3101e; --eng:#1b3f8b; --true:#d07200;
+  --tough:rgba(27,63,139,0.12); --resil:rgba(0,140,90,0.30);
+  --sans:Helvetica, "Helvetica Neue", Arial, sans-serif; --serif:"Times New Roman", Times, serif;
+  color-scheme:light;
+}
+body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:15px}
+.wrap{max-width:1180px;margin:0 auto;padding-block:14px 28px;padding-inline:16px;position:relative}
+.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 16px}
+h1{font-size:22px;margin:0;font-weight:700;text-wrap:balance}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+button{font-family:var(--sans);font-size:14px;background:var(--accent);color:#fff;border:0;border-radius:4px;padding:7px 14px;cursor:pointer}
+button:hover{background:var(--accent-hover)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--eng);outline-offset:2px}
+.controls{margin-top:12px;display:grid;grid-template-columns:auto auto;justify-content:start;gap:10px 28px;align-items:center}
+@media (max-width:760px){.controls{grid-template-columns:minmax(0,1fr)}}
+.row2{margin-top:10px;display:flex;flex-wrap:wrap;align-items:center;gap:10px 28px}
+.row2 .ctl{flex:0 1 auto}
+.row2 .ctlF input[type=range]{width:210px}
+.row2 .val{min-width:52px}
+.pbtns{display:flex;gap:8px}
+.ctl{display:flex;align-items:center;gap:10px;min-width:0;font-size:17px;color:#000}
+.ctl label{white-space:nowrap}
+.ctl label,.val{flex:none}
+.ctl input[type=range]{flex:0 1 auto;width:210px;min-width:90px;margin-top:.5rem}
+.ctl select{flex:0 1 auto;max-width:100%}
+.val{font-variant-numeric:tabular-nums;min-width:80px;text-align:left}
+select{font-family:var(--sans);font-size:17px;color:#000;padding:4px 6px;flex:1;min-width:0}
+.g{font-family:var(--serif);font-style:italic;font-size:1.08em}
+.checks{margin-top:12px;display:flex;flex-wrap:wrap;align-items:center;gap:8px 22px;font-size:16px}
+.checks .btns{margin-left:0}
+.btns button,.pbtns button{font-size:16.1px}
+.ctl.off input[type=range]{opacity:.35;cursor:not-allowed}
+.ctl.off input[type=range]::-webkit-slider-thumb{background:#888;cursor:not-allowed}
+.ctl.off input[type=range]::-moz-range-thumb{background:#888;cursor:not-allowed}
+.ctl.off label{color:#888}
+@media (min-width:900px){.checks{flex-wrap:nowrap}.checks label{white-space:nowrap}}
+.checks label{display:flex;align-items:center;gap:6px;cursor:pointer}
+.checks input{accent-color:var(--accent);width:16px;height:16px}
+.main{margin-top:14px;display:flex;flex-wrap:wrap;gap:4px 8px}
+.plotbox{flex:3 1 520px;min-width:0}
+.side{flex:2 1 330px;min-width:0;display:flex;flex-direction:column;gap:12px}
+canvas{display:block;width:100%;touch-action:none}
+#plot{cursor:crosshair}
+.region{font-weight:700;font-size:16px}
+.region.el{color:var(--eng)} .region.up{color:#0c7a4f} .region.nk{color:var(--true)} .region.fr{color:var(--accent)}
+table{border-collapse:collapse;width:auto;align-self:flex-start;max-width:100%;font-variant-numeric:tabular-nums;font-size:17px;color:#000}
+td{padding:5px 2px;border-bottom:1px solid var(--line)}
+td:first-child{padding-right:22px}
+td:last-child{text-align:left;white-space:nowrap}
+.hint{color:#000;font-size:17px;margin:0}
+.panel{position:absolute;z-index:20;right:16px;width:min(620px,calc(100% - 32px));background:#fff;border:1px solid #bbb;border-radius:6px;box-shadow:0 8px 28px rgba(0,0,0,.22);display:flex;flex-direction:column;max-height:72vh}
+.panel[hidden]{display:none}
+#pDet{width:min(775px,calc(100% - 32px))}
+.panel .ph{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line);flex:none}
+.panel .ph b{font-size:16px}
+.panel .x{background:none;color:var(--fg);font-size:22px;line-height:1;padding:0 4px}
+.panel .x:hover{background:none;color:var(--accent)}
+.panel .pb{padding:12px 16px 16px;overflow-y:auto;line-height:1.5}
+.panel .pb p{margin:0 0 10px}
+.panel mjx-container[display="true"]{text-align:left!important;margin:6px 0 10px!important}
+.panel a{color:var(--accent)}
+.panel h3{font-size:16px;margin:16px 0 8px}
+.defs{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 16px;align-items:baseline}
+input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body style="margin:0">
+<script>
+window.MathJax={tex:{inlineMath:[['\\(','\\)']]},svg:{fontCache:'global',displayAlign:'left'}};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.min.js" async></script>
+
+<div class="wrap" id="wrap">
+  <div class="top">
+    <h1>Stress–Strain Curves</h1>
+  </div>
+
+  <div class="panel" id="pDir" hidden>
+    <div class="ph"><b>Directions</b><button class="x" type="button" aria-label="Close">×</button></div>
+    <div class="pb">
+      <p>This simulation shows the engineering stress–strain curve for a tensile test of a metal specimen. Pick a material from the menu. The Young's modulus <i>E</i>, strength coefficient <i>K</i>, hardening exponent <i>n</i>, and fracture strain <i>ε</i><sub>f</sub> sliders are inactive for these materials; select "Custom" to change them with the sliders (they start from the values of the material that was selected).</p>
+      <p>Set the applied strain with the strain slider, press <b>Pull</b> to run the test, or click and drag on the plot. The specimen on the right stretches, necks, and fractures as the strain increases.</p>
+      <p>Check <b>true stress–strain</b> to add the true curve (shown up to the onset of necking), <b>0.2% offset</b> to find the yield strength, <b>areas</b> to shade the modulus of resilience (green) and toughness (blue), and <b>unload</b> to see the elastic recovery and the permanent strain. <b>Zoom to elastic region</b> shows strains up to 0.01.</p>
+      <p>The gray dashed line (<b>0.2% offset line</b>) starts at a strain of 0.002 and is parallel to the elastic part of the curve (slope <i>E</i>). The yield strength <i>σ</i><sub>y</sub> is the stress where this line crosses the stress–strain curve.</p>
+      <p>The red dashed line (<b>unloading</b>) shows what happens if the load is removed at the current strain. The specimen recovers elastically along a line parallel to the elastic region, and the point where the line reaches zero stress is the permanent strain <i>ε</i><sub>p</sub> that remains in the specimen.</p>
+      <p>At full scale both dashed lines look nearly vertical because the elastic strains are very small (less than 0.01). Check <b>zoom to elastic region</b> to see them clearly.</p>
+    </div>
+  </div>
+  <div class="panel" id="pDet" hidden>
+    <div class="ph"><b>Details</b><button class="x" type="button" aria-label="Close">×</button></div>
+    <div class="pb">
+      <p>In the elastic region, stress is proportional to strain (Hooke's law):</p>
+      \[\sigma = E\,\varepsilon\]
+      <p>where \(\sigma\) is engineering stress (force per original area, MPa), \(\varepsilon\) is engineering strain (\(\Delta L/L_0\)), and \(E\) is Young's modulus.</p>
+      <p>True stress and true strain use the instantaneous area and length. Assuming constant volume during uniform deformation:</p>
+      \[\sigma_T = \sigma\,(1+\varepsilon), \qquad \varepsilon_T = \ln(1+\varepsilon)\]
+      <p>Plastic deformation is described by the Hollomon equation:</p>
+      \[\sigma_T = K\,\varepsilon_T^{\,n}\]
+      <p>so the engineering stress in the uniform plastic region is</p>
+      \[\sigma = \frac{K\,[\ln(1+\varepsilon)]^{n}}{1+\varepsilon}\]
+      <p>The elastic line and the Hollomon curve meet at the proportional limit. Necking begins at the maximum of the engineering curve (Considère criterion), where \(d\sigma_T/d\varepsilon_T = \sigma_T\), which gives</p>
+      \[\varepsilon_{T,u} = n, \qquad \varepsilon_u = e^{n}-1, \qquad \sigma_{UTS} = K\,n^{n}e^{-n}\]
+      <p>After necking begins, the engineering stress decreases until fracture at \(\varepsilon_f\). This part of the curve uses an empirical quadratic that drops to 75% of the UTS at fracture:</p>
+      \[\sigma = \sigma_{UTS} - 0.25\,\sigma_{UTS}\left(\frac{\varepsilon-\varepsilon_u}{\varepsilon_f-\varepsilon_u}\right)^{2}\]
+      <p>The 0.2% offset yield strength \(\sigma_y\) is where the curve crosses a line of slope \(E\) that starts at \(\varepsilon = 0.002\):</p>
+      \[\sigma(\varepsilon) = E\,(\varepsilon - 0.002)\]
+      <p>The modulus of resilience \(U_r\) is the elastic energy per volume absorbed up to yielding, and the toughness \(U_t\) is the total area under the engineering curve:</p>
+      \[U_r = \frac{\sigma_y^{2}}{2E}, \qquad U_t = \int_0^{\varepsilon_f}\sigma\,d\varepsilon\]
+      <p>1 MPa × (mm/mm) = 1 MJ/m³. When a specimen is unloaded from a plastic strain \(\varepsilon\), it recovers elastically along a line of slope \(E\), leaving a permanent strain</p>
+      \[\varepsilon_p = \varepsilon - \sigma/E\]
+      <p>A brittle material (gray cast iron here) fractures with little or no plastic deformation, so it has no necking and may have no 0.2% offset yield strength. Material parameters are approximate values from standard materials-science tables.</p>
+      <h3>Definitions</h3>
+      <div class="defs">
+        <span>\(A\)</span><span>instantaneous cross-sectional area of the specimen (mm²)</span>
+        <span>\(A_0\)</span><span>original cross-sectional area (mm²)</span>
+        <span>\(E\)</span><span>Young's modulus (elastic modulus), the slope of the elastic region (GPa)</span>
+        <span>\(F\)</span><span>applied tensile force (N)</span>
+        <span>\(K\)</span><span>strength coefficient in the Hollomon equation (MPa)</span>
+        <span>\(L\)</span><span>instantaneous gauge length (mm)</span>
+        <span>\(L_0\)</span><span>original gauge length (mm)</span>
+        <span>\(\Delta L\)</span><span>elongation, \(L - L_0\) (mm)</span>
+        <span>\(n\)</span><span>strain-hardening exponent in the Hollomon equation (dimensionless)</span>
+        <span>\(U_r\)</span><span>modulus of resilience, elastic energy absorbed per volume up to yielding (kJ/m³)</span>
+        <span>\(U_t\)</span><span>toughness, total energy absorbed per volume up to fracture (MJ/m³)</span>
+        <span>\(\varepsilon\)</span><span>engineering strain, \(\Delta L/L_0\) (mm/mm)</span>
+        <span>\(\varepsilon_f\)</span><span>engineering strain at fracture; ductility (%EL) = \(100\,\varepsilon_f\)</span>
+        <span>\(\varepsilon_p\)</span><span>permanent (plastic) strain that remains after unloading (mm/mm)</span>
+        <span>\(\varepsilon_T\)</span><span>true strain, \(\ln(L/L_0)\) (mm/mm)</span>
+        <span>\(\varepsilon_{T,u}\)</span><span>true strain at the onset of necking</span>
+        <span>\(\varepsilon_u\)</span><span>uniform elongation, the engineering strain at the onset of necking (mm/mm)</span>
+        <span>\(\sigma\)</span><span>engineering stress, \(F/A_0\) (MPa)</span>
+        <span>\(\sigma_T\)</span><span>true stress, \(F/A\) (MPa)</span>
+        <span>\(\sigma_{UTS}\)</span><span>ultimate tensile strength, the maximum engineering stress (MPa)</span>
+        <span>\(\sigma_y\)</span><span>yield strength by the 0.2% offset method (MPa)</span>
+      </div>
+    </div>
+  </div>
+  <div class="panel" id="pAbout" hidden>
+    <div class="ph"><b>About</b><button class="x" type="button" aria-label="Close">×</button></div>
+    <div class="pb">
+      <p>This simulation was created in the <a href="https://www.colorado.edu/chbe/" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="https://learncheme.com/" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.</p>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="ctl"><label for="mat">material</label>
+      <select id="mat"></select></div>
+    <div class="ctl"><label for="sE">Young's modulus <i>E</i></label><input id="sE" type="range" min="20" max="250" step="1"><span class="val" id="vE"></span></div>
+    <div class="ctl"><label for="sK">strength coeff. <i>K</i></label><input id="sK" type="range" min="200" max="3000" step="10"><span class="val" id="vK"></span></div>
+    <div class="ctl"><label for="sN">hardening exponent <i>n</i></label><input id="sN" type="range" min="0.02" max="0.60" step="0.01"><span class="val" id="vN"></span></div>
+  </div>
+  <div class="row2">
+    <div class="ctl ctlF"><label for="sF">fracture strain <span class="g">ε</span><sub>f</sub></label><input id="sF" type="range" min="0.002" max="0.80" step="0.001"><span class="val" id="vF"></span></div>
+    <div class="ctl ctlA"><label for="sA">applied strain <span class="g">ε</span></label><input id="sA" type="range" min="0" max="1000" step="1" value="0"><span class="val" id="vA"></span></div>
+    <div class="pbtns"><button id="bPlay" type="button">Pull</button><button id="bReset" type="button">Reset</button></div>
+  </div>
+  <div class="checks">
+    <label><input type="checkbox" id="cTrue">true stress–strain</label>
+    <label><input type="checkbox" id="cOff" checked>0.2% offset</label>
+    <label><input type="checkbox" id="cArea">areas</label>
+    <label><input type="checkbox" id="cUnload">unload</label>
+    <label><input type="checkbox" id="cZoom">zoom to elastic region</label>
+    <div class="btns" id="btns">
+      <button id="bDir" type="button">Directions</button>
+      <button id="bDet" type="button">Details</button>
+      <button id="bAbout" type="button">About</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="plotbox"><canvas id="plot"></canvas></div>
+    <div class="side">
+      <canvas id="spec"></canvas>
+      <div class="region" id="region"></div>
+      <table id="tbl"></table>
+      <p class="hint">Click or drag on the plot to set the strain.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+const PRESETS=[
+ {name:'low-carbon steel (annealed)',E:207,K:600,n:0.21,ef:0.37},
+ {name:'4340 steel (tempered at 315 °C)',E:207,K:2650,n:0.12,ef:0.16},
+ {name:'304 stainless steel (annealed)',E:193,K:1400,n:0.44,ef:0.65},
+ {name:'copper (annealed)',E:110,K:530,n:0.44,ef:0.60},
+ {name:'naval brass (annealed)',E:100,K:585,n:0.21,ef:0.40},
+ {name:'2024-T3 aluminum alloy',E:72.4,K:780,n:0.17,ef:0.20},
+ {name:'AZ31B magnesium alloy (annealed)',E:45,K:450,n:0.16,ef:0.21},
+ {name:'gray cast iron (brittle)',E:100,K:900,n:0.30,ef:0.004}
+];
+const $=id=>document.getElementById(id);
+const C={eng:'#1b3f8b',tru:'#c46a00',acc:'#98000D',fg:'#000',muted:'#6a6a70',grid:'#ebe8e8',axis:'#000',tough:'rgba(27,63,139,0.12)',resil:'rgba(0,140,90,0.32)'};
+const SANS='Helvetica, "Helvetica Neue", Arial, sans-serif', SERIF='"Times New Roman", Times, serif';
+
+const P={E:207000,K:600,n:0.21,ef:0.37};
+const D={};
+let ea=0, playing=false, lastT=0;
+
+// ---------- model ----------
+function hol(e){ if(e<=0) return 0; return P.K*Math.pow(Math.log(1+e),P.n)/(1+e); }
+function derive(){
+  let lo=1e-10, hi=0.8;
+  for(let i=0;i<200;i++){const m=0.5*(lo+hi); if(P.E*m-hol(m)<0) lo=m; else hi=m;}
+  D.ey=hi; D.sy=P.E*hi;
+  D.eu=Math.exp(P.n)-1;
+  if(D.eu<=D.ey){D.eu=D.ey; D.su=D.sy;} else D.su=hol(D.eu);
+  D.sfr=0.75*D.su;
+  D.brittle = P.ef<=D.ey;
+  D.necks = P.ef>D.eu;
+  // 0.2% offset
+  D.syo=null; D.eyo=null;
+  const g=e=>sig(e)-P.E*(e-0.002);
+  if(g(P.ef)<0){ let a=0.002,b=P.ef; if(g(a)<0) a=0; for(let i=0;i<200;i++){const m=0.5*(a+b); if(g(m)>0) a=m; else b=m;} D.eyo=b; D.syo=sig(b); }
+  // toughness
+  const N=4000; let s=0; for(let i=0;i<N;i++){const e1=P.ef*i/N,e2=P.ef*(i+1)/N; s+=0.5*(sig(e1)+sig(e2))*(e2-e1);} D.Ut=s;
+  const sr = D.syo!=null ? D.syo : sig(P.ef);
+  D.sres=sr; D.Ur=sr*sr/(2*P.E);
+  D.sMax = Math.max(D.su, sig(Math.min(P.ef,D.eu)));
+}
+function sig(e){
+  if(e<=0) return 0;
+  if(e<=D.ey) return P.E*e;
+  if(e<=D.eu) return hol(e);
+  const t=(e-D.eu)/(P.ef-D.eu);
+  return D.su-(D.su-D.sfr)*t*t;
+}
+function region(e){
+  if(e>=P.ef) return ['Fracture','fr'];
+  if(e<=D.ey) return ['Elastic deformation','el'];
+  if(e<D.eu) return ['Uniform plastic deformation','up'];
+  return ['Necking','nk'];
+}
+
+// ---------- canvas helpers ----------
+function setup(cv,w,h){const r=window.devicePixelRatio||1; cv.style.height=h+'px'; cv.width=Math.round(w*r); cv.height=Math.round(h*r); cv.cssW=w; cv.cssH=h; const x=cv.getContext('2d'); x.setTransform(r,0,0,r,0,0); return x;}
+// segs: [text, kind] kind: 'n' normal, 'g' greek serif italic, 'i' italic, 'sub', 'sup'
+function rich(ctx,x,y,segs,size,align){
+  const fonts=segs.map(([t,k])=>{const s=(k==='sub'||k==='sup')?size*0.72:size; if(k==='g') return `italic ${s*1.1}px ${SERIF}`; if(k==='i'||k==='isub') return `italic ${s}px ${SANS}`; return `${s}px ${SANS}`;});
+  let w=0; segs.forEach((s,i)=>{ctx.font=fonts[i]; w+=ctx.measureText(s[0]).width;});
+  let cx = align==='center'? x-w/2 : align==='right'? x-w : x;
+  ctx.textAlign='left';
+  segs.forEach(([t,k],i)=>{ctx.font=fonts[i]; const dy= k==='sub'?size*0.3 : k==='sup'?-size*0.38:0; ctx.fillText(t,cx,y+dy); cx+=ctx.measureText(t).width;});
+  return w;
+}
+function niceMax(v){ if(v<=0) return 1; const p=Math.pow(10,Math.floor(Math.log10(v))); for(const m of [1,1.2,1.5,2,2.5,3,4,5,6,8,10]) if(m*p>=v*0.999) return m*p; return 10*p; }
+function niceStep(range,target){ const raw=range/target, p=Math.pow(10,Math.floor(Math.log10(raw))); for(const m of [1,2,2.5,5,10]) if(m*p>=raw) return m*p; return 10*p; }
+function fmtTick(v,step){ const d=Math.max(0,-Math.floor(Math.log10(step)+1e-9)); return v.toFixed(d+ (step*Math.pow(10,d)%1>1e-6?1:0)); }
+
+// ---------- plot ----------
+const plot=$('plot'), spec=$('spec');
+let geo=null;
+function drawPlot(){
+  const W=plot.parentElement.clientWidth, H=Math.max(330,Math.min(530,W*0.72));
+  const ctx=setup(plot,W,H);
+  ctx.fillStyle='#fff'; ctx.fillRect(0,0,W,H);
+  const m={l:86,r:22,t:18,b:72}, pw=W-m.l-m.r, ph=H-m.t-m.b;
+  const showT=$('cTrue').checked, zoom=$('cZoom').checked;
+  const xFull=niceMax(P.ef*1.06);
+  const xmax= zoom? Math.min(0.01,xFull) : xFull;
+  const eEnd=Math.min(P.ef,xmax);
+  let ymaxV=0; const N=900;
+  const pts=[]; for(let i=0;i<=N;i++){const e=eEnd*i/N; pts.push([e,sig(e)]);}
+  if(D.ey<eEnd) pts.push([D.ey,sig(D.ey)]);
+  pts.sort((a,b)=>a[0]-b[0]);
+  pts.forEach(p=>ymaxV=Math.max(ymaxV,p[1]));
+  const tp=[]; if(showT){const eT=Math.min(P.ef,D.eu); for(let i=0;i<=N;i++){const e=eT*i/N; if(Math.log(1+e)>xmax) break; tp.push([Math.log(1+e),sig(e)*(1+e)]);} tp.forEach(p=>ymaxV=Math.max(ymaxV,p[1]));}
+  const ymax=niceMax(ymaxV*1.1);
+  const X=e=>m.l+e/xmax*pw, Y=s=>m.t+ph-s/ymax*ph;
+  geo={X,Y,m,pw,ph,xmax,ymax};
+  // grid + ticks
+  const xs=niceStep(xmax,W<520?4:6), ys=niceStep(ymax,6);
+  ctx.strokeStyle=C.grid; ctx.lineWidth=1; ctx.fillStyle=C.fg; ctx.font=`18px ${SANS}`;
+  for(let v=0;v<=xmax+1e-12;v+=xs){ctx.beginPath();ctx.moveTo(X(v),m.t);ctx.lineTo(X(v),m.t+ph);ctx.stroke(); ctx.textAlign='center'; ctx.fillText(fmtTick(v,xs),X(v),m.t+ph+24);}
+  let tw=0; for(let v=0;v<=ymax+1e-9;v+=ys){ctx.beginPath();ctx.moveTo(m.l,Y(v));ctx.lineTo(m.l+pw,Y(v));ctx.stroke(); ctx.textAlign='right'; const tl=Math.round(v).toString(); tw=Math.max(tw,ctx.measureText(tl).width); ctx.fillText(tl,m.l-8,Y(v)+6);}
+  ctx.strokeStyle=C.axis; ctx.lineWidth=1.2; ctx.strokeRect(m.l,m.t,pw,ph);
+  // axis labels
+  ctx.fillStyle=C.fg;
+  rich(ctx,m.l+pw/2,H-12,showT?[['strain, ','n'],['ε','g'],[' (mm/mm)','n']]:[['engineering strain, ','n'],['ε','g'],[' (mm/mm)','n']],18,'center');
+  ctx.save(); ctx.translate(m.l-8-tw-10,m.t+ph/2); ctx.rotate(-Math.PI/2); rich(ctx,0,0,showT?[['stress, ','n'],['σ','g'],[' (MPa)','n']]:[['engineering stress, ','n'],['σ','g'],[' (MPa)','n']],18,'center'); ctx.restore();
+
+  ctx.save(); ctx.beginPath(); ctx.rect(m.l,m.t,pw,ph); ctx.clip();
+  // areas
+  if($('cArea').checked){
+    ctx.fillStyle=C.tough; ctx.beginPath(); ctx.moveTo(X(0),Y(0)); pts.forEach(p=>ctx.lineTo(X(p[0]),Y(p[1]))); ctx.lineTo(X(eEnd),Y(0)); ctx.closePath(); ctx.fill();
+    const er=D.sres/P.E; ctx.fillStyle=C.resil; ctx.beginPath(); ctx.moveTo(X(0),Y(0)); for(let i=1;i<=300;i++){const e=er*i/300; ctx.lineTo(X(e),Y(Math.min(P.E*e,sig(e))));} ctx.lineTo(X(er),Y(0)); ctx.closePath(); ctx.fill();
+  }
+  // offset line
+  if($('cOff').checked && D.syo!=null){
+    ctx.setLineDash([8,5]); ctx.strokeStyle=C.muted; ctx.lineWidth=2.6; ctx.beginPath(); ctx.moveTo(X(0.002),Y(0)); const top=D.syo*1.08; ctx.lineTo(X(0.002+top/P.E),Y(top)); ctx.stroke(); ctx.setLineDash([]);
+  }
+  // true curve
+  if(showT && tp.length){ ctx.strokeStyle=C.tru; ctx.lineWidth=2.4; ctx.beginPath(); tp.forEach((p,i)=>i?ctx.lineTo(X(p[0]),Y(p[1])):ctx.moveTo(X(p[0]),Y(p[1]))); ctx.stroke();
+    if(D.necks && Math.log(1+D.eu)<=xmax){ ctx.fillStyle=C.tru; ctx.beginPath(); ctx.arc(X(Math.log(1+D.eu)),Y(D.su*(1+D.eu)),4,0,7); ctx.fill(); } }
+  // engineering curve
+  ctx.strokeStyle=C.eng; ctx.lineWidth=2.6; ctx.beginPath(); pts.forEach((p,i)=>i?ctx.lineTo(X(p[0]),Y(p[1])):ctx.moveTo(X(p[0]),Y(p[1]))); ctx.stroke();
+  // unload
+  const fr=ea>=P.ef;
+  if($('cUnload').checked && ea>D.ey && !fr){ const s=sig(ea), ep=ea-s/P.E; ctx.setLineDash([7,4]); ctx.strokeStyle=C.acc; ctx.lineWidth=1.8; ctx.beginPath(); ctx.moveTo(X(ea),Y(s)); ctx.lineTo(X(ep),Y(0)); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle=C.acc; ctx.beginPath(); ctx.arc(X(ep),Y(0),4,0,7); ctx.fill(); }
+  ctx.restore();
+
+  // markers
+  function mark(e,s,label,dx,dy){ if(e>xmax) return; ctx.strokeStyle=C.fg; ctx.fillStyle='#fff'; ctx.lineWidth=1.5; ctx.beginPath(); ctx.arc(X(e),Y(s),4.5,0,7); ctx.fill(); ctx.stroke(); ctx.fillStyle=C.fg; rich(ctx,X(e)+dx,Y(s)+dy,label,17,dx<0?'right':'left'); }
+  if($('cOff').checked && D.syo!=null) mark(D.eyo,D.syo,[['σ','g'],['y','sub']],10,20);
+  if(D.necks && D.eu<=xmax && !D.brittle) mark(D.eu,D.su,[['UTS','n']],-2,-12);
+  if(P.ef<=xmax){ const x=X(P.ef),y=Y(sig(P.ef)); ctx.strokeStyle=C.acc; ctx.lineWidth=2.2; ctx.beginPath(); ctx.moveTo(x-6,y-6);ctx.lineTo(x+6,y+6);ctx.moveTo(x+6,y-6);ctx.lineTo(x-6,y+6); ctx.stroke(); ctx.fillStyle=C.fg; ctx.font=`17px ${SANS}`; const fw=ctx.measureText('fracture').width; if(x+12+fw<m.l+pw-4) rich(ctx,x+12,y+6,[['fracture','n']],17,'left'); else rich(ctx,x-4,y+30,[['fracture','n']],17,'right'); }
+  // current point
+  const ec=Math.min(ea,P.ef);
+  if(ec<=xmax){ ctx.strokeStyle='rgba(152,0,13,0.25)'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(X(ec),m.t); ctx.lineTo(X(ec),m.t+ph); ctx.stroke();
+    ctx.fillStyle=C.acc; ctx.beginPath(); ctx.arc(X(ec),Y(sig(ec)),6,0,7); ctx.fill(); }
+  if(showT && ec<=Math.min(D.eu,P.ef) && Math.log(1+ec)<=xmax){ ctx.fillStyle=C.tru; ctx.strokeStyle='#fff'; ctx.lineWidth=1.5; ctx.beginPath(); ctx.arc(X(Math.log(1+ec)),Y(sig(ec)*(1+ec)),5.5,0,7); ctx.fill(); ctx.stroke(); }
+  // direct labels on curves and areas
+  if($('cArea').checked){
+    // toughness: inside the blue area
+    const eM=eEnd*0.62, yM=Y(sig(eM)*0.18);
+    ctx.fillStyle=C.eng; rich(ctx,X(eM),yM,[['toughness ','n'],['U','i'],['t','sub']],17,'center');
+    // resilience: inside the green triangle if it is big enough, otherwise with a leader line
+    const er=D.sres/P.E, tw=X(er)-X(0), th=Y(0)-Y(D.sres);
+    const gx=X(er*2/3), gy=Y(D.sres/3);
+    ctx.fillStyle='#0a6640';
+    if(tw>150 && th>60){ rich(ctx,gx,gy+6,[['resilience ','n'],['U','i'],['r','sub']],17,'center'); }
+    else if(tw>30){ const lx=m.l+12, ly=Y(ymax*0.9);
+      ctx.strokeStyle='#0a6640'; ctx.lineWidth=1.2; ctx.beginPath(); ctx.moveTo(gx,gy); ctx.lineTo(lx+30,ly+6); ctx.stroke();
+      rich(ctx,lx,ly,[['resilience ','n'],['U','i'],['r','sub']],17,'left'); }
+    else { const lx=Math.max(X(er)+40,m.l+60), ly=Math.min(Y(D.sres*0.25), m.t+ph-30);
+      ctx.strokeStyle='#0a6640'; ctx.lineWidth=1.2; ctx.beginPath(); ctx.moveTo(gx,gy); ctx.lineTo(lx-4,ly-6); ctx.stroke();
+      rich(ctx,lx,ly,[['resilience ','n'],['U','i'],['r','sub']],17,'left'); }
+  }
+  if(showT){
+    // engineering curve: label just below the curve
+    const eL=(D.necks&&D.eu<eEnd)? D.eu*0.8 : eEnd*0.7, xL=X(eL), yL=Y(sig(eL))+30;
+    ctx.fillStyle=C.eng; rich(ctx,xL,yL,[['engineering','n']],17,'center');
+    // true curve: label at its end
+    if(tp.length){ const [tx,ty]=tp[tp.length-1]; ctx.font=`17px ${SANS}`; const w=ctx.measureText('true').width;
+      let x=X(tx)+10, y=Y(ty)+6;
+      if(x+w>m.l+pw-4){ x=X(tx)-w-6; y=Y(ty)-12; }
+      ctx.fillStyle=C.tru; rich(ctx,x,Math.max(m.t+18,y),[['true','n']],17,'left'); }
+  }
+  // dashed-line labels
+  if($('cOff').checked && D.syo!=null){
+    const top=D.syo*1.08, xt=X(0.002+top/P.E), yt=Y(top);
+    const x0l=X(0.002), dxl=X(0.002+D.syo/P.E)-x0l, dyl=Y(D.syo)-Y(0);
+    ctx.fillStyle=C.fg;
+    if(dxl>25){ // line visibly tilted: write the label along it, on its right side
+      const ang=Math.atan2(dyl,dxl), f=0.42, cx=x0l+dxl*f, cyy=Y(0)+dyl*f;
+      ctx.save(); ctx.translate(cx,cyy); ctx.rotate(ang); rich(ctx,0,20,[['0.2% offset line','n']],17,'center'); ctx.restore(); }
+    else if(xt<m.l+pw-120) rich(ctx,xt+8,Math.max(m.t+16,yt+4),[['0.2% offset line','n']],17,'left');
+  }
+  if($('cUnload').checked && ea>D.ey && ea<P.ef && ea<=xmax){
+    const s=sig(ea), ep=ea-s/P.E, t=0.72, xm=X(ea+(ep-ea)*t), ym=Y(s*(1-t));
+    ctx.fillStyle=C.acc; rich(ctx,xm-8,ym,[['unloading','n']],17,'right');
+    rich(ctx,X(ep)+8,Y(0)-8,[['ε','g'],['p','sub']],17,'left');
+  }
+}
+
+// ---------- specimen ----------
+function drawSpec(){
+  const W=spec.parentElement.clientWidth, H=Math.max(200,Math.min(240,W*0.52));
+  const ctx=setup(spec,W,H);
+  ctx.fillStyle='#fff'; ctx.fillRect(0,0,W,H);
+  const cy=H*0.46, grip=Math.max(34,W*0.1), sh=18, hw0=Math.min(22,H*0.1), gh=hw0*2.1;
+  const L0=(W-2*grip-2*sh-24)/1.82;
+  const fr=ea>=P.ef, ec=Math.min(ea,P.ef);
+  const L=L0*(1+ec);
+  const hw=hw0/Math.sqrt(1+Math.min(ec,D.eu));
+  let d=0; if(D.necks && ec>D.eu) d=0.55*(ec-D.eu)/(P.ef-D.eu);
+  const x0=Math.min(46,(W-(2*grip+2*sh+L))/2); // left grip fixed near the plot; specimen stretches to the right
+  const g0=x0+grip+sh; // gauge start
+  const prof=x=>hw*(1-d*Math.exp(-Math.pow((x-L/2)/(0.11*L0),2)));
+  const gap = fr? 14:0;
+  const grad=ctx.createLinearGradient(0,cy-gh,0,cy+gh); grad.addColorStop(0,'#c9ccd1'); grad.addColorStop(0.45,'#f1f2f4'); grad.addColorStop(1,'#9ea3aa');
+  function piece(a,b,side){ // gauge range [a,b] in local coords, side -1 left piece, +1 right, 0 whole
+    const sx = side<0? -gap/2 : side>0? gap/2 : 0;
+    const top=[]; const n=120; for(let i=0;i<=n;i++){const x=a+(b-a)*i/n; top.push([g0+x+sx,cy-prof(x)]);}
+    ctx.beginPath();
+    if(side<=0){ ctx.moveTo(x0+sx,cy+gh); ctx.lineTo(x0+sx,cy-gh); ctx.lineTo(x0+grip+sx,cy-gh); ctx.bezierCurveTo(x0+grip+sh*0.6+sx,cy-gh,x0+grip+sh*0.4+sx,cy-prof(0),g0+sx,cy-prof(0)); }
+    else { ctx.moveTo(top[0][0],cy+prof(a)); ctx.lineTo(top[0][0],top[0][1]); }
+    top.forEach(p=>ctx.lineTo(p[0],p[1]));
+    const xe=g0+L+sx;
+    if(side>=0){ ctx.bezierCurveTo(xe+sh*0.6,cy-prof(L),xe+sh*0.4,cy-gh,xe+sh,cy-gh); ctx.lineTo(xe+sh+grip,cy-gh); ctx.lineTo(xe+sh+grip,cy+gh); ctx.lineTo(xe+sh,cy+gh); ctx.bezierCurveTo(xe+sh*0.4,cy+gh,xe+sh*0.6,cy+prof(L),xe,cy+prof(L)); }
+    else { // fracture face at b
+      const xb=g0+b+sx, h=prof(b);
+      if(D.brittle || !D.necks){ ctx.lineTo(xb,cy+h); }
+      else { ctx.lineTo(xb+h*0.5,cy-h*0.35); ctx.lineTo(xb+h*0.5,cy+h*0.35); ctx.lineTo(xb,cy+h); }
+    }
+    for(let i=top.length-1;i>=0;i--) ctx.lineTo(top[i][0],2*cy-top[i][1]);
+    if(side<=0){ ctx.bezierCurveTo(x0+grip+sh*0.4+sx,cy+prof(0),x0+grip+sh*0.6+sx,cy+gh,x0+grip+sx,cy+gh); }
+    else { // fracture face on right piece at a
+      const xa=g0+a+sx, h=prof(a);
+      if(!(D.brittle||!D.necks)){ ctx.lineTo(xa,cy+h); ctx.lineTo(xa+h*0.5,cy+h*0.35); ctx.lineTo(xa+h*0.5,cy-h*0.35); }
+    }
+    ctx.closePath(); ctx.fillStyle=grad; ctx.fill(); ctx.strokeStyle='#555'; ctx.lineWidth=1.2; ctx.stroke();
+  }
+  if(fr){ piece(0,L/2,-1); piece(L/2,L,1); } else piece(0,L,0);
+  // grips hatch
+  ctx.fillStyle='rgba(60,60,70,0.55)';
+  const gl=x0-(fr?gap/2:0), gr=g0+L+sh+(fr?gap/2:0);
+  ctx.fillRect(gl,cy-gh-6,grip,2*gh+12); ctx.fillRect(gr,cy-gh-6,grip,2*gh+12);
+  // force arrows
+  const s=fr?0:sig(ec), fl=Math.max(0,Math.min(1,s/D.sMax))*Math.min(40,x0+4);
+  if(fl>3){ ctx.strokeStyle=C.acc; ctx.fillStyle=C.acc; ctx.lineWidth=2.5;
+    [[gl,-1],[gr+grip,1]].forEach(([x,dir])=>{ ctx.beginPath(); ctx.moveTo(x,cy); ctx.lineTo(x+dir*fl,cy); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x+dir*(fl+8),cy); ctx.lineTo(x+dir*fl,cy-5); ctx.lineTo(x+dir*fl,cy+5); ctx.fill(); });
+    ctx.fillStyle=C.fg; ctx.font=`italic 17px ${SANS}`; ctx.textAlign='center'; ctx.fillText('F',Math.max(10,gl-fl/2),cy-11); ctx.fillText('F',Math.min(W-10,gr+grip+fl/2),cy-11); }
+  // gauge length dimension
+  const yd=cy+gh+26, a=g0-(fr?gap/2:0), b=g0+L+(fr?gap/2:0);
+  ctx.strokeStyle=C.fg; ctx.fillStyle=C.fg; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(a,cy+hw0+4); ctx.lineTo(a,yd+5); ctx.moveTo(b,cy+hw0+4); ctx.lineTo(b,yd+5); ctx.moveTo(a,yd); ctx.lineTo(b,yd); ctx.stroke();
+  [[a,1],[b,-1]].forEach(([x,dr])=>{ctx.beginPath();ctx.moveTo(x,yd);ctx.lineTo(x+dr*7,yd-4);ctx.lineTo(x+dr*7,yd+4);ctx.fill();});
+  rich(ctx,(a+b)/2,yd+19,[['L','i'],[' = ','n'],['L','i'],['0','sub'],['(1 + ','n'],['ε','g'],[')','n']],17,'center');
+  if(ec>0 && ec<D.ey*1.0001 && !fr){ ctx.fillStyle=C.fg; rich(ctx,W/2,18,[['elastic strain too small to see','n']],17,'center'); }
+}
+
+// ---------- readouts ----------
+function fmt(v,d){return v.toFixed(d);}
+function updateReadout(){
+  const fr=ea>=P.ef, ec=Math.min(ea,P.ef);
+  const [rt,rc]=region(ea); const r=$('region'); r.textContent=rt; r.className='region '+rc;
+  const rows=[];
+  rows.push(['applied strain ε', fmt(ec, ec<0.02?4:3)]);
+  rows.push(['engineering stress σ', fr?'0 MPa':fmt(sig(ec),0)+' MPa']);
+  if($('cTrue').checked) rows.push(['true stress σ<sub>T</sub>', (!fr && ec<=D.eu)? fmt(sig(ec)*(1+ec),0)+' MPa' : '—']);
+  if($('cUnload').checked) rows.push(['permanent strain after unloading', (ea>D.ey && !fr)? fmt(ec-sig(ec)/P.E,4) : fr? fmt(P.ef-D.sfr/P.E,4) : '0']);
+  rows.push(['yield strength σ<sub>y</sub> (0.2% offset)', D.syo!=null? fmt(D.syo,0)+' MPa':'none (fractures first)']);
+  rows.push(['tensile strength (UTS)', fmt(D.necks?D.su:sig(P.ef),0)+' MPa']);
+  rows.push(['uniform elongation ε<sub>u</sub>', D.necks? fmt(D.eu,3):'no necking']);
+  rows.push(['ductility (%EL)', fmt(100*P.ef, P.ef<0.02?2:1)+'%']);
+  rows.push(['modulus of resilience U<sub>r</sub>', fmt(D.Ur*1000,0)+' kJ/m³']);
+  rows.push(['toughness U<sub>t</sub>', fmt(D.Ut, D.Ut<1?3:0)+' MJ/m³']);
+  $('tbl').innerHTML=rows.map(([a,b])=>`<tr><td>${a.replace(/ε/g,'<span class="g">ε</span>').replace(/σ/g,'<span class="g">σ</span>')}</td><td>${b}</td></tr>`).join('');
+}
+
+// ---------- UI ----------
+const sel=$('mat');
+PRESETS.forEach((p,i)=>{const o=document.createElement('option'); o.value=i; o.textContent=p.name; sel.appendChild(o);});
+const oc=document.createElement('option'); oc.value='c'; oc.textContent='Custom'; sel.appendChild(oc);
+function loadPreset(i){const p=PRESETS[i]; $('sE').value=p.E; $('sK').value=p.K; $('sN').value=p.n; $('sF').value=p.ef; readSliders(); ea=0; $('sA').value=0;}
+function readSliders(){ P.E=+$('sE').value*1000; P.K=+$('sK').value; P.n=+$('sN').value; P.ef=+$('sF').value;
+  $('vE').textContent=(+$('sE').value).toFixed(0)+' GPa'; $('vK').textContent=P.K+' MPa'; $('vN').textContent=P.n.toFixed(2); $('vF').textContent=P.ef.toFixed(3); derive(); }
+function syncStrainSlider(){ $('sA').value=Math.round(1000*Math.min(ea,P.ef)/P.ef); $('vA').textContent=Math.min(ea,P.ef).toFixed(Math.min(ea,P.ef)<0.02?4:3); }
+function render(){ syncStrainSlider(); drawPlot(); drawSpec(); updateReadout(); }
+
+const PARAM=['sE','sK','sN','sF'];
+function setLock(){ const lock=sel.value!=='c'; PARAM.forEach(id=>{ $(id).disabled=lock; $(id).closest('.ctl').classList.toggle('off',lock); }); }
+sel.addEventListener('change',()=>{ if(sel.value!=='c'){loadPreset(+sel.value); stop(); render();} setLock(); });
+PARAM.forEach(id=>$(id).addEventListener('input',()=>{ readSliders(); ea=Math.min(ea,P.ef); render(); }));
+['cTrue','cOff','cArea','cUnload','cZoom'].forEach(id=>$(id).addEventListener('change',render));
+$('sA').addEventListener('input',()=>{ stop(); ea=P.ef*(+$('sA').value)/1000; render(); });
+
+function stop(){ playing=false; $('bPlay').textContent='Pull'; }
+function tick(t){ if(!playing) return; const dt=Math.min(0.05,(t-lastT)/1000); lastT=t;
+  const zoom=$('cZoom').checked; const span= zoom? Math.min(0.01,P.ef) : P.ef;
+  ea+= span/6*dt; if(ea>=P.ef){ea=P.ef; stop();} render(); if(playing) requestAnimationFrame(tick); }
+$('bPlay').addEventListener('click',()=>{ if(playing){stop();return;} if(ea>=P.ef) ea=0; playing=true; $('bPlay').textContent='Pause'; lastT=performance.now(); requestAnimationFrame(tick); });
+$('bReset').addEventListener('click',()=>{ stop(); ea=0; render(); });
+
+function plotPick(ev){ if(!geo) return; const r=plot.getBoundingClientRect(); const x=ev.clientX-r.left; let e=(x-geo.m.l)/geo.pw*geo.xmax; ea=Math.max(0,Math.min(P.ef,e)); render(); }
+plot.addEventListener('pointerdown',ev=>{ stop(); plot.setPointerCapture(ev.pointerId); plotPick(ev); });
+plot.addEventListener('pointermove',ev=>{ if(plot.hasPointerCapture(ev.pointerId)) plotPick(ev); });
+
+// panels
+const panels={bDir:'pDir',bDet:'pDet',bAbout:'pAbout'};
+function placePanel(p){ const wr=$('wrap').getBoundingClientRect(), br=$('btns').getBoundingClientRect(); p.style.top=(br.bottom-wr.top+8)+'px'; }
+Object.entries(panels).forEach(([b,pid])=>{ $(b).addEventListener('click',()=>{ const p=$(pid), open=p.hidden; Object.values(panels).forEach(q=>$(q).hidden=true); if(open){ p.hidden=false; placePanel(p); if(pid==='pDet'&&window.MathJax&&MathJax.typesetPromise) MathJax.typesetPromise([p]).catch(()=>{}); } }); });
+document.querySelectorAll('.panel .x').forEach(x=>x.addEventListener('click',()=>x.closest('.panel').hidden=true));
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') Object.values(panels).forEach(q=>$(q).hidden=true); });
+
+let rz; window.addEventListener('resize',()=>{clearTimeout(rz); rz=setTimeout(()=>{render(); Object.values(panels).forEach(q=>{if(!$(q).hidden) placePanel($(q));});},60);});
+
+loadPreset(0); setLock(); ea=0.12; render();
+})();
+</script>
+</body>
+</html>

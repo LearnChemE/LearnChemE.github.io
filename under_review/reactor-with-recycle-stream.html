@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Reactor with Recycle Stream</title>
+<script>
+window.MathJax = {
+  chtml: { displayAlign: 'left', displayIndent: '0' }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+<style>
+  :root{
+    --maroon:#98000D;
+    --maroon-dark:#7a000a;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;
+    padding:0;
+    font-family:Helvetica, Arial, sans-serif;
+    background:#ffffff;
+    color:#222;
+  }
+  #app{
+    width:fit-content;
+    max-width:100%;
+    margin:0 auto;
+    padding:14px 14px 22px 14px;
+  }
+  h1{
+    text-align:center;
+    font-size:22px;
+    font-weight:bold;
+    margin:4px 0 14px 0;
+    color:#222;
+  }
+  #figureBox{
+    position:relative;
+    border:1px solid #cccccc;
+    padding:8px 0 0 0;
+    margin-bottom:8px;
+  }
+  #canvasWrap{
+    display:flex;
+    justify-content:center;
+    margin-bottom:2px;
+  }
+  canvas{
+    max-width:100%;
+  }
+  .btnRow{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .btnWrap{
+    position:relative;
+  }
+  .panelBtn{
+    background:var(--maroon);
+    color:#ffffff;
+    border:none;
+    padding:9px 25px;
+    font-size:16.1px;
+    font-family:Helvetica, Arial, sans-serif;
+    border-radius:4px;
+    cursor:pointer;
+    text-align:center;
+  }
+  .panelBtn:hover{
+    background:var(--maroon-dark);
+  }
+  .panel{
+    display:none;
+    position:absolute;
+    top:calc(100% + 4px);
+    left:0;
+    z-index:20;
+    width:640px;
+    max-width:calc(100vw - 40px);
+    max-height:420px;
+    overflow-y:auto;
+    background:#fbfbfb;
+    border:1px solid #b5b5b5;
+    border-radius:6px;
+    padding:16px 18px;
+    font-size:16.7px;
+    line-height:1.55;
+    box-shadow:0 4px 14px rgba(0,0,0,0.18);
+  }
+  .panel.open{
+    display:block;
+  }
+  .panelClose{
+    position:absolute;
+    top:8px;
+    right:10px;
+    background:none;
+    border:none;
+    font-size:20px;
+    line-height:1;
+    color:#777;
+    cursor:pointer;
+    padding:2px 6px;
+    font-family:Helvetica, Arial, sans-serif;
+  }
+  .panelClose:hover{
+    color:var(--maroon);
+  }
+  .panel mjx-container[display="true"]{
+    text-align:left !important;
+    margin:0 !important;
+  }
+  .panel .eq{
+    margin:0 0 4px 0;
+  }
+  .panel p:has(+ .eq){
+    margin-bottom:2px;
+  }
+  .panel h3{
+    font-size:17px;
+    color:var(--maroon);
+    margin:14px 0 6px 0;
+  }
+  .symTable{
+    border-collapse:collapse;
+  }
+  .symTable td{
+    padding:2px 10px 2px 0;
+    vertical-align:top;
+  }
+  .symTable td:first-child{
+    white-space:nowrap;
+    padding-right:14px;
+  }
+  .controls{
+    display:flex;
+    flex-direction:column;
+    row-gap:10px;
+    width:fit-content;
+    margin:12px auto 0 auto;
+  }
+  .sliderRowGroup{
+    display:flex;
+    flex-wrap:wrap;
+    column-gap:36px;
+    row-gap:10px;
+  }
+  .sliderRow{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex:0 0 auto;
+  }
+  .sliderLabel{
+    font-size:16.1px;
+    white-space:nowrap;
+    flex-shrink:0;
+  }
+  input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+  input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  .sliderRow input[type=range]{
+    width:115px;
+    flex:0 0 auto;
+    margin:0;
+  }
+  .sliderVal{
+    min-width:32px;
+    text-align:left;
+    font-size:16.1px;
+    font-variant-numeric:tabular-nums;
+    flex-shrink:0;
+  }
+  .panel h2{
+    margin-top:0;
+    font-size:18.4px;
+    color:var(--maroon);
+    border-bottom:1px solid #e0e0e0;
+    padding-bottom:6px;
+  }
+  .panel p{
+    margin:0 0 10px 0;
+  }
+  .about-link{
+    color:var(--maroon);
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <h1>Reactor with Recycle Stream</h1>
+
+  <div id="figureBox">
+    <div class="btnRow">
+      <div class="btnWrap">
+        <button class="panelBtn" id="btnDir">Directions</button>
+        <div class="panel" id="panelDir">
+          <button class="panelClose" aria-label="Close">&times;</button>
+          <h2>Directions</h2>
+          <p>Mass balances are demonstrated for a reactor system. Pure \(A\) is fed to the system and two parallel reactions take place in the reactor:</p>
+          <p>\(A \rightarrow B\) (desired)</p>
+          <p>\(A \rightarrow C\) (undesired)</p>
+          <p>A separation unit after the reactor removes some of the unreacted \(A\) and recycles it back to the feed stream. Use a slider to set the recycle ratio, which is the ratio of the recycle flow rate to the fresh feed flow rate. Set the reactor selectivity, which is the (flow rate of \(B\)) / (flow rate of \(C\)) leaving the reactor, with a slider. Set the reactor conversion, which is the percent of \(A\) entering the reactor that is consumed, with a slider. The overall conversion of \(A\) is the percent of the feed (100 mol A/hr) that is consumed. The yield is the percentage of the feed that is converted to the desired product \(B\). A negative flow rate of \(A\) exiting the system indicates an impossible combination of reaction selectivity and reactor conversion.</p>
+        </div>
+      </div>
+      <div class="btnWrap">
+        <button class="panelBtn" id="btnDet">Details</button>
+        <div class="panel" id="panelDet">
+          <button class="panelClose" aria-label="Close">&times;</button>
+          <h2>Details</h2>
+          <p>Pure \(A\) is fed to the reactor where two parallel reactions occur:</p>
+          <p>\(A \rightarrow B\) (desired),</p>
+          <p>\(A \rightarrow C\) (undesired).</p>
+          <p>A separation unit splits the reactant \(A\) from products \(B\) and \(C\), and some \(A\) is recycled back to the reactor. The recycle ratio \(R\) is the ratio of the recycle flow rate to the fresh feed flow rate:</p>
+          <div class="eq">\[ R = \dot{n}_{A,R} / \dot{n}_{A,\text{in}}. \]</div>
+          <p>The yield \(Y_D\) is the fraction of the feed that is converted to the desired product \(B\):</p>
+          <div class="eq">\[ Y_D = \dot{n}_B / \dot{n}_{A,\text{in}}. \]</div>
+          <p>The reactor selectivity \(S_{D/U}\) is the ratio of the desired product \(B\) to the undesired product \(C\):</p>
+          <div class="eq">\[ S_{D/U} = \dot{n}_B / \dot{n}_C. \]</div>
+          <p>The reactor conversion is the fraction of \(A\) entering the reactor that is consumed:</p>
+          <div class="eq">\[ x_S = \frac{\dot{n}_{r,\text{in}} - \dot{n}_{r,\text{out}}}{\dot{n}_{r,\text{in}}}. \]</div>
+          <p>The overall conversion is the fraction of the feed that is consumed:</p>
+          <div class="eq">\[ x_O = \frac{\dot{n}_{A,\text{in}} - \dot{n}_{A,\text{out}}}{\dot{n}_{A,\text{in}}}. \]</div>
+          <h3>Symbols</h3>
+          <table class="symTable">
+            <tr><td>\(R\)</td><td>recycle ratio</td></tr>
+            <tr><td>\(\dot{n}_{A,\text{in}}\)</td><td>fresh feed flow rate of \(A\) (100 mol/hr)</td></tr>
+            <tr><td>\(\dot{n}_{A,R}\)</td><td>recycle flow rate of \(A\) (mol/hr)</td></tr>
+            <tr><td>\(\dot{n}_{A,\text{out}}\)</td><td>flow rate of \(A\) exiting the system (mol/hr)</td></tr>
+            <tr><td>\(\dot{n}_{r,\text{in}}\)</td><td>flow rate of \(A\) entering the reactor (mol/hr)</td></tr>
+            <tr><td>\(\dot{n}_{r,\text{out}}\)</td><td>flow rate of \(A\) exiting the reactor (mol/hr)</td></tr>
+            <tr><td>\(\dot{n}_B\)</td><td>flow rate of desired product \(B\) (mol/hr)</td></tr>
+            <tr><td>\(\dot{n}_C\)</td><td>flow rate of undesired product \(C\) (mol/hr)</td></tr>
+            <tr><td>\(Y_D\)</td><td>yield of desired product \(B\)</td></tr>
+            <tr><td>\(S_{D/U}\)</td><td>reactor selectivity</td></tr>
+            <tr><td>\(x_S\)</td><td>reactor (single-pass) conversion of \(A\)</td></tr>
+            <tr><td>\(x_O\)</td><td>overall conversion of \(A\)</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="btnWrap">
+        <button class="panelBtn" id="btnAbt">About</button>
+        <div class="panel" id="panelAbt">
+          <button class="panelClose" aria-label="Close">&times;</button>
+          <h2>About</h2>
+          <p>This simulation was created in the <a class="about-link" href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a class="about-link" href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a <a class="about-link" href="https://demonstrations.wolfram.com/ReactorWithRecycleStream/" target="_blank">Mathematica simulation</a> by Michael Wrobel. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls">
+    <div class="sliderRowGroup">
+      <div class="sliderRow">
+        <span class="sliderLabel">recycle ratio</span>
+        <input type="range" id="sR" min="0" max="1" step="0.01" value="0">
+        <span class="sliderVal" id="vR">0.00</span>
+      </div>
+      <div class="sliderRow">
+        <span class="sliderLabel">reaction selectivity</span>
+        <input type="range" id="sS" min="0" max="10" step="0.1" value="1.9">
+        <span class="sliderVal" id="vS">1.9</span>
+      </div>
+    </div>
+    <div class="sliderRowGroup">
+      <div class="sliderRow">
+        <span class="sliderLabel">reactor conversion (%)</span>
+        <input type="range" id="sX" min="0" max="100" step="1" value="51">
+        <span class="sliderVal" id="vX">51</span>
+      </div>
+    </div>
+    </div>
+
+    <div id="canvasWrap">
+      <canvas id="cv" width="700" height="365"></canvas>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const canvas = document.getElementById('cv');
+  const ctx = canvas.getContext('2d');
+  const DPR = window.devicePixelRatio || 1;
+  // Data coordinate system, cropped tightly to the drawing; scales fixed so the
+  // flowsheet keeps its size and the canvas is only as large as needed
+  const dataXMin = -2.95, dataXMax = 4.15, dataYMin = -1.27, dataYMax = 1.03;
+  const padTop = 4, padBottom = 4, padLeft = 8, padRight = 8;
+  const scaleX = 90.67, scaleY = 101.5;
+  const CSS_W = Math.round(padLeft + padRight + (dataXMax - dataXMin) * scaleX);
+  const CSS_H = Math.round(padTop + padBottom + (dataYMax - dataYMin) * scaleY);
+  canvas.width = CSS_W * DPR;
+  canvas.height = CSS_H * DPR;
+  canvas.style.width = CSS_W + 'px';
+  canvas.style.height = CSS_H + 'px';
+  ctx.scale(DPR, DPR);
+
+  function px(x){ return padLeft + (x - dataXMin) * scaleX; }
+  function py(y){ return padTop + (dataYMax - y) * scaleY; }
+
+  const x1 = 1, y1 = 0.85, x2 = 0.75, y2 = 0.65;
+
+  function drawArrow(x0,y0,x1_,y1_, headFracs){
+    ctx.beginPath();
+    ctx.moveTo(px(x0), py(y0));
+    ctx.lineTo(px(x1_), py(y1_));
+    ctx.lineWidth = 2.4;
+    ctx.strokeStyle = '#000';
+    ctx.stroke();
+    const angle = Math.atan2(py(y1_)-py(y0), px(x1_)-px(x0));
+    (headFracs||[1]).forEach(f=>{
+      const hx = px(x0) + (px(x1_)-px(x0))*f;
+      const hy = py(y0) + (py(y1_)-py(y0))*f;
+      drawArrowHead(hx,hy,angle);
+    });
+  }
+
+  function drawArrowHead(x,y,angle){
+    const size = 9;
+    ctx.save();
+    ctx.translate(x,y);
+    ctx.rotate(angle);
+    ctx.beginPath();
+    ctx.moveTo(0,0);
+    ctx.lineTo(-size, size*0.55);
+    ctx.lineTo(-size, -size*0.55);
+    ctx.closePath();
+    ctx.fillStyle = '#000';
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawPolylineArrow(points){
+    ctx.beginPath();
+    ctx.moveTo(px(points[0][0]), py(points[0][1]));
+    for(let i=1;i<points.length;i++){
+      ctx.lineTo(px(points[i][0]), py(points[i][1]));
+    }
+    ctx.lineWidth = 2.4;
+    ctx.strokeStyle = '#000';
+    ctx.stroke();
+    const n = points.length;
+    const [ax,ay] = points[n-2];
+    const [bx,by] = points[n-1];
+    const angle = Math.atan2(py(by)-py(ay), px(bx)-px(ax));
+    drawArrowHead(px(bx),py(by),angle);
+  }
+
+  function fmt1(v){
+    return v.toFixed(1);
+  }
+  function fmtRound(v){
+    return Math.round(v).toString();
+  }
+
+  // Draws a horizontally-centered line of text made of normal and subscript parts.
+  function drawMixedText(centerX, baselineY, parts, baseFontPx){
+    const baseFont = baseFontPx + 'px Helvetica, Arial, sans-serif';
+    const subFont = Math.round(baseFontPx*0.72) + 'px Helvetica, Arial, sans-serif';
+    let total = 0;
+    parts.forEach(p=>{
+      ctx.font = p.sub ? subFont : baseFont;
+      total += ctx.measureText(p.text).width;
+    });
+    let curX = centerX - total/2;
+    parts.forEach(p=>{
+      ctx.font = p.sub ? subFont : baseFont;
+      ctx.textAlign = 'left';
+      ctx.fillText(p.text, curX, baselineY + (p.sub ? baseFontPx*0.22 : 0));
+      curX += ctx.measureText(p.text).width;
+    });
+  }
+
+  function render(){
+    const R = parseFloat(document.getElementById('sR').value);
+    const SDU = parseFloat(document.getElementById('sS').value);
+    const xS = parseFloat(document.getElementById('sX').value);
+
+    document.getElementById('vR').textContent = R.toFixed(2);
+    document.getElementById('vS').textContent = SDU.toFixed(1);
+    document.getElementById('vX').textContent = xS.toFixed(0);
+
+    const nAin = 100;
+    const nArec = R * nAin;
+    const rin = nAin + nArec;
+    const rout = rin * (1 - xS/100);
+    const nC = (xS/100) * (rin/(1+SDU));
+    const nB = nC * SDU;
+    const nAout = rout - nArec;
+    const xO = 100 * (nAin - nAout)/nAin;
+    const YD = nB/nAin;
+    const invalid = nAout < 0;
+
+    ctx.clearRect(0,0,CSS_W,CSS_H);
+    ctx.textBaseline = 'middle';
+
+    // Reactor rectangle
+    ctx.lineWidth = 2.4;
+    ctx.strokeStyle = '#000';
+    if(invalid){
+      ctx.fillStyle = 'rgba(219,68,55,0.30)';
+      ctx.fillRect(px(0), py(y1), px(x1)-px(0), py(0)-py(y1));
+    }
+    ctx.strokeRect(px(0), py(y1), px(x1)-px(0), py(0)-py(y1));
+
+    // Separator rectangle
+    ctx.strokeRect(px(x1+x2), py(y1), px(2*x1+x2)-px(x1+x2), py(0)-py(y1));
+
+    drawArrow(-3.5*x2, y1/2, -2*x2, y1/2, [1]);        // fresh feed (50% longer)
+    drawArrow(-2*x2, y1/2, 0, y1/2, [1]);
+    drawArrow(x1, y1/2, x1+x2, y1/2, [1]);
+    drawArrow(2*x1+x2, y1/2, 2*x1+2.5*x2, y1/2, [1]);  // outlet (50% longer)
+
+    // Recycle loop arrow
+    drawPolylineArrow([
+      [1.5*x1+x2, 0],
+      [1.5*x1+x2, -y2],
+      [-2*x2, -y2],
+      [-2*x2, y1/2]
+    ]);
+
+    // Text labels
+    ctx.fillStyle = '#000';
+    ctx.textAlign = 'center';
+
+    ctx.font = '15px Helvetica, Arial, sans-serif';
+    ctx.fillText('reactor', px(x1/2), py(y1/2)-18);
+    ctx.fillText('A \u2192 B', px(x1/2), py(y1/2));
+    ctx.fillText('A \u2192 C', px(x1/2), py(y1/2)+18);
+
+    ctx.fillText('separation', px(1.5*x1+x2), py(y1/2)-9);
+    ctx.fillText('unit', px(1.5*x1+x2), py(y1/2)+9);
+
+    // Fresh feed label (raised to clear the line)
+    ctx.textAlign = 'right';
+    ctx.font = '16px Helvetica, Arial, sans-serif';
+    ctx.fillText(fmt1(nAin) + ' mol A/hr', px(-2*x2) - 6, py(y1/2) - 15);
+
+    // Combined inflow label (raised to clear the line)
+    ctx.textAlign = 'left';
+    ctx.fillText(fmtRound(rin) + ' mol A/hr', px(-1.75*x2), py(y1/2) - 15);
+
+    // recycle label (with A,R as subscript)
+    const recLabelX = px(((-2*x2) + (1.5*x1+x2))/2);
+    const recLabelY = py(-y2) + 16;
+    drawMixedText(recLabelX, recLabelY, [
+      {text: 'n\u0307', sub:false},
+      {text: 'A,R', sub:true},
+      {text: ' = ' + fmtRound(nArec) + ' mol A/hr', sub:false}
+    ], 16);
+
+    // Product labels: A and B above the outlet line, C below
+    ctx.textAlign = 'left';
+    ctx.font = '16px Helvetica, Arial, sans-serif';
+    const outX = px(2*x1+x2) + 6;
+    const lineY = py(y1/2);
+    ctx.fillStyle = invalid ? '#B22222' : '#000';
+    ctx.fillText(fmt1(nAout) + ' mol A/hr', outX, lineY - 34);
+    ctx.fillStyle = '#000';
+    ctx.fillText(fmt1(nB) + ' mol B/hr', outX, lineY - 15);
+    ctx.fillText(fmt1(nC) + ' mol C/hr', outX, lineY + 17);
+
+    // Yield and overall conversion on one line, no box
+    ctx.font = '17px Helvetica, Arial, sans-serif';
+    ctx.textAlign = 'left';
+    const tYield = 'yield = ' + fmt1(YD*100) + '%';
+    const tConv = 'overall conversion of A = ' + fmt1(xO) + '%';
+    const gap = 40;
+    const wY = ctx.measureText(tYield).width;
+    const wC = ctx.measureText(tConv).width;
+    const lineCx = CSS_W / 2;
+    const startX = lineCx - (wY + gap + wC)/2;
+    const resY = py(-1.17);
+    ctx.fillStyle = '#000';
+    ctx.fillText(tYield, startX, resY);
+    ctx.fillStyle = invalid ? '#B22222' : '#000';
+    ctx.fillText(tConv, startX + wY + gap, resY);
+
+    if(invalid){
+      ctx.fillStyle = '#B22222';
+      ctx.font = 'bold 15px Helvetica, Arial, sans-serif';
+      ctx.fillText('invalid system specifications', px(x1/2), py(y1) - 11);
+    }
+  }
+
+  ['sR','sS','sX'].forEach(id=>{
+    document.getElementById(id).addEventListener('input', render);
+  });
+
+  render();
+
+  // Panel toggle logic
+  const panels = { dir: document.getElementById('panelDir'), det: document.getElementById('panelDet'), abt: document.getElementById('panelAbt') };
+  const figureBox = document.getElementById('figureBox');
+  function positionPanel(panel){
+    panel.style.left = '0px';
+    const wrap = panel.parentElement;
+    const wrapRect = wrap.getBoundingClientRect();
+    const boxRect = figureBox.getBoundingClientRect();
+    const panelW = panel.offsetWidth;
+    let left = 0;
+    const margin = 6;
+    if(wrapRect.left + left + panelW > boxRect.right - margin){
+      left = (boxRect.right - margin - panelW) - wrapRect.left;
+    }
+    if(wrapRect.left + left < boxRect.left + margin){
+      left = (boxRect.left + margin) - wrapRect.left;
+    }
+    panel.style.left = left + 'px';
+  }
+  function togglePanel(key){
+    const isOpen = panels[key].classList.contains('open');
+    Object.values(panels).forEach(p=>p.classList.remove('open'));
+    if(!isOpen){
+      const p = panels[key];
+      p.classList.add('open');
+      p.scrollTop = 0;
+      positionPanel(p);
+      if(window.MathJax && MathJax.typesetPromise){
+        MathJax.typesetPromise([p]).then(()=>{ p.scrollTop = 0; }).catch(()=>{});
+      }
+    }
+  }
+  document.getElementById('btnDir').addEventListener('click', ()=>togglePanel('dir'));
+  document.getElementById('btnDet').addEventListener('click', ()=>togglePanel('det'));
+  document.getElementById('btnAbt').addEventListener('click', ()=>togglePanel('abt'));
+  document.querySelectorAll('.panelClose').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      btn.closest('.panel').classList.remove('open');
+    });
+  });
+})();
+</script>
+</body>
+</html>

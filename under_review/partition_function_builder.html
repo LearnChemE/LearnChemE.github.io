@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Partition Function Builder</title>
+<style>
+:root{
+  --bg:#f3f4f6; --panel:#ffffff; --ink:#000000; --line:#d9dde4; --grid:#e8ebf0;
+  --accent:#98000D; --accent-dark:#7a000a;
+  --c-t:#2563eb; --c-r:#059669; --c-v:#d97706; --c-e:#9333ea; --c-tot:#000000; --c-cv:#555555;
+}
+*{box-sizing:border-box}
+html,body{background:var(--bg)}
+body{margin:0;color:#000;font:17px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:1360px;margin:0 auto;padding:16px}
+header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+h1{font-size:26px;margin:0;color:#000;font-weight:700}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.charttabs{margin-bottom:12px}
+.redbtn{background:var(--accent);color:#fff;border:0;border-radius:6px;padding:9px 20px;font:inherit;font-size:17px;font-weight:400;cursor:pointer}
+.redbtn:hover{background:var(--accent-dark)}
+.redbtn[aria-pressed="true"]{box-shadow:inset 0 0 0 3px #000}
+
+#panels{margin-bottom:4px}
+.headwrap{position:relative}
+#panels{position:absolute;top:100%;left:0;width:75%;margin-top:10px;z-index:40}
+.infopanel{position:relative;background:var(--panel);border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:10px;padding:18px 46px 18px 20px;margin-bottom:14px;font-size:17px;line-height:1.6;box-shadow:0 10px 30px rgba(0,0,0,.18);max-height:75vh;overflow-y:auto}
+.infopanel[hidden]{display:none}
+.infopanel h2{margin:0 0 10px;font-size:17px;font-weight:700;color:#000}
+.infopanel b{font-weight:400}
+.infopanel a{color:var(--accent)}
+.infopanel p{margin:0 0 10px}
+.infopanel ul{margin:0 0 10px;padding-left:22px}
+.infopanel li{margin:4px 0}
+.closeX{position:absolute;top:6px;right:8px;background:none;border:0;font-size:24px;line-height:1;cursor:pointer;color:#000;padding:6px 10px;border-radius:6px}
+.closeX:hover{color:#fff;background:var(--accent)}
+.eq{font-family:ui-monospace,Menlo,Consolas,monospace;text-align:left;background:#f6f7f9;border:1px solid var(--line);border-radius:6px;padding:9px 14px;margin:8px 0;font-size:17px;overflow-x:auto}
+.sqrt{display:inline-block;position:relative;padding:.16em .12em 0 .68em;line-height:1;white-space:nowrap;vertical-align:baseline}
+.sqrt svg{position:absolute;left:0;top:0;width:.68em;height:100%;display:block;overflow:visible}
+.sqrt .vinc{position:absolute;left:.6em;right:0;top:0;border-top:.09em solid #000}
+.symlist{list-style:none;margin:6px 0 0;padding:0}
+.symlist li{display:flex;gap:4px;padding:4px 0;border-bottom:1px solid var(--grid)}
+.symlist b{min-width:60px;flex:none}
+
+.app{display:grid;grid-template-columns:320px minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:980px){.app{grid-template-columns:1fr}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px}
+.panel h2{font-size:17px;margin:0 0 8px;font-weight:700;color:#000}
+.panel+.panel{margin-top:12px}
+label{display:block;font-size:17px;color:#000;margin:8px 0 4px}
+select,input[type=number]{padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:#fff;color:#000;font:inherit;font-size:17px}
+input[type=number]{width:100%}
+#mol{width:auto;max-width:100%;float:left;margin-right:10px}
+.molrow{overflow:hidden}
+#molNote{font-size:17px;color:#000;padding-top:6px}
+
+.modes{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:8px;overflow:hidden;width:max-content;max-width:100%}
+.mode{display:flex;align-items:center;gap:8px;padding:6px 9px;cursor:pointer;user-select:none;border-bottom:1px solid var(--grid)}
+.mode:last-child{border-bottom:none}
+.mode input{accent-color:var(--accent);width:17px;height:17px;margin:0}
+.mode .sw{width:12px;height:12px;border-radius:3px;flex:none}
+.mode .nm{font-weight:400;font-size:17px}
+.mode .th{font-size:15px;color:#333;font-variant-numeric:tabular-nums;margin-left:6px}
+.mode.off{opacity:.55}
+
+input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+#Tslider{width:75%}
+
+.trow{display:flex;justify-content:space-between;align-items:baseline}
+.tval{font-size:17px;font-weight:400;font-variant-numeric:tabular-nums}
+
+.seg{display:inline-flex;border:1px solid var(--accent);border-radius:7px;overflow:hidden}
+.seg button{border:0;background:#fff;color:#000;padding:6px 13px;font:inherit;font-size:17px;cursor:pointer}
+.seg button.on{background:var(--accent);color:#fff}
+
+.rangerow{display:flex;gap:16px;flex-wrap:wrap;margin-top:8px}
+.paramgrid{gap:2px 14px}
+.paramgrid label{margin:5px 0 2px}
+.paramgrid input[type=number]{cursor:ew-resize;touch-action:pan-y}
+.paramgrid input[type=number]:focus{cursor:text}
+.paramgrid input.scrubbing{border-color:var(--accent);box-shadow:0 0 0 2px rgba(152,0,13,.18);user-select:none}
+.rangerow>div{display:flex;flex-direction:column;gap:3px}
+.rangerow select{width:auto}
+
+.chk{display:flex;align-items:center;gap:7px;font-size:17px;margin:8px 0 0;color:#000}
+.chk input{accent-color:var(--accent);width:17px;height:17px}
+
+details summary{cursor:pointer;font-size:17px;color:#000;font-weight:600}
+
+.charttabs{display:flex;gap:10px;flex-wrap:wrap}
+.chartbox{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px}
+.chartbox.big{width:80%}
+.chartbox svg{display:block;width:100%;height:auto;touch-action:pan-y;cursor:crosshair}
+.chartbox svg[hidden]{display:none}
+
+.tblpanel{display:inline-block;max-width:100%}
+.tblwrap{max-width:100%;overflow-x:auto}
+table{border-collapse:collapse;font-size:17px;width:auto;font-variant-numeric:tabular-nums}
+th,td{padding:5px 10px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+th{text-align:center;font-weight:700;color:#000}
+td:first-child,th:first-child{text-align:left}
+tr.tot td{font-weight:700;border-bottom:0}
+.bar{height:8px;border-radius:4px;background:var(--grid);width:80px;overflow:hidden}
+.bar b{display:block;height:100%}
+.actcell{display:flex;align-items:center;gap:10px}
+.bar{flex:none}
+.st{font-size:16px;color:#333;white-space:nowrap}
+
+.measureProbe{position:absolute;visibility:hidden;white-space:pre;top:-9999px;left:-9999px}
+svg text{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;fill:#000}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>Partition Function Builder</h1>
+</header>
+
+<div class="app">
+  <aside>
+    <div class="panel">
+      <h2>molecule</h2>
+      <div class="molrow">
+        <select id="mol" aria-label="molecule"></select>
+        <div id="molNote"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <details id="paramDetails">
+        <summary>molecular parameters <span style="font-weight:400">(editable)</span></summary>
+        <div class="rangerow paramgrid" style="display:grid;grid-template-columns:1fr 1fr">
+          <div><label for="p_thr">&theta;<sub>rot</sub> (K)</label><input type="number" id="p_thr" step="any" min="0.01"></div>
+          <div><label for="p_thv">&theta;<sub>vib</sub> (K)</label><input type="number" id="p_thv" step="any" min="1"></div>
+          <div><label for="p_sigma">&sigma; (symmetry no.)</label><input type="number" id="p_sigma" step="1" min="1" max="2"></div>
+          <div><label for="p_M">mass (g/mol)</label><input type="number" id="p_M" step="any" min="0.5"></div>
+          <div><label for="p_g0">g<sub>0</sub> (ground el.)</label><input type="number" id="p_g0" step="1" min="1"></div>
+          <div><label for="p_thel">&theta;<sub>el</sub> (K), 1st excited</label><input type="number" id="p_thel" step="any" min="0"></div>
+          <div><label for="p_g1">g<sub>1</sub> (0 = none)</label><input type="number" id="p_g1" step="1" min="0"></div>
+        </div>
+        <div style="margin-top:8px">editing any value switches to a custom molecule.</div>
+      </details>
+    </div>
+
+    <div class="panel">
+      <div class="trow" style="margin-bottom:2px;width:75%"><h2 style="margin:0;font-weight:400">temperature</h2><span class="tval" id="Tval">300 K</span></div>
+      <input type="range" id="Tslider" min="0" max="1000" value="500" aria-label="temperature">
+      <div class="rangerow">
+        <div><label for="Tmin" style="margin-top:0">T<sub>min</sub> (K)</label><select id="Tmin"><option>1</option><option selected>10</option><option>50</option><option>100</option></select></div>
+        <div><label for="Tmax" style="margin-top:0">T<sub>max</sub> (K)</label><select id="Tmax"><option value="1000">1k</option><option value="3000">3k</option><option value="10000" selected>10k</option><option value="30000">30k</option></select></div>
+      </div>
+      <div class="trow"><label style="margin:8px 0 4px">temperature axis</label><div class="seg" id="axisSeg"><button data-v="log" class="on" aria-pressed="true">log</button><button data-v="lin" aria-pressed="false">linear</button></div></div>
+      <label>units</label>
+      <div class="seg" id="unitSeg"><button data-v="R" class="on" aria-pressed="true">R (dimensionless)</button><button data-v="J" aria-pressed="false">J&nbsp;mol&#8315;&#185;&nbsp;K&#8315;&#185;</button></div>
+      <label for="Psel">pressure (sets q<sub>trans</sub> and S)</label>
+      <select id="Psel"><option value="0.1">0.1 bar</option><option value="1" selected>1 bar</option><option value="10">10 bar</option></select>
+      <div class="chk"><input type="checkbox" id="perMode" checked><label for="perMode" style="margin:0;color:#000">show per-mode curves</label></div>
+      <div class="chk"><input type="checkbox" id="markers" checked><label for="markers" style="margin:0;color:#000">show characteristic temperatures</label></div>
+    </div>
+
+    <div class="panel" style="width:max-content;max-width:100%">
+      <h2>contributions to q</h2>
+      <div class="modes" id="modes"></div>
+      <label for="rotMode">rotational treatment</label>
+      <select id="rotMode">
+        <option value="exact">exact sum over J (&divide; &sigma;)</option>
+        <option value="high">high-T limit&nbsp; q = T/(&sigma;&theta;<sub>rot</sub>)</option>
+        <option value="equil" data-h2="1">H&#8322; equilibrium ortho/para</option>
+        <option value="frozen" data-h2="1">H&#8322; normal (3:1 frozen)</option>
+      </select>
+    </div>
+  </aside>
+
+  <main>
+    <div class="headwrap">
+    <div class="toolbar" id="toolbar">
+      <button class="redbtn" data-panel="directions" aria-pressed="false">Directions</button>
+      <button class="redbtn" data-panel="details" aria-pressed="false">Details</button>
+      <button class="redbtn" data-panel="about" aria-pressed="false">About</button>
+    </div>
+    <div class="charttabs" id="charttabs">
+      <button class="redbtn" data-chart="ch_q" aria-pressed="true">log(partition function)</button>
+      <button class="redbtn" data-chart="ch_s" aria-pressed="false">Entropy</button>
+      <button class="redbtn" data-chart="ch_cp" aria-pressed="false">Heat capacity</button>
+    </div>
+
+    <div id="panels">
+      <div class="infopanel" id="panel-directions" hidden>
+        <button class="closeX" data-close="directions" aria-label="close">&times;</button>
+        <h2>Directions</h2>
+        <p>This simulation builds the molecular partition function, q, of a diatomic ideal gas one contribution at a time. It shows how translational, rotational, vibrational, and electronic motion each add to q, and how the heat capacity (C<sub>v</sub>, C<sub>p</sub>), entropy (S), and q itself change with temperature as each mode "turns on" near its own characteristic temperature &mdash; for example, the rotational and vibrational steps in C<sub>v</sub>(T) for H&#8322;.</p>
+        <p><b>how to use this simulation</b></p>
+        <ul>
+          <li>Choose a molecule from the dropdown menu or select custom, which opens the molecular parameters, or open "molecular parameters (editable)" to build a custom molecule from its own &theta;<sub>rot</sub>, &theta;<sub>vib</sub>, mass, symmetry number, and electronic degeneracies. The molecular parameters can be changed using the up/down arrows on the side of the input boxes or by dragging the numbers to the left or right to decrease or increase the numbers.</li>
+          <li>Use the checkboxes to turn translational, rotational, vibrational, and electronic contributions on and off, and watch how q, C<sub>v</sub>, S, and C<sub>p</sub> change in the three plots.</li>
+          <li>Drag the temperature slider, or click and drag directly on any plot, to move the temperature; the table below the plots updates with each mode's contribution at that temperature.</li>
+          <li>Use the temperature axis and units buttons to switch between a log or linear temperature scale and between dimensionless (R) and J&nbsp;mol&#8315;&#185;&nbsp;K&#8315;&#185; units.</li>
+          <li>The dashed vertical lines mark each mode's characteristic temperature; the dotted horizontal lines mark the classical equipartition limits those heat capacities approach.</li>
+          <li>For H&#8322;, the "rotational treatment" menu also offers the equilibrium and frozen (normal) ortho/para mixtures, which is what real H&#8322; heat-capacity data follow.</li>
+        </ul>
+      </div>
+      <div class="infopanel" id="panel-details" hidden>
+        <button class="closeX" data-close="details" aria-label="close">&times;</button>
+        <h2>Details</h2>
+        <p>The total partition function factors into independent contributions, so ln q, U, C<sub>v</sub>, and S all add over the enabled modes:</p>
+        <div class="eq">q = q<sub>trans</sub> &middot; q<sub>rot</sub> &middot; q<sub>vib</sub> &middot; q<sub>elec</sub></div>
+
+        <p><b>translational</b> &mdash; free particle in a box of volume V = kT/P:</p>
+        <div class="eq">q<sub>trans</sub>/N = kT/(P&Lambda;&sup3;),&nbsp;&nbsp; <span style="white-space:nowrap">&Lambda; = h/<span class="sqrt"><svg viewBox="0 0 22 36" preserveAspectRatio="none"><path d="M0 22 L6 34 L12.5 1.2 L22 1.2" fill="none" stroke="#000" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="vinc"></span>2&pi;mkT</span></span></div>
+        <div class="eq">C<sub>v,trans</sub> = (3/2)R &nbsp;&nbsp;&nbsp; S<sub>trans</sub>/R = ln(q<sub>trans</sub>/N)+5/2 &nbsp;(Sackur&ndash;Tetrode)</div>
+
+        <p><b>rotational</b> (rigid rotor):</p>
+        <div class="eq">q<sub>rot</sub> = (1/&sigma;)&Sigma;<sub>J</sub>(2J+1)exp[&minus;J(J+1)&theta;<sub>rot</sub>/T]</div>
+        <div class="eq">high-T limit: q<sub>rot</sub> &rarr; T/(&sigma;&theta;<sub>rot</sub>)</div>
+        <p>As T &#8811; &theta;<sub>rot</sub>, C<sub>v,rot</sub>/R &rarr; 1. Heteronuclear molecules briefly overshoot this limit (C<sub>v,rot</sub>/R &asymp; 1.1) before settling back to 1.</p>
+
+        <p><b>vibrational</b> (harmonic oscillator, energy measured from the ground vibrational state):</p>
+        <div class="eq">q<sub>vib</sub> = 1/(1&minus;e<sup>&minus;&theta;<sub>vib</sub>/T</sup>)</div>
+        <div class="eq">C<sub>v,vib</sub>/R = x&sup2;e<sup>x</sup>/(e<sup>x</sup> &minus; 1)&sup2;,&nbsp;&nbsp; x = &theta;<sub>vib</sub>/T &nbsp;(Einstein function)</div>
+
+        <p><b>electronic</b>:</p>
+        <div class="eq">q<sub>elec</sub> = g<sub>0</sub> + g<sub>1</sub>e<sup>&minus;&theta;<sub>el</sub>/T</sup></div>
+        <p>A degenerate ground state (g<sub>0</sub> &gt; 1) contributes S<sub>elec</sub>/R = ln g<sub>0</sub> even as T &rarr; 0. A low-lying excited state (NO, &theta;<sub>el</sub> = 174 K) produces a Schottky bump in C<sub>v</sub>.</p>
+
+        <p><b>Pressure &amp; C<sub>p</sub></b>: C<sub>p</sub> = C<sub>v</sub> + R for an ideal gas. Entropies use the chosen standard-state pressure and exclude nuclear-spin entropy.</p>
+
+        <p><b>H&#8322; spin isomers</b>: ortho-H&#8322; (odd J, nuclear spin weight 3) and para-H&#8322; (even J, weight 1). "equilibrium" mixes the two populations at every temperature; "normal" H&#8322; freezes the room-temperature 3:1 ortho:para ratio, which is what most measured H&#8322; heat-capacity data actually follow.</p>
+
+        <p><b>Model limits</b>: this is a rigid-rotor, harmonic-oscillator, ideal-gas model &mdash; no dissociation, anharmonicity, centrifugal distortion, or vibration&ndash;rotation coupling. Curves above roughly 2000&ndash;3000 K (H&#8322; up to about 3000 K) are a thought experiment, not real gas behavior.</p>
+
+        <h2 style="margin-top:16px">Symbols</h2>
+        <ul class="symlist">
+          <li><b>q</b><span>molecular partition function (and q<sub>trans</sub>, q<sub>rot</sub>, q<sub>vib</sub>, q<sub>elec</sub> for each mode)</span></li>
+          <li><b>T</b><span>absolute temperature (K)</span></li>
+          <li><b>&theta;<sub>rot</sub></b><span>characteristic rotational temperature, &theta;<sub>rot</sub> = h&sup2;/(8&pi;&sup2;Ik) (K)</span></li>
+          <li><b>&theta;<sub>vib</sub></b><span>characteristic vibrational temperature, &theta;<sub>vib</sub> = h&nu;/k (K)</span></li>
+          <li><b>&theta;<sub>el</sub></b><span>energy of the first excited electronic state, divided by k (K)</span></li>
+          <li><b>&sigma;</b><span>symmetry number (2 for a homonuclear diatomic, 1 for heteronuclear)</span></li>
+          <li><b>J</b><span>rotational quantum number</span></li>
+          <li><b>g<sub>0</sub>, g<sub>1</sub></b><span>degeneracy of the ground and first excited electronic states</span></li>
+          <li><b>k, h, R</b><span>Boltzmann constant, Planck constant, gas constant</span></li>
+          <li><b>&Lambda;</b><span>thermal de Broglie wavelength</span></li>
+          <li><b>P, N</b><span>pressure, number of molecules</span></li>
+          <li><b>C<sub>v</sub>, C<sub>p</sub></b><span>heat capacity at constant volume, at constant pressure</span></li>
+          <li><b>S</b><span>entropy</span></li>
+          <li><b>&gamma;</b><span>heat-capacity ratio, C<sub>p</sub>/C<sub>v</sub></span></li>
+        </ul>
+      </div>
+      <div class="infopanel" id="panel-about" hidden>
+        <button class="closeX" data-close="about" aria-label="close">&times;</button>
+        <h2>About</h2>
+        <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.</p>
+      </div>
+    </div>
+    </div>
+    <div class="chartbox big">
+      <svg id="ch_q" viewBox="0 0 1000 550" role="img" aria-label="log q versus temperature"></svg>
+      <svg id="ch_s" viewBox="0 0 1000 550" role="img" aria-label="entropy versus temperature" hidden></svg>
+      <svg id="ch_cp" viewBox="0 0 1000 550" role="img" aria-label="Cp versus temperature" hidden></svg>
+    </div>
+
+    <div class="panel tblpanel" style="margin-top:12px">
+      <h2>contributions at this temperature</h2>
+      <div class="tblwrap"><table id="tbl"></table></div>
+    </div>
+  </main>
+</div>
+</div>
+<span class="measureProbe" id="measureProbe"></span>
+
+<script>
+(function(){
+"use strict";
+// ---------- constants ----------
+const kB=1.380649e-23, hP=6.62607015e-34, R=8.314462618, LN10=Math.LN10;
+
+// ---------- molecule data (θ from ω_e, B_e; ideal-gas approximations) ----------
+const MOLS={
+  H2:{name:"H₂",thr:87.6,thv:6332,sigma:2,M:2.016,g0:1,thel:0,g1:0,note:"Textbook case: rotation switches on near 90 K, vibration near a few thousand K."},
+  N2:{name:"N₂",thr:2.88,thv:3393,sigma:2,M:28.014,g0:1,thel:0,g1:0,note:"Rotation is fully active by ~10 K, so at room temperature C<sub>v</sub> = 5/2 R."},
+  O2:{name:"O₂",thr:2.08,thv:2274,sigma:2,M:31.998,g0:3,thel:11393,g1:2,note:"Triplet ground state (g<sub>0</sub>&nbsp;=&nbsp;3); the a¹Δg level at ~11,400 K is included."},
+  CO:{name:"CO",thr:2.78,thv:3122,sigma:1,M:28.010,g0:1,thel:0,g1:0,note:"Heteronuclear (σ = 1), otherwise very similar to N₂."},
+  NO:{name:"NO",thr:2.45,thv:2740,sigma:1,M:30.006,g0:2,thel:174.2,g1:2,note:"Doublet ground state with a 121 cm⁻¹ spin–orbit level: watch the electronic C<sub>v</sub> bump near 100 to 200 K."},
+  HCl:{name:"HCl",thr:15.2,thv:4303,sigma:1,M:36.461,g0:1,thel:0,g1:0,note:"Large θ<sub>rot</sub> (15 K) makes the rotational step easy to see."},
+  HF:{name:"HF",thr:30.2,thv:5955,sigma:1,M:20.006,g0:1,thel:0,g1:0,note:"Light hydride: large θ<sub>rot</sub> and θ<sub>vib</sub>."},
+  Cl2:{name:"Cl₂",thr:0.351,thv:805,sigma:2,M:70.906,g0:1,thel:0,g1:0,note:"Vibration is already partly active at room temperature (θ<sub>vib</sub> ≈ 800 K)."},
+  I2:{name:"I₂",thr:0.0537,thv:309,sigma:2,M:253.809,g0:1,thel:0,g1:0,note:"Heavy, floppy: vibration is nearly fully active at 300 K. Set T<sub>min</sub> = 1 K to see rotation."}
+};
+
+// ---------- state ----------
+const state={key:"H2",p:Object.assign({},MOLS.H2),
+  modes:{t:true,r:true,v:true,e:true},rotMode:"exact",
+  T:300,log:true,Tmin:10,Tmax:10000,units:"R",P:1,perMode:true,markers:true};
+const MODE_ORDER=["t","r","v","e"];
+const MODE_DEF={
+  t:{name:"translational",short:"translation",css:"--c-t"},
+  r:{name:"rotational",short:"rotation",css:"--c-r"},
+  v:{name:"vibrational",short:"vibration",css:"--c-v"},
+  e:{name:"electronic",short:"electronic",css:"--c-e"}
+};
+
+// ---------- physics: each returns {lnq, cv, u, s} in units of R (u = U/RT) ----------
+function trans(T,p,P){
+  const m=p.M*1e-3/6.02214076e23; // kg per molecule
+  const lam=hP/Math.sqrt(2*Math.PI*m*kB*T);
+  const lnq=Math.log(kB*T/(P*1e5))-3*Math.log(lam);
+  return {lnq:lnq,cv:1.5,u:1.5,s:lnq+2.5};
+}
+function rotSums(th,T,parity){ // parity 0 all J, 1 even, 2 odd
+  const Jmax=Math.ceil(Math.sqrt(60*T/th))+3;
+  let q=0,e1=0,e2=0;
+  for(let J=(parity===2?1:0);J<=Jmax;J+=(parity?2:1)){
+    const E=J*(J+1)*th, w=(2*J+1)*Math.exp(-E/T);
+    q+=w;e1+=w*E;e2+=w*E*E;
+  }
+  const U=e1/q;
+  return {q:q,u:U/T,cv:Math.max(0,(e2/q-U*U)/(T*T))};
+}
+function rot(p,T,mode){
+  const th=p.thr;
+  if(mode==="high"){const l=Math.log(T/(p.sigma*th));return {lnq:l,cv:1,u:1,s:l+1};}
+  if(mode==="exact"){const r=rotSums(th,T,0),l=Math.log(r.q/p.sigma);return {lnq:l,cv:r.cv,u:r.u,s:l+r.u};}
+  const ev=rotSums(th,T,1), od=rotSums(th,T,2);
+  if(mode==="equil"){
+    const qe=ev.q, qo=3*od.q, qt=qe+qo, pe=qe/qt, po=qo/qt;
+    const u=pe*ev.u+po*od.u;
+    const cv=pe*(ev.cv+ev.u*ev.u)+po*(od.cv+od.u*od.u)-u*u;
+    const l=Math.log(qt/4);
+    return {lnq:l,cv:cv,u:u,s:l+u};
+  }
+  // frozen 3:1
+  const xo=0.75,xp=0.25;
+  const u=xo*od.u+xp*ev.u, cv=xo*od.cv+xp*ev.cv;
+  const s=xo*(Math.log(od.q)+od.u+Math.log(3))+xp*(Math.log(ev.q)+ev.u)
+          -(xo*Math.log(xo)+xp*Math.log(xp))-Math.log(4);
+  return {lnq:s-u,cv:cv,u:u,s:s};
+}
+function vib(p,T){
+  const x=p.thv/T, e=Math.exp(-x), d=1-e;
+  const lnq=-Math.log1p(-e), u=x*e/d;
+  return {lnq:lnq,cv:x*x*e/(d*d),u:u,s:lnq+u};
+}
+function elec(p,T){
+  const g0=Math.max(1,p.g0), g1=Math.max(0,p.g1);
+  if(!g1||!(p.thel>0)){const l=Math.log(g0);return {lnq:l,cv:0,u:0,s:l};}
+  const y=p.thel/T, w=g1*Math.exp(-y), q=g0+w, p1=w/q;
+  return {lnq:Math.log(q),cv:p1*(1-p1)*y*y,u:p1*y,s:Math.log(q)+p1*y};
+}
+function calc(T){
+  const p=state.p, m={t:trans(T,p,state.P),r:rot(p,T,state.rotMode),v:vib(p,T),e:elec(p,T)};
+  const tot={lnq:0,cv:0,u:0,s:0};
+  MODE_ORDER.forEach(k=>{if(state.modes[k]){tot.lnq+=m[k].lnq;tot.cv+=m[k].cv;tot.u+=m[k].u;tot.s+=m[k].s;}});
+  tot.cp=tot.cv+1;
+  return {m:m,tot:tot};
+}
+
+// ---------- helpers ----------
+const $=id=>document.getElementById(id);
+const anyOn=()=>MODE_ORDER.some(k=>state.modes[k]);
+const uf=()=>state.units==="J"?R:1;
+function fmt(x,d){ if(!isFinite(x))return "–"; return x.toFixed(d===undefined?2:d); }
+
+// Never falls back to native exponential ("1.2e+3") notation: plain decimal
+// for |exponent| < 4, proper ×10^n (superscript) markup otherwise.
+function fmtSci(x,sig){
+  sig=sig||3;
+  if(!isFinite(x))return "–";
+  if(x===0)return (0).toFixed(Math.max(0,sig-1));
+  const neg=x<0, ax=Math.abs(x);
+  let e=Math.floor(Math.log10(ax));
+  let mant=ax/Math.pow(10,e);
+  let mantStr=mant.toFixed(sig-1);
+  if(parseFloat(mantStr)>=10){mantStr=(parseFloat(mantStr)/10).toFixed(sig-1);e+=1;}
+  if(e>=4||e<=-4) return (neg?"−":"")+mantStr+"×10<sup>"+e+"</sup>";
+  const decimals=Math.max(0,sig-1-e);
+  return (neg?"−":"")+ax.toFixed(decimals);
+}
+function sciQ(lnq){return fmtSci(Math.exp(lnq),3);}
+function niceStep(raw){const e=Math.floor(Math.log10(raw)),f=raw/Math.pow(10,e);return (f<1.5?1:f<3?2:f<7?5:10)*Math.pow(10,e);}
+function niceTicks(lo,hi,n){
+  if(hi-lo<1e-9){hi=lo+1;}
+  const st=niceStep((hi-lo)/n), a=Math.floor(lo/st+1e-9)*st, b=Math.ceil(hi/st-1e-9)*st, t=[];
+  for(let v=a;v<=b+st/2;v+=st)t.push(Math.abs(v)<1e-12?0:v);
+  return {ticks:t,lo:a,hi:b,step:st};
+}
+function tFromFrac(f){return state.log?state.Tmin*Math.pow(state.Tmax/state.Tmin,f):state.Tmin+(state.Tmax-state.Tmin)*f;}
+function fracFromT(T){return state.log?Math.log(T/state.Tmin)/Math.log(state.Tmax/state.Tmin):(T-state.Tmin)/(state.Tmax-state.Tmin);}
+function fmtT(T){return T>=100?Math.round(T).toString():T>=10?T.toFixed(1):T.toFixed(2);}
+function fmtTtop(T){ // like fmtT, but switches to 1k/10k notation above 999
+  if(T<1000)return fmtT(T);
+  const k=T/1000;
+  return (k>=100?Math.round(k).toString():k>=10?(+k.toFixed(1)).toString():(+k.toFixed(2)).toString())+"k";
+}
+function tickLabel(v){return v>=1000?(v/1e3)+"k":String(v);}
+function fmtTh(x){return x>=100?Math.round(x):+x.toPrecision(3);}
+
+// ---------- charts ----------
+const W=1000,H=550,ML=98,MR=160,MT=40,MB=56,PW=W-ML-MR,PH=H-MT-MB;
+let data=[], charts={}, xs=[];
+let FS=17, FSC=16; // font sizes (user-space units), rescaled in build() to render as true CSS px
+let INCH=96; // one true CSS inch, in user-space units, rescaled in build() alongside FS/FSC
+
+const SPECS=[
+  {id:"ch_q",title:"",ylabel:"log of partition function (log₁₀ q per molecule)",get:(r,k)=>(k==="tot"?r.tot.lnq:r.m[k].lnq)/LN10,zero:false,hl:()=>[],
+   series:()=>seriesModes()},
+  {id:"ch_s",title:"",ylabel:"entropy/R (S/R)",get:(r,k)=>(k==="tot"?r.tot.s:r.m[k].s)*uf(),zero:false,hl:()=>[],
+   series:()=>seriesModes()},
+  {id:"ch_cp",title:"",ylabel:"heat capacity/R (Cₚ/R)",
+   get:(r,k)=>(k==="cv"?r.tot.cv:r.tot.cp)*uf(),zero:true,hl:()=>ceilings(1),
+   series:()=>{const s=state.units==="J"?"":"/R";return [{k:"cv",label:"Cᵥ"+s,css:"--c-cv",w:1.8,dash:"4 3"},{k:"tot",label:"Cₚ"+s,css:"--c-tot",w:2.8}];}}
+];
+function seriesModes(){
+  const s=[];
+  if(state.perMode)MODE_ORDER.forEach(k=>{if(state.modes[k])s.push({k:k,label:MODE_DEF[k].short,css:MODE_DEF[k].css,w:1.8});});
+  if(anyOn())s.push({k:"tot",label:"total",css:"--c-tot",w:3});
+  return s;
+}
+function ceilings(extra){ // equipartition ceilings for enabled classical modes
+  const out=[];let c=0;
+  if(state.modes.t){c+=1.5;out.push(c+extra);}
+  if(state.modes.r){c+=1;out.push(c+extra);}
+  if(state.modes.v){c+=1;out.push(c+extra);}
+  return out;
+}
+function frac(v){ const t=Math.round(v*2); return t%2===0?String(t/2):t+"/2"; }
+
+function build(){
+  const N=320; xs=[]; data=[];
+  for(let i=0;i<=N;i++){xs.push(tFromFrac(i/N));}
+  data=xs.map(calc);
+  const stageEl=document.querySelector(".chartbox.big");
+  const stageW=stageEl?stageEl.clientWidth-16:W; // minus 8px padding each side
+  // floor keeps the right-margin label text from ballooning (in user-units) at
+  // narrow container widths, which would otherwise overflow the viewBox; below
+  // this floor the curve-end labels render a bit smaller than 17/16 true px
+  // rather than risk clipping off the right edge
+  const k=W/Math.max(stageW,775);
+  FS=+(17*k).toFixed(3); FSC=+(16*k).toFixed(3); INCH=+(96*k).toFixed(3);
+  SPECS.forEach(sp=>drawChart(sp));
+  updateCursor();
+}
+
+function declutter(items,minGap,top,bottom){
+  items.sort((a,b)=>a.y-b.y);
+  for(let i=1;i<items.length;i++){if(items[i].y-items[i-1].y<minGap)items[i].y=items[i-1].y+minGap;}
+  if(items.length){
+    const over=items[items.length-1].y-bottom;
+    if(over>0)for(let i=0;i<items.length;i++)items[i].y-=over;
+  }
+  for(let i=0;i<items.length;i++)items[i].y=Math.max(top,Math.min(bottom,items[i].y));
+  return items;
+}
+
+function drawChart(sp){
+  const svg=$(sp.id), ser=sp.series(), title=typeof sp.title==="function"?sp.title():sp.title;
+  const hl=sp.hl();
+  const vals=ser.map(s=>data.map(r=>sp.get(r,s.k)));
+  let lo=Infinity,hi=-Infinity;
+  vals.forEach(a=>a.forEach(v=>{if(isFinite(v)){if(v<lo)lo=v;if(v>hi)hi=v;}}));
+  const hlv=hl.map(v=>v*uf());
+  hlv.forEach(v=>{if(v>hi)hi=v;});
+  if(!isFinite(lo)){lo=0;hi=1;}
+  if(sp.zero)lo=Math.min(0,lo);
+  const pad=(hi-lo)*0.08||0.5; hi+=pad; if(!sp.zero||lo<0)lo-=pad;
+  const yt=niceTicks(lo,hi,5); lo=yt.lo;hi=yt.hi;
+  const X=T=>ML+fracFromT(T)*PW, Y=v=>MT+PH-(v-lo)/(hi-lo)*PH;
+  const id=sp.id;
+  let g="";
+  // grid + x ticks
+  let xt=[];
+  if(state.log){
+    const b=Math.floor(Math.log10(state.Tmax)+1e-9);
+    for(let k=Math.floor(Math.log10(state.Tmin));k<=b;k++){
+      for(let m=2;m<=9;m++){const t=m*Math.pow(10,k);if(t>state.Tmin&&t<state.Tmax)g+="<line x1='"+X(t)+"' x2='"+X(t)+"' y1='"+MT+"' y2='"+(MT+PH)+"' style='stroke:var(--grid);stroke-width:.5;opacity:.7'/>";}
+    }
+    const a=Math.ceil(Math.log10(state.Tmin)-1e-9);
+    for(let k=a;k<=b;k++)xt.push(Math.pow(10,k));
+  } else xt=niceTicks(state.Tmin,state.Tmax,5).ticks.filter(t=>t>=state.Tmin-1e-9&&t<=state.Tmax+1e-9);
+  const FSAX=+(FS*1.1).toFixed(3); // axis tick-number labels, 10% larger than base
+  xt.forEach(t=>{const x=X(t);
+    g+="<line x1='"+x+"' x2='"+x+"' y1='"+MT+"' y2='"+(MT+PH)+"' style='stroke:var(--grid)'/>"+
+       "<text x='"+x+"' y='"+(MT+PH+22)+"' text-anchor='middle' font-size='"+FSAX+"' style='fill:#000'>"+tickLabel(t)+"</text>";});
+  yt.ticks.forEach(v=>{const y=Y(v);
+    g+="<line x1='"+ML+"' x2='"+(ML+PW)+"' y1='"+y+"' y2='"+y+"' style='stroke:var(--grid)'/>"+
+       "<text x='"+(ML-8)+"' y='"+(y+5)+"' text-anchor='end' font-size='"+FSAX+"' style='fill:#000'>"+(Math.abs(yt.step)>=1?v.toFixed(0):Math.abs(yt.step)>=0.1?v.toFixed(1):v.toFixed(2))+"</text>";});
+  // equipartition ceilings
+  hl.forEach(v=>{const y=Y(v*uf());
+    g+="<line x1='"+ML+"' x2='"+(ML+PW)+"' y1='"+y+"' y2='"+y+"' style='stroke:#888;stroke-dasharray:2 4;opacity:.8'/>"+
+       "<text x='"+(ML+10)+"' y='"+(y-8)+"' text-anchor='start' font-size='"+FS+"' style='fill:#555'>"+frac(v)+"</text>";});
+  // characteristic temperatures
+  if(state.markers){
+    const marks=[];
+    if(state.modes.r)marks.push({T:state.p.thr,css:"--c-r",sub:"rot"});
+    if(state.modes.v)marks.push({T:state.p.thv,css:"--c-v",sub:"vib"});
+    if(state.modes.e&&state.p.g1>0&&state.p.thel>0)marks.push({T:state.p.thel,css:"--c-e",sub:"el"});
+    marks.forEach(m=>{
+      if(m.T<=state.Tmin||m.T>=state.Tmax)return;
+      const x=X(m.T), right=x>ML+PW-70;
+      const fsm=m.sub?+(FS*1.15).toFixed(3):FS, fwm=m.sub?700:400;
+      const lbl=m.sub?"θ<tspan baseline-shift='-20%' font-size='"+(fsm*0.72).toFixed(3)+"'>"+m.sub+"</tspan>":m.l;
+      g+="<line x1='"+x+"' x2='"+x+"' y1='"+MT+"' y2='"+(MT+PH)+"' style='stroke:var("+m.css+");stroke-dasharray:5 4;opacity:.85'/>"+
+         "<text x='"+(right?x-3:x+3)+"' y='"+(MT+17)+"' text-anchor='"+(right?"end":"start")+"' font-size='"+fsm+"' font-weight='"+fwm+"' style='fill:var("+m.css+")'>"+lbl+" = "+fmtTh(m.T)+" K</text>";
+    });
+  }
+  // curves
+  ser.forEach((s,i)=>{
+    let d="";
+    vals[i].forEach((v,j)=>{d+=(j?"L":"M")+X(xs[j]).toFixed(1)+","+Y(v).toFixed(1);});
+    g+="<path d='"+d+"' fill='none' stroke-linejoin='round' stroke-linecap='round' style='stroke:var("+s.css+");stroke-width:"+s.w+(s.dash?";stroke-dasharray:"+s.dash:"")+"' clip-path='url(#clip_"+id+")'/>";
+  });
+  // in-figure end-of-curve labels (replaces a separate legend)
+  if(ser.length){
+    const items=ser.map((s,i)=>{
+      const vv=vals[i][vals[i].length-1];
+      return {y:Y(vv),text:s.label,css:s.css};
+    });
+    declutter(items,20,MT+8,MT+PH-4);
+    items.forEach(it=>{
+      g+="<text x='"+(ML+PW+8)+"' y='"+(it.y+5)+"' font-size='"+FS+"' font-weight='600' style='fill:var("+it.css+")'>"+it.text+"</text>";
+    });
+  }
+  // axes + labels
+  g+="<line x1='"+ML+"' x2='"+ML+"' y1='"+MT+"' y2='"+(MT+PH)+"' style='stroke:#000;stroke-width:1.5'/>"+
+     "<line x1='"+ML+"' x2='"+(ML+PW)+"' y1='"+(MT+PH)+"' y2='"+(MT+PH)+"' style='stroke:#000;stroke-width:1.5'/>"+
+     "<text x='"+(ML+PW/2)+"' y='"+(H-8)+"' text-anchor='middle' font-size='"+FSAX+"' style='fill:#000'>temperature (K)"+(state.log?"  [log scale]":"")+"</text>"+
+     (title?"<text x='"+ML+"' y='22' font-size='"+FS+"' font-weight='600' style='fill:#000'>"+title+"</text>":"")+
+     "<text x='42' y='"+(MT+PH/2)+"' text-anchor='middle' font-size='"+FSAX+"' style='fill:#000' transform='rotate(-90 42 "+(MT+PH/2)+")'>"+sp.ylabel+"</text>";
+  if(!ser.length)g+="<text x='"+(ML+PW/2)+"' y='"+(MT+PH/2)+"' text-anchor='middle' font-size='"+FS+"' style='fill:#555'>turn on at least one mode</text>";
+  svg.innerHTML="<defs><clipPath id='clip_"+id+"'><rect x='"+ML+"' y='"+(MT-1)+"' width='"+PW+"' height='"+(PH+2)+"'/></clipPath></defs>"+g+
+     "<g id='cur_"+id+"'></g>";
+  charts[id]={sp:sp,ser:ser,X:X,Y:Y,title:title};
+  // temperature follows the pointer only while the button is held down (click-and-drag)
+  svg.onpointerdown=e=>{
+    if(e.button!==0)return;
+    svg._drag=true;
+    try{svg.setPointerCapture(e.pointerId);}catch(_){}
+    setFromEvent(svg,e);
+    e.preventDefault();
+  };
+  svg.onpointermove=e=>{if(svg._drag)setFromEvent(svg,e);};
+  svg.onpointerup=svg.onpointercancel=svg.onlostpointercapture=()=>{svg._drag=false;};
+}
+function setFromEvent(svg,e){
+  const r=svg.getBoundingClientRect(), x=(e.clientX-r.left)/r.width*W;
+  const f=Math.max(0,Math.min(1,(x-ML)/PW));
+  state.T=tFromFrac(f); $("Tslider").value=Math.round(f*1000); updateCursor();
+}
+function updateCursor(){
+  const T=state.T, res=calc(T);
+  SPECS.forEach(sp=>{
+    const c=charts[sp.id]; if(!c)return;
+    const x=c.X(T); let s="<line x1='"+x+"' x2='"+x+"' y1='"+MT+"' y2='"+(MT+PH)+"' style='stroke:#000;stroke-width:1;opacity:.5'/>";
+    c.ser.forEach(se=>{const v=sp.get(res,se.k),y=c.Y(v);
+      if(y>=MT-2&&y<=MT+PH+2)s+="<circle cx='"+x+"' cy='"+y+"' r='"+(se.k==="tot"?4.2:3)+"' style='fill:var("+se.css+");stroke:#fff;stroke-width:1.5'/>";});
+    const tot=c.ser.filter(q=>q.k==="tot")[0];
+    if(tot){const v=sp.get(res,"tot");
+      const lbl=sp.id==="ch_q"?"q = ":sp.id==="ch_s"?"S/R = ":"Cₚ/R = ";
+      const vs=sp.id==="ch_q"?v.toFixed(1):v.toFixed(2);
+      const fsReadout=+(FS*1.15).toFixed(3);
+      s+="<text x='"+(ML+PW-INCH)+"' y='22' text-anchor='end' font-size='"+fsReadout+"' style='fill:#000'>T = "+fmtTtop(T)+" K&nbsp;&nbsp;&nbsp;&nbsp;"+lbl+vs+"</text>";}
+    $("cur_"+sp.id).innerHTML=s;
+  });
+  renderReadout(res);
+  $("Tval").textContent=fmtT(T)+" K";
+}
+
+// ---------- readout ----------
+function statusFor(k,r,T){
+  const m=r.m[k]; let f;
+  if(k==="t")f=1;
+  else if(k==="r")f=Math.min(1,m.cv/1);
+  else if(k==="v")f=Math.min(1,m.cv/1);
+  else{const g0=Math.max(1,state.p.g0),g1=state.p.g1;
+    if(!(g1>0&&state.p.thel>0))return {f:0,txt:"ground state only"};
+    const y=state.p.thel/T,p1=g1*Math.exp(-y)/(g0+g1*Math.exp(-y));f=p1/(g1/(g0+g1));}
+  const txt=k==="e"?(f<0.05?"frozen":f>0.95?"fully populated":"turning on"):(f<0.05?"frozen":f>0.95?"fully active":"turning on");
+  return {f:f,txt:txt};
+}
+function renderReadout(res){
+  const T=state.T, u=uf(), isJ=state.units==="J";
+  const chars={t:"–",r:"θ = "+fmtTh(state.p.thr)+" K",v:"θ = "+fmtTh(state.p.thv)+" K",
+    e:(state.p.g1>0&&state.p.thel>0)?"θ = "+fmtTh(state.p.thel)+" K":"g₀ = "+state.p.g0};
+  const sHead=isJ?"S":"S/R";
+  let h="<tr><th>mode</th><th>characteristic</th><th>q</th><th>Cᵥ"+(isJ?"":"/R")+"</th><th>"+sHead+"</th><th>activation</th></tr>";
+  MODE_ORDER.forEach(k=>{
+    const m=res.m[k], on=state.modes[k], st=statusFor(k,res,T);
+    const sVal=isJ?fmt(m.s*u,1):fmtSci(m.s,3);
+    h+="<tr style='"+(on?"":"opacity:.4")+"'><td><span style='display:inline-block;width:10px;height:10px;border-radius:2px;background:var("+MODE_DEF[k].css+");margin-right:6px'></span>"+MODE_DEF[k].name+"</td>"+
+       "<td>"+chars[k]+"</td><td>"+sciQ(m.lnq)+"</td><td>"+fmt(m.cv*u,2)+"</td><td>"+sVal+"</td>"+
+       "<td style='text-align:left'><div class='actcell'><div class='bar'><b style='width:"+(st.f*100).toFixed(0)+"%;background:var("+MODE_DEF[k].css+")'></b></div><div class='st'>"+(on?st.txt:"off")+"</div></div></td></tr>";
+  });
+  const sTot=isJ?fmt(res.tot.s*u,1):fmtSci(res.tot.s,3);
+  h+="<tr class='tot'><td>total (enabled)</td><td></td><td>"+sciQ(res.tot.lnq)+"</td><td>"+fmt(res.tot.cv*u,2)+"</td><td>"+sTot+"</td><td></td></tr>";
+  $("tbl").innerHTML=h;
+}
+
+
+// ---------- auto-width selects ----------
+function sizeSelect(sel){
+  const probe=$("measureProbe"); if(!probe)return;
+  const cs=getComputedStyle(sel);
+  probe.style.fontSize=cs.fontSize; probe.style.fontFamily=cs.fontFamily; probe.style.fontWeight=cs.fontWeight;
+  const opt=sel.options[sel.selectedIndex];
+  probe.textContent=opt?opt.text:"";
+  const w=probe.getBoundingClientRect().width;
+  sel.style.width=Math.ceil(w)+46+"px";
+}
+
+// ---------- controls ----------
+function buildControls(){
+  const sel=$("mol");
+  sel.innerHTML=Object.keys(MOLS).map(k=>"<option value='"+k+"'>"+MOLS[k].name+"</option>").join("")+"<option value='custom'>custom</option>";
+  sel.value=state.key;
+  const md=$("modes");
+  md.innerHTML=MODE_ORDER.map(k=>"<label class='mode' id='m_"+k+"'><input type='checkbox' data-k='"+k+"' checked><span class='sw' style='background:var("+MODE_DEF[k].css+")'></span><span class='nm'>"+MODE_DEF[k].name+"</span><span class='th' id='mth_"+k+"'></span></label>").join("");
+  md.querySelectorAll("input").forEach(cb=>cb.addEventListener("change",()=>{state.modes[cb.dataset.k]=cb.checked;refreshAll();}));
+  sel.addEventListener("change",()=>{
+    if(sel.value==="custom"){state.key="custom";$("paramDetails").open=true;}
+    else{state.key=sel.value;state.p=Object.assign({},MOLS[sel.value]);}
+    syncParams();refreshAll();
+  });
+  ["thr","thv","sigma","M","g0","thel","g1"].forEach(n=>{
+    $("p_"+n).addEventListener("input",e=>{
+      const v=parseFloat(e.target.value); if(!isFinite(v))return;
+      const lim={thr:[0.01,1e5],thv:[1,1e5],sigma:[1,2],M:[0.5,1000],g0:[1,20],thel:[0,1e5],g1:[0,20]}[n];
+      state.p[n]=Math.min(lim[1],Math.max(lim[0],v));
+      state.key="custom";$("mol").value="custom";sizeSelect($("mol"));refreshAll(true);
+    });
+  });
+  // scrubbers: drag left/right on a parameter box to lower/raise its value (click without dragging still types)
+  const SCRUB={thr:{lo:0.01,hi:1e5,int:false},thv:{lo:1,hi:1e5,int:false},M:{lo:0.5,hi:1000,int:false},
+               thel:{lo:0,hi:1e5,int:false},sigma:{lo:1,hi:2,int:true},g0:{lo:1,hi:20,int:true},g1:{lo:0,hi:20,int:true}};
+  const sig3=v=>v===0?0:+v.toPrecision(3);
+  Object.keys(SCRUB).forEach(n=>{
+    const inp=$("p_"+n), cfg=SCRUB[n];
+    let x0=null,v0=0,scrubbing=false,pid=null;
+    inp.addEventListener("pointerdown",e=>{
+      if(e.button!==0)return;
+      // leave the native spinner arrows (right edge) alone
+      const r=inp.getBoundingClientRect(); if(e.clientX>r.right-22)return;
+      x0=e.clientX; v0=parseFloat(inp.value); if(!isFinite(v0))v0=cfg.lo; scrubbing=false; pid=e.pointerId;
+    });
+    inp.addEventListener("pointermove",e=>{
+      if(x0===null||e.pointerId!==pid)return;
+      const dx=e.clientX-x0;
+      if(!scrubbing){
+        if(Math.abs(dx)<4)return;
+        scrubbing=true; inp.blur(); inp.classList.add("scrubbing");
+        try{inp.setPointerCapture(pid);}catch(_){}
+      }
+      e.preventDefault();
+      let v;
+      if(cfg.int){v=Math.round(v0+dx/14);}
+      else{
+        const base=v0>0?v0:1;                // θel can start at 0
+        v=base*Math.exp(dx*0.01);            // ~×2.7 per 100 px, smooth on any scale
+        if(v0<=0&&dx<=0)v=0;
+        if(n==="thel"&&v<0.5)v=0;            // allow dragging θel back down to "no excited state"
+        v=sig3(v);
+      }
+      v=Math.min(cfg.hi,Math.max(cfg.lo,v));
+      if(String(v)!==inp.value){inp.value=v;inp.dispatchEvent(new Event("input",{bubbles:true}));}
+    });
+    const end=e=>{
+      if(x0===null)return;
+      if(scrubbing){e.preventDefault();inp.classList.remove("scrubbing");}
+      x0=null;scrubbing=false;
+    };
+    inp.addEventListener("pointerup",end);
+    inp.addEventListener("pointercancel",end);
+  });
+  $("rotMode").addEventListener("change",e=>{state.rotMode=e.target.value;refreshAll();});
+  $("Tslider").addEventListener("input",e=>{state.T=tFromFrac(e.target.value/1000);updateCursor();});
+  $("Tmin").addEventListener("change",e=>{state.Tmin=+e.target.value;sizeSelect($("Tmin"));fixRange("min");});
+  $("Tmax").addEventListener("change",e=>{state.Tmax=+e.target.value;sizeSelect($("Tmax"));fixRange("max");});
+  $("Psel").addEventListener("change",e=>{state.P=+e.target.value;refreshAll();});
+  segment("axisSeg",v=>{state.log=v==="log";refreshAll();});
+  segment("unitSeg",v=>{state.units=v;refreshAll();});
+  $("perMode").addEventListener("change",e=>{state.perMode=e.target.checked;refreshAll();});
+  $("markers").addEventListener("change",e=>{state.markers=e.target.checked;refreshAll();});
+
+  // info panels
+  function openPanel(name){
+    ["directions","details","about"].forEach(n=>{
+      const el=$("panel-"+n), btn=document.querySelector(".redbtn[data-panel='"+n+"']");
+      const show=n===name;
+      el.hidden=!show; btn.setAttribute("aria-pressed",show?"true":"false");
+    });
+  }
+  function closePanel(name){
+    $("panel-"+name).hidden=true;
+    document.querySelector(".redbtn[data-panel='"+name+"']").setAttribute("aria-pressed","false");
+  }
+  document.querySelectorAll("#toolbar .redbtn").forEach(b=>b.addEventListener("click",()=>{
+    const name=b.dataset.panel;
+    if(b.getAttribute("aria-pressed")==="true")closePanel(name);else openPanel(name);
+  }));
+  document.querySelectorAll(".closeX").forEach(b=>b.addEventListener("click",()=>closePanel(b.dataset.close)));
+
+  function selectChart(id){
+    ["ch_q","ch_s","ch_cp"].forEach(cid=>{
+      if(cid!==id)$(cid).setAttribute("hidden","");else $(cid).removeAttribute("hidden");
+      document.querySelector(".redbtn[data-chart=\'"+cid+"\']").setAttribute("aria-pressed", cid===id?"true":"false");
+    });
+  }
+  document.querySelectorAll("#charttabs .redbtn").forEach(b=>b.addEventListener("click",()=>selectChart(b.dataset.chart)));
+}
+function segment(id,fn){
+  const el=$(id);
+  el.querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{
+    el.querySelectorAll("button").forEach(x=>{const on=x===b;x.classList.toggle("on",on);x.setAttribute("aria-pressed",on?"true":"false");});
+    fn(b.dataset.v);
+  }));
+}
+function fixRange(which){
+  if(state.Tmin>=state.Tmax){
+    if(which==="min"){state.Tmax=[1000,3000,10000,30000].filter(v=>v>state.Tmin)[0];$("Tmax").value=state.Tmax;sizeSelect($("Tmax"));}
+    else{state.Tmin=[1,10,50,100].filter(v=>v<state.Tmax).pop();$("Tmin").value=state.Tmin;sizeSelect($("Tmin"));}
+  }
+  refreshAll();
+}
+function syncParams(){
+  const p=state.p;
+  ["thr","thv","sigma","M","g0","thel","g1"].forEach(n=>{$("p_"+n).value=p[n];});
+  $("mol").value=state.key;
+  sizeSelect($("mol"));
+}
+function refreshAll(keepFields){
+  const isH2=state.key==="H2";
+  document.querySelectorAll("#rotMode option[data-h2]").forEach(o=>{o.disabled=!isH2;});
+  if(!isH2&&(state.rotMode==="equil"||state.rotMode==="frozen"))state.rotMode="exact";
+  $("rotMode").value=state.rotMode;
+  if(!keepFields)syncParams();
+  state.T=Math.min(state.Tmax,Math.max(state.Tmin,state.T));
+  $("Tslider").value=Math.round(Math.max(0,Math.min(1,fracFromT(state.T)))*1000);
+  MODE_ORDER.forEach(k=>{
+    $("m_"+k).classList.toggle("off",!state.modes[k]);
+    const th={t:"always on",r:"θ = "+fmtTh(state.p.thr)+" K",v:"θ = "+fmtTh(state.p.thv)+" K",
+      e:(state.p.g1>0&&state.p.thel>0)?"θ = "+fmtTh(state.p.thel)+" K":"g₀ = "+state.p.g0}[k];
+    $("mth_"+k).textContent=th;
+  });
+  const mol=MOLS[state.key];
+  $("molNote").innerHTML=mol?mol.note:"User-defined parameters";
+  build();
+}
+
+buildControls();
+syncParams();
+sizeSelect($("Tmin"));sizeSelect($("Tmax"));
+refreshAll();
+let _resizeTimer=null;
+window.addEventListener("resize",()=>{
+  sizeSelect($("mol"));sizeSelect($("Tmin"));sizeSelect($("Tmax"));
+  clearTimeout(_resizeTimer); _resizeTimer=setTimeout(build,120);
+});
+})();
+</script>
+</body>
+</html>

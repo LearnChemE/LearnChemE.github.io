@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cryogenic Recovery of Acetone from Air</title>
+
+<!-- MathJax v3 -->
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['\\(','\\)']], displayMath: [['$$','$$']] },
+    chtml: { displayAlign: 'left' },
+    startup: { typeset: false }
+  };
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<style>
+  :root{
+    --lce-red:#98000D;      /* LearnChemE house red (UI accents) */
+    --cond:#7D0000;         /* condenser (RGBColor[0.49,0,0]) */
+    --flash:#4021D1;        /* flash drum (RGBColor[0.25,0.13,0.82]) */
+    --vapor:#7D004D;        /* vapor stream (RGBColor[0.49,0,0.3]) */
+    --liquid:#FF0000;       /* liquid stream */
+    --green:#1a9e1a;        /* coolant */
+    --ink:#1a1a1a;
+    --panelbg:#f7f7f7;
+    --border:#c9c9c9;
+  }
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:Helvetica,Arial,sans-serif;
+    color:var(--ink);
+    background:#ffffff;
+    -webkit-font-smoothing:antialiased;
+  }
+  .sim{max-width:640px;margin:0 auto;padding:6px 10px 4px 10px;}
+
+  .title{
+    font-size:20px;
+    font-weight:600;
+    text-align:center;
+    margin:2px 0 8px 0;
+    color:var(--ink);
+  }
+
+  /* ---- slider (font increased 25%) ---- */
+  .slider-row{
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:10px;
+    font-size:1.15em;            /* +25%, then -8% */
+    margin:2px 0 6px 0;
+  }
+  .slider-row label{white-space:nowrap;}
+  /* slider gets 80% of the free row space; the ::after spacer takes the other 20% */
+  .slider-row input[type=range]{flex:4 1 0;min-width:144px;}
+  .slider-row::after{content:"";flex:1 1 0;}
+  input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+  input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  .slider-val{
+    min-width:64px;
+    text-align:left;
+    font-variant-numeric:tabular-nums;
+  }
+
+  /* ---- buttons: just below slider, left side ---- */
+  .btn-row{
+    display:flex;
+    gap:8px;
+    justify-content:flex-start;
+    margin:2px 0 0 0;
+  }
+  .btn{
+    font-family:inherit;
+    font-size:15.4px;
+    padding:5.5px 13.2px;
+    color:#fff;
+    background:var(--lce-red);
+    border:none;
+    border-radius:4px;
+    cursor:pointer;
+  }
+  .btn:hover{background:#b3141f;}
+  .btn.active{background:#6f000a;}
+
+  /* ---- flyout panels: overlay the figure, open below the buttons ---- */
+  .panels{position:relative;}
+  .panel{
+    display:none;
+    position:absolute;
+    top:6px; left:0; right:0;
+    z-index:20;
+    margin:0;
+    padding:12px 16px 14px 16px;
+    background:var(--panelbg);
+    border:1px solid var(--border);
+    border-radius:6px;
+    font-size:14px;
+    line-height:1.5;
+    box-shadow:0 5px 16px rgba(0,0,0,0.20);
+  }
+  .panel.open{display:block;}
+  .panel .close{
+    position:absolute;
+    top:8px;
+    right:10px;
+    z-index:30;
+    width:22px;height:22px;
+    line-height:20px;
+    text-align:center;
+    border:1px solid var(--border);
+    border-radius:4px;
+    background:#fff;
+    cursor:pointer;
+    font-size:15px;
+    color:#444;
+  }
+  .panel .close:hover{background:#eee;color:#000;}
+  .panel h3{margin:0 0 2px 0;font-size:15px;color:var(--lce-red);}
+  .panel p{margin:0.4em 0;}
+  .panel h3 + p{margin-top:0;}
+  .panel a{color:var(--lce-red);}
+  .panel table{border-collapse:collapse;margin:6px 0;font-size:13px;}
+  .panel td,.panel th{border:1px solid var(--border);padding:3px 8px;text-align:center;}
+
+  /* Details: no scroll bars on the equations, one scroll bar on the panel body */
+  .panel .eq{overflow:visible;}
+  .panel mjx-container{overflow:visible !important;}
+  .panel .eq{margin:0;}
+  .panel .eq mjx-container[display="true"]{margin:0.25em 0 !important;}
+  #p-det .det-body p{margin:0.25em 0;}
+  .panel .symbols{border-collapse:collapse;margin:4px 0 0 0;}
+  .panel .symbols td{border:none;padding:1px 10px 1px 0;text-align:left;vertical-align:top;}
+  #p-det .det-body{overflow-y:auto;overflow-x:hidden;padding-right:8px;}
+
+  /* ---- figure: no extra whitespace above/below ---- */
+  .figure{margin:2px 0 0 0;line-height:0;}
+  canvas{display:block;width:600px;max-width:100%;height:auto;margin:0;}
+</style>
+</head>
+<body>
+<div class="sim">
+  <div class="title">Cryogenic Recovery of Acetone from Air</div>
+
+  <div class="slider-row">
+    <label for="theta">coolant temperature in&nbsp;&deg;C</label>
+    <input type="range" id="theta" min="-100" max="-20" step="2" value="-50">
+    <span class="slider-val" id="thetaVal">-50</span>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn" data-target="p-dir">Directions</button>
+    <button class="btn" data-target="p-det">Details</button>
+    <button class="btn" data-target="p-abt">About</button>
+  </div>
+
+  <div class="panels">
+    <!-- Directions -->
+    <div class="panel" id="p-dir">
+      <div class="close" data-close="p-dir" title="close">&times;</div>
+      <h3>Directions</h3>
+      <p>A 5&nbsp;mol% acetone/95&nbsp;mole% air stream flows into a condenser at a rate
+      of 1000&nbsp;kmol/h. The acetone is recovered from air using a cryogenic process with
+      temperatures between &minus;100&nbsp;&deg;C and &minus;20&nbsp;&deg;C. The liquid phase
+      that exits the process is pure acetone. A 10&nbsp;&deg;C approach temperature is chosen,
+      which allows the determination of the isothermal flash temperature from the user-set
+      value of the coolant temperature. The simulation displays the flow rates and their mole
+      fractions. At sufficiently low condenser temperatures, almost 100% of the acetone can
+      be recovered.</p>
+    </div>
+
+    <!-- Details -->
+    <div class="panel" id="p-det">
+      <div class="close" data-close="p-det" title="close">&times;</div>
+      <div class="det-body">
+      <h3>Details</h3>
+      <p>The feed (component&nbsp;1 = acetone, component&nbsp;2 = air) is flashed at the drum
+      temperature \(T\), which is set by a 10&nbsp;&deg;C approach to the coolant temperature
+      \(\theta\):</p>
+      <div class="eq">$$T = \theta + 10 + 273.15\;\text{K}$$</div>
+
+      <p>The overall and acetone mole balances on the flash drum are</p>
+      <div class="eq">$$F = L + V, \qquad F\,z = L\,x + V\,y,$$</div>
+      <p>with feed rate \(F = 1000\ \text{kmol/h}\) and feed acetone fraction \(z = 0.05\).
+      Here \(x\) and \(y\) are the acetone mole fractions in the liquid and vapor,
+      \(L\) and \(V\) are the liquid and vapor molar flow rates.</p>
+
+      <p>Vapor&ndash;liquid equilibrium uses a modified Raoult's law with Wilson activity
+      coefficients \(\gamma_i\):</p>
+      <div class="eq">$$y = \frac{\gamma_1\,P_1^{\,\text{sat}}\,x}{P}, \qquad
+                        1 - y = \frac{\gamma_2\,P_2^{\,\text{sat}}\,(1-x)}{P},$$</div>
+      <p>with total pressure \(P = 101.325\ \text{kPa}\).</p>
+
+      <p>The saturation pressures (kPa) are given by the extended (DIPPR) Antoine form:</p>
+      <div class="eq">$$\ln P_i^{\,\text{sat}} = A_i + \frac{B_i}{C_i + T}
+                        + D_i \ln T + E_i\,T^{\,F_i}$$</div>
+
+      <p>The Wilson model gives</p>
+      <div class="eq">$$\Lambda_{12} = \frac{V_2}{V_1}\,
+        \exp\!\left(-\frac{\lambda_{12} + b_{12}\,T}{R\,T}\right),$$</div>
+      <div class="eq">$$\Lambda_{21} = \frac{V_1}{V_2}\,
+        \exp\!\left(-\frac{\lambda_{21} + b_{21}\,T}{R\,T}\right),$$</div>
+      <div class="eq">$$\ln\gamma_1 = -\ln\!\left(x_1 + x_2\Lambda_{12}\right) + 1
+        - \left[\frac{x_1}{x_1 + x_2\Lambda_{12}}
+        + \frac{x_2\,\Lambda_{21}}{x_1\Lambda_{21} + x_2}\right],$$</div>
+      <div class="eq">$$\ln\gamma_2 = -\ln\!\left(x_1\Lambda_{21} + x_2\right) + 1
+        - \left[\frac{x_1\,\Lambda_{12}}{x_1 + x_2\Lambda_{12}}
+        + \frac{x_2}{x_1\Lambda_{21} + x_2}\right],$$</div>
+      <p>where \(x_1 = x\), \(x_2 = 1 - x\), and \(R = 1.987\ \text{cal/(mol·K)}\).
+      The four VLE and balance equations are solved for \(x,\,y,\,L,\,V\) at each temperature.</p>
+
+      <p><strong>Antoine (DIPPR) coefficients</strong></p>
+      <table>
+        <tr><th></th><th>\(A\)</th><th>\(B\)</th><th>\(C\)</th><th>\(D\)</th><th>\(E\)</th><th>\(F\)</th></tr>
+        <tr><td>acetone (1)</td><td>71.13031</td><td>&minus;5952</td><td>0</td><td>&minus;8.53128</td><td>7.82393&times;10<sup>&minus;6</sup></td><td>2</td></tr>
+        <tr><td>air (2)</td><td>21.662</td><td>&minus;692.39</td><td>0</td><td>&minus;0.39208</td><td>4.7574&times;10<sup>&minus;3</sup></td><td>1</td></tr>
+      </table>
+
+      <p><strong>Wilson parameters</strong> (cal/mol):
+      \(\lambda_{12} = 906.5\), \(\lambda_{21} = -1.805\),
+      \(b_{12} = -0.002\), \(b_{21} = 1.916\),
+      \(V_1 = 7.44767\), \(V_2 = 3.29136\).</p>
+
+      <p><strong>Symbols</strong></p>
+      <table class="symbols">
+        <tr><td>\(A_i\)&ndash;\(F_i\)</td><td>Antoine (DIPPR) coefficients for component \(i\)</td></tr>
+        <tr><td>\(b_{12},\,b_{21}\)</td><td>temperature coefficients in the Wilson parameters (cal/(mol&middot;K))</td></tr>
+        <tr><td>\(F\)</td><td>feed molar flow rate (kmol/h)</td></tr>
+        <tr><td>\(L\)</td><td>liquid molar flow rate (kmol/h)</td></tr>
+        <tr><td>\(P\)</td><td>total pressure (kPa)</td></tr>
+        <tr><td>\(P_i^{\,\text{sat}}\)</td><td>saturation pressure of component \(i\) (kPa)</td></tr>
+        <tr><td>\(R\)</td><td>ideal gas constant (cal/(mol&middot;K))</td></tr>
+        <tr><td>\(T\)</td><td>flash drum temperature (K)</td></tr>
+        <tr><td>\(V\)</td><td>vapor molar flow rate (kmol/h)</td></tr>
+        <tr><td>\(V_1,\,V_2\)</td><td>Wilson molar-volume parameters of acetone and air</td></tr>
+        <tr><td>\(x\)</td><td>acetone mole fraction in liquid</td></tr>
+        <tr><td>\(x_1,\,x_2\)</td><td>liquid mole fractions of acetone and air</td></tr>
+        <tr><td>\(y\)</td><td>acetone mole fraction in vapor</td></tr>
+        <tr><td>\(z\)</td><td>acetone mole fraction in feed</td></tr>
+        <tr><td>\(\gamma_i\)</td><td>activity coefficient of component \(i\)</td></tr>
+        <tr><td>\(\theta\)</td><td>coolant temperature (&deg;C)</td></tr>
+        <tr><td>\(\lambda_{12},\,\lambda_{21}\)</td><td>Wilson interaction energies (cal/mol)</td></tr>
+        <tr><td>\(\Lambda_{12},\,\Lambda_{21}\)</td><td>Wilson binary parameters</td></tr>
+      </table>
+      </div>
+    </div>
+
+    <!-- About -->
+    <div class="panel" id="p-abt">
+      <div class="close" data-close="p-abt" title="close">&times;</div>
+      <h3>About</h3>
+      <p>This simulation was created in the
+      <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of
+      Chemical and Biological Engineering</a> at University of Colorado Boulder for
+      <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a>
+      by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a
+      <a href="https://demonstrations.wolfram.com/CryogenicRecoveryOfAcetoneFromAir/"
+      target="_blank" rel="noopener">Mathematica simulation</a> by Housam Binous and
+      Ahmed Bellagi. It was prepared with financial support from the National Science
+      Foundation (DUE 2336987 and 2336988). Address any questions or comments to
+      <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.</p>
+    </div>
+  </div>
+
+  <div class="figure">
+    <canvas id="fig"></canvas>
+  </div>
+</div>
+
+<script>
+/* ============================ physics ============================ */
+const P = 101.325, R = 1.987, F = 1000, z = 0.05;
+// component 1 = acetone, component 2 = air
+const A1=71.13031, B1=-5952, C1=0, D1=-8.53128, E1=7.82393e-6, Fe1=2;
+const A2=21.662,   B2=-692.39, C2=0, D2=-0.39208, E2=4.7574e-3, Fe2=1;
+const l21=-1.805, l12=906.5, b12=-0.002, b21=1.916, V2c=3.29136, V1c=7.44767;
+
+function solve(theta){
+  const T = 273.15 + theta + 10;
+  const Ps1 = Math.exp(A1 + B1/(C1+T) + D1*Math.log(T) + E1*Math.pow(T,Fe1));
+  const Ps2 = Math.exp(A2 + B2/(C2+T) + D2*Math.log(T) + E2*Math.pow(T,Fe2));
+  const A12 = (V2c/V1c)*Math.exp(-(l12 + b12*T)/(R*T));
+  const A21 = (V1c/V2c)*Math.exp(-(l21 + b21*T)/(R*T));
+  function Kvals(x){
+    const x1=x, x2=1-x;
+    const g1=Math.exp(-Math.log(x1+x2*A12)+1-(x1/(x1+x2*A12)+x2*(A21/(x1*A21+x2))));
+    const g2=Math.exp(-Math.log(x1*A21+x2)+1-(x1*(A12/(x1+x2*A12))+x2/(x1*A21+x2)));
+    return [Ps1*g1/P, Ps2*g2/P];
+  }
+  const g = x => { const [K1,K2]=Kvals(x); return K1*x + K2*(1-x) - 1; };
+  let lo=1e-4, hi=0.999999, glo=g(lo);
+  for(let i=0;i<200;i++){
+    const mid=0.5*(lo+hi), gm=g(mid);
+    if((glo<0)===(gm<0)){ lo=mid; glo=gm; } else { hi=mid; }
+  }
+  const x=0.5*(lo+hi);
+  const y=Kvals(x)[0]*x;
+  const L=F*(z-y)/(x-y);
+  const V=F-L;
+  return {T, x, y, L, V};
+}
+
+/* ---- number formatting per spec ---- */
+const fmtV = v => v.toFixed(1);                          // vapor flow: 1 decimal
+const fmtL = L => (L > 10 ? L.toFixed(1) : L.toFixed(2)); // liquid: 1 dec if >10, else 2
+const fmt3 = v => v.toFixed(3);                          // compositions: 3 decimals
+const fmtT = th => (th + 10).toFixed(1);                 // flash temp: 1 decimal
+
+/* ============================ figure ============================ */
+const canvas = document.getElementById('fig');
+const ctx = canvas.getContext('2d');
+
+// world -> css-pixel transform (tight bounds, no extra whitespace)
+const WXMIN=-4.0, WXMAX=9.6, WYMIN=-3.2, WYMAX=6.0;
+const PAD=8;
+const CSSW=600;
+const scale=(CSSW-2*PAD)/(WXMAX-WXMIN);
+const CSSH=Math.round((WYMAX-WYMIN)*scale + 2*PAD);
+const X = wx => PAD + (wx-WXMIN)*scale;
+const Y = wy => PAD + (WYMAX-wy)*scale;
+
+// font tiers (non-bold) — Mathematica 12/14/16 pt scaled up for the larger canvas
+const FS = {sm:15, md:17, lg:19};
+const FSR = 15*1.1;   // flow rates & mole fractions, +10%
+
+function setupHiDPI(){
+  const dpr = window.devicePixelRatio || 1;
+  canvas.style.width = CSSW+'px';
+  canvas.style.height = CSSH+'px';
+  canvas.width = Math.round(CSSW*dpr);
+  canvas.height = Math.round(CSSH*dpr);
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+
+function arrow(pts, color, lw){
+  ctx.strokeStyle=color; ctx.fillStyle=color; ctx.lineWidth=lw;
+  ctx.lineJoin='round'; ctx.lineCap='round';
+  ctx.beginPath();
+  ctx.moveTo(X(pts[0][0]), Y(pts[0][1]));
+  for(let i=1;i<pts.length;i++) ctx.lineTo(X(pts[i][0]), Y(pts[i][1]));
+  ctx.stroke();
+  // arrowhead on last segment
+  const a=pts[pts.length-2], b=pts[pts.length-1];
+  const ax=X(a[0]),ay=Y(a[1]),bx=X(b[0]),by=Y(b[1]);
+  const ang=Math.atan2(by-ay,bx-ax), hl=11, hw=6;
+  ctx.beginPath();
+  ctx.moveTo(bx,by);
+  ctx.lineTo(bx-hl*Math.cos(ang)+hw*Math.sin(ang), by-hl*Math.sin(ang)-hw*Math.cos(ang));
+  ctx.lineTo(bx-hl*Math.cos(ang)-hw*Math.sin(ang), by-hl*Math.sin(ang)+hw*Math.cos(ang));
+  ctx.closePath(); ctx.fill();
+}
+
+function rect(x0,y0,x1,y1,color){
+  const px=X(x0), py=Y(y1), w=(x1-x0)*scale, h=(y1-y0)*scale;
+  ctx.fillStyle=color; ctx.globalAlpha=0.30;
+  ctx.fillRect(px,py,w,h);
+  ctx.globalAlpha=1.0;
+  ctx.strokeStyle=color; ctx.lineWidth=3;
+  ctx.strokeRect(px,py,w,h);
+}
+
+function label(text, wx, wy, color, size, align){
+  ctx.fillStyle=color;
+  ctx.font = size+'px Helvetica, Arial, sans-serif';   // non-bold
+  ctx.textAlign = align;                               // 'center' or 'left'
+  ctx.textBaseline='middle';
+  ctx.fillText(text, X(wx), Y(wy));
+}
+
+function draw(theta){
+  const s = solve(theta);
+  setupHiDPI();
+  ctx.clearRect(0,0,CSSW,CSSH);
+
+  // vessels
+  rect(0,0,2,2,'#7D0000');       // condenser
+  rect(5,0,7,2,'#4021D1');       // flash drum
+
+  // streams
+  arrow([[-3,1],[0,1]], '#000000', 3);              // feed
+  arrow([[0.5,2],[0.5,3.5]], '#1a9e1a', 3);          // coolant in
+  arrow([[1.5,3.5],[1.5,2]], '#1a9e1a', 3);          // coolant out
+  arrow([[2,1],[5,1]], '#4021D1', 3);                // condenser -> flash
+  arrow([[6,2],[6,3],[9,3]], '#7D004D', 3);          // vapor
+  arrow([[6,0],[6,-1],[9,-1]], '#FF0000', 3);        // liquid
+
+  // vessel + coolant labels
+  label('condenser', 1, 1, '#000', FS.sm, 'center');
+  label('flash', 6, 1, '#000', FS.sm, 'center');
+  label(fmtT(theta)+' \u00B0C', 3.5, 1.25, '#4021D1', FS.md, 'center');
+  label('coolant', 1, 4, '#1a9e1a', FS.lg, 'center');
+
+  // feed labels
+  label('feed', -2, 0.5, '#000', FS.lg, 'center');
+  label('50 kmol/h acetone', -3.2, -0.1, '#000', FSR, 'left');
+  label('950 kmol/h air',   -3.2, -0.7, '#000', FSR, 'left');
+
+  // vapor stream readouts
+  label('vapor', 7, 5.5, '#7D004D', FS.lg, 'center');
+  label(fmtV(s.V)+' kmol/h', 6, 4.8, '#7D004D', FSR, 'left');
+  label(fmt3(1-s.y)+' air',  6, 4.2, '#7D004D', FSR, 'left');
+  label(fmt3(s.y)+' acetone',6, 3.6, '#7D004D', FSR, 'left');
+
+  // liquid stream readouts
+  label('liquid', 7, -1.5, '#FF0000', FS.lg, 'center');
+  label(fmtL(s.L)+' kmol/h', 6, -2.2, '#FF0000', FSR, 'left');
+  label(fmt3(s.x)+' acetone',6, -2.8, '#FF0000', FSR, 'left');
+}
+
+/* ============================ controls ============================ */
+const slider = document.getElementById('theta');
+const sval = document.getElementById('thetaVal');
+function update(){
+  sval.textContent = slider.value;
+  draw(parseFloat(slider.value));
+}
+slider.addEventListener('input', update);
+window.addEventListener('resize', update);
+
+/* panels: toggle open, close via x */
+const buttons = document.querySelectorAll('.btn[data-target]');
+buttons.forEach(b=>{
+  b.addEventListener('click', ()=>{
+    const id=b.dataset.target;
+    const panel=document.getElementById(id);
+    const isOpen=panel.classList.contains('open');
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('open'));
+    buttons.forEach(x=>x.classList.remove('active'));
+    if(!isOpen){
+      panel.classList.add('open');
+      b.classList.add('active');
+      const sizeDetails=()=>{
+        if(id!=='p-det') return;
+        const body=panel.querySelector('.det-body');
+        if(!body) return;
+        body.style.height='auto';
+        const full=body.scrollHeight;
+        body.style.height=Math.round(full/2)+'px';
+      };
+      if(window.MathJax && MathJax.typesetPromise){
+        MathJax.typesetPromise([panel]).then(sizeDetails);
+      } else {
+        sizeDetails();
+      }
+    }
+  });
+});
+document.querySelectorAll('.panel .close').forEach(c=>{
+  c.addEventListener('click', ()=>{
+    document.getElementById(c.dataset.close).classList.remove('open');
+    buttons.forEach(x=>x.classList.remove('active'));
+  });
+});
+
+update();
+</script>
+</body>
+</html>

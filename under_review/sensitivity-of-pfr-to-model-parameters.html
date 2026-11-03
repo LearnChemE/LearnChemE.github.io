@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sensitivity of a Plug Flow Reactor to Model Parameters</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+  svg: { fontCache: 'global', displayAlign: 'left', displayIndent: '0' }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.min.js"></script>
+<style>
+  body {
+    font-family: Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 15px;
+    background-color: #ffffff;
+    color: #000000;
+  }
+  #app {
+    max-width: 780px;
+    margin: 30px auto 0 auto;   /* keeps all buttons below the top ~40 px strip */
+  }
+  #topRow {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 6px;
+  }
+  #topLeft {
+    width: 288px;
+    flex-shrink: 0;
+  }
+  #topRight {
+    width: 440px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  #reaction {
+    font-size: 18px;
+    color: #000000;
+    display: inline-flex;
+    align-items: flex-end;
+    white-space: nowrap;
+    padding-right: 14px;     /* lines up with the plot's right edge */
+  }
+  #reaction .arr {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1;
+    margin: 0 5px;
+  }
+  #reaction .arr-num {
+    font-size: 11px;
+  }
+  #mainRow {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  #controls {
+    width: 288px;
+    flex-shrink: 0;
+    padding-top: 6px;
+  }
+  #plotArea {
+    flex-grow: 0;
+  }
+  canvas {
+    display: block;
+  }
+  .setter-row {
+    display: flex;
+    justify-content: center;
+    gap: 0px;
+  }
+  .setter-btn {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    padding: 5px 10px;
+    border: 1px solid #999;
+    background-color: #f5f5f5;
+    color: #000;
+    cursor: pointer;
+  }
+  .setter-btn:first-child {
+    border-radius: 4px 0 0 4px;
+  }
+  .setter-btn:last-child {
+    border-radius: 0 4px 4px 0;
+    border-left: none;
+  }
+  .setter-btn.active {
+    background-color: #6a9fd8;
+    color: #ffffff;
+    border-color: #5a8fc8;
+  }
+  .group-label {
+    font-size: 14.5px;
+    margin: 10px 0 2px 0;
+  }
+  .divider {
+    border-top: 1px solid #d0d0d0;
+    margin: 10px 0 8px 0;
+  }
+  .slider-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 3px 0;
+  }
+  .slider-label {
+    font-size: 14.5px;
+    width: 72px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* ---- range slider style ---- */
+  input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+  input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+
+  .slider-row input[type=range] {
+    width: 138px;          /* 20% longer than 115px */
+    flex-shrink: 0;
+    margin: 0;             /* keep slider vertically centered with its label */
+  }
+  .slider-value {
+    font-size: 14.5px;
+    width: 42px;
+    text-align: left;
+  }
+  #bottomButtons {
+    display: flex;
+    justify-content: flex-start;
+    gap: 8px;
+  }
+  .panel-btn {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    padding: 6px 18px;
+    background-color: #98000D;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .panel-btn:hover {
+    background-color: #7a000a;
+  }
+  #app {
+    display: flex;
+    flex-direction: column;
+  }
+  #panelAnchor {
+    position: relative;
+    order: -1;              /* button row sits above the controls and plot */
+    z-index: 10;
+  }
+  .panel {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    z-index: 10;
+    border: 1px solid #b0b0b0;
+    border-radius: 5px;
+    background-color: #fdfdfd;
+    padding: 6px 34px 12px 18px;
+    font-size: 15.5px;
+    line-height: 1.5;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.25);
+    box-sizing: border-box;
+    max-height: min(510px, calc(100vh - 120px));
+    overflow-y: auto;
+  }
+  .panel-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #000000;
+    margin: 6px 0 4px 0;
+  }
+  .panel-close {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    font-size: 22px;
+    line-height: 1;
+    color: #555;
+    cursor: pointer;
+    user-select: none;
+  }
+  .panel-close:hover {
+    color: #98000D;
+  }
+  .panel.open {
+    display: block;
+  }
+  .panel a {
+    color: #0645ad;
+  }
+  .symbol-list {
+    margin: 4px 0 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .symbol-list li {
+    margin: 2px 0;
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="mainRow">
+    <div id="controls">
+      <div class="group-label" style="margin-top:4px">feed flow rate (mol/s)</div>
+      <div class="slider-row">
+        <span class="slider-label"><i>F</i><sub><i>A</i>,0</sub></span>
+        <input type="range" id="sFao" min="45" max="55" step="1" value="50">
+        <span class="slider-value" id="vFao">50</span>
+      </div>
+
+      <div class="divider"></div>
+      <div class="group-label">feed temperature (K)</div>
+      <div class="slider-row">
+        <span class="slider-label"><i>T</i><sub>0</sub></span>
+        <input type="range" id="sTo" min="268" max="328" step="1" value="298">
+        <span class="slider-value" id="vTo">298</span>
+      </div>
+
+      <div class="divider"></div>
+      <div class="group-label">heat transfer coefficient (kJ/(m<sup>3</sup> s K))</div>
+      <div class="slider-row">
+        <span class="slider-label">Ua&thinsp;&times;&thinsp;4/<i>D</i></span>
+        <input type="range" id="sUa" min="20" max="30" step="1" value="25">
+        <span class="slider-value" id="vUa">25</span>
+      </div>
+
+      <div class="divider"></div>
+      <div class="group-label">heat of reaction (kJ/mol)</div>
+      <div class="slider-row">
+        <span class="slider-label">&Delta;<i>H</i><sub>1</sub></span>
+        <input type="range" id="sdH1" min="-34" max="-20" step="1" value="-27">
+        <span class="slider-value" id="vdH1">-27</span>
+      </div>
+      <div class="slider-row">
+        <span class="slider-label">&Delta;<i>H</i><sub>2</sub></span>
+        <input type="range" id="sdH2" min="-40" max="-20" step="1" value="-30">
+        <span class="slider-value" id="vdH2">-30</span>
+      </div>
+
+      <div class="divider"></div>
+      <div class="group-label">rate constant at 380 K (1/s)</div>
+      <div class="slider-row">
+        <span class="slider-label"><i>k</i><sub>1</sub></span>
+        <input type="range" id="sk1" min="380" max="460" step="5" value="420">
+        <span class="slider-value" id="vk1">420</span>
+      </div>
+      <div class="slider-row">
+        <span class="slider-label"><i>k</i><sub>2</sub></span>
+        <input type="range" id="sk2" min="175" max="215" step="2" value="195">
+        <span class="slider-value" id="vk2">195</span>
+      </div>
+
+      <div class="divider"></div>
+      <div class="group-label">activation energy (kJ/mol)</div>
+      <div class="slider-row">
+        <span class="slider-label">Ea<sub>1</sub></span>
+        <input type="range" id="sEa1" min="34" max="42" step="1" value="38">
+        <span class="slider-value" id="vEa1">38</span>
+      </div>
+      <div class="slider-row">
+        <span class="slider-label">Ea<sub>2</sub></span>
+        <input type="range" id="sEa2" min="40" max="50" step="1" value="45">
+        <span class="slider-value" id="vEa2">45</span>
+      </div>
+    </div>
+
+    <div id="plotArea">
+      <canvas id="plotCanvas" width="440" height="462"></canvas>
+    </div>
+  </div>
+
+  <div id="panelAnchor">
+  <div class="panel" id="panelDirections">
+    <span class="panel-close" title="Close">&times;</span>
+    <div class="panel-title">Directions</div>
+    <p>Plots of temperature and molar flow rates versus reactor volume are shown for gas-phase reactions A&nbsp;&rarr;&nbsp;B&nbsp;&rarr;&nbsp;C in a non-isothermal, plug flow reactor (PFR). Both reactions are first order and only A is fed to the reactor. Use the sliders to vary the inlet molar flow rate, feed temperature and seven model parameters (a maximum of 10%) to see how sensitive the temperature and molar flow rates are to values used in the reactor model (parametric sensitivity). Since parameters used in a reactor model are not always known accurately, doing a parametric sensitivity analysis could identify potential problems.</p>
+  </div>
+
+  <div class="panel" id="panelDetails">
+    <span class="panel-close" title="Close">&times;</span>
+    <div class="panel-title">Details</div>
+    <p>The rate laws for these reactions are:</p>
+    <p>\[ r_1 = -k_1 C_A, \]</p>
+    <p>\[ r_2 = -k_2 C_B, \]</p>
+    <p>\[ C_A = C_{A,\,0}\, \frac{F_A}{F_T}\, \frac{T_0}{T}, \]</p>
+    <p>\[ C_B = C_{A,\,0}\, \frac{F_B}{F_T}\, \frac{T_0}{T}, \]</p>
+    <p>\[ F_T = F_A + F_B + F_C, \]</p>
+    <p>where \(r_i\) is the rate of reaction \(i = (1, 2)\) (mol/(dm\(^3\) s)), \(k_i\) is the rate constant (1/s), \(T\) is reaction temperature (K), \(C_A\) and \(C_B\) are the concentrations of A and B (mol/dm\(^3\)), the subscript \(0\) refers to the inlet, \(F_A\), \(F_B\) and \(F_C\) are the molar flow rates of A, B and C (mol/s) and \(F_T\) is the total molar flow rate (mol/s).</p>
+    <p>The rate constants are calculated from the pre-exponential factors which are solved at \(T = 380\) K:</p>
+    <p>\[ A_i = \frac{k_{s,\,i}}{e^{-\frac{Ea_i}{R\,380}}}, \]</p>
+    <p>\[ k_i = A_i\, e^{-\frac{Ea_i}{R\,T}}, \]</p>
+    <p>where \(A_i\) is a pre-exponential factor (1/s), \(k_{s,\,i}\) is the rate constant at 380 K, \(Ea_i\) is activation energy (kJ/mol) and \(R\) is the ideal gas constant (kJ/(mol K)),</p>
+    <p>Mole and energy balances are done around the reactor:</p>
+    <p>\[ \frac{d F_A}{d V} = r_1, \]</p>
+    <p>\[ \frac{d F_B}{d V} = -r_1 + r_2, \]</p>
+    <p>\[ \frac{d F_C}{d V} = -r_2, \]</p>
+    <p>\[ \frac{d T}{d V} = \frac{Ua\,(T_a - T) + r_1\, \Delta H_1 + r_2\, \Delta H_2}{F_A\, Cp_A + F_B\, Cp_B + F_C\, Cp_C}, \]</p>
+    <p>where \(V\) is volume (m\(^3\)), \(Ua\) is the heat transfer coefficient times heat transfer area per volume (kJ/(m\(^3\) s K)), \(T_a\) is the coolant temperature (K), \(\Delta H_i\) is heat of reaction (kJ/mol), and \(Cp_A\), \(Cp_B\) and \(Cp_C\) are the heat capacities of A, B and C (kJ/(mol K)).</p>
+
+    <p><b>Symbols</b></p>
+    <ul class="symbol-list">
+      <li>\(A_i\) = pre-exponential factor for reaction \(i\) (1/s)</li>
+      <li>\(C_A,\ C_B\) = concentrations of A and B (mol/dm\(^3\))</li>
+      <li>\(C_{A,\,0}\) = inlet concentration of A (mol/dm\(^3\))</li>
+      <li>\(Cp_A,\ Cp_B,\ Cp_C\) = heat capacities of A, B and C (kJ/(mol K))</li>
+      <li>\(Ea_i\) = activation energy of reaction \(i\) (kJ/mol)</li>
+      <li>\(F_A,\ F_B,\ F_C\) = molar flow rates of A, B and C (mol/s)</li>
+      <li>\(F_{A,\,0}\) = inlet molar flow rate of A (mol/s)</li>
+      <li>\(F_T\) = total molar flow rate (mol/s)</li>
+      <li>\(k_i\) = rate constant of reaction \(i\) (1/s)</li>
+      <li>\(k_{s,\,i}\) = rate constant of reaction \(i\) at 380 K (1/s)</li>
+      <li>\(R\) = ideal gas constant (kJ/(mol K))</li>
+      <li>\(r_i\) = rate of reaction \(i\) (mol/(dm\(^3\) s))</li>
+      <li>\(T\) = reaction temperature (K)</li>
+      <li>\(T_0\) = feed temperature (K)</li>
+      <li>\(T_a\) = coolant temperature (K)</li>
+      <li>\(Ua\) = heat transfer coefficient times heat transfer area per volume (kJ/(m\(^3\) s K))</li>
+      <li>\(V\) = reactor volume (m\(^3\))</li>
+      <li>\(\Delta H_i\) = heat of reaction \(i\) (kJ/mol)</li>
+    </ul>
+  </div>
+
+  <div class="panel" id="panelAbout">
+    <span class="panel-close" title="Close">&times;</span>
+    <div class="panel-title">About</div>
+    <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/SensitivityOfAPlugFlowReactorToModelParameters/" target="_blank" rel="noopener">Mathematica simulation</a> by Rachael L. Baumann. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.</p>
+  </div>
+
+  <div id="topRow">
+    <div id="topLeft">
+      <div class="setter-row">
+        <button class="setter-btn active" id="btnTemp">temperature</button>
+        <button class="setter-btn" id="btnFlow">molar flow rates</button>
+      </div>
+    </div>
+    <div id="topRight">
+      <div id="bottomButtons">
+        <button class="panel-btn" data-panel="panelDirections">Directions</button>
+        <button class="panel-btn" data-panel="panelDetails">Details</button>
+        <button class="panel-btn" data-panel="panelAbout">About</button>
+      </div>
+      <div id="reaction">A<span class="arr"><span class="arr-num">1</span>&#x27F6;</span>B<span class="arr"><span class="arr-num">2</span>&#x27F6;</span>C</div>
+    </div>
+  </div>
+  </div>
+
+</div>
+
+<script>
+"use strict";
+
+/* ---------------- state ---------------- */
+const state = {
+  view: 1,      // 1 = temperature, 2 = molar flow rates
+  Fao: 50,
+  To: 298,
+  Ua: 25,
+  dH1: -27,
+  dH2: -30,
+  k1s: 420,
+  k2s: 195,
+  Ea1: 38,
+  Ea2: 45
+};
+
+/* ---------------- model ---------------- */
+// Fixed constants (from the Mathematica source)
+const vo = 1000;        // dm^3/s
+const R = 0.008314;     // kJ/(mol K)
+const Ta = 378;         // K
+const Cpa = 0.09, Cpb = 0.09, Cpc = 0.18;  // kJ/(mol K)
+const Vmax = 10;
+
+function solveODE() {
+  const { Fao, To, Ua, dH1, dH2, k1s, k2s, Ea1, Ea2 } = state;
+  const Cao = Fao / vo;
+  const A1 = k1s / Math.exp(-Ea1 / (R * 380));
+  const A2 = k2s / Math.exp(-Ea2 / (R * 380));
+
+  function deriv(y) {
+    const Fa = y[0], Fb = y[1], Fc = y[2], T = y[3];
+    const Ft = Fa + Fb + Fc;
+    const k1 = A1 * Math.exp(-Ea1 / (R * T));
+    const k2 = A2 * Math.exp(-Ea2 / (R * T));
+    const Ca = Cao * (Fa / Ft) * (To / T);
+    const Cb = Cao * (Fb / Ft) * (To / T);
+    const r1 = -k1 * Ca;
+    const r2 = -k2 * Cb;
+    const dT = (Ua * (Ta - T) + r1 * dH1 + r2 * dH2) /
+               (Fa * Cpa + Fb * Cpb + Fc * Cpc);
+    return [r1, r2 - r1, -r2, dT];
+  }
+
+  // RK4 with fixed fine step
+  const nSteps = 4000;
+  const h = Vmax / nSteps;
+  let y = [Fao, 0, 0, To];
+  const Vout = [0], out = [y.slice()];
+  const saveEvery = 4;  // 1001 saved points
+
+  for (let i = 0; i < nSteps; i++) {
+    const k1v = deriv(y);
+    const y2 = y.map((v, j) => v + 0.5 * h * k1v[j]);
+    const k2v = deriv(y2);
+    const y3 = y.map((v, j) => v + 0.5 * h * k2v[j]);
+    const k3v = deriv(y3);
+    const y4 = y.map((v, j) => v + h * k3v[j]);
+    const k4v = deriv(y4);
+    y = y.map((v, j) => v + (h / 6) * (k1v[j] + 2 * k2v[j] + 2 * k3v[j] + k4v[j]));
+    if ((i + 1) % saveEvery === 0) {
+      Vout.push((i + 1) * h);
+      out.push(y.slice());
+    }
+  }
+  return { V: Vout, Fa: out.map(r => r[0]), Fb: out.map(r => r[1]),
+           Fc: out.map(r => r[2]), T: out.map(r => r[3]) };
+}
+
+/* ---------------- canvas setup (hi-DPI) ---------------- */
+const canvas = document.getElementById("plotCanvas");
+const ctx = canvas.getContext("2d");
+const CW = 440, CH = 462;
+function setupHiDPI() {
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = CW * dpr;
+  canvas.height = CH * dpr;
+  canvas.style.width = CW + "px";
+  canvas.style.height = CH + "px";
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+setupHiDPI();
+
+/* ---------------- helpers ---------------- */
+function niceTicks(lo, hi, nTarget) {
+  const span = hi - lo;
+  const raw = span / nTarget;
+  const mag = Math.pow(10, Math.floor(Math.log10(raw)));
+  const norm = raw / mag;
+  let step;
+  if (norm < 1.5) step = 1;
+  else if (norm < 3) step = 2;
+  else if (norm < 7) step = 5;
+  else step = 10;
+  step *= mag;
+  const ticks = [];
+  const start = Math.ceil(lo / step) * step;
+  for (let t = start; t <= hi + 1e-9; t += step) {
+    ticks.push(Math.abs(t) < 1e-9 ? 0 : t);
+  }
+  return ticks;
+}
+
+function fmtTick(v) {
+  if (Math.abs(v - Math.round(v)) < 1e-9) return String(Math.round(v));
+  return String(v);
+}
+
+// Draw text with subscript support: parts = [{t:"F", italic:true},{t:"A", sub:true}]
+function drawRich(parts, x, y, size, color, align) {
+  return drawRichOn(ctx, parts, x, y, size, color, align);
+}
+function drawRichOn(ctx, parts, x, y, size, color, align) {
+  // measure total width
+  let w = 0;
+  for (const p of parts) {
+    const s = p.sub || p.sup ? size * 0.7 : size;
+    ctx.font = (p.italic ? "italic " : "") + s + "px Helvetica, Arial, sans-serif";
+    w += ctx.measureText(p.t).width;
+  }
+  let cx = x;
+  if (align === "center") cx = x - w / 2;
+  else if (align === "right") cx = x - w;
+  for (const p of parts) {
+    const s = p.sub || p.sup ? size * 0.7 : size;
+    ctx.font = (p.italic ? "italic " : "") + s + "px Helvetica, Arial, sans-serif";
+    ctx.fillStyle = color;
+    const dy = p.sub ? size * 0.22 : (p.sup ? -size * 0.38 : 0);
+    ctx.fillText(p.t, cx, y + dy);
+    cx += ctx.measureText(p.t).width;
+  }
+  return w;
+}
+
+// Draw a label horizontally on an offscreen canvas, then rotate it onto the plot,
+// so the y-axis label renders exactly like the x-axis label.
+function drawRotatedLabel(parts, cx, cy, size, color) {
+  const dpr = window.devicePixelRatio || 1;
+  const off = document.createElement("canvas");
+  const octx = off.getContext("2d");
+  let w = 0;
+  for (const p of parts) {
+    const s = p.sub || p.sup ? size * 0.7 : size;
+    octx.font = (p.italic ? "italic " : "") + s + "px Helvetica, Arial, sans-serif";
+    w += octx.measureText(p.t).width;
+  }
+  w = Math.ceil(w) + 4;
+  const h = Math.ceil(size * 1.6);
+  off.width = w * dpr;
+  off.height = h * dpr;
+  octx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  octx.textBaseline = "alphabetic";
+  drawRichOn(octx, parts, w / 2, h * 0.72, size, color, "center");
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(-Math.PI / 2);
+  ctx.drawImage(off, -w / 2, -h / 2, w, h);
+  ctx.restore();
+}
+
+const AXIS_LABEL_SIZE = 18.7;   // 10% larger than 17 px
+
+/* ---------------- plotting ---------------- */
+const margin = { left: 72, right: 14, top: 14, bottom: 62 };
+
+function draw() {
+  const sol = solveODE();
+  ctx.clearRect(0, 0, CW, CH);
+  ctx.textBaseline = "alphabetic";
+
+  const pw = CW - margin.left - margin.right;
+  const ph = CH - margin.top - margin.bottom;
+
+  // ---- data ranges ----
+  const xlo = 0, xhi = Vmax;
+  let ylo, yhi;
+  if (state.view === 1) {
+    let tmin = Infinity, tmax = -Infinity;
+    for (const t of sol.T) { if (t < tmin) tmin = t; if (t > tmax) tmax = t; }
+    const pad = 0.05 * (tmax - tmin);
+    ylo = tmin - pad; yhi = tmax + pad;
+    if (yhi - ylo < 1) { ylo -= 0.5; yhi += 0.5; }
+  } else {
+    let fmax = -Infinity;
+    for (let i = 0; i < sol.V.length; i++) {
+      fmax = Math.max(fmax, sol.Fa[i], sol.Fb[i], sol.Fc[i]);
+    }
+    const pad = 0.045 * fmax;
+    ylo = 0 - pad; yhi = fmax + pad;
+  }
+
+  const X = v => margin.left + (v - xlo) / (xhi - xlo) * pw;
+  const Y = v => margin.top + ph - (v - ylo) / (yhi - ylo) * ph;
+
+  // ---- frame ----
+  ctx.strokeStyle = "#000000";
+  ctx.lineWidth = 1;
+  ctx.strokeRect(margin.left, margin.top, pw, ph);
+
+  // ---- ticks ----
+  const xticks = niceTicks(xlo, xhi, 5);
+  const yticks = niceTicks(ylo, yhi, 6);
+  const tickLen = 6;
+  ctx.fillStyle = "#000000";
+  ctx.font = "17px Helvetica, Arial, sans-serif";
+  ctx.textAlign = "center";
+  for (const t of xticks) {
+    const px = X(t);
+    ctx.beginPath();
+    ctx.moveTo(px, margin.top + ph);
+    ctx.lineTo(px, margin.top + ph - tickLen);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(px, margin.top);
+    ctx.lineTo(px, margin.top + tickLen);
+    ctx.stroke();
+    ctx.fillText(fmtTick(t), px, margin.top + ph + 22);
+  }
+  ctx.textAlign = "right";
+  for (const t of yticks) {
+    const py = Y(t);
+    ctx.beginPath();
+    ctx.moveTo(margin.left, py);
+    ctx.lineTo(margin.left + tickLen, py);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(margin.left + pw, py);
+    ctx.lineTo(margin.left + pw - tickLen, py);
+    ctx.stroke();
+    ctx.fillText(fmtTick(t), margin.left - 8, py + 6);
+  }
+  // minor x ticks
+  const xminor = (xticks.length > 1) ? (xticks[1] - xticks[0]) / 4 : 0;
+  if (xminor > 0) {
+    for (let t = xlo; t <= xhi + 1e-9; t += xminor) {
+      const px = X(t);
+      ctx.beginPath();
+      ctx.moveTo(px, margin.top + ph);
+      ctx.lineTo(px, margin.top + ph - 3.5);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(px, margin.top);
+      ctx.lineTo(px, margin.top + 3.5);
+      ctx.stroke();
+    }
+  }
+  const yminor = (yticks.length > 1) ? (yticks[1] - yticks[0]) / 4 : 0;
+  if (yminor > 0) {
+    for (let t = Math.ceil(ylo / yminor) * yminor; t <= yhi + 1e-9; t += yminor) {
+      const py = Y(t);
+      ctx.beginPath();
+      ctx.moveTo(margin.left, py);
+      ctx.lineTo(margin.left + 3.5, py);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(margin.left + pw, py);
+      ctx.lineTo(margin.left + pw - 3.5, py);
+      ctx.stroke();
+    }
+  }
+
+  // (reaction A → B → C is now shown in the HTML button row)
+
+  // ---- axis labels ----
+  ctx.textAlign = "left";
+  // x label: volume (dm^3) for temperature view, volume (m^3) for flows (as in original)
+  const xUnit = state.view === 1 ? "dm" : "m";
+  drawRich(
+    [{ t: "volume (" }, { t: xUnit }, { t: "3", sup: true }, { t: ")" }],
+    margin.left + pw / 2, CH - 14, AXIS_LABEL_SIZE, "#000000", "center"
+  );
+  // y label: drawn horizontally offscreen, then rotated (matches x label)
+  drawRotatedLabel(
+    [{ t: state.view === 1 ? "temperature (K)" : "molar flow rate (mol/s)" }],
+    16, margin.top + ph / 2, AXIS_LABEL_SIZE, "#000000"
+  );
+
+  // ---- curves (clipped to frame) ----
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(margin.left, margin.top, pw, ph);
+  ctx.clip();
+  ctx.lineWidth = 2.4;
+  ctx.lineJoin = "round";
+
+  function plotCurve(arr, color) {
+    ctx.strokeStyle = color;
+    ctx.beginPath();
+    for (let i = 0; i < sol.V.length; i++) {
+      const px = X(sol.V[i]), py = Y(arr[i]);
+      if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    ctx.stroke();
+  }
+
+  if (state.view === 1) {
+    plotCurve(sol.T, "#f58518");   // orange
+  } else {
+    plotCurve(sol.Fa, "#0000ff");  // blue
+    plotCurve(sol.Fb, "#8000ff");  // purple
+    plotCurve(sol.Fc, "#000000");  // black
+    // curve labels F_A, F_B, F_C in rounded white pills
+    labelOnCurve("A", "#0000ff", 2, sol);
+    labelOnCurve("B", "#8000ff", 5, sol);
+    labelOnCurve("C", "#000000", 8, sol);
+  }
+  ctx.restore();
+
+  function labelOnCurve(species, color, vAt, sol) {
+    // interpolate flow value at V = vAt
+    const arr = species === "A" ? sol.Fa : (species === "B" ? sol.Fb : sol.Fc);
+    let idx = 0;
+    for (let i = 0; i < sol.V.length; i++) {
+      if (sol.V[i] >= vAt) { idx = i; break; }
+    }
+    const px = X(vAt), py = Y(arr[idx]);
+    // white rounded pill background
+    const size = 18;
+    ctx.font = "italic " + size + "px Helvetica, Arial, sans-serif";
+    const wF = ctx.measureText("F").width;
+    ctx.font = (size * 0.7) + "px Helvetica, Arial, sans-serif";
+    const wS = ctx.measureText(species).width;
+    const totW = wF + wS;
+    const padX = 8, padY = 6;
+    const bx = px - totW / 2 - padX, by = py - size / 2 - padY;
+    const bw = totW + 2 * padX, bh = size + 2 * padY;
+    ctx.fillStyle = "#ffffff";
+    roundRect(bx, by, bw, bh, 12);
+    ctx.fill();
+    drawRich(
+      [{ t: "F", italic: true }, { t: species, sub: true }],
+      px, py + size * 0.32, size, color, "center"
+    );
+  }
+
+  function roundRect(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+}
+
+function drawTitle() {
+  // "A ⟶ B ⟶ C" with 1 above first arrow, 2 above second, 18 pt
+  const size = 18;
+  const cy = 26;
+  ctx.fillStyle = "#000000";
+  ctx.textAlign = "left";
+  const arrow = "\u27F6";
+  ctx.font = size + "px Helvetica, Arial, sans-serif";
+  const parts = ["A ", arrow, " B ", arrow, " C"];
+  const widths = parts.map(p => ctx.measureText(p).width);
+  const totW = widths.reduce((a, b) => a + b, 0);
+  // right-justified near the right edge of the plot frame
+  let cx = CW - margin.right - 12 - totW;
+  const arrowCenters = [];
+  for (let i = 0; i < parts.length; i++) {
+    ctx.font = size + "px Helvetica, Arial, sans-serif";
+    ctx.fillText(parts[i], cx, cy);
+    if (parts[i] === arrow) arrowCenters.push(cx + widths[i] / 2);
+    cx += widths[i];
+  }
+  ctx.font = (size * 0.62) + "px Helvetica, Arial, sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText("1", arrowCenters[0], cy - size * 0.75);
+  ctx.fillText("2", arrowCenters[1], cy - size * 0.75);
+}
+
+/* ---------------- controls wiring ---------------- */
+const sliders = [
+  ["sFao", "vFao", "Fao"],
+  ["sTo",  "vTo",  "To"],
+  ["sUa",  "vUa",  "Ua"],
+  ["sdH1", "vdH1", "dH1"],
+  ["sdH2", "vdH2", "dH2"],
+  ["sk1",  "vk1",  "k1s"],
+  ["sk2",  "vk2",  "k2s"],
+  ["sEa1", "vEa1", "Ea1"],
+  ["sEa2", "vEa2", "Ea2"]
+];
+for (const [sid, vid, key] of sliders) {
+  const s = document.getElementById(sid);
+  const v = document.getElementById(vid);
+  s.addEventListener("input", () => {
+    state[key] = Number(s.value);
+    v.textContent = s.value;
+    draw();
+  });
+}
+
+const btnTemp = document.getElementById("btnTemp");
+const btnFlow = document.getElementById("btnFlow");
+btnTemp.addEventListener("click", () => {
+  state.view = 1;
+  btnTemp.classList.add("active");
+  btnFlow.classList.remove("active");
+  draw();
+});
+btnFlow.addEventListener("click", () => {
+  state.view = 2;
+  btnFlow.classList.add("active");
+  btnTemp.classList.remove("active");
+  draw();
+});
+
+/* ---------------- panels ---------------- */
+let detailsTypeset = false;
+document.querySelectorAll(".panel-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const target = document.getElementById(btn.dataset.panel);
+    const wasOpen = target.classList.contains("open");
+    document.querySelectorAll(".panel").forEach(p => p.classList.remove("open"));
+    if (!wasOpen) {
+      target.classList.add("open");
+      if (btn.dataset.panel === "panelDetails" && !detailsTypeset && window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise([target]).then(() => { detailsTypeset = true; });
+      }
+    }
+  });
+});
+
+document.querySelectorAll(".panel-close").forEach(x => {
+  x.addEventListener("click", () => {
+    x.parentElement.classList.remove("open");
+  });
+});
+
+draw();
+</script>
+</body>
+</html>

@@ -1,45 +1,70 @@
-const ul = document.getElementById("list");
 const grid = document.getElementById('simulations-grid');
+const filters = document.getElementById('simulation-filters');
+
+const simulationSources = [
+  {
+    id: 'from spreadsheet',
+    label: 'From Spreadsheet JSON',
+    load: async () => simulation_list
+  },
+  {
+    id: 'lab-experiments',
+    label: 'Lab Experiments',
+    url: './home_page/output/lab-experiments.json',
+    key: 'experiments'
+  },
+  {
+    id: 'demos',
+    label: 'Demos',
+    url: './home_page/output/demos.json',
+    key: 'demos'
+  },
+  {
+    id: 'under-review',
+    label: 'Under Review',
+    url: './home_page/output/under-review.json',
+    key: 'under_review'
+  }
+];
+
+async function loadJSONList(source) {
+  const response = await fetch(source.url);
+  if (!response.ok) {
+    throw new Error(`Failed to load ${source.label}: ${response.status}`);
+  }
+
+  const data = await response.json();
+  return Array.isArray(data) ? data : Array.isArray(data[source.key]) ? data[source.key] : [];
+}
 
 (async () => {
-  let experiments = [];
-  let demos = [];
-
-  try {
-    const response = await fetch('./home_page/output/lab-experiments.json');
-    if (!response.ok) {
-      throw new Error(`Failed to load lab experiments: ${response.status}`);
+  const loadedSources = await Promise.all(simulationSources.map(async source => {
+    try {
+      return {
+        ...source,
+        simulations: source.load ? await source.load() : await loadJSONList(source)
+      };
+    } catch (error) {
+      console.error(error);
+      return null;
     }
-
-    const data = await response.json();
-    experiments = Array.isArray(data) ? data : Array.isArray(data.experiments) ? data.experiments : [];
-  } catch (error) {
-    console.error(error);
-  }
-
-  try {
-    const response = await fetch('./home_page/output/demos.json');
-    if (!response.ok) {
-      throw new Error(`Failed to load demos: ${response.status}`);
-    }
-
-    const data = await response.json();
-    demos = Array.isArray(data) ? data : Array.isArray(data.demos) ? data.demos : [];
-  } catch (error) {
-    console.error(error);
-  }
-
-  let sorted_list = [...experiments, ...demos, ...simulation_list].sort((a, b) => {
-    if (a.title > b.title) { return 1; }
-    if (a.title < b.title) { return -1; }
+  }));
+  const sources = loadedSources.filter(source => source !== null);
+  const sorted_list = sources.flatMap(source =>
+    source.simulations
+      .filter(sim => !sim.title.includes("PhET"))
+      .map(sim => ({ simulation: sim, sourceId: source.id }))
+  ).sort((a, b) => {
+    if (a.simulation.title > b.simulation.title) { return 1; }
+    if (a.simulation.title < b.simulation.title) { return -1; }
     return 0;
   });
 
-  sorted_list = sorted_list.filter(sim => !sim.title.includes("PhET"));
-
-  sorted_list.forEach(sim => {
+  createFilters(sources);
+  sorted_list.forEach(({ simulation: sim, sourceId }) => {
     const card = document.createElement('div');
     card.classList.add('card');
+    card.dataset.sourceId = sourceId;
 
     const img = document.createElement('img');
     img.src = sim.image;
@@ -79,6 +104,30 @@ const grid = document.getElementById('simulations-grid');
     card.addEventListener('mouseleave', () => removeTooltip(card));
   });
 })();
+
+function createFilters(sources) {
+  const options = [{ id: 'all', label: 'All' }, ...sources];
+
+  options.forEach((option, index) => {
+    const label = document.createElement('label');
+    const input = document.createElement('input');
+    input.type = 'radio';
+    input.name = 'simulation-filter';
+    input.value = option.id;
+    input.checked = index === 0;
+    input.addEventListener('change', () => {
+      if (input.checked) {
+        grid.querySelectorAll('.card').forEach(card => {
+          card.hidden = option.id !== 'all' && card.dataset.sourceId !== option.id;
+        });
+      }
+    });
+
+    label.appendChild(input);
+    label.appendChild(document.createTextNode(option.label));
+    filters.appendChild(label);
+  });
+}
 
 function showTooltip(card, sim) {
   if (!document.getElementById('tooltip')) {

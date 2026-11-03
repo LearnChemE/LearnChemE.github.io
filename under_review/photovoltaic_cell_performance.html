@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>[hidden]{display:none!important}body{margin:0}</style>
+<title>Photovoltaic Cell Performance</title>
+<style>
+/* Layout: LearnChemE sim frame — button row on top, controls column left, plot right; stacks on phones. Single light look. */
+:root{
+  color-scheme:light;
+  --bg:#ffffff; --fg:#000000; --line:#d6d7db; --panel:#f6f6f7; --panel-bd:#c9cacf;
+  --btn:#98000D; --btn-fg:#ffffff; --btn-off:#e6e6e8;
+  --c-j:#1c55b0;
+  --font:Helvetica, Arial, sans-serif;
+}
+body{background:var(--bg);color:var(--fg);font-family:var(--font);font-size:17px;font-weight:normal}
+*{font-weight:normal}
+.wrap{max-width:1100px;margin:0 auto;padding-inline:16px;padding-block:14px 28px}
+.simtitle{font-size:20px;font-weight:bold;margin:0 0 10px;color:var(--fg)}
+.bar{position:relative;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin-bottom:12px}
+.group{display:flex;flex-wrap:wrap;gap:6px}
+button{font-family:var(--font);font-size:17px;font-weight:normal;border:0;border-radius:4px;padding:6px 12px;cursor:pointer}
+.btn{background:var(--btn);color:var(--btn-fg)}
+.tab{background:var(--btn-off);color:var(--fg)}
+.tab[aria-pressed="true"]{background:var(--btn);color:var(--btn-fg)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--c-j);outline-offset:2px}
+.panel{position:absolute;z-index:20;top:100%;margin-top:6px;right:var(--rofs);width:max-content;max-width:min(640px,calc(100vw - 32px));
+  background:var(--bg);border:1px solid var(--panel-bd);border-radius:6px;box-shadow:0 8px 24px rgba(0,0,0,.18);
+  max-height:75vh;display:flex;flex-direction:column}
+.panel[hidden]{display:none}
+.panel .x{position:absolute;top:4px;right:6px;background:none;color:var(--fg);font-size:24px;line-height:1;padding:2px 8px}
+.panel .inner{overflow-y:auto;padding:14px 40px 16px 18px;line-height:1.5}
+.panel h2{font-size:17px;margin:0 0 8px;color:var(--btn)}
+.panel h3{font-size:17px;margin:14px 0 4px;color:var(--btn)}
+.panel p{margin:6px 0}
+.panel a{color:var(--c-j)}
+.nom{border-collapse:collapse;margin-top:4px}
+.nom td{padding:2px 14px 2px 0;vertical-align:top}
+mjx-container[display="true"]{margin:8px 0 !important}
+.main{display:grid;grid-template-columns:minmax(300px,max-content) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:800px){.main{grid-template-columns:minmax(0,1fr)}}
+.controls{display:flex;flex-direction:column;gap:10px}
+.ctl{display:grid;grid-template-columns:1fr auto;gap:2px 8px;align-items:center;width:298px;max-width:100%}
+.ctl .val{font-variant-numeric:tabular-nums;text-align:right}
+.ctl input[type=range]{grid-column:1 / -1}
+.selrow{display:flex;flex-direction:column;align-items:flex-start;gap:4px}
+select{font-family:var(--font);font-size:17px;padding:3px 4px;width:auto;max-width:100%;background:var(--bg);color:var(--fg);border:1px solid var(--panel-bd);border-radius:4px}
+.checks{display:flex;flex-direction:column;gap:4px}
+.checks label{display:flex;gap:6px;align-items:center}
+.checks input{accent-color:#98000D;width:16px;height:16px}
+.readrow{margin-top:10px;min-width:0;display:flex;flex-wrap:wrap;gap:10px;align-items:flex-start}
+.oprow{display:flex;flex-wrap:wrap;align-items:center;gap:4px 24px;font-variant-numeric:tabular-nums}
+.oprow + .oprow{margin-top:6px}
+.oprow .k{margin-right:8px}
+.bar{--rofs:0px}
+#pgroup{margin-right:var(--rofs)}
+.readout{width:max-content;max-width:100%;box-sizing:border-box;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:8px 10px}
+.readout h4{margin:0 0 6px;font-size:17px;color:var(--fg);font-weight:bold}
+.readout dl{display:grid;grid-template-columns:auto auto;justify-content:start;gap:3px 10px;margin:0;font-variant-numeric:tabular-nums}
+.readout dd{margin:0;text-align:left}
+.plotcol{min-width:0}
+#cv{width:100%;display:block;touch-action:pan-y}
+.linkbtn{background:var(--btn);color:var(--btn-fg);font-size:17px;padding:5px 10px;margin-top:4px;text-align:left;line-height:1.25}
+.linkbtn:disabled{background:var(--btn-off);color:#555;cursor:default}
+
+input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <h1 class="simtitle">Photovoltaic Cell Performance</h1>
+  <div class="bar" id="bar">
+    <div class="group" role="group" aria-label="View">
+      <button class="tab" id="v-iv" aria-pressed="true">current–voltage</button>
+      <button class="tab" id="v-sp" aria-pressed="false">solar spectrum</button>
+      <button class="tab" id="v-eg" aria-pressed="false">efficiency vs. band gap</button>
+    </div>
+    <div class="group" id="pgroup">
+      <button class="btn" data-panel="p-dir">Directions</button>
+      <button class="btn" data-panel="p-det">Details</button>
+      <button class="btn" data-panel="p-abt">About</button>
+    </div>
+
+    <div class="panel" id="p-dir" hidden><button class="x" aria-label="Close">×</button><div class="inner">
+      <h2>Directions</h2>
+      <p>This simulation shows how a single-junction solar cell converts sunlight into electrical power, and how the semiconductor band gap, light intensity, temperature, and resistive losses determine the cell's current, voltage, power, and efficiency. The cell is modeled with the one-diode equivalent circuit.</p>
+      <p>Select a semiconductor from the drop-down menu or set the band gap with its slider. The other sliders change the sunlight intensity, cell temperature, diode ideality factor, series and shunt resistances, and quantum efficiency. Cell performance values are listed below the sliders.</p>
+      <p>The current–voltage view plots current density and power density versus cell voltage. The red dot is the maximum power point. When the operating point is not at the maximum power point, the "move to maximum power point" button becomes red and clicking it moves the operating point to the maximum power point. The shaded rectangle has area \(V_{mp}J_{mp}\) and the dashed rectangle has area \(V_{oc}J_{sc}\); their ratio is the fill factor. Click or drag on the graph to move the operating point along the curve; the dotted line is the load line for the external resistance that gives that operating point. The dashed gray curve is the same cell at standard test conditions (1000 W/m², 25 °C).</p>
+      <p>The solar spectrum view shows how incident sunlight is divided: photons with energy below the band gap pass through the cell, and photons above the band gap are absorbed but lose their excess energy \(E - E_g\) as heat.</p>
+      <p>The efficiency vs. band gap view sweeps the band gap for the present settings and compares the result with an ideal cell.</p>
+    </div></div>
+
+    <div class="panel" id="p-det" hidden><button class="x" aria-label="Close">×</button><div class="inner">
+      <h2>Details</h2>
+      <h3>One-diode model</h3>
+      <p>The current density at cell voltage \(V\) satisfies</p>
+      \[ J = J_{ph} - J_0\left[\exp\!\left(\frac{q\,(V + J R_s)}{n k_B T}\right) - 1\right] - \frac{V + J R_s}{R_{sh}} \]
+      <p>This equation is implicit in \(J\) and is solved numerically at each voltage.</p>
+      <h3>Photocurrent</h3>
+      <p>Sunlight is approximated as a blackbody at \(T_s = 5778\) K, scaled so its total irradiance equals \(G\):</p>
+      \[ \Phi(E) = A\,\frac{E^2}{\exp(E/k_B T_s) - 1} \]
+      \[ \int_0^\infty E\,\Phi(E)\,dE = G \]
+      <p>Each absorbed photon with energy above the band gap contributes one electron with probability EQE:</p>
+      \[ J_{ph} = q\,\mathrm{EQE}\int_{E_g}^{\infty} \Phi(E)\,dE \]
+      <h3>Saturation current and temperature</h3>
+      \[ J_0 = 1.5\times 10^{5}\left(\frac{T}{300\ \mathrm{K}}\right)^{3} \exp\!\left(-\frac{E_g}{n k_B T}\right)\ \ \mathrm{A/cm^2} \]
+      <p>The band gap decreases with temperature (Varshni relation, with the silicon constants used for every material):</p>
+      \[ E_g(T) = E_g(300\ \mathrm{K}) - \alpha\left(\frac{T^2}{T+\beta} - \frac{300^2}{300+\beta}\right) \]
+      <h3>Performance measures</h3>
+      \[ J_{sc} = J(V=0) \]
+      \[ J(V_{oc}) = 0 \]
+      \[ P = V J \]
+      \[ P_{max} = V_{mp} J_{mp} \]
+      \[ FF = \frac{V_{mp}\,J_{mp}}{V_{oc}\,J_{sc}} \]
+      \[ \eta = \frac{P_{max}}{G} \]
+      <p>For an ideal cell (\(R_s = 0\), \(R_{sh}\to\infty\)), the open-circuit voltage is</p>
+      \[ V_{oc} = \frac{n k_B T}{q}\ln\!\left(\frac{J_{ph}}{J_0} + 1\right) \]
+      <p>The ideal cell in the efficiency vs. band gap view has \(n = 1\), \(R_s = 0\), \(R_{sh}\to\infty\), and EQE = 1.</p>
+      <h3>Spectrum energy balance</h3>
+      <p>Of the incident power, the part with \(E &lt; E_g\) is not absorbed, the fraction</p>
+      \[ \frac{1}{G}\int_{E_g}^\infty (E - E_g)\,\Phi\,dE \]
+      <p>is lost as heat (thermalization), and the fraction</p>
+      \[ \frac{E_g}{G}\int_{E_g}^\infty \Phi\,dE \]
+      <p>remains at the band-gap energy. The cell efficiency is lower than this last fraction because \(qV_{oc} &lt; E_g\), \(FF &lt; 1\), and EQE &lt; 1.</p>
+      <h3>Limitations</h3>
+      <p>A blackbody spectrum is used instead of the AM1.5G reference spectrum, so short-circuit currents differ from measured values by several percent. The \(J_0\) expression is empirical, and all materials share the same temperature coefficients. The model shows trends; it does not predict the performance of a specific device.</p>
+      <h3>Symbols</h3>
+      <table class="nom">
+        <tr><td>\(A\)</td><td>spectrum scaling constant</td></tr>
+        <tr><td>\(E\)</td><td>photon energy (eV)</td></tr>
+        <tr><td>\(E_g\)</td><td>semiconductor band gap (eV)</td></tr>
+        <tr><td>EQE</td><td>external quantum efficiency (electrons collected per absorbed photon)</td></tr>
+        <tr><td>\(FF\)</td><td>fill factor</td></tr>
+        <tr><td>\(G\)</td><td>irradiance, incident solar power per area (W/m²)</td></tr>
+        <tr><td>\(J\)</td><td>cell current density (A/cm²)</td></tr>
+        <tr><td>\(J_0\)</td><td>diode saturation current density (A/cm²)</td></tr>
+        <tr><td>\(J_{mp}\)</td><td>current density at maximum power (A/cm²)</td></tr>
+        <tr><td>\(J_{ph}\)</td><td>photocurrent density (A/cm²)</td></tr>
+        <tr><td>\(J_{sc}\)</td><td>short-circuit current density (A/cm²)</td></tr>
+        <tr><td>\(k_B\)</td><td>Boltzmann constant, \(8.617\times10^{-5}\) eV/K</td></tr>
+        <tr><td>\(n\)</td><td>diode ideality factor</td></tr>
+        <tr><td>\(P\)</td><td>power density (W/cm²)</td></tr>
+        <tr><td>\(P_{max}\)</td><td>maximum power density (W/cm²)</td></tr>
+        <tr><td>\(q\)</td><td>elementary charge (C)</td></tr>
+        <tr><td>\(R_s\)</td><td>series resistance (Ω·cm²)</td></tr>
+        <tr><td>\(R_{sh}\)</td><td>shunt resistance (Ω·cm²)</td></tr>
+        <tr><td>\(T\)</td><td>cell temperature (K)</td></tr>
+        <tr><td>\(T_s\)</td><td>sun surface temperature, 5778 K</td></tr>
+        <tr><td>\(V\)</td><td>cell voltage (V)</td></tr>
+        <tr><td>\(V_{mp}\)</td><td>voltage at maximum power (V)</td></tr>
+        <tr><td>\(V_{oc}\)</td><td>open-circuit voltage (V)</td></tr>
+        <tr><td>\(\alpha\)</td><td>Varshni constant, \(4.73\times10^{-4}\) eV/K</td></tr>
+        <tr><td>\(\beta\)</td><td>Varshni constant, 636 K</td></tr>
+        <tr><td>\(\eta\)</td><td>cell efficiency</td></tr>
+        <tr><td>\(\Phi\)</td><td>photon flux per unit photon energy (m⁻² s⁻¹ eV⁻¹)</td></tr>
+      </table>
+    </div></div>
+
+    <div class="panel" id="p-abt" hidden><button class="x" aria-label="Close">×</button><div class="inner">
+      <h2>About</h2>
+      <p style="max-width:34em">This simulation was created in the <a href="https://www.colorado.edu/chbe/" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="https://learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.</p>
+    </div></div>
+  </div>
+
+  <div class="main">
+    <div class="controls">
+      <div class="selrow"><label for="mat">semiconductor</label>
+        <select id="mat">
+          <option value="0.66">germanium (Ge), 0.66 eV</option>
+          <option value="1.12" selected>silicon (Si), 1.12 eV</option>
+          <option value="1.15">CIGS, 1.15 eV</option>
+          <option value="1.42">gallium arsenide (GaAs), 1.42 eV</option>
+          <option value="1.45">cadmium telluride (CdTe), 1.45 eV</option>
+          <option value="1.55">perovskite (MAPbI₃), 1.55 eV</option>
+          <option value="1.70">amorphous silicon (a-Si:H), 1.70 eV</option>
+          <option value="custom">custom band gap</option>
+        </select></div>
+      <div class="ctl"><label for="eg">band gap at 300 K</label><span class="val" id="eg-v"></span><input type="range" id="eg" min="0.6" max="2.4" step="0.01" value="1.12"></div>
+      <div class="ctl"><label for="g">irradiance</label><span class="val" id="g-v"></span><input type="range" id="g" min="100" max="1200" step="10" value="1000"></div>
+      <div class="ctl"><label for="t">cell temperature</label><span class="val" id="t-v"></span><input type="range" id="t" min="0" max="100" step="1" value="25"></div>
+      <div class="ctl"><label for="n">ideality factor</label><span class="val" id="n-v"></span><input type="range" id="n" min="1" max="2" step="0.05" value="1"></div>
+      <div class="ctl"><label for="rs">series resistance</label><span class="val" id="rs-v"></span><input type="range" id="rs" min="0" max="5" step="0.05" value="0.5"></div>
+      <div class="ctl"><label for="rsh">shunt resistance</label><span class="val" id="rsh-v"></span><input type="range" id="rsh" min="0.5" max="5" step="0.05" value="3"></div>
+      <div class="ctl"><label for="eqe">quantum efficiency</label><span class="val" id="eqe-v"></span><input type="range" id="eqe" min="0.5" max="1" step="0.01" value="0.9"></div>
+      <div class="checks" id="iv-checks">
+        <label><input type="checkbox" id="c-p" checked> power curve</label>
+        <label><input type="checkbox" id="c-ff" checked> fill-factor rectangles</label>
+        <label><input type="checkbox" id="c-ref" checked> standard test conditions curve</label>
+      </div>
+      <div class="readout">
+        <h4>Cell performance</h4>
+        <dl id="ro"></dl>
+      </div>
+    </div>
+    <div class="plotcol" id="plotcol">
+      <canvas id="cv" aria-label="plot"></canvas>
+    <div class="readrow">
+      <div class="readout" id="op-box">
+        <h4>Operating point</h4>
+        <div class="oprow" id="op1"></div>
+        <div class="oprow"><span id="op2" style="display:contents"></span><button class="linkbtn" id="to-mpp">move to maximum power point</button></div>
+      </div>
+    </div>
+    </div>
+  </div>
+</div>
+
+<script>
+window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},svg:{fontCache:'global',displayAlign:'left',displayIndent:'1em'}};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js" async></script>
+<script>
+(()=>{
+const kB=8.617333262e-5, TS=5778;
+// ---- blackbody spectrum grid ----
+const NE=2400, EMAX=6, dE=EMAX/NE, Egr=new Float64Array(NE), shp=new Float64Array(NE), cumN=new Float64Array(NE+1), cumP=new Float64Array(NE+1);
+for(let i=0;i<NE;i++){const E=(i+.5)*dE;Egr[i]=E;shp[i]=E*E/Math.expm1(E/(kB*TS));}
+for(let i=NE-1;i>=0;i--){cumN[i]=cumN[i+1]+shp[i]*dE;cumP[i]=cumP[i+1]+Egr[i]*shp[i]*dE;}
+const PN=cumP[0];
+function above(arr,E){const x=E/dE-.5;if(x<=0)return arr[0];if(x>=NE)return 0;const i=Math.floor(x),f=x-i;return arr[i]*(1-f)+arr[i+1]*f;}
+// ---- model ----
+const S={view:'iv',Eg:1.12,G:1000,TC:25,n:1,Rs:.5,lRsh:3,EQE:.9,showP:true,showFF:true,showRef:true,opV:null};
+function EgT(Eg300,T){return Eg300-4.73e-4*(T*T/(T+636)-90000/936);}
+function model(p){const T=p.TC+273.15,Eg=EgT(p.Eg,T),Vt=kB*T;
+  return{T,Eg,Vt,n:p.n,Rs:p.Rs,Rsh:10**p.lRsh,G:p.G,
+    Jph:p.G*p.EQE*above(cumN,Eg)/PN*1e-4,
+    J0:1.5e5*(T/300)**3*Math.exp(-Eg/(p.n*Vt))};}
+function ex(a){return Math.exp(Math.min(a,700));}
+function JofV(m,V){let lo=-(m.Jph+1),hi=m.Jph+1;const nV=m.n*m.Vt;
+  for(let k=0;k<64;k++){const J=(lo+hi)/2,u=V+J*m.Rs;const f=m.Jph-m.J0*(ex(u/nV)-1)-u/m.Rsh-J;if(f>0)lo=J;else hi=J;}
+  return(lo+hi)/2;}
+function Voc(m){let lo=0,hi=m.Eg+.6;const nV=m.n*m.Vt;
+  for(let k=0;k<64;k++){const V=(lo+hi)/2;const f=m.Jph-m.J0*(ex(V/nV)-1)-V/m.Rsh;if(f>0)lo=V;else hi=V;}return(lo+hi)/2;}
+function analyze(m){const Jsc=JofV(m,0),Vo=Voc(m);let a=0,b=Vo;const r=(Math.sqrt(5)-1)/2;
+  let c=b-r*(b-a),d=a+r*(b-a),fc=c*JofV(m,c),fd=d*JofV(m,d);
+  for(let k=0;k<48;k++){if(fc>fd){b=d;d=c;fd=fc;c=b-r*(b-a);fc=c*JofV(m,c);}else{a=c;c=d;fc=fd;d=a+r*(b-a);fd=d*JofV(m,d);}}
+  const Vmp=(a+b)/2,Jmp=JofV(m,Vmp),Pmp=Vmp*Jmp;
+  return{Jsc,Voc:Vo,Vmp,Jmp,Pmp,FF:Pmp/(Vo*Jsc),eta:Pmp*1e4/m.G};}
+
+// ---- controls ----
+const $=id=>document.getElementById(id);
+const fmtR=v=>{const s=Number(v.toPrecision(2));return s>=1000?s.toLocaleString('en-US'):String(s);};
+const ctl=[['eg','Eg',v=>v.toFixed(2)+' eV'],['g','G',v=>v.toFixed(0)+' W/m²'],['t','TC',v=>v.toFixed(0)+' °C'],
+  ['n','n',v=>v.toFixed(2)],['rs','Rs',v=>v.toFixed(2)+' Ω·cm²'],['rsh','lRsh',v=>fmtR(10**v)+' Ω·cm²'],['eqe','EQE',v=>v.toFixed(2)]];
+ctl.forEach(([id,key,f])=>{const el=$(id);const upd=()=>{S[key]=+el.value;$(id+'-v').textContent=f(S[key]);};upd();
+  el.addEventListener('input',()=>{upd();if(id==='eg'){const o=[...$('mat').options].find(o=>o.value!=='custom'&&Math.abs(+o.value-S.Eg)<1e-6);$('mat').value=o?o.value:'custom';}draw();});});
+$('mat').addEventListener('change',e=>{if(e.target.value==='custom')return;$('eg').value=e.target.value;$('eg').dispatchEvent(new Event('input'));});
+[['c-p','showP'],['c-ff','showFF'],['c-ref','showRef']].forEach(([id,k])=>$(id).addEventListener('change',e=>{S[k]=e.target.checked;draw();}));
+let anim=0;
+$('to-mpp').addEventListener('click',()=>{if(!geom||S.opV==null)return;const v0=S.opV,v1=geom.r.Vmp,t0=performance.now(),dur=matchMedia('(prefers-reduced-motion: reduce)').matches?0:500,id=++anim;
+  const step=t=>{if(id!==anim)return;const u=dur?Math.min(1,(t-t0)/dur):1,e=u<.5?2*u*u:1-2*(1-u)*(1-u);
+    if(u<1){S.opV=v0+(v1-v0)*e;draw();requestAnimationFrame(step);}else{S.opV=null;draw();}};requestAnimationFrame(step);});
+[['v-iv','iv'],['v-sp','sp'],['v-eg','eg']].forEach(([id,v])=>$(id).addEventListener('click',()=>{S.view=v;
+  document.querySelectorAll('.tab').forEach(b=>b.setAttribute('aria-pressed',b.id===id));
+  $('iv-checks').hidden=v!=='iv';$('op-box').hidden=v!=='iv';draw();}));
+
+// ---- panels: overlay, toggle on second click, × closes ----
+document.querySelectorAll('[data-panel]').forEach(b=>b.addEventListener('click',()=>{const p=$(b.dataset.panel),was=!p.hidden;
+  document.querySelectorAll('.panel').forEach(x=>x.hidden=true);if(!was){p.hidden=false;p.style.right='';
+    const r=p.getBoundingClientRect();if(r.left<16)p.style.right=(parseFloat(getComputedStyle($('bar')).getPropertyValue('--rofs'))-(16-r.left))+'px';
+    if(window.MathJax&&MathJax.typesetPromise&&!p.dataset.ts){p.dataset.ts=1;MathJax.typesetPromise([p]).catch(()=>{});}}}));
+document.querySelectorAll('.panel .x').forEach(x=>x.addEventListener('click',()=>x.parentElement.hidden=true));
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.panel').forEach(x=>x.hidden=true);});
+
+// ---- colors (curve labels share their curve's color) ----
+const C={fg:'#000',grid:'#e4e4e8',j:'#1c55b0',p:'#c25a00',ref:'#6f7178',mark:'#98000D',load:'#4a4c53',ff:'rgba(28,85,176,.12)',
+  trans:'#cfd0d5',transT:'#5f6168',therm:'#f3b062',thermT:'#b05800',use:'#6b98e2',useT:'#1c4fa8',bg:'#fff'};
+const LAB=20.8, NUM=16, CL=17.6; // axis-label, axis-number, curve-label sizes (px)
+
+// ---- canvas helpers ----
+const cv=$('cv'),ctx=cv.getContext('2d');let W=600,H=420,DPR=1;
+function size(){DPR=window.devicePixelRatio||1;const w=$('plotcol').clientWidth;W=w;H=Math.round(Math.max(380,Math.min(w*.72,600)));
+  cv.style.height=H+'px';cv.width=Math.round(w*DPR);cv.height=Math.round(H*DPR);ctx.setTransform(DPR,0,0,DPR,0,0);}
+const FONT=s=>`normal ${s}px Helvetica, Arial, sans-serif`;
+function segs(str){const re=/_\{([^}]*)\}|\^\{([^}]*)\}|([^_^]+)/g,out=[];let m;
+  while((m=re.exec(str))){if(m[1]!=null)out.push([m[1],1]);else if(m[2]!=null)out.push([m[2],2]);else out.push([m[3],0]);}return out;}
+function measureRich(str,sz){let w=0;segs(str).forEach(s=>{ctx.font=FONT(s[1]?sz*.72:sz);w+=ctx.measureText(s[0]).width;});return w;}
+function rich(g,str,x,y,align,sz,color){const sg=segs(str);let w=0;sg.forEach(s=>{g.font=FONT(s[1]?sz*.72:sz);s[3]=g.measureText(s[0]).width;w+=s[3];});
+  let x0=align==='center'?x-w/2:align==='right'?x-w:x;g.fillStyle=color||C.fg;g.textAlign='left';g.textBaseline='middle';
+  sg.forEach(s=>{g.font=FONT(s[1]?sz*.72:sz);g.fillText(s[0],x0,y+(s[1]===1?sz*.3:s[1]===2?-sz*.38:0));x0+=s[3];});return w;}
+// y-axis labels: draw horizontally on an offscreen canvas, then rotate, so they match the x-axis label exactly
+function rotLabel(str,cx,cy,sz,color,ang){const w=Math.ceil(measureRich(str,sz))+8,h=Math.ceil(sz*1.9);
+  const oc=document.createElement('canvas');oc.width=Math.ceil(w*DPR);oc.height=Math.ceil(h*DPR);
+  const og=oc.getContext('2d');og.scale(DPR,DPR);rich(og,str,w/2,h/2,'center',sz,color);
+  ctx.save();ctx.translate(cx,cy);ctx.rotate(ang);ctx.drawImage(oc,-w/2,-h/2,w,h);ctx.restore();}
+function niceStep(r,n){const raw=r/n,mag=10**Math.floor(Math.log10(raw)),f=raw/mag;return(f<1.5?1:f<3?2:f<7?5:10)*mag;}
+function niceCeil(v){const mag=10**Math.floor(Math.log10(v));for(const r of[1,1.2,1.5,2,2.5,3,4,5,6,8,10])if(r*mag>=v*(1-1e-9))return r*mag;}
+function tickList(lo,hi,n){const st=niceStep(hi-lo,n),a=[];for(let v=Math.ceil(lo/st-1e-9)*st;v<=hi+st*1e-6;v+=st)a.push(+v.toFixed(10));
+  const d=Math.max(0,-Math.floor(Math.log10(st)+1e-9));return a.map(v=>[v,v.toFixed(d)]);}
+// reserveY2 keeps the right margin fixed so the plot (and x-axis scale) never shifts when the second axis is hidden
+function axes(o){const P={l:74,t:o.topAxis?58:16,r:W-74,b:H-54};P.w=P.r-P.l;P.h=P.b-P.t;
+  const X=v=>P.l+(v-o.xr[0])/(o.xr[1]-o.xr[0])*P.w,Y=v=>P.b-(v-o.yr[0])/(o.yr[1]-o.yr[0])*P.h;
+  const Y2=o.y2?v=>P.b-(v-o.y2[0])/(o.y2[1]-o.y2[0])*P.h:null;
+  const xt=tickList(o.xr[0],o.xr[1],W<520?5:8),yt=tickList(o.yr[0],o.yr[1],6);
+  ctx.strokeStyle=C.grid;ctx.lineWidth=1;ctx.beginPath();
+  xt.forEach(([v])=>{ctx.moveTo(X(v)+.5,P.t);ctx.lineTo(X(v)+.5,P.b);});yt.forEach(([v])=>{ctx.moveTo(P.l,Y(v)+.5);ctx.lineTo(P.r,Y(v)+.5);});ctx.stroke();
+  ctx.strokeStyle=C.fg;ctx.lineWidth=1.2;ctx.strokeRect(P.l,P.t,P.w,P.h);
+  ctx.beginPath();xt.forEach(([v])=>{ctx.moveTo(X(v),P.b);ctx.lineTo(X(v),P.b-6);});yt.forEach(([v])=>{ctx.moveTo(P.l,Y(v));ctx.lineTo(P.l+6,Y(v));});ctx.stroke();
+  ctx.font=FONT(NUM);ctx.fillStyle=C.fg;ctx.textBaseline='top';ctx.textAlign='center';xt.forEach(([v,s])=>ctx.fillText(s,X(v),P.b+6));
+  ctx.textBaseline='middle';ctx.textAlign='right';yt.forEach(([v,s])=>ctx.fillText(s,P.l-7,Y(v)));
+  rich(ctx,o.xlab,P.l+P.w/2,H-14,'center',LAB);
+  ctx.font=FONT(NUM);const yw=Math.max(...yt.map(t=>ctx.measureText(t[1]).width));
+  rotLabel(o.ylab,P.l-7-yw-6-LAB*.6,P.t+P.h/2,LAB,o.ycol||C.fg,-Math.PI/2);
+  if(o.y2){const t2=tickList(o.y2[0],o.y2[1],6);ctx.strokeStyle=C.fg;ctx.beginPath();t2.forEach(([v])=>{ctx.moveTo(P.r,Y2(v));ctx.lineTo(P.r-6,Y2(v));});ctx.stroke();
+    ctx.font=FONT(NUM);ctx.fillStyle=o.y2col;ctx.textAlign='left';ctx.textBaseline='middle';t2.forEach(([v,s])=>ctx.fillText(s,P.r+7,Y2(v)));
+    ctx.font=FONT(NUM);const y2w=Math.max(...t2.map(t=>ctx.measureText(t[1]).width));
+    rotLabel(o.y2lab,P.r+7+y2w+6+LAB*.6,P.t+P.h/2,LAB,o.y2col,Math.PI/2);}
+  return{P,X,Y,Y2};}
+function line(pts,col,w,dash){ctx.strokeStyle=col;ctx.lineWidth=w;ctx.setLineDash(dash||[]);ctx.beginPath();pts.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.stroke();ctx.setLineDash([]);}
+function dot(x,y,r,fill,stroke){ctx.beginPath();ctx.arc(x,y,r,0,7);if(fill){ctx.fillStyle=fill;ctx.fill();}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=2;ctx.stroke();}}
+function clip(P){ctx.save();ctx.beginPath();ctx.rect(P.l,P.t,P.w,P.h);ctx.clip();}
+
+// ---- occupancy grid for placing curve labels where they do not overlap curves or other labels ----
+const CS=2;let occ,OW,OH,PB;
+function occReset(P){PB=P;OW=Math.ceil(W/CS)+1;OH=Math.ceil(H/CS)+1;occ=new Uint8Array(OW*OH);}
+function occPt(x,y,r){const i0=Math.max(0,Math.floor((x-r)/CS)),i1=Math.min(OW-1,Math.floor((x+r)/CS)),j0=Math.max(0,Math.floor((y-r)/CS)),j1=Math.min(OH-1,Math.floor((y+r)/CS));
+  for(let j=j0;j<=j1;j++)for(let i=i0;i<=i1;i++)occ[j*OW+i]=1;}
+function occLine(pts,r=3){for(let k=0;k<pts.length;k++){const[x,y]=pts[k];if(!k){occPt(x,y,r);continue;}const[a,b]=pts[k-1],n=Math.max(1,Math.ceil(Math.hypot(x-a,y-b)/1.5));
+  for(let s=1;s<=n;s++)occPt(a+(x-a)*s/n,b+(y-b)*s/n,r);}}
+function occRect(r){occPt((r.x0+r.x1)/2,(r.y0+r.y1)/2,0);for(let y=r.y0;y<=r.y1;y+=CS)for(let x=r.x0;x<=r.x1;x+=CS)occPt(x,y,0);}
+function occFree(r){const i0=Math.floor(r.x0/CS),i1=Math.floor(r.x1/CS),j0=Math.floor(r.y0/CS),j1=Math.floor(r.y1/CS);
+  if(i0<0||j0<0||i1>=OW||j1>=OH)return false;for(let j=j0;j<=j1;j++)for(let i=i0;i<=i1;i++)if(occ[j*OW+i])return false;return true;}
+function curveCands(pts,fracs,dys){const c=[];fracs.forEach(f=>{const p=pts[Math.round(f*(pts.length-1))];
+  dys.forEach(dy=>{c.push({x:p[0]+8,y:p[1]+dy,a:'left'},{x:p[0],y:p[1]+dy,a:'center'},{x:p[0]-8,y:p[1]+dy,a:'right'});});});return c;}
+function gridCands(ax,ay,step=10){const c=[],P=PB;for(let y=P.t+10;y<P.b-8;y+=step)for(let x=P.l+20;x<P.r-20;x+=step)c.push({x,y,a:'center',lead:true,d:Math.hypot(x-ax,y-ay)});
+  return c.sort((u,v)=>u.d-v.d);}
+function placeLabel(text,color,cands,anchor,extra){const w=measureRich(text,CL),h=CL*1.2,P=PB;
+  for(let pass=0;pass<2;pass++)for(const c of cands){const x0=c.a==='left'?c.x:c.a==='right'?c.x-w:c.x-w/2;
+    const r={x0:x0-3,x1:x0+w+3,y0:c.y-h/2-1,y1:c.y+h/2+1};
+    if(r.x0<P.l+6||r.x1>P.r-6||r.y0<P.t+3||r.y1>P.b-3)continue;
+    if(pass===0&&!occFree(r))continue;if(extra&&!extra(r))continue;
+    rich(ctx,text,x0,c.y,'left',CL,color);occRect(r);
+    if(c.lead&&anchor){const px=Math.min(Math.max(anchor[0],r.x0),r.x1),py=Math.min(Math.max(anchor[1],r.y0),r.y1);
+      if(Math.hypot(px-anchor[0],py-anchor[1])>6){line([[px,py],anchor],color,1);occLine([[px,py],anchor],1);}}
+    return r;}
+  return null;}
+
+// ---- readouts ----
+function setRO(m,r){const rows=[['J<sub>sc</sub>',(r.Jsc*1e3).toFixed(1)+' mA/cm²'],['V<sub>oc</sub>',r.Voc.toFixed(3)+' V'],['fill factor',r.FF.toFixed(3)],
+  ['V<sub>mp</sub>',r.Vmp.toFixed(3)+' V'],['J<sub>mp</sub>',(r.Jmp*1e3).toFixed(1)+' mA/cm²'],['P<sub>max</sub>',(r.Pmp*1e3).toFixed(2)+' mW/cm²'],
+  ['efficiency',(r.eta*100).toFixed(1)+' %'],['E<sub>g</sub> at T',m.Eg.toFixed(3)+' eV']];
+  $('ro').innerHTML=rows.map(([a,b])=>`<dt>${a}</dt><dd>${b}</dd>`).join('');}
+
+// ---- views ----
+let geom=null;
+function drawIV(){const m=model(S),r=analyze(m),mr=model({...S,G:1000,TC:25}),rr=analyze(mr);setRO(m,r);
+  // axis ranges depend only on the cell, never on which curves are shown
+  const xmax=Math.ceil(1.06*Math.max(r.Voc,rr.Voc)*10)/10,ymax=niceCeil(1.15*Math.max(r.Jsc,rr.Jsc)*1e3),pmax=niceCeil(1.25*Math.max(r.Pmp,rr.Pmp)*1e3);
+  const g=axes({xr:[0,xmax],yr:[0,ymax],xlab:'voltage (V)',ylab:'current density (mA/cm^{2})',ycol:C.j,reserveY2:true,
+    y2:S.showP?[0,pmax]:null,y2lab:'power density (mW/cm^{2})',y2col:C.p});const{P,X,Y,Y2}=g;geom={...g,xmax,m,r};
+  occReset(P);
+  const N=320,cur=[],pow=[],ref=[];
+  for(let i=0;i<=N;i++){const V=xmax*i/N,J=JofV(m,V);cur.push([X(V),Y(J*1e3)]);if(Y2)pow.push([X(V),Y2(V*J*1e3)]);ref.push([X(V),Y(JofV(mr,V)*1e3)]);}
+  const curC=cur.filter(p=>p[1]<=P.b+1),powC=pow.filter(p=>p[1]<=P.b+1),refC=ref.filter(p=>p[1]<=P.b+1);
+  const Vop=S.opV==null?r.Vmp:Math.min(Math.max(S.opV,0),r.Voc),Jop=JofV(m,Vop);
+  let load=null;if(Vop>1e-4&&Jop>1e-9){const R=Vop/Jop,xe=Math.min(xmax,ymax/1e3*R);load=[[X(0),Y(0)],[X(xe),Y(xe/R*1e3)]];}
+  clip(P);
+  if(S.showFF){ctx.fillStyle=C.ff;ctx.fillRect(X(0),Y(r.Jmp*1e3),X(r.Vmp)-X(0),Y(0)-Y(r.Jmp*1e3));
+    ctx.strokeStyle=C.j;ctx.setLineDash([5,4]);ctx.lineWidth=1;ctx.strokeRect(X(0),Y(r.Jsc*1e3),X(r.Voc)-X(0),Y(0)-Y(r.Jsc*1e3));ctx.setLineDash([]);
+    occLine([[X(0),Y(r.Jsc*1e3)],[X(r.Voc),Y(r.Jsc*1e3)],[X(r.Voc),Y(0)]],2);occLine([[X(0),Y(r.Jmp*1e3)],[X(r.Vmp),Y(r.Jmp*1e3)],[X(r.Vmp),Y(0)]],2);}
+  if(S.showRef){line(ref,C.ref,1.8,[7,5]);occLine(refC);}
+  if(load){line(load,C.load,1.4,[2,3]);occLine(load,2);}
+  if(S.showP){line(pow,C.p,2.4);occLine(powC);}
+  line(cur,C.j,2.8);occLine(curC);
+  ctx.restore();
+  const mpx=X(r.Vmp),mpy=Y(r.Jmp*1e3);dot(mpx,mpy,5.5,C.mark);occPt(mpx,mpy,7);
+  if(S.showP){dot(mpx,Y2(r.Pmp*1e3),5.5,C.mark);occPt(mpx,Y2(r.Pmp*1e3),7);}
+  if(S.opV!=null){dot(X(Vop),Y(Jop*1e3),6,C.bg,C.fg);occPt(X(Vop),Y(Jop*1e3),8);if(S.showP){dot(X(Vop),Y2(Vop*Jop*1e3),6,C.bg,C.fg);occPt(X(Vop),Y2(Vop*Jop*1e3),8);}}
+  // labels on curves, same color as the curve, moved until they clear every curve
+  const near=(x,y)=>[{x:x+10,y:y-14,a:'left'},{x:x+10,y:y+14,a:'left'},{x:x-10,y:y-14,a:'right'},{x:x-10,y:y+14,a:'right'},{x:x+12,y,a:'left'},{x:x-12,y,a:'right'}];
+  placeLabel('maximum power point',C.mark,[...near(mpx,mpy),...gridCands(mpx,mpy)],[mpx,mpy]);
+  placeLabel('J_{sc}',C.j,[{x:X(0)+8,y:Y(r.Jsc*1e3)-13,a:'left'},{x:X(0)+8,y:Y(r.Jsc*1e3)+13,a:'left'},...gridCands(X(0),Y(r.Jsc*1e3),6).slice(0,400)],[X(0)+2,Y(r.Jsc*1e3)]);
+  placeLabel('V_{oc}',C.j,[{x:X(r.Voc)+8,y:Y(0)-13,a:'left'},{x:X(r.Voc)-8,y:Y(0)-13,a:'right'},{x:X(r.Voc)+8,y:Y(0)-26,a:'left'},...gridCands(X(r.Voc),Y(0)-4,6).slice(0,400)],[X(r.Voc),Y(0)-2]);
+  if(S.showFF){const rc={x0:X(0),x1:X(r.Vmp),y0:Y(r.Jmp*1e3),y1:Y(0)},cx=(rc.x0+rc.x1)/2,cy=(rc.y0+rc.y1)/2;
+    const inside=gridCands(cx,cy,6).map(c=>({...c,lead:false}));
+    placeLabel(`fill factor = ${r.FF.toFixed(3)}`,C.j,inside,null,q=>q.x0>=rc.x0+2&&q.x1<=rc.x1-2&&q.y0>=rc.y0+2&&q.y1<=rc.y1-2);}
+  const dys=[-15,15,-26,26];
+  const lab=(t,col,pts,fr)=>{if(!pts.length)return;const a=pts[Math.round(fr[0]*(pts.length-1))];placeLabel(t,col,[...curveCands(pts,fr,dys),...gridCands(a[0],a[1])],a);};
+  lab('current density',C.j,curC,[.2,.3,.12,.4,.5,.6]);
+  if(S.showP)lab('power density',C.p,powC,[.45,.35,.55,.25,.65,.15]);
+  if(S.showRef)lab('1000 W/m^{2}, 25 °C',C.ref,refC,[.35,.25,.45,.15,.55,.65]);
+  if(load){const pts=[];for(let i=0;i<=40;i++)pts.push([load[0][0]+(load[1][0]-load[0][0])*i/40,load[0][1]+(load[1][1]-load[0][1])*i/40]);lab('load line',C.load,pts,[.55,.4,.7,.3,.8]);}
+  if(S.opV!=null){const ox=X(Vop),oy=Y(Jop*1e3);placeLabel('operating point',C.fg,[...near(ox,oy),...gridCands(ox,oy)],[ox,oy]);}
+  const R=Jop>1e-9?Vop/Jop:Infinity;
+  {const atM=S.opV==null||Math.abs(S.opV-r.Vmp)<2e-3,bt=$('to-mpp');bt.disabled=atM;bt.textContent=atM?'at maximum power point':'move to maximum power point';}
+  const it=(k,v)=>`<span><span class="k">${k}</span>${v}</span>`;
+  $('op1').innerHTML=it('voltage',Vop.toFixed(3)+' V')+it('current density',(Jop*1e3).toFixed(1)+' mA/cm²')+it('power density',(Vop*Jop*1e3).toFixed(2)+' mW/cm²');
+  $('op2').innerHTML=it('load resistance',isFinite(R)?R.toFixed(1)+' Ω·cm²':'open circuit')+it('fraction of P<sub>max</sub>',(Vop*Jop/r.Pmp*100).toFixed(1)+' %');}
+
+const vis=[[380,'#7a2cc4'],[420,'#3b2cd6'],[470,'#1f6fe0'],[500,'#15a9b8'],[530,'#2fb52f'],[580,'#e6d21a'],[620,'#f07a14'],[700,'#d61a1a'],[750,'#8a0f0f']];
+function drawSP(){const m=model(S),r=analyze(m);setRO(m,r);const Eg=m.Eg,G=S.G;
+  const f=E=>G*E*E*E/Math.expm1(E/(kB*TS))/PN; // W/(m2 eV)
+  let pk=0;for(let E=.02;E<4;E+=.01)pk=Math.max(pk,E**3/Math.expm1(E/(kB*TS)));
+  const ymax=niceCeil(1.12*1200*pk/PN);
+  const g=axes({xr:[0,4],yr:[0,ymax],xlab:'photon energy (eV)',ylab:'spectral irradiance (W/m^{2}/eV)',topAxis:true});const{P,X,Y}=g;
+  occReset(P);
+  const Es=[];for(let E=0.005;E<=4.0001;E+=0.005)Es.push(E);
+  clip(P);
+  const poly=(a,b,top,bot)=>{const s=Es.filter(E=>E>=a&&E<=b);if(s.length<2)return false;ctx.beginPath();s.forEach((E,i)=>i?ctx.lineTo(X(E),Y(top(E))):ctx.moveTo(X(E),Y(top(E))));for(let i=s.length-1;i>=0;i--)ctx.lineTo(X(s[i]),Y(bot(s[i])));ctx.closePath();return true;};
+  if(poly(0,Eg,f,()=>0)){ctx.fillStyle=C.trans;ctx.fill();}
+  if(poly(Eg,4,f,E=>f(E)*Eg/E)){ctx.fillStyle=C.therm;ctx.fill();}
+  if(poly(Eg,4,E=>f(E)*Eg/E,()=>0)){ctx.fillStyle=C.use;ctx.fill();}
+  const curve=Es.map(E=>[X(E),Y(f(E))]);line(curve,C.fg,1.8);
+  // visible band along the top edge
+  const grd=ctx.createLinearGradient(X(1240/750),0,X(1240/380),0);vis.forEach(([l,c])=>grd.addColorStop((1240/l-1240/750)/(1240/380-1240/750),c));
+  ctx.fillStyle=grd;ctx.fillRect(X(1240/750),P.t,X(1240/380)-X(1240/750),8);
+  ctx.restore();
+  line([[X(Eg),P.t],[X(Eg),P.b]],C.mark,1.6,[6,4]);
+  // everything under the spectrum is filled, so labels go in the open area above it
+  for(let x=P.l;x<=P.r;x+=1){const E=(x-P.l)/P.w*4;const y=Math.max(P.t,Y(f(Math.max(E,1e-4))));for(let yy=y-4;yy<=P.b;yy+=CS)occPt(x,yy,0);}
+  occLine([[X(Eg),P.t],[X(Eg),P.b]],3);occRect({x0:X(1240/750),x1:X(1240/380),y0:P.t,y1:P.t+10});
+  // top wavelength axis
+  ctx.strokeStyle=C.fg;ctx.lineWidth=1.2;ctx.font=FONT(NUM);ctx.fillStyle=C.fg;ctx.textAlign='center';ctx.textBaseline='bottom';
+  [2000,1000,700,500,400].forEach(l=>{const x=X(1240/l);ctx.beginPath();ctx.moveTo(x,P.t);ctx.lineTo(x,P.t+6);ctx.stroke();ctx.fillText(l,x,P.t-4);});
+  rich(ctx,'wavelength (nm)',P.l+P.w/2,P.t-38,'center',LAB);
+  const tr=1-above(cumP,Eg)/PN,use=Eg*above(cumN,Eg)/PN,th=1-tr-use;
+  placeLabel(`band gap, E_{g} = ${Eg.toFixed(2)} eV`,C.mark,[{x:X(Eg)+8,y:P.t+24,a:'left'},{x:X(Eg)-8,y:P.t+24,a:'right'},{x:X(Eg)+8,y:P.t+44,a:'left'},{x:X(Eg)-8,y:P.t+44,a:'right'},...gridCands(X(Eg),P.t+24)],[X(Eg),P.t+24]);
+  placeLabel('visible light',C.fg,[{x:X(2.45),y:P.t+22,a:'center'},...gridCands(X(2.45),P.t+10)],[X(2.45),P.t+9]);
+  const anchorBelow=(E,frac,topf,botf)=>[X(E),Y(botf(E)+(topf(E)-botf(E))*frac)];
+  if(Eg>0.08){const Ea=Math.max(Eg*.7,Eg-0.25);placeLabel(`not absorbed, ${(tr*100).toFixed(1)}%`,C.transT,gridCands(...anchorBelow(Ea,.5,f,()=>0)),anchorBelow(Ea,.5,f,()=>0));}
+  if(Eg<3.8){let Eb=Eg+0.35;let best=0;for(let E=Eg;E<4;E+=.01){const d=f(E)*(1-Eg/E);if(d>best){best=d;Eb=E;}}
+    const a=anchorBelow(Eb,.5,f,E=>f(E)*Eg/E);placeLabel(`lost as heat, ${(th*100).toFixed(1)}%`,C.thermT,gridCands(...a),a);
+    let Ec=Eg+0.05,bc=0;for(let E=Eg;E<4;E+=.01){const d=f(E)*Eg/E;if(d>bc){bc=d;Ec=E;}}
+    Ec=Math.min(3.9,Ec+0.35);const b=anchorBelow(Ec,.45,E=>f(E)*Eg/E,()=>0);placeLabel(`converted at band-gap energy, ${(use*100).toFixed(1)}%`,C.useT,gridCands(...b),b);}
+}
+
+const mats=[['Ge',0.66],['Si',1.12],['CIGS',1.15],['GaAs',1.42],['CdTe',1.45],['perovskite',1.55],['a-Si',1.70]];
+let egCache={k:'',a:null,b:null};
+function drawEG(){const m=model(S),r=analyze(m);setRO(m,r);
+  const k=[S.G,S.TC,S.n,S.Rs,S.lRsh,S.EQE].join();
+  if(egCache.k!==k){const a=[],b=[];for(let E=0.5;E<=2.5001;E+=0.02){a.push([E,analyze(model({...S,Eg:E})).eta*100]);b.push([E,analyze(model({...S,Eg:E,n:1,Rs:0,lRsh:9,EQE:1})).eta*100]);}egCache={k,a,b};}
+  const ymax=niceCeil(1.15*Math.max(...egCache.b.map(p=>p[1])));
+  const g=axes({xr:[0.5,2.5],yr:[0,ymax],xlab:'band gap at 300 K (eV)',ylab:'efficiency (%)'});const{P,X,Y}=g;
+  occReset(P);
+  const pa=egCache.a.map(([E,e])=>[X(E),Y(e)]),pb=egCache.b.map(([E,e])=>[X(E),Y(e)]);
+  clip(P);line(pb,C.ref,1.8,[7,5]);line(pa,C.j,2.8);ctx.restore();occLine(pa);occLine(pb);
+  const eAt=E=>{const a=egCache.a,i=Math.min(a.length-2,Math.max(0,Math.floor((E-.5)/.02))),t=(E-a[i][0])/.02;return a[i][1]*(1-t)+a[i+1][1]*t;};
+  const pts=mats.map(([nm,E])=>[nm,X(E),Y(eAt(E))]);pts.forEach(([,x,y])=>{dot(x,y,3.5,C.fg);occPt(x,y,5);});
+  const sx=X(S.Eg),sy=Y(r.eta*100);dot(sx,sy,6.5,C.mark);occPt(sx,sy,8);
+  placeLabel(`efficiency = ${(r.eta*100).toFixed(1)}%`,C.mark,[{x:sx+12,y:sy+18,a:'left'},{x:sx-12,y:sy+18,a:'right'},{x:sx+12,y:sy+34,a:'left'},{x:sx-12,y:sy+34,a:'right'},...gridCands(sx,sy)],[sx,sy]);
+  pts.forEach(([nm,x,y])=>{const c=[];for(let dy=16;dy<=110;dy+=6)c.push({x,y:y+dy,a:'center',lead:dy>18},{x,y:y-dy,a:'center',lead:dy>18});placeLabel(nm,C.fg,[...c,...gridCands(x,y)],[x,y+4]);});
+  const dys=[-15,15,-26,26];
+  placeLabel('present settings',C.j,[...curveCands(pa,[.85,.75,.95,.65,.15,.1],dys),...gridCands(...pa[Math.round(.85*(pa.length-1))])],pa[Math.round(.85*(pa.length-1))]);
+  placeLabel('ideal cell',C.ref,[...curveCands(pb,[.8,.9,.7,.15,.1],dys),...gridCands(...pb[Math.round(.8*(pb.length-1))])],pb[Math.round(.8*(pb.length-1))]);
+}
+
+function draw(){ctx.clearRect(0,0,W,H);geom=null;
+  if(S.view==='iv')drawIV();else if(S.view==='sp')drawSP();else drawEG();}
+
+// ---- dragging the operating point ----
+function setFromPointer(e){if(!geom)return;const rc=cv.getBoundingClientRect(),x=e.clientX-rc.left;
+  const V=(x-geom.P.l)/geom.P.w*geom.xmax;S.opV=Math.min(Math.max(V,0),geom.r.Voc);draw();}
+cv.addEventListener('pointerdown',e=>{if(S.view!=='iv')return;anim++;cv.setPointerCapture(e.pointerId);setFromPointer(e);});
+cv.addEventListener('pointermove',e=>{if(S.view==='iv'&&cv.hasPointerCapture(e.pointerId))setFromPointer(e);});
+cv.style.cursor='crosshair';
+
+function alignButtons(){const bar=$('bar'),br=bar.getBoundingClientRect(),cr=cv.getBoundingClientRect();
+  bar.style.setProperty('--rofs',Math.max(0,br.right-(cr.left+W-74))+'px');}
+new ResizeObserver(()=>{size();draw();alignButtons();}).observe($('plotcol'));
+size();draw();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Construct a McCabe-Thiele Diagram for Distillation</title>
+
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+  svg: { fontCache: 'global' },
+  startup: { typeset: false }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<style>
+  html, body {
+    margin: 0; padding: 0;
+    background: #ffffff;
+    font-family: Helvetica, Arial, sans-serif;
+    color: #000;
+  }
+  #app {
+    width: 640px;
+    margin: 8px auto 30px auto;
+    padding: 0 10px;
+    position: relative;
+  }
+  h1.title {
+    font-size: 22px;
+    font-weight: bold;
+    margin: 6px 0 10px 0;
+    text-align: center;
+    font-family: Helvetica, Arial, sans-serif;
+  }
+
+  /* ---------- controls ---------- */
+  #controls { border-bottom: 1px solid #d0d0d0; padding-bottom: 8px; margin-bottom: 8px; }
+  .ctrlrow { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 7px; }
+
+  button.mmabtn {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    font-weight: normal;
+    padding: 3px 10px;
+    background: linear-gradient(#fefefe, #e6e6e6);
+    border: 1px solid #a8a8a8;
+    border-radius: 4px;
+    cursor: pointer;
+    color: #000;
+  }
+  button.mmabtn:hover { background: linear-gradient(#ffffff, #efefef); }
+  button.mmabtn:active { background: linear-gradient(#dcdcdc, #ececec); }
+  button.mmabtn:disabled { color: #999; cursor: default; background: #f2f2f2; }
+
+  .steptext { font-size: 15px; line-height: 1.15; white-space: pre-line; flex: 1 1 auto; }
+
+  label.cbx { font-size: 15px; cursor: pointer; user-select: none; white-space: nowrap; }
+  label.cbx input { vertical-align: middle; margin-right: 3px; cursor: pointer; }
+  label.cbx.off { display: none; }
+  label.cbx.dis { color: #999; cursor: default; }
+
+  /* ---------- sliders ---------- */
+  #sliderrow { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 22px; min-height: 34px; }
+  .sl { display: flex; align-items: center; gap: 7px; font-size: 15px; }
+  .sl .lab { font-size: 15px; white-space: nowrap; }
+  input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+  input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  .sl input[type=range] { width: 118px; margin-bottom: 0; }
+  .sl input[type=range]:disabled::-webkit-slider-thumb { background: #999; cursor: default; }
+  .sl input[type=range]:disabled::-moz-range-thumb { background: #999; cursor: default; }
+  .sl .val {
+    font-size: 15px; min-width: 46px; text-align: right;
+    padding: 1px 4px; border: 1px solid #c8c8c8; border-radius: 3px; background: #fafafa;
+  }
+  .sl.dis { opacity: 0.55; }
+  #columnhint { font-size: 14px; color: #000; }
+
+  /* ---------- panel buttons ---------- */
+  #panelbar { position: relative; margin: 10px 0 6px 0; }
+  button.pbtn {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    font-weight: normal;
+    color: #fff;
+    background: #98000D;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 15px;
+    margin-right: 8px;
+    cursor: pointer;
+  }
+  button.pbtn:hover { background: #b3101d; }
+  button.pbtn.active { background: #6d0009; }
+
+  .panel {
+    display: none;
+    position: absolute;
+    left: 0; top: 34px;
+    width: 600px;
+    max-height: 372px;
+    overflow-y: auto;
+    z-index: 40;
+    background: #fff;
+    border: 1px solid #98000D;
+    border-radius: 5px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.30);
+    padding: 12px 34px 14px 14px;
+    font-size: 14.5px;
+    line-height: 1.45;
+    text-align: left;
+  }
+  .panel.show { display: block; }
+  .panel p { margin: 0 0 8px 0; }
+  .panel .eq { margin: 6px 0 8px 0; text-align: left; }
+  .panel mjx-container[display="true"],
+  .panel mjx-container[jax="CHTML"][display="true"] {
+    text-align: left !important;
+    margin: 6px 0 !important;
+    padding-left: 0 !important;
+  }
+  .panel mjx-container[display="true"] > mjx-math { margin: 0 !important; text-align: left !important; }
+  .panel .sub { margin-left: 16px; }
+  .panel h3, .panel h4 {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 14.5px; line-height: 1.45; font-weight: bold; color: #000;
+  }
+  .panel h3 { margin: 0 0 8px 0; }
+  .panel h4 { margin: 12px 0 6px 0; }
+  .panel table.sym { border-collapse: collapse; margin: 2px 0 4px 0; }
+  .panel table.sym td { padding: 1px 12px 1px 0; vertical-align: top; }
+  .panel table.sym td:first-child { white-space: nowrap; }
+  .panel a { color: #98000D; }
+  .closex {
+    position: absolute; top: 4px; right: 7px;
+    font-size: 20px; line-height: 1; color: #98000D;
+    background: none; border: none; cursor: pointer; padding: 2px 5px;
+    font-family: Helvetica, Arial, sans-serif;
+  }
+  .closex:hover { color: #000; }
+
+  /* ---------- figure ---------- */
+  #plotlabel {
+    height: 24px; font-size: 16px; line-height: 22px;
+    text-align: center; margin-top: 4px;
+  }
+  #figwrap { position: relative; width: 600px; margin: 0 auto; }
+  canvas { display: block; touch-action: none; }
+  sub { font-size: 0.72em; }
+  .ovb { text-decoration: overline; }
+</style>
+</head>
+<body>
+<div id="app">
+  <h1 class="title">Construct a McCabe&#8211;Thiele Diagram for Distillation</h1>
+
+  <div id="controls">
+    <div class="ctrlrow">
+      <button class="mmabtn" id="btnNew">new problem</button>
+      <button class="mmabtn" id="btnNext">next</button>
+      <span class="steptext" id="stepText"></span>
+      <label class="cbx" id="lblSol"><input type="checkbox" id="cbSol">solution</label>
+      <label class="cbx" id="lblHint"><input type="checkbox" id="cbHint">hint</label>
+      <label class="cbx" id="lblCol"><input type="checkbox" id="cbCol">column</label>
+    </div>
+    <div class="ctrlrow" id="sliderrow"></div>
+  </div>
+
+  <div id="panelbar">
+    <button class="pbtn" id="bDir">Directions</button>
+    <button class="pbtn" id="bDet">Details</button>
+    <button class="pbtn" id="bAbt">About</button>
+
+    <div class="panel" id="pDir">
+      <button class="closex" data-close="pDir">&times;</button>
+      <h3>Directions</h3>
+      <p>This simulation uses a step-by-step approach to calculate the number of stages for a
+      specified distillation problem, using the McCabe&#8211;Thiele method. Click the
+      &ldquo;new problem&rdquo; button to change the starting conditions. Check the
+      &ldquo;hint&rdquo; box for a hint on how to proceed. After completing each step, check the
+      &ldquo;solution&rdquo; box to see the correct solution and then click &ldquo;next&rdquo;
+      for the next step. Once you check &ldquo;solution,&rdquo; you cannot change your answer.
+      Also, you cannot return to the previous step once you click &ldquo;next.&rdquo;</p>
+      <p>In steps 1&#8211;3, drag the sliders to solve for the missing green variables. In steps
+      4&#8211;9, drag the points on the diagram. In step 10, drag the &ldquo;feed height&rdquo;
+      slider to place the feed stream on the correct stage.</p>
+    </div>
+
+    <div class="panel" id="pDet">
+      <button class="closex" data-close="pDet">&times;</button>
+      <h3>Details</h3>
+      <p>The McCabe&#8211;Thiele graphical solution method for binary distillation is used to
+      determine the number of equilibrium stages needed to achieve a specified separation in a
+      distillation column. This method assumes:</p>
+
+      <p class="sub">1. The distillation column is adiabatic.</p>
+
+      <p class="sub">2. Constant molar overflow (CMO), which means that for every mole of vapor
+      condensed, one mole is vaporized on any equilibrium stage. This results in constant
+      \(L\) and \(V\) flow rates in the rectifying (upper) section, and constant \(\bar{L}\) and
+      \(\bar{V}\) flow rates in the stripping (bottom) section. The symbols used for liquid and
+      vapor flow rates are \(L\) (liquid flow rate in the rectifying section), \(V\) (vapor flow
+      rate in the rectifying section), \(\bar{L}\) (liquid flow rate in the stripping section)
+      and \(\bar{V}\) (vapor flow rate in the stripping section).</p>
+
+      <p>The constant molar overflow (CMO) assumption requires that:</p>
+
+      <p class="sub">2a. Specific heat of vaporization \(\lambda_{\text{vap}}\) is the same for
+      both components and thus independent of concentration.</p>
+
+      <p class="sub">2b. Molar enthalpy changes (\(\Delta h = |h_{i+1}-h_i|\) J/mol) between
+      stages are small compared to latent heat changes, so
+      \(|h_{i+1}-h_i| \approx \lambda_{\text{vap}}\).</p>
+
+      <p class="sub">3. Heat of mixing is negligible.</p>
+
+      <p>The equilibrium curve was calculated using the modified Raoult&rsquo;s law:</p>
+      <p class="eq">\[ P = x_1\,\gamma_1\,P_1^{\text{sat}} + x_2\,\gamma_2\,P_2^{\text{sat}} , \]</p>
+      <p class="eq">\[ y_i\,P = x_i\,\gamma_i\,P_i^{\text{sat}} , \]</p>
+      <p>where \(x_i\) and \(y_i\) are the liquid and vapor mole fractions (\(i=1\) for the more
+      volatile component, \(i=2\) for the less volatile component), \(x_1+x_2=1\),
+      \(y_1+y_2=1\), \(P\) is total pressure and \(P_i^{\text{sat}}\) is the saturation
+      pressure, which is calculated using the Antoine equation:</p>
+      <p class="eq">\[ P_i^{\text{sat}} = 10^{\left(A_i - \dfrac{B_i}{T + C_i}\right)} , \]</p>
+      <p>where \(T\) is temperature, and \(A_i\), \(B_i\) and \(C_i\) are Antoine constants.</p>
+
+      <p>The activity coefficients \(\gamma_i\) are calculated using the two-parameter Margules
+      model:</p>
+      <p class="eq">\[ \ln\gamma_1 = x_2^2\left(A_{12} + 2\,(A_{21}-A_{12})\,x_1\right) , \]</p>
+      <p class="eq">\[ \ln\gamma_2 = x_1^2\left(A_{21} + 2\,(A_{12}-A_{21})\,x_2\right) , \]</p>
+      <p>where \(A_{12}\) and \(A_{21}\) are the Margules parameters for a binary mixture.
+      Typically, these are measured experimentally. In this simulation, Margules parameters are
+      pseudorandom values.</p>
+
+      <h4>The method</h4>
+      <p>1. First the feed and rectifying operating lines are calculated. In this simulation
+      \(q = \dfrac{\bar{L}-L}{F}\), where \(F\) is the feed rate. Note that for subcooled
+      liquids, \(q\) is greater than 1 and for superheated vapors, \(q\) is less than 0.
+      Equations for the feed line and the top and bottom operating lines are given below.</p>
+      <p class="eq">Feed line: \(\; y_F = \dfrac{q}{q-1}\,x - \dfrac{z_F}{q-1}\),</p>
+      <p class="eq">Top operating line: \(\; y_R = \dfrac{R}{R+1}\,x + \dfrac{x_D}{R+1}\),</p>
+      <p class="eq">Bottom operating line: \(\; y_S = \dfrac{\bar{L}}{\bar{V}}\,x -
+      \left(\dfrac{\bar{L}}{\bar{V}}-1\right)x_B\),</p>
+      <p>where \(q\) is the quality of the feed \(q = \dfrac{\bar{L}-L}{F}\), \(z_F\) is the mole
+      fraction of the more volatile component in the feed, \(x_D\) is the liquid mole fraction of
+      the more volatile component in the distillate, and \(R = L/D\) is the reflux ratio.</p>
+
+      <p>The intersection point of the top operating line, bottom operating line and feed line
+      \((x_{\text{int}}, y_{\text{int}})\) can be calculated:</p>
+      <p class="eq">\[ x_{\text{int}} = \frac{x_D\,(q-1) + z_F\,(R+1)}{q+R} , \]</p>
+      <p class="eq">\[ y_{\text{int}} = y_F(x_{\text{int}}) = y_R(x_{\text{int}}) . \]</p>
+
+      <p>2. The number of stages is determined by &ldquo;stair stepping&rdquo; along the operating
+      line, using the equilibrium line to determine the composition at each equilibrium stage. You
+      can &ldquo;stair step&rdquo; from the bottom (reboiler stage) to the top (condenser stage) or
+      from the top (condenser stage) to the bottom (reboiler stage). In this simulation, stairs are
+      drawn from the top down.</p>
+
+      <p>3. The location of the feed stream is determined using the now fully specified graph.
+      Locate the equilibrium stage that transitions from the top operating line to the bottom
+      operating line. This is the stage where the feed stream must be put in order to get the
+      specified distillate and bottoms compositions and flow rates.</p>
+
+      <p>View the screencast videos [1, 2] for a step-by-step explanation of the
+      McCabe&#8211;Thiele method.</p>
+
+      <h4>References</h4>
+      <p>[1] G. Nicodemus. <i>McCabe&#8211;Thiele Graphical Method Example Part 1</i> [Video].
+      (Jun 1, 2018)
+      <a href="https://www.youtube.com/watch?v=Cv4KjY2BJTA" target="_blank"
+      rel="noopener">www.youtube.com/watch?v=Cv4KjY2BJTA</a>.</p>
+      <p>[2] G. Nicodemus. <i>McCabe&#8211;Thiele Graphical Method Example Part 2</i> [Video].
+      (Jun 1, 2018)
+      <a href="https://www.youtube.com/watch?v=eIJk5uXmBRc" target="_blank"
+      rel="noopener">www.youtube.com/watch?v=eIJk5uXmBRc</a>.</p>
+
+      <h4>Symbols</h4>
+      <table class="sym">
+        <tr><td>\(A_i,\ B_i,\ C_i\)</td><td>Antoine constants for component \(i\)</td></tr>
+        <tr><td>\(A_{12},\ A_{21}\)</td><td>two-parameter Margules constants</td></tr>
+        <tr><td>\(B\)</td><td>bottoms flow rate (kmol/h)</td></tr>
+        <tr><td>\(D\)</td><td>distillate flow rate (kmol/h)</td></tr>
+        <tr><td>\(F\)</td><td>feed flow rate (kmol/h)</td></tr>
+        <tr><td>\(h_i\)</td><td>molar enthalpy on stage \(i\) (J/mol)</td></tr>
+        <tr><td>\(L\)</td><td>liquid flow rate in the rectifying (top) section (kmol/h)</td></tr>
+        <tr><td>\(\bar{L}\)</td><td>liquid flow rate in the stripping (bottom) section (kmol/h)</td></tr>
+        <tr><td>\(P\)</td><td>total pressure (mmHg)</td></tr>
+        <tr><td>\(P_i^{\text{sat}}\)</td><td>saturation pressure of component \(i\) (mmHg)</td></tr>
+        <tr><td>\(q\)</td><td>feed quality, \((\bar{L}-L)/F\)</td></tr>
+        <tr><td>\(R\)</td><td>reflux ratio, \(L/D\)</td></tr>
+        <tr><td>\(T\)</td><td>temperature (\(^\circ\)C)</td></tr>
+        <tr><td>\(V\)</td><td>vapor flow rate in the rectifying (top) section (kmol/h)</td></tr>
+        <tr><td>\(\bar{V}\)</td><td>vapor flow rate in the stripping (bottom) section (kmol/h)</td></tr>
+        <tr><td>\(x,\ x_i\)</td><td>liquid mole fraction (of component \(i\))</td></tr>
+        <tr><td>\(x_B\)</td><td>mole fraction of the more volatile component in the bottoms</td></tr>
+        <tr><td>\(x_D\)</td><td>mole fraction of the more volatile component in the distillate</td></tr>
+        <tr><td>\(x_{\text{int}},\ y_{\text{int}}\)</td><td>coordinates of the intersection of the feed line and the operating lines</td></tr>
+        <tr><td>\(y,\ y_i\)</td><td>vapor mole fraction (of component \(i\))</td></tr>
+        <tr><td>\(y_F,\ y_R,\ y_S\)</td><td>\(y\) values on the feed line, top operating line and bottom operating line</td></tr>
+        <tr><td>\(z_F\)</td><td>mole fraction of the more volatile component in the feed (\(z_{\text{feed}}\) on the diagram)</td></tr>
+        <tr><td>\(\gamma_i\)</td><td>activity coefficient of component \(i\)</td></tr>
+        <tr><td>\(\lambda_{\text{vap}}\)</td><td>heat of vaporization (J/mol)</td></tr>
+      </table>
+    </div>
+
+    <div class="panel" id="pAbt">
+      <button class="closex" data-close="pAbt">&times;</button>
+      <h3>About</h3>
+      <p>This simulation was created in the
+      <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical
+      and Biological Engineering</a> at University of Colorado Boulder for
+      <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by
+      John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a
+      <a href="https://demonstrations.wolfram.com/ConstructAMcCabeThieleDiagramForDistillation/"
+      target="_blank" rel="noopener">Mathematica simulation</a> by Neil Hendren and
+      Rachael L. Baumann. It was prepared with financial support from the National Science
+      Foundation (DUE 2336987 and 2336988).
+      Address any questions or comments to
+      <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.</p>
+    </div>
+  </div>
+
+  <div id="plotlabel"></div>
+  <div id="figwrap"><canvas id="cv" width="600" height="360"></canvas></div>
+</div>
+
+<script>
+"use strict";
+
+/* =====================================================================
+   Random number generator
+   ===================================================================== */
+function mulberry32(a) {
+  return function () {
+    a |= 0; a = (a + 0x6D2B79F5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/* =====================================================================
+   Monotone cubic interpolation (Fritsch-Carlson)
+   ===================================================================== */
+function makeInterp(xs, ys) {
+  const n = xs.length;
+  const dx = [], dy = [], m = [];
+  for (let i = 0; i < n - 1; i++) { dx.push(xs[i + 1] - xs[i]); dy.push(ys[i + 1] - ys[i]); m.push(dy[i] / dx[i]); }
+  const c1 = new Array(n);
+  c1[0] = m[0]; c1[n - 1] = m[n - 2];
+  for (let i = 1; i < n - 1; i++) {
+    if (m[i - 1] * m[i] <= 0) c1[i] = 0;
+    else {
+      const w1 = 2 * dx[i] + dx[i - 1], w2 = dx[i] + 2 * dx[i - 1];
+      c1[i] = (w1 + w2) / (w1 / m[i - 1] + w2 / m[i]);
+    }
+  }
+  function f(x) {
+    if (x <= xs[0]) return ys[0] + c1[0] * (x - xs[0]);
+    if (x >= xs[n - 1]) return ys[n - 1] + c1[n - 1] * (x - xs[n - 1]);
+    let lo = 0, hi = n - 1;
+    while (hi - lo > 1) { const mid = (lo + hi) >> 1; if (xs[mid] <= x) lo = mid; else hi = mid; }
+    const h = dx[lo], t = (x - xs[lo]) / h;
+    const t2 = t * t, t3 = t2 * t;
+    return (2 * t3 - 3 * t2 + 1) * ys[lo] + (t3 - 2 * t2 + t) * h * c1[lo] +
+           (-2 * t3 + 3 * t2) * ys[lo + 1] + (t3 - t2) * h * c1[lo + 1];
+  }
+  f.inverse = function (y) {           /* assumes increasing */
+    let lo = xs[0], hi = xs[n - 1];
+    if (y <= f(lo)) return lo;
+    if (y >= f(hi)) return hi;
+    for (let k = 0; k < 70; k++) { const mid = 0.5 * (lo + hi); if (f(mid) < y) lo = mid; else hi = mid; }
+    return 0.5 * (lo + hi);
+  };
+  return f;
+}
+
+/* =====================================================================
+   Problem generation
+   ===================================================================== */
+const QLIST = [-0.2, 0.05, 0.22, 0.49, 0.75, 0.95, 1.13];
+
+/* Antoine constants (mmHg, deg C).  a = more volatile component (2). */
+function VPa(T) { return Math.pow(10, 8.08097 - 1582.271 / (T + 239.726)); }
+function VPb(T) { return Math.pow(10, 8.07131 - 1730.63 / (T + 233.426)); }
+
+function bubbleT(x2, A12, A21, P) {
+  const g1 = Math.exp(x2 * x2 * (A12 + 2 * (A21 - A12) * (1 - x2)));
+  const g2 = Math.exp((1 - x2) * (1 - x2) * (A21 + 2 * (A12 - A21) * x2));
+  const f = T => VPb(T) * g1 * (1 - x2) + VPa(T) * g2 * x2 - P;
+  let lo = -80, hi = 400;
+  if (f(lo) > 0 || f(hi) < 0) return null;
+  for (let k = 0; k < 90; k++) { const mid = 0.5 * (lo + hi); if (f(mid) < 0) lo = mid; else hi = mid; }
+  const T = 0.5 * (lo + hi);
+  return { T: T, y2: VPa(T) * g2 * x2 / P };
+}
+
+function buildProblem(seed) {
+  const R1 = mulberry32(seed >>> 0);
+  const ri = (a, b) => a + Math.floor(R1() * (b - a + 1));
+
+  const A12 = R1();
+  const A21 = -0.5 + 1.5 * R1();
+  const P   = 100 + 200 * R1();
+  const q   = QLIST[Math.floor(R1() * QLIST.length)];
+  const zf  = ri(30, 70) / 100;
+  const F   = ri(100, 1000) / 100;
+  const xd  = ri(85, 92) / 100;
+  const xb  = ri(5, 12) / 100;
+
+  /* ---- equilibrium curve ---- */
+  const xs = [], ys = [];
+  for (let i = 0; i <= 100; i++) {
+    const x2 = i * 0.01;
+    const r = bubbleT(x2, A12, A21, P);
+    if (!r || !isFinite(r.y2)) return null;
+    xs.push(x2); ys.push(r.y2);
+  }
+  for (let i = 1; i <= 100; i++) if (ys[i] <= ys[i - 1] + 1e-6) return null;   /* monotonic */
+  for (let i = 1; i <= 99; i++) if (ys[i] - xs[i] < 0.006) return null;        /* no azeotrope / pinch */
+  const equilb = makeInterp(xs, ys);
+
+  /* ---- feed (q) line ---- */
+  const feed = x => q * x / (q - 1) - zf / (q - 1);
+  let lo, hi;
+  if (q < 1) { lo = 0; hi = zf; } else { lo = zf; hi = 1; }
+  const g = x => feed(x) - equilb(x);
+  if (g(lo) * g(hi) > 0) return null;
+  for (let k = 0; k < 80; k++) {
+    const mid = 0.5 * (lo + hi);
+    if (g(lo) * g(mid) <= 0) hi = mid; else lo = mid;
+  }
+  const xeq = 0.5 * (lo + hi), yeq = feed(xeq);
+  if (xeq < 0.02 || xeq > 0.98) return null;
+
+  /* ---- reflux ratio ---- */
+  const slope = (xd - yeq) / (xd - xeq);
+  if (!(slope > 0.05 && slope < 0.95)) return null;
+  let Rmin = slope / (1 - slope), R;
+  if (Rmin < 1) { R = ri(13, 18) / 10; Rmin = R; }
+  else { R = Rmin * (ri(15, 20) / 10); }
+  if (!(R > 0.2 && R < 30)) return null;
+
+  const rect = x => (R / (R + 1)) * x + xd / (R + 1);
+
+  /* ---- flows ---- */
+  const D = F * (zf - xb) / (xd - xb);
+  const B = F - D;
+  const L = D * R, V = D + L;
+  const Lbar = L + q * F, Vbar = V - (1 - q) * F;
+  if (!(Vbar > 0.02 * F) || !(Lbar > 0.02 * F)) return null;
+  const strip = x => (Lbar / Vbar) * x - (Lbar / Vbar - 1) * xb;
+
+  const xi = (xd * (q - 1) + zf * (R + 1)) / (q + R);
+  const yi = rect(xi);
+  if (!(xi > xb + 0.03 && xi < xd - 0.03)) return null;
+  if (!(yi > 0.02 && yi < 0.99)) return null;
+
+  /* operating lines must stay below / above the equilibrium curve */
+  for (let x = xi; x <= xd; x += 0.01) if (rect(x) >= equilb(x) - 0.004) return null;
+  for (let x = xb; x <= xi; x += 0.01) if (strip(x) >= equilb(x) - 0.004) return null;
+
+  /* ---- stage stepping (top down), following the original algorithm ---- */
+  const xR = [xd], yR = [xd];
+  let i = 0, nR = 0;
+  while (xR[i] !== undefined && xR[i] > xi) {
+    const x1 = equilb.inverse(yR[i]);
+    const y1 = rect(x1);
+    if (x1 > xi || (x1 < xi && i < 1)) { xR[i + 1] = x1; yR[i + 1] = y1; }
+    i++; nR = i - 1;
+    if (i > 40) return null;
+  }
+  const xS = [xR[nR]], yS = [yR[nR]];
+  i = 0;
+  while (xS[i] >= xb) {
+    const x1 = equilb.inverse(yS[i]);
+    xS[i + 1] = x1; yS[i + 1] = strip(x1);
+    i++;
+    if (i > 40) return null;
+  }
+  const nS = i - 1;
+  const nT = nR + nS + 1;
+  if (!(nR >= 1 && nS >= 1 && nT >= 4 && nT <= 11)) return null;
+
+  /* ---- which variables are given / unknown ---- */
+  const mode = ri(1, 6);
+  const ANSVAR = {
+    1: [2, 5, 7, 8, 10, 11],
+    2: [3, 5, 7, 8,  9, 11],
+    3: [3, 4, 6, 8, 10, 11],
+    4: [0, 4, 6, 8,  9, 10],
+    5: [0, 1, 6, 7,  9, 10],
+    6: [2, 1, 6, 7, 10, 11]
+  }[mode];
+
+  const val = [F, zf, D, B, xd, xb, R, L, V, Lbar, Vbar, q];
+
+  /* ---- slider ranges ---- */
+  const u = () => 1 + 2 * R1();
+  const rngMax = [];
+  rngMax[0] = u() * F;
+  rngMax[1] = 1;
+  rngMax[2] = u() * val[ANSVAR[2]];
+  rngMax[3] = u() * val[ANSVAR[3]];
+  rngMax[4] = u() * val[ANSVAR[4]];
+  let lo6, hi6;
+  if (ANSVAR[5] === 11) {
+    const c = [2.3, 2.1, 1.2, 1.4, 1.48, 1.87][Math.floor(R1() * 6)];
+    const s = Math.abs(c * q);
+    lo6 = -s; hi6 = s;
+  } else { lo6 = 0; hi6 = u() * Vbar; }
+  const rngMin = [0, 0, 0, 0, 0, lo6];
+  rngMax[5] = hi6;
+  for (let k = 0; k < 5; k++) if (!(rngMax[k] > val[ANSVAR[k]] * 0.999)) return null;
+
+  return {
+    A12: A12, A21: A21, P: P, q: q, zf: zf, F: F, xd: xd, xb: xb,
+    equilb: equilb, feed: feed, rect: rect, strip: strip,
+    xeq: xeq, yeq: yeq, xi: xi, yi: yi, Rmin: Rmin, R: R,
+    D: D, B: B, L: L, V: V, Lbar: Lbar, Vbar: Vbar,
+    xR: xR, yR: yR, xS: xS, yS: yS, nR: nR, nS: nS, nT: nT,
+    mode: mode, ansVar: ANSVAR, val: val, rngMin: rngMin, rngMax: rngMax
+  };
+}
+
+function newProblem(seed) {
+  for (let s = seed; s < seed + 5000; s++) {
+    const p = buildProblem(s);
+    if (p) { p.seed = s; return p; }
+  }
+  return buildProblem(598);
+}
+
+/* =====================================================================
+   State
+   ===================================================================== */
+const S = {
+  seed: 598,
+  MB: 1,
+  solution: false, hint: false, showcolumn: false,
+  Ans: [0, 0, 0, 0, 0, 0],
+  ptdist: [0.6, 0.6], ptbott: [0.4, 0.4], ptfeed: [0.2, 0.2],
+  qdot1: [0.3, 0.9], qdot2: [0.1, 0.9],
+  BOLdot1: [0.3, 0.9], BOLdot2: [0.1, 0.9],
+  TOLdot1: [0.3, 0.7], TOLdot2: [0.1, 0.7],
+  stageGuess: [0.5, 0.8],
+  arrowHeight: 50
+};
+let P = newProblem(S.seed);
+S.seed = P.seed;
+
+function resetAll() {
+  S.MB = 1; S.solution = false; S.hint = false; S.showcolumn = false;
+  S.Ans = [0, 0, 0, 0, 0, 0];
+  S.ptdist = [0.6, 0.6]; S.ptbott = [0.4, 0.4]; S.ptfeed = [0.2, 0.2];
+  S.qdot1 = [0.3, 0.9]; S.qdot2 = [0.1, 0.9];
+  S.BOLdot1 = [0.3, 0.9]; S.BOLdot2 = [0.1, 0.9];
+  S.TOLdot1 = [0.3, 0.7]; S.TOLdot2 = [0.1, 0.7];
+  S.stageGuess = [0.5, P.equilb(0.5)];
+  S.arrowHeight = 50;
+}
+resetAll();
+
+/* =====================================================================
+   Rich-text renderer for the canvas
+      *x*    italic
+      _x  _{xx}    subscript (upright)
+      @x  @{xx}    overbar
+   ===================================================================== */
+function parseRich(str) {
+  const out = []; let it = false, i = 0;
+  while (i < str.length) {
+    const c = str[i];
+    if (c === '*') { it = !it; i++; continue; }
+    if (c === '_' || c === '@') {
+      let body;
+      if (str[i + 1] === '{') { const j = str.indexOf('}', i + 2); body = str.slice(i + 2, j); i = j + 1; }
+      else { body = str[i + 1]; i += 2; }
+      out.push({ t: body, it: (c === '@') ? it : false, sub: c === '_', over: c === '@' });
+      continue;
+    }
+    let j = i;
+    while (j < str.length && '*_@'.indexOf(str[j]) < 0) j++;
+    out.push({ t: str.slice(i, j), it: it, sub: false, over: false });
+    i = j;
+  }
+  return out;
+}
+function richWidth(ctx, str, size) {
+  const segs = parseRich(str); let w = 0;
+  for (const s of segs) {
+    ctx.font = (s.it ? 'italic ' : '') + (s.sub ? (size * 0.72).toFixed(1) : size) + 'px Helvetica, Arial, sans-serif';
+    w += ctx.measureText(s.t).width;
+  }
+  return w;
+}
+/* align: 'l' | 'c' | 'r' ; y is the baseline */
+function drawRich(ctx, str, x, y, size, align, color) {
+  const segs = parseRich(str);
+  const w = richWidth(ctx, str, size);
+  let px = x;
+  if (align === 'c') px = x - w / 2; else if (align === 'r') px = x - w;
+  ctx.fillStyle = color || '#000';
+  ctx.textBaseline = 'alphabetic';
+  ctx.textAlign = 'left';
+  for (const s of segs) {
+    const fs = s.sub ? size * 0.72 : size;
+    ctx.font = (s.it ? 'italic ' : '') + fs.toFixed(1) + 'px Helvetica, Arial, sans-serif';
+    const dy = s.sub ? size * 0.28 : 0;
+    ctx.fillText(s.t, px, y + dy);
+    const sw = ctx.measureText(s.t).width;
+    if (s.over) {
+      ctx.save();
+      ctx.strokeStyle = color || '#000';
+      ctx.lineWidth = Math.max(1, size / 16);
+      ctx.beginPath();
+      ctx.moveTo(px, y - size * 0.80);
+      ctx.lineTo(px + sw, y - size * 0.80);
+      ctx.stroke();
+      ctx.restore();
+    }
+    px += sw;
+  }
+  return w;
+}
+/* multi-line, "\n" separated */
+function drawRichLines(ctx, str, x, y, size, align, color) {
+  const lines = str.split('\n');
+  for (let k = 0; k < lines.length; k++) drawRich(ctx, lines[k], x, y + k * size * 1.25, size, align, color);
+}
+
+/* =====================================================================
+   Canvas / views
+   ===================================================================== */
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+const CW = 600, CH = 360;
+function setupHiDPI() {
+  const dpr = window.devicePixelRatio || 1;
+  cv.width = CW * dpr; cv.height = CH * dpr;
+  cv.style.width = CW + 'px'; cv.style.height = CH + 'px';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+setupHiDPI();
+
+function View(px, py, pw, ph, xmin, xmax, ymin, ymax) {
+  this.px = px; this.py = py; this.pw = pw; this.ph = ph;
+  this.xmin = xmin; this.xmax = xmax; this.ymin = ymin; this.ymax = ymax;
+}
+View.prototype.X = function (x) { return this.px + (x - this.xmin) / (this.xmax - this.xmin) * this.pw; };
+View.prototype.Y = function (y) { return this.py + this.ph - (y - this.ymin) / (this.ymax - this.ymin) * this.ph; };
+View.prototype.invX = function (sx) { return this.xmin + (sx - this.px) / this.pw * (this.xmax - this.xmin); };
+View.prototype.invY = function (sy) { return this.ymin + (this.py + this.ph - sy) / this.ph * (this.ymax - this.ymin); };
+
+const COL_F = 'rgb(153,102,51)';    /* colF = RGBColor[0.6,0.4,0.2]   feed   */
+const COL_R = 'rgb(0,153,0)';       /* colR = RGBColor[0,0.6,0]       rectifying */
+const COL_S = 'rgb(255,0,153)';     /* colS = Hue[0.9]                stripping  */
+const GREEN = 'rgb(0,153,0)';
+const BLUE  = 'rgb(0,0,255)';
+const ORANGE= 'rgb(230,77,0)';
+const LBL = 17;
+
+function line(v, x1, y1, x2, y2, color, w, dash) {
+  ctx.save();
+  ctx.strokeStyle = color; ctx.lineWidth = w; ctx.lineCap = 'round';
+  if (dash) ctx.setLineDash(dash);
+  ctx.beginPath(); ctx.moveTo(v.X(x1), v.Y(y1)); ctx.lineTo(v.X(x2), v.Y(y2)); ctx.stroke();
+  ctx.restore();
+}
+function arrow(v, x1, y1, x2, y2, color, w) {
+  const X1 = v.X(x1), Y1 = v.Y(y1), X2 = v.X(x2), Y2 = v.Y(y2);
+  ctx.save();
+  ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = w; ctx.lineCap = 'butt';
+  const a = Math.atan2(Y2 - Y1, X2 - X1), h = 9, hw = 4.2;
+  ctx.beginPath(); ctx.moveTo(X1, Y1); ctx.lineTo(X2 - h * Math.cos(a) * 0.85, Y2 - h * Math.sin(a) * 0.85); ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(X2, Y2);
+  ctx.lineTo(X2 - h * Math.cos(a) + hw * Math.sin(a), Y2 - h * Math.sin(a) - hw * Math.cos(a));
+  ctx.lineTo(X2 - h * Math.cos(a) - hw * Math.sin(a), Y2 - h * Math.sin(a) + hw * Math.cos(a));
+  ctx.closePath(); ctx.fill();
+  ctx.restore();
+}
+function ellipseArc(v, cx, cy, rx, ry, a0, a1, color, w) {
+  ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = w; ctx.beginPath();
+  const N = 60;
+  for (let k = 0; k <= N; k++) {
+    const t = a0 + (a1 - a0) * k / N;
+    const X = v.X(cx + rx * Math.cos(t)), Y = v.Y(cy + ry * Math.sin(t));
+    if (k === 0) ctx.moveTo(X, Y); else ctx.lineTo(X, Y);
+  }
+  ctx.stroke(); ctx.restore();
+}
+function dot1(v, p, color) {          /* ring marker (draggable) */
+  const X = v.X(p[0]), Y = v.Y(p[1]);
+  ctx.save();
+  ctx.fillStyle = color; ctx.globalAlpha = 0.6;
+  ctx.beginPath(); ctx.arc(X, Y, 7.2, 0, 6.2832); ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.beginPath(); ctx.arc(X, Y, 5.9, 0, 6.2832); ctx.fill();
+  ctx.restore();
+}
+function dot2(v, p, color) {          /* solid marker */
+  const X = v.X(p[0]), Y = v.Y(p[1]);
+  ctx.save(); ctx.fillStyle = color;
+  ctx.beginPath(); ctx.arc(X, Y, 7.2, 0, 6.2832); ctx.fill(); ctx.restore();
+}
+function f2(x) { return (Math.abs(x) < 5e-3 ? 0 : x).toFixed(2); }
+
+/* ---------------------------------------------------------------
+   McCabe-Thiele frame
+   --------------------------------------------------------------- */
+function mccabeView(x0, w) {
+  const ml = (w > 400) ? 60 : 55, mr = 12, mt = 12, mb = 52;
+  return new View(x0 + ml, mt, w - ml - mr, CH - mt - mb, 0, 1, 0, 1);
+}
+function drawMcCabeFrame(v) {
+  ctx.save();
+  /* grid */
+  ctx.strokeStyle = 'rgb(204,204,204)'; ctx.lineWidth = 1;
+  for (let k = 0; k <= 20; k++) {
+    const t = k * 0.05;
+    ctx.beginPath(); ctx.moveTo(Math.round(v.X(t)) + 0.5, v.Y(0)); ctx.lineTo(Math.round(v.X(t)) + 0.5, v.Y(1)); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(v.X(0), Math.round(v.Y(t)) + 0.5); ctx.lineTo(v.X(1), Math.round(v.Y(t)) + 0.5); ctx.stroke();
+  }
+  /* frame */
+  ctx.strokeStyle = '#000'; ctx.lineWidth = 1.2;
+  ctx.strokeRect(v.X(0), v.Y(1), v.pw, v.ph);
+  /* ticks + labels */
+  ctx.fillStyle = '#000';
+  ctx.font = LBL + 'px Helvetica, Arial, sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  for (let k = 0; k <= 5; k++) {
+    const t = k * 0.2;
+    const X = v.X(t), Y = v.Y(t);
+    ctx.beginPath(); ctx.moveTo(X, v.Y(0)); ctx.lineTo(X, v.Y(0) - 6); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(X, v.Y(1)); ctx.lineTo(X, v.Y(1) + 6); ctx.stroke();
+    ctx.fillText(t.toFixed(1), X, v.Y(0) + 5);
+    ctx.beginPath(); ctx.moveTo(v.X(0), Y); ctx.lineTo(v.X(0) + 6, Y); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(v.X(1), Y); ctx.lineTo(v.X(1) - 6, Y); ctx.stroke();
+    ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+    ctx.fillText(t.toFixed(1), v.X(0) - 7, Y);
+    ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  }
+  for (let k = 0; k <= 20; k++) {
+    const t = k * 0.05;
+    if (Math.abs(t * 5 - Math.round(t * 5)) < 1e-9) continue;
+    ctx.beginPath(); ctx.moveTo(v.X(t), v.Y(0)); ctx.lineTo(v.X(t), v.Y(0) - 3.5); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(v.X(0), v.Y(t)); ctx.lineTo(v.X(0) + 3.5, v.Y(t)); ctx.stroke();
+  }
+  /* frame labels */
+  drawRich(ctx, 'liquid mole fraction, *x*', (v.X(0) + v.X(1)) / 2, v.Y(0) + 45, LBL, 'c');
+  ctx.save();
+  ctx.translate(v.X(0) - 42, (v.Y(0) + v.Y(1)) / 2);
+  ctx.rotate(-Math.PI / 2);
+  drawRich(ctx, 'vapor mole fraction, *y*', 0, 0, LBL, 'c');
+  ctx.restore();
+  ctx.restore();
+}
+function clipPlot(v) { ctx.save(); ctx.beginPath(); ctx.rect(v.X(0), v.Y(1), v.pw, v.ph); ctx.clip(); }
+
+/* ---------------------------------------------------------------
+   Column drawing
+   --------------------------------------------------------------- */
+function columnView(x0, w, leftLimit, rightEdge, yLo, yHi) {
+  return new View(x0, 0, w, CH, leftLimit, rightEdge,
+                  (yLo === undefined) ? -15 : yLo, (yHi === undefined) ? 102 : yHi);
+}
+function drawColumn(v, rightLimit, arrowH) {
+  const T = 2.2;
+  line(v, 28, 25, 28, 85, '#000', T);
+  line(v, 65, 25, 65, 85, '#000', T);
+  ellipseArc(v, 46.5, 85, 18.5, 8, 0, Math.PI, '#000', T);
+  ellipseArc(v, 46.5, 25, 18.5, 8, Math.PI, 2 * Math.PI, '#000', T);
+  line(v, 49, 93, 49, 100, '#000', T);
+  line(v, 49, 100, 80, 100, '#000', T);
+  arrow(v, 80, 100, 80, 90, '#000', T);
+  ellipseArc(v, 80, 85, 5, 5, 0, 2 * Math.PI, '#000', T);
+  arrow(v, 60, 19, 60, 10, '#000', T);
+  line(v, 55, 5, 45, 5, '#000', T);
+  arrow(v, 45, 5, 45, 17, '#000', T);
+  ellipseArc(v, 60, 5, 5, 5, 0, 2 * Math.PI, '#000', T);
+  arrow(v, 75, 85, 65, 85, '#000', T);
+  arrow(v, 85, 85, rightLimit, 85, '#000', T);
+  arrow(v, 65, 5, rightLimit, 5, '#000', T);
+  drawRich(ctx, 'C', v.X(80), v.Y(85) + 5.5, 15, 'c');
+  drawRich(ctx, 'R', v.X(60), v.Y(5) + 5.5, 15, 'c');
+  /* feed arrow */
+  arrow(v, -15, arrowH, 28, arrowH, '#000', T);
+}
+
+/* =====================================================================
+   Variable descriptions
+   ===================================================================== */
+const VARLBL = [
+  'feed rate', 'feed composition *z*_{feed}', 'distillate flow rate', 'bottoms flow rate',
+  'distillate composition *x*_D', 'bottoms composition *x*_B', 'reflux ratio',
+  'liquid flow rate *L*', 'vapor flow rate *V*', 'liquid flow rate @L',
+  'vapor flow rate @V', 'quality'
+];
+/* text drawn on the column diagram: [prefix, correctPrefix, unit, posKnown, posCorrect] */
+function varText(idx, value, prefix) {
+  const u = ' kmol/h';
+  switch (idx) {
+    case 0: return prefix + f2(value) + u;
+    case 1: return prefix + f2(value);
+    case 2: return prefix + f2(value) + u;
+    case 3: return prefix + f2(value) + u;
+    case 4: return prefix + f2(value);
+    case 5: return prefix + f2(value);
+    case 6: return prefix + f2(value);
+    case 7: return prefix + f2(value) + u;
+    case 8: return prefix + f2(value) + u;
+    case 9: return prefix + f2(value) + u;
+    case 10: return prefix + f2(value) + u;
+    case 11: return prefix + f2(value);
+  }
+}
+const KNOWN_PREFIX = [
+  'feed rate (*F*) = ', '*z*_{feed} = ', 'distillate flow (*D*) = ', 'bottoms flow (*B*) = ',
+  '*x*_D = ', '*x*_B = ', 'reflux ratio (*L* / *D*) = ', '*L* = ', '*V* = ',
+  '@L = ', '@V = ', 'quality = '
+];
+const CORRECT_PREFIX = [
+  'correct feed rate =\n', 'correct *z*_{feed} = ', 'correct distillate flow =\n',
+  'correct bottoms flow =\n', 'correct *x*_D = ', 'correct *x*_B = ',
+  'correct reflux ratio = ', 'correct *L* = ', 'correct *V* = ',
+  'correct @L = ', 'correct @V = ', 'correct quality = '
+];
+const POS_KNOWN = [
+  [-49.5, 40], [-30, 58], [70, 72], [70, 14], [88, 94], [70, -3],
+  [88, 92], [29.3, 53], [29.3, 63], [29.3, 32], [29.3, 40], [-30, 58]
+];
+const POS_CORRECT = [
+  [-49.5, 26], [-38, 68], [70, 60], [70, 32], [88, 102], [70, -12],
+  [88, 100], [70, 53], [70, 63], [70, 32], [70, 40], [-38, 68]
+];
+/* values printed inside the column shell must stay left of the right wall */
+const INSIDE_COLUMN = { 7: 63, 8: 63, 9: 63, 10: 63 };
+
+/* item lists (see the original Manipulate): index = variable index 0..11
+   'k' = known (black)   'c' = correct (blue)   'g' = guess (green) */
+const SHOW = {
+  1: {
+    1: { k: [0, 1, 3, 4], g: [2, 5] },
+    2: { k: [0, 1, 2, 4], g: [3, 5] },
+    3: { k: [0, 1, 2, 5], g: [3, 4] },
+    4: { k: [1, 2, 3, 5], g: [0, 4] },
+    5: { k: [2, 3, 4, 5], g: [0, 1] },
+    6: { k: [0, 3, 4, 5], g: [1, 2] }
+  },
+  2: {
+    1: { k: [2, 6], g: [7, 8] }, 2: { k: [2, 6], g: [7, 8] },
+    3: { k: [2, 7], g: [6, 8] }, 4: { k: [2, 7], g: [6, 8] },
+    5: { k: [2, 8], g: [6, 7] }, 6: { k: [2, 8], g: [6, 7] }
+  },
+  3: {
+    1: { k: [0, 7, 8, 9], g: [10, 11] }, 2: { k: [0, 7, 8, 10], g: [9, 11] },
+    3: { k: [0, 7, 8, 9], g: [10, 11] }, 4: { k: [0, 7, 8, 11], g: [9, 10] },
+    5: { k: [0, 7, 8, 11], g: [9, 10] }, 6: { k: [0, 7, 8, 9], g: [10, 11] }
+  }
+};
+
+/* =====================================================================
+   Drawing the three "mass balance" steps (1-3)
+   ===================================================================== */
+/* draw rich text at data coordinates, nudged so it never runs off the panel.
+   opt.maxX shrinks the type until the text fits left of that data coordinate. */
+function drawAt(v, str, x, y, size, color, opt) {
+  opt = opt || {};
+  const lines = str.split('\n');
+  const wid = sz => { let w = 0; for (const L of lines) w = Math.max(w, richWidth(ctx, L, sz)); return w; };
+  let sz = size, w = wid(sz);
+  if (opt.maxX !== undefined) {
+    const avail = v.X(opt.maxX) - v.X(x);
+    while (w > avail && sz > 11.5) { sz -= 0.5; w = wid(sz); }
+  }
+  let px = v.X(x);
+  const right = v.px + v.pw - 3, left = v.px + 2;
+  if (px + w > right) px = right - w;
+  if (px < left) px = left;
+  let by = v.Y(y) + 6;
+  const topLim = v.py + sz * 0.92;
+  const botLim = v.py + v.ph - 2 - sz * 0.35 - (lines.length - 1) * sz * 1.25;
+  if (by < topLim) by = topLim;
+  if (by > botLim) by = botLim;
+  for (let k = 0; k < lines.length; k++)
+    drawRich(ctx, lines[k], px, by + k * sz * 1.25, sz, 'l', color);
+}
+
+/* label on the McCabe-Thiele plot: white backing, kept inside the frame.
+   avoid = true nudges the label clear of ones already placed this frame */
+let placedLabels = [];
+function tagLabel(v, str, px, py, align, color, avoid) {
+  const w = richWidth(ctx, str, LBL);
+  let x0 = (align === 'r') ? px - w : (align === 'c') ? px - w / 2 : px;
+  const left = v.X(0) + 3, right = v.X(1) - 3;
+  if (x0 + w > right) x0 = right - w;
+  if (x0 < left) x0 = left;
+  let y0 = py;
+  const topLim = v.Y(1) + LBL * 0.95, botLim = v.Y(0) - LBL * 0.55;
+  if (y0 < topLim) y0 = topLim;
+  if (y0 > botLim) y0 = botLim;
+  const h = LBL * 1.30;
+  if (avoid) {
+    const box = () => ({ x: x0 - 2.5, y: y0 - LBL * 0.88, w: w + 5, h: h });
+    const hits = r => placedLabels.some(q =>
+      !(r.x + r.w < q.x || q.x + q.w < r.x || r.y + r.h < q.y || q.y + q.h < r.y));
+    const start = y0;
+    let k = 0;
+    while (hits(box()) && k < 10) {
+      k++;
+      y0 = (k % 2) ? start + Math.ceil(k / 2) * (h + 3) : start - Math.ceil(k / 2) * (h + 3);
+      if (y0 > botLim || y0 < topLim) y0 = start + k * (h + 3);
+      if (y0 > botLim) y0 = botLim;
+    }
+    placedLabels.push(box());
+  }
+  ctx.save(); ctx.fillStyle = '#fff';
+  ctx.fillRect(x0 - 2.5, y0 - LBL * 0.88, w + 5, h);
+  ctx.restore();
+  drawRich(ctx, str, x0, y0, LBL, 'l', color);
+}
+
+function drawColumnPane(v, withValues) {
+  const rightLimit = (S.MB >= 4) ? 100 : 120;
+  const arrowH = (S.MB === 1) ? 49 : S.arrowHeight;
+  drawColumn(v, rightLimit, arrowH);
+
+  if (!withValues) {
+    /* values placed on the column when the "column" box is checked */
+    if (S.MB === 4) {
+      drawAt(v, '*z*_{feed} = ' + f2(P.zf), -28, 56, LBL, '#000', { maxX: 27 });
+      drawAt(v, '*x*_D = ' + f2(P.xd), 75, 75, LBL, '#000');
+      drawAt(v, '*x*_B = ' + f2(P.xb), 75, 12, LBL, '#000');
+    } else if (S.MB === 5) {
+      drawAt(v, '*z*_{feed} = ' + f2(P.zf), -28, 56, LBL, '#000', { maxX: 27 });
+      drawAt(v, '*q* = ' + f2(P.q), -28, 64, LBL, '#000', { maxX: 27 });
+    } else if (S.MB === 6) {
+      drawAt(v, '*L* = ' + f2(P.L) + ' kmol/h', 30, 78, LBL, '#000', { maxX: 63 });
+      drawAt(v, '*V* = ' + f2(P.V) + ' kmol/h', 30, 65, LBL, '#000', { maxX: 63 });
+      drawAt(v, '@V = ' + f2(P.Vbar) + ' kmol/h', 30, 40, LBL, '#000', { maxX: 63 });
+      drawAt(v, '@L = ' + f2(P.Lbar) + ' kmol/h', 30, 26, LBL, '#000', { maxX: 63 });
+      drawAt(v, '*x*_D = ' + f2(P.xd), 75, 75, LBL, '#000');
+      drawAt(v, '*x*_B = ' + f2(P.xb), 75, 12, LBL, '#000');
+    }
+    return;
+  }
+
+  const step = S.MB, m = P.mode, sh = SHOW[step][m];
+  const known = sh.k.slice(), guess = sh.g.slice();
+
+  /* when solution is checked, every quantity of the step is shown */
+  let correct = [];
+  if (S.solution) {
+    correct = guess.slice();
+    if (step === 1) { known.length = 0; for (let i = 0; i < 6; i++) known.push(i); }
+    if (step === 2) { known.length = 0; known.push(2); [6, 7, 8].forEach(i => { if (!correct.includes(i)) known.push(i); }); }
+    if (step === 3) { known.length = 0; known.push(0); [7, 8, 9, 10, 11].forEach(i => { if (!correct.includes(i)) known.push(i); }); }
+  }
+
+  /* known (black) */
+  for (const i of known) {
+    if (correct.includes(i)) continue;
+    let p = POS_KNOWN[i].slice();
+    if (S.MB === 3 && (i === 7 || i === 8)) p[1] += 10;   /* L and V move up on step 3 */
+    drawAt(v, varText(i, P.val[i], KNOWN_PREFIX[i]), p[0], p[1], LBL, '#000',
+           { maxX: INSIDE_COLUMN[i] });
+  }
+  /* correct (blue) */
+  for (const i of correct) {
+    const p = POS_CORRECT[i];
+    drawAt(v, varText(i, P.val[i], CORRECT_PREFIX[i]), p[0], p[1], LBL, BLUE);
+  }
+  /* student's answer (green) */
+  const slot = { 1: [0, 1], 2: [2, 3], 3: [4, 5] }[step];
+  for (const s of slot) {
+    const i = P.ansVar[s];
+    const p = POS_KNOWN[i];
+    drawAt(v, varText(i, S.Ans[s], KNOWN_PREFIX[i]), p[0], p[1], LBL, GREEN,
+           { maxX: INSIDE_COLUMN[i] });
+  }
+  /* explanatory notes */
+  if (step === 2)
+    drawAt(v, '*L* and *V* are the liquid and vapor\nflow rates in the rectifying (top) section',
+      -45, 0, LBL, '#000');
+  if (step === 3)
+    drawAt(v, '@L and @V are the liquid and vapor\nflow rates in the stripping (bottom) section',
+      -45, 0, LBL, '#000');
+}
+
+/* =====================================================================
+   The McCabe-Thiele diagram (steps 4-10)
+   ===================================================================== */
+function stageStepGeometry() {
+  const xR = P.xR, yR = P.yR, xS = P.xS, yS = P.yS, nR = P.nR, nS = P.nS;
+  const Rx = [], Ry = [], Sx = [], Sy = [];
+  for (let i = 0; i <= nR - 1; i++) Rx.push([xR[i], yR[i], xR[i + 1], yR[i]]);
+  if (nR < 1) Rx.push([xR[0], yR[0], xR[0], yR[0]]);
+  for (let i = 1; i <= nR; i++) Ry.push([xR[i], yR[i - 1], xR[i], yR[i]]);
+  for (let i = 1; i <= nS + 1; i++) Sx.push([xS[i - 1], yS[i - 1], xS[i], yS[i - 1]]);
+  for (let i = 0; i <= nS - 1; i++) Sy.push([xS[i + 1], yS[i], xS[i + 1], yS[i + 1]]);
+  const Sr = [xS[nS + 1], yS[nS], xS[nS + 1], 0];
+  return { Rx: Rx, Ry: Ry, Sx: Sx, Sy: Sy, Sr: Sr };
+}
+function dotNumbers() {
+  const out = [], nR = P.nR, nS = P.nS, nT = P.nT;
+  for (let a = 0; a <= nT - 1; a++) {
+    let pos;
+    if (a === 0) pos = [nR > 0 ? P.xR[1] : P.xS[1], P.yR[0]];
+    else if (a === 1 && nR === 0) pos = [P.xS[2], P.yS[1]];
+    else if (a < nR) pos = [P.xR[a + 1], P.yR[a]];
+    else if (a === nR) pos = [P.xS[1], P.yS[0]];
+    else pos = [P.xS[a - nR + 1], P.yS[a - nR]];
+    out.push({ pos: pos, label: (a < nT - 1) ? String(a + 1) : 'R' });
+  }
+  return out;
+}
+function drawStageBadge(v, pos, label) {
+  ctx.save();
+  ctx.font = '15px Helvetica, Arial, sans-serif';
+  const w0 = ctx.measureText(label).width + 14;
+  const X = v.X(pos[0]) - w0 / 2 - 6, Y = v.Y(pos[1]) - 12;
+  const w = w0, h = 21;
+  ctx.fillStyle = '#fff'; ctx.strokeStyle = '#000'; ctx.lineWidth = 1;
+  roundRect(X - w / 2, Y - h / 2, w, h, h / 2); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = '#000'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(label, X, Y + 1);
+  ctx.restore();
+}
+function roundRect(x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y); ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r); ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h); ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+function coordLabel(v, p, color) {
+  tagLabel(v, '(' + f2(p[0]) + ', ' + f2(p[1]) + ')', v.X(p[0]), v.Y(p[1]) - 13, 'c', color, true);
+}
+function boxedLabel(v, str, x, y, color) {
+  drawRich(ctx, str, v.X(x), v.Y(y) + 6, LBL, 'l', color);
+}
+
+function drawMcCabe(v) {
+  drawMcCabeFrame(v);
+  clipPlot(v);
+
+  /* equilibrium curve and y = x line */
+  ctx.save(); ctx.strokeStyle = '#000'; ctx.lineWidth = 2.4; ctx.lineJoin = 'round';
+  ctx.beginPath();
+  for (let k = 0; k <= 200; k++) { const x = k / 200; const X = v.X(x), Y = v.Y(P.equilb(x)); if (k === 0) ctx.moveTo(X, Y); else ctx.lineTo(X, Y); }
+  ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(v.X(0), v.Y(0)); ctx.lineTo(v.X(1), v.Y(1)); ctx.stroke();
+  ctx.restore();
+
+  const MB = S.MB, sol = S.solution;
+  const G = stageStepGeometry();
+  const DN = dotNumbers();
+
+  /* ---------- step 4 ---------- */
+  if (MB === 4) {
+    if (!S.showcolumn) {
+      ctx.save(); ctx.fillStyle = '#fff';
+      ctx.fillRect(v.X(0.7), v.Y(0.35), v.X(1) - v.X(0.7), v.Y(0.05) - v.Y(0.35)); ctx.restore();
+      boxedLabel(v, '*z*_{feed} = ' + f2(P.zf), 0.7, 0.3, COL_F);
+      boxedLabel(v, '*x*_D = ' + f2(P.xd), 0.7, 0.2, COL_R);
+      boxedLabel(v, '*x*_B = ' + f2(P.xb), 0.7, 0.1, COL_S);
+    }
+    if (sol) {
+      arrow(v, P.zf, P.zf - 0.15, P.zf, P.zf, '#000', 2);
+      tagLabel(v, 'correct *z*_{feed}', v.X(P.zf), v.Y(P.zf - 0.19) + 6, 'c', COL_F);
+      arrow(v, P.xd, P.xd - 0.15, P.xd, P.xd, '#000', 2);
+      tagLabel(v, 'correct *x*_D', v.X(P.xd), v.Y(P.xd - 0.19) + 6, 'c', COL_R);
+      arrow(v, P.xb + 0.16, P.xb - 0.05, P.xb, P.xb, '#000', 2);
+      tagLabel(v, 'correct *x*_B', v.X(P.xb + 0.19), v.Y(P.xb - 0.06) + 6, 'l', COL_S);
+      dot2(v, [P.zf, P.zf], COL_F); dot2(v, [P.xd, P.xd], COL_R); dot2(v, [P.xb, P.xb], COL_S);
+    }
+    dot1(v, S.ptdist, COL_R);
+    tagLabel(v, '*x*_D = ' + f2(S.ptdist[0]), v.X(S.ptdist[0]) - 8, v.Y(S.ptdist[1]) - 12, 'r', COL_R, true);
+    dot1(v, S.ptbott, COL_S);
+    tagLabel(v, '*x*_B = ' + f2(S.ptbott[0]), v.X(S.ptbott[0]) + 8, v.Y(S.ptbott[1]) - 12, 'l', COL_S, true);
+    dot1(v, S.ptfeed, COL_F);
+    tagLabel(v, '*z*_{feed} = ' + f2(S.ptfeed[0]), v.X(S.ptfeed[0]) - 8, v.Y(S.ptfeed[1]) - 12, 'r', COL_F, true);
+  }
+
+  /* ---------- points on y = x for steps 5 and 6 ---------- */
+  if (MB === 5 || MB === 6) {
+    dot2(v, [P.zf, P.zf], COL_F); dot2(v, [P.xd, P.xd], COL_R); dot2(v, [P.xb, P.xb], COL_S);
+  }
+
+  /* ---------- step 5 : q-line ---------- */
+  if (MB === 5) {
+    if (!S.showcolumn) {
+      ctx.save(); ctx.fillStyle = '#fff';
+      ctx.fillRect(v.X(0.7), v.Y(0.6), v.X(1) - v.X(0.7), v.Y(0.4) - v.Y(0.6)); ctx.restore();
+      boxedLabel(v, '*z*_{feed} = ' + f2(P.zf), 0.7, 0.55, '#000');
+      boxedLabel(v, 'quality = ' + f2(P.q), 0.7, 0.45, '#000');
+    }
+    if (sol) line(v, P.xeq, P.yeq, P.zf, P.zf, 'rgba(0,0,255,0.5)', 7);
+    line(v, S.qdot1[0], S.qdot1[1], S.qdot2[0], S.qdot2[1], '#000', 2.4, [8, 6]);
+    dot1(v, S.qdot1, COL_F); dot1(v, S.qdot2, COL_F);
+    if (!sol) { coordLabel(v, S.qdot1, COL_F); coordLabel(v, S.qdot2, COL_F); }
+  }
+
+  /* ---------- step 6 : operating lines ---------- */
+  if (MB === 6) {
+    if (!S.showcolumn) {
+      ctx.save(); ctx.fillStyle = '#fff';
+      ctx.fillRect(v.X(0.7), v.Y(0.6), v.X(1) - v.X(0.7), v.Y(0) - v.Y(0.6)); ctx.restore();
+      boxedLabel(v, '*L* = ' + f2(P.L) + ' kmol/h', 0.7, 0.55, '#000');
+      boxedLabel(v, '*V* = ' + f2(P.V) + ' kmol/h', 0.7, 0.45, '#000');
+      boxedLabel(v, '@L = ' + f2(P.Lbar) + ' kmol/h', 0.7, 0.35, '#000');
+      boxedLabel(v, '@V = ' + f2(P.Vbar) + ' kmol/h', 0.7, 0.25, '#000');
+      boxedLabel(v, '*x*_D = ' + f2(P.xd), 0.7, 0.15, '#000');
+      boxedLabel(v, '*x*_B = ' + f2(P.xb), 0.7, 0.05, '#000');
+    }
+    line(v, P.xeq, P.yeq, P.zf, P.zf, COL_F, 2.6);
+    if (sol) {
+      line(v, P.xb, P.xb, P.xi, P.yi, 'rgba(0,0,255,0.5)', 7);
+      line(v, P.xd, P.xd, P.xi, P.yi, 'rgba(0,0,255,0.5)', 7);
+      dot2(v, [P.xi, P.yi], 'purple');
+    }
+    line(v, S.TOLdot1[0], S.TOLdot1[1], S.TOLdot2[0], S.TOLdot2[1], '#000', 2.4, [8, 6]);
+    line(v, S.BOLdot1[0], S.BOLdot1[1], S.BOLdot2[0], S.BOLdot2[1], '#000', 2.4, [8, 6]);
+    dot1(v, S.TOLdot1, COL_R); dot1(v, S.TOLdot2, COL_R);
+    dot1(v, S.BOLdot1, COL_S); dot1(v, S.BOLdot2, COL_S);
+    if (!sol) {
+      coordLabel(v, S.TOLdot1, COL_R); coordLabel(v, S.TOLdot2, COL_R);
+      coordLabel(v, S.BOLdot1, COL_S); coordLabel(v, S.BOLdot2, COL_S);
+    }
+  }
+
+  /* ---------- steps 7-10 : final lines ---------- */
+  if (MB > 6) {
+    line(v, P.xi, P.yi, P.zf, P.zf, COL_F, 2.6);
+    line(v, P.xb, P.xb, P.xi, P.yi, COL_S, 2.6);
+    line(v, P.xd, P.xd, P.xi, P.yi, COL_R, 2.6);
+  }
+
+  /* ---------- steps 7, 8, 9 : drag a stage ---------- */
+  if (MB === 7 || MB === 8 || MB === 9) {
+    const gx = S.stageGuess[0], gy = P.equilb(gx);
+    const hp2 = [gx, gy];
+    let hp1;
+    if (gy >= P.yi) hp1 = [(gy - P.xd / (P.R + 1)) * (P.R + 1) / P.R, gy];
+    else hp1 = [(gy + (P.Lbar / P.Vbar - 1) * P.xb) / (P.Lbar / P.Vbar), gy];
+    let vp1;
+    if (hp2[0] >= P.xi) vp1 = [hp2[0], P.rect(hp2[0])];
+    else if (hp2[0] >= P.xb) vp1 = [hp2[0], P.strip(hp2[0])];
+    else vp1 = [hp2[0], 0];
+
+    if (MB === 8) {
+      ctx.save(); ctx.strokeStyle = '#000'; ctx.lineWidth = 2.6;
+      const a = (P.nR > 0) ? G.Ry[0] : G.Sy[0], b = G.Rx[0];
+      [a, b].forEach(s => { if (s) line(v, s[0], s[1], s[2], s[3], '#000', 2.6); });
+      ctx.restore();
+    }
+    if (MB === 9) {
+      G.Ry.forEach(s => line(v, s[0], s[1], s[2], s[3], '#000', 2.6));
+      G.Sy.forEach(s => line(v, s[0], s[1], s[2], s[3], '#000', 2.6));
+      G.Rx.forEach(s => line(v, s[0], s[1], s[2], s[3], '#000', 2.6));
+      for (let a = 0; a < P.nS; a++) line(v, G.Sx[a][0], G.Sx[a][1], G.Sx[a][2], G.Sx[a][3], '#000', 2.6);
+    }
+    if (sol) {
+      if (MB === 7) {
+        const a = (P.nR > 0) ? G.Ry[0] : G.Sy[0];
+        if (a) line(v, a[0], a[1], a[2], a[3], 'rgba(0,0,255,0.5)', 7);
+        if (G.Rx[0]) line(v, G.Rx[0][0], G.Rx[0][1], G.Rx[0][2], G.Rx[0][3], 'rgba(0,0,255,0.5)', 7);
+      }
+      if (MB === 8) {
+        let segs = [];
+        if (P.nR === 0 && P.nS > 1) segs = [G.Sy[1], G.Sx[1]];
+        else if (P.nR === 0 && P.nS === 1) segs = [G.Sr, G.Sx[1]];
+        else if (P.nR === 1 && P.nS > 0) segs = [G.Sy[0], G.Sx[0]];
+        else if (P.nR === 1 && P.nS === 1) segs = [G.Sr, G.Rx[1]];
+        else if (P.nR > 1) segs = [G.Ry[1], G.Rx[1]];
+        segs.forEach(s => { if (s) line(v, s[0], s[1], s[2], s[3], 'rgba(0,0,255,0.5)', 7); });
+      }
+      if (MB === 9) {
+        line(v, G.Sr[0], G.Sr[1], G.Sr[2], G.Sr[3], 'rgba(0,0,255,0.5)', 7);
+        const s = G.Sx[P.nS];
+        if (s) line(v, s[0], s[1], s[2], s[3], 'rgba(0,0,255,0.5)', 7);
+      }
+    }
+    line(v, hp1[0], hp1[1], hp2[0], hp2[1], ORANGE, 3.2, [9, 6]);
+    line(v, vp1[0], vp1[1], hp2[0], hp2[1], ORANGE, 3.2, [9, 6]);
+    dot1(v, [gx, gy], BLUE);
+    drawStageBadge(v, hp2, (MB === 7 || MB === 8) ? String(MB - 6) : 'R');
+    if (MB === 8 || MB === 9) drawStageBadge(v, DN[0].pos, DN[0].label);
+    if (MB === 9) for (let a = 1; a <= P.nT - 2; a++) drawStageBadge(v, DN[a].pos, DN[a].label);
+  }
+
+  /* ---------- step 10 : complete staircase ---------- */
+  if (MB === 10) {
+    const gray = 'rgb(102,102,102)';
+    G.Ry.forEach(s => line(v, s[0], s[1], s[2], s[3], gray, 2.6));
+    G.Sy.forEach(s => line(v, s[0], s[1], s[2], s[3], gray, 2.6));
+    G.Rx.forEach(s => line(v, s[0], s[1], s[2], s[3], gray, 2.6));
+    G.Sx.forEach(s => line(v, s[0], s[1], s[2], s[3], gray, 2.6));
+    line(v, G.Sr[0], G.Sr[1], G.Sr[2], G.Sr[3], gray, 2.6);
+    DN.forEach(d => drawStageBadge(v, d.pos, d.label));
+  }
+
+  ctx.restore();   /* clip */
+}
+
+/* =====================================================================
+   Step 10 column with stages
+   ===================================================================== */
+function drawStageColumn(v) {
+  drawColumn(v, 100, S.arrowHeight);
+  const nT = P.nT;
+  if (S.solution) {
+    ctx.save(); ctx.fillStyle = 'rgba(255,255,0,0.5)';
+    const y0 = 20 + (70 / nT) * P.nS, y1 = 20 + (70 / nT) * (P.nS + 1);
+    ctx.fillRect(v.X(28), v.Y(y1), v.X(65) - v.X(28), v.Y(y0) - v.Y(y1));
+    ctx.restore();
+  }
+  for (let i = 1; i <= nT - 1; i++) {
+    const y = 20 + (70 / nT) * i;
+    line(v, 28, y, 65, y, '#000', 2.2);
+    drawRich(ctx, 'stage ' + (nT - i), v.X(47), v.Y(y + 2) + 5, 15, 'c', '#000');
+  }
+  drawRich(ctx, 'feed stream', v.X(13), v.Y(S.arrowHeight + 5) + 5, LBL, 'c', '#000');
+}
+
+/* =====================================================================
+   Main render
+   ===================================================================== */
+function render() {
+  ctx.clearRect(0, 0, CW, CH);
+  ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, CW, CH);
+  hitZones = []; placedLabels = [];
+
+  const MB = S.MB;
+  if (MB <= 3) {
+    const v = columnView(0, 600, -50, 150, -20, 108);
+    drawColumnPane(v, true);
+  } else if (MB === 10) {
+    const vc = columnView(0, 310, -5, 101);
+    drawStageColumn(vc);
+    const vp = mccabeView(310, 290);
+    drawMcCabe(vp);
+  } else if (S.showcolumn && (MB === 5 || MB === 6)) {
+    const vp = mccabeView(0, 290);
+    drawMcCabe(vp);
+    const leftLimit = (MB === 6) ? 10 : -30;
+    const vc = columnView(290, 310, leftLimit, 101);
+    ctx.save(); ctx.beginPath(); ctx.rect(290, 0, 310, CH); ctx.clip();
+    drawColumnPane(vc, false);
+    ctx.restore();
+  } else {
+    const vp = mccabeView(0, 600);
+    drawMcCabe(vp);
+  }
+  registerHits();
+}
+
+/* =====================================================================
+   Dragging
+   ===================================================================== */
+let hitZones = [];
+function activeView() {
+  const MB = S.MB;
+  if (MB === 10) return mccabeView(310, 290);
+  if (S.showcolumn && (MB === 5 || MB === 6)) return mccabeView(0, 290);
+  return mccabeView(0, 600);
+}
+function registerHits() {
+  hitZones = [];
+  if (S.solution) return;
+  const v = activeView(), MB = S.MB;
+  const add = (key, p, mode) => hitZones.push({ key: key, p: p, X: v.X(p[0]), Y: v.Y(p[1]), mode: mode });
+  if (MB === 4) { add('ptdist', S.ptdist, 'diag'); add('ptbott', S.ptbott, 'diag'); add('ptfeed', S.ptfeed, 'diag'); }
+  if (MB === 5) { add('qdot1', S.qdot1, 'free'); add('qdot2', S.qdot2, 'free'); }
+  if (MB === 6) {
+    add('TOLdot1', S.TOLdot1, 'free'); add('TOLdot2', S.TOLdot2, 'free');
+    add('BOLdot1', S.BOLdot1, 'free'); add('BOLdot2', S.BOLdot2, 'free');
+  }
+  if (MB >= 7 && MB <= 9) add('stageGuess', S.stageGuess, 'eq');
+}
+let dragging = null;
+function localPt(ev) {
+  const r = cv.getBoundingClientRect();
+  return [ev.clientX - r.left, ev.clientY - r.top];
+}
+cv.addEventListener('pointerdown', ev => {
+  const [mx, my] = localPt(ev);
+  let best = null, bd = 20;
+  for (const h of hitZones) {
+    const d = Math.hypot(mx - h.X, my - h.Y);
+    if (d < bd) { bd = d; best = h; }
+  }
+  if (best) { dragging = best; cv.setPointerCapture(ev.pointerId); moveTo(mx, my); }
+});
+cv.addEventListener('pointermove', ev => {
+  if (!dragging) {
+    const [mx, my] = localPt(ev);
+    let over = false;
+    for (const h of hitZones) if (Math.hypot(mx - h.X, my - h.Y) < 14) over = true;
+    cv.style.cursor = over ? 'move' : 'default';
+    return;
+  }
+  const [mx, my] = localPt(ev);
+  moveTo(mx, my);
+});
+cv.addEventListener('pointerup', () => { dragging = null; });
+cv.addEventListener('pointercancel', () => { dragging = null; });
+
+function moveTo(mx, my) {
+  const v = activeView();
+  let x = Math.min(0.99, Math.max(0.01, v.invX(mx)));
+  let y = Math.min(0.99, Math.max(0.01, v.invY(my)));
+  if (dragging.mode === 'diag') { S[dragging.key] = [x, x]; }
+  else if (dragging.mode === 'eq') { S.stageGuess = [x, P.equilb(x)]; }
+  else { S[dragging.key] = [x, y]; }
+  render();
+}
+
+/* =====================================================================
+   Plot label / hint text
+   ===================================================================== */
+function ital(s) { return '<i>' + s + '</i>'; }
+const OV = s => '<span class="ovb">' + s + '</span>';
+function plotLabelHTML() {
+  const sol = S.solution, hint = S.hint;
+  switch (S.MB) {
+    case 1:
+      if (sol) return 'Equations: ' + ital('F') + ' = ' + ital('B') + ' + ' + ital('D') + ' and ' +
+        ital('F') + 'z<sub>feed</sub> = ' + ital('x') + '<sub>B</sub>' + ital('B') + ' + ' +
+        ital('x') + '<sub>D</sub>' + ital('D');
+      if (hint) return 'Do an overall balance and a component balance.';
+      return '';
+    case 2:
+      if (sol) return 'Equations: ' + ital('V') + ' = ' + ital('L') + ' + ' + ital('D') + ' and ' +
+        ital('L') + ' / ' + ital('D') + ' = reflux ratio.';
+      if (hint) return 'Do a mass balance around the condenser.';
+      return '';
+    case 3:
+      if (sol) return 'Equations: ' + ital('L') + ' + ' + OV(ital('V')) + ' = ' + OV(ital('L')) +
+        ' + ' + ital('V') + ' and ' + ital('q') + ' = (' + OV(ital('L')) + ' &minus; ' + ital('L') +
+        ')/' + ital('F') + '.';
+      if (hint) return 'Do a mass balance around the feed stage.';
+      return '';
+    case 4:
+      if (hint) return ital('x') + ' and ' + ital('y') + ' coordinates should equal their respective compositions.';
+      return '';
+    case 5:
+      if (S.showcolumn) return '';
+      if (sol) return ital('q') + '-line equation: ' + ital('y') + '<sub>F</sub> = (' + ital('q') +
+        ' / (' + ital('q') + ' &minus; 1))' + ital('x') + ' &minus; (' + ital('z') +
+        '<sub>feed</sub> / (' + ital('q') + ' &minus; 1))';
+      if (hint) return ital('q') + '-line slope: ' + ital('q') + ' / (' + ital('q') + ' &minus; 1)';
+      return '';
+    case 6:
+      if (S.showcolumn) return '';
+      if (sol) return ital('y') + '<sub>top</sub> = (' + ital('L') + ' / ' + ital('V') + ')' + ital('x') +
+        ' + (1 &minus; ' + ital('L') + ' / ' + ital('V') + ')' + ital('x') + '<sub>D</sub> and ' +
+        ital('y') + '<sub>bot</sub> = (' + OV(ital('L')) + ' / ' + OV(ital('V')) + ')' + ital('x') +
+        ' + (1 &minus; ' + OV(ital('L')) + ' / ' + OV(ital('V')) + ')' + ital('x') + '<sub>B</sub>.';
+      if (hint) return 'Slope of the top operating line = (' + ital('L') + ' / ' + ital('V') +
+        ') and bottom operating line = (' + OV(ital('L')) + ' / ' + OV(ital('V')) + ').';
+      return '';
+    case 7: return hint ? 'Start at the condenser.' : '';
+    case 8: return hint ? 'The second stair from the top.' : '';
+    case 9: return hint ? 'Continue the &ldquo;stair stepping&rdquo; method.' : '';
+    case 10: return hint ? 'Look where operating lines intersect.' : '';
+  }
+  return '';
+}
+function columnHintHTML() {
+  if (!S.showcolumn) return '';
+  if (S.MB === 5) {
+    if (S.solution) return ital('q') + '-line equation: ' + ital('y') + '<sub>F</sub> = (' + ital('q') +
+      ' / (' + ital('q') + ' &minus; 1))' + ital('x') + ' &minus; (' + ital('z') + '<sub>feed</sub> / (' +
+      ital('q') + ' &minus; 1))';
+    if (S.hint) return ital('q') + '-line slope: ' + ital('q') + ' / (' + ital('q') + ' &minus; 1)';
+  }
+  if (S.MB === 6) {
+    if (S.solution) return ital('y') + '<sub>top</sub> = (' + ital('L') + ' / ' + ital('V') + ')' +
+      ital('x') + ' + (1 &minus; ' + ital('L') + ' / ' + ital('V') + ')' + ital('x') + '<sub>D</sub>';
+    if (S.hint) return 'Slope of top operating line = (' + ital('L') + ' / ' + ital('V') + ')';
+  }
+  return '';
+}
+
+/* =====================================================================
+   UI
+   ===================================================================== */
+const STEPTEXT = {
+  1: '1. Solve for the missing green variables.',
+  2: '2. Solve for the missing green variables.',
+  3: '3. Solve for the missing green variables.',
+  4: '4. Place the points at their correct\nlocations on the y = x line.',
+  5: '5. Draw the q-line (feed line).',
+  6: '6. Move the points to draw the top\nand bottom operating lines.',
+  7: '7. Drag the point to locate the first stage.',
+  8: '8. Drag the point to locate the second stage.',
+  9: '9. Drag the point to locate the final stage.',
+  10: '10. Determine the feed stream location.'
+};
+
+const el = id => document.getElementById(id);
+const sliderRow = el('sliderrow');
+
+function buildSliders() {
+  sliderRow.innerHTML = '';
+  const MB = S.MB;
+  let slots = null;
+  if (MB === 1) slots = [0, 1];
+  else if (MB === 2) slots = [2, 3];
+  else if (MB === 3) slots = [4, 5];
+
+  if (slots) {
+    slots.forEach(s => {
+      const vi = P.ansVar[s];
+      const wrap = document.createElement('div');
+      wrap.className = 'sl' + (S.solution ? ' dis' : '');
+      const lab = document.createElement('span');
+      lab.className = 'lab';
+      lab.innerHTML = richToHTML(VARLBL[vi]);
+      const inp = document.createElement('input');
+      inp.type = 'range';
+      inp.min = P.rngMin[s]; inp.max = P.rngMax[s]; inp.step = 0.01;
+      inp.value = S.Ans[s];
+      inp.disabled = S.solution;
+      const val = document.createElement('span');
+      val.className = 'val'; val.textContent = f2(S.Ans[s]);
+      inp.addEventListener('input', () => {
+        S.Ans[s] = parseFloat(inp.value);
+        val.textContent = f2(S.Ans[s]);
+        render();
+      });
+      wrap.appendChild(lab); wrap.appendChild(inp); wrap.appendChild(val);
+      sliderRow.appendChild(wrap);
+    });
+  } else if (MB === 10) {
+    const wrap = document.createElement('div');
+    wrap.className = 'sl' + (S.solution ? ' dis' : '');
+    const lab = document.createElement('span');
+    lab.className = 'lab'; lab.textContent = 'feed height';
+    const inp = document.createElement('input');
+    inp.type = 'range'; inp.min = 20; inp.max = 90; inp.step = 1;
+    inp.value = S.arrowHeight; inp.disabled = S.solution;
+    const val = document.createElement('span');
+    val.className = 'val'; val.textContent = String(S.arrowHeight);
+    inp.addEventListener('input', () => {
+      S.arrowHeight = parseInt(inp.value, 10);
+      val.textContent = String(S.arrowHeight);
+      render();
+    });
+    wrap.appendChild(lab); wrap.appendChild(inp); wrap.appendChild(val);
+    sliderRow.appendChild(wrap);
+  }
+
+  const ch = document.createElement('span');
+  ch.id = 'columnhint';
+  ch.innerHTML = columnHintHTML();
+  sliderRow.appendChild(ch);
+}
+function richToHTML(s) {
+  const segs = parseRich(s);
+  let out = '';
+  for (const g of segs) {
+    let t = g.t;
+    if (g.over) t = '<span class="ovb">' + t + '</span>';
+    if (g.it) t = '<i>' + t + '</i>';
+    if (g.sub) t = '<sub>' + t + '</sub>';
+    out += t;
+  }
+  return out;
+}
+
+function syncUI() {
+  el('stepText').textContent = STEPTEXT[S.MB];
+  el('btnNext').style.display = (S.MB >= 1 && S.MB < 10) ? '' : 'none';
+
+  el('cbSol').checked = S.solution;
+  el('cbSol').disabled = S.solution;
+  el('lblSol').className = 'cbx' + (S.solution ? ' dis' : '');
+
+  el('cbHint').checked = S.hint;
+  el('lblHint').className = 'cbx' + (S.MB === 4 ? ' off' : '');
+
+  el('cbCol').checked = S.showcolumn;
+  el('lblCol').className = 'cbx' + ((S.MB === 5 || S.MB === 6) ? '' : ' off');
+
+  el('plotlabel').innerHTML = plotLabelHTML();
+  buildSliders();
+  render();
+}
+
+el('btnNew').addEventListener('click', () => {
+  P = newProblem(S.seed + 1);
+  S.seed = P.seed;
+  resetAll();
+  syncUI();
+});
+el('btnNext').addEventListener('click', () => {
+  if (S.MB >= 1 && S.MB < 10) {
+    S.MB++;
+    S.solution = false; S.hint = false; S.showcolumn = false;
+    if (S.MB === 7) S.stageGuess = [0.5, P.equilb(0.5)];
+    else S.stageGuess = [0.2, P.equilb(0.2)];
+    syncUI();
+  }
+});
+el('cbSol').addEventListener('change', e => { if (e.target.checked) { S.solution = true; } syncUI(); });
+el('cbHint').addEventListener('change', e => { S.hint = e.target.checked; syncUI(); });
+el('cbCol').addEventListener('change', e => { S.showcolumn = e.target.checked; syncUI(); });
+
+/* ---------- panels ---------- */
+const PANELS = { bDir: 'pDir', bDet: 'pDet', bAbt: 'pAbt' };
+let openPanel = null;
+function closePanels() {
+  Object.values(PANELS).forEach(p => el(p).classList.remove('show'));
+  Object.keys(PANELS).forEach(b => el(b).classList.remove('active'));
+  openPanel = null;
+}
+Object.keys(PANELS).forEach(bid => {
+  el(bid).addEventListener('click', () => {
+    const pid = PANELS[bid];
+    const wasOpen = (openPanel === pid);
+    closePanels();
+    if (!wasOpen) {
+      el(pid).classList.add('show');
+      el(bid).classList.add('active');
+      openPanel = pid;
+      if (pid === 'pDet' && window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise([el(pid)]);
+      }
+    }
+  });
+});
+document.querySelectorAll('.closex').forEach(b => {
+  b.addEventListener('click', () => closePanels());
+});
+
+syncUI();
+</script>
+</body>
+</html>

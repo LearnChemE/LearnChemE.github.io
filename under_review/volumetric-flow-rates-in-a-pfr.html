@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Volumetric Flow Rates in a Plug Flow Reactor</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] },
+  svg: { fontCache: 'global', displayAlign: 'left' }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.min.js"></script>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    font-family: Helvetica, Arial, sans-serif;
+    background: #ffffff;
+    color: #000000;
+  }
+  #app {
+    width: 640px;
+    margin: 10px auto;
+  }
+  #controls {
+    width: 620px;
+    margin: 0 auto 4px auto;
+    padding: 6px 8px 2px 8px;
+  }
+  .ctrl-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    flex-wrap: nowrap;
+  }
+  .ctrl-label {
+    font-size: 16.1px;
+    font-weight: normal;
+    margin-right: 8px;
+    white-space: nowrap;
+  }
+  .setter-group {
+    display: inline-flex;
+  }
+  .setter-group button {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    font-weight: normal;
+    padding: 3px 10px;
+    margin: 0;
+    background: #f6f6f6;
+    border: 1px solid #9a9a9a;
+    border-right: none;
+    cursor: pointer;
+    color: #000;
+  }
+  .setter-group button:first-child {
+    border-radius: 4px 0 0 4px;
+  }
+  .setter-group button:last-child {
+    border-radius: 0 4px 4px 0;
+    border-right: 1px solid #9a9a9a;
+  }
+  .setter-group button.selected {
+    background: #d7e6f9;
+    border-color: #5b87b8;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.15);
+  }
+  .spacer15 { width: 15px; display: inline-block; }
+
+  /* LearnChemE range slider */
+  input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+  input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  #Pslider {
+    width: 190px;
+    margin: 0 8px;
+    vertical-align: middle;
+  }
+
+  #Pvalue {
+    font-size: 16.1px;
+    display: inline-block;
+    width: 30px;
+  }
+  .trig-btn {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    width: 34px;
+    height: 26px;
+    padding: 0;
+    margin-left: 4px;
+    background: #f6f6f6;
+    border: 1px solid #9a9a9a;
+    border-radius: 4px;
+    cursor: pointer;
+    color: #000;
+  }
+  .trig-btn:active { background: #e2e2e2; }
+  #plotCanvas {
+    display: block;
+    margin: 0 auto;
+    width: 600px;
+    height: 320px;
+  }
+  #figWrap {
+    position: relative;
+    width: 640px;
+  }
+  #panelButtons {
+    display: flex;
+    justify-content: flex-end;
+    padding-right: 6px;
+    margin: 6px 0 8px 0;
+  }
+  #panelButtons button {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    font-weight: normal;
+    color: #ffffff;
+    background: #98000D;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 22px;
+    margin: 0 0 0 8px;
+    cursor: pointer;
+  }
+  #panelButtons button:hover { background: #7c000b; }
+  .panel {
+    display: none;
+    position: absolute;
+    width: 483px;
+    border: 1px solid #b0b0b0;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 15px;
+    line-height: 1.45;
+    background: #ffffff;
+    box-shadow: 2px 3px 8px rgba(0,0,0,0.25);
+    z-index: 10;
+    max-height: 430px;
+    overflow-y: auto;
+  }
+  #panelDetails { width: 567px; }
+  .panel h3 {
+    margin: 0 0 6px 0;
+    font-size: 17px;
+    font-weight: bold;
+    color: #000;
+  }
+  .panel a { color: #0645ad; }
+  .panel-close {
+    position: absolute;
+    top: 4px;
+    right: 10px;
+    font-size: 20px;
+    line-height: 20px;
+    color: #666;
+    cursor: pointer;
+    user-select: none;
+  }
+  .panel-close:hover { color: #98000D; }
+  #panelDetails mjx-container[jax="SVG"][display="true"] {
+    text-align: left !important;
+    margin-left: 0 !important;
+  }
+  .sym-list { margin: 0; padding: 0; list-style: none; }
+  .sym-list li { margin: 2px 0; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="controls">
+    <div class="ctrl-row">
+      <span class="ctrl-label">moles product/moles reactant</span>
+      <span class="setter-group" id="mGroup">
+        <button data-val="0.5">1/2</button>
+        <button data-val="1">1</button>
+        <button data-val="2" class="selected">2</button>
+      </span>
+      <span class="spacer15"></span>
+      <span class="ctrl-label" style="margin-left:12px;">reaction order</span>
+      <span class="setter-group" id="nGroup">
+        <button data-val="0.5">1/2</button>
+        <button data-val="1" class="selected">1</button>
+        <button data-val="2">2</button>
+      </span>
+    </div>
+    <div class="ctrl-row">
+      <span class="ctrl-label">pressure (bar)</span>
+      <input type="range" id="Pslider" min="15" max="30" step="1" value="20">
+      <span id="Pvalue">20</span>
+      <span class="ctrl-label" style="margin-left:26px;">run reaction</span>
+      <button class="trig-btn" id="playBtn" title="Play/Pause">&#9654;</button>
+      <button class="trig-btn" id="resetBtn" title="Reset">&#8635;</button>
+    </div>
+  </div>
+
+  <div id="figWrap">
+  <div id="panelButtons">
+    <button id="btnDirections">Directions</button>
+    <button id="btnDetails">Details</button>
+    <button id="btnAbout">About</button>
+  </div>
+
+  <canvas id="plotCanvas"></canvas>
+
+  <div class="panel" id="panelDirections">
+    <span class="panel-close" title="Close">&times;</span>
+    <h3>Directions</h3>
+    <p>This simulation shows how the reaction stoichiometry affects the
+    volumetric flow rate in an isothermal, constant-pressure, plug flow reactor
+    by following a control volume (initially 10&nbsp;mL of A) through the
+    reactor. In the gas phase reaction A&nbsp;&rarr;&nbsp;<i>m</i>&nbsp;B, the
+    reactant A is blue and the product B is green. Use the buttons to change
+    the reaction stoichiometry <i>m</i> and the reaction order. Use the slider to
+    change the reactor pressure. The rate constants are chosen so that the
+    initial rates are the same for all orders at 10-bar pressure. The inlet
+    velocity is fixed at 1.4&nbsp;cm/s, independent of pressure, so the feed
+    molar flow rates change when pressure changes. Click the "Play" button to
+    run the reaction and click the "Reset" button to start over. The volumetric
+    flow rate is shown below the reactor, and the change in the 10-mL inlet
+    volume is shown above the reactor.</p>
+  </div>
+
+  <div class="panel" id="panelDetails">
+    <span class="panel-close" title="Close">&times;</span>
+    <h3>Details</h3>
+    <p>The molar flow rate for species \(i = (\mathrm{A}, \mathrm{B})\) through
+    the reactor is related to the volumetric flow rate using the ideal gas
+    law:</p>
+    <p>\[ F_i = y_i \, \frac{P \, v}{R \, T}, \]</p>
+    <p>\[ F_\mathrm{T} = \frac{P \, v}{R \, T}, \]</p>
+    <p>where \(F_\mathrm{T}\) is the total molar flow rate, \(y_i\) is the
+    mole fraction, \(P\) is reactor pressure, and \(v\) is the volumetric flow
+    rate.</p>
+    <p>Mass balances are used to calculate the molar flow rates of A and B down
+    the reactor:</p>
+    <p>\[ \frac{dF_\mathrm{A}}{dz} = -A \, k \, C_\mathrm{A}^{\,n}, \]</p>
+    <p>\[ \frac{dF_\mathrm{B}}{dz} = m \, A \, k \, C_\mathrm{A}^{\,n}, \]</p>
+    <p>where \(n\) is the reaction order, \(m\) is the moles of B formed for
+    each mole of A reacted, \(z\) is distance down the reactor, \(A\) is the
+    cross-sectional area of the reactor, and \(C_i\) is concentration. The rate
+    constants are chosen so the rate at the reactor inlet is the same for each
+    reaction order at a pressure of 10&nbsp;bar.</p>
+    <p>The concentration of A is related to molar flow rates using the ideal
+    gas law:</p>
+    <p>\[ C_\mathrm{A} = \frac{F_\mathrm{A}}{F_\mathrm{A} + F_\mathrm{B}} \,
+    \frac{P}{R \, T} = y_\mathrm{A} \, \frac{P}{R \, T}. \]</p>
+    <p>The conversion of A is:</p>
+    <p>\[ X_\mathrm{A} = \frac{F_{\mathrm{A},0} - F_\mathrm{A}}
+    {F_{\mathrm{A},0}}, \]</p>
+    <p>where \(F_{\mathrm{A},0}\) is the inlet molar flow rate of A.</p>
+    <p>The change in the control volume is the control volume at any location
+    minus the initial control volume (\(V_0 = 10\) mL):</p>
+    <p>\[ \Delta V = V - V_0. \]</p>
+    <p><b>Symbols</b></p>
+    <ul class="sym-list">
+      <li>\(A\) = reactor cross-sectional area (cm<sup>2</sup>)</li>
+      <li>\(C_i\) = concentration of species \(i\) (mol/cm<sup>3</sup>)</li>
+      <li>\(F_i\) = molar flow rate of species \(i\) (mol/s)</li>
+      <li>\(F_{\mathrm{A},0}\) = inlet molar flow rate of A (mol/s)</li>
+      <li>\(F_\mathrm{T}\) = total molar flow rate (mol/s)</li>
+      <li>\(k\) = rate constant (units depend on reaction order)</li>
+      <li>\(m\) = moles of B formed per mole of A reacted</li>
+      <li>\(n\) = reaction order</li>
+      <li>\(P\) = reactor pressure (bar)</li>
+      <li>\(R\) = ideal gas constant (83.14 cm<sup>3</sup>&nbsp;bar/(mol&nbsp;K))</li>
+      <li>\(T\) = temperature (650 K)</li>
+      <li>\(v\) = volumetric flow rate (mL/s)</li>
+      <li>\(V\) = control volume (mL)</li>
+      <li>\(V_0\) = initial control volume (10 mL)</li>
+      <li>\(\Delta V\) = change in control volume (mL)</li>
+      <li>\(X_\mathrm{A}\) = conversion of A</li>
+      <li>\(y_i\) = mole fraction of species \(i\)</li>
+      <li>\(z\) = distance down the reactor (cm)</li>
+    </ul>
+  </div>
+
+  <div class="panel" id="panelAbout">
+    <span class="panel-close" title="Close">&times;</span>
+    <h3>About</h3>
+    <p>This simulation was created in the
+    <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department
+    of Chemical and Biological Engineering</a> at University of Colorado
+    Boulder for <a href="http://www.learncheme.com" target="_blank"
+    rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It
+    is a JavaScript/HTML5 implementation of a
+    <a href="https://demonstrations.wolfram.com/VolumetricFlowRatesInAPlugFlowReactor/"
+    target="_blank" rel="noopener">Mathematica simulation</a> by Rachael L.
+    Baumann and Adam J. Johnson. It was prepared with financial support from
+    the National Science Foundation (DUE 2336987 and 2336988). Address any
+    questions or comments to
+    LearnChemE@gmail.com.</p>
+  </div>
+  </div><!-- /figWrap -->
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  // ---------- physical constants (from the Mathematica CDF) ----------
+  var rTube = 1.5;                      // reactor radius, cm
+  var A = Math.PI * rTube * rTube;      // cross-sectional area, cm^2
+  var T = 650;                          // temperature, K
+  var R = 83.14;                        // gas constant, cm^3 bar / (mol K)
+  var vin = 10;                         // inlet volumetric flow rate, mL/s
+  var L = 15.94;                        // reactor length, cm
+  var h = 8;                            // reactor height in plot units
+
+  function kOf(n){
+    if (n === 1)   return 0.1471;
+    if (n === 2)   return 794.8;
+    return 0.002001;                    // n = 1/2
+  }
+
+  // ---------- state ----------
+  var m = 2;          // moles product / moles reactant
+  var n = 1;          // reaction order
+  var P = 20;         // pressure, bar
+  var z = 0;          // trigger position, cm
+  var playing = false;
+
+  // ---------- ODE solution (RK4, tabulated, interpolated) ----------
+  var NSTEP = 2000;
+  var sol = null;     // {fA0, FA:[], FB:[]}
+
+  function solveODE(){
+    var k = kOf(n);
+    var fA0 = P / (R * T) * vin;
+    var dx = L / NSTEP;
+    var FA = fA0, FB = 0;
+    var FAarr = new Float64Array(NSTEP + 1);
+    var FBarr = new Float64Array(NSTEP + 1);
+    FAarr[0] = FA; FBarr[0] = FB;
+    function deriv(fa, fb){
+      var CA = (P / (R * T)) * (fa / (fa + fb));
+      if (CA < 0) CA = 0;
+      var rate = A * k * Math.pow(CA, n);
+      return [-rate, m * rate];
+    }
+    for (var i = 0; i < NSTEP; i++){
+      var d1 = deriv(FA, FB);
+      var d2 = deriv(FA + dx/2*d1[0], FB + dx/2*d1[1]);
+      var d3 = deriv(FA + dx/2*d2[0], FB + dx/2*d2[1]);
+      var d4 = deriv(FA + dx*d3[0],  FB + dx*d3[1]);
+      FA += dx/6*(d1[0] + 2*d2[0] + 2*d3[0] + d4[0]);
+      FB += dx/6*(d1[1] + 2*d2[1] + 2*d3[1] + d4[1]);
+      if (FA < 0) FA = 0;
+      FAarr[i+1] = FA; FBarr[i+1] = FB;
+    }
+    sol = { fA0: fA0, FA: FAarr, FB: FBarr };
+  }
+
+  function interp(arr, x){
+    var t = x / L * NSTEP;
+    if (t <= 0) return arr[0];
+    if (t >= NSTEP) return arr[NSTEP];
+    var i = Math.floor(t), f = t - i;
+    return arr[i] * (1 - f) + arr[i+1] * f;
+  }
+  function fAat(x){ return interp(sol.FA, x); }
+  function fBat(x){ return interp(sol.FB, x); }
+  function fTat(x){ return fAat(x) + fBat(x); }
+  function vAt(x){ return fTat(x) * R * T / P; }          // mL/s
+  function xaAt(x){ return (sol.fA0 - fAat(x)) / sol.fA0; }
+
+  // ---------- canvas setup ----------
+  var canvas = document.getElementById('plotCanvas');
+  var ctx = canvas.getContext('2d');
+  var W = 600, H = 320;
+  var dpr = window.devicePixelRatio || 1;
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  // plot range: x in [-0.3, 19.4], y in [-4, 17]
+  // (top trimmed from 19 to 17 and canvas height reduced so the vertical
+  //  scale is unchanged; removes blank space above the reactor)
+  var XMIN = -0.3, XMAX = 19.4, YMIN = -4, YMAX = 17;
+  function px(x){ return (x - XMIN) / (XMAX - XMIN) * W; }
+  function py(y){ return H - (y - YMIN) / (YMAX - YMIN) * H; }
+
+  // seeded RNG so points don't twinkle when paused, but refresh as z moves
+  function mulberry32(seed){
+    return function(){
+      seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+      var t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  // ---------- canvas text helpers (subscript / superscript, mixed color) ----------
+  function drawRich(segs, x, y, fontSize, align){
+    var total = 0;
+    segs.forEach(function(s){
+      var fs = (s.sub || s.sup) ? fontSize * 0.68 : fontSize;
+      ctx.font = (s.italic ? 'italic ' : '') + fs + 'px Helvetica, Arial, sans-serif';
+      s._w = ctx.measureText(s.t).width;
+      total += s._w;
+    });
+    var cx;
+    if (align === 'left') cx = x;
+    else if (align === 'right') cx = x - total;
+    else if (typeof align === 'number'){
+      cx = x - align * total;
+    } else cx = x - total / 2;
+    segs.forEach(function(s){
+      var fs = (s.sub || s.sup) ? fontSize * 0.68 : fontSize;
+      var dy = s.sub ? fontSize * 0.22 : (s.sup ? -fontSize * 0.38 : 0);
+      ctx.font = (s.italic ? 'italic ' : '') + fs + 'px Helvetica, Arial, sans-serif';
+      ctx.fillStyle = s.color || '#000';
+      ctx.fillText(s.t, cx, y + dy);
+      cx += s._w;
+    });
+    return total;
+  }
+
+  function fmt1(x){ return x.toFixed(1); }
+
+  // ---------- drawing ----------
+  function draw(){
+    ctx.clearRect(0, 0, W, H);
+    ctx.textBaseline = 'middle';
+
+    var vz  = vAt(z);
+    var xa  = xaAt(z);
+    var fT  = fTat(z);
+    var vel = vz / A;
+    var cvLeft  = z;
+    var cvRight = z + vz / A;
+
+    // reactor rectangle
+    var rx0 = px(vin / A), rx1 = px(L), ry0 = py(h), ry1 = py(0);
+    ctx.fillStyle = 'rgb(230,230,230)';
+    ctx.fillRect(rx0, ry0, rx1 - rx0, ry1 - ry0);
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(rx0, ry0, rx1 - rx0, ry1 - ry0);
+
+    // random points for A (blue) and B (green) inside the control volume
+    var nA = Math.round(50000 * fT * (1 - xa));
+    var nB = Math.round(50000 * fT * xa);
+    var rng = mulberry32(Math.floor(z * 977) + 1);
+    var rad = 0.007 * W / 2;
+    ctx.fillStyle = 'rgb(0,0,255)';
+    for (var i = 0; i < nA; i++){
+      var xx = cvLeft + rng() * (cvRight - cvLeft);
+      var yy = rng() * h;
+      ctx.beginPath();
+      ctx.arc(px(xx), py(yy), rad, 0, 2 * Math.PI);
+      ctx.fill();
+    }
+    ctx.fillStyle = 'rgb(0,153,0)';
+    for (var j = 0; j < nB; j++){
+      var xb = cvLeft + rng() * (cvRight - cvLeft);
+      var yb = rng() * h;
+      ctx.beginPath();
+      ctx.arc(px(xb), py(yb), rad, 0, 2 * Math.PI);
+      ctx.fill();
+    }
+
+    // bracket above reactor showing the volume change
+    var by = h + 1.25;
+    var bx0 = z + vin / A, bx1 = cvRight;
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(px(bx0), py(by)); ctx.lineTo(px(bx1), py(by));
+    ctx.moveTo(px(bx0), py(by + 0.5)); ctx.lineTo(px(bx0), py(by - 0.5));
+    ctx.moveTo(px(bx1), py(by - 0.5)); ctx.lineTo(px(bx1), py(by + 0.5));
+    ctx.stroke();
+
+    // arrow below reactor
+    var ay = py(-1.5);
+    var ax0 = px(z), ax1 = px(z + vel);
+    var headLen = 0.025 * W;
+    ctx.strokeStyle = '#000';
+    ctx.fillStyle = '#000';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(ax0, ay);
+    ctx.lineTo(ax1 - headLen * 0.6, ay);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(ax1, ay);
+    ctx.lineTo(ax1 - headLen, ay - headLen * 0.36);
+    ctx.lineTo(ax1 - headLen, ay + headLen * 0.36);
+    ctx.closePath();
+    ctx.fill();
+
+    var offFrac = (z / 18);
+
+    // "flow rate = xx.x mL/s" below the arrow
+    drawRich([{t: 'flow rate = ' + fmt1(vz) + ' mL/s'}],
+             px(z), py(-1.5) + 26, 18, offFrac);
+
+    // "ΔV = xx.x mL" above the bracket, raised so it clears the end ticks
+    var dV = vz - vin;
+    var dVstr;
+    if (m === 1) dVstr = '0';
+    else {
+      if (Math.abs(dV) < 1e-4) dV = 0;
+      dVstr = fmt1(dV);
+    }
+    var dVy = py(by + 0.5) - 18;      // 18 px above the top of the bracket ticks
+    drawRich([{t: '\u0394'}, {t: 'V', italic: true}, {t: ' = ' + dVstr + ' mL'}],
+             px(z + vin / A), dVy, 20, offFrac);
+
+    // stoichiometry / reaction-rate block, top-left
+    var Bstr = (m === 1) ? 'B' : (m === 2 ? '2 B' : '1/2 B');
+    drawRich([{t: 'stoichiometry: '},
+              {t: 'A', color: 'rgb(0,0,255)'},
+              {t: ' \u2192 '},
+              {t: Bstr, color: 'rgb(0,153,0)'}],
+             px(1), py(15.3), 20, 'left');
+    var kSub = (n === 0.5) ? '1/2' : String(n);
+    var rateSegs = [{t: 'reaction rate = '},
+                    {t: 'k', italic: true},
+                    {t: kSub, sub: true},
+                    {t: ' [A]', color: 'rgb(0,0,255)'}];
+    if (n === 0.5) rateSegs.push({t: '1/2', sup: true, color: 'rgb(0,0,255)'});
+    else if (n === 2) rateSegs.push({t: '2', sup: true, color: 'rgb(0,0,255)'});
+    drawRich(rateSegs, px(1), py(13.1), 20, 'left');
+
+    // control volume / conversion block, top-right
+    drawRich([{t: 'control volume = ' + fmt1(vz) + ' mL'}],
+             px(15), py(15.3), 20, 'center');
+    var convStr = (z === 0) ? '0' : fmt1(100 * xa);
+    drawRich([{t: 'conversion = ' + convStr + ' %'}],
+             px(15), py(13.1), 20, 'center');
+  }
+
+  // ---------- animation ----------
+  var lastT = null;
+  function frame(t){
+    if (!playing){ lastT = null; return; }
+    if (lastT === null) lastT = t;
+    var dt = Math.min((t - lastT) / 1000, 0.05);
+    lastT = t;
+    z += (vAt(z) / A) * dt;
+    if (z >= L){
+      z = L;
+      playing = false;
+      playBtn.innerHTML = '&#9654;';
+    }
+    draw();
+    if (playing) requestAnimationFrame(frame);
+  }
+
+  // ---------- controls ----------
+  function wireSetter(groupId, setter){
+    var group = document.getElementById(groupId);
+    var btns = group.querySelectorAll('button');
+    btns.forEach(function(b){
+      b.addEventListener('click', function(){
+        btns.forEach(function(x){ x.classList.remove('selected'); });
+        b.classList.add('selected');
+        setter(parseFloat(b.getAttribute('data-val')));
+        solveODE();
+        draw();
+      });
+    });
+  }
+  wireSetter('mGroup', function(v){ m = v; });
+  wireSetter('nGroup', function(v){ n = v; });
+
+  var slider = document.getElementById('Pslider');
+  var Pval = document.getElementById('Pvalue');
+  slider.addEventListener('input', function(){
+    P = parseFloat(slider.value);
+    Pval.textContent = slider.value;
+    solveODE();
+    draw();
+  });
+
+  var playBtn = document.getElementById('playBtn');
+  playBtn.addEventListener('click', function(){
+    if (playing){
+      playing = false;
+      playBtn.innerHTML = '&#9654;';
+    } else {
+      if (z >= L) z = 0;
+      playing = true;
+      playBtn.innerHTML = '&#10074;&#10074;';
+      lastT = null;
+      requestAnimationFrame(frame);
+    }
+  });
+
+  document.getElementById('resetBtn').addEventListener('click', function(){
+    playing = false;
+    playBtn.innerHTML = '&#9654;';
+    z = 0;
+    draw();
+  });
+
+  // ---------- panels (flyouts anchored to their buttons) ----------
+  var typeset = { panelDetails: false };
+  function wirePanel(btnId, panelId){
+    var btn = document.getElementById(btnId);
+    var panel = document.getElementById(panelId);
+    btn.addEventListener('click', function(){
+      var open = panel.style.display === 'block';
+      document.querySelectorAll('.panel').forEach(function(p){
+        p.style.display = 'none';
+      });
+      if (!open){
+        panel.style.display = 'block';
+        var top = btn.offsetTop + btn.offsetHeight + 4;
+        var left = btn.offsetLeft - panel.offsetWidth - 4;
+        if (left < 0) left = 0;
+        panel.style.top = top + 'px';
+        panel.style.left = left + 'px';
+        if (panelId === 'panelDetails' && !typeset.panelDetails &&
+            window.MathJax && MathJax.typesetPromise){
+          MathJax.typesetPromise([panel]).then(function(){
+            typeset.panelDetails = true;
+          });
+        }
+      }
+    });
+  }
+  wirePanel('btnDirections', 'panelDirections');
+  wirePanel('btnDetails', 'panelDetails');
+  wirePanel('btnAbout', 'panelAbout');
+  document.querySelectorAll('.panel-close').forEach(function(x){
+    x.addEventListener('click', function(){
+      x.parentElement.style.display = 'none';
+    });
+  });
+
+  // ---------- init ----------
+  solveODE();
+  draw();
+})();
+</script>
+</body>
+</html>

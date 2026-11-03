@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Determine if a Truss Can Be Solved</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(', '\\)']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-chtml.min.js"></script>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #ffffff;
+    font-family: Helvetica, Arial, sans-serif;
+  }
+  #app {
+    width: 700px;
+    margin: 0 auto;
+    padding: 10px 0 70px 0;
+    position: relative;
+  }
+  h1.simTitle {
+    font-size: 22px;
+    font-weight: bold;
+    text-align: center;
+    margin: 6px 0 10px 0;
+  }
+  #controls {
+    width: 680px;
+    margin: 0 auto 4px auto;
+    padding: 6px 8px;
+  }
+  .ctrlRow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+  .cbLabel {
+    font-size: 17.3px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .cbLabel input { cursor: pointer; }
+  .cbGap { width: 15px; display: inline-block; }
+  .setterGroup {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-right: 10px;
+  }
+  .setterLabel { font-size: 17.3px; }
+  .setterBtns { display: inline-flex; }
+  .setterBtns button {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 16.1px;
+    padding: 3px 10px;
+    border: 1px solid #979797;
+    background: #fdfdfd;
+    cursor: pointer;
+    color: #000;
+  }
+  .setterBtns button:first-child {
+    border-radius: 4px 0 0 4px;
+    border-right: none;
+  }
+  .setterBtns button:last-child { border-radius: 0 4px 4px 0; }
+  .setterBtns button.selected {
+    background: #d5d5d5;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.35);
+  }
+  #simCanvas {
+    display: block;
+    margin: 0 auto;
+    background: #ffffff;
+  }
+  /* bottom buttons + panels */
+  #panelArea {
+    position: relative;
+    width: 680px;
+    margin: 14px auto 0 auto;
+  }
+  #btnRow {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+  }
+  #btnRow button.panelBtn {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    background: #98000D;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 18px;
+    cursor: pointer;
+  }
+  #btnRow button.panelBtn:hover { background: #7c000b; }
+  .panel {
+    display: none;
+    position: absolute;
+    bottom: 46px;              /* opens above the buttons */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 640px;
+    max-height: 420px;
+    overflow-y: auto;
+    background: #ffffff;
+    border: 2px solid #98000D;
+    border-radius: 6px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.30);
+    padding: 14px 34px 14px 16px;
+    font-size: 15px;
+    line-height: 1.45;
+    z-index: 20;
+    text-align: left;
+  }
+  .panel.open { display: block; }
+  .panel .closeX {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #98000D;
+    background: none;
+    border: none;
+    cursor: pointer;
+    line-height: 1;
+    padding: 2px 6px;
+  }
+  .panel .closeX:hover { color: #000; }
+  .panel a { color: #0645ad; }
+  .panel .panelTitle {
+    font-size: 15px;
+    font-weight: bold;
+    margin: 0 0 8px 0;
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <h1 class="simTitle">Determine if a Truss Can Be Solved</h1>
+
+  <div id="controls">
+    <div class="ctrlRow">
+      <label class="cbLabel"><input type="checkbox" id="cbSupportB" checked> support at joint B</label>
+      <span class="cbGap"></span>
+      <label class="cbLabel"><input type="checkbox" id="cbLabels"> joint labels</label>
+    </div>
+    <div class="ctrlRow" id="settersTrue">
+      <span class="setterGroup">
+        <span class="setterLabel">joint A</span>
+        <span class="setterBtns" data-var="SA">
+          <button data-val="1" class="selected">&nbsp;roller&nbsp;</button><button data-val="2">&nbsp;pinned&nbsp;</button>
+        </span>
+      </span>
+      <span class="setterGroup">
+        <span class="setterLabel">joint B</span>
+        <span class="setterBtns" data-var="SB">
+          <button data-val="1" class="selected">&nbsp;roller&nbsp;</button><button data-val="2">&nbsp;pinned&nbsp;</button>
+        </span>
+      </span>
+      <span class="setterGroup">
+        <span class="setterLabel">joint F</span>
+        <span class="setterBtns" data-var="SF">
+          <button data-val="1" class="selected">&nbsp;roller&nbsp;</button><button data-val="2">&nbsp;pinned&nbsp;</button>
+        </span>
+      </span>
+    </div>
+    <div class="ctrlRow" id="settersFalse" style="display:none;">
+      <span class="setterGroup">
+        <span class="setterLabel">joint A</span>
+        <span class="setterBtns" data-var="SA">
+          <button data-val="1" class="selected">&nbsp;roller&nbsp;</button><button data-val="2">&nbsp;pinned&nbsp;</button>
+        </span>
+      </span>
+      <span class="setterGroup">
+        <span class="setterLabel">joint E</span>
+        <span class="setterBtns" data-var="SF">
+          <button data-val="1" class="selected">&nbsp;roller&nbsp;</button><button data-val="2">&nbsp;pinned&nbsp;</button>
+        </span>
+      </span>
+    </div>
+  </div>
+
+  <canvas id="simCanvas"></canvas>
+
+  <div id="panelArea">
+    <div id="btnRow">
+      <button class="panelBtn" data-panel="panelDirections">Directions</button>
+      <button class="panelBtn" data-panel="panelDetails">Details</button>
+      <button class="panelBtn" data-panel="panelAbout">About</button>
+    </div>
+
+    <div class="panel" id="panelDirections">
+      <button class="closeX" aria-label="close">&#10005;</button>
+      <div class="panelTitle">Directions</div>
+      <p>This Demonstration determines whether a truss can be solved or if it is
+      statically indeterminate by calculating the number of equations and the
+      number of unknowns. Use buttons to make joints either rollers (one
+      reaction force) or pinned (two reaction forces). Eliminate joint B by
+      unchecking &ldquo;support at joint B&rdquo;. The number of members,
+      joints and reaction forces is shown above the truss. Check &ldquo;joint
+      labels&rdquo; to show labels for each joint. The point load forces are
+      green (known forces) and the reaction forces (unknown forces) are
+      blue.</p>
+    </div>
+
+    <div class="panel" id="panelDetails">
+      <button class="closeX" aria-label="close">&#10005;</button>
+      <div class="panelTitle">Details</div>
+      <p>To determine if the truss can be solved or not, a degree of freedom
+      analysis is done:</p>
+      <p style="text-align:left;">\(\mathrm{DOF} = 2\,j - u\),</p>
+      <p>where \(\mathrm{DOF}\) is degrees of freedom, \(j\) is the number of
+      joints, and \(u\) is the number of unknowns; and \(u = m + r\), where
+      \(m\) is the number of members, and \(r\) is the number of unknown
+      reaction forces.</p>
+    </div>
+
+    <div class="panel" id="panelAbout">
+      <button class="closeX" aria-label="close">&#10005;</button>
+      <div class="panelTitle">About</div>
+      <p>This simulation was created in the
+      <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department
+      of Chemical and Biological Engineering</a> at University of Colorado
+      Boulder for <a href="http://www.learncheme.com" target="_blank"
+      rel="noopener">LearnChemE.com</a> by John&nbsp;L.&nbsp;Falconer using
+      Claude&nbsp;AI. It is a JavaScript/HTML5 implementation of a
+      <a href="https://demonstrations.wolfram.com/DetermineIfATrussCanBeSolved/"
+      target="_blank" rel="noopener">Mathematica simulation</a> by
+      Rachael&nbsp;L.&nbsp;Baumann. It was prepared with financial support from
+      the National Science Foundation (DUE&nbsp;2336987 and 2336988). Address
+      any questions or comments to
+      <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ---------- state ----------
+  var state = {
+    ADTR: true,    // support at joint B
+    labels: false, // joint labels
+    SA: 1,         // 1 = roller, 2 = pinned
+    SB: 1,
+    SF: 1
+  };
+
+  // ---------- canvas setup ----------
+  var canvas = document.getElementById('simCanvas');
+  var ctx = canvas.getContext('2d');
+
+  var W = 680;                       // CSS pixels
+  var xmin = -3.5, xmax = 19;
+  var ymin = -2.95, ymax = 10.55;
+  var s = W / (xmax - xmin);         // px per world unit
+  var H = Math.round((ymax - ymin) * s);
+
+  var dpr = window.devicePixelRatio || 1;
+  canvas.width = Math.round(W * dpr);
+  canvas.height = Math.round(H * dpr);
+  canvas.style.width = W + 'px';
+  canvas.style.height = H + 'px';
+
+  function X(wx) { return (wx - xmin) * s; }
+  function Y(wy) { return (ymax - wy) * s; }
+
+  var FS = 19.6;   // main label font size (17 increased 15%)
+  var FONT = function (px, italic) {
+    return (italic ? 'italic ' : '') + px + 'px Helvetica, Arial, sans-serif';
+  };
+
+  // ---------- drawing helpers ----------
+  function line(x1, y1, x2, y2, color, lw) {
+    ctx.strokeStyle = color; ctx.lineWidth = lw;
+    ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+  }
+
+  function polyline(pts, color, lw, close) {
+    ctx.strokeStyle = color; ctx.lineWidth = lw;
+    ctx.beginPath();
+    ctx.moveTo(pts[0][0], pts[0][1]);
+    for (var i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
+    if (close) ctx.closePath();
+    ctx.stroke();
+  }
+
+  function arrow(x1, y1, x2, y2, color) {
+    // shaft
+    ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 1.7;
+    var ang = Math.atan2(y2 - y1, x2 - x1);
+    var hl = 11, hw = 4.5;
+    var bx = x2 - hl * Math.cos(ang), by = y2 - hl * Math.sin(ang);
+    ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(bx, by); ctx.stroke();
+    // head
+    ctx.beginPath();
+    ctx.moveTo(x2, y2);
+    ctx.lineTo(x2 - hl * Math.cos(ang) - hw * Math.sin(ang),
+               y2 - hl * Math.sin(ang) + hw * Math.cos(ang));
+    ctx.lineTo(x2 - hl * Math.cos(ang) + hw * Math.sin(ang),
+               y2 - hl * Math.sin(ang) - hw * Math.cos(ang));
+    ctx.closePath(); ctx.fill();
+  }
+
+  // parts: [{t:'R', i:true, sub:false}, {t:'A, ', i:false, sub:true}, ...]
+  function measureStyled(parts, size) {
+    var w = 0;
+    parts.forEach(function (p) {
+      var f = p.sub ? Math.round(size * 0.72) : size;
+      ctx.font = FONT(f, p.i);
+      w += ctx.measureText(p.t).width;
+    });
+    return w;
+  }
+
+  // ax: -1 left-align at x, 0 center, 1 right-align. ay: -1 top at y, 0 middle, 1 bottom(baseline block centered)
+  function drawStyled(parts, x, y, ax, ay, color, size) {
+    size = size || FS;
+    var w = measureStyled(parts, size);
+    var sx = (ax === -1) ? x : (ax === 0 ? x - w / 2 : x - w);
+    var cy = (ay === -1) ? y + size * 0.62 : (ay === 0 ? y + size * 0.36 : y);
+    ctx.fillStyle = color || '#000';
+    parts.forEach(function (p) {
+      var f = p.sub ? Math.round(size * 0.72) : size;
+      ctx.font = FONT(f, p.i);
+      var dy = p.sub ? size * 0.22 : 0;
+      ctx.fillText(p.t, sx, cy + dy);
+      sx += ctx.measureText(p.t).width;
+    });
+    return w;
+  }
+
+  function plainParts(txt) { return [{ t: txt, i: false, sub: false }]; }
+
+  // ---------- support glyphs ----------
+  // drawn in px around joint (jx, jy); rot in radians (screen rotation)
+  function drawRoller(jx, jy, rot) {
+    var u = 25 / 2.76; // px per glyph unit (ImageSize -> width 25)
+    ctx.save();
+    ctx.translate(jx, jy);
+    if (rot) ctx.rotate(rot);
+    ctx.lineWidth = 1;
+    ctx.fillStyle = '#808080';
+    ctx.strokeStyle = '#000';
+    // small disk r=1 at (0,0)
+    ctx.beginPath(); ctx.arc(0, 0, 1 * u, 0, 2 * Math.PI); ctx.fill(); ctx.stroke();
+    // large disk r=1.5 at (0, +1.5) in screen (y down)
+    ctx.beginPath(); ctx.arc(0, 1.5 * u, 1.5 * u, 0, 2 * Math.PI); ctx.fill(); ctx.stroke();
+    // trapezoid (screen y = -world y)
+    ctx.beginPath();
+    ctx.moveTo(-0.975 * u, -0.175 * u);
+    ctx.lineTo(-1.38 * u, 0.93 * u);
+    ctx.lineTo(1.38 * u, 0.93 * u);
+    ctx.lineTo(0.975 * u, -0.175 * u);
+    ctx.closePath(); ctx.fill();
+    // side lines
+    ctx.beginPath(); ctx.moveTo(-0.975 * u, -0.175 * u); ctx.lineTo(-1.38 * u, 0.93 * u); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0.975 * u, -0.175 * u); ctx.lineTo(1.38 * u, 0.93 * u); ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawPin(jx, jy, rot) {
+    var u = 25 / 2.2;
+    ctx.save();
+    ctx.translate(jx, jy);
+    if (rot) ctx.rotate(rot);
+    ctx.lineWidth = 1;
+    ctx.fillStyle = '#808080';
+    ctx.strokeStyle = '#000';
+    // disk r=1
+    ctx.beginPath(); ctx.arc(0, 0, 1 * u, 0, 2 * Math.PI); ctx.fill(); ctx.stroke();
+    // trapezoid base
+    ctx.beginPath();
+    ctx.moveTo(-1 * u, 0);
+    ctx.lineTo(-1.1 * u, 1.3 * u);
+    ctx.lineTo(1.1 * u, 1.3 * u);
+    ctx.lineTo(1 * u, 0);
+    ctx.closePath(); ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(-1 * u, 0);
+    ctx.lineTo(-1.1 * u, 1.3 * u);
+    ctx.lineTo(1.1 * u, 1.3 * u);
+    ctx.lineTo(1 * u, 0);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // ---------- main draw ----------
+  function draw() {
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+    ctx.textBaseline = 'alphabetic';
+
+    var w = 5, h = 5, d = 2; // truss geometry (world units)
+    var A = state.ADTR;
+    var mem = A ? 13 : 11;
+    var jts = A ? 8 : 7;
+    var rf = state.SA + (A ? state.SB : 0) + state.SF;
+    var vars = mem + rf;
+    var eqs = 2 * jts;
+
+    // ----- truss members (thick black) -----
+    var LW = 2.6;
+    polyline([[X(0), Y(0)], [X(w), Y(0)], [X(0.5 * w), Y(h)]], '#000', LW, true);
+    polyline([[X(w), Y(0)], [X(2 * w), Y(0)], [X(1.5 * w), Y(h)]], '#000', LW, true);
+    polyline([[X(2 * w), Y(0)], [X(3 * w), Y(0)], [X(2.5 * w), Y(h)]], '#000', LW, true);
+    if (A) {
+      polyline([[X(0), Y(0)], [X(0), Y(h)], [X(2.5 * w), Y(h)]], '#000', LW, false);
+    } else {
+      polyline([[X(0.5 * w), Y(h)], [X(2.5 * w), Y(h)]], '#000', LW, false);
+    }
+
+    // ----- supports -----
+    // A at (0, -0.25): support just below joint
+    (state.SA === 1 ? drawRoller : drawPin)(X(0), Y(0) + 6, 0);
+    if (A) {
+      // B at (-0.25, h): rotated -90 deg, base points left toward the wall
+      (state.SB === 1 ? drawRoller : drawPin)(X(0) - 6, Y(h), Math.PI / 2);
+    }
+    (state.SF === 1 ? drawRoller : drawPin)(X(3 * w), Y(0) + 6, 0);
+
+    // ----- reaction force arrows (blue) -----
+    var BLUE = '#0000ff';
+    function Rlabel(joint, comp) {
+      return [
+        { t: 'R', i: true, sub: false },
+        { t: joint + ', ', i: false, sub: true },
+        { t: comp, i: true, sub: true }
+      ];
+    }
+    // joint A
+    arrow(X(0), Y(-d), X(0), Y(0), BLUE);
+    drawStyled(Rlabel('A', 'y'), X(0), Y(-d) + 4, 0, -1, BLUE);
+    if (state.SA === 2) {
+      arrow(X(-d), Y(0), X(0), Y(0), BLUE);
+      drawStyled(Rlabel('A', 'x'), X(-d) - 4, Y(0), 1, 0, BLUE);
+    }
+    // joint B
+    if (A) {
+      arrow(X(-d), Y(h), X(0), Y(h), BLUE);
+      drawStyled(Rlabel('B', 'x'), X(-d) - 4, Y(h), 1, 0, BLUE);
+      if (state.SB === 2) {
+        arrow(X(0), Y(h + d), X(0), Y(h), BLUE);
+        drawStyled(Rlabel('B', 'y'), X(0), Y(h + d) - 6, 0, 1, BLUE);
+      }
+    }
+    // joint F (or E)
+    var FE = A ? 'F' : 'E';
+    arrow(X(3 * w), Y(-d), X(3 * w), Y(0), BLUE);
+    drawStyled(Rlabel(FE, 'y'), X(3 * w), Y(-d) + 4, 0, -1, BLUE);
+    if (state.SF === 2) {
+      arrow(X(3 * w + d), Y(0), X(3 * w), Y(0), BLUE);
+      drawStyled(Rlabel(FE, 'x'), X(3 * w + d) + 4, Y(0), -1, 0, BLUE);
+    }
+
+    // ----- applied loads (green) -----
+    var GREEN = '#008000';
+    function Flabel(sub) {
+      return [{ t: 'F', i: true, sub: false }, { t: sub, i: false, sub: true }];
+    }
+    arrow(X(w), Y(0), X(w), Y(-d), GREEN);
+    drawStyled(Flabel(A ? 'H' : 'G'), X(w), Y(-d) + 4, 0, -1, GREEN);
+    arrow(X(2 * w), Y(0), X(2 * w), Y(-d), GREEN);
+    drawStyled(Flabel(A ? 'G' : 'F'), X(2 * w), Y(-d) + 4, 0, -1, GREEN);
+    arrow(X(3 * w), Y(h), X(2.5 * w), Y(h), GREEN);
+    drawStyled(Flabel(A ? 'E' : 'D'), X(3 * w) + 6, Y(h), -1, 0, GREEN);
+
+    // ----- equation annotation (top) -----
+    var yMem = Y(9.7), yRea = Y(9.05), yJts = Y(8.15);
+    var xR = X(4.6);              // right edge of the counts column
+    drawStyled(plainParts(mem + ' members'), xR, yMem, 1, 0, '#000');
+    drawStyled(plainParts(rf + ' reaction forces'), xR, yRea, 1, 0, '#000');
+    drawStyled(plainParts(jts + ' joints \u00d7 2 balances'), xR, yJts, 1, 0, '#000');
+
+    var xVar = X(5.75);
+    var yVar = (yMem + yRea) / 2;
+    // thin bracket lines
+    line(xR + 6, yMem, xVar - 6, yVar, '#000', 1);
+    line(xVar - 6, yVar, xR + 6, yRea, '#000', 1);
+    line(xR + 6, yJts, xVar - 6, yJts, '#000', 1);
+
+    var wVar = drawStyled(plainParts(vars + ' variables'), xVar, yVar, -1, 0, '#000');
+    var wEq = drawStyled(plainParts(eqs + ' equations'), xVar, yJts, -1, 0, '#000');
+
+    var xB = xVar + Math.max(wVar, wEq) + 8;
+    var yMid = (yVar + yJts) / 2;
+    line(xB, yVar, xB + 20, yMid, '#000', 1);
+    line(xB + 20, yMid, xB, yJts, '#000', 1);
+
+    var xRes = xB + 28;
+    drawStyled(plainParts('variables \u2212 equations = ' + (vars - eqs)),
+               xRes, yMid - 12, -1, 0, '#000');
+    if (vars - eqs <= 0) {
+      drawStyled(plainParts('solvable'), xRes, yMid + 12, -1, 0, '#009900');
+    } else {
+      drawStyled(plainParts('statically indeterminate'), xRes, yMid + 12, -1, 0, '#cc0000');
+    }
+
+    // ----- joint points (black ring, white center) -----
+    var joints = [
+      [0, 0], [0.5 * w, h], [w, 0], [1.5 * w, h],
+      [2 * w, 0], [2.5 * w, h], [3 * w, 0]
+    ];
+    if (A) joints.push([0, h]);
+    joints.forEach(function (p) {
+      ctx.fillStyle = '#000';
+      ctx.beginPath(); ctx.arc(X(p[0]), Y(p[1]), 5.1, 0, 2 * Math.PI); ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.beginPath(); ctx.arc(X(p[0]), Y(p[1]), 3.4, 0, 2 * Math.PI); ctx.fill();
+    });
+
+    // ----- joint labels -----
+    if (state.labels) {
+      var lab = A ?
+        [['A', 0, 0], ['B', 0, h], ['C', 0.5 * w, h], ['D', 1.5 * w, h],
+         ['E', 2.5 * w, h], ['F', 3 * w, 0], ['G', 2 * w, 0], ['H', w, 0]] :
+        [['A', 0, 0], ['B', 0.5 * w, h], ['C', 1.5 * w, h], ['D', 2.5 * w, h],
+         ['E', 3 * w, 0], ['F', 2 * w, 0], ['G', w, 0]];
+      lab.forEach(function (L) {
+        var px = X(L[1]), py = Y(L[2]);
+        ctx.font = FONT(18.4, false);
+        var tw = ctx.measureText(L[0]).width;
+        var pw = tw + 20, ph = 27, r = 13.5;
+        ctx.fillStyle = '#fff';
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        // rounded pill
+        ctx.moveTo(px - pw / 2 + r, py - ph / 2);
+        ctx.arcTo(px + pw / 2, py - ph / 2, px + pw / 2, py + ph / 2, r);
+        ctx.arcTo(px + pw / 2, py + ph / 2, px - pw / 2, py + ph / 2, r);
+        ctx.arcTo(px - pw / 2, py + ph / 2, px - pw / 2, py - ph / 2, r);
+        ctx.arcTo(px - pw / 2, py - ph / 2, px + pw / 2, py - ph / 2, r);
+        ctx.closePath();
+        ctx.fill(); ctx.stroke();
+        ctx.fillStyle = '#000';
+        ctx.fillText(L[0], px - tw / 2, py + 6.3);
+      });
+    }
+  }
+
+  // ---------- controls wiring ----------
+  document.getElementById('cbSupportB').addEventListener('change', function () {
+    state.ADTR = this.checked;
+    document.getElementById('settersTrue').style.display = state.ADTR ? '' : 'none';
+    document.getElementById('settersFalse').style.display = state.ADTR ? 'none' : '';
+    syncSetters();
+    draw();
+  });
+  document.getElementById('cbLabels').addEventListener('change', function () {
+    state.labels = this.checked;
+    draw();
+  });
+
+  function syncSetters() {
+    document.querySelectorAll('.setterBtns').forEach(function (grp) {
+      var v = state[grp.getAttribute('data-var')];
+      grp.querySelectorAll('button').forEach(function (b) {
+        b.classList.toggle('selected', +b.getAttribute('data-val') === v);
+      });
+    });
+  }
+
+  document.querySelectorAll('.setterBtns button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var grp = b.parentElement;
+      state[grp.getAttribute('data-var')] = +b.getAttribute('data-val');
+      syncSetters();
+      draw();
+    });
+  });
+
+  // ---------- panels ----------
+  var panels = ['panelDirections', 'panelDetails', 'panelAbout'];
+  var typeset = {};
+  document.querySelectorAll('#btnRow .panelBtn').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var id = b.getAttribute('data-panel');
+      panels.forEach(function (p) {
+        var el = document.getElementById(p);
+        if (p === id) {
+          var opening = !el.classList.contains('open');
+          el.classList.toggle('open', opening);
+          if (opening && !typeset[p] && window.MathJax && MathJax.typesetPromise) {
+            typeset[p] = true;
+            MathJax.typesetPromise([el]);
+          }
+        } else {
+          el.classList.remove('open');
+        }
+      });
+    });
+  });
+  document.querySelectorAll('.panel .closeX').forEach(function (x) {
+    x.addEventListener('click', function () {
+      x.parentElement.classList.remove('open');
+    });
+  });
+
+  syncSetters();
+  draw();
+})();
+</script>
+</body>
+</html>

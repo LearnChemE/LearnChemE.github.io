@@ -33,3 +33,7 @@ export const maxInjection = 2.0; // uL
 export const injectionErr = 0.15; // uL
 export const deadTime = 60; // s
 export const N_GC = 10000;
+
+export const minInjConc = 0.0; // M
+export const maxInjConc = 1.0; // M
+export const injConcStep = 0.05; // M

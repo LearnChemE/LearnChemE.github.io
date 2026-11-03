@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TTT and CCT diagrams for steel</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+  chtml: { displayAlign: 'left', displayIndent: '1em' },
+  startup: { typeset: false }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js" async></script>
+<style>
+  :root {
+    --red: #98000D;
+    --ink: #1a1a1a;
+    --muted: #5a5a5a;
+    --line: #cfcfcf;
+    --panel: #f6f6f6;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body {
+    margin: 0; padding: 12px 16px 24px;
+    font-family: Helvetica, Arial, sans-serif; color: var(--ink); background: #fff;
+  }
+  #app { max-width: 1120px; margin: 0 auto; }
+  header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; position: relative; }
+  h1 { font-size: 22px; margin: 4px 0; font-weight: bold; }
+  .btn {
+    background: var(--red); color: #fff; border: none; border-radius: 4px;
+    padding: 6px 14px; font-family: inherit; font-size: 17px; font-weight: normal; cursor: pointer;
+  }
+  .btn:hover { filter: brightness(1.15); }
+  .btn:focus-visible, .seg button:focus-visible, input:focus-visible { outline: 2px solid #1f5fbf; outline-offset: 2px; }
+  .btnwrap { position: relative; }
+  .btnrow { display: flex; gap: 8px; }
+
+  /* flyout panels: overlay, never move the buttons */
+  .flyout {
+    position: absolute; top: calc(100% + 8px); right: 0; z-index: 20;
+    width: min(640px, calc(100vw - 32px)); max-height: 72vh;
+    background: #fff; border: 1px solid #999; border-radius: 6px;
+    box-shadow: 0 6px 24px rgba(0,0,0,.25);
+    display: flex; flex-direction: column;
+  }
+  #detPanel, #dirPanel { width: min(768px, calc(100vw - 32px)); }
+  .flyout[hidden] { display: none; }
+  .flyout .close {
+    position: absolute; top: 6px; right: 10px; background: none; border: none;
+    font-size: 24px; line-height: 1; cursor: pointer; color: #333; z-index: 2;
+  }
+  .flyout .inner { overflow-y: auto; padding: 14px 40px 16px 18px; font-size: 15px; line-height: 1.5; }
+  .flyout h2 { font-size: 17px; margin: 4px 0 8px; }
+  .flyout h3 { font-size: 15px; margin: 14px 0 4px; }
+  .flyout p { margin: 6px 0; }
+  .flyout ul { margin: 4px 0; padding-left: 20px; }
+  .flyout a { color: var(--red); }
+  mjx-container[display="true"] { text-align: left !important; margin: 6px 0 !important; }
+
+  .controls {
+    display: flex; flex-direction: column; gap: 10px;
+    margin: 8px 0 6px; padding: 10px 12px; background: var(--panel); border-radius: 6px;
+  }
+  .toprow { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+  .slrow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 22px; }
+  .table-sym { border-collapse: collapse; margin: 4px 0 8px; }
+  .table-sym td { padding: 3px 14px 3px 0; vertical-align: top; }
+  .table-sym td:first-child { white-space: nowrap; }
+  .seg { display: inline-flex; border: 1px solid var(--red); border-radius: 5px; overflow: hidden; }
+  .seg button {
+    background: #fff; color: var(--red); border: none; padding: 6px 12px;
+    font-family: inherit; font-size: 17px; font-weight: normal; cursor: pointer;
+  }
+  .seg button.on { background: var(--red); color: #fff; }
+  .ctl { display: flex; align-items: center; gap: 8px; font-size: 16px; }
+  .ctl .val { min-width: 62px; font-variant-numeric: tabular-nums; }
+  .ctl label.cb { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+  .ctlgroup { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 22px; }
+  input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  .ctl input[type="range"] { width: 150px; margin-bottom: 0; }
+
+  main { display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
+  #plotwrap { flex: 1 1 560px; min-width: 0; }
+  #plot { width: 100%; display: block; touch-action: none; }
+  aside {
+    flex: 0 0 330px; min-width: 0; font-size: 16px; border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px;
+  }
+  aside h2 { font-size: 16px; margin: 0 0 2px; }
+  #stage { font-size: 16px; color: var(--muted); margin-bottom: 10px; min-height: 18px; font-variant-numeric: tabular-nums; }
+  .phase { display: grid; grid-template-columns: 132px 1fr 52px; gap: 6px; align-items: center; font-size: 16px; margin: 5px 0; }
+  .track { height: 14px; background: #eee; border-radius: 3px; overflow: hidden; }
+  .fill { height: 100%; width: 0; }
+  .pct { text-align: right; font-variant-numeric: tabular-nums; }
+  #stack { display: flex; height: 26px; border-radius: 4px; overflow: hidden; border: 1px solid #bbb; margin: 8px 0 12px; }
+  #stack div { height: 100%; }
+  .hard { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line); font-size: 16px; }
+  #hrc { font-size: 16px; font-weight: normal; font-variant-numeric: tabular-nums; }
+  .note { font-size: 16px; color: var(--muted); margin-top: 6px; line-height: 1.4; }
+  .playrow { display: flex; gap: 8px; margin-top: 12px; }
+
+  @media (max-width: 900px) { aside { flex: 1 1 100%; } }
+</style>
+</head>
+<body>
+<div id="app">
+  <h1>TTT and CCT diagrams for eutectoid steel</h1>
+
+  <div class="controls">
+    <div class="toprow">
+      <div class="seg" role="group" aria-label="Diagram type">
+        <button id="modeTTT" class="on">isothermal (TTT)</button>
+        <button id="modeCCT">continuous cooling (CCT)</button>
+      </div>
+      <div class="btnwrap">
+        <div class="btnrow">
+          <button class="btn" data-panel="dirPanel">Directions</button>
+          <button class="btn" data-panel="detPanel">Details</button>
+          <button class="btn" data-panel="aboutPanel">About</button>
+        </div>
+        <div class="flyout" id="dirPanel" hidden>
+          <button class="close" aria-label="Close">&times;</button>
+          <div class="inner">
+            <h2>Directions</h2>
+            <p>This simulation shows how austenite in a eutectoid (0.77 wt% C) steel transforms to pearlite, bainite, or martensite, depending on the thermal path.</p>
+            <p><b>Isothermal (TTT)</b>: the steel is quenched instantly from above the temperature A<sub>1</sub> to the hold temperature, held for the hold time, then quenched to room temperature. The three black curves give the time needed at each hold temperature for the austenite to be 1% transformed (solid curve on the left, start), 50% transformed (dashed curve), and 99% transformed (solid curve on the right, finish).</p>
+            <p>The shaded regions show the microstructure: gray is austenite, blue is pearlite, orange is bainite, and purple is martensite. The lighter band between the start and finish curves is partly transformed austenite. In continuous cooling, the shading at a point is the microstructure of steel that reaches that point while cooling at a constant rate.</p>
+            <p><b>Continuous cooling (CCT)</b>: the steel cools at a constant rate. Time is measured from the moment the steel cools through A<sub>1</sub> = 727 °C. The blue curves are the CCT start, 50%, and finish curves; check the box to compare them with the gray TTT curves. The dotted green curve is the critical cooling rate, the slowest rate that avoids pearlite and bainite.</p>
+            <p>The <b>alloying shift</b> slider multiplies all transformation times, the way alloying elements such as Cr, Mo, and Ni slow the diffusional transformations and increase hardenability.</p>
+            <p>The panel on the right shows the room-temperature microstructure and an estimated hardness. Press <b>play</b> to watch the microstructure develop along the path. The path is drawn only when you press <b>play</b>; changing a slider clears it. Press <b>reset</b> to clear the path without changing the settings.</p>
+            <p>Martensite is what austenite becomes when it is cooled too fast for carbon to diffuse. Austenite is FCC iron with all 0.77 wt% carbon dissolved in it. Below M<sub>s</sub>, the FCC lattice becomes unstable, and it shears cooperatively into a body-centered structure without any atoms diffusing. The carbon has no time to leave, so it stays trapped in the new lattice. That trapped carbon distorts the lattice into body-centered tetragonal (BCT) and makes martensite hard. The driving force is the free-energy difference between this supersaturated FCC phase and BCC iron. Only austenite has that driving force and the FCC structure that can shear.</p>
+            <p>Bainite has already done what martensite only partly does. It is ferrite, which is BCC iron holding almost no carbon (about 0.02 wt%), plus cementite (Fe<sub>3</sub>C) carrying the rest of the carbon. The carbon has already been sorted into its equilibrium homes, and the iron is already BCC, so there is no FCC lattice to shear. Ferrite plus cementite also has a lower free energy than martensite. Martensite is a metastable, high-energy, supersaturated phase, and converting bainite into it would raise the free energy, so it can’t happen spontaneously at any cooling rate. The same reasoning applies to pearlite, which is also ferrite plus cementite, just in a lamellar arrangement.</p>
+            <p>The possible transformations all go downhill:</p>
+            <ul>
+              <li>austenite → pearlite or bainite (diffusional, needs time)</li>
+              <li>austenite → martensite (diffusionless, needs only undercooling below M<sub>s</sub>)</li>
+              <li>martensite → ferrite + carbides when reheated (tempering)</li>
+            </ul>
+            <p>None go from ferrite + cementite back to martensite. The only route is to reheat above A<sub>1</sub>, which dissolves the cementite and makes austenite again, and then quench.</p>
+          </div>
+        </div>
+
+        <div class="flyout" id="detPanel" hidden>
+          <button class="close" aria-label="Close">&times;</button>
+          <div class="inner">
+            <h2>Details</h2>
+            <h3>Isothermal kinetics</h3>
+            <p>At a constant temperature, the fraction of austenite transformed by diffusional processes follows the Avrami equation:</p>
+            \[ f = 1 - \exp\!\left[-(k\,t)^{n}\right], \qquad n = 2.5 \]
+            <p>The rate constant is the sum of a pearlite and a bainite contribution:</p>
+            \[ k = \frac{1}{S}\left(k_P + k_B\right) \]
+            \[ k_P = C_P\,(A_1 - T)^{3.799}\exp\!\left(-\frac{Q_P}{R\,T}\right) \quad (T < A_1) \]
+            \[ k_B = C_B\,(B_s - T)^{2.5}\exp\!\left(-\frac{Q_B}{R\,T}\right) \quad (T < B_s) \]
+            <p>The undercooling terms \((A_1 - T)\) and \((B_s - T)\) represent the thermodynamic driving force for nucleation, and the Arrhenius terms represent diffusion. Their product produces the C shape. The fraction of transformed material that is pearlite is \(k_P/(k_P+k_B)\); pearlite and bainite form at equal rates at 540 °C, the nose of the curve, so pearlite dominates above the nose and bainite below it.</p>
+            <p>The times for a transformed fraction \(X\) (the TTT curves) are</p>
+            \[ t_X = \frac{\left[-\ln(1-X)\right]^{1/n}}{k} \]
+            <p>\(A_1 = 727\) °C, \(B_s = 638\) °C, \(Q_P = 231.5\) kJ/mol, \(Q_B = 107.3\) kJ/mol, \(\ln C_P = 11.808\), \(\ln C_B = 1.955\) (with \(T\) in K inside the exponentials and in °C inside the undercooling terms). These values were fit to the standard textbook TTT diagram for eutectoid steel (nose near 540 °C at about 0.7 s), with the requirements that \(k_P = k_B\) at the nose, pearlite forms at least 10 times faster than bainite at 620 °C, and bainite forms at least 10 times faster than pearlite at 460 °C. \(S\) is the alloying shift factor.</p>
+            <h3>Continuous cooling (additivity rule)</h3>
+            <p>During continuous cooling, the transformation is integrated in small temperature steps. At each step, the fictitious time \(t^*\) that would produce the current fraction at the current temperature is calculated, the time step is added, and the Avrami equation gives the new fraction:</p>
+            \[ t^{*} = \frac{\left[-\ln(1-f)\right]^{1/n}}{k(T)}, \qquad f_{\text{new}} = 1 - \exp\!\left[-\left(k(T)\,(t^{*} + \Delta t)\right)^{n}\right] \]
+            <p>This is the Scheil–Avrami additivity approach. Because the steel spends only a short time at each temperature, the CCT curves lie below and to the right of the TTT curves.</p>
+            <h3>Martensite</h3>
+            <p>Below \(M_s = 220\) °C, the austenite remaining when \(M_s\) is reached transforms athermally (no diffusion, no time dependence) according to the Koistinen–Marburger equation:</p>
+            \[ f_M = f_{\gamma,M_s}\left\{1 - \exp\left[-0.011\,(M_s - T)\right]\right\} \]
+            <p>About 12% of that austenite is retained at room temperature. Diffusional transformation is not allowed below \(M_s\) in this model.</p>
+            <h3>Region shading</h3>
+            <p>In TTT mode, each point \((t, T)\) is shaded by the isothermal transformed fraction \(f\): austenite for \(f < 0.01\), the product phase for \(f > 0.99\), and a lighter mixed shade in between. The product is pearlite where \(k_P > k_B\) and bainite otherwise. In CCT mode, the point is shaded by the fraction calculated along the constant-rate cooling curve that passes through it, with rate \((A_1 - T)/t\). Below \(M_s\), austenite that has not transformed becomes martensite.</p>
+            <h3>Microstructure and hardness</h3>
+            <p>Pearlite that forms above 650 °C is labeled coarse, and below 650 °C fine. Bainite that forms above 350 °C is labeled upper, and below 350 °C lower. The hardness is a rule-of-mixtures estimate: pearlite 15–42 HRC and bainite 42–60 HRC (both increasing as the formation temperature decreases), martensite 65 HRC, retained austenite 20 HRC. Values below about 20 HRC are outside the normal Rockwell C range and are only indicative.</p>
+            <h3>Limitations</h3>
+            <ul>
+              <li>Real plain-carbon eutectoid steels form almost no bainite during continuous cooling, because pearlite forms first. The simple additivity model predicts some bainite at intermediate cooling rates.</li>
+              <li>The model critical cooling rate (about 250 °C/s) is higher than the commonly quoted value of about 140 °C/s for eutectoid steel.</li>
+              <li>Proeutectoid ferrite and cementite, tempering, and section-size effects are not included.</li>
+            </ul>
+            <h3>Symbols</h3>
+            <table class="table-sym">
+              <tr><td>\(A_1\)</td><td>eutectoid temperature (727 °C)</td></tr>
+              <tr><td>\(B_s\)</td><td>bainite start temperature in the rate expression (638 °C)</td></tr>
+              <tr><td>\(C_P,\ C_B\)</td><td>pre-exponential factors for pearlite (s\(^{-1}\) °C\(^{-3.799}\)) and bainite (s\(^{-1}\) °C\(^{-2.5}\))</td></tr>
+              <tr><td>\(f\)</td><td>fraction of austenite transformed by diffusion (pearlite + bainite)</td></tr>
+              <tr><td>\(f_{\text{new}}\)</td><td>transformed fraction at the end of a time step</td></tr>
+              <tr><td>\(f_M\)</td><td>fraction of the steel that is martensite</td></tr>
+              <tr><td>\(f_{\gamma,M_s}\)</td><td>fraction of austenite remaining when the steel reaches \(M_s\)</td></tr>
+              <tr><td>\(k\)</td><td>overall rate constant (s\(^{-1}\))</td></tr>
+              <tr><td>\(k_P,\ k_B\)</td><td>rate constants for pearlite and bainite formation (s\(^{-1}\))</td></tr>
+              <tr><td>\(M_s\)</td><td>martensite start temperature (220 °C)</td></tr>
+              <tr><td>\(n\)</td><td>Avrami exponent (2.5)</td></tr>
+              <tr><td>\(Q_P,\ Q_B\)</td><td>activation energies for pearlite and bainite formation (kJ/mol)</td></tr>
+              <tr><td>\(R\)</td><td>ideal gas constant (8.314 J/(mol K))</td></tr>
+              <tr><td>\(S\)</td><td>alloying shift factor; multiplies all transformation times</td></tr>
+              <tr><td>\(T\)</td><td>temperature (°C; K in the Arrhenius terms)</td></tr>
+              <tr><td>\(t\)</td><td>time (s)</td></tr>
+              <tr><td>\(t_X\)</td><td>time to reach transformed fraction \(X\) at constant temperature (s)</td></tr>
+              <tr><td>\(t^{*}\)</td><td>fictitious time that gives the current transformed fraction at the current temperature (s)</td></tr>
+              <tr><td>\(\Delta t\)</td><td>time step (s)</td></tr>
+              <tr><td>\(X\)</td><td>transformed fraction that defines a curve (0.01 start, 0.50, 0.99 finish)</td></tr>
+              <tr><td>HRC</td><td>Rockwell C hardness</td></tr>
+            </table>
+          </div>
+        </div>
+
+        <div class="flyout" id="aboutPanel" hidden>
+          <button class="close" aria-label="Close">&times;</button>
+          <div class="inner">
+            <h2>About</h2>
+            <p>This simulation was created in the <a href="https://www.colorado.edu/chbe/" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="https://learncheme.com/" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="slrow">
+      <div class="ctlgroup" id="tttCtl">
+        <div class="ctl"><span>hold temperature</span><input type="range" id="holdT" min="100" max="720" step="5" value="600"><span class="val" id="holdTv"></span></div>
+        <div class="ctl"><span>hold time</span><input type="range" id="holdt" min="-1" max="5" step="0.05" value="1.5"><span class="val" id="holdtv"></span></div>
+      </div>
+      <div class="ctlgroup" id="cctCtl" hidden>
+        <div class="ctl"><span>cooling rate</span><input type="range" id="rate" min="-2" max="3" step="0.02" value="0.5"><span class="val" id="ratev"></span></div>
+        <div class="ctl"><label class="cb"><input type="checkbox" id="showTTT" checked>show TTT curves</label></div>
+      </div>
+      <div class="ctl"><span>alloying shift</span><input type="range" id="shift" min="0" max="2" step="0.05" value="0"><span class="val" id="shiftv"></span></div>
+    </div>
+  </div>
+
+  <main>
+    <div id="plotwrap"><canvas id="plot"></canvas></div>
+    <aside>
+      <h2>Microstructure</h2>
+      <div id="stage"></div>
+      <div id="stack"></div>
+      <div id="bars"></div>
+      <div class="hard">estimated hardness: <span id="hrc"></span> HRC</div>
+      <div class="note" id="critNote"></div>
+      <div class="playrow">
+        <button class="btn" id="play">play</button>
+        <button class="btn" id="reset">reset</button>
+      </div>
+    </aside>
+  </main>
+</div>
+
+<script>
+(() => {
+  // ---------------- model ----------------
+  const Rg = 8.314, A1 = 727, Bs = 638.3, mB = 2.5, mP = 3.799, Ms = 220, N = 2.5, aKM = 0.011, Troom = 25;
+  const CP = Math.exp(11.80752), QP = 231.5012e3, CB = Math.exp(1.95490), QB = 107.2914e3;
+  let S = 1; // alloying shift factor (multiplies all times)
+
+  function rates(T) {
+    const TK = T + 273.15;
+    const kp = T < A1 ? CP * Math.pow(A1 - T, mP) * Math.exp(-QP / (Rg * TK)) / S : 0;
+    const kb = T < Bs ? CB * Math.pow(Bs - T, mB) * Math.exp(-QB / (Rg * TK)) / S : 0;
+    return [kp, kb];
+  }
+  const tX = (k, X) => Math.pow(-Math.log(1 - X), 1 / N) / k;
+  const KM = T => T >= Ms ? 0 : 1 - Math.exp(-aKM * (Ms - T));
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const H_P = T => clamp(15 + (720 - T) / 170 * 27, 12, 42);
+  const H_B = T => clamp(42 + (550 - T) / 300 * 18, 42, 60);
+  const H_M = 65, H_A = 20;
+
+  const PH = [
+    { key: 'cP', name: 'coarse pearlite', col: '#2b5d8f' },
+    { key: 'fP', name: 'fine pearlite', col: '#7fb0de' },
+    { key: 'uB', name: 'upper bainite', col: '#c9731a' },
+    { key: 'lB', name: 'lower bainite', col: '#f2b872' },
+    { key: 'M',  name: 'martensite', col: '#6a3d9a' },
+    { key: 'A',  name: 'austenite', col: '#a8a8a8' }
+  ];
+  const blank = () => ({ cP: 0, fP: 0, uB: 0, lB: 0, M: 0, A: 1, Hd: 0 });
+  const copy = s => Object.assign({}, s);
+  function addDiff(s, df, kp, kb, T) {
+    const k = kp + kb, dP = df * kp / k, dB = df * kb / k;
+    if (T >= 650) s.cP += dP; else s.fP += dP;
+    if (T >= 350) s.uB += dB; else s.lB += dB;
+    s.Hd += dP * H_P(T) + dB * H_B(T);
+  }
+  const fDiff = s => s.cP + s.fP + s.uB + s.lB;
+  const hardness = s => s.Hd + s.M * H_M + s.A * H_A;
+
+  // isothermal state at time t in hold at Th (before final quench)
+  function isoHold(Th, t) {
+    const s = blank();
+    if (Th <= Ms) { s.M = KM(Th); s.A = 1 - s.M; return s; }
+    const [kp, kb] = rates(Th), k = kp + kb;
+    if (k > 0 && t > 0) {
+      const f = 1 - Math.exp(-Math.pow(k * t, N));
+      addDiff(s, f, kp, kb, Th);
+      s.A = 1 - f;
+    }
+    return s;
+  }
+  // quench from a held state at Th down to T
+  function isoQuench(held, Th, T) {
+    const s = copy(held);
+    if (Th <= Ms) { s.M = KM(T); s.A = 1 - s.M; }
+    else { s.M = held.A * KM(T); s.A = held.A - s.M; }
+    return s;
+  }
+
+  // constant-rate cooling from A1; returns final state, crossing points, optional frames
+  function cool(Rt, dT, record) {
+    let T = A1, t = 0, f = 0, AMs = null;
+    const s = blank();
+    const cross = { 0.01: null, 0.5: null, 0.99: null };
+    const frames = record ? [{ t: 0, T: A1, s: copy(s) }] : null;
+    let fAtMs = 0;
+    while (T > Troom + 1e-9) {
+      const Tn = Math.max(Troom, T - dT), dt = (T - Tn) / Rt, Tm = 0.5 * (T + Tn);
+      t += dt;
+      if (Tm > Ms) {
+        const [kp, kb] = rates(Tm), k = kp + kb;
+        if (k > 0 && f < 0.999999) {
+          const ts = f > 0 ? Math.pow(-Math.log(1 - f), 1 / N) / k : 0;
+          const fn = 1 - Math.exp(-Math.pow(k * (ts + dt), N));
+          addDiff(s, fn - f, kp, kb, Tm);
+          f = fn;
+          for (const X of [0.01, 0.5, 0.99]) if (cross[X] === null && f >= X) cross[X] = { t, T: Tm };
+        }
+        s.A = 1 - f;
+      } else {
+        if (AMs === null) { AMs = 1 - f; fAtMs = f; }
+        s.M = AMs * KM(Tn);
+        s.A = AMs - s.M;
+      }
+      T = Tn;
+      if (record) frames.push({ t, T, s: copy(s) });
+    }
+    if (AMs === null) fAtMs = f;
+    return { s, cross, frames, fAtMs, tEnd: t };
+  }
+
+  function criticalRate() {
+    let lo = -3, hi = 6; // log10 rate
+    for (let i = 0; i < 40; i++) {
+      const mid = 0.5 * (lo + hi);
+      if (cool(Math.pow(10, mid), 1, false).fAtMs > 0.01) lo = mid; else hi = mid;
+    }
+    return Math.pow(10, 0.5 * (lo + hi));
+  }
+
+  let cctCurves = null, Rcrit = null;
+  function computeCCT() {
+    const pts = { 0.01: [], 0.5: [], 0.99: [] };
+    const nR = 160;
+    for (let i = 0; i < nR; i++) {
+      const lr = -2.5 + (4.5 * i) / (nR - 1);
+      const r = cool(Math.pow(10, lr), 1, false);
+      for (const X of [0.01, 0.5, 0.99]) if (r.cross[X]) pts[X].push(r.cross[X]);
+    }
+    cctCurves = pts;
+    Rcrit = criticalRate();
+  }
+
+  // ---------------- UI state ----------------
+  const $ = id => document.getElementById(id);
+  let mode = 'TTT';
+  let frames = [], finalState = null, anim = null, playIdx = null;
+
+  const fmtT = v => (Math.abs(v) >= 100 ? v.toFixed(0) : v.toPrecision(2));
+  function fmtTime(t) {
+    if (t < 1) return t.toPrecision(2) + ' s';
+    if (t < 100) return t.toPrecision(3).replace(/\.?0+$/, '') + ' s';
+    if (t < 3600) return Math.round(t) + ' s';
+    if (t < 86400) return (t / 3600).toPrecision(3) + ' h';
+    return (t / 86400).toPrecision(3) + ' d';
+  }
+  function fmtRate(r) { return (r >= 10 ? r.toFixed(0) : r >= 1 ? r.toFixed(1) : r.toPrecision(2)) + ' °C/s'; }
+
+  function readInputs() {
+    S = Math.pow(10, +$('shift').value);
+    $('shiftv').textContent = S < 9.95 ? S.toFixed(1) + '×' : S.toFixed(0) + '×';
+    $('holdTv').textContent = $('holdT').value + ' °C';
+    $('holdtv').textContent = fmtTime(Math.pow(10, +$('holdt').value));
+    $('ratev').textContent = fmtRate(Math.pow(10, +$('rate').value));
+  }
+
+  // build path frames for animation and final state
+  function buildPath() {
+    frames = [];
+    if (mode === 'TTT') {
+      const Th = +$('holdT').value, th = Math.pow(10, +$('holdt').value);
+      const x0 = XMIN;
+      for (let i = 0; i <= 30; i++) {
+        const T = 800 - (800 - Th) * i / 30;
+        const s = T <= Ms ? isoQuench(blank(), 800, T) : blank();
+        if (T <= Ms) { s.M = KM(T); s.A = 1 - s.M; }
+        frames.push({ t: x0, T, s, stage: 'quench' });
+      }
+      const nH = 220, l0 = Math.log10(x0), l1 = Math.log10(th);
+      for (let i = 1; i <= nH; i++) {
+        const t = Math.pow(10, l0 + (l1 - l0) * i / nH);
+        frames.push({ t, T: Th, s: isoHold(Th, t), stage: 'hold' });
+      }
+      const held = isoHold(Th, th);
+      for (let i = 1; i <= 50; i++) {
+        const T = Th - (Th - Troom) * i / 50;
+        frames.push({ t: th, T, s: isoQuench(held, Th, T), stage: 'final' });
+      }
+      finalState = isoQuench(held, Th, Troom);
+    } else {
+      const Rt = Math.pow(10, +$('rate').value);
+      const r = cool(Rt, 0.25, true);
+      finalState = r.s;
+      // resample uniformly in log time for the animation
+      const all = r.frames.filter(f => f.t >= XMIN);
+      if (all.length === 0) { frames = r.frames.slice(-1); return; }
+      const l0 = Math.log10(Math.max(XMIN, all[0].t)), l1 = Math.log10(all[all.length - 1].t);
+      let j = 0;
+      for (let i = 0; i <= 300; i++) {
+        const lt = l0 + (l1 - l0) * i / 300;
+        while (j < all.length - 1 && Math.log10(all[j].t) < lt) j++;
+        frames.push(all[j]);
+      }
+      frames.push(all[all.length - 1]);
+      frames.pathAll = r.frames;
+    }
+  }
+
+  // ---------------- microstructure panel ----------------
+  function buildBars() {
+    $('bars').innerHTML = PH.map(p =>
+      `<div class="phase"><span>${p.name}</span><div class="track"><div class="fill" id="bar_${p.key}" style="background:${p.col}"></div></div><span class="pct" id="pct_${p.key}"></span></div>`
+    ).join('');
+    $('stack').innerHTML = PH.map(p => `<div id="stk_${p.key}" style="background:${p.col}" title="${p.name}"></div>`).join('');
+  }
+  function showState(s, label) {
+    for (const p of PH) {
+      const v = Math.max(0, s[p.key]);
+      $('bar_' + p.key).style.width = (100 * v).toFixed(2) + '%';
+      $('stk_' + p.key).style.width = (100 * v).toFixed(2) + '%';
+      $('pct_' + p.key).textContent = (v >= 0.0005 && v < 0.01 ? (100 * v).toFixed(1) : (100 * v).toFixed(0)) + '%';
+    }
+    $('hrc').textContent = hardness(s).toFixed(0);
+    $('stage').textContent = label;
+  }
+
+  // ---------------- plot ----------------
+  const cv = $('plot'), ctx = cv.getContext('2d');
+  const XMIN = 0.01, XMAX = 1e5, YMIN = 0, YMAX = 800;
+  const FONT = 'Helvetica, Arial, sans-serif', FS = 17, SFS = 12;
+  let W = 600, H = 480, pad = { l: 80, r: 14, t: 14, b: 66 };
+  let labelCache = null, regionImg = null;
+  const RC = { stable: [244, 244, 244], A: [226, 226, 226], P: [200, 222, 244], B: [252, 222, 186], M: [228, 214, 242] };
+  const mix = (a, b) => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2];
+
+  // fraction transformed along constant-rate cooling paths (for CCT shading)
+  function cctTable() {
+    const rows = [];
+    for (let i = 0; i <= 250; i++) {
+      const R = Math.pow(10, -5 + 0.04 * i);
+      const F = new Float32Array(A1 + 1), Pf = new Float32Array(A1 + 1);
+      let f = 0, P = 0, B = 0;
+      F[A1] = 0;
+      for (let T = A1; T > 0; T--) {
+        const Tm = T - 0.5;
+        if (Tm > Ms) {
+          const [kp, kb] = rates(Tm), k = kp + kb;
+          if (k > 0 && f < 0.999999) {
+            const ts = f > 0 ? Math.pow(-Math.log(1 - f), 1 / N) / k : 0;
+            const fn = 1 - Math.exp(-Math.pow(k * (ts + 1 / R), N));
+            P += (fn - f) * kp / k; B += (fn - f) * kb / k; f = fn;
+          }
+        }
+        F[T - 1] = f; Pf[T - 1] = P > B ? 1 : 0;
+      }
+      rows.push({ F, Pf });
+    }
+    return rows;
+  }
+
+  function buildRegions() {
+    const w = W - pad.l - pad.r, h = H - pad.t - pad.b, cs = 2;
+    const nx = Math.ceil(w / cs), ny = Math.ceil(h / cs);
+    const off = document.createElement('canvas'); off.width = nx; off.height = ny;
+    const oc = off.getContext('2d'), img = oc.createImageData(nx, ny), d = img.data;
+    const lt0 = Math.log10(XMIN), lt1 = Math.log10(XMAX);
+    const tab = mode === 'CCT' ? cctTable() : null;
+    for (let j = 0; j < ny; j++) {
+      const T = YMAX - (j + 0.5) * cs / h * (YMAX - YMIN);
+      const [kp, kb] = rates(T), k = kp + kb, prodTTT = kp > kb ? RC.P : RC.B;
+      for (let i = 0; i < nx; i++) {
+        const t = Math.pow(10, lt0 + (i + 0.5) * cs / w * (lt1 - lt0));
+        let c;
+        if (T >= A1) c = RC.stable;
+        else if (!tab) {
+          if (T <= Ms) c = RC.M;
+          else {
+            const f = 1 - Math.exp(-Math.pow(k * t, N));
+            c = f < 0.01 ? RC.A : f > 0.99 ? prodTTT : mix(RC.A, prodTTT);
+          }
+        } else {
+          const li = clamp(Math.round((Math.log10((A1 - T) / t) + 5) / 0.04), 0, 250);
+          const row = tab[li];
+          if (T > Ms) {
+            const Ti = Math.floor(T), f = row.F[Ti];
+            const prod = f > 0.001 ? (row.Pf[Ti] ? RC.P : RC.B) : prodTTT;
+            c = f < 0.01 ? RC.A : f > 0.99 ? prod : mix(RC.A, prod);
+          } else {
+            const fMs = row.F[Ms];
+            c = fMs > 0.99 ? (row.Pf[Ms] ? RC.P : RC.B) : RC.M;
+          }
+        }
+        const o = 4 * (j * nx + i);
+        d[o] = c[0]; d[o + 1] = c[1]; d[o + 2] = c[2]; d[o + 3] = 255;
+      }
+    }
+    oc.putImageData(img, 0, 0);
+    regionImg = { off, w: nx * cs, h: ny * cs };
+  }
+  const X = t => pad.l + (Math.log10(t) - Math.log10(XMIN)) / (Math.log10(XMAX) - Math.log10(XMIN)) * (W - pad.l - pad.r);
+  const Y = T => H - pad.b - (T - YMIN) / (YMAX - YMIN) * (H - pad.t - pad.b);
+  const COL = { ttt: '#1a1a1a', tttGray: '#9a9a9a', cct: '#1f5fbf', crit: '#2e8b57', path: '#98000D',
+                P: '#2b5d8f', B: '#c9731a', M: '#6a3d9a', A: '#555555', ref: '#444444' };
+
+  function resize() {
+    const w = $('plotwrap').clientWidth;
+    W = Math.max(320, w);
+    H = Math.round(clamp(W * 0.8, 360, 620));
+    const dpr = window.devicePixelRatio || 1;
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    cv.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    labelCache = null; regionImg = null;
+    draw();
+  }
+
+  // ---- rich text: [{s:'A'},{s:'1',sub:true},{s:' = 727 °C'}] ----
+  const segsOf = x => typeof x === 'string' ? [{ s: x }] : x;
+  function segFont(g, bold, k = 1) { return (bold ? 'bold ' : '') + ((g.sub || g.sup ? SFS : FS) * k) + 'px ' + FONT; }
+  function richW(segs, bold, k = 1, c = ctx) {
+    let w = 0;
+    for (const g of segs) { c.font = segFont(g, bold, k); w += c.measureText(g.s).width; }
+    return w;
+  }
+  function richDraw(segs, x, y, color, bold, halo, k = 1, c = ctx) {
+    const ctx = c;
+    ctx.save(); ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
+    for (const pass of halo ? [0, 1] : [1]) {
+      let xx = x;
+      for (const g of segs) {
+        ctx.font = segFont(g, bold, k);
+        const dy = (g.sub ? 5 : g.sup ? -6 : 0) * k;
+        if (pass === 0) { ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(255,255,255,0.9)'; ctx.lineJoin = 'round'; ctx.strokeText(g.s, xx, y + dy); }
+        else { ctx.fillStyle = color; ctx.fillText(g.s, xx, y + dy); }
+        xx += ctx.measureText(g.s).width;
+      }
+    }
+    ctx.restore();
+  }
+
+  // axis title drawn horizontally on an offscreen canvas, then rotated, so it renders like the x-axis title
+  const AXK = 1.1;
+  function rotatedLabel(segs, cx, cy) {
+    const dpr = window.devicePixelRatio || 1;
+    const off = document.createElement('canvas'), oc = off.getContext('2d');
+    const w = Math.ceil(richW(segs, false, AXK, oc)) + 4, h = 30;
+    off.width = Math.ceil(w * dpr); off.height = Math.ceil(h * dpr);
+    oc.scale(dpr, dpr);
+    richDraw(segs, 2, h / 2, '#1a1a1a', false, false, AXK, oc);
+    ctx.save(); ctx.translate(cx, cy); ctx.rotate(-Math.PI / 2);
+    ctx.drawImage(off, -w / 2, -h / 2, w, h);
+    ctx.restore();
+  }
+
+  // ---- curve geometry in data coordinates ----
+  function tttCurve(Xf) {
+    const pts = [];
+    for (let T = A1 - 0.5; T > Ms; T -= 1) {
+      const [kp, kb] = rates(T), k = kp + kb;
+      if (k <= 0) continue;
+      const t = tX(k, Xf);
+      if (t >= XMIN * 0.5 && t <= XMAX * 2) pts.push({ t: clamp(t, XMIN, XMAX), T });
+    }
+    return pts;
+  }
+  function critCurve() {
+    const cp = [];
+    for (let i = 0; i <= 300; i++) {
+      const t = Math.pow(10, -2 + 7 * i / 300), T = A1 - Rcrit * t;
+      if (T < 0) break; cp.push({ t, T });
+    }
+    return cp;
+  }
+  const nose = pts => pts.reduce((a, b) => (b.t < a.t ? b : a), pts[0]);
+  const toPx = pts => pts.map(p => [X(p.t), Y(p.T)]);
+
+  function line(pts, color, width, dash) {
+    if (pts.length < 2) return;
+    ctx.save();
+    ctx.strokeStyle = color; ctx.lineWidth = width; ctx.setLineDash(dash || []);
+    ctx.beginPath();
+    pts.forEach((p, i) => i ? ctx.lineTo(X(p.t), Y(p.T)) : ctx.moveTo(X(p.t), Y(p.T)));
+    ctx.stroke(); ctx.restore();
+  }
+
+  // ---- label placement that avoids curves and other labels ----
+  function makePlacer(bounds) {
+    const chunks = [], rects = [];
+    function addPoly(px) {
+      const d = [];
+      for (const p of px) {
+        const q = d[d.length - 1];
+        if (!q || Math.abs(p[0] - q[0]) + Math.abs(p[1] - q[1]) >= 3) d.push(p);
+      }
+      if (px.length) d.push(px[px.length - 1]);
+      for (let i = 0; i < d.length - 1; i += 16) {
+        const seg = d.slice(i, Math.min(d.length, i + 17));
+        const xs = seg.map(p => p[0]), ys = seg.map(p => p[1]);
+        chunks.push({ x0: Math.min(...xs), x1: Math.max(...xs), y0: Math.min(...ys), y1: Math.max(...ys), pts: seg });
+      }
+    }
+    function segHit(ax, ay, bx, by, r) {
+      let t0 = 0, t1 = 1;
+      const dx = bx - ax, dy = by - ay;
+      const P = [-dx, dx, -dy, dy], Q = [ax - r.x, r.x + r.w - ax, ay - r.y, r.y + r.h - ay];
+      for (let i = 0; i < 4; i++) {
+        if (P[i] === 0) { if (Q[i] < 0) return false; }
+        else {
+          const t = Q[i] / P[i];
+          if (P[i] < 0) { if (t > t1) return false; if (t > t0) t0 = t; }
+          else { if (t < t0) return false; if (t < t1) t1 = t; }
+        }
+      }
+      return true;
+    }
+    function free(r) {
+      if (r.x < bounds.x0 + 3 || r.x + r.w > bounds.x1 - 3 || r.y < bounds.y0 + 2 || r.y + r.h > bounds.y1 - 2) return false;
+      const q = { x: r.x - 3, y: r.y - 2, w: r.w + 6, h: r.h + 4 };
+      for (const o of rects) if (q.x < o.x + o.w && q.x + q.w > o.x && q.y < o.y + o.h && q.y + q.h > o.y) return false;
+      for (const c of chunks) {
+        if (c.x1 < q.x || c.x0 > q.x + q.w || c.y1 < q.y || c.y0 > q.y + q.h) continue;
+        for (let i = 0; i < c.pts.length - 1; i++)
+          if (segHit(c.pts[i][0], c.pts[i][1], c.pts[i + 1][0], c.pts[i + 1][1], q)) return false;
+      }
+      return true;
+    }
+    const g = 6;
+    const CAND = {
+      R: (ax, ay, w, h) => ({ x: ax + g, y: ay - h / 2 }),
+      L: (ax, ay, w, h) => ({ x: ax - g - w, y: ay - h / 2 }),
+      A: (ax, ay, w, h) => ({ x: ax - w / 2, y: ay - g - h }),
+      B: (ax, ay, w, h) => ({ x: ax - w / 2, y: ay + g }),
+      AR: (ax, ay, w, h) => ({ x: ax + g, y: ay - g - h }),
+      AL: (ax, ay, w, h) => ({ x: ax - g - w, y: ay - g - h }),
+      BR: (ax, ay, w, h) => ({ x: ax + g, y: ay + g }),
+      BL: (ax, ay, w, h) => ({ x: ax - g - w, y: ay + g }),
+      C: (ax, ay, w, h) => ({ x: ax - w / 2, y: ay - h / 2 })
+    };
+    function segSeg(a, b, c, d) {
+      const o = (p, q, r) => (q[0] - p[0]) * (r[1] - p[1]) - (q[1] - p[1]) * (r[0] - p[0]);
+      return ((o(c, d, a) > 0) !== (o(c, d, b) > 0)) && ((o(a, b, c) > 0) !== (o(a, b, d) > 0));
+    }
+    function lineFree(a, b) {
+      const bx0 = Math.min(a[0], b[0]), bx1 = Math.max(a[0], b[0]), by0 = Math.min(a[1], b[1]), by1 = Math.max(a[1], b[1]);
+      for (const c of chunks) {
+        if (c.x1 < bx0 || c.x0 > bx1 || c.y1 < by0 || c.y0 > by1) continue;
+        for (let i = 0; i < c.pts.length - 1; i++) if (segSeg(a, b, c.pts[i], c.pts[i + 1])) return false;
+      }
+      for (const r of rects) {
+        const q = { x: r.x - 2, y: r.y - 2, w: r.w + 4, h: r.h + 4 };
+        if (segHit(a[0], a[1], b[0], b[1], q)) return false;
+      }
+      return true;
+    }
+    // label joined to a point on a curve by a short leader line; side = -1 (left) or +1 (right)
+    function callout(text, color, anchors, side, crossOK) {
+      const segs = segsOf(text), w = richW(segs, false), h = 20;
+      for (const a of anchors) {
+        for (const dist of [30, 55, 80, 110]) {
+          for (const dy of [0, -24, 24, -48, 48]) {
+            const r = { x: side < 0 ? a[0] - dist - w : a[0] + dist, y: a[1] + dy - h / 2, w, h };
+            const e = [side < 0 ? r.x + w + 3 : r.x - 3, a[1] + dy];
+            const len = Math.hypot(e[0] - a[0], e[1] - a[1]);
+            const s0 = [a[0] + (e[0] - a[0]) * 5 / len, a[1] + (e[1] - a[1]) * 5 / len];
+            if (free(r) && (crossOK || lineFree(s0, e))) {
+              rects.push(r); addPoly([a, e]);
+              return { segs, color, bold: false, r, leader: [a, e] };
+            }
+          }
+        }
+      }
+      return null;
+    }
+    // anchors: [[x,y],...] in px; cands: list of candidate keys tried at each anchor
+    function place(text, color, bold, anchors, cands) {
+      const segs = segsOf(text), w = richW(segs, bold), h = 20;
+      let first = null;
+      for (const a of anchors) {
+        if (!isFinite(a[0]) || !isFinite(a[1])) continue;
+        for (const k of cands) {
+          const p = CAND[k](a[0], a[1], w, h), r = { x: p.x, y: p.y, w, h };
+          if (!first) first = r;
+          if (free(r)) { rects.push(r); return { segs, color, bold, r }; }
+        }
+      }
+      return null; // no clear spot: leave unlabeled rather than overlap a curve
+    }
+    return { addPoly, place, callout };
+  }
+
+  function every(px, step) { const out = []; for (let i = 0; i < px.length; i += step) out.push(px[i]); return out; }
+
+  function computeLabels(geo) {
+    const x0 = pad.l, x1 = W - pad.r, y0 = pad.t, y1 = H - pad.b;
+    const P = makePlacer({ x0, x1, y0, y1 });
+    geo.polys.forEach(pl => P.addPoly(pl));
+    const L = [];
+    const put = (...a) => { const r = P.place(...a); if (r) L.push(r); };
+
+    // reference lines
+    put([{ s: 'A' }, { s: '1', sub: true }, { s: ' = 727 °C' }], COL.ref, false,
+        [[x1, Y(A1)], [x0, Y(A1)]], ['AL', 'AR']);
+    put([{ s: 'M' }, { s: 's', sub: true }, { s: ' = 220 °C' }], COL.ref, false,
+        [[x1, Y(Ms)], [x0, Y(Ms)], [X(1e3), Y(Ms)], [X(10), Y(Ms)]], ['AL', 'AR', 'BL', 'BR']);
+    put('austenite (stable)', COL.A, false,
+        [3, 1, 10, 0.3, 30, 0.1, 100, 1e3].map(t => [X(t), (Y(A1) + y0) / 2]), ['C']);
+
+    // callout labels (TTT curves)
+    for (const c of geo.callouts || []) {
+      const pts = c.pts.filter(p => p.T > Ms + 15 && p.T < A1 - 25 && p.t > XMIN * 1.5 && p.t < XMAX / 1.5);
+      pts.sort((p, q) => Math.abs(p.T - c.Tpref) - Math.abs(q.T - c.Tpref));
+      const r = P.callout(c.text, c.color, every(toPx(pts), 4), c.side, c.crossOK);
+      if (r) L.push(r);
+    }
+
+    // curve labels
+    for (const c of geo.labeled) {
+      const px = toPx(c.pts);
+      let anchors = [];
+      if (c.at === 'nose') {
+        // nose first, then the lower branch (pts run from high T to low T), then the upper branch
+        const ni = c.pts.indexOf(nose(c.pts));
+        anchors = [px[ni]].concat(every(px.slice(ni + 1), 6), every(px.slice(0, ni).reverse(), 6));
+      }
+      else if (c.at === 'low') anchors = every(px.slice().reverse(), 3);
+      else anchors = every(px, 6);
+      put(c.text, c.color, false, anchors, c.cands);
+    }
+
+    // critical cooling rate (CCT)
+    if (geo.crit) {
+      const px = toPx(geo.crit.filter(p => p.T < 600 && p.T > 30));
+      put('critical cooling rate', COL.crit, false, every(px.reverse(), 4), ['R', 'L']);
+    }
+
+    // region labels
+    for (const rg of geo.regions) {
+      put(rg.text, rg.color, true, rg.anchors.map(p => [X(p.t), Y(p.T)]), ['C']);
+    }
+
+    // thermal path: placed last, so the other labels never depend on where the path is
+    if (geo.pathPx.length > 1) {
+      P.addPoly(geo.pathPx);
+      const along = every(geo.pathPx, Math.max(1, Math.floor(geo.pathPx.length / 40)));
+      const anchors = geo.pathHold ? geo.pathHold.concat(along) : along;
+      const n0 = L.length;
+      put('thermal path', COL.path, false, anchors, geo.pathHold ? ['A', 'B', 'AR', 'BR', 'R', 'L'] : ['R', 'L', 'AR', 'BL']);
+      if (L.length > n0) L[L.length - 1].isPath = true;
+    }
+    return L;
+  }
+
+  function regionAnchors(curve, Tlist, mults) {
+    // points to the right of a finish curve at the listed temperatures
+    const out = [];
+    if (!curve || !curve.length) return out;
+    for (const T of Tlist) {
+      let best = null;
+      for (const p of curve) if (!best || Math.abs(p.T - T) < Math.abs(best.T - T)) best = p;
+      if (!best || Math.abs(best.T - T) > 15 || best.t >= XMAX * 0.99) continue;
+      for (const m of mults) { const t = best.t * m; if (t < XMAX / 2) out.push({ t, T }); }
+    }
+    return out;
+  }
+
+  function fullPathPts() {
+    if (mode === 'TTT') return frames.map(f => ({ t: Math.max(XMIN, f.t), T: f.T }));
+    return (frames.pathAll || []).filter(f => f.t >= XMIN).map(f => ({ t: f.t, T: f.T }));
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    const x0 = pad.l, x1 = W - pad.r, y0 = pad.t, y1 = H - pad.b;
+    if (!labelCache || !regionImg) buildRegions();
+    ctx.save();
+    ctx.beginPath(); ctx.rect(x0, y0, x1 - x0, y1 - y0); ctx.clip();
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(regionImg.off, x0, y0, regionImg.w, regionImg.h);
+    ctx.restore();
+
+    // grid
+    ctx.save(); ctx.lineWidth = 1;
+    for (let e = -2; e <= 5; e++) {
+      for (let m = 1; m < 10; m++) {
+        const t = m * Math.pow(10, e); if (t > XMAX) break;
+        ctx.strokeStyle = m === 1 ? 'rgba(0,0,0,0.12)' : 'rgba(0,0,0,0.04)';
+        ctx.beginPath(); ctx.moveTo(X(t), y0); ctx.lineTo(X(t), y1); ctx.stroke();
+      }
+    }
+    for (let T = 0; T <= 800; T += 100) {
+      ctx.strokeStyle = 'rgba(0,0,0,0.10)';
+      ctx.beginPath(); ctx.moveTo(x0, Y(T)); ctx.lineTo(x1, Y(T)); ctx.stroke();
+    }
+    ctx.restore();
+
+    // curves
+    const showTTT = mode === 'TTT' || $('showTTT').checked;
+    const tttCol = mode === 'TTT' ? COL.ttt : COL.tttGray;
+    const t1 = tttCurve(0.01), t50 = tttCurve(0.5), t99 = tttCurve(0.99);
+    const crit = mode === 'CCT' && cctCurves ? critCurve() : null;
+    const pathAll = fullPathPts();
+
+    ctx.save();
+    ctx.beginPath(); ctx.rect(x0, y0, x1 - x0, y1 - y0); ctx.clip();
+    line([{ t: XMIN, T: A1 }, { t: XMAX, T: A1 }], COL.ref, 1.3, [6, 4]);
+    line([{ t: XMIN, T: Ms }, { t: XMAX, T: Ms }], COL.ref, 1.3, [6, 4]);
+    if (showTTT) { line(t1, tttCol, 1.65); line(t50, tttCol, 1.4, [7, 5]); line(t99, tttCol, 1.65); }
+    if (mode === 'CCT' && cctCurves) {
+      line(cctCurves[0.01], COL.cct, 2.4);
+      line(cctCurves[0.5], COL.cct, 1.5, [7, 5]);
+      line(cctCurves[0.99], COL.cct, 2.4);
+      line(crit, COL.crit, 1.8, [3, 4]);
+    }
+
+    // labels (computed once per setting, reused while the animation plays)
+    if (!labelCache) {
+      const polys = [];
+      if (showTTT) polys.push(toPx(t1), toPx(t50), toPx(t99));
+      const labeled = [], regions = [], callouts = [];
+      if (mode === 'TTT') {
+        callouts.push({ pts: t1, text: 'start (1% transformed)', color: COL.ttt, side: -1, Tpref: 430 });
+        callouts.push({ pts: t99, text: 'finish (99% transformed)', color: COL.ttt, side: 1, Tpref: 500 });
+        callouts.push({ pts: t50, text: '50% transformed', color: COL.ttt, side: 1, Tpref: 330, crossOK: true });
+        regions.push({ text: 'austenite', color: COL.A, anchors: [0.05, 0.03, 0.1, 0.2].flatMap(t => [480, 430, 540, 380, 600].map(T => ({ t, T }))) });
+        regions.push({ text: 'pearlite', color: COL.P, anchors: regionAnchors(t99, [645, 625, 665, 605], [8, 4, 16, 30]) });
+        regions.push({ text: 'bainite', color: COL.B, anchors: regionAnchors(t99, [380, 340, 420, 300, 460], [8, 4, 16, 30]) });
+      } else if (cctCurves) {
+        const c1 = cctCurves[0.01], c5 = cctCurves[0.5], c9 = cctCurves[0.99];
+        polys.push(toPx(c1), toPx(c5), toPx(c9), toPx(crit));
+        labeled.push({ pts: c1, text: 'CCT start', color: COL.cct, at: 'low', cands: ['L', 'BL', 'AL', 'B'] });
+        labeled.push({ pts: c9, text: 'CCT finish', color: COL.cct, at: 'low', cands: ['B', 'BR', 'R', 'BL'] });
+        labeled.push({ pts: c5, text: '50%', color: COL.cct, at: 'low', cands: ['B', 'BL', 'L', 'R'] });
+        if (showTTT) {
+          labeled.push({ pts: t1, text: 'TTT start', color: '#777', at: 'low', cands: ['L', 'AL', 'BL', 'A'] });
+          labeled.push({ pts: t99, text: 'TTT finish', color: '#777', at: 'low', cands: ['R', 'AR', 'BR', 'A'] });
+        }
+        regions.push({ text: 'pearlite', color: COL.P, anchors: regionAnchors(c9, [640, 620, 600, 660], [8, 4, 16, 30]) });
+      }
+      const mAnch = [];
+      for (const T of [190, 150, 110, 80, 50]) for (const t of [3, 1, 10, 0.3, 30, 0.1, 100, 1e3, 1e4]) mAnch.push({ t, T });
+      regions.push({ text: 'martensite', color: COL.M, anchors: mAnch });
+
+      const pathPx = toPx(pathAll);
+      let pathHold = null;
+      if (mode === 'TTT') {
+        const Th = +$('holdT').value, th = Math.pow(10, +$('holdt').value);
+        if (th > XMIN * 3) {
+          pathHold = [];
+          for (let i = 1; i <= 9; i++) {
+            const t = Math.pow(10, Math.log10(XMIN) + (Math.log10(th) - Math.log10(XMIN)) * [0.5, 0.35, 0.65, 0.2, 0.8, 0.1, 0.9, 0.05, 0.95][i - 1]);
+            pathHold.push([X(t), Y(Th)]);
+          }
+        }
+      }
+      labelCache = computeLabels({ polys, labeled, regions, callouts, crit, pathPx, pathHold });
+    }
+
+    // path (partial during animation)
+    const hidePath = playIdx === -1;
+    const upto = playIdx === null || hidePath ? frames.length - 1 : playIdx;
+    let pathPts;
+    if (mode === 'TTT') pathPts = frames.slice(0, upto + 1).map(f => ({ t: Math.max(XMIN, f.t), T: f.T }));
+    else {
+      const tNow = playIdx === null ? Infinity : (frames[upto] ? frames[upto].t : 0);
+      pathPts = pathAll.filter(f => f.t <= tNow + 1e-12);
+    }
+    if (pathPts.length > 800) { const k = Math.ceil(pathPts.length / 800); pathPts = pathPts.filter((p, i) => i % k === 0 || i === pathPts.length - 1); }
+    if (!hidePath) line(pathPts, COL.path, 3);
+    const cur = frames[upto];
+    if (cur && !hidePath) {
+      ctx.fillStyle = COL.path; ctx.strokeStyle = '#fff'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(X(Math.max(XMIN, cur.t)), Y(cur.T), 6, 0, 2 * Math.PI); ctx.fill(); ctx.stroke();
+    }
+    ctx.restore();
+
+    for (const l of labelCache) {
+      if (l.isPath && playIdx !== null) continue; // path label only when the whole path is shown
+      if (l.leader) {
+        const [a, e] = l.leader;
+        ctx.save(); ctx.strokeStyle = l.color; ctx.lineWidth = 1.2;
+        ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(e[0], e[1]); ctx.stroke();
+        ctx.fillStyle = l.color; ctx.beginPath(); ctx.arc(a[0], a[1], 3, 0, 2 * Math.PI); ctx.fill();
+        ctx.restore();
+      }
+      richDraw(l.segs, l.r.x, l.r.y + l.r.h / 2, l.color, l.bold, true);
+    }
+
+    // axes box and ticks
+    ctx.save(); ctx.strokeStyle = '#1a1a1a'; ctx.lineWidth = 1.3; ctx.strokeRect(x0, y0, x1 - x0, y1 - y0); ctx.restore();
+    for (let e = -2; e <= 5; e++) {
+      const x = X(Math.pow(10, e));
+      ctx.save(); ctx.strokeStyle = '#1a1a1a'; ctx.beginPath(); ctx.moveTo(x, y1); ctx.lineTo(x, y1 + 5); ctx.stroke(); ctx.restore();
+      const segs = [{ s: '10' }, { s: String(e).replace('-', '−'), sup: true }];
+      richDraw(segs, x - richW(segs) / 2, y1 + 20, '#1a1a1a', false, false);
+    }
+    const xl = mode === 'CCT'
+      ? [{ s: 'time after cooling through A' }, { s: '1', sub: true }, { s: ' (s)' }]
+      : [{ s: 'time (s)' }];
+    richDraw(xl, (x0 + x1) / 2 - richW(xl, false, AXK) / 2, H - 16, '#1a1a1a', false, false, AXK);
+    for (let T = 0; T <= 800; T += 100) {
+      ctx.save(); ctx.strokeStyle = '#1a1a1a'; ctx.beginPath(); ctx.moveTo(x0 - 5, Y(T)); ctx.lineTo(x0, Y(T)); ctx.stroke();
+      ctx.font = FS + 'px ' + FONT; ctx.fillStyle = '#1a1a1a'; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+      ctx.fillText(String(T), x0 - 8, Y(T)); ctx.restore();
+    }
+    rotatedLabel([{ s: 'temperature (°C)' }], 17, (y0 + y1) / 2);
+  }
+
+  // ---------------- wiring ----------------
+  function stageLabel(f) {
+    if (!f) return '';
+    if (mode === 'TTT') {
+      const w = f.stage === 'quench' ? 'quenching' : f.stage === 'hold' ? 'holding' : 'final quench';
+      return `${w}: t = ${fmtTime(f.t)}, T = ${f.T.toFixed(0)} °C`;
+    }
+    return `cooling: t = ${fmtTime(f.t)}, T = ${f.T.toFixed(0)} °C`;
+  }
+  function critNote() {
+    if (mode === 'CCT') {
+      const r = Math.pow(10, +$('rate').value);
+      $('critNote').innerHTML = `critical cooling rate ≈ ${fmtRate(Rcrit)}<br>` +
+        (r >= Rcrit ? 'The cooling rate is above critical, so no pearlite or bainite forms.'
+                    : 'The cooling rate is below critical, so some austenite transforms by diffusion before M<sub>s</sub>.');
+    } else {
+      const Th = +$('holdT').value;
+      $('critNote').innerHTML = Th <= Ms
+        ? 'The hold temperature is below M<sub>s</sub>, so martensite forms immediately on quenching.'
+        : 'Austenite left after the hold transforms to martensite during the final quench.';
+    }
+  }
+  function refresh(recomputeCCT) {
+    stop();
+    readInputs();
+    if (recomputeCCT && mode === 'CCT') computeCCT();
+    buildPath();
+    playIdx = -1; // path stays hidden until play is pressed
+    labelCache = null;
+    showState(blank(), 'press play to follow the thermal path');
+    critNote();
+    draw();
+  }
+
+  function stop() { if (anim) cancelAnimationFrame(anim); anim = null; $('play').textContent = 'play'; }
+  function play() {
+    if (anim) { stop(); return; }
+    if (playIdx === null || playIdx < 0 || playIdx >= frames.length - 1) playIdx = 0;
+    $('play').textContent = 'pause';
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const dur = reduce ? 1 : 6000;
+    const startIdx = playIdx, t0 = performance.now();
+    const step = now => {
+      const frac = clamp((now - t0) / (dur * (frames.length - startIdx) / frames.length), 0, 1);
+      playIdx = Math.min(frames.length - 1, startIdx + Math.round(frac * (frames.length - 1 - startIdx)));
+      const f = frames[playIdx];
+      showState(f.s, stageLabel(f));
+      draw();
+      if (playIdx < frames.length - 1) anim = requestAnimationFrame(step);
+      else { anim = null; playIdx = null; draw(); $('play').textContent = 'play'; $('stage').textContent = 'final microstructure at 25 °C'; }
+    };
+    anim = requestAnimationFrame(step);
+  }
+
+  function setMode(m) {
+    mode = m;
+    $('modeTTT').classList.toggle('on', m === 'TTT');
+    $('modeCCT').classList.toggle('on', m === 'CCT');
+    $('tttCtl').hidden = m !== 'TTT';
+    $('cctCtl').hidden = m !== 'CCT';
+    refresh(true);
+  }
+  $('modeTTT').addEventListener('click', () => setMode('TTT'));
+  $('modeCCT').addEventListener('click', () => setMode('CCT'));
+  ['holdT', 'holdt', 'rate'].forEach(id => $(id).addEventListener('input', () => refresh(false)));
+  $('shift').addEventListener('input', () => refresh(true));
+  $('showTTT').addEventListener('change', () => { labelCache = null; draw(); });
+  $('play').addEventListener('click', play);
+  $('reset').addEventListener('click', () => {
+    stop();
+    refresh(false); // keep the current settings; only clear the path
+  });
+
+  // flyouts
+  let mjDone = false;
+  document.querySelectorAll('[data-panel]').forEach(b => b.addEventListener('click', () => {
+    const id = b.dataset.panel, p = $(id), open = p.hidden;
+    document.querySelectorAll('.flyout').forEach(f => f.hidden = true);
+    p.hidden = !open;
+    if (open && id === 'detPanel' && !mjDone && window.MathJax && MathJax.typesetPromise) {
+      MathJax.typesetPromise([p]).then(() => { mjDone = true; });
+    }
+  }));
+  document.querySelectorAll('.flyout .close').forEach(c => c.addEventListener('click', () => c.closest('.flyout').hidden = true));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') document.querySelectorAll('.flyout').forEach(f => f.hidden = true); });
+
+  buildBars();
+  window.addEventListener('resize', resize);
+  readInputs();
+  buildPath();
+  playIdx = -1;
+  showState(blank(), 'press play to follow the thermal path');
+  critNote();
+  resize();
+})();
+</script>
+</body>
+</html>

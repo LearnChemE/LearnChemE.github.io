@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Solving a Double Scissor Truss</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+  svg: { fontCache: 'global', displayAlign: 'left', displayIndent: '0' }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.min.js"></script>
+<style>
+  body {
+    font-family: Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 15px;
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  #appContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  #controlsRow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 4px;
+    font-size: 17.6px;
+  }
+  .ctrlGroup {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0 10px;
+  }
+  .sliderLabel {
+    font-size: 18.7px;
+    white-space: nowrap;
+  }
+  .sliderLabel em { font-style: italic; font-family: Helvetica, Arial, sans-serif; }
+  .sliderLabel sub { font-style: normal; font-size: 12px; }
+  input[type="range"] {
+    width: 120px;
+    cursor: pointer;
+    accent-color: #666666;
+  }
+  .sliderValue {
+    font-size: 17.6px;
+    min-width: 24px;
+    text-align: left;
+  }
+  .checkboxGroup {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-left: 12px;
+    font-size: 17.6px;
+  }
+  .checkboxGroup input { cursor: pointer; width: 15px; height: 15px; }
+  #simArea {
+    position: relative;
+  }
+  #simCanvas {
+    display: block;
+  }
+  #buttonRow {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    margin: 8px 0 6px 0;
+  }
+  .panelButton {
+    background-color: #98000D;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    padding: 9px 22px;
+    font-size: 17px;
+    font-family: Helvetica, Arial, sans-serif;
+    cursor: pointer;
+  }
+  .panelButton:hover { background-color: #b31220; }
+  .infoPanel {
+    display: none;
+    position: absolute;
+    z-index: 10;
+    width: 560px;
+    box-sizing: border-box;
+    border: 1px solid #aaaaaa;
+    border-radius: 6px;
+    background-color: #fafafa;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.25);
+    padding: 6px 22px 16px 22px;
+    font-size: 15.5px;
+    line-height: 1.5;
+  }
+  #panelDetails {
+    width: 840px;
+    max-height: 520px;
+    overflow-y: auto;
+  }
+  .infoPanel h2 {
+    font-size: 18px;
+    margin: 10px 0 6px 0;
+  }
+  .panelClose {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    width: 26px;
+    height: 26px;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    color: #555555;
+    font-size: 20px;
+    line-height: 26px;
+    font-family: Helvetica, Arial, sans-serif;
+    cursor: pointer;
+    padding: 0;
+  }
+  .panelClose:hover {
+    background: #e2e2e2;
+    color: #000000;
+  }
+  #panelDetails .panelClose {
+    position: sticky;
+    float: right;
+    top: 8px;
+    margin-right: -12px;
+  }
+  .infoPanel a { color: #0645ad; }
+  .figCaption { text-align: center; margin: 2px 0 14px 0; }
+  .figWrap { text-align: center; margin-top: 10px; }
+</style>
+</head>
+<body>
+<div id="appContainer">
+  <div id="controlsRow">
+    <span style="font-size:16px;">point loads (kN):</span>
+    <div class="ctrlGroup">
+      <span class="sliderLabel"><em>F</em><sub>E</sub></span>
+      <input type="range" id="feSlider" min="0" max="15" step="1" value="10">
+      <span class="sliderValue" id="feValue">10</span>
+    </div>
+    <div class="ctrlGroup">
+      <span class="sliderLabel"><em>F</em><sub>F</sub></span>
+      <input type="range" id="ffSlider" min="0" max="15" step="1" value="10">
+      <span class="sliderValue" id="ffValue">10</span>
+    </div>
+    <div class="checkboxGroup">
+      <input type="checkbox" id="jointsCheck">
+      <label for="jointsCheck">show joint labels</label>
+    </div>
+  </div>
+
+  <div id="buttonRow">
+    <button class="panelButton" id="btnDirections">Directions</button>
+    <button class="panelButton" id="btnDetails">Details</button>
+    <button class="panelButton" id="btnAbout">About</button>
+  </div>
+
+  <div id="simArea">
+  <canvas id="simCanvas"></canvas>
+
+  <div class="infoPanel" id="panelDirections">
+    <button class="panelClose" data-panel="panelDirections" aria-label="Close">×</button>
+    <h2>Directions</h2>
+    <p>This Demonstration uses the method of joints to solve the member forces in a double scissor truss. The point loads (\(F_{\mathrm{E}}\), \(F_{\mathrm{F}}\)) and reaction forces (\(R_{\mathrm{A}}\), \(R_{\mathrm{D}}\)) are shown in blue. Set the point loads with sliders. Check "show joint labels" to show the labels assigned to each joint. Arrows that point outward represent the member response to compression forces (green), and arrows that point inward represent the member response to tension forces (red). Compression acts to shorten the member, and tension acts to lengthen the member. Black members are zero members; that is, these members are neither in tension nor in compression, so the force is 0&nbsp;kN. The purpose of zero members is to provide stability and extra support to the structure in case another member fails. The member forces are shown on the diagram in kN.</p>
+  </div>
+
+  <div class="infoPanel" id="panelDetails">
+    <button class="panelClose" data-panel="panelDetails" aria-label="Close">×</button>
+    <h2>Details</h2>
+    <p>The method of sections is used to determine the individual member forces in the scissor truss. First, write out the lengths of the members (Figure 1).</p>
+    <p>For the equilateral triangles:</p>
+    <p>\[ z_1 = \sqrt{L^2 + L^2} = \sqrt{2}\,L; \]</p>
+    <p>for the scalene triangles:</p>
+    <p>\[ z_2 = \sqrt{(2 L)^2 + L^2} = \sqrt{5}\,L, \]</p>
+    <p>where \(z\) is the length of the hypotenuse.</p>
+    <p>Next, solve for the reaction forces. The sum of the moments about joint \(\mathrm{A}\) and the sum of the forces in the \(y\) direction are taken.</p>
+    <p>\[ \sum M_{\mathrm{A}} = 0 = L\,F_{\mathrm{E}} + 2 L\,F_{\mathrm{F}} - 3 L\,R_{\mathrm{D}}, \]</p>
+    <p>\[ \sum F_y = 0 = R_{\mathrm{A}} - F_{\mathrm{E}} - F_{\mathrm{F}} + R_{\mathrm{D}}, \]</p>
+    <p>where \(F_{\mathrm{E}}\) and \(F_{\mathrm{F}}\) are the vertical point load forces at joints \(\mathrm{A}\) and \(\mathrm{B}\), and \(R_{\mathrm{A}}\) and \(R_{\mathrm{D}}\) are the reaction forces at joints \(\mathrm{A}\) and \(\mathrm{D}\) (all in kN).</p>
+    <p>Next, do the force balances at the joints in the \(x\) and \(y\) directions. The order in which the force balances are presented is the order in which they should be solved. The force balances around joints are done assuming we know which members are under tension and which are under compression before solving the truss. If we assume incorrectly, the force will be negative.</p>
+    <p>Joint \(\mathrm{F}\)</p>
+    <p>\[ \sum F_y = 0 = F_{BF}\,\frac{1}{\sqrt{2}} - F_{\mathrm{F}}, \]</p>
+    <p>\[ \sum F_x = 0 = -F_{BF}\,\frac{1}{\sqrt{2}} + F_{DF} - F_{EF}. \]</p>
+    <p>Joint \(\mathrm{E}\)</p>
+    <p>\[ \sum F_y = 0 = F_{CE}\,\frac{1}{\sqrt{2}} - F_{\mathrm{E}}, \]</p>
+    <p>\[ \sum F_x = 0 = -F_{AE} + F_{CE}\,\frac{1}{\sqrt{2}} + F_{EF}. \]</p>
+    <p>Joint \(\mathrm{B}\)</p>
+    <p>\[ \sum F_y = 0 = F_{AB}\,\frac{1}{\sqrt{2}} + F_{BD}\,\frac{1}{\sqrt{5}} - F_{BF}\,\frac{1}{\sqrt{2}}, \]</p>
+    <p>\[ \sum F_x = 0 = F_{AB}\,\frac{1}{\sqrt{2}} - F_{BD}\,\frac{2}{\sqrt{5}} + F_{BF}\,\frac{1}{\sqrt{2}}. \]</p>
+    <p>Joint \(\mathrm{C}\)</p>
+    <p>\[ \sum F_y = 0 = F_{AC}\,\frac{1}{\sqrt{5}} + F_{CD}\,\frac{1}{\sqrt{2}} - F_{CE}\,\frac{1}{\sqrt{2}}, \]</p>
+    <p>\[ \sum F_x = 0 = F_{AC}\,\frac{2}{\sqrt{5}} - F_{CD}\,\frac{1}{\sqrt{2}} - F_{CE}\,\frac{1}{\sqrt{2}}. \]</p>
+    <p>Joint \(\mathrm{A}\)</p>
+    <p>\[ \sum F_x = 0 = -F_{AB}\,\frac{1}{\sqrt{2}} - F_{AC}\,\frac{2}{\sqrt{5}} + F_{AE}. \]</p>
+    <div class="figWrap"><canvas id="fig1Canvas"></canvas></div>
+    <p class="figCaption">Figure 1.</p>
+    <div class="figWrap"><canvas id="fig2Canvas"></canvas></div>
+    <p class="figCaption">Figure 2.</p>
+    <p>Reference</p>
+    <p>[1] R. C. Hibbeler, <i>Engineering Mechanics: Statics</i>, 12th ed., Upper Saddle River, NJ: Prentice Hall, 2010.</p>
+  </div>
+
+  <div class="infoPanel" id="panelAbout">
+    <button class="panelClose" data-panel="panelAbout" aria-label="Close">×</button>
+    <h2>About</h2>
+    <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/SolvingADoubleScissorTruss/" target="_blank" rel="noopener">Mathematica simulation</a> by Rachael L. Baumann. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.</p>
+  </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ------------------------------------------------------------------
+  // Geometry and physics (from the Mathematica CDF)
+  // ------------------------------------------------------------------
+  var w = 5, h = 5;
+  var theta1 = Math.atan(h / w);          // 45 deg
+  var theta2 = Math.atan(h / (2 * w));    // ~26.57 deg
+  var SQ2 = Math.SQRT2, SQ5 = Math.sqrt(5);
+
+  // Closed-form solution of the joint equilibrium equations.
+  // Sign convention matches the CDF output: positive = tension (red),
+  // negative = compression (green), zero = zero member (black).
+  function solveTruss(FE, FF) {
+    return {
+      RA:  (2 * FE + FF) / 3,
+      RD:  (FE + 2 * FF) / 3,
+      FAB: -SQ2 * FF / 3,
+      FAC: -(2 * SQ5 / 3) * FE,
+      FAE: (4 * FE + FF) / 3,
+      FBD: -(2 * SQ5 / 3) * FF,
+      FBF: SQ2 * FF,
+      FCD: -SQ2 * FE / 3,
+      FCE: SQ2 * FE,
+      FDF: (FE + 4 * FF) / 3,
+      FEF: (FE + FF) / 3
+    };
+  }
+
+  // scale$[F] in the CDF: arrow length factor for loads/reactions
+  function loadScale(F) {
+    return (F === 0 ? 0 : 0.25) + F / 15;
+  }
+
+  // ------------------------------------------------------------------
+  // Canvas setup (hi-DPI)
+  // ------------------------------------------------------------------
+  var CW = 600, CH = 368;
+  var canvas = document.getElementById('simCanvas');
+  var ctx = canvas.getContext('2d');
+  var dpr = window.devicePixelRatio || 1;
+  canvas.width = CW * dpr;
+  canvas.height = CH * dpr;
+  canvas.style.width = CW + 'px';
+  canvas.style.height = CH + 'px';
+  ctx.scale(dpr, dpr);
+
+  // Plot range: x in [-1.65, 16.65]; y bottom = -3.75, aspect ratio 1:1
+  var XMIN = -1.65, XMAX = 16.65, YMIN = -3.75;
+  var pxPerUnit = CW / (XMAX - XMIN);       // ~32.8 px per unit
+  var YMAX = YMIN + CH / pxPerUnit;         // top of range
+
+  function px(x) { return (x - XMIN) * pxPerUnit; }
+  function py(y) { return CH - (y - YMIN) * pxPerUnit; }
+
+  var COL_T = 'rgb(255,0,64)';   // tension  RGBColor[1, 0, 0.25]
+  var COL_C = 'rgb(0,153,0)';    // compression RGBColor[0, 0.6, 0]
+  var BLUE  = 'rgb(0,0,255)';
+
+  function colC0(F) { return F === 0 ? '#000000' : COL_C; }
+  function colT0(F) { return F === 0 ? '#000000' : COL_T; }
+
+  // Number formatting: one digit after the decimal point (NumberForm {n,1})
+  function fmt1(x) {
+    var v = Math.abs(x) < 5e-11 ? 0 : x;
+    return v.toFixed(1);
+  }
+
+  // ------------------------------------------------------------------
+  // Text helpers: mixed italic/plain with subscripts on canvas
+  // Segments: {t: 'text', it: bool, sub: bool}
+  // ------------------------------------------------------------------
+  function drawRich(segments, x, y, size, color, align, bg, angle) {
+    ctx.save();
+    ctx.translate(x, y);
+    if (angle) ctx.rotate(-angle);   // canvas y is flipped
+    ctx.textBaseline = 'middle';
+
+    // measure
+    var total = 0;
+    segments.forEach(function (s) {
+      var fs = s.sub ? size * 0.7 : size;
+      ctx.font = (s.it ? 'italic ' : '') + fs + 'px Helvetica, Arial, sans-serif';
+      total += ctx.measureText(s.t).width;
+    });
+
+    var x0;
+    if (align === 'center') x0 = -total / 2;
+    else if (align === 'right') x0 = -total;
+    else x0 = 0;
+
+    if (bg) {
+      ctx.fillStyle = bg;
+      ctx.fillRect(x0 - 3, -size * 0.62, total + 6, size * 1.24);
+    }
+
+    ctx.fillStyle = color;
+    var cx = x0;
+    segments.forEach(function (s) {
+      var fs = s.sub ? size * 0.7 : size;
+      ctx.font = (s.it ? 'italic ' : '') + fs + 'px Helvetica, Arial, sans-serif';
+      var dy = s.sub ? size * 0.25 : 0;
+      ctx.fillText(s.t, cx, dy);
+      cx += ctx.measureText(s.t).width;
+    });
+    ctx.restore();
+  }
+
+  // ------------------------------------------------------------------
+  // Arrow drawing
+  // ------------------------------------------------------------------
+  function drawLineSeg(ax, ay, bx, by, color, width) {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    ctx.beginPath();
+    ctx.moveTo(px(ax), py(ay));
+    ctx.lineTo(px(bx), py(by));
+    ctx.stroke();
+  }
+
+  // arrowhead at plot point (x,y) pointing in direction (dx,dy) [plot coords]
+  function arrowHead(x, y, dx, dy, color, len) {
+    var L = Math.hypot(dx, dy);
+    if (L === 0) return;
+    var ux = dx / L, uy = dy / L;
+    var X = px(x), Y = py(y);
+    // canvas direction (y flipped)
+    var cx = ux, cy = -uy;
+    var wHalf = len * 0.42;
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(X, Y);
+    ctx.lineTo(X - cx * len - cy * wHalf, Y - cy * len + cx * wHalf);
+    ctx.lineTo(X - cx * len + cy * wHalf, Y - cy * len - cx * wHalf);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  // simple arrow from a to b with head at b (loads/reactions)
+  function drawArrow(ax, ay, bx, by, color, width, headLen) {
+    var dx = bx - ax, dy = by - ay;
+    var L = Math.hypot(dx, dy);
+    if (L === 0) return;
+    var ux = dx / L, uy = dy / L;
+    var hl = headLen / pxPerUnit;
+    drawLineSeg(ax, ay, bx - ux * hl * 0.8, by - uy * hl * 0.8, color, width);
+    arrowHead(bx, by, dx, dy, color, headLen);
+  }
+
+  // Member arrow, Mathematica-style Arrowheads specs.
+  // spec: list of {s: size sign (+ along line, - reversed), pos: fraction along line}
+  function drawMemberArrow(ax, ay, bx, by, color, width, specs, headLen) {
+    drawLineSeg(ax, ay, bx, by, color, width);
+    var dx = bx - ax, dy = by - ay;
+    specs.forEach(function (sp) {
+      var x = ax + dx * sp.pos, y = ay + dy * sp.pos;
+      var d = sp.s > 0 ? 1 : -1;
+      arrowHead(x, y, dx * d, dy * d, color, headLen);
+    });
+  }
+
+  // Outward (compression): head at each end pointing out of the member
+  var HEADS_COMP = [{ s: -1, pos: 0 }, { s: 1, pos: 1 }];
+  // Inward (tension): heads at 0.4 and 0.6 pointing toward each other
+  var HEADS_TENS = [{ s: 1, pos: 0.4 }, { s: -1, pos: 0.6 }];
+  // Inward for the crossing members BF, CE (offset from the crossing point)
+  var HEADS_TENS_X = [{ s: 1, pos: 0.3 }, { s: -1, pos: 0.8 }];
+
+  // ------------------------------------------------------------------
+  // Main drawing
+  // ------------------------------------------------------------------
+  var THICK = 2.4;
+  var HEAD = 15;
+
+  function draw() {
+    var FE = parseInt(document.getElementById('feSlider').value, 10);
+    var FF = parseInt(document.getElementById('ffSlider').value, 10);
+    var showJoints = document.getElementById('jointsCheck').checked;
+    var s = solveTruss(FE, FF);
+
+    ctx.clearRect(0, 0, CW, CH);
+
+    // ---- truss outline: two polygons + two long diagonals (black, thick)
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = THICK;
+    ctx.lineJoin = 'round';
+    // Polygon A-F-B
+    ctx.beginPath();
+    ctx.moveTo(px(0), py(0));
+    ctx.lineTo(px(2 * w), py(0));
+    ctx.lineTo(px(w), py(h));
+    ctx.closePath();
+    ctx.stroke();
+    // Polygon D-E-C
+    ctx.beginPath();
+    ctx.moveTo(px(3 * w), py(0));
+    ctx.lineTo(px(w), py(0));
+    ctx.lineTo(px(2 * w), py(h));
+    ctx.closePath();
+    ctx.stroke();
+    drawLineSeg(w, h, 3 * w, 0, '#000000', THICK);   // B-D
+    drawLineSeg(2 * w, h, 0, 0, '#000000', THICK);   // C-A
+
+    // ---- point load arrows (blue, downward) and labels
+    if (loadScale(FE) > 0) {
+      drawArrow(w, 0, w, -(h / 2) * loadScale(FE), BLUE, THICK, HEAD);
+    }
+    if (loadScale(FF) > 0) {
+      drawArrow(2 * w, 0, 2 * w, -(h / 2) * loadScale(FF), BLUE, THICK, HEAD);
+    }
+    if (FE !== 0) {
+      drawRich(
+        [{ t: 'F', it: true }, { t: 'E', sub: true }, { t: ' = ' + fmt1(FE) + ' kN' }],
+        px(w), py(-(h / 2) * loadScale(FE)) + 15, 17, BLUE, 'center', null, 0);
+    }
+    if (FF !== 0) {
+      drawRich(
+        [{ t: 'F', it: true }, { t: 'F', sub: true }, { t: ' = ' + fmt1(FF) + ' kN' }],
+        px(2 * w), py(-(h / 2) * loadScale(FF)) + 15, 17, BLUE, 'center', null, 0);
+    }
+
+    // ---- reaction arrows (blue, upward into supports) and labels
+    if (loadScale(s.RA) > 0) {
+      drawArrow(0, -(h / 2) * loadScale(s.RA), 0, 0, BLUE, THICK, HEAD);
+    }
+    if (loadScale(s.RD) > 0) {
+      drawArrow(3 * w, -(h / 2) * loadScale(s.RD), 3 * w, 0, BLUE, THICK, HEAD);
+    }
+    if (Math.abs(s.RA) > 1e-9) {
+      drawRich(
+        [{ t: 'R', it: true }, { t: 'A', sub: true }, { t: ' = ' + fmt1(s.RA) + ' kN' }],
+        px(0), py(-(h / 2) * loadScale(s.RA)) + 15, 17, BLUE, 'center', null, 0);
+    }
+    if (Math.abs(s.RD) > 1e-9) {
+      drawRich(
+        [{ t: 'R', it: true }, { t: 'D', sub: true }, { t: ' = ' + fmt1(s.RD) + ' kN' }],
+        px(3 * w), py(-(h / 2) * loadScale(s.RD)) + 15, 17, BLUE, 'center', null, 0);
+    }
+
+    // ---- member force arrows + rotated labels with white background
+    // members: [F, x1,y1, x2,y2, labelX, labelY, rotAngle, headSpecTension]
+    var members = [
+      [s.FAB, 0, 0, w, h,           w / 2, h / 2,      theta1,  HEADS_TENS],
+      [s.FAC, 0, 0, 2 * w, h,       w, h / 2,          theta2,  HEADS_TENS],
+      [s.FAE, 0, 0, w, 0,           w / 2, 0,          0,       HEADS_TENS],
+      [s.FBD, w, h, 3 * w, 0,       2 * w, h / 2,     -theta2,  HEADS_TENS],
+      [s.FCD, 2 * w, h, 3 * w, 0,   2.5 * w, h / 2,   -theta1,  HEADS_TENS],
+      [s.FDF, 3 * w, 0, 2 * w, 0,   2.5 * w, 0,        0,       HEADS_TENS],
+      [s.FEF, w, 0, 2 * w, 0,       1.5 * w, 0,        0,       HEADS_TENS],
+      [s.FBF, w, h, 2 * w, 0,       1.65 * w, 0.35 * h, -theta1, HEADS_TENS_X],
+      [s.FCE, 2 * w, h, w, 0,       1.35 * w, 0.35 * h,  theta1, HEADS_TENS_X]
+    ];
+
+    members.forEach(function (m) {
+      var F = Math.abs(m[0]) < 5e-11 ? 0 : m[0];
+      var color, specs;
+      if (F < 0) { color = colC0(F); specs = HEADS_COMP; }
+      else       { color = colT0(F); specs = m[8]; }
+      if (F === 0) {
+        drawLineSeg(m[1], m[2], m[3], m[4], '#000000', THICK);
+      } else {
+        drawMemberArrow(m[1], m[2], m[3], m[4], color, THICK, specs, HEAD);
+      }
+      drawRich([{ t: fmt1(Math.abs(F)) }], px(m[5]), py(m[6]), 17,
+               F === 0 ? '#000000' : color, 'center', '#ffffff', m[7]);
+    });
+
+    // ---- joint labels (rounded frames) when checkbox is on
+    if (showJoints) {
+      var jl = [
+        ['A', 0, 0,        -1,  0],   // to the left of A
+        ['B', w, h,         0,  1],   // above B
+        ['C', 2 * w, h,     0,  1],   // above C
+        ['D', 3 * w, 0,     1,  0],   // to the right of D
+        ['E', w, 0,        -1, -1],   // below-left of E
+        ['F', 2 * w, 0,     1, -1]    // below-right of F
+      ];
+      jl.forEach(function (j) {
+        var X = px(j[1]) + j[3] * 22;
+        var Y = py(j[2]) - j[4] * 20;
+        ctx.font = '15px Helvetica, Arial, sans-serif';
+        var tw = ctx.measureText(j[0]).width;
+        var bw = tw + 16, bh = 24, r = 12;
+        ctx.fillStyle = '#ffffff';
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(X - bw / 2 + r, Y - bh / 2);
+        ctx.arcTo(X + bw / 2, Y - bh / 2, X + bw / 2, Y + bh / 2, r);
+        ctx.arcTo(X + bw / 2, Y + bh / 2, X - bw / 2, Y + bh / 2, r);
+        ctx.arcTo(X - bw / 2, Y + bh / 2, X - bw / 2, Y - bh / 2, r);
+        ctx.arcTo(X - bw / 2, Y - bh / 2, X + bw / 2, Y - bh / 2, r);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = '#000000';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(j[0], X - tw / 2, Y + 1);
+      });
+    }
+
+    // ---- joint pins (black ring with white center)
+    var pins = [[0, 0], [w, 0], [w, h], [2 * w, 0], [2 * w, h], [3 * w, 0]];
+    pins.forEach(function (p) {
+      ctx.fillStyle = '#000000';
+      ctx.beginPath();
+      ctx.arc(px(p[0]), py(p[1]), 4.5, 0, 2 * Math.PI);
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(px(p[0]), py(p[1]), 3, 0, 2 * Math.PI);
+      ctx.fill();
+    });
+
+    // ---- title line: "all tension and compression forces are in kN"
+    (function () {
+      var size = 18.4;   // "all tension and compression..." (increased 15%)
+      var parts = [
+        { t: 'all ', c: '#000000' },
+        { t: 'tension', c: COL_T },
+        { t: ' and ', c: '#000000' },
+        { t: 'compression', c: COL_C },
+        { t: ' forces are in kN', c: '#000000' }
+      ];
+      ctx.font = size + 'px Helvetica, Arial, sans-serif';
+      ctx.textBaseline = 'middle';
+      var total = 0;
+      parts.forEach(function (p) { total += ctx.measureText(p.t).width; });
+      var X = px(1.5 * w) - total / 2, Y = py(1.3 * h);
+      parts.forEach(function (p) {
+        ctx.fillStyle = p.c;
+        ctx.fillText(p.t, X, Y);
+        X += ctx.measureText(p.t).width;
+      });
+    })();
+  }
+
+  // ------------------------------------------------------------------
+  // Details-panel figures
+  // ------------------------------------------------------------------
+  function setupFigCanvas(id, cw, ch) {
+    var c = document.getElementById(id);
+    var g = c.getContext('2d');
+    c.width = cw * dpr;
+    c.height = ch * dpr;
+    c.style.width = cw + 'px';
+    c.style.height = ch + 'px';
+    g.scale(dpr, dpr);
+    return g;
+  }
+
+  // Figure 1: truss with member force labels and load/reaction arrows
+  function drawFig1() {
+    var FW = 550, FH = 320;
+    var g = setupFigCanvas('fig1Canvas', FW, FH);
+    var xmin = -1.6, xmax = 16.6, ymin = -3.6;
+    var ppu = FW / (xmax - xmin);
+    function fx(x) { return (x - xmin) * ppu; }
+    function fy(y) { return FH - (y - ymin) * ppu; }
+    var LW = 2.2, HL = 12;
+
+    function seg(ax, ay, bx, by) {
+      g.beginPath(); g.moveTo(fx(ax), fy(ay)); g.lineTo(fx(bx), fy(by)); g.stroke();
+    }
+    function head(x, y, dx, dy) {
+      var L = Math.hypot(dx, dy), ux = dx / L, uy = -dy / L;
+      var X = fx(x), Y = fy(y), wH = HL * 0.42;
+      g.beginPath();
+      g.moveTo(X, Y);
+      g.lineTo(X - ux * HL - uy * wH, Y - uy * HL + ux * wH);
+      g.lineTo(X - ux * HL + uy * wH, Y - uy * HL - ux * wH);
+      g.closePath(); g.fill();
+    }
+    function memberArrow(ax, ay, bx, by, specs) {
+      seg(ax, ay, bx, by);
+      var dx = bx - ax, dy = by - ay;
+      specs.forEach(function (sp) {
+        head(ax + dx * sp.pos, ay + dy * sp.pos, dx * (sp.s > 0 ? 1 : -1), dy * (sp.s > 0 ? 1 : -1));
+      });
+    }
+    function rich(segments, x, y, size, bg) {
+      var total = 0;
+      segments.forEach(function (sgm) {
+        var fs = sgm.sub ? size * 0.7 : size;
+        g.font = (sgm.it ? 'italic ' : '') + fs + 'px Helvetica, Arial, sans-serif';
+        total += g.measureText(sgm.t).width;
+      });
+      var X = fx(x) - total / 2, Y = fy(y);
+      g.textBaseline = 'middle';
+      if (bg) { g.fillStyle = '#ffffff'; g.fillRect(X - 2, Y - size * 0.6, total + 4, size * 1.2); }
+      g.fillStyle = '#000000';
+      segments.forEach(function (sgm) {
+        var fs = sgm.sub ? size * 0.7 : size;
+        g.font = (sgm.it ? 'italic ' : '') + fs + 'px Helvetica, Arial, sans-serif';
+        g.fillText(sgm.t, X, Y + (sgm.sub ? size * 0.25 : 0));
+        X += g.measureText(sgm.t).width;
+      });
+    }
+    function jointLabel(t, x, y, ox, oy) {
+      var X = fx(x) + ox * 19, Y = fy(y) - oy * 17;
+      g.font = '13px Helvetica, Arial, sans-serif';
+      var tw = g.measureText(t).width, bw = tw + 13, bh = 20, r = 10;
+      g.fillStyle = '#ffffff'; g.strokeStyle = '#000000'; g.lineWidth = 1;
+      g.beginPath();
+      g.moveTo(X - bw / 2 + r, Y - bh / 2);
+      g.arcTo(X + bw / 2, Y - bh / 2, X + bw / 2, Y + bh / 2, r);
+      g.arcTo(X + bw / 2, Y + bh / 2, X - bw / 2, Y + bh / 2, r);
+      g.arcTo(X - bw / 2, Y + bh / 2, X - bw / 2, Y - bh / 2, r);
+      g.arcTo(X - bw / 2, Y - bh / 2, X + bw / 2, Y - bh / 2, r);
+      g.closePath(); g.fill(); g.stroke();
+      g.fillStyle = '#000000'; g.textBaseline = 'middle';
+      g.fillText(t, X - tw / 2, Y + 1);
+    }
+
+    g.strokeStyle = '#000000'; g.fillStyle = '#000000'; g.lineWidth = LW; g.lineJoin = 'round';
+
+    // load and reaction arrows with labels
+    seg(5, 0, 5, -1.75); head(5, -2, 0, -1);
+    seg(10, 0, 10, -1.75); head(10, -2, 0, -1);
+    seg(0, -2, 0, -0.25); head(0, 0, 0, 1);
+    seg(15, -2, 15, -0.25); head(15, 0, 0, 1);
+    rich([{ t: 'F', it: true }, { t: 'E', sub: true }], 5, -2.65, 15, false);
+    rich([{ t: 'F', it: true }, { t: 'F', sub: true }], 10, -2.65, 15, false);
+    rich([{ t: 'R', it: true }, { t: 'A', sub: true }], 0, -2.65, 15, false);
+    rich([{ t: 'R', it: true }, { t: 'D', sub: true }], 15, -2.65, 15, false);
+
+    // members with outward heads: AB, BD, CA, CD
+    var OUT = [{ s: -1, pos: 0 }, { s: 1, pos: 1 }];
+    memberArrow(0, 0, 5, 5, OUT);
+    memberArrow(5, 5, 15, 0, OUT);
+    memberArrow(10, 5, 0, 0, OUT);
+    memberArrow(10, 5, 15, 0, OUT);
+    // bottom chord: inward heads at 0.4/0.6
+    var IN = [{ s: 1, pos: 0.4 }, { s: -1, pos: 0.6 }];
+    memberArrow(0, 0, 5, 0, IN);
+    memberArrow(5, 0, 10, 0, IN);
+    memberArrow(10, 0, 15, 0, IN);
+    // crossing members
+    memberArrow(5, 0, 10, 5, [{ s: 1, pos: 0.25 }, { s: -1, pos: 0.375 }]);
+    memberArrow(5, 5, 10, 0, [{ s: 1, pos: 0.625 }, { s: -1, pos: 0.75 }]);
+
+    // joint labels
+    jointLabel('A', 0, 0, -1, 0);
+    jointLabel('B', 5, 5, 0, 1);
+    jointLabel('C', 10, 5, 0, 1);
+    jointLabel('D', 15, 0, 1, 0);
+    jointLabel('E', 5, 0, -1, -1);
+    jointLabel('F', 10, 0, 1, -1);
+
+    // member force labels (white background)
+    rich([{ t: 'F', it: true }, { t: 'AB', sub: true }], 2.5, 2.5, 15, true);
+    rich([{ t: 'F', it: true }, { t: 'BF', sub: true }], 8.5, 1.5, 15, true);
+    rich([{ t: 'F', it: true }, { t: 'AE', sub: true }], 2.5, 0, 15, true);
+    rich([{ t: 'F', it: true }, { t: 'CE', sub: true }], 6.667, 1.667, 15, true);
+    rich([{ t: 'F', it: true }, { t: 'CD', sub: true }], 12.5, 2.5, 15, true);
+    rich([{ t: 'F', it: true }, { t: 'DF', sub: true }], 12.5, 0, 15, true);
+    rich([{ t: 'F', it: true }, { t: 'EF', sub: true }], 7.5, 0, 15, true);
+    rich([{ t: 'F', it: true }, { t: 'BD', sub: true }], 10, 2.5, 15, true);
+    rich([{ t: 'F', it: true }, { t: 'AC', sub: true }], 5, 2.5, 15, true);
+  }
+
+  // Figure 2: truss with member lengths and the dimension L
+  function drawFig2() {
+    var FW = 500, FH = 190;
+    var g = setupFigCanvas('fig2Canvas', FW, FH);
+    var xmin = -1.9, xmax = 16.1, ymin = -0.7;
+    var ppu = FW / (xmax - xmin);
+    function fx(x) { return (x - xmin) * ppu; }
+    function fy(y) { return FH - (y - ymin) * ppu; }
+    function seg(ax, ay, bx, by, lw) {
+      g.lineWidth = lw;
+      g.beginPath(); g.moveTo(fx(ax), fy(ay)); g.lineTo(fx(bx), fy(by)); g.stroke();
+    }
+    function lenLabel(root, x, y) {
+      var size = 15;
+      var pre = root ? '\u221A' + root + ' ' : '';
+      g.font = size + 'px Helvetica, Arial, sans-serif';
+      var w1 = g.measureText(pre).width;
+      g.font = 'italic ' + size + 'px Helvetica, Arial, sans-serif';
+      var w2 = g.measureText('L').width;
+      var X = fx(x) - (w1 + w2) / 2, Y = fy(y);
+      g.textBaseline = 'middle';
+      g.fillStyle = '#ffffff';
+      g.fillRect(X - 2, Y - size * 0.6, w1 + w2 + 4, size * 1.2);
+      g.fillStyle = '#000000';
+      g.font = size + 'px Helvetica, Arial, sans-serif';
+      g.fillText(pre, X, Y);
+      g.font = 'italic ' + size + 'px Helvetica, Arial, sans-serif';
+      g.fillText('L', X + w1, Y);
+    }
+
+    g.strokeStyle = '#000000'; g.fillStyle = '#000000'; g.lineJoin = 'round';
+    var LW = 2.2;
+    // truss outline
+    g.lineWidth = LW;
+    g.beginPath();
+    g.moveTo(fx(0), fy(0)); g.lineTo(fx(10), fy(0)); g.lineTo(fx(5), fy(5)); g.closePath(); g.stroke();
+    g.beginPath();
+    g.moveTo(fx(15), fy(0)); g.lineTo(fx(5), fy(0)); g.lineTo(fx(10), fy(5)); g.closePath(); g.stroke();
+    seg(5, 5, 15, 0, LW);
+    seg(10, 5, 0, 0, LW);
+
+    // dimension line at x = -0.5 with end ticks
+    seg(-0.5, 0, -0.5, 5, 1);
+    seg(-0.75, 0, -0.25, 0, 1);
+    seg(-0.75, 5, -0.25, 5, 1);
+
+    // length labels
+    lenLabel('2', 2.5, 2.5);
+    lenLabel('2', 8.5, 1.5);
+    lenLabel('', 2.5, 0);
+    lenLabel('2', 6.5, 1.5);
+    lenLabel('2', 12.5, 2.5);
+    lenLabel('', 12.5, 0);
+    lenLabel('', 7.5, 0);
+    lenLabel('5', 10, 2.5);
+    lenLabel('5', 5, 2.5);
+    lenLabel('', -0.5, 2.5);
+  }
+
+  // ------------------------------------------------------------------
+  // Controls and panels
+  // ------------------------------------------------------------------
+  var feSlider = document.getElementById('feSlider');
+  var ffSlider = document.getElementById('ffSlider');
+
+  feSlider.addEventListener('input', function () {
+    document.getElementById('feValue').textContent = feSlider.value;
+    draw();
+  });
+  ffSlider.addEventListener('input', function () {
+    document.getElementById('ffValue').textContent = ffSlider.value;
+    draw();
+  });
+  document.getElementById('jointsCheck').addEventListener('change', draw);
+
+  var figsDrawn = false;
+  var panelBtn = {
+    panelDirections: 'btnDirections',
+    panelDetails: 'btnDetails',
+    panelAbout: 'btnAbout'
+  };
+  function positionPanel(p, panelId) {
+    var btn = document.getElementById(panelBtn[panelId]);
+    var simArea = document.getElementById('simArea');
+    var btnRect = btn.getBoundingClientRect();
+    var areaRect = simArea.getBoundingClientRect();
+    var left;
+    if (panelId === 'panelDetails') {
+      // open under the full button row, centered on it
+      var rowRect = document.getElementById('buttonRow').getBoundingClientRect();
+      left = (rowRect.left + rowRect.right) / 2 - areaRect.left - p.offsetWidth / 2;
+    } else {
+      left = btnRect.left - areaRect.left;
+    }
+    // keep the panel from running off either edge of the window
+    var maxLeft = window.innerWidth - areaRect.left - p.offsetWidth - 12;
+    if (left > maxLeft) left = maxLeft;
+    var minLeft = -areaRect.left + 12;
+    if (left < minLeft) left = minLeft;
+    p.style.left = left + 'px';
+    p.style.top = (btnRect.bottom - areaRect.top + 4) + 'px';
+  }
+  function togglePanel(panelId) {
+    ['panelDirections', 'panelDetails', 'panelAbout'].forEach(function (id) {
+      var p = document.getElementById(id);
+      if (id === panelId) {
+        var opening = p.style.display !== 'block';
+        p.style.display = opening ? 'block' : 'none';
+        if (opening) {
+          positionPanel(p, id);
+          if (id === 'panelDetails' && !figsDrawn) {
+            drawFig1();
+            drawFig2();
+            figsDrawn = true;
+          }
+          if (window.MathJax && MathJax.typesetPromise) {
+            MathJax.typesetPromise([p]);
+          }
+        }
+      } else {
+        p.style.display = 'none';
+      }
+    });
+  }
+  document.getElementById('btnDirections').addEventListener('click', function () { togglePanel('panelDirections'); });
+  document.getElementById('btnDetails').addEventListener('click', function () { togglePanel('panelDetails'); });
+  document.getElementById('btnAbout').addEventListener('click', function () { togglePanel('panelAbout'); });
+  Array.prototype.forEach.call(document.querySelectorAll('.panelClose'), function (btn) {
+    btn.addEventListener('click', function () {
+      document.getElementById(btn.getAttribute('data-panel')).style.display = 'none';
+    });
+  });
+
+  draw();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fins with Different Tip Boundary Conditions</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] },
+  chtml: { displayAlign: 'left' },
+  svg: { displayAlign: 'left' }
+};
+</script>
+<script id="MathJax-script" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+<style>
+  html,body{ margin:0; padding:0; background:#fff; }
+  #wrap{ font-family:Helvetica, Arial, sans-serif; color:#000; }
+  #app{ width:800px; position:relative; transform-origin:top left; }
+  #title{ font-size:19px; font-weight:bold; padding:8px 2px 2px; }
+  #btnbar{ display:flex; gap:8px; padding:6px 2px 10px; }
+  .ib{ background:#98000D; color:#fff; border:none; padding:8px 18px; font-size:14px;
+       font-family:inherit; border-radius:3px; cursor:pointer; }
+  .ib:hover{ background:#b3101c; }
+  .ib.active{ background:#5f0008; }
+
+  .panel{ position:absolute; left:2px; top:78px; width:718px; background:#fff;
+          border:1px solid #999; border-radius:4px; box-shadow:0 6px 18px rgba(0,0,0,.22);
+          padding:16px 42px 18px 20px; z-index:60; display:none; max-height:660px; overflow:auto;
+          font-size:15px; line-height:1.5; }
+  .panel h3{ margin:0 0 2px; font-size:17px; line-height:1.2; }
+  .panel a{ color:#98000D; }
+  .panel p{ margin:9px 0; }
+  .panel h3 + p{ margin-top:0; }
+  .symtab{ border-collapse:collapse; margin:2px 0 4px; }
+  .symtab td{ padding:1px 14px 1px 0; vertical-align:baseline; }
+  .symtab td:first-child{ min-width:34px; }
+  .closex{ position:absolute; top:6px; right:12px; font-size:24px; line-height:1;
+           cursor:pointer; color:#444; user-select:none; }
+  .closex:hover{ color:#000; }
+  .eqwrap{ overflow:visible; }
+  #p_details{ max-height:660px; overflow-x:hidden; }
+  mjx-container[display="true"]{ text-align:left !important; margin:0.6em 0 !important; }
+
+  #fig{ position:relative; width:800px; height:830px; overflow:visible; }
+  #cv{ position:absolute; left:0; top:0; }
+
+  /* slider styling */
+  input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+  input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  #fig input[type="range"]{ position:absolute; margin:0; cursor:pointer; }
+
+  .olab{ position:absolute; white-space:nowrap; }
+  .sl-lab{ font-size:16px; }
+  .sc-lab{ font-size:17px; }
+  .fin-lab{ font-size:18.7px; }           /* fin schematic labels: +10% */
+  .xtitle{ position:absolute; font-size:18px; white-space:nowrap; transform:translate(-50%,-50%); }
+  .ytitle{ position:absolute; font-size:15px; font-weight:normal; white-space:nowrap; transform:translate(-50%,-50%) rotate(-90deg); }
+  .legend{ position:absolute; font-size:15.6px; line-height:1.55; }
+  .legend div{ display:flex; align-items:center; white-space:nowrap; }
+  .legend .ln{ display:inline-block; width:33px; height:0; border-top:2.5px solid; margin-right:7px; }
+  #tip{ position:absolute; display:none; pointer-events:none; background:#fff; border:2px solid #000;
+        border-radius:4px; padding:3px 8px; font-size:15px; white-space:nowrap; z-index:40;
+        box-shadow:0 2px 6px rgba(0,0,0,.25); }
+  i{ font-style:italic; }
+</style>
+</head>
+<body>
+<div id="wrap">
+<div id="app">
+
+  <div id="title">Comparing Fins with Different Tip Boundary Conditions</div>
+
+  <div id="btnbar">
+    <button class="ib" data-p="directions">Directions</button>
+    <button class="ib" data-p="details">Details</button>
+    <button class="ib" data-p="about">About</button>
+  </div>
+
+  <!-- ================= PANELS ================= -->
+  <div class="panel" id="p_directions">
+    <span class="closex" data-close>&times;</span>
+    <h3>Directions</h3>
+    <p>This simulation compares the steady-state temperature profile along a fin for four tip
+       boundary conditions: tip convection (TC), an adiabatic tip (A), a fixed tip temperature
+       equal to the ambient temperature <i>T</i><sub>&infin;</sub> (FT), and an infinite fin (IF).</p>
+    <p>Use the slider bars to adjust the thermal conductivity of the fin <i>k</i>, the convection
+       coefficient <i>h</i>, the ambient temperature <i>T</i><sub>&infin;</sub>, and the ratio of the
+       cross-sectional perimeter <i>P</i><sub>c</sub> to the cross-sectional area <i>A</i><sub>c</sub>.
+       The <i>P</i><sub>c</sub>/<i>A</i><sub>c</sub> slider changes the shape of the cross section shown
+       at the upper right (from a square to a four-pointed star). The base temperature
+       (<i>T</i><sub>b</sub> = 300 K) and fin length (<i>L</i> = 0.17 m) are fixed.</p>
+    <p>The temperature profiles for each tip condition are shown in the top plot. The total heat
+       dissipated by each fin and the fin effectiveness are shown visually in the two lower bar plots.
+       The use of a fin is generally justified when its effectiveness is above about 2 (dashed line).</p>
+  </div>
+
+  <div class="panel" id="p_details">
+    <span class="closex" data-close>&times;</span>
+    <h3>Details</h3>
+    <p>The analysis assumes steady-state, one-dimensional conduction along the fin with constant
+       properties and no radiation or volumetric heat generation. Define the excess temperature
+       \(\theta = T - T_\infty\) with base value \(\theta_b = T_b - T_\infty\), the fin parameter
+       \(m\), and the heat-rate scale \(M\):</p>
+    <div class="eqwrap">
+    $$ m=\sqrt{\dfrac{h\,P_c}{k\,A_c}}\,,\qquad M=\sqrt{h\,P_c\,k\,A_c}\;\theta_b $$
+    </div>
+
+    <p><b>Tip convection (TC)</b></p>
+    <div class="eqwrap">
+    $$ \frac{\theta}{\theta_b}=\frac{\cosh\!\big[m(L-x)\big]+\dfrac{h}{mk}\sinh\!\big[m(L-x)\big]}
+                                    {\cosh(mL)+\dfrac{h}{mk}\sinh(mL)} $$
+    $$ q_f=M\,\frac{\sinh(mL)+\dfrac{h}{mk}\cosh(mL)}{\cosh(mL)+\dfrac{h}{mk}\sinh(mL)} $$
+    </div>
+
+    <p><b>Adiabatic tip (A)</b></p>
+    <div class="eqwrap">
+    $$ \frac{\theta}{\theta_b}=\frac{\cosh\!\big[m(L-x)\big]}{\cosh(mL)}\,,\qquad q_f=M\tanh(mL) $$
+    </div>
+
+    <p><b>Fixed tip temperature at \(T_\infty\) (FT)</b></p>
+    <div class="eqwrap">
+    $$ \frac{\theta}{\theta_b}=\frac{\sinh\!\big[m(L-x)\big]}{\sinh(mL)}\,,\qquad
+       q_f=M\,\frac{\cosh(mL)}{\sinh(mL)} $$
+    </div>
+
+    <p><b>Infinite fin (IF)</b></p>
+    <div class="eqwrap">
+    $$ \frac{\theta}{\theta_b}=e^{-mx}\,,\qquad q_f=M $$
+    </div>
+
+    <p>The fin effectiveness compares the heat dissipated to that from the bare base area:</p>
+    <div class="eqwrap">
+    $$ \varepsilon_f=\frac{q_f}{h\,A_c\,\theta_b} $$
+    </div>
+    <p>Fins are typically worthwhile when \(\varepsilon_f \gtrsim 2\). The star-shaped cross section has
+       area \(A_c\) and perimeter \(P_c\); making it spikier increases \(P_c/A_c\).</p>
+
+    <p><b>Symbols</b></p>
+    <table class="symtab">
+      <tr><td>\(A_c\)</td><td>cross-sectional area of the fin [m<sup>2</sup>]</td></tr>
+      <tr><td>\(h\)</td><td>convection heat transfer coefficient [W/m<sup>2</sup>-K]</td></tr>
+      <tr><td>\(k\)</td><td>thermal conductivity of the fin [W/m-K]</td></tr>
+      <tr><td>\(L\)</td><td>fin length [m]</td></tr>
+      <tr><td>\(m\)</td><td>fin parameter [m<sup>-1</sup>]</td></tr>
+      <tr><td>\(M\)</td><td>heat-rate scale [W]</td></tr>
+      <tr><td>\(P_c\)</td><td>perimeter of the fin cross section [m]</td></tr>
+      <tr><td>\(q_f\)</td><td>heat dissipated by the fin [W]</td></tr>
+      <tr><td>\(T\)</td><td>fin temperature [K]</td></tr>
+      <tr><td>\(T_b\)</td><td>fin base temperature [K]</td></tr>
+      <tr><td>\(T_\infty\)</td><td>ambient fluid temperature [K]</td></tr>
+      <tr><td>\(x\)</td><td>distance from the fin base [m]</td></tr>
+      <tr><td>\(\varepsilon_f\)</td><td>fin effectiveness [&ndash;]</td></tr>
+      <tr><td>\(\theta\)</td><td>excess temperature, \(T - T_\infty\) [K]</td></tr>
+      <tr><td>\(\theta_b\)</td><td>excess temperature at the base, \(T_b - T_\infty\) [K]</td></tr>
+    </table>
+  </div>
+
+  <div class="panel" id="p_about">
+    <span class="closex" data-close>&times;</span>
+    <h3>About</h3>
+    <p>This simulation was created in the
+       <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a>
+       at University of Colorado Boulder for
+       <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a>
+       by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a MATLAB
+       simulation by Keith Regner. It was prepared with financial support from the National Science
+       Foundation (DUE 2336987 and 2336988). Address any questions or comments to
+       <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.</p>
+  </div>
+
+  <!-- ================= FIGURE ================= -->
+  <div id="fig">
+    <canvas id="cv"></canvas>
+
+    <!-- sliders -->
+    <input type="range" id="sl_k"    min="1"   max="301"  step="1"     value="10"  style="left:30px;  top:46px;  width:200px;">
+    <input type="range" id="sl_Tinf" min="200" max="400"  step="1"     value="200" style="left:30px;  top:111px; width:200px;">
+    <input type="range" id="sl_h"    min="1"   max="1001" step="1"     value="10"  style="left:30px;  top:171px; width:200px;">
+    <input type="range" id="sl_pcac" min="0.1" max="1"    step="0.001" value="1"   style="left:630px; top:171px; width:145px;">
+
+    <!-- slider value labels -->
+    <div class="olab sl-lab" id="lab_k"    style="left:70px;  top:62px;"></div>
+    <div class="olab sl-lab" id="lab_Tinf" style="left:70px;  top:127px;"></div>
+    <div class="olab sl-lab" id="lab_h"    style="left:70px;  top:187px;"></div>
+    <div class="olab sl-lab" id="lab_pcac" style="left:640px; top:187px;"></div>
+
+    <!-- schematic labels -->
+    <div class="olab sc-lab" style="left:645px; top:20px;">cross-section</div>
+    <div class="olab fin-lab" style="left:343px; top:38px;"><i>T</i><sub>b</sub> = 300 K</div>
+    <div class="olab fin-lab" style="left:419px; top:88px; color:#fff;"><i>k</i></div>
+    <div class="olab fin-lab" style="left:309px; top:129px;"><i>x</i></div>
+    <div class="olab fin-lab" style="left:447px; top:138px;"><i>h</i>, <i>T</i><sub>&infin;</sub></div>
+
+    <!-- axis titles -->
+    <div class="xtitle" style="left:400px; top:583px;">position [m]</div>
+    <div class="ytitle" style="left:50px;  top:400px; font-size:18px;">temperature [K]</div>
+    <div class="ytitle" style="left:36px;  top:700px; font-size:18px;">heat dissipated <i>q</i><sub>f</sub> [W]</div>
+    <div class="ytitle" style="left:402px; top:700px;">fin effectiveness &epsilon;<sub>f</sub></div>
+
+    <!-- legend (top-left inside temperature plot) -->
+    <div class="legend" style="left:114px; top:260px;">
+      <div><span class="ln" style="border-color:#FF0000;"></span>tip convection (TC)</div>
+      <div><span class="ln" style="border-color:#000000;"></span>adiabatic (A)</div>
+      <div><span class="ln" style="border-color:#0000FF;"></span>fixed temperature @&nbsp;<i>T</i><sub>&infin;</sub>&nbsp;(FT)</div>
+      <div><span class="ln" style="border-color:#00AA00;"></span>infinite fin (IF)</div>
+    </div>
+
+    <!-- hover label for temperature curves -->
+    <div id="tip"></div>
+  </div>
+
+</div>
+</div>
+
+<script>
+"use strict";
+/* ------------------------------------------------------------------ */
+/*  Fin comparison — JS/HTML5 port of Keith Regner's MATLAB demo       */
+/* ------------------------------------------------------------------ */
+const FIG_W = 800, FIG_H = 830;
+const COL = ['#FF0000','#000000','#0000FF','#00AA00'];   // TC, A, FT, IF (green darkened for readability)
+const NAMES = ['tip convection (TC)','adiabatic (A)',
+               'fixed temperature @ <i>T</i><sub>&infin;</sub> (FT)','infinite fin (IF)'];
+const TB = {x:100,y:250,w:600,h:300};                    // temperature plot box
+
+const state = { h:10, Tinf:200, k:10, a:1, Tb:300, L:0.17 };
+let lastData = null, hoverIdx = -1;
+
+/* ---- canvas / hi-DPI ---- */
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+function setupCanvas(){
+  const dpr = window.devicePixelRatio || 1;
+  cv.width = FIG_W*dpr; cv.height = FIG_H*dpr;
+  cv.style.width = FIG_W+'px'; cv.style.height = FIG_H+'px';
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+
+/* ---- physics ---- */
+function computeAll(s){
+  const a = s.a;
+  const PA = 2*Math.sqrt(2*a*a - 2*a + 1)/a;    // Pc/Ac [1/m]
+  const A  = 4*a;                                // Ac [m^2] (shoelace area of the star)
+  const m  = Math.sqrt(s.h*PA/s.k);
+  const thb = s.Tb - s.Tinf;
+  const M  = Math.sqrt(s.h*s.k*PA*A*A)*thb;      // = sqrt(h*Pc*k*Ac)*thb
+  const L = s.L, hmk = s.h/(m*s.k);
+  const N = 101, xs = [], T = [[],[],[],[]];
+  for(let i=0;i<N;i++){
+    const x = L*i/(N-1); xs.push(x);
+    const lx = L-x;
+    T[0].push(thb*(Math.cosh(m*lx)+hmk*Math.sinh(m*lx))/(Math.cosh(m*L)+hmk*Math.sinh(m*L)) + s.Tinf);
+    T[1].push(thb*Math.cosh(m*lx)/Math.cosh(m*L) + s.Tinf);
+    T[2].push(thb*Math.sinh(m*lx)/Math.sinh(m*L) + s.Tinf);
+    T[3].push(thb*Math.exp(-m*x) + s.Tinf);
+  }
+  const qt1 = (Math.sinh(m*L)+hmk*Math.cosh(m*L))/(Math.cosh(m*L)+hmk*Math.sinh(m*L));
+  const qt2 = Math.tanh(m*L);
+  const qt3 = Math.cosh(m*L)/Math.sinh(m*L);
+  const qt4 = 1;
+  const q = [M*qt1, M*qt2, M*qt3, M*qt4];
+  const ef = Math.sqrt(s.k*PA/s.h);
+  const e = [qt1*ef, qt2*ef, qt3*ef, qt4*ef];
+  return {PA,A,m,M,xs,T,q,e};
+}
+
+/* ---- nice ticks ---- */
+function niceNum(range, round){
+  const exp = Math.floor(Math.log10(range));
+  const f = range/Math.pow(10,exp);
+  let nf;
+  if(round){ nf = f<1.5?1 : f<3?2 : f<7?5 : 10; }
+  else     { nf = f<=1?1 : f<=2?2 : f<=5?5 : 10; }
+  return nf*Math.pow(10,exp);
+}
+function niceTicks(min,max,maxTicks){
+  maxTicks = maxTicks||5;
+  if(min===max){ min-=1; max+=1; }
+  const range = niceNum(max-min,false);
+  const d = niceNum(range/(maxTicks-1),true);
+  const gmin = Math.floor(min/d)*d, gmax = Math.ceil(max/d)*d;
+  const ticks = [];
+  for(let v=gmin; v<=gmax+d*0.5; v+=d) ticks.push(Math.abs(v)<d*1e-6?0:v);
+  return {ticks, min:gmin, max:gmax};
+}
+function fmtTick(v){
+  if(Math.abs(v)<1e-9) return '0';
+  return parseFloat(v.toFixed(4)).toString();
+}
+
+/* ---- drawing helpers ---- */
+function drawArrow(x1,y1,x2,y2,head){
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  const ang = Math.atan2(y2-y1,x2-x1);
+  ctx.beginPath();
+  ctx.moveTo(x2,y2);
+  ctx.lineTo(x2-head*Math.cos(ang-0.42), y2-head*Math.sin(ang-0.42));
+  ctx.lineTo(x2-head*Math.cos(ang+0.42), y2-head*Math.sin(ang+0.42));
+  ctx.closePath(); ctx.fill();
+}
+function box(B){ ctx.strokeStyle='#000'; ctx.lineWidth=1.5; ctx.strokeRect(B.x,B.y,B.w,B.h); }
+
+/* ---- schematic ---- */
+function drawSchematic(){
+  ctx.fillStyle = '#999999';
+  ctx.fillRect(260,43,30,120);      // base wall
+  ctx.fillRect(290,75,300,50);      // fin body
+  ctx.strokeStyle='#000'; ctx.fillStyle='#000'; ctx.lineWidth=1.2;
+  drawArrow(290,125,322,125,7);     // x direction
+  ctx.beginPath(); ctx.moveTo(290,90); ctx.lineTo(350,50); ctx.stroke();  // Tb leader
+  drawArrow(382,180,442,140,7);     // convection h, Tinf
+}
+
+/* ---- star cross section (ax1) ---- */
+function drawStar(){
+  const B={x:650,y:50,w:100,h:100}, a=state.a;
+  const pts=[[1,0],[a,a],[0,1],[-a,a],[-1,0],[-a,-a],[0,-1],[a,-a]];
+  const X=v=>B.x+(v+1)/2*B.w, Y=v=>B.y+B.h-(v+1)/2*B.h;
+  ctx.strokeStyle='#0070BD'; ctx.lineWidth=1.6; ctx.lineJoin='round';
+  ctx.beginPath();
+  pts.forEach((p,i)=>{ const px=X(p[0]),py=Y(p[1]); i?ctx.lineTo(px,py):ctx.moveTo(px,py); });
+  ctx.closePath(); ctx.stroke();
+}
+
+/* ---- temperature plot (ax2) ---- */
+const tX = v=>TB.x+v/0.17*TB.w, tY = v=>TB.y+TB.h-(v-200)/200*TB.h;
+function drawTemp(d){
+  const B=TB, X=tX, Y=tY;
+  box(B);
+  ctx.font='17px Helvetica, Arial, sans-serif'; ctx.fillStyle='#000'; ctx.strokeStyle='#000'; ctx.lineWidth=1;
+  ctx.textAlign='center'; ctx.textBaseline='top';
+  [0,0.05,0.1,0.15].forEach(t=>{ const px=X(t);
+    ctx.beginPath();ctx.moveTo(px,B.y+B.h);ctx.lineTo(px,B.y+B.h-6);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(px,B.y);ctx.lineTo(px,B.y+6);ctx.stroke();
+    ctx.fillText(fmtTick(t),px,B.y+B.h+6); });
+  ctx.textAlign='right'; ctx.textBaseline='middle';
+  [200,250,300,350,400].forEach(t=>{ const py=Y(t);
+    ctx.beginPath();ctx.moveTo(B.x,py);ctx.lineTo(B.x+6,py);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(B.x+B.w,py);ctx.lineTo(B.x+B.w-6,py);ctx.stroke();
+    ctx.fillText(String(t),B.x-6,py); });
+  ctx.save(); ctx.beginPath(); ctx.rect(B.x,B.y,B.w,B.h); ctx.clip();
+  for(let c=0;c<4;c++){
+    if(c===hoverIdx) continue;                 // hovered curve drawn last, on top
+    strokeCurve(d,c,1.6);
+  }
+  if(hoverIdx>=0) strokeCurve(d,hoverIdx,3.2);
+  ctx.restore();
+}
+function strokeCurve(d,c,w){
+  ctx.lineWidth=w; ctx.strokeStyle=COL[c]; ctx.beginPath();
+  for(let i=0;i<d.xs.length;i++){ const px=tX(d.xs[i]),py=tY(d.T[c][i]); i?ctx.lineTo(px,py):ctx.moveTo(px,py); }
+  ctx.stroke();
+}
+
+/* ---- generic bar plot ---- */
+function drawBars(B, vals, yrange, ticks, refY, useExp){
+  const X=v=>B.x+v/5*B.w;
+  const Y=v=>B.y+B.h-(v-yrange[0])/(yrange[1]-yrange[0])*B.h;
+  box(B);
+  let E=0;
+  if(useExp){ const ma=Math.max(Math.abs(yrange[0]),Math.abs(yrange[1])); if(ma>=1e3) E=Math.floor(Math.log10(ma)); }
+  ctx.font='17px Helvetica, Arial, sans-serif'; ctx.fillStyle='#000'; ctx.strokeStyle='#000'; ctx.lineWidth=1;
+  ctx.textAlign='right'; ctx.textBaseline='middle';
+  ticks.forEach(t=>{ if(t<yrange[0]-1e-9||t>yrange[1]+1e-9) return; const py=Y(t);
+    ctx.beginPath();ctx.moveTo(B.x,py);ctx.lineTo(B.x+6,py);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(B.x+B.w,py);ctx.lineTo(B.x+B.w-6,py);ctx.stroke();
+    ctx.fillText(fmtTick(E?t/Math.pow(10,E):t), B.x-6, py); });
+  if(E){ ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+    ctx.font='17px Helvetica, Arial, sans-serif'; ctx.fillText('\u00D710',B.x,B.y-6);
+    const bw=ctx.measureText('\u00D710').width; ctx.font='11px Helvetica, Arial, sans-serif';
+    ctx.fillText(String(E),B.x+bw+1,B.y-13); }
+  ctx.font='15.6px Helvetica, Arial, sans-serif';
+  ctx.textAlign='center'; ctx.textBaseline='top';
+  const cats=['TC','A','FT','IF'];
+  [1,2,3,4].forEach((xt,i)=>{ const px=X(xt);
+    ctx.beginPath();ctx.moveTo(px,B.y+B.h);ctx.lineTo(px,B.y+B.h-6);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(px,B.y);ctx.lineTo(px,B.y+6);ctx.stroke();
+    ctx.fillText(cats[i],px,B.y+B.h+6); });
+  ctx.save(); ctx.beginPath(); ctx.rect(B.x,B.y,B.w,B.h); ctx.clip();
+  ctx.setLineDash([5,4]); ctx.lineWidth=0.9; ctx.strokeStyle='#000';
+  const pr=Y(refY); ctx.beginPath(); ctx.moveTo(B.x,pr); ctx.lineTo(B.x+B.w,pr); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.lineWidth=24; ctx.lineCap='butt';
+  [1,2,3,4].forEach((xt,i)=>{ ctx.strokeStyle=COL[i]; const px=X(xt);
+    ctx.beginPath(); ctx.moveTo(px,Y(0)); ctx.lineTo(px,Y(vals[i])); ctx.stroke(); });
+  ctx.restore();
+}
+
+/* ---- heat dissipated (ax3, auto-scale) ---- */
+function drawQ(d){
+  const B={x:80,y:610,w:280,h:180};
+  const vals=d.q.concat([0]);
+  const nt=niceTicks(Math.min(...vals),Math.max(...vals),5);
+  drawBars(B,d.q,[nt.min,nt.max],nt.ticks,0,true);
+}
+/* ---- effectiveness (ax4, fixed [-0.1,20]) ---- */
+function drawEff(d){
+  const B={x:440,y:610,w:280,h:180};
+  drawBars(B,d.e,[-0.1,20],[0,5,10,15,20],2,false);
+}
+
+/* ---- labels ---- */
+function updateLabels(d){
+  document.getElementById('lab_k').innerHTML    = '<i>k</i> = '+Math.round(state.k)+' [W/m-K]';
+  document.getElementById('lab_Tinf').innerHTML = '<i>T</i><sub>&infin;</sub> = '+Math.round(state.Tinf)+' [K]';
+  document.getElementById('lab_h').innerHTML    = '<i>h</i> = '+Math.round(state.h)+' [W/m<sup>2</sup>-K]';
+  const pa = (Math.round(d.PA*100)/100).toString();
+  document.getElementById('lab_pcac').innerHTML = '<i>P</i><sub>c</sub>/<i>A</i><sub>c</sub> = '+pa+' [m<sup>-1</sup>]';
+}
+
+/* ---- master redraw ---- */
+function redraw(recompute){
+  if(recompute!==false || !lastData) lastData = computeAll(state);
+  const d = lastData;
+  ctx.clearRect(0,0,FIG_W,FIG_H);
+  ctx.fillStyle='#fff'; ctx.fillRect(0,0,FIG_W,FIG_H);
+  drawSchematic();
+  drawStar();
+  drawTemp(d);
+  drawQ(d);
+  drawEff(d);
+  updateLabels(d);
+}
+
+/* ---- hover labels on temperature curves ---- */
+const tip = document.getElementById('tip');
+const fig = document.getElementById('fig');
+function segDist(px,py,x1,y1,x2,y2){
+  const dx=x2-x1, dy=y2-y1, L2=dx*dx+dy*dy;
+  let t = L2 ? ((px-x1)*dx+(py-y1)*dy)/L2 : 0;
+  t = Math.max(0,Math.min(1,t));
+  const qx=x1+t*dx-px, qy=y1+t*dy-py;
+  return Math.sqrt(qx*qx+qy*qy);
+}
+function nearestCurve(mx,my){
+  if(!lastData || mx<TB.x || mx>TB.x+TB.w || my<TB.y || my>TB.y+TB.h) return -1;
+  const d=lastData, TOL=7;
+  let best=-1, bestD=TOL;
+  for(let c=0;c<4;c++){
+    for(let i=1;i<d.xs.length;i++){
+      const x1=tX(d.xs[i-1]), x2=tX(d.xs[i]);
+      if(mx < x1-TOL || mx > x2+TOL) continue;
+      const dd=segDist(mx,my,x1,tY(d.T[c][i-1]),x2,tY(d.T[c][i]));
+      if(dd<bestD){ bestD=dd; best=c; }
+    }
+  }
+  return best;
+}
+function onMove(ev){
+  const r = cv.getBoundingClientRect();
+  const s = r.width/FIG_W;                       // accounts for responsive scaling
+  const mx = (ev.clientX-r.left)/s, my = (ev.clientY-r.top)/s;
+  const idx = nearestCurve(mx,my);
+  if(idx!==hoverIdx){ hoverIdx=idx; redraw(false); }
+  if(idx>=0){
+    tip.innerHTML = NAMES[idx];
+    tip.style.color = COL[idx]; tip.style.borderColor = COL[idx];
+    tip.style.display = 'block';
+    let lx = mx+14, ly = my-34;
+    const w = tip.offsetWidth;
+    if(lx+w > TB.x+TB.w) lx = mx-14-w;          // keep inside plot on the right
+    if(ly < TB.y+2) ly = my+14;
+    tip.style.left = lx+'px'; tip.style.top = ly+'px';
+    fig.style.cursor = 'pointer';
+  } else {
+    tip.style.display = 'none';
+    fig.style.cursor = '';
+  }
+}
+fig.addEventListener('mousemove', e=>{ if(e.target.tagName!=='INPUT') onMove(e); });
+fig.addEventListener('mouseleave', ()=>{ tip.style.display='none'; fig.style.cursor='';
+  if(hoverIdx!==-1){ hoverIdx=-1; redraw(false); } });
+
+/* ---- sliders ---- */
+function bind(id,key){ document.getElementById(id).addEventListener('input',e=>{ state[key]=+e.target.value; redraw(); }); }
+bind('sl_k','k'); bind('sl_Tinf','Tinf'); bind('sl_h','h'); bind('sl_pcac','a');
+
+/* ---- panels ---- */
+const buttons = Array.from(document.querySelectorAll('.ib'));
+const panels = { directions:document.getElementById('p_directions'),
+                 details:document.getElementById('p_details'),
+                 about:document.getElementById('p_about') };
+let current=null, detailsTypeset=false;
+function closePanel(){ Object.values(panels).forEach(p=>p.style.display='none');
+  buttons.forEach(b=>b.classList.remove('active')); current=null; }
+function openPanel(name,btn){
+  closePanel(); panels[name].style.display='block'; btn.classList.add('active'); current=name;
+  if(name==='details' && !detailsTypeset && window.MathJax && MathJax.typesetPromise){
+    MathJax.typesetPromise([panels.details]).then(()=>{detailsTypeset=true;}).catch(()=>{});
+  }
+}
+buttons.forEach(b=>b.addEventListener('click',()=>{ const n=b.dataset.p; (current===n)?closePanel():openPanel(n,b); }));
+document.querySelectorAll('[data-close]').forEach(x=>x.addEventListener('click',closePanel));
+
+/* ---- responsive scaling ---- */
+function fitScale(){
+  const app=document.getElementById('app');
+  app.style.transform='scale(1)';
+  const natW=800, natH=app.offsetHeight;
+  const avail=Math.max(320, document.documentElement.clientWidth-4);
+  const s=Math.min(1, avail/natW);
+  app.style.transform='scale('+s+')';
+  document.getElementById('wrap').style.height=(natH*s)+'px';
+}
+window.addEventListener('resize',fitScale);
+
+/* ---- init ---- */
+setupCanvas();
+redraw();
+fitScale();
+</script>
+</body>
+</html>

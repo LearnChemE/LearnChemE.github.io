@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nuclear Fission Chain-Reaction Kinetics</title>
+<style>
+  :root {
+    color-scheme: light;
+    --surface-1:      #fcfcfb;
+    --page:           #f9f9f7;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #52514e;
+    --muted:          #898781;
+    --grid:           #e1e0d9;
+    --axis:           #c3c2b7;
+    --border:         rgba(11,11,11,0.10);
+    --series-u:       #2a78d6;
+    --series-n:       #eb6834;
+    --series-xe:      #1baf7a;
+    --series-sr:      #eda100;
+    --panel-shadow:   rgba(11,11,11,0.18);
+    --btn-red:        #c0392b;
+    --btn-red-hover:  #a93226;
+    --btn-red-active: #922b21;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --surface-1:      #1a1a19;
+      --page:           #0d0d0d;
+      --text-primary:   #ffffff;
+      --text-secondary: #c3c2b7;
+      --muted:          #898781;
+      --grid:           #2c2c2a;
+      --axis:           #383835;
+      --border:         rgba(255,255,255,0.10);
+      --series-u:       #3987e5;
+      --series-n:       #d95926;
+      --series-xe:      #199e70;
+      --series-sr:      #c98500;
+      --panel-shadow:   rgba(0,0,0,0.5);
+      --btn-red:        #e15241;
+      --btn-red-hover:  #c94636;
+      --btn-red-active: #b03c2e;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--page);
+    color: var(--text-primary);
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  }
+
+  .app {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 16px;
+    position: relative;
+  }
+
+  header.topbar {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .title-block h1 {
+    font-size: 17px;
+    font-weight: 700;
+    margin: 0 0 6px 0;
+    letter-spacing: 0.01em;
+  }
+
+  .reaction {
+    font-size: 19px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+  }
+  .reaction sup { font-size: 65%; position: relative; top: -0.3em; }
+  .reaction sub { font-size: 65%; position: relative; top: 0.3em; }
+  .reaction .xvar { color: var(--series-n); font-weight: 700; }
+  /* Nuclide symbol prefix: mass number as a superscript stacked directly
+     over the atomic number as a subscript, both to the left of the element
+     symbol -- e.g. 235 (raised) over 92 (lowered) before U.
+     Implementation note: an inline-block's baseline is its LAST line box's
+     baseline (well-defined in CSS2.1 and consistent across browsers, unlike
+     inline-flex baselines). So the bottom number (92) sits on the parent
+     baseline, and `top` nudges it down to the same depth as the .reaction
+     sub elements; the top number (235) then lands one line above, at the
+     same height as the .reaction sup elements. Same 65% size as sup/sub so
+     all the small numbers in the equation match. */
+  .reaction .nuclide {
+    display: inline-block;
+    position: relative;
+    top: 0.3em;
+    font-size: 65%;
+    line-height: 0.95;
+    text-align: left;
+  }
+  .reaction .nuclide span { display: block; }
+
+  .buttonrow { display: flex; gap: 8px; flex-shrink: 0; }
+  .buttonrow button {
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 14px;
+    border-radius: 7px;
+    border: 1px solid var(--btn-red);
+    background: var(--btn-red);
+    color: #ffffff;
+    cursor: pointer;
+  }
+  .buttonrow button:hover { background: var(--btn-red-hover); border-color: var(--btn-red-hover); }
+  .buttonrow button[aria-pressed="true"] {
+    background: var(--btn-red-active);
+    border-color: var(--btn-red-active);
+    color: #ffffff;
+    box-shadow: inset 0 0 0 2px rgba(255,255,255,0.55);
+  }
+
+  main.layout {
+    display: flex;
+    gap: 12px;
+    align-items: stretch;
+    flex-wrap: wrap;
+  }
+
+  .chart-card {
+    flex: 1 1 640px;
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 14px 8px 8px;
+    min-width: 340px;
+  }
+
+  svg.chart { width: 100%; height: auto; display: block; overflow: visible; }
+  .gridline { stroke: var(--grid); stroke-width: 1; }
+  .axisline { stroke: var(--axis); stroke-width: 1; }
+  .axistext { fill: var(--muted); font-size: 15.8px; letter-spacing: 0.02em; }
+  .axistitle { fill: var(--text-secondary); font-size: 17.25px; font-weight: 400; letter-spacing: 0.05em; }
+  .directlabel { font-size: 15px; font-weight: 700; letter-spacing: 0.02em; }
+  .series-line { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+  .series-dot { stroke: var(--surface-1); stroke-width: 2; }
+  .crosshair { stroke: var(--axis); stroke-width: 1; stroke-dasharray: 3 3; }
+  .hoverdot { stroke: var(--surface-1); stroke-width: 2; }
+
+  .tooltip {
+    position: absolute;
+    pointer-events: none;
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 4px 14px var(--panel-shadow);
+    padding: 8px 10px;
+    font-size: 12px;
+    color: var(--text-primary);
+    min-width: 150px;
+    opacity: 0;
+    transition: opacity 0.08s ease;
+    z-index: 20;
+  }
+  .tooltip .t-time { font-weight: 700; margin-bottom: 4px; color: var(--text-secondary); }
+  .tooltip .t-row { display: flex; justify-content: space-between; gap: 12px; }
+  .tooltip .t-row .k { display: flex; align-items: center; gap: 6px; color: var(--text-secondary); }
+  .tooltip .t-row .swatch { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .tooltip .t-row .v { font-variant-numeric: tabular-nums; font-weight: 600; }
+
+  .side-card {
+    flex: 0 0 260px;
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  .slider-block .label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 4px;
+  }
+  .slider-block .label-row .name { font-size: 14.85px; font-weight: 400; }
+  .slider-block .label-row .val {
+    font-variant-numeric: tabular-nums;
+    font-size: 14.85px;
+    font-weight: 400;
+    color: var(--series-u);
+  }
+  .slider-block input[type=range] {
+    width: 100%;
+    accent-color: var(--series-u);
+  }
+  .slider-block .minmax {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14.3px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+  .slider-block .desc {
+    font-size: 13.2px;
+    color: var(--text-secondary);
+    margin-top: 6px;
+    line-height: 1.4;
+  }
+
+  .ic-card {
+    font-size: 13.8px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    border-top: 1px solid var(--grid);
+    padding-top: 12px;
+  }
+  .ic-card b { color: var(--text-primary); font-weight: 400; }
+
+  .criticality {
+    font-size: 13.8px;
+    line-height: 1.5;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  .crit-sub { background: rgba(42,120,214,0.08); }
+  .crit-crit { background: rgba(27,175,122,0.10); }
+  .crit-super { background: rgba(235,104,52,0.10); }
+
+  .mode-hidden { display: none !important; }
+
+  /* Overlay panels */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+    display: none;
+    align-items: flex-start;
+    justify-content: center;
+    z-index: 100;
+    padding: 40px 16px;
+    overflow-y: auto;
+  }
+  .overlay.open { display: flex; }
+  .panel {
+    background: var(--surface-1);
+    color: var(--text-primary);
+    border-radius: 12px;
+    max-width: 620px;
+    width: 100%;
+    padding: 26px 26px 22px 26px;
+    position: relative;
+    box-shadow: 0 12px 40px var(--panel-shadow);
+    border: 1px solid var(--border);
+  }
+  .panel h2 {
+    margin: 0 0 12px 0;
+    font-size: 17px;
+  }
+  .panel p, .panel li { font-size: 13.5px; line-height: 1.65; color: var(--text-secondary); }
+  .panel .eq {
+    font-size: 14px;
+    color: var(--text-primary);
+    background: var(--page);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin: 8px 0;
+  }
+  .panel .close-x {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--page);
+    color: var(--text-primary);
+    font-size: 15px;
+    line-height: 1;
+    cursor: pointer;
+  }
+  .panel .close-x:hover { background: var(--grid); }
+  .panel a { color: var(--series-u); }
+  .panel sup { font-size: 65%; position: relative; top: -0.3em; }
+
+  @media (max-width: 760px) {
+    .side-card { flex: 1 1 100%; order: -1; }
+    .reaction { font-size: 15px; white-space: normal; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="topbar">
+    <div class="title-block">
+      <h1>Fission Chain-Reaction Kinetics</h1>
+      <div class="reaction" id="reactionGeneric">
+        A + <sup>1</sup>n &rarr; B + C + <span class="xvar" id="reactionXGeneric">3</span><sup>1</sup>n
+      </div>
+      <div class="reaction mode-hidden" id="reactionExample">
+        <span class="nuclide"><span>235</span><span>92</span></span>U + <span class="nuclide"><span>1</span><span>0</span></span>n &rarr; <span class="nuclide"><span>144</span><span>54</span></span>Xe + <span class="nuclide"><span>89</span><span>38</span></span>Sr + <span class="xvar">3</span><span class="nuclide"><span>1</span><span>0</span></span>n
+      </div>
+    </div>
+    <div class="buttonrow">
+      <button type="button" id="btnExample" aria-pressed="false">Example</button>
+      <button type="button" id="btnDirections" aria-pressed="false">Directions</button>
+      <button type="button" id="btnDetails" aria-pressed="false">Details</button>
+      <button type="button" id="btnAbout" aria-pressed="false">About</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="chart-card">
+      <div style="position:relative;">
+        <svg class="chart" id="chartSvg" viewBox="0 0 760 420" preserveAspectRatio="xMidYMid meet"></svg>
+        <div class="tooltip" id="tooltip"></div>
+      </div>
+    </section>
+
+    <aside class="side-card">
+      <div class="slider-block" id="xSliderBlock">
+        <div class="label-row">
+          <span class="name">X &nbsp;(neutrons released)</span>
+          <span class="val" id="xVal">3</span>
+        </div>
+        <input type="range" id="xSlider" min="0" max="3" step="1" value="3">
+        <div class="minmax"><span>0</span><span>3</span></div>
+        <div class="desc" id="xDescGeneric">Number of neutrons produced per fission event.</div>
+      </div>
+
+      <div class="slider-block">
+        <div class="label-row">
+          <span class="name">k &nbsp;(rate constant)</span>
+          <span class="val" id="kVal">5.0</span>
+        </div>
+        <input type="range" id="kSlider" min="1" max="10" step="0.1" value="5">
+        <div class="minmax"><span>1</span><span>10</span></div>
+      </div>
+
+      <div class="criticality" id="criticalityNote"></div>
+
+      <div class="ic-card">
+        Initial conditions (t = 0):<br>
+        <div id="icGeneric">
+          <b>N<sub>A</sub></b> = 1000 &nbsp;&nbsp; <b>N<sub>n</sub></b> = 100<br>
+          <b>N<sub>B</sub></b> = 0 &nbsp;&nbsp; <b>N<sub>C</sub></b> = 0
+        </div>
+        <div id="icExample" class="mode-hidden">
+          <b>N<sub>235</sub></b> = 1000 &nbsp;&nbsp; <b>N<sub>n</sub></b> = 100<br>
+          <b>N<sub>144</sub></b> = 0 &nbsp;&nbsp; <b>N<sub>89</sub></b> = 0
+        </div>
+      </div>
+    </aside>
+  </main>
+
+</div>
+
+<!-- Overlay panels -->
+<div class="overlay" id="overlayDirections">
+  <div class="panel">
+    <button class="close-x" data-close="overlayDirections" aria-label="Close">&times;</button>
+    <h2>Directions</h2>
+    <p>This simulation models a fission-type chain reaction in which a neutron strikes a nucleus of isotope A, splitting it into isotopes B and C and releasing X additional neutrons:</p>
+    <p class="eq">A + <sup>1</sup>n &rarr; B + C + X&middot;<sup>1</sup>n</p>
+    <p>Click <b>Example</b> (top right) to switch to a specific, proton + neutron-balanced reaction, <sup>235</sup>U + <sup>1</sup>n &rarr; <sup>144</sup>Xe + <sup>89</sup>Sr + 3&middot;<sup>1</sup>n. Note that X = 3 is the only value of X that balances the reaction. Click <b>Example</b> again to return to the general A/B/C reaction, where X is adjustable.</p>
+    <p>Drag the <b>X</b> slider (0&ndash;3) to set how many neutrons each fission event releases, and the <b>k</b> slider (1&ndash;10) to set the fission rate constant. The plot recalculates immediately, starting from 1000 nuclei of the parent isotope and 100 free neutrons.</p>
+    <p>Watch how X controls whether the reaction dies out, holds steady, or accelerates:</p>
+    <ul>
+      <li><b>X = 0</b>: no replacement neutrons &mdash; the starting neutrons are consumed quickly and the reaction stops (sub-critical).</li>
+      <li><b>X = 1</b>: each fission replaces the neutron it consumes &mdash; the neutron population stays constant and the parent isotope decays smoothly (critical).</li>
+      <li><b>X = 2 or 3</b>: each fission produces a net surplus of neutrons, so the neutron population grows and the reaction accelerates until the parent isotope is depleted (super-critical).</li>
+    </ul>
+    <p>Hover over the plot to read exact values at any time. Click <b>Details</b> for the governing equations.</p>
+  </div>
+</div>
+
+<div class="overlay" id="overlayDetails">
+  <div class="panel">
+    <button class="close-x" data-close="overlayDetails" aria-label="Close">&times;</button>
+    <h2>Details</h2>
+    <p>Let N<sub>A</sub>, N<sub>B</sub>, N<sub>C</sub>, and N<sub>n</sub> be the numbers of parent nuclei (A), the two product nuclei (B and C), and free neutrons. Each fission event consumes one A and one neutron, and produces one B, one C, and X neutrons, at a rate r = k&middot;N<sub>A</sub>&middot;N<sub>n</sub>:</p>
+    <p class="eq">dN<sub>A</sub>/dt = &minus;k&middot;N<sub>A</sub>&middot;N<sub>n</sub></p>
+    <p class="eq">dN<sub>B</sub>/dt = k&middot;N<sub>A</sub>&middot;N<sub>n</sub></p>
+    <p class="eq">dN<sub>C</sub>/dt = k&middot;N<sub>A</sub>&middot;N<sub>n</sub></p>
+    <p class="eq">dN<sub>n</sub>/dt = &minus;k&middot;N<sub>A</sub>&middot;N<sub>n</sub> + X&middot;k&middot;N<sub>A</sub>&middot;N<sub>n</sub> = (X&minus;1)&middot;k&middot;N<sub>A</sub>&middot;N<sub>n</sub></p>
+    <p>Because dN<sub>B</sub>/dt and dN<sub>C</sub>/dt are both equal to &minus;dN<sub>A</sub>/dt, and N<sub>B</sub>(0) = N<sub>C</sub>(0) = 0, it follows that N<sub>B</sub>(t) = N<sub>C</sub>(t) = N<sub>A</sub>(0) &minus; N<sub>A</sub>(t) at every instant.</p>
+    <p>The equations are solved numerically (4th-order Runge&ndash;Kutta) from t = 0, with N<sub>A</sub>(0) = 1000, N<sub>n</sub>(0) = 100, N<sub>B</sub>(0) = 0, and N<sub>C</sub>(0) = 0, using the current slider values of X and k.</p>
+    <p>Click <b>Example</b> to see these same equations applied with A = <sup>235</sup>U, B = <sup>144</sup>Xe, and C = <sup>89</sup>Sr. In that view X is fixed at 3 (the only mass-balanced choice), and <sup>89</sup>Sr (= N<sub>C</sub>) is also plotted alongside <sup>144</sup>Xe (= N<sub>B</sub>) for direct comparison with the reaction given in the original problem statement.</p>
+  </div>
+</div>
+
+<div class="overlay" id="overlayAbout">
+  <div class="panel">
+    <button class="close-x" data-close="overlayAbout" aria-label="Close">&times;</button>
+    <h2>About</h2>
+    <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.</p>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var U0 = 1000, n0 = 100;
+
+  var seriesColors = {
+    U:  getVar('--series-u'),
+    n:  getVar('--series-n'),
+    Xe: getVar('--series-xe'),
+    Sr: getVar('--series-sr')
+  };
+  function getVar(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  }
+
+  // ---------- ODE solve ----------
+  // dU/dt = -k U n
+  // dn/dt = (X-1) k U n
+  // Xe(t) = Sr(t) = U0 - U(t)
+  //
+  // The reaction timescale varies by many orders of magnitude across the
+  // slider ranges (a super-critical X=3 case can burn through 1000 U-235
+  // nuclei almost instantaneously, while a critical X=1, small-k case decays
+  // gently over dozens of time units). Rather than guess a fixed time
+  // window, integrate with a self-scaling adaptive step (small steps during
+  // fast transients, large steps once the system settles) and stop once the
+  // reaction rate has become negligible compared to its initial value.
+  function simulate(X, k) {
+    function deriv(U, n) {
+      var r = k * U * n;
+      return [-r, (X - 1) * r];
+    }
+
+    var U = U0, n = n0, t = 0;
+    var data = [{ t: 0, U: U, n: n, Xe: 0, Sr: 0 }];
+
+    var r0 = k * U0 * n0;
+    var relEps = 1e-4;      // reaction rate this fraction of r0 counts as "settled"
+    var settleNeeded = 8;   // consecutive settled steps required to stop
+    var maxIterations = 20000;
+    var dtCap = 20 / k;     // upper bound on step size once things go quiet
+    var settleCount = 0;
+    var tSettleStart = null;
+
+    for (var iter = 0; iter < maxIterations; iter++) {
+      var r = k * U * n;
+      var dU0 = -r, dn0 = (X - 1) * r;
+
+      var scaleU = Math.max(U, 1e-6);
+      var scaleN = Math.max(n, 1e-6);
+      var dtU = 0.005 * scaleU / Math.max(Math.abs(dU0), 1e-12);
+      var dtN = 0.005 * scaleN / Math.max(Math.abs(dn0), 1e-12);
+      var dt = Math.min(dtU, dtN, dtCap);
+      if (!isFinite(dt) || dt <= 0) dt = dtCap;
+
+      var k1 = deriv(U, n);
+      var k2 = deriv(U + 0.5 * dt * k1[0], n + 0.5 * dt * k1[1]);
+      var k3 = deriv(U + 0.5 * dt * k2[0], n + 0.5 * dt * k2[1]);
+      var k4 = deriv(U + dt * k3[0], n + dt * k3[1]);
+
+      U += (dt / 6) * (k1[0] + 2 * k2[0] + 2 * k3[0] + k4[0]);
+      n += (dt / 6) * (k1[1] + 2 * k2[1] + 2 * k3[1] + k4[1]);
+      if (U < 0) U = 0;
+      if (n < 0) n = 0;
+      t += dt;
+
+      var Xe = U0 - U;
+      data.push({ t: t, U: U, n: n, Xe: Xe, Sr: Xe });
+
+      var relRate = (k * U * n) / r0;
+      if (relRate < relEps) {
+        if (tSettleStart === null) tSettleStart = t;
+        settleCount++;
+      } else {
+        settleCount = 0;
+        tSettleStart = null;
+      }
+      if (settleCount >= settleNeeded) break;
+    }
+
+    var displayTmax = tSettleStart !== null ? tSettleStart * 1.15 : t;
+    var trimmed = data.filter(function (d) { return d.t <= displayTmax; });
+    if (trimmed.length < 2) trimmed = data;
+    return trimmed;
+  }
+
+  // ---------- nice ticks ----------
+  // Returns { ticks, step }. Ticks are generated by multiplying an integer
+  // index by the step (not by repeated addition), and the 1/2/5 threshold
+  // comparison is rounded before comparing, so floating-point noise (e.g.
+  // 0.0018/6 landing on 2.9999999999999996 instead of exactly 3) can't stretch
+  // a 5-tick axis into 10 crowded ticks.
+  function niceTicks(maxVal, count) {
+    if (maxVal <= 0) maxVal = 1;
+    var rough = maxVal / count;
+    var mag = Math.pow(10, Math.floor(Math.log10(rough)));
+    var norm = Math.round((rough / mag) * 1e9) / 1e9;
+    var step;
+    if (norm < 1.5) step = 1 * mag;
+    else if (norm < 3) step = 2 * mag;
+    else if (norm < 7) step = 5 * mag;
+    else step = 10 * mag;
+    var numSteps = Math.ceil((maxVal / step) - 1e-9);
+    var ticks = [];
+    for (var i = 0; i <= numSteps; i++) {
+      ticks.push(Math.round(i * step * 1e9) / 1e9);
+    }
+    return { ticks: ticks, step: step };
+  }
+
+  function fmt(v) {
+    if (v === 0) return "0";
+    if (Math.abs(v) >= 100) return Math.round(v).toLocaleString();
+    if (Math.abs(v) >= 1) return v.toFixed(1);
+    return v.toFixed(3);
+  }
+  function fmtTime(v, ref) {
+    // ref = the magnitude of the axis range this value belongs to, so tick
+    // labels get enough decimal places to stay distinct even when the whole
+    // time domain is much less than 1 (fast, super-critical reactions).
+    var mag = Math.abs(ref !== undefined ? ref : v);
+    if (mag === 0) return "0";
+    if (mag >= 100) return v.toFixed(0);
+    if (mag >= 10) return v.toFixed(1);
+    if (mag >= 1) return v.toFixed(2);
+    if (mag >= 0.01) return v.toFixed(4);
+    if (mag >= 0.0001) return v.toFixed(6);
+    return v.toExponential(1);
+  }
+
+  // Builds x-axis (time) ticks with two goals: labels never carry more than
+  // 3 decimal digits (scaling the whole axis by a power of ten and noting it
+  // in the axis title when the raw step needs more precision than that), and
+  // trailing zeros are stripped per label. If the resulting labels still
+  // wouldn't fit the plot width, the tick count is reduced and it retries.
+  function buildTimeAxis(tMax, targetCount, plotWArg) {
+    var count = targetCount;
+    var result, labels, scaleExp;
+    for (var attempt = 0; attempt < 5; attempt++) {
+      result = niceTicks(tMax, count);
+      var step = result.step;
+      var rawDecimals = step > 0 ? Math.max(0, -Math.floor(Math.log10(step) + 1e-9)) : 0;
+      scaleExp = rawDecimals > 3 ? 3 * Math.ceil((rawDecimals - 3) / 3) : 0;
+      var scale = Math.pow(10, scaleExp);
+      var decimals = Math.min(3, Math.max(0, rawDecimals - scaleExp));
+
+      labels = result.ticks.map(function (t) {
+        var scaled = t * scale;
+        if (Math.abs(scaled) < 1e-9) return "0";
+        var s = scaled.toFixed(decimals);
+        if (s.indexOf(".") !== -1) s = s.replace(/0+$/, "").replace(/\.$/, "");
+        return s;
+      });
+
+      // measure the actual rendered width of each label (font-agnostic --
+      // avoids the per-character px heuristic that doesn't generalize across
+      // browsers/OSes, which was the root cause of overlapping axis labels)
+      var maxLabelWidth = 0;
+      for (var li = 0; li < labels.length; li++) {
+        var w = measureText(labels[li], "axistext").width;
+        if (w > maxLabelWidth) maxLabelWidth = w;
+      }
+      var estLabelWidth = maxLabelWidth + 14; // padding between adjacent labels
+      var neededWidth = estLabelWidth * result.ticks.length;
+      if (neededWidth <= plotWArg || count <= 3) break;
+      count = Math.max(3, count - 2);
+    }
+    return { ticks: result.ticks, labels: labels, scaleExp: scaleExp };
+  }
+
+  // ---------- chart geometry ----------
+  var svgNS = "http://www.w3.org/2000/svg";
+  var VB_W = 760, VB_H = 420;
+  // Left/right margins are recomputed every render() from the actual
+  // measured size of the y-tick labels, the y-axis title, and the direct
+  // curve-end labels (see measureText below) rather than fixed guesses --
+  // this keeps the layout correct regardless of which font the browser/OS
+  // actually resolves the UI font stack to. These starting values are just
+  // an initial fallback used before the first render() call runs.
+  var margin = { top: 16, right: 108, bottom: 50, left: 80 };
+  var plotW = VB_W - margin.left - margin.right;
+  var plotH = VB_H - margin.top - margin.bottom;
+
+  var svg = document.getElementById("chartSvg");
+
+  // Fills an SVG <text> element from a "parts" array, rendering {s: "..."}
+  // entries as true superscripts (smaller font, raised baseline) via <tspan>
+  // dy offsets, and {t: "..."} entries as normal text. This replaces the
+  // Unicode superscript characters previously used in chart labels: those
+  // glyphs come from two different Unicode blocks (1-3 vs 0,4-9), which some
+  // platform fonts (notably on Apple devices) draw at different heights, so
+  // e.g. the 5 in "235" sat at a different level than the 2 and 3. Real
+  // tspan superscripts render digits from the normal digit glyphs, which are
+  // always level with each other. baseSize is the label's font size in SVG
+  // user units, used to compute the raise and the superscript size.
+  function setLabelContent(textEl, parts, baseSize) {
+    while (textEl.firstChild) textEl.removeChild(textEl.firstChild);
+    var shift = 0; // current cumulative baseline offset (user units, negative = up)
+    parts.forEach(function (p) {
+      var ts = document.createElementNS(svgNS, "tspan");
+      if (p.s !== undefined) {
+        var target = -0.35 * baseSize;
+        ts.setAttribute("font-size", (baseSize * 0.68).toFixed(2));
+        ts.setAttribute("dy", (target - shift).toFixed(2));
+        shift = target;
+        ts.textContent = p.s;
+      } else {
+        ts.setAttribute("dy", (0 - shift).toFixed(2));
+        shift = 0;
+        ts.textContent = p.t;
+      }
+      textEl.appendChild(ts);
+    });
+  }
+
+  // Measures the rendered pixel width/height of a label as it would actually
+  // appear with CSS class `className` applied, by briefly appending a real
+  // SVG <text> element to the chart's own <svg> and reading getBBox(). This
+  // is font-agnostic -- it reflects whatever font the browser/OS actually
+  // resolves the UI font stack to, instead of a hardcoded px-per-character
+  // guess that only happened to match one environment's font metrics.
+  // Accepts either a plain string or a parts array (see setLabelContent);
+  // parts require baseSize so superscript sizing matches the real render.
+  function measureText(text, className, baseSize) {
+    var t = document.createElementNS(svgNS, "text");
+    t.setAttribute("class", className);
+    t.setAttribute("x", -9999);
+    t.setAttribute("y", -9999);
+    if (Array.isArray(text)) {
+      setLabelContent(t, text, baseSize || 15);
+    } else {
+      t.textContent = text;
+    }
+    svg.appendChild(t);
+    var box = { width: 0, height: 0 };
+    try {
+      var bbox = t.getBBox();
+      box.width = bbox.width;
+      box.height = bbox.height;
+    } catch (e) {
+      // getBBox can throw if the svg isn't laid out yet (e.g. hidden ancestor);
+      // fall back to a rough per-character estimate so layout still degrades
+      // gracefully instead of throwing.
+      var approxLen = Array.isArray(text)
+        ? text.reduce(function (n, p) { return n + String(p.s !== undefined ? p.s : p.t).length; }, 0)
+        : String(text).length;
+      box.width = approxLen * 9.5;
+      box.height = 16;
+    }
+    svg.removeChild(t);
+    return box;
+  }
+  var tooltip = document.getElementById("tooltip");
+  var xValEl = document.getElementById("xVal");
+  var kValEl = document.getElementById("kVal");
+  var reactionXGeneric = document.getElementById("reactionXGeneric");
+  var critEl = document.getElementById("criticalityNote");
+  var xSlider = document.getElementById("xSlider");
+  var kSlider = document.getElementById("kSlider");
+
+  // Two reactions share the exact same kinetics (r = k*N_parent*N_n); only
+  // the species labels and which curves are plotted differ.
+  //   generic (default on load): A + n -> B + C + Xn, plots N_A, N_B, N_n
+  //   example (Example button):  235U + n -> 144Xe + 89Sr + Xn, plots all four
+  var mode = "generic";
+
+  function getSeriesDefs(m) {
+    // `label` is the rich HTML version used in the tooltip (rendered via
+    // innerHTML, so it can use <sup>/<sub>); `shortParts` is the structured
+    // form used for the direct on-chart end-of-line labels, rendered inside
+    // SVG <text> via setLabelContent -- {s:...} entries become true tspan
+    // superscripts. (Unicode superscript characters are deliberately avoided:
+    // they mix two Unicode blocks that some platform fonts render at
+    // different heights.)
+    if (m === "example") {
+      return [
+        { key: "U",  label: "<sup>235</sup>U (N<sub>235</sub>)",   shortParts: [{ s: "235" }, { t: "U" }],  color: seriesColors.U },
+        { key: "n",  label: "neutrons (N<sub>n</sub>)",            shortParts: [{ t: "neutrons" }],         color: seriesColors.n },
+        { key: "Xe", label: "<sup>144</sup>Xe (N<sub>144</sub>)",  shortParts: [{ s: "144" }, { t: "Xe" }], color: seriesColors.Xe },
+        { key: "Sr", label: "<sup>89</sup>Sr (N<sub>89</sub>)",    shortParts: [{ s: "89" }, { t: "Sr" }],  color: seriesColors.Sr }
+      ];
+    }
+    return [
+      { key: "U",  label: "A (N<sub>A</sub>)",        shortParts: [{ t: "A" }],        color: seriesColors.U },
+      { key: "n",  label: "neutrons (N<sub>n</sub>)", shortParts: [{ t: "neutrons" }], color: seriesColors.n },
+      { key: "Xe", label: "B, C (N<sub>B</sub>)",     shortParts: [{ t: "B, C" }],     color: seriesColors.Xe }
+    ];
+  }
+
+  // ---------- mode (Example) toggle ----------
+  var btnExample = document.getElementById("btnExample");
+  var reactionGeneric = document.getElementById("reactionGeneric");
+  var reactionExample = document.getElementById("reactionExample");
+  var xSliderBlock = document.getElementById("xSliderBlock");
+  var icGeneric = document.getElementById("icGeneric");
+  var icExample = document.getElementById("icExample");
+
+  function applyModeVisibility() {
+    var showExample = mode === "example";
+    reactionGeneric.classList.toggle("mode-hidden", showExample);
+    reactionExample.classList.toggle("mode-hidden", !showExample);
+    // X is fixed at 3 (the only mass-balanced choice) for the U-235 example,
+    // so its slider doesn't apply there and is hidden.
+    xSliderBlock.classList.toggle("mode-hidden", showExample);
+    icGeneric.classList.toggle("mode-hidden", showExample);
+    icExample.classList.toggle("mode-hidden", !showExample);
+    btnExample.setAttribute("aria-pressed", showExample ? "true" : "false");
+  }
+
+  btnExample.addEventListener("click", function () {
+    mode = mode === "example" ? "generic" : "example";
+    applyModeVisibility();
+    render();
+  });
+
+  function el(tag, attrs) {
+    var e = document.createElementNS(svgNS, tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+
+  var currentData = null;
+  var xScale = null, yScale = null;
+
+  function render() {
+    var defs = getSeriesDefs(mode);
+    // In the U-235 example, X is fixed at 3 (the only mass-balanced choice)
+    // and its slider is hidden; the generic view keeps X slider-driven.
+    var X = mode === "example" ? 3 : parseInt(xSlider.value, 10);
+    var k = parseFloat(kSlider.value);
+
+    xValEl.textContent = X;
+    kValEl.textContent = k.toFixed(1);
+    reactionXGeneric.textContent = X; // hidden while in example mode, harmless
+
+    var speciesLabel = mode === "example" ? "<sup>235</sup>U" : "the parent isotope";
+    if (X === 0) {
+      critEl.className = "criticality crit-sub";
+      critEl.innerHTML = "<b>Sub-critical (X = 0):</b> no new neutrons are produced, so the chain reaction quickly dies out.";
+    } else if (X === 1) {
+      critEl.className = "criticality crit-crit";
+      critEl.innerHTML = "<b>Critical (X = 1):</b> the neutron population stays constant while " + speciesLabel + " decays steadily.";
+    } else {
+      critEl.className = "criticality crit-super";
+      var massNote = (mode === "example" && X === 3) ? " (X = 3 is also mass-balanced)" : "";
+      critEl.innerHTML = "<b>Super-critical (X = " + X + "):</b> neutrons multiply, accelerating the reaction until " + speciesLabel + " is depleted" + massNote + ".";
+    }
+
+    var data = simulate(X, k);
+    currentData = data;
+
+    var tMax = data[data.length - 1].t;
+    var yMax = U0;
+    data.forEach(function (d) {
+      if (d.n > yMax) yMax = d.n;
+      if (d.Xe > yMax) yMax = d.Xe;
+    });
+
+    var yResult = niceTicks(yMax, 6);
+    var yTicks = yResult.ticks;
+    var yMaxTick = yTicks[yTicks.length - 1];
+
+    // ---- dynamic margins from real measured text, not hardcoded guesses ----
+    // Left margin: widest y-tick label + gap to axis + rotated axis-title
+    // height (its "height" becomes horizontal extent once rotated -90) + pad.
+    var maxYLabelWidth = 0;
+    yTicks.forEach(function (v) {
+      var w = measureText(fmt(v), "axistext").width;
+      if (w > maxYLabelWidth) maxYLabelWidth = w;
+    });
+    var yTitleBox = measureText("Number of particles", "axistitle");
+    // The rotated title's own "thickness" (its unrotated bbox height) plus a
+    // little padding is the horizontal band it occupies at the left edge;
+    // yTitleOffset positions its (pre-rotation) baseline within that band so
+    // it never collides with the tick labels to its right.
+    var titleBand = yTitleBox.height + 4;
+    var yTitleOffset = Math.round(yTitleBox.height * 0.72);
+    margin.left = Math.ceil(titleBand + 10 + maxYLabelWidth + 8);
+
+    // Right margin: widest direct end-of-line curve label + its offset from
+    // the curve endpoint + pad, so it never gets clipped or overlaps.
+    var maxDirectLabelWidth = 0;
+    defs.forEach(function (s) {
+      var w = measureText(s.shortParts, "directlabel", 15).width;
+      if (w > maxDirectLabelWidth) maxDirectLabelWidth = w;
+    });
+    margin.right = Math.ceil(maxDirectLabelWidth + 8 + 16);
+
+    plotW = VB_W - margin.left - margin.right;
+    plotH = VB_H - margin.top - margin.bottom;
+
+    var xAxis = buildTimeAxis(tMax, 6, plotW);
+    var xTicks = xAxis.ticks;
+    var xMaxTick = xTicks[xTicks.length - 1];
+
+    xScale = function (t) { return margin.left + (t / xMaxTick) * plotW; };
+    yScale = function (v) { return margin.top + plotH - (v / yMaxTick) * plotH; };
+
+    drawChart(data, xTicks, yTicks, xAxis.labels, xAxis.scaleExp, defs, yTitleOffset);
+  }
+
+  function drawChart(data, xTicks, yTicks, xLabels, scaleExp, defs, yTitleOffset) {
+    var xMaxTick = xTicks[xTicks.length - 1];
+    svg.innerHTML = "";
+    var g = el("g", {});
+    svg.appendChild(g);
+
+    // gridlines + y ticks
+    yTicks.forEach(function (v) {
+      var y = yScale(v);
+      g.appendChild(el("line", {
+        class: "gridline", x1: margin.left, x2: margin.left + plotW, y1: y, y2: y
+      }));
+      var txt = el("text", {
+        class: "axistext", x: margin.left - 8, y: y + 4, "text-anchor": "end"
+      });
+      txt.textContent = fmt(v);
+      g.appendChild(txt);
+    });
+
+    // x ticks (labels are pre-formatted: capped at 3 decimals, scaled by a
+    // power of ten and trailing-zero-stripped when the raw step needs more
+    // precision than that — see buildTimeAxis)
+    xTicks.forEach(function (t, i) {
+      var x = xScale(t);
+      var txt = el("text", {
+        class: "axistext", x: x, y: margin.top + plotH + 18, "text-anchor": "middle"
+      });
+      txt.textContent = xLabels[i];
+      g.appendChild(txt);
+    });
+
+    // axes
+    g.appendChild(el("line", {
+      class: "axisline", x1: margin.left, x2: margin.left, y1: margin.top, y2: margin.top + plotH
+    }));
+    g.appendChild(el("line", {
+      class: "axisline", x1: margin.left, x2: margin.left + plotW, y1: margin.top + plotH, y2: margin.top + plotH
+    }));
+
+    // axis titles
+    var xt = el("text", {
+      class: "axistitle", x: margin.left + plotW / 2, y: VB_H - 6, "text-anchor": "middle"
+    });
+    if (scaleExp > 0) {
+      // Exponent as a real tspan superscript (not Unicode superscript
+      // characters, which render at inconsistent heights on some platforms).
+      setLabelContent(xt, [
+        { t: "Time (arbitrary units, ×10" },
+        { s: "−" + scaleExp },
+        { t: ")" }
+      ], 17.25);
+    } else {
+      xt.textContent = "Time (arbitrary units)";
+    }
+    g.appendChild(xt);
+
+    var yt = el("text", {
+      class: "axistitle",
+      x: -(margin.top + plotH / 2), y: yTitleOffset,
+      "text-anchor": "middle",
+      transform: "rotate(-90)"
+    });
+    yt.textContent = "Number of particles";
+    g.appendChild(yt);
+
+    // series lines
+    defs.forEach(function (s) {
+      var d = "";
+      data.forEach(function (pt, i) {
+        var x = xScale(pt.t), y = yScale(pt[s.key]);
+        d += (i === 0 ? "M" : "L") + x.toFixed(2) + "," + y.toFixed(2) + " ";
+      });
+      g.appendChild(el("path", { class: "series-line", d: d, stroke: s.color }));
+
+      // end marker
+      var last = data[data.length - 1];
+      g.appendChild(el("circle", {
+        class: "series-dot", cx: xScale(last.t), cy: yScale(last[s.key]),
+        r: 5, fill: s.color
+      }));
+    });
+
+    // direct end-of-line labels (replace the legend): colored text sitting
+    // right next to each curve's own endpoint, in that curve's color, so
+    // identity comes from proximity + color rather than a separate legend
+    // or a connector dot. Only nudged vertically (never far away) if two
+    // curves end close enough together that their labels would overlap.
+    (function drawDirectLabels() {
+      var last = data[data.length - 1];
+      var items = defs.map(function (s) {
+        var y = yScale(last[s.key]);
+        return { parts: s.shortParts, color: s.color, x: xScale(last.t), y: y };
+      });
+      items.sort(function (a, b) { return a.y - b.y; });
+
+      // Required vertical spacing is derived from the actual measured height
+      // of these specific labels (not a fixed guess) -- this also naturally
+      // accounts for the extra height of tspan-superscripted isotope numbers
+      // like the 144 in 144Xe that a fixed px gap wouldn't anticipate.
+      var labelLineHeight = 0;
+      items.forEach(function (it) {
+        var h = measureText(it.parts, "directlabel", 15).height;
+        if (h > labelLineHeight) labelLineHeight = h;
+      });
+      var minGap = labelLineHeight + 6;
+      var topLimit = margin.top + 5;
+      // Keep labels clear of the x-axis tick-label row below the plot area
+      // (it sits at margin.top + plotH + 18, and the rightmost x-tick shares
+      // the same x position as these end-of-line labels) -- without this, a
+      // curve ending near zero (e.g. a depleted reactant) puts its label
+      // right on top of the rightmost x-axis number. Full label height of
+      // clearance above the axis line is enough since the tick row itself
+      // starts a further 18px below that.
+      var bottomLimit = margin.top + plotH - labelLineHeight - 2;
+
+      // Two-pass overlap resolution (standard "dodge" placement): push
+      // labels down to satisfy minGap, then if that ran past the bottom
+      // limit, pull them back up from the bottom -- pushing down and then
+      // shifting the whole stack as one unit (the old approach) could undo
+      // the bottom clearance it had just enforced. If there simply isn't
+      // room for every label at minGap spacing (rare, needs 5+ close curves),
+      // the final clamps below still guarantee no label sits outside
+      // [topLimit, bottomLimit], and remaining tight spacing is an
+      // acceptable last resort rather than being pushed off the chart.
+      var i;
+      for (i = 1; i < items.length; i++) {
+        if (items[i].y - items[i - 1].y < minGap) items[i].y = items[i - 1].y + minGap;
+      }
+      if (items.length && items[items.length - 1].y > bottomLimit) {
+        items[items.length - 1].y = bottomLimit;
+        for (i = items.length - 2; i >= 0; i--) {
+          if (items[i + 1].y - items[i].y < minGap) items[i].y = items[i + 1].y - minGap;
+        }
+      }
+      if (items.length && items[0].y < topLimit) {
+        items[0].y = topLimit;
+        for (i = 1; i < items.length; i++) {
+          if (items[i].y - items[i - 1].y < minGap) items[i].y = items[i - 1].y + minGap;
+        }
+      }
+      if (items.length && items[items.length - 1].y > bottomLimit) {
+        items[items.length - 1].y = bottomLimit;
+      }
+
+      items.forEach(function (it) {
+        var txt = el("text", { class: "directlabel", x: it.x + 8, y: it.y + 4.5, fill: it.color });
+        setLabelContent(txt, it.parts, 15);
+        g.appendChild(txt);
+      });
+    })();
+
+    // hover layer
+    var hoverGroup = el("g", { visibility: "hidden" });
+    var crossline = el("line", { class: "crosshair", y1: margin.top, y2: margin.top + plotH });
+    hoverGroup.appendChild(crossline);
+    var hoverDots = {};
+    defs.forEach(function (s) {
+      var c = el("circle", { class: "hoverdot", r: 4.5, fill: s.color });
+      hoverGroup.appendChild(c);
+      hoverDots[s.key] = c;
+    });
+    g.appendChild(hoverGroup);
+
+    var overlay = el("rect", {
+      x: margin.left, y: margin.top, width: plotW, height: plotH,
+      fill: "transparent", style: "cursor:crosshair;"
+    });
+    g.appendChild(overlay);
+
+    function findNearest(t) {
+      var lo = 0, hi = data.length - 1;
+      while (lo < hi) {
+        var mid = (lo + hi) >> 1;
+        if (data[mid].t < t) lo = mid + 1; else hi = mid;
+      }
+      return lo;
+    }
+
+    overlay.addEventListener("mousemove", function (evt) {
+      var rect = svg.getBoundingClientRect();
+      var scaleX = VB_W / rect.width;
+      var mx = (evt.clientX - rect.left) * scaleX;
+      var t = ((mx - margin.left) / plotW) * xMaxTick;
+      if (t < 0) t = 0;
+      if (t > data[data.length - 1].t) t = data[data.length - 1].t;
+      var idx = findNearest(t);
+      var pt = data[idx];
+
+      hoverGroup.setAttribute("visibility", "visible");
+      var xPix = xScale(pt.t);
+      crossline.setAttribute("x1", xPix);
+      crossline.setAttribute("x2", xPix);
+      defs.forEach(function (s) {
+        hoverDots[s.key].setAttribute("cx", xPix);
+        hoverDots[s.key].setAttribute("cy", yScale(pt[s.key]));
+      });
+
+      var rows = defs.map(function (s) {
+        return '<div class="t-row"><span class="k"><span class="swatch" style="background:' + s.color + '"></span>' + s.label + '</span><span class="v">' + fmt(pt[s.key]) + "</span></div>";
+      }).join("");
+      tooltip.innerHTML = '<div class="t-time">t = ' + fmtTime(pt.t, xMaxTick) + "</div>" + rows;
+      tooltip.style.opacity = "1";
+
+      var chartRect = svg.parentElement.getBoundingClientRect();
+      var px = (xPix / VB_W) * chartRect.width;
+      var py = (yScale(pt.U) / VB_H) * chartRect.height;
+      var ttLeft = px + 14;
+      if (ttLeft + 170 > chartRect.width) ttLeft = px - 170;
+      tooltip.style.left = ttLeft + "px";
+      tooltip.style.top = Math.max(0, py - 40) + "px";
+    });
+
+    overlay.addEventListener("mouseleave", function () {
+      hoverGroup.setAttribute("visibility", "hidden");
+      tooltip.style.opacity = "0";
+    });
+  }
+
+  // ---------- overlay panel controls ----------
+  function wirePanel(btnId, overlayId) {
+    var btn = document.getElementById(btnId);
+    var overlay = document.getElementById(overlayId);
+    btn.addEventListener("click", function () {
+      overlay.classList.add("open");
+      btn.setAttribute("aria-pressed", "true");
+    });
+    overlay.querySelectorAll("[data-close]").forEach(function (x) {
+      x.addEventListener("click", function () {
+        overlay.classList.remove("open");
+        btn.setAttribute("aria-pressed", "false");
+      });
+    });
+    overlay.addEventListener("click", function (evt) {
+      if (evt.target === overlay) {
+        overlay.classList.remove("open");
+        btn.setAttribute("aria-pressed", "false");
+      }
+    });
+  }
+  wirePanel("btnDirections", "overlayDirections");
+  wirePanel("btnDetails", "overlayDetails");
+  wirePanel("btnAbout", "overlayAbout");
+
+  xSlider.addEventListener("input", render);
+  kSlider.addEventListener("input", render);
+
+  applyModeVisibility();
+  render();
+})();
+</script>
+</body>
+</html>

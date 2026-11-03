@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Heat Transfer in Fins</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+  body {
+    font-family: Helvetica, Arial, sans-serif;
+    background: #ffffff;
+    margin: 0;
+    padding: 12px;
+    color: #000;
+  }
+  #app {
+    position: relative;
+    width: 700px;
+    margin: 0 auto;
+  }
+  h1.sim-title {
+    font-size: 24px;
+    font-weight: normal;
+    text-align: center;
+    margin: 4px 0 14px 0;
+  }
+  .controls {
+    margin-bottom: 4px;
+  }
+  .control-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    flex-wrap: nowrap;
+  }
+  .control-label {
+    font-size: 15px;
+    margin-right: 6px;
+    white-space: nowrap;
+  }
+  .setter-group {
+    display: inline-flex;
+    margin-right: 24px;
+  }
+  .setter-btn {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    padding: 3px 10px;
+    border: 1px solid #999;
+    background: #f5f5f5;
+    cursor: pointer;
+    margin: 0;
+  }
+  .setter-btn:first-child { border-radius: 4px 0 0 4px; }
+  .setter-btn:last-child { border-radius: 0 4px 4px 0; border-left: none; }
+  .setter-btn.active {
+    background: #d8e6f5;
+    border-color: #7a9cc4;
+  }
+  select {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    padding: 2px 4px;
+  }
+
+  /* LearnChemE range-slider style */
+  input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+  input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  /* keep the sliders short and vertically centered in the row */
+  .control-row input[type="range"] {
+    width: 130px;
+    margin: 0 8px;
+  }
+
+  .slider-value {
+    font-size: 17.25px;
+    min-width: 34px;
+    display: inline-block;
+  }
+  .slider-label {
+    font-size: 17.25px;
+  }
+  .panel-buttons {
+    display: inline-flex;
+    margin-left: auto;
+  }
+  .panel-btn {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    font-weight: normal;
+    color: #fff;
+    background: #98000D;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 12px;
+    margin-left: 8px;
+    cursor: pointer;
+  }
+  .panel-btn:hover { background: #7a000a; }
+  .panel-btn.active { background: #5c0008; }
+
+  /* flyout panels: Directions/About narrow, Details ~50% wider,
+     long content scrolls inside with the × pinned */
+  .flyout {
+    display: none;
+    position: absolute;
+    right: 0;
+    width: 440px;
+    background: #fdfdfd;
+    border: 1px solid #98000D;
+    border-radius: 6px;
+    padding: 14px 8px 14px 18px;
+    z-index: 50;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+    font-size: 17px;
+    line-height: 1.45;
+    text-align: left;
+  }
+  #detPanel { width: 660px; }
+  #dirPanel, #aboPanel { width: 528px; }
+  .flyout, .flyout h3,
+  .flyout table.kvals td, .flyout table.syms td { font-size: 14.45px; }
+  .flyout.open { display: block; }
+  .flyout-body {
+    max-height: 480px;
+    overflow-y: auto;
+    padding-right: 22px;
+  }
+  .flyout .close-x {
+    position: absolute;
+    top: 6px;
+    right: 10px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #98000D;
+    background: none;
+    border: none;
+    cursor: pointer;
+    line-height: 1;
+    padding: 2px 4px;
+    z-index: 2;
+  }
+  .flyout .close-x:hover { color: #5c0008; }
+  .flyout h3 {
+    margin: 0 0 8px 0;
+    font-size: 17px;
+    font-weight: bold;
+    color: #000;
+  }
+  .flyout p { margin: 6px 0; }
+  .flyout a { color: #0645ad; text-decoration: none; }
+  .flyout a:hover { text-decoration: underline; }
+  .flyout table.kvals td { padding: 1px 18px 1px 0; font-size: 14.45px; }
+  .flyout table.syms td { padding: 2px 10px 2px 0; font-size: 14.45px; vertical-align: top; }
+  .flyout table.syms td:first-child { white-space: nowrap; }
+
+  #results {
+    font-size: 17px;
+    margin: 6px 0 2px 0;
+    white-space: nowrap;
+  }
+  canvas { display: block; }
+</style>
+</head>
+<body>
+<div id="app">
+  <h1 class="sim-title">Heat Transfer in Fins</h1>
+
+  <div class="controls">
+    <div class="control-row">
+      <span class="control-label">fin type:</span>
+      <span class="setter-group">
+        <button id="btnRect" class="setter-btn active">rectangular</button>
+        <button id="btnPin" class="setter-btn">pin</button>
+      </span>
+      <span class="control-label">fin material:</span>
+      <select id="matSel">
+        <option value="1" selected>stainless steel</option>
+        <option value="2">carbon steel</option>
+        <option value="3">iron</option>
+        <option value="4">brass</option>
+        <option value="5">aluminum</option>
+        <option value="6">copper</option>
+      </select>
+      <span class="panel-buttons">
+        <button class="panel-btn" id="dirBtn">Directions</button>
+        <button class="panel-btn" id="detBtn">Details</button>
+        <button class="panel-btn" id="aboBtn">About</button>
+      </span>
+    </div>
+    <div class="control-row">
+      <span class="control-label slider-label">fin length (mm)</span>
+      <input type="range" id="lenSlider" min="5" max="20" step="1" value="12">
+      <span class="slider-value" id="lenVal">12</span>
+      <span class="control-label slider-label" style="margin-left:24px;">ambient temperature (K)</span>
+      <input type="range" id="taSlider" min="250" max="350" step="1" value="275">
+      <span class="slider-value" id="taVal">275</span>
+    </div>
+  </div>
+
+  <!-- Flyout panels -->
+  <div class="flyout" id="dirPanel">
+    <button class="close-x" aria-label="close">&times;</button>
+    <div class="flyout-body">
+    <h3>Directions</h3>
+    <p>This simulation shows a calculation of heat transfer through a single fin (either a rectangular or a pin fin) mounted on a heat sink. Use the sliders to vary the fin length and the ambient air temperature. Select the fin material from the drop-down menu. The temperature distribution is shown on the fin surface using a color scale (red is hottest, blue is coolest), and the temperature of the fin tip is shown on the right along with the temperature legend. The thickness of the rectangular fin and the diameter of the pin fin are both 1.5&nbsp;mm. The heat transfer rate through the fin is calculated and displayed above the fin, as well as the fin effectiveness&mdash;the ratio of the fin heat transfer rate to the heat transfer rate without the fin. The fin tip is assumed to be adiabatic and the air flow laminar.</p>
+    </div>
+  </div>
+
+  <div class="flyout" id="detPanel">
+    <button class="close-x" aria-label="close">&times;</button>
+    <div class="flyout-body">
+    <h3>Details</h3>
+    <p>The heat transfer coefficient of air \(h\) is calculated using Nusselt correlations for laminar flow over a flat plate and a cylinder. Air properties are evaluated at 300&nbsp;K. The average Nusselt and Reynolds numbers are:</p>
+    <p>\(\mathrm{Nu}_{\mathrm{rect}} = \dfrac{h\,w}{k_a}\), \(\;\mathrm{Re}_{\mathrm{rect}} = \dfrac{u\,w}{\nu}\) for the rectangular fin of width \(w\),</p>
+    <p>\(\mathrm{Nu}_{\mathrm{pin}} = \dfrac{h\,t}{k_a}\), \(\;\mathrm{Re}_{\mathrm{pin}} = \dfrac{u\,t}{\nu}\) for the pin fin of diameter \(t\).</p>
+    <p>For a rectangular fin:</p>
+    <p>\(\mathrm{Nu}_{\mathrm{rect}} = 0.664\,\mathrm{Re}_{\mathrm{rect}}^{1/2}\,\mathrm{Pr}^{1/3}\),</p>
+    <p>for a pin fin:</p>
+    <p>\(\mathrm{Nu}_{\mathrm{pin}} = 0.683\,\mathrm{Re}_{\mathrm{pin}}^{0.466}\,\mathrm{Pr}^{1/3}\),</p>
+    <p>where the Prandtl number is:</p>
+    <p>\(\mathrm{Pr} = \dfrac{C_p\,\mu}{k_a}\).</p>
+    <p>For a fin with an adiabatic tip:</p>
+    <p>\(T = T_{\infty} + \dfrac{\cosh(m\,(L - z))}{\cosh(m\,L)}\,(T_b - T_{\infty})\),</p>
+    <p>\(q_f = \sqrt{h\,P\,k\,A_c}\;\tanh(m\,L)\,(T_b - T_{\infty})\),</p>
+    <p>\(m = \sqrt{\dfrac{h\,P}{k\,A_c}}\).</p>
+    <p>For a rectangular fin:</p>
+    <p>\(P = 2\,w + 2\,t\),</p>
+    <p>\(A_c = w\,t\).</p>
+    <p>For a pin fin:</p>
+    <p>\(P = \pi\,t\),</p>
+    <p>\(A_c = \dfrac{\pi}{4}\,t^2\).</p>
+    <p>The fin effectiveness is the ratio of the fin heat transfer rate to the heat transfer rate that would exist without the fin:</p>
+    <p>\(\varepsilon_f = \dfrac{q_f}{h\,A_c\,(T_b - T_{\infty})}\).</p>
+    <p>The thermal conductivities (\(\mathrm{W/m\ K}\)) of the fin materials are:</p>
+    <table class="kvals">
+      <tr><td>stainless steel</td><td>\(k = 14\)</td></tr>
+      <tr><td>carbon steel</td><td>\(k = 60.5\)</td></tr>
+      <tr><td>iron</td><td>\(k = 80.2\)</td></tr>
+      <tr><td>brass</td><td>\(k = 110\)</td></tr>
+      <tr><td>aluminum</td><td>\(k = 237\)</td></tr>
+      <tr><td>copper</td><td>\(k = 401\)</td></tr>
+    </table>
+    <p style="margin-top:10px;"><b>Symbols</b></p>
+    <table class="syms">
+      <tr><td>\(A_c\)</td><td>fin cross-sectional area (\(\mathrm{m^2}\))</td></tr>
+      <tr><td>\(C_p\)</td><td>heat capacity of air (\(\mathrm{J/kg\ K}\))</td></tr>
+      <tr><td>\(h\)</td><td>heat transfer coefficient of air (\(\mathrm{W/m^2\ K}\))</td></tr>
+      <tr><td>\(k\)</td><td>thermal conductivity of fin material (\(\mathrm{W/m\ K}\))</td></tr>
+      <tr><td>\(k_a\)</td><td>thermal conductivity of air (\(\mathrm{W/m\ K}\))</td></tr>
+      <tr><td>\(L\)</td><td>fin length (\(\mathrm{m}\))</td></tr>
+      <tr><td>\(m\)</td><td>fin parameter (\(\mathrm{m^{-1}}\))</td></tr>
+      <tr><td>\(\mathrm{Nu}\)</td><td>average Nusselt number (unitless)</td></tr>
+      <tr><td>\(P\)</td><td>fin perimeter (\(\mathrm{m}\))</td></tr>
+      <tr><td>\(\mathrm{Pr}\)</td><td>Prandtl number (unitless)</td></tr>
+      <tr><td>\(q_f\)</td><td>fin heat transfer rate (\(\mathrm{W}\))</td></tr>
+      <tr><td>\(\mathrm{Re}\)</td><td>Reynolds number (unitless)</td></tr>
+      <tr><td>\(t\)</td><td>rectangular fin thickness or pin fin diameter, 0.0015 (\(\mathrm{m}\))</td></tr>
+      <tr><td>\(T\)</td><td>fin temperature (\(\mathrm{K}\))</td></tr>
+      <tr><td>\(T_b\)</td><td>base temperature, 500 (\(\mathrm{K}\))</td></tr>
+      <tr><td>\(T_{\infty}\)</td><td>ambient air temperature (\(\mathrm{K}\))</td></tr>
+      <tr><td>\(u\)</td><td>air velocity, 1 (\(\mathrm{m/s}\))</td></tr>
+      <tr><td>\(w\)</td><td>rectangular fin width, 0.02 (\(\mathrm{m}\))</td></tr>
+      <tr><td>\(z\)</td><td>distance along the fin from the base (\(\mathrm{m}\))</td></tr>
+      <tr><td>\(\varepsilon_f\)</td><td>fin effectiveness (unitless)</td></tr>
+      <tr><td>\(\mu\)</td><td>dynamic viscosity of air (\(\mathrm{N\ s/m^2}\))</td></tr>
+      <tr><td>\(\nu\)</td><td>kinematic viscosity of air (\(\mathrm{m^2/s}\))</td></tr>
+    </table>
+    <p style="margin-top:10px;"><b>Reference</b></p>
+    <p>[1] T. L. Bergman, A. S. Lavine, F. P. Incropera, and D. P. DeWitt, <i>Introduction to Heat Transfer</i>, 6th ed., Hoboken, NJ: John Wiley &amp; Sons, 2011.</p>
+    </div>
+  </div>
+
+  <div class="flyout" id="aboPanel">
+    <button class="close-x" aria-label="close">&times;</button>
+    <div class="flyout-body">
+    <h3>About</h3>
+    <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/HeatTransferInFins/" target="_blank" rel="noopener">Mathematica simulation</a> by Rachael L. Baumann. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.</p>
+    </div>
+  </div>
+
+  <div id="results">
+    fin heat transfer rate = <span id="qfOut"></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;temperature of fin tip = <span id="tipOut"></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;fin effectiveness = <span id="effOut"></span>
+  </div>
+
+  <canvas id="cv" width="700" height="340"></canvas>
+</div>
+
+<script>
+"use strict";
+/* ---------------- state ---------------- */
+const state = {
+  fin: 1,      // 1 rectangular, 2 pin
+  mat: 1,      // material index
+  length: 12,  // mm
+  Ta: 275      // K
+};
+
+/* ---------------- physics ---------------- */
+const kVals = {1:14, 2:60.5, 3:80.2, 4:110, 5:237, 6:401};
+
+function compute(s) {
+  const t = 0.0015, w = 0.02;
+  const L = s.length / 1000;
+  const u = 1, Cp = 1005, ka = 0.0264, nu = 0.0000171, rho = 1.164;
+  const mu = nu * rho;
+  const Pr = Cp * mu / ka;
+  const Rex = u * (s.fin === 1 ? w : t) / nu;
+  let h;
+  if (s.fin === 1) {
+    h = (0.664 * Math.sqrt(Rex) * Math.cbrt(Pr)) * ka / w;
+  } else {
+    h = (0.683 * Math.pow(Rex, 0.466) * Math.cbrt(Pr)) * ka / t;
+  }
+  let P, Ac;
+  if (s.fin === 1) { P = 2 * w + 2 * t; Ac = w * t; }
+  else { P = Math.PI * t; Ac = Math.PI * t * t / 4; }
+  const k = kVals[s.mat];
+  const Tb = 500;
+  const m = Math.sqrt(h * P / (k * Ac));
+  const qf = (Tb - s.Ta) * Math.sqrt(h * P * k * Ac) * Math.tanh(m * L);
+  const T = x => (Tb - s.Ta) * Math.cosh(m * (L - x)) / Math.cosh(m * L) + s.Ta;
+  const eff = qf / (h * Ac * (Tb - s.Ta));
+  return { t, w, L, h, P, Ac, k, Tb, m, qf, T, eff };
+}
+
+/* xT polynomial mapping temperature -> [0, 0.02] used for color scaling */
+function xT(T) {
+  return 2.195e-11 * Math.pow(T, 4) - 3.059e-8 * Math.pow(T, 3)
+       + 0.000015999 * T * T - 0.003676 * T + 0.3118;
+}
+
+/* Mathematica "TemperatureMap" approximation */
+const tmapStops = [
+  [0.00, 0.178, 0.305, 0.933],
+  [0.25, 0.512, 0.671, 0.976],
+  [0.50, 0.867, 0.865, 0.816],
+  [0.75, 0.968, 0.557, 0.419],
+  [1.00, 0.848, 0.163, 0.180]
+];
+function temperatureMap(v) {
+  v = Math.max(0, Math.min(1, v));
+  for (let i = 0; i < tmapStops.length - 1; i++) {
+    const a = tmapStops[i], b = tmapStops[i + 1];
+    if (v <= b[0]) {
+      const f = (v - a[0]) / (b[0] - a[0]);
+      const r = a[1] + f * (b[1] - a[1]);
+      const g = a[2] + f * (b[2] - a[2]);
+      const bl = a[3] + f * (b[3] - a[3]);
+      return `rgb(${Math.round(r*255)},${Math.round(g*255)},${Math.round(bl*255)})`;
+    }
+  }
+  const s = tmapStops[tmapStops.length - 1];
+  return `rgb(${Math.round(s[1]*255)},${Math.round(s[2]*255)},${Math.round(s[3]*255)})`;
+}
+function colorForT(T) {
+  return temperatureMap(xT(T) / 0.02);
+}
+
+/* ---------------- number formatting (NumberForm) ---------------- */
+function sigRound(x, n) {
+  if (x === 0) return 0;
+  const d = Math.ceil(Math.log10(Math.abs(x)));
+  const p = n - d;
+  return Math.round(x * Math.pow(10, p)) / Math.pow(10, p);
+}
+function numberForm(x, n, f) {
+  const v = sigRound(x, n);
+  let s = v.toFixed(f);
+  if (f > 0) s = s.replace(/\.?0+$/, "");
+  return s;
+}
+
+/* ---------------- drawing ---------------- */
+const canvas = document.getElementById("cv");
+const ctx = canvas.getContext("2d");
+const DPR = window.devicePixelRatio || 1;
+const CW = 700, CH = 340;
+canvas.width = CW * DPR;
+canvas.height = CH * DPR;
+canvas.style.width = CW + "px";
+canvas.style.height = CH + "px";
+ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+
+/* orthographic projection, ViewPoint {2,-2,1} */
+const S2 = Math.SQRT1_2;
+const rVec = [S2, S2, 0];
+const uVec = [-1/(3*Math.SQRT2), 1/(3*Math.SQRT2), 4/(3*Math.SQRT2)];
+const SCALE = 10500;          // px per meter
+const OX = 150, OY = 190;     // screen origin for 3D scene
+
+function proj(p) {
+  const sx = p[0]*rVec[0] + p[1]*rVec[1] + p[2]*rVec[2];
+  const sy = p[0]*uVec[0] + p[1]*uVec[1] + p[2]*uVec[2];
+  return [OX + sx * SCALE, OY - sy * SCALE];
+}
+function poly(pts, fill, stroke) {
+  ctx.beginPath();
+  pts.forEach((p, i) => {
+    const q = proj(p);
+    if (i === 0) ctx.moveTo(q[0], q[1]); else ctx.lineTo(q[0], q[1]);
+  });
+  ctx.closePath();
+  if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+  if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = 0.5; ctx.stroke(); }
+}
+
+function drawScene(res, s) {
+  ctx.clearRect(0, 0, CW, CH);
+  const { t, w, L, T } = res;
+  const baseCol = colorForT(res.Tb);
+
+  /* ---- base cuboid: x in [-0.0025, 0], y,z in [-w/2, w/2] ---- */
+  const x0 = -0.0025, x1 = 0, hw = w / 2;
+  // +z (top)
+  poly([[x0,-hw,hw],[x1,-hw,hw],[x1,hw,hw],[x0,hw,hw]], shade(baseCol, 1.06), "#555");
+  // -y (front)
+  poly([[x0,-hw,-hw],[x1,-hw,-hw],[x1,-hw,hw],[x0,-hw,hw]], shade(baseCol, 0.88), "#555");
+  // +x (face toward camera)
+  poly([[x1,-hw,-hw],[x1,hw,-hw],[x1,hw,hw],[x1,-hw,hw]], baseCol, "#555");
+
+  /* ---- fin ---- */
+  const N = 90;
+  if (s.fin === 1) {
+    /* rectangular slab: x 0..L, y -w/2..w/2, z 0..t */
+    for (let i = 0; i < N; i++) {
+      const xa = L * i / N, xb = L * (i + 1) / N;
+      const c = colorForT(T((xa + xb) / 2));
+      poly([[xa,-hw,t],[xb,-hw,t],[xb,hw,t],[xa,hw,t]], shade(c, 1.06), null);
+      poly([[xa,-hw,0],[xb,-hw,0],[xb,-hw,t],[xa,-hw,t]], shade(c, 0.85), null);
+    }
+    const cEnd = colorForT(T(L));
+    poly([[L,-hw,0],[L,hw,0],[L,hw,t],[L,-hw,t]], cEnd, "#555");
+    ctx.strokeStyle = "#555"; ctx.lineWidth = 0.6;
+    poly([[0,-hw,t],[L,-hw,t],[L,hw,t],[0,hw,t]], null, "#555");
+    poly([[0,-hw,0],[L,-hw,0],[L,-hw,t],[0,-hw,t]], null, "#555");
+  } else {
+    /* pin fin: cylinder along x, radius t/2, drawn far -> near */
+    const r = t / 2, M = 36;
+    for (let i = 0; i <= N; i++) {
+      const x = L * i / N;
+      const c = colorForT(T(x));
+      ctx.beginPath();
+      for (let j = 0; j <= M; j++) {
+        const th = 2 * Math.PI * j / M;
+        const p = proj([x, r * Math.sin(th), r * Math.cos(th)]);
+        if (j === 0) ctx.moveTo(p[0], p[1]); else ctx.lineTo(p[0], p[1]);
+      }
+      ctx.closePath();
+      ctx.fillStyle = c;
+      ctx.fill();
+      ctx.strokeStyle = c;
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+    }
+    ctx.beginPath();
+    for (let j = 0; j <= M; j++) {
+      const th = 2 * Math.PI * j / M;
+      const p = proj([L, r * Math.sin(th), r * Math.cos(th)]);
+      if (j === 0) ctx.moveTo(p[0], p[1]); else ctx.lineTo(p[0], p[1]);
+    }
+    ctx.closePath();
+    ctx.strokeStyle = "#555"; ctx.lineWidth = 0.6; ctx.stroke();
+  }
+
+  /* ---- base label (moved further above the base) ---- */
+  const lp = proj([-0.00125, 0, hw + 0.0015]);
+  ctx.fillStyle = "#000";
+  ctx.font = "18px Helvetica, Arial, sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "bottom";
+  ctx.fillText("base 500 K", lp[0], lp[1] - 16);
+
+  /* ---- temperature legend ---- */
+  drawLegend(res);
+}
+
+function shade(rgbStr, f) {
+  const m = rgbStr.match(/rgb\((\d+),(\d+),(\d+)\)/);
+  const r = Math.min(255, Math.round(+m[1] * f));
+  const g = Math.min(255, Math.round(+m[2] * f));
+  const b = Math.min(255, Math.round(+m[3] * f));
+  return `rgb(${r},${g},${b})`;
+}
+
+function drawLegend(res) {
+  const lx = 470, lyTop = 18, lw = 110, lh = 300;
+  const Tmin = 273, Tmax = 500, pad = 5;
+  const yOfT = T => lyTop + lh * (1 - (T - (Tmin - pad)) / ((Tmax + pad) - (Tmin - pad)));
+
+  for (let py = 0; py < lh; py++) {
+    const frac = 1 - py / lh;
+    const T = (Tmin - pad) + frac * ((Tmax + pad) - (Tmin - pad));
+    ctx.fillStyle = colorForT(Math.max(Tmin, Math.min(Tmax, T)));
+    ctx.fillRect(lx, lyTop + py, lw, 1.5);
+  }
+
+  ctx.strokeStyle = "#000";
+  ctx.lineWidth = 1;
+  ctx.strokeRect(lx, lyTop, lw, lh);
+
+  ctx.font = "15px Helvetica, Arial, sans-serif";
+  ctx.fillStyle = "#000";
+  ctx.textAlign = "left";
+  ctx.textBaseline = "middle";
+  for (let T = 300; T <= 500; T += 50) {
+    const y = yOfT(T);
+    ctx.beginPath();
+    ctx.moveTo(lx + lw, y);
+    ctx.lineTo(lx + lw - 6, y);
+    ctx.stroke();
+    ctx.fillText(String(T), lx + lw + 6, y);
+  }
+  for (let T = 270; T <= 500; T += 10) {
+    if (T % 50 === 0) continue;
+    const y = yOfT(T);
+    if (y < lyTop || y > lyTop + lh) continue;
+    ctx.beginPath();
+    ctx.moveTo(lx + lw, y);
+    ctx.lineTo(lx + lw - 3.5, y);
+    ctx.stroke();
+  }
+
+  const Ttip = res.T(res.L);
+  const yTip = yOfT(Ttip);
+  ctx.beginPath();
+  ctx.moveTo(lx - 55, yTip);
+  ctx.lineTo(lx + lw, yTip);
+  ctx.strokeStyle = "#000";
+  ctx.lineWidth = 1.2;
+  ctx.stroke();
+  ctx.font = "17px Helvetica, Arial, sans-serif";
+  ctx.textAlign = "right";
+  ctx.fillText(numberForm(Ttip, 3, 0), lx - 59, yTip);
+
+  const labelTxt = "temperature  (K)";
+  const off = document.createElement("canvas");
+  const octx = off.getContext("2d");
+  octx.font = "17px Helvetica, Arial, sans-serif";
+  const tw = Math.ceil(octx.measureText(labelTxt).width) + 8;
+  const th = 26;
+  off.width = tw * DPR;
+  off.height = th * DPR;
+  octx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  octx.font = "17px Helvetica, Arial, sans-serif";
+  octx.fillStyle = "#000";
+  octx.textAlign = "center";
+  octx.textBaseline = "middle";
+  octx.fillText(labelTxt, tw / 2, th / 2);
+  ctx.save();
+  ctx.translate(lx + lw + 52, lyTop + lh / 2);
+  ctx.rotate(Math.PI / 2);
+  ctx.drawImage(off, -tw / 2, -th / 2, tw, th);
+  ctx.restore();
+}
+
+/* ---------------- update ---------------- */
+function update() {
+  const res = compute(state);
+  document.getElementById("qfOut").textContent = numberForm(res.qf, 3, 2) + " W";
+  document.getElementById("tipOut").textContent = numberForm(res.T(res.L), 3, 0) + " K";
+  document.getElementById("effOut").textContent = numberForm(res.eff, 4, 1);
+  drawScene(res, state);
+}
+
+/* ---------------- controls ---------------- */
+const btnRect = document.getElementById("btnRect");
+const btnPin = document.getElementById("btnPin");
+btnRect.addEventListener("click", () => {
+  state.fin = 1;
+  btnRect.classList.add("active");
+  btnPin.classList.remove("active");
+  update();
+});
+btnPin.addEventListener("click", () => {
+  state.fin = 2;
+  btnPin.classList.add("active");
+  btnRect.classList.remove("active");
+  update();
+});
+document.getElementById("matSel").addEventListener("change", e => {
+  state.mat = +e.target.value;
+  update();
+});
+document.getElementById("lenSlider").addEventListener("input", e => {
+  state.length = +e.target.value;
+  document.getElementById("lenVal").textContent = e.target.value;
+  update();
+});
+document.getElementById("taSlider").addEventListener("input", e => {
+  state.Ta = +e.target.value;
+  document.getElementById("taVal").textContent = e.target.value;
+  update();
+});
+
+/* ---------------- flyout panels ---------------- */
+const panels = {
+  dirBtn: document.getElementById("dirPanel"),
+  detBtn: document.getElementById("detPanel"),
+  aboBtn: document.getElementById("aboPanel")
+};
+let openPanel = null;
+function positionPanel(panel, btn) {
+  const appRect = document.getElementById("app").getBoundingClientRect();
+  const b = btn.getBoundingClientRect();
+  panel.style.top = (b.bottom - appRect.top + 6) + "px";
+}
+Object.keys(panels).forEach(id => {
+  const btn = document.getElementById(id);
+  const panel = panels[id];
+  btn.addEventListener("click", () => {
+    if (openPanel === panel) {
+      panel.classList.remove("open");
+      btn.classList.remove("active");
+      openPanel = null;
+      return;
+    }
+    Object.keys(panels).forEach(k => {
+      panels[k].classList.remove("open");
+      document.getElementById(k).classList.remove("active");
+    });
+    positionPanel(panel, btn);
+    panel.classList.add("open");
+    btn.classList.add("active");
+    openPanel = panel;
+    if (window.MathJax && MathJax.typesetPromise) {
+      MathJax.typesetPromise([panel]);
+    }
+  });
+  panel.querySelector(".close-x").addEventListener("click", () => {
+    panel.classList.remove("open");
+    btn.classList.remove("active");
+    openPanel = null;
+  });
+});
+
+update();
+</script>
+</body>
+</html>

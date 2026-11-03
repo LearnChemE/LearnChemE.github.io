@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fourier Series: Square Wave</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+  svg: { fontCache: 'global', displayAlign: 'left', displayIndent: '0' }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.min.js"></script>
+<style>
+  body {
+    font-family: Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 10px;
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  #title {
+    font-size: 22px;
+    margin: 6px 0 4px 0;
+    text-align: center;
+    font-weight: normal;
+  }
+  #plotCanvas {
+    display: block;
+  }
+  #controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px;
+    font-size: 16px;
+  }
+  #controls .endLabel {
+    font-size: 16px;
+    margin: 0 8px;
+  }
+  #termsSlider {
+    width: 400px;
+    margin: 0 4px;
+  }
+  #sliderReadout {
+    font-size: 16px;
+    margin-left: 22px;
+    min-width: 190px;
+  }
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    background: #d3d3d3;
+    border-radius: 3px;
+    outline: none;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #98000D;
+    cursor: pointer;
+    border: none;
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #98000D;
+    cursor: pointer;
+    border: none;
+  }
+  #buttonRow {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    margin: 14px 0 8px 0;
+  }
+  .panelButton {
+    background-color: #98000D;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    padding: 9px 22px;
+    font-size: 17px;
+    font-family: Helvetica, Arial, sans-serif;
+    cursor: pointer;
+  }
+  .panelButton:hover {
+    background-color: #7a000a;
+  }
+  #panelAnchor {
+    position: relative;
+    width: 100%;
+    height: 0;
+  }
+  .panel {
+    display: none;
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 800px;
+    max-width: 95vw;
+    max-height: 560px;
+    overflow-y: auto;
+    border: 1px solid #999999;
+    border-radius: 4px;
+    padding: 14px 20px;
+    font-size: 16px;
+    line-height: 1.5;
+    background-color: #ffffff;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+    z-index: 10;
+    box-sizing: border-box;
+  }
+  .panel a { color: #0000cc; }
+  .closeX {
+    position: absolute;
+    top: 6px;
+    right: 10px;
+    font-size: 22px;
+    line-height: 1;
+    color: #555555;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 2px 6px;
+    font-family: Helvetica, Arial, sans-serif;
+  }
+  .closeX:hover { color: #98000D; }
+  .panel mjx-container[display="true"] {
+    text-align: left !important;
+    margin-left: 0 !important;
+  }
+</style>
+</head>
+<body>
+
+<div id="title">Fourier Series Approximation of a Square Wave</div>
+
+<canvas id="plotCanvas"></canvas>
+
+<div id="controls">
+  <span class="endLabel">1</span>
+  <input type="range" id="termsSlider" min="1" max="101" step="1" value="1">
+  <span class="endLabel">101</span>
+  <span id="sliderReadout">number of terms = 1</span>
+</div>
+
+<div id="panelAnchor">
+<div class="panel" id="directionsPanel">
+  <button class="closeX" onclick="closePanel('directionsPanel')" aria-label="Close">&times;</button>
+  <p>This demonstration shows how a periodic square wave can be built by summing sine
+  and cosine waves with specific frequencies and amplitudes (Fourier series). Each term
+  in the Fourier series is shown in the upper plot. The sum of the terms and the actual
+  square wave are shown in the bottom plot. Change the number of terms in the Fourier
+  series using the slider bar. As the number of terms increases, the summation approaches
+  the actual square wave.</p>
+</div>
+
+<div class="panel" id="detailsPanel">
+  <button class="closeX" onclick="closePanel('detailsPanel')" aria-label="Close">&times;</button>
+  <p>A periodic square wave of amplitude \(A\) and period \(T_p\) can be represented by
+  the Fourier series:</p>
+  \[ f(t) \;=\; \frac{4A}{\pi} \sum_{n=1}^{N} \frac{\sin\!\big(2\pi\,(2n-1)\,f_0\,t\big)}{2n-1} \]
+  <p>where:</p>
+  <p>
+  \(f(t)\) = sum of the Fourier series terms (amplitude, a.u.)<br>
+  \(A\) = amplitude of the square wave (\(A = 1\) a.u.)<br>
+  \(f_0\) = fundamental frequency (\(f_0 = 1/T_p = 1\) Hz)<br>
+  \(T_p\) = period of the square wave (\(T_p = 1\) s)<br>
+  \(n\) = term index<br>
+  \(N\) = number of terms in the summation (set by the slider)<br>
+  \(t\) = time (s)
+  </p>
+  <p>Each individual term in the summation,</p>
+  \[ F_n(t) \;=\; \frac{4A}{\pi}\,\frac{\sin\!\big(2\pi\,(2n-1)\,f_0\,t\big)}{2n-1}, \]
+  <p>is a sine wave with frequency \((2n-1)f_0\) (the odd harmonics of the fundamental
+  frequency) and amplitude \(\dfrac{4A}{\pi(2n-1)}\); these terms are plotted in the upper
+  plot. Only odd harmonics appear because the square wave is an odd function with
+  half-wave symmetry, so the cosine coefficients and the even sine coefficients are zero.
+  As \(N \to \infty\), the sum converges to the square wave everywhere except at the
+  discontinuities, where the overshoot that remains near the jumps is known as the Gibbs
+  phenomenon.</p>
+</div>
+
+<div class="panel" id="aboutPanel">
+  <button class="closeX" onclick="closePanel('aboutPanel')" aria-label="Close">&times;</button>
+  <p>This simulation was created in the
+  <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a>
+  at University of Colorado Boulder for
+  <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a>
+  by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a
+  MATLAB simulation by Keith Regner. It was prepared with financial support from the
+  National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to
+  <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.</p>
+</div>
+</div>
+
+<div id="buttonRow">
+  <button class="panelButton" onclick="togglePanel('directionsPanel')">Directions</button>
+  <button class="panelButton" onclick="togglePanel('detailsPanel')">Details</button>
+  <button class="panelButton" onclick="togglePanel('aboutPanel')">About</button>
+</div>
+
+
+<script>
+"use strict";
+
+// ------------------------- model -------------------------
+const fund = 1;          // fundamental frequency [Hz]
+const A = 1;             // square wave amplitude [a.u.]
+const Tp = 1;            // square wave period [s]
+const NPTS = 2500;       // points in time vector
+const tMin = 0, tMax = 2;
+
+const time = new Array(NPTS);
+for (let i = 0; i < NPTS; i++) time[i] = tMin + (tMax - tMin) * i / (NPTS - 1);
+
+// actual square wave: sign of sin(2*pi*t/Tp), amplitude A
+const sqActual = time.map(t => {
+  const s = Math.sin(2 * Math.PI * t / Tp);
+  return s > 0 ? A : (s < 0 ? -A : 0);
+});
+
+// Fourier components: F_n = (4A/pi) sin(2*pi*(2n-1)*fund*t)/(2n-1)
+function components(numTerms) {
+  const F = [];       // array of arrays, one per term
+  const Fsum = new Array(NPTS).fill(0);
+  for (let n = 1; n <= numTerms; n++) {
+    const k = 2 * n - 1;
+    const term = new Array(NPTS);
+    for (let i = 0; i < NPTS; i++) {
+      term[i] = (4 * A / Math.PI) * Math.sin(2 * Math.PI * k * fund * time[i]) / k;
+      Fsum[i] += term[i];
+    }
+    F.push(term);
+  }
+  return { F, Fsum };
+}
+
+// MATLAB R2014b default color order
+const matlabColors = [
+  "rgb(0,114,189)",   // [0 0.4470 0.7410]
+  "rgb(217,83,25)",   // [0.8500 0.3250 0.0980]
+  "rgb(237,177,32)",  // [0.9290 0.6940 0.1250]
+  "rgb(126,47,142)",  // [0.4940 0.1840 0.5560]
+  "rgb(119,172,48)",  // [0.4660 0.6740 0.1880]
+  "rgb(77,190,238)",  // [0.3010 0.7450 0.9330]
+  "rgb(162,20,47)"    // [0.6350 0.0780 0.1840]
+];
+
+// ------------------------- canvas setup -------------------------
+const canvas = document.getElementById("plotCanvas");
+const ctx = canvas.getContext("2d");
+
+const CW = 760, CH = 720;   // CSS pixel size
+function setupHiDPI() {
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = CW * dpr;
+  canvas.height = CH * dpr;
+  canvas.style.width = CW + "px";
+  canvas.style.height = CH + "px";
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+setupHiDPI();
+
+// plot areas (CSS px): left, top, width, height
+const ax1 = { l: 90, t: 40, w: 600, h: 265 };                 // upper plot
+const ax2 = { l: 90, t: 40 + 265 + 90, w: 600, h: 265 };      // lower plot
+
+const XLIM = [0, 2];
+const YLIM = [-1.75, 1.75];
+
+function xPix(ax, x) { return ax.l + (x - XLIM[0]) / (XLIM[1] - XLIM[0]) * ax.w; }
+function yPix(ax, y) { return ax.t + ax.h - (y - YLIM[0]) / (YLIM[1] - YLIM[0]) * ax.h; }
+
+// ------------------------- drawing -------------------------
+function drawAxes(ax) {
+  ctx.save();
+  ctx.strokeStyle = "#000000";
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(ax.l, ax.t, ax.w, ax.h);
+
+  ctx.fillStyle = "#000000";
+  ctx.font = "16.5px Helvetica, Arial, sans-serif";
+
+  // x ticks: 0 to 2 by 0.5
+  ctx.textAlign = "center";
+  ctx.textBaseline = "top";
+  for (let x = 0; x <= 2.0001; x += 0.5) {
+    const px = xPix(ax, x);
+    ctx.beginPath();
+    ctx.moveTo(px, ax.t + ax.h);
+    ctx.lineTo(px, ax.t + ax.h - 7);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(px, ax.t);
+    ctx.lineTo(px, ax.t + 7);
+    ctx.stroke();
+    ctx.fillText((Math.round(x * 2) / 2).toFixed(1), px, ax.t + ax.h + 7);
+  }
+
+  // y ticks: -1.5 to 1.5 by 0.5
+  ctx.textAlign = "right";
+  ctx.textBaseline = "middle";
+  for (let y = -1.5; y <= 1.5001; y += 0.5) {
+    const py = yPix(ax, y);
+    ctx.beginPath();
+    ctx.moveTo(ax.l, py);
+    ctx.lineTo(ax.l + 7, py);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(ax.l + ax.w, py);
+    ctx.lineTo(ax.l + ax.w - 7, py);
+    ctx.stroke();
+    ctx.fillText((Math.round(y * 2) / 2).toFixed(1), ax.l - 9, py);
+  }
+
+  // axis labels (not bold)
+  ctx.font = "18.7px Helvetica, Arial, sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "alphabetic";
+  ctx.fillText("time [sec]", ax.l + ax.w / 2, ax.t + ax.h + 45);
+
+  ctx.save();
+  ctx.translate(ax.l - 55, ax.t + ax.h / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.font = "18.7px Helvetica, Arial, sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "alphabetic";
+  ctx.fillText("amplitude [a.u.]", 0, 0);
+  ctx.restore();
+
+  ctx.restore();
+}
+
+function drawCurve(ax, yData, color, width) {
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(ax.l, ax.t, ax.w, ax.h);
+  ctx.clip();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = width;
+  ctx.lineJoin = "round";
+  ctx.beginPath();
+  for (let i = 0; i < NPTS; i++) {
+    const px = xPix(ax, time[i]);
+    const py = yPix(ax, yData[i]);
+    if (i === 0) ctx.moveTo(px, py);
+    else ctx.lineTo(px, py);
+  }
+  ctx.stroke();
+  ctx.restore();
+}
+
+// actual square wave drawn with vertical jumps at the discontinuities
+function drawSquareWave(ax, color, width) {
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(ax.l, ax.t, ax.w, ax.h);
+  ctx.clip();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = width;
+  ctx.lineJoin = "round";
+  ctx.beginPath();
+  // segments: value alternates +A / -A each half period, jumps at multiples of Tp/2
+  const half = Tp / 2;
+  let t = 0;
+  let val = A;   // sin(2*pi*t) > 0 on (0, 0.5)
+  ctx.moveTo(xPix(ax, 0), yPix(ax, val));
+  while (t < tMax - 1e-12) {
+    const tNext = Math.min(t + half, tMax);
+    ctx.lineTo(xPix(ax, tNext), yPix(ax, val));
+    if (tNext < tMax - 1e-12) {
+      val = -val;
+      ctx.lineTo(xPix(ax, tNext), yPix(ax, val));
+    }
+    t = tNext;
+  }
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawLegend(ax) {
+  ctx.save();
+  ctx.font = "14.85px Helvetica, Arial, sans-serif";
+  ctx.textAlign = "left";
+  ctx.textBaseline = "middle";
+  const x0 = ax.l + ax.w - 150;
+  let y0 = ax.t + 22;
+  // actual (red)
+  ctx.strokeStyle = "rgb(255,0,0)";
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x0 + 32, y0); ctx.stroke();
+  ctx.fillStyle = "#000000";
+  ctx.fillText("actual", x0 + 40, y0);
+  // sum of sines (black)
+  y0 += 24;
+  ctx.strokeStyle = "#000000";
+  ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x0 + 32, y0); ctx.stroke();
+  ctx.fillText("sum of sines", x0 + 40, y0);
+  ctx.restore();
+}
+
+function draw() {
+  const numTerms = parseInt(document.getElementById("termsSlider").value, 10);
+  document.getElementById("sliderReadout").textContent = "number of terms = " + numTerms;
+
+  const { F, Fsum } = components(numTerms);
+
+  ctx.clearRect(0, 0, CW, CH);
+
+  drawAxes(ax1);
+  drawAxes(ax2);
+
+  // upper plot: individual terms, MATLAB color order
+  for (let n = 0; n < F.length; n++) {
+    drawCurve(ax1, F[n], matlabColors[n % matlabColors.length], 1.5);
+  }
+
+  // lower plot: actual (red) then sum (black)
+  drawSquareWave(ax2, "rgb(255,0,0)", 2);
+  drawCurve(ax2, Fsum, "#000000", 2);
+  drawLegend(ax2);
+}
+
+// ------------------------- interactions -------------------------
+document.getElementById("termsSlider").addEventListener("input", draw);
+
+function closePanel(id) {
+  document.getElementById(id).style.display = "none";
+}
+
+function togglePanel(id) {
+  const ids = ["directionsPanel", "detailsPanel", "aboutPanel"];
+  ids.forEach(p => {
+    const el = document.getElementById(p);
+    if (p === id) {
+      const opening = el.style.display !== "block";
+      el.style.display = opening ? "block" : "none";
+      if (opening && p === "detailsPanel" && window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise([el]);
+      }
+    } else {
+      el.style.display = "none";
+    }
+  });
+}
+
+draw();
+</script>
+</body>
+</html>

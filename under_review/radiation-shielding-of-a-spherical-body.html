@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Radiation Shielding of a Spherical Body</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$','$$'], ['\\[','\\]']] },
+  chtml: { displayAlign: 'left', displayIndent: '0' },
+  svg: { fontCache: 'global', displayAlign: 'left', displayIndent: '0' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    font-family: Helvetica, Arial, sans-serif;
+    background: #ffffff;
+  }
+  #app {
+    width: 700px;
+    margin: 10px auto 30px auto;
+  }
+  #simTitle {
+    margin: 0 0 6px 0;
+    text-align: center;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 24px;
+    font-weight: bold;
+    color: #000;
+  }
+  /* ---------- controls ---------- */
+  #controls {
+    padding: 8px 6px 10px 6px;
+    font-size: 16.5px;
+  }
+  .ctrlRow {
+    display: flex;
+    align-items: center;
+    column-gap: 22px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  .ctrl {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+  }
+  .ctrl label.name { margin-right: 6px; }
+  input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+  input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  .ctrl input[type=range] {
+    width: 110px;
+    margin: 0 8px 0 0;
+    vertical-align: middle;
+  }
+  .ctrl .val {
+    display: inline-block;
+    min-width: 34px;
+    text-align: left;
+  }
+  #shieldCtrl { user-select: none; font-size: 16.5px; }
+  #shieldCtrl input { margin-right: 5px; transform: scale(1.1); }
+  .hiddenCtrl { visibility: hidden; }
+  /* setter buttons (network / plot) */
+  .setter {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 16.5px;
+    padding: 3px 12px;
+    border: 1px solid #9a9a9a;
+    background: linear-gradient(#fdfdfd, #ececec);
+    color: #000;
+    cursor: pointer;
+  }
+  .setter:first-child { border-radius: 4px 0 0 4px; }
+  .setter:last-child { border-radius: 0 4px 4px 0; border-left: none; }
+  .setter.selected {
+    background: linear-gradient(#cfdcee, #b8cbe4);
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.35);
+  }
+  /* panel buttons */
+  #panelButtons {
+    display: flex;
+    gap: 8px;
+  }
+  .panelBtn {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 15.4px;
+    font-weight: normal;
+    color: #ffffff;
+    background: #98000D;
+    border: 1px solid #7a000a;
+    border-radius: 4px;
+    padding: 4px 10px;
+    cursor: pointer;
+  }
+  .panelBtn:hover { background: #b0000f; }
+  /* ---------- figure + panels ---------- */
+  #figureWrap {
+    position: relative;
+    width: 660px;
+    margin: 4px auto 0 auto;
+  }
+  #simCanvas {
+    display: block;
+    width: 660px;
+    height: 456px;
+  }
+  .panel {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 660px;
+    max-height: 456px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    background: #ffffff;
+    border: 1px solid #444;
+    border-radius: 4px;
+    box-shadow: 3px 3px 8px rgba(0,0,0,0.35);
+    padding: 12px 34px 14px 16px;
+    font-size: 14.5px;
+    line-height: 1.45;
+    z-index: 20;
+  }
+  .panel.open { display: block; }
+  .panel .closeX {
+    position: absolute;
+    top: 4px;
+    right: 8px;
+    font-size: 20px;
+    line-height: 20px;
+    color: #444;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: Helvetica, Arial, sans-serif;
+  }
+  .panel .closeX:hover { color: #98000D; }
+  .panel h4 {
+    margin: 0 0 2px 0;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 14.5px;
+    font-weight: bold;
+    line-height: 1.45;
+  }
+  .panel .symList p { margin: 0 0 3px 0; }
+  .panel p { margin: 0 0 9px 0; }
+  #detPanel mjx-container[display="true"] {
+    text-align: left !important;
+    margin: 0 !important;
+  }
+  #detPanel mjx-container[display="true"] > mjx-math {
+    margin-left: 0 !important;
+    text-align: left !important;
+  }
+  .panel a { color: #98000D; }
+</style>
+</head>
+<body>
+<div id="app">
+  <h1 id="simTitle">Radiation Shielding of a Spherical Body</h1>
+  <div id="controls">
+    <!-- row 1: shield, network/plot, panel buttons -->
+    <div class="ctrlRow">
+      <div class="ctrl" id="shieldCtrl">
+        <label><input type="checkbox" id="shieldChk" checked>shield</label>
+      </div>
+      <div class="ctrl" id="setterCtrl">
+        <button class="setter selected" id="btnNetwork">network</button><button class="setter" id="btnPlot">plot</button>
+      </div>
+      <div class="ctrl" id="panelButtons">
+        <button class="panelBtn" id="dirBtn">Directions</button>
+        <button class="panelBtn" id="detBtn">Details</button>
+        <button class="panelBtn" id="aboBtn">About</button>
+      </div>
+    </div>
+    <!-- row 2: two sliders -->
+    <div class="ctrlRow">
+      <div class="ctrl">
+        <label class="name" for="dSlider">diameter of object (m)</label>
+        <input type="range" id="dSlider" min="0.1" max="2" step="0.1" value="0.3">
+        <span class="val" id="dVal">0.3</span>
+      </div>
+      <div class="ctrl">
+        <label class="name" for="TballSlider">temperature of ball (K)</label>
+        <input type="range" id="TballSlider" min="100" max="1000" step="10" value="300">
+        <span class="val" id="TballVal">300</span>
+      </div>
+    </div>
+    <!-- row 3: remaining sliders -->
+    <div class="ctrlRow">
+      <div class="ctrl">
+        <label class="name" for="ebSlider">emissivity of ball</label>
+        <input type="range" id="ebSlider" min="0.05" max="0.95" step="0.05" value="0.3">
+        <span class="val" id="ebVal">0.3</span>
+      </div>
+      <div class="ctrl" id="esiCtrl">
+        <label class="name" for="esiSlider">emissivity of inner shield</label>
+        <input type="range" id="esiSlider" min="0.05" max="0.55" step="0.01" value="0.3">
+        <span class="val" id="esiVal">0.3</span>
+      </div>
+    </div>
+    <!-- outer shield slider (network view only) -->
+    <div class="ctrlRow" id="esRow">
+      <div class="ctrl" id="esCtrl">
+        <label class="name" for="esSlider">emissivity of outer shield</label>
+        <input type="range" id="esSlider" min="0.05" max="0.55" step="0.01" value="0.3">
+        <span class="val" id="esVal">0.3</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="figureWrap">
+    <canvas id="simCanvas" width="660" height="456"></canvas>
+
+    <div class="panel" id="dirPanel">
+      <button class="closeX" aria-label="close">&times;</button>
+      <h4>Directions</h4>
+      <p>This simulation shows how a radiation shield affects radiative heat
+      transfer to a ball. The ball, in the center of an enclosure, is the object
+      that is shielded; you can remove the shield by unchecking "shield". The
+      enclosure around the shield and ball is assumed to be a black body at a
+      temperature of 600&nbsp;K. The radiation shield diameter is 0.2&nbsp;m larger than
+      the ball diameter, and the shield is thin enough that conductive heat
+      transfer can be ignored. Use buttons to view a radiation network or a plot
+      of the radiative heat transfer from the enclosure to the ball as a
+      function of the emissivity of the shield. The plot is available only when
+      "shield" is checked, and a 3D physical representation of the ball and
+      shield is shown on the plot.</p>
+    </div>
+
+    <div class="panel" id="detPanel">
+      <button class="closeX" aria-label="close">&times;</button>
+      <h4>Details</h4>
+      <p>The radiative heat transfer is calculated using a relation between the
+      temperatures of the ball and enclosure over the sum of the resistances:</p>
+      <p>$$q_{\mathrm{shield}} = \frac{\sigma\,(T_{\mathrm{w}}^4 - T_{\mathrm{b}}^4)}
+      {R_{\mathrm{w+s}} + R_{\mathrm{s,i}} + R_{\mathrm{s,o}} + R_{\mathrm{b+s}} + R_{\mathrm{b}}},$$</p>
+      <p>$$q_{\mathrm{no\ shield}} = \frac{\sigma\,(T_{\mathrm{w}}^4 - T_{\mathrm{b}}^4)}
+      {R_{\mathrm{b+s}} + R_{\mathrm{b}}},$$</p>
+      <p>where $q$ is in $\mathrm{W/m^2}$, $\sigma$ is the Stefan&ndash;Boltzmann
+      constant ($\mathrm{W/[m^2\,K^4]}$), $T_{\mathrm{w}}$ and $T_{\mathrm{b}}$
+      are the wall and ball temperatures (K) and $R$ is thermal resistance
+      ($\mathrm{m^{-2}}$).</p>
+      <p>The resistance from enclosure to shield is:</p>
+      <p>$$R_{\mathrm{w+s}} = 1/A_{\mathrm{s}},$$</p>
+      <p>where $A_{\mathrm{s}} = \pi d_{\mathrm{s}}^2 = \pi (d_{\mathrm{b}} + 0.2)^2$.</p>
+      <p>The resistances associated with shield emissivity are:</p>
+      <p>$$R_{\mathrm{s,i}} = \frac{1-\epsilon_{\mathrm{s,i}}}{\epsilon_{\mathrm{s,i}}\,A_{\mathrm{s}}},$$</p>
+      <p>$$R_{\mathrm{s,o}} = \frac{1-\epsilon_{\mathrm{s,o}}}{\epsilon_{\mathrm{s,o}}\,A_{\mathrm{s}}}.$$</p>
+      <p>The resistance between the shield and ball is:</p>
+      <p>$$R_{\mathrm{b+s}} = 1/A_{\mathrm{b}},$$</p>
+      <p>where $A_{\mathrm{b}} = \pi d_{\mathrm{b}}^2$.</p>
+      <p>The resistance associated with the ball emissivity is:</p>
+      <p>$$R_{\mathrm{b}} = \frac{1-\epsilon_{\mathrm{b}}}{\epsilon_{\mathrm{b}}\,A_{\mathrm{b}}},$$</p>
+      <p>where $A$ is surface area ($\mathrm{m^2}$), $d$ is diameter (m) and
+      $\epsilon$ is emissivity.</p>
+      <p><b>Reference</b></p>
+      <p>[1] T. L. Bergman, A. S. Lavine, F. P. Incropera and D. P. DeWitt,
+      <i>Introduction to Heat Transfer</i>, 6th ed., Hoboken, NJ: John Wiley and
+      Sons, 2011.</p>
+      <p><b>Symbols</b></p>
+      <div class="symList">
+        <p>$A_{\mathrm{b}}$ = surface area of ball ($\mathrm{m^2}$)</p>
+        <p>$A_{\mathrm{s}}$ = surface area of shield ($\mathrm{m^2}$)</p>
+        <p>$d_{\mathrm{b}}$ = diameter of ball (m)</p>
+        <p>$d_{\mathrm{s}}$ = diameter of shield (m)</p>
+        <p>$q$ = net radiative heat flow from wall to ball ($\mathrm{W/m^2}$)</p>
+        <p>$R_{\mathrm{w+s}}$ = space resistance between wall and shield ($\mathrm{m^{-2}}$)</p>
+        <p>$R_{\mathrm{s,o}}$ = surface resistance of outer shield surface ($\mathrm{m^{-2}}$)</p>
+        <p>$R_{\mathrm{s,i}}$ = surface resistance of inner shield surface ($\mathrm{m^{-2}}$)</p>
+        <p>$R_{\mathrm{b+s}}$ = space resistance between shield and ball ($\mathrm{m^{-2}}$)</p>
+        <p>$R_{\mathrm{b}}$ = surface resistance of ball ($\mathrm{m^{-2}}$)</p>
+        <p>$T_{\mathrm{w}}$ = wall (enclosure) temperature, 600 K</p>
+        <p>$T_{\mathrm{b}}$ = ball temperature (K)</p>
+        <p>$\epsilon_{\mathrm{b}}$ = emissivity of ball</p>
+        <p>$\epsilon_{\mathrm{s,i}}$ = emissivity of inner shield surface</p>
+        <p>$\epsilon_{\mathrm{s,o}}$ = emissivity of outer shield surface</p>
+        <p>$\sigma$ = Stefan&ndash;Boltzmann constant, $5.67\times10^{-8}\ \mathrm{W/(m^2\,K^4)}$</p>
+      </div>
+    </div>
+
+    <div class="panel" id="aboPanel">
+      <button class="closeX" aria-label="close">&times;</button>
+      <h4>About</h4>
+      <p>This simulation was created in the
+      <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department
+      of Chemical and Biological Engineering</a> at University of Colorado
+      Boulder for <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a>
+      by John L. Falconer using Claude AI. It is a JavaScript/HTML5
+      implementation of a
+      <a href="https://demonstrations.wolfram.com/RadiationShieldingOfASphericalBlackBody/"
+      target="_blank" rel="noopener">Mathematica simulation</a> by Mathew L.
+      Williams and Rachael L. Baumann. It was prepared with financial support from the
+      National Science Foundation (DUE 2336987 and 2336988). Address any
+      questions or comments to
+      <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ---------------- state ---------------- */
+  var state = {
+    shield: true,   // ptv
+    view: 1,        // W: 1 = network, 2 = plot
+    d: 0.3,
+    Tball: 300,
+    eball: 0.3,
+    esi: 0.3,
+    es: 0.3
+  };
+
+  var SIGMA = 5.67e-8;
+  var TWALL = 600;
+
+  /* ---------------- physics ---------------- */
+  function Aball()   { return Math.PI * state.d * state.d; }
+  function Ashield() { return Math.PI * Math.pow(state.d + 0.2, 2); }
+  function Rball()   { return (1 - state.eball) / (state.eball * Aball()); }
+  function Rshieldo(eso) { return (1 - eso) / (eso * Ashield()); }
+  function Rshieldi() { return (1 - state.esi) / (state.esi * Ashield()); }
+  function Rshieldball() { return 1 / Aball(); }
+  function Rwallshield() { return 1 / Ashield(); }
+
+  function q(eso) {
+    var dT4 = Math.pow(TWALL, 4) - Math.pow(state.Tball, 4);
+    if (state.shield) {
+      return SIGMA * dT4 /
+        (Rwallshield() + Rshieldi() + Rshieldo(eso) + Rshieldball() + Rball());
+    }
+    return SIGMA * dT4 / (Rshieldball() + Rball());
+  }
+
+  /* ---------------- number formatting ---------------- */
+  // NumberForm[x, 3]: 3 significant figures, Mathematica style
+  function numberForm3(x) {
+    if (!isFinite(x)) return '\u221E';
+    if (x === 0) return '0.';
+    var s = Math.abs(x).toPrecision(3);
+    // avoid exponent form for the magnitudes that occur here
+    if (s.indexOf('e') >= 0) s = Number(s).toString();
+    if (s.indexOf('.') >= 0) {
+      s = s.replace(/0+$/, '');           // strip trailing zeros, keep dot
+    } else {
+      s = s + '.';                        // Mathematica shows "605."
+    }
+    return (x < 0 ? '-' : '') + s;
+  }
+
+  // ScientificForm[x, 3]: returns {mantissa, exponent} for canvas drawing
+  function scientificForm3(x) {
+    if (x === 0) return { m: '0.', e: null };
+    var exp = Math.floor(Math.log10(Math.abs(x)));
+    var man = x / Math.pow(10, exp);
+    var s = Math.abs(man).toPrecision(3);
+    if (s.indexOf('.') >= 0) s = s.replace(/0+$/, '');
+    if (s.indexOf('.') < 0) s = s + '.';
+    if (parseFloat(s) >= 10) { // rounding pushed mantissa to 10.
+      exp += 1;
+      man = x / Math.pow(10, exp);
+      s = Math.abs(man).toPrecision(3);
+      if (s.indexOf('.') >= 0) s = s.replace(/0+$/, '');
+      if (s.indexOf('.') < 0) s = s + '.';
+    }
+    return { m: (x < 0 ? '-' : '') + s, e: String(exp) };
+  }
+
+  // axis tick label, comma for >= 1000
+  function tickLabel(v) {
+    var r = Math.round(v * 1e6) / 1e6;
+    if (Math.abs(r) >= 1000) {
+      return r.toLocaleString('en-US');
+    }
+    return String(r);
+  }
+
+  function sliderLabel(v) {
+    return String(parseFloat(v.toFixed(4)));
+  }
+
+  /* ---------------- canvas setup ---------------- */
+  var canvas = document.getElementById('simCanvas');
+  var ctx = canvas.getContext('2d');
+  var CW = 660, CH = 456;
+  var dpr = window.devicePixelRatio || 1;
+  canvas.width = CW * dpr;
+  canvas.height = CH * dpr;
+  canvas.style.width = CW + 'px';
+  canvas.style.height = CH + 'px';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  /* mixed-script text: pieces = [{t: 'text', s: 0|1|-1}] (0 normal, 1 sup, -1 sub) */
+  function measurePieces(pieces, size, italicR) {
+    var w = 0;
+    for (var i = 0; i < pieces.length; i++) {
+      var p = pieces[i];
+      var fs = p.s === 0 ? size : Math.round(size * 0.72);
+      var style = (p.it ? 'italic ' : 'normal ') + 'normal ' + fs + 'px Helvetica, Arial, sans-serif';
+      ctx.font = style;
+      w += ctx.measureText(p.t).width;
+    }
+    return w;
+  }
+  function drawPiecesOn(c, pieces, cx, cy, size, align) {
+    // cx: left x if align 'left', center if 'center'; cy: baseline
+    var total = measurePieces(pieces, size);
+    var x = (align === 'center') ? cx - total / 2 : cx;
+    for (var i = 0; i < pieces.length; i++) {
+      var p = pieces[i];
+      var fs = p.s === 0 ? size : Math.round(size * 0.72);
+      var dy = p.s === 1 ? -size * 0.38 : (p.s === -1 ? size * 0.18 : 0);
+      c.font = (p.it ? 'italic ' : 'normal ') + 'normal ' + fs + 'px Helvetica, Arial, sans-serif';
+      c.textAlign = 'left';
+      c.textBaseline = 'alphabetic';
+      c.fillText(p.t, x, cy + dy);
+      x += c.measureText(p.t).width;
+    }
+    return total;
+  }
+  function drawPieces(pieces, cx, cy, size, align) {
+    return drawPiecesOn(ctx, pieces, cx, cy, size, align);
+  }
+
+  /* ---------------- network view ---------------- */
+  var NET = { xmin: -2.35, xmax: 3.2, ymin: -1.35, ymax: 1.5 };
+  function nx(x) { return (x - NET.xmin) / (NET.xmax - NET.xmin) * CW; }
+  function ny(y) { return CH - (y - NET.ymin) / (NET.ymax - NET.ymin) * CH; }
+
+  var DX = 0.1, DY = 0.2;
+
+  function drawResistor(x0, tickDir) {
+    // zigzag polyline
+    var pts = [[x0, 0], [x0 + 2 * DX, 0]];
+    var zig = [[1, -1], [3, 1], [5, -1], [7, 1], [9, -1], [11, 1]];
+    for (var i = 0; i < zig.length; i++) {
+      pts.push([x0 + 2 * DX + zig[i][0] * DX / 2, zig[i][1] * DY]);
+    }
+    pts.push([x0 + 2 * DX + 12 * DX / 2, 0]);
+    pts.push([x0 + 2 * DX + 16 * DX / 2, 0]);
+    ctx.beginPath();
+    ctx.moveTo(nx(pts[0][0]), ny(pts[0][1]));
+    for (var j = 1; j < pts.length; j++) ctx.lineTo(nx(pts[j][0]), ny(pts[j][1]));
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 1.4;
+    ctx.lineJoin = 'miter';
+    ctx.stroke();
+    // leader tick toward label
+    if (tickDir) {
+      var xm = x0 + 5 * DX;
+      ctx.beginPath();
+      ctx.moveTo(nx(xm), ny(tickDir * 1.4 * DY));
+      ctx.lineTo(nx(xm), ny(tickDir * (1.4 * DY + 1.25 * DY)));
+      ctx.stroke();
+    }
+  }
+
+  function drawPoint(x, y) {
+    ctx.beginPath();
+    ctx.arc(nx(x), ny(y), 0.015 * CW / 2, 0, 2 * Math.PI);
+    ctx.fillStyle = '#000';
+    ctx.fill();
+  }
+
+  function resistorLabel(name, value, cx, cyPlot, above) {
+    // "R_name = val m^-2", 18 px, centered at cx; above/below the coord
+    var pieces = [
+      { t: 'R', s: 0, it: true },
+      { t: name, s: -1 },
+      { t: ' = ' + numberForm3(value), s: 0 },
+      { t: ' m', s: 0 },
+      { t: '-2', s: 1 }
+    ];
+    var baseline = above ? ny(cyPlot) - 6 : ny(cyPlot) + 18;
+    ctx.fillStyle = '#000';
+    drawPieces(pieces, nx(cx), baseline, 18, 'center');
+  }
+
+  function drawHeatFlowBox() {
+    var sf = scientificForm3(q(state.es));
+    var pieces = [{ t: 'heat flow = ' + sf.m, s: 0 }];
+    if (sf.e !== null) {
+      pieces.push({ t: '\u00D710', s: 0 });
+      pieces.push({ t: sf.e, s: 1 });
+    }
+    pieces.push({ t: ' W/m', s: 0 });
+    pieces.push({ t: '2', s: 1 });
+    var size = 18;
+    var w = measurePieces(pieces, size);
+    var cx = 0.78 * CW, cy = CH - 0.9 * CH; // scaled {0.78, 0.9}
+    var padX = 8, padY = 6;
+    var boxW = w + 2 * padX, boxH = size + 2 * padY;
+    var bx = cx - boxW / 2, by = cy - boxH / 2;
+    ctx.fillStyle = '#FFFFD9'; /* light yellow */
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 1;
+    ctx.fillRect(bx, by, boxW, boxH);
+    ctx.strokeRect(bx + 0.5, by + 0.5, boxW - 1, boxH - 1);
+    ctx.fillStyle = '#000';
+    drawPieces(pieces, cx, cy + size * 0.36, size, 'center');
+  }
+
+  function drawNetworkView() {
+    // caption
+    ctx.fillStyle = '#000';
+    ctx.font = '18px Helvetica, Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('thermal resistance network', nx(0.425), ny(-1.06));
+
+    if (state.shield) {
+      var dirs = { '-2': -1, '-1': 1, '0': -1, '1': 1, '2': -1 };
+      for (var x0 = -2; x0 <= 2; x0++) {
+        drawResistor(x0, dirs[String(x0)]);
+        drawPoint(x0, 0);
+        drawPoint(x0 + 1, 0);
+      }
+      resistorLabel('wall+shield', Rwallshield(), -1.5, -0.5, false);
+      resistorLabel('shield, outer', Rshieldo(state.es), -0.5, 0.5, true);
+      resistorLabel('shield, inner', Rshieldi(), 0.5, -0.5, false);
+      resistorLabel('shield+ball', Rshieldball(), 1.5, 0.5, true);
+      resistorLabel('ball', Rball(), 2.5, -0.5, false);
+    } else {
+      drawResistor(-1, 1);
+      drawResistor(1, 1);
+      ctx.beginPath();
+      ctx.moveTo(nx(0), ny(0));
+      ctx.lineTo(nx(1), ny(0));
+      ctx.strokeStyle = '#000';
+      ctx.lineWidth = 1.4;
+      ctx.stroke();
+      drawPoint(-1, 0); drawPoint(0.5, 0); drawPoint(2, 0);
+      resistorLabel('ball+wall', Rshieldball(), -0.5, 0.5, true);
+      resistorLabel('ball', Rball(), 1.5, 0.5, true);
+    }
+    drawHeatFlowBox();
+  }
+
+  /* ---------------- 3D inset (enclosure, ball, shield) ---------------- */
+  function drawInset3D(cx, cy, sizePx) {
+    // camera from ViewPoint {0.8, -2.4, 0.7}
+    var vp = [0.8, -2.4, 0.7];
+    var L = 4.6; // box edge length
+    var C = [vp[0] * L, vp[1] * L, vp[2] * L];
+    var Cd = Math.hypot(C[0], C[1], C[2]);
+    var f = [-C[0] / Cd, -C[1] / Cd, -C[2] / Cd]; // forward
+    var up = [0, 0, 1];
+    // right = f x up
+    var r = [f[1] * up[2] - f[2] * up[1], f[2] * up[0] - f[0] * up[2], f[0] * up[1] - f[1] * up[0]];
+    var rl = Math.hypot(r[0], r[1], r[2]);
+    r = [r[0] / rl, r[1] / rl, r[2] / rl];
+    // camera up = r x f
+    var u = [r[1] * f[2] - r[2] * f[1], r[2] * f[0] - r[0] * f[2], r[0] * f[1] - r[1] * f[0]];
+    var focal = Cd * 0.9;
+
+    function proj(p) {
+      var d0 = [p[0] - C[0], p[1] - C[1], p[2] - C[2]];
+      var depth = d0[0] * f[0] + d0[1] * f[1] + d0[2] * f[2];
+      var sx = (d0[0] * r[0] + d0[1] * r[1] + d0[2] * r[2]) / depth * focal;
+      var sy = (d0[0] * u[0] + d0[1] * u[1] + d0[2] * u[2]) / depth * focal;
+      return { x: sx, y: sy, depth: depth };
+    }
+
+    var h = 2.3;
+    var corners = {};
+    [-1, 1].forEach(function (sx) {
+      [-1, 1].forEach(function (sy) {
+        [-1, 1].forEach(function (sz) {
+          corners[sx + ',' + sy + ',' + sz] = [sx * h, sy * h, sz * h];
+        });
+      });
+    });
+    // faces drawn in Mathematica: top z=+h, bottom z=-h, back y=+h, left x=-h, right x=+h
+    var faces = [
+      { pts: ['-1,-1,-1', '1,-1,-1', '1,1,-1', '-1,1,-1'], fill: '#c9c9c9' }, // bottom
+      { pts: ['-1,-1,1', '1,-1,1', '1,1,1', '-1,1,1'],     fill: '#e4e4e4' }, // top
+      { pts: ['-1,1,-1', '1,1,-1', '1,1,1', '-1,1,1'],     fill: '#d8d8d8' }, // back
+      { pts: ['-1,-1,-1', '-1,1,-1', '-1,1,1', '-1,-1,1'], fill: '#d1d1d1' }, // left
+      { pts: ['1,-1,-1', '1,1,-1', '1,1,1', '1,-1,1'],     fill: '#dddddd' }  // right
+    ];
+    // project all corners; compute scale to fit sizePx
+    var projected = {};
+    var minx = 1e9, maxx = -1e9, miny = 1e9, maxy = -1e9;
+    Object.keys(corners).forEach(function (k) {
+      var p = proj(corners[k]);
+      projected[k] = p;
+      if (p.x < minx) minx = p.x; if (p.x > maxx) maxx = p.x;
+      if (p.y < miny) miny = p.y; if (p.y > maxy) maxy = p.y;
+    });
+    var scale = sizePx * 0.92 / Math.max(maxx - minx, maxy - miny);
+    var ox = (minx + maxx) / 2, oy = (miny + maxy) / 2;
+    function S(p) { return { x: cx + (p.x - ox) * scale, y: cy - (p.y - oy) * scale }; }
+
+    // painter's: far faces first
+    faces.forEach(function (fc) {
+      var dsum = 0;
+      fc.pts.forEach(function (k) { dsum += projected[k].depth; });
+      fc.depth = dsum / 4;
+    });
+    faces.sort(function (a, b) { return b.depth - a.depth; });
+
+    ctx.save();
+    faces.forEach(function (fc) {
+      ctx.beginPath();
+      fc.pts.forEach(function (k, i) {
+        var s = S(projected[k]);
+        if (i === 0) ctx.moveTo(s.x, s.y); else ctx.lineTo(s.x, s.y);
+      });
+      ctx.closePath();
+      ctx.fillStyle = fc.fill;
+      ctx.globalAlpha = 0.95;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+      ctx.strokeStyle = '#8a8a8a';
+      ctx.lineWidth = 0.8;
+      ctx.stroke();
+    });
+
+    // spheres at origin
+    var o = proj([0, 0, 0]);
+    var oc = S(o);
+    function sphereRadius(R) { return R * focal / o.depth * scale; }
+    // ball (purple)
+    var rb = sphereRadius(state.d);
+    var g1 = ctx.createRadialGradient(oc.x - rb * 0.3, oc.y - rb * 0.3, rb * 0.15, oc.x, oc.y, rb);
+    g1.addColorStop(0, 'rgb(140,80,190)');
+    g1.addColorStop(1, 'rgb(60,0,110)');
+    ctx.globalAlpha = Math.min(1, 0.9 * state.eball);
+    ctx.beginPath();
+    ctx.arc(oc.x, oc.y, rb, 0, 2 * Math.PI);
+    ctx.fillStyle = g1;
+    ctx.fill();
+    // shield (pink translucent)
+    if (state.shield) {
+      var rs = sphereRadius(state.d + 0.2);
+      var g2 = ctx.createRadialGradient(oc.x - rs * 0.3, oc.y - rs * 0.3, rs * 0.15, oc.x, oc.y, rs);
+      g2.addColorStop(0, 'rgb(255,205,215)');
+      g2.addColorStop(1, 'rgb(240,140,160)');
+      ctx.globalAlpha = Math.min(1, 0.85 * state.es);
+      ctx.beginPath();
+      ctx.arc(oc.x, oc.y, rs, 0, 2 * Math.PI);
+      ctx.fillStyle = g2;
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    ctx.restore();
+  }
+
+  /* ---------------- plot view ---------------- */
+  function niceTicks(lo, hi, n) {
+    var span = hi - lo;
+    if (span <= 0) return [lo];
+    var step = Math.pow(10, Math.floor(Math.log10(span / n)));
+    var err = span / n / step;
+    if (err >= 7.5) step *= 10;
+    else if (err >= 3.5) step *= 5;
+    else if (err >= 1.5) step *= 2;
+    var ticks = [];
+    var t0 = Math.ceil(lo / step) * step;
+    for (var t = t0; t <= hi + 1e-9 * span; t += step) {
+      ticks.push(Math.abs(t) < step * 1e-6 ? 0 : t);
+    }
+    return ticks;
+  }
+
+  function drawPlotView() {
+    var padL = 115, padR = 12, padB = 58, padT = 36;
+    var px0 = padL, px1 = CW - padR, py0 = CH - padB, py1 = padT;
+
+    // data
+    var N = 240, data = [];
+    var qmin = Infinity, qmax = -Infinity;
+    for (var i = 0; i <= N; i++) {
+      var e = i / N;
+      var qq = (e === 0) ? 0 : q(e);
+      data.push([e, qq]);
+      if (qq < qmin) qmin = qq;
+      if (qq > qmax) qmax = qq;
+    }
+    var ylo = Math.min(0, qmin), yhi = Math.max(0, qmax);
+    if (ylo === yhi) { yhi = ylo + 1; }
+    var ypad = (yhi - ylo) * 0.04;
+    yhi += ypad;                      // PlotRangePadding: top automatic, bottom none
+
+    function X(x) { return px0 + x * (px1 - px0); }
+    function Y(y) { return py0 - (y - ylo) / (yhi - ylo) * (py0 - py1); }
+
+    // title
+    ctx.fillStyle = '#000';
+    ctx.font = 'normal normal 20px Helvetica, Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('net radiative heat rate from wall to ball', (px0 + px1) / 2, py1 - 18);
+
+    // frame
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(px0 + 0.5, py1 + 0.5, px1 - px0 - 1, py0 - py1 - 1);
+
+    // ticks
+    var xt = [0, 0.2, 0.4, 0.6, 0.8, 1.0];
+    var yt = niceTicks(ylo, yhi, 6);
+    var TICK = 6, MINT = 3.5;
+    ctx.font = 'normal normal 18px Helvetica, Arial, sans-serif';
+    ctx.fillStyle = '#000';
+    xt.forEach(function (t) {
+      var x = X(t);
+      ctx.beginPath(); ctx.moveTo(x, py0); ctx.lineTo(x, py0 - TICK); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(x, py1); ctx.lineTo(x, py1 + TICK); ctx.stroke();
+      ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+      ctx.fillText(tickLabel(t), x, py0 + 7);
+    });
+    // x minor ticks
+    for (var mx = 0; mx <= 1.001; mx += 0.05) {
+      if (Math.abs(Math.round(mx / 0.2) * 0.2 - mx) < 1e-9) continue;
+      var xm = X(mx);
+      ctx.beginPath(); ctx.moveTo(xm, py0); ctx.lineTo(xm, py0 - MINT); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(xm, py1); ctx.lineTo(xm, py1 + MINT); ctx.stroke();
+    }
+    var maxTickW = 0;
+    yt.forEach(function (t) {
+      var y = Y(t);
+      ctx.beginPath(); ctx.moveTo(px0, y); ctx.lineTo(px0 + TICK, y); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(px1, y); ctx.lineTo(px1 - TICK, y); ctx.stroke();
+      ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+      ctx.fillText(tickLabel(t), px0 - 7, y);
+      var tw = ctx.measureText(tickLabel(t)).width;
+      if (tw > maxTickW) maxTickW = tw;
+    });
+    // y minor ticks
+    if (yt.length >= 2) {
+      var ystep = yt[1] - yt[0];
+      for (var my = yt[0] - ystep; my <= yhi + ystep; my += ystep / 5) {
+        if (my < ylo - 1e-9 || my > yhi + 1e-9) continue;
+        var onMajor = yt.some(function (t) { return Math.abs(t - my) < ystep * 1e-6; });
+        if (onMajor) continue;
+        var ym = Y(my);
+        ctx.beginPath(); ctx.moveTo(px0, ym); ctx.lineTo(px0 + MINT, ym); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(px1, ym); ctx.lineTo(px1 - MINT, ym); ctx.stroke();
+      }
+    }
+
+    // axis labels, 20 px
+    ctx.font = 'normal normal 20px Helvetica, Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText('emissivity of outer shield', (px0 + px1) / 2, CH - 8);
+
+    // rotated y label: rendered horizontally on an offscreen canvas at the
+    // same 20 px font as the x-axis label, then rotated as a bitmap so the
+    // glyphs match exactly
+    var yPieces = [
+      { t: 'heat rate (W/m', s: 0 },
+      { t: '2', s: 1 },
+      { t: ')', s: 0 }
+    ];
+    var yLabW = measurePieces(yPieces, 20) + 4;
+    var yLabH = 30;
+    var off = document.createElement('canvas');
+    off.width = Math.ceil(yLabW * dpr);
+    off.height = Math.ceil(yLabH * dpr);
+    var octx = off.getContext('2d');
+    octx.scale(dpr, dpr);
+    octx.fillStyle = '#000';
+    drawPiecesOn(octx, yPieces, 2, 22, 20, 'left');
+    // place the label just left of the tick labels
+    var yLabX = Math.max(yLabH / 2 + 1, px0 - 7 - maxTickW - 6 - yLabH / 2);
+    ctx.save();
+    ctx.translate(yLabX, (py0 + py1) / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.drawImage(off, -yLabW / 2, -yLabH / 2, yLabW, yLabH);
+    ctx.restore();
+
+    // inset 3D representation
+    var insetY = (q(1) < 0) ? 0.65 : 0.35;
+    drawInset3D(px0 + 0.75 * (px1 - px0), py0 - insetY * (py0 - py1), 150);
+
+    // curve (thick blue) on top
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(px0, py1, px1 - px0, py0 - py1);
+    ctx.clip();
+    ctx.beginPath();
+    data.forEach(function (p, i) {
+      var x = X(p[0]), y = Y(p[1]);
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    });
+    ctx.strokeStyle = '#0000FF';
+    ctx.lineWidth = 2.4;
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  /* ---------------- main draw ---------------- */
+  function draw() {
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, CW, CH);
+    if (state.shield && state.view === 2) {
+      drawPlotView();
+    } else {
+      drawNetworkView();
+    }
+  }
+
+  /* ---------------- controls wiring ---------------- */
+  function $(id) { return document.getElementById(id); }
+
+  function updateVisibility() {
+    $('setterCtrl').classList.toggle('hiddenCtrl', !state.shield);
+    $('esiCtrl').classList.toggle('hiddenCtrl', !state.shield);
+    var showEs = state.shield && state.view === 1;
+    $('esRow').style.display = showEs ? '' : 'none';
+    $('esCtrl').classList.toggle('hiddenCtrl', !showEs);
+  }
+
+  $('shieldChk').addEventListener('change', function () {
+    state.shield = this.checked;
+    updateVisibility();
+    draw();
+  });
+  $('btnNetwork').addEventListener('click', function () {
+    state.view = 1;
+    $('btnNetwork').classList.add('selected');
+    $('btnPlot').classList.remove('selected');
+    updateVisibility();
+    draw();
+  });
+  $('btnPlot').addEventListener('click', function () {
+    state.view = 2;
+    $('btnPlot').classList.add('selected');
+    $('btnNetwork').classList.remove('selected');
+    updateVisibility();
+    draw();
+  });
+
+  function bindSlider(id, valId, key) {
+    $(id).addEventListener('input', function () {
+      state[key] = parseFloat(this.value);
+      $(valId).textContent = sliderLabel(state[key]);
+      draw();
+    });
+  }
+  bindSlider('dSlider', 'dVal', 'd');
+  bindSlider('TballSlider', 'TballVal', 'Tball');
+  bindSlider('ebSlider', 'ebVal', 'eball');
+  bindSlider('esiSlider', 'esiVal', 'esi');
+  bindSlider('esSlider', 'esVal', 'es');
+
+  /* ---------------- panels ---------------- */
+  var panels = { dirBtn: 'dirPanel', detBtn: 'detPanel', aboBtn: 'aboPanel' };
+  Object.keys(panels).forEach(function (btnId) {
+    $(btnId).addEventListener('click', function () {
+      var target = $(panels[btnId]);
+      var willOpen = !target.classList.contains('open');
+      // close all
+      Object.keys(panels).forEach(function (b) {
+        $(panels[b]).classList.remove('open');
+      });
+      if (willOpen) {
+        target.classList.add('open');
+        if (panels[btnId] === 'detPanel' && window.MathJax && MathJax.typesetPromise) {
+          MathJax.typesetPromise([target]).catch(function () {});
+        }
+      }
+    });
+  });
+  document.querySelectorAll('.panel .closeX').forEach(function (x) {
+    x.addEventListener('click', function () {
+      this.parentElement.classList.remove('open');
+    });
+  });
+
+  updateVisibility();
+  draw();
+})();
+</script>
+</body>
+</html>

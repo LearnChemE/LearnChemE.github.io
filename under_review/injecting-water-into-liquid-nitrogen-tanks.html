@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Injecting Water into Liquid Nitrogen Tanks</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+  chtml: { displayAlign: 'left', displayIndent: '0' },
+  options: { renderActions: { addMenu: [] } }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-chtml.min.js" id="MathJax-script" async></script>
+<style>
+  html, body {
+    margin: 0; padding: 0;
+    font-family: Helvetica, Arial, sans-serif;
+    color: #222; background: #fff;
+    -webkit-font-smoothing: antialiased;
+  }
+  #app {
+    position: relative;
+    width: 700px;
+    margin: 6px auto 20px auto;
+    padding: 6px 10px 10px 10px;
+    box-sizing: border-box;
+  }
+  #title {
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    margin: 4px 0 10px 0;
+  }
+  /* ---- controls ---- */
+  #controlbar {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 14px;
+    margin-bottom: 6px;
+  }
+  .startlabel { font-size: 16.5px; white-space: nowrap; }
+  .transport { display: flex; align-items: center; gap: 5px; }
+  .tbtn {
+    width: 30px; height: 26px;
+    border: 1px solid #7a7a7a;
+    background: #f2f2f2;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0;
+    color: #222;
+  }
+  .tbtn:hover { background: #e4e4e4; }
+  .tbtn:active { background: #d6d6d6; }
+  .tbtn svg { display: block; }
+  .infobtns { display: flex; gap: 6px; margin-left: auto; }
+  .infobtn {
+    background: #98000D;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    padding: 5px 12px;
+    cursor: pointer;
+  }
+  .infobtn:hover { background: #7c000b; }
+  .infobtn.active { background: #5f0008; }
+
+  /* ---- sliders ---- */
+  #sliders {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 16px;
+    row-gap: 5px;
+    margin: 4px 0 4px 0;
+    max-width: 680px;
+  }
+  .sctl { display: flex; align-items: center; gap: 5px; }
+  .slabel {
+    /* base 13px -> +15% -> +10% = ~16.45px */
+    font-size: 16.45px;
+    white-space: nowrap;
+    flex: 0 0 auto;
+    width: 180px;
+    text-align: right;
+  }
+  .sctl input[type=range] { width: 84px; flex: 0 0 auto; }
+  .sval {
+    font-size: 16.45px;
+    white-space: nowrap;
+    flex: 0 0 auto;
+    width: 54px;
+    text-align: left;
+  }
+  input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+  input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  input[type=range]:disabled { opacity: 0.45; }
+
+  /* ---- info panels ---- */
+  #panelhost { position: relative; }
+  .panel {
+    position: absolute;
+    top: 2px; left: 0;
+    width: 640px;
+    background: #fbfbfb;
+    border: 1px solid #b9b9b9;
+    border-radius: 6px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.14);
+    padding: 14px 40px 16px 18px;
+    box-sizing: border-box;
+    font-size: 15px;
+    line-height: 1.5;
+    z-index: 30;
+    display: none;
+  }
+  .panel.show { display: block; }
+  .panel h3 {
+    margin: 0 0 3px 0;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    font-weight: bold;
+    color: #000;
+  }
+  .panel h3 + p { margin-top: 0; }
+  .panel h4 {
+    margin: 12px 0 4px 0;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    font-weight: bold;
+    color: #000;
+  }
+  .panel a { color: #98000D; }
+  .closebtn {
+    position: absolute;
+    top: 6px; right: 8px;
+    width: 24px; height: 24px;
+    border: none; background: transparent;
+    font-size: 20px; line-height: 20px;
+    cursor: pointer; color: #555;
+    border-radius: 4px;
+  }
+  .closebtn:hover { background: #eee; color: #000; }
+  .eqline { margin: 2px 0; overflow: visible; }
+  .eqline mjx-container[display="true"] { margin: 0 !important; }
+  .eqline mjx-container { margin: 0 !important; }
+  .panel p.preq { margin-bottom: 2px; }
+  .eqline + p { margin-top: 2px; }
+  .panel .vardef { margin: 3px 0; }
+
+  #canvaswrap { margin-top: 2px; }
+  canvas { display: block; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="title">Injecting Water into Liquid Nitrogen Tanks</div>
+
+  <div id="controlbar">
+    <span class="startlabel">click to start:</span>
+    <div class="transport">
+      <button class="tbtn" id="btnReset" title="reset">
+        <svg width="15" height="14" viewBox="0 0 15 14"><path d="M4 2 L4 12 M6 7 L13 2 L13 12 Z" fill="#222" stroke="#222" stroke-width="1.2" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="tbtn" id="btnPlay" title="play / pause">
+        <svg id="playicon" width="14" height="14" viewBox="0 0 14 14"><path d="M3 2 L12 7 L3 12 Z" fill="#222"/></svg>
+      </button>
+      <button class="tbtn" id="btnFaster" title="faster">
+        <svg width="14" height="14" viewBox="0 0 14 14"><path d="M7 4 L2 9 M7 4 L12 9" fill="none" stroke="#222" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="tbtn" id="btnSlower" title="slower">
+        <svg width="14" height="14" viewBox="0 0 14 14"><path d="M7 10 L2 5 M7 10 L12 5" fill="none" stroke="#222" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+    <div class="infobtns">
+      <button class="infobtn" id="tabDirections">Directions</button>
+      <button class="infobtn" id="tabDetails">Details</button>
+      <button class="infobtn" id="tabAbout">About</button>
+    </div>
+  </div>
+
+  <div id="sliders">
+    <div class="sctl"><span class="slabel">hot water injected</span><input type="range" id="sVhW" min="1" max="5" step="0.1" value="3"><span class="sval" id="vVhW">3.0 mL</span></div>
+    <div class="sctl"><span class="slabel">cold water injected</span><input type="range" id="sVcW" min="5" max="10" step="0.1" value="8"><span class="sval" id="vVcW">8.0 mL</span></div>
+    <div class="sctl"><span class="slabel">hot water temperature</span><input type="range" id="sThW" min="70" max="100" step="1" value="85"><span class="sval" id="vThW">85 &deg;C</span></div>
+    <div class="sctl"><span class="slabel">cold water temperature</span><input type="range" id="sTcW" min="1" max="30" step="1" value="15"><span class="sval" id="vTcW">15 &deg;C</span></div>
+  </div>
+
+  <div id="panelhost">
+    <!-- Directions -->
+    <div class="panel" id="panelDirections">
+      <button class="closebtn" data-close="panelDirections">&times;</button>
+      <h3>Directions</h3>
+      <p>In this simulation, hot and cold water are injected into insulated tanks
+      containing liquid nitrogen. The volume of water injected has a large impact on
+      the amount of liquid nitrogen evaporated. Adjust the sliders to change the volume
+      and temperature of water in each syringe, then click the play button. After
+      equilibrium is reached, select the reset button to run the simulation for
+      different starting conditions.</p>
+      <p>The simulation may be paused at any time, and the animation speed may be
+      increased or decreased using the up arrow and down arrow buttons. The simulation
+      is at a much slower speed than the actual process in order to help visualize the
+      process, and the volume of the ice cubes is exaggerated relative to the volume of
+      the nitrogen gas.</p>
+    </div>
+
+    <!-- Details -->
+    <div class="panel" id="panelDetails">
+      <button class="closebtn" data-close="panelDetails">&times;</button>
+      <h3>Details</h3>
+      <p class="preq">In an adiabatic system with excess liquid nitrogen, the mass of nitrogen
+      vaporized \(m_{\text{vap}}\) depends on the mass of water injected \(m_{w}\), the
+      specific enthalpy of the injected water \(\hat H_{w,\,i}\) and the final enthalpy
+      \(\hat H_{w,\,f}\) of the water, which at equilibrium is the enthalpy of ice at
+      \(-196\ ^{\circ}\text{C}\):</p>
+      <div class="eqline">\[ m_{\text{vap}}\,\Delta \hat H^{\text{vap}}_{\text{N}_2}
+        = m_{w}\left(\hat H_{w,\,i}-\hat H_{w,\,f}\right), \]</div>
+      <p>where \(\Delta \hat H^{\text{vap}}_{\text{N}_2}\) is the specific enthalpy of
+      vaporization of nitrogen.</p>
+      <p class="preq">The difference between the initial and final specific enthalpies of water is the
+      sum of the sensible heat changes and the heat of fusion of water
+      \(\left(\Delta \hat H^{\text{melt}}_{\text{H}_2\text{O}}\right)\):</p>
+      <div class="eqline">\[ \hat H_{w,\,i}-\hat H_{w,\,f}
+        = c_{p,\,\text{liq}}\left(T_{\text{init}}-T_{\text{melt}}\right)
+        + \Delta \hat H^{\text{melt}}_{\text{H}_2\text{O}}
+        + c_{p,\,\text{ice}}\left(T_{\text{melt}}-T_{\text{final}}\right), \]</div>
+      <p>where \(c_{p,\,\text{liq}}\) and \(c_{p,\,\text{ice}}\) are the heat capacities
+      of liquid water and ice, respectively, \(T_{\text{init}}\) is the initial
+      temperature of the water, \(T_{\text{melt}}\) is the freezing temperature of water
+      \((0\ ^{\circ}\text{C})\), and \(T_{\text{final}}\) is \(-196\ ^{\circ}\text{C}\),
+      the boiling temperature of liquid nitrogen.</p>
+      <p style="margin-top:10px">Values used in this simulation (per mole):
+      \(c_{p,\,\text{liq}} = 75.3\ \text{J/(mol·K)}\),
+      \(\Delta \hat H^{\text{melt}}_{\text{H}_2\text{O}} = 6002\ \text{J/mol}\),
+      \(c_{p,\,\text{ice}} = 37.816 + 0.1283\,T\ \text{J/(mol·K)}\) (with \(T\) in
+      \(^{\circ}\text{C}\)), and
+      \(\Delta \hat H^{\text{vap}}_{\text{N}_2} = 6100\ \text{J/mol}\). The density of
+      nitrogen vapor is taken as \(1.25\ \text{g/L}\).</p>
+      <p>This Demonstration was inspired by an article by M.&nbsp;Prince et al.&nbsp;[1].</p>
+      <p style="font-size:14px;margin-top:8px">[1] M.&nbsp;Prince, M.&nbsp;Vigeant and
+      K.&nbsp;Nottis, "Repairing Student Misconceptions in Heat Transfer Using
+      Inquiry-Based Activities," <em>Chemical Engineering Education</em>,
+      <strong>50</strong>(1), 2016 pp.&nbsp;52&ndash;61.
+      <a href="https://journals.flvc.org/cee/article/view/87720" target="_blank" rel="noopener">journals.flvc.org/cee/article/view/87720</a>.</p>
+      <h4>Symbols</h4>
+      <div class="vardef">\(c_{p,\,\text{ice}}\) = heat capacity of ice (J/(mol·K))</div>
+      <div class="vardef">\(c_{p,\,\text{liq}}\) = heat capacity of liquid water (J/(mol·K))</div>
+      <div class="vardef">\(\hat H_{w,\,f}\) = specific enthalpy of the water at equilibrium (ice at \(T_{\text{final}}\))</div>
+      <div class="vardef">\(\hat H_{w,\,i}\) = specific enthalpy of the injected water</div>
+      <div class="vardef">\(m_{\text{vap}}\) = mass of nitrogen vaporized</div>
+      <div class="vardef">\(m_{w}\) = mass of water injected</div>
+      <div class="vardef">\(T\) = temperature in the ice heat-capacity correlation (\(^{\circ}\text{C}\))</div>
+      <div class="vardef">\(T_{\text{final}}\) = final temperature of the water, the boiling temperature of liquid nitrogen (\(-196\ ^{\circ}\text{C}\))</div>
+      <div class="vardef">\(T_{\text{init}}\) = initial temperature of the injected water (\(^{\circ}\text{C}\))</div>
+      <div class="vardef">\(T_{\text{melt}}\) = freezing temperature of water (\(0\ ^{\circ}\text{C}\))</div>
+      <div class="vardef">\(\Delta \hat H^{\text{melt}}_{\text{H}_2\text{O}}\) = heat of fusion of water (J/mol)</div>
+      <div class="vardef">\(\Delta \hat H^{\text{vap}}_{\text{N}_2}\) = heat of vaporization of nitrogen (J/mol)</div>
+    </div>
+
+    <!-- About -->
+    <div class="panel" id="panelAbout">
+      <button class="closebtn" data-close="panelAbout">&times;</button>
+      <h3>About</h3>
+      <p>This simulation was created in the
+      <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of
+      Chemical and Biological Engineering</a> at University of Colorado Boulder for
+      <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a>
+      by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a
+      <a href="https://demonstrations.wolfram.com/InjectingWaterIntoLiquidNitrogenTanks/" target="_blank" rel="noopener">Mathematica
+      simulation</a> by Neil Hendren and John L. Falconer. It was prepared with financial
+      support from the National Science Foundation (DUE 2336987 and 2336988). Address any
+      questions or comments to LearnChemE@gmail.com.</p>
+    </div>
+  </div>
+
+  <div id="canvaswrap">
+    <canvas id="cv" width="680" height="450"></canvas>
+  </div>
+</div>
+
+<script>
+"use strict";
+(function(){
+
+  // ------- physical constants (from the CDF) -------
+  const mpWater = 0;          // deg C, freezing point of water
+  const cpWater = 75.3;       // J/(mol K), liquid water heat capacity
+  const rhoWater = 1;         // g/mL
+  const gammaFusion = 6002;   // J/mol, heat of fusion of water
+  const bpNitrogen = -195.8;  // deg C, boiling point of nitrogen
+  const gammaVapN2 = 6100;    // J/mol, heat of vaporization of nitrogen
+  const rhoN2vap = 1.25;      // g/L, density of nitrogen vapor
+  const MW_water = 18;        // g/mol
+  const MW_N2 = 28;           // g/mol
+
+  // integral of cpIce(T)=37.816+0.1283 T from bpNitrogen to mpWater
+  // = [37.816 T + 0.1283 T^2/2] evaluated bpNitrogen->0
+  function iceIntegral(){
+    const f = (T)=> 37.816*T + 0.1283*T*T/2;
+    return f(mpWater) - f(bpNitrogen);   // J/mol (per mole of water)
+  }
+  const ICE_INT = iceIntegral();
+
+  // ------- state -------
+  const state = {
+    VhW: 3.0, VcW: 8.0, ThW: 85, TcW: 15,
+    evapProg: 0,
+    playing: false,
+    speed: 1,             // multiplier
+    baseRate: 1/20,       // fraction per second at speed 1 (DefaultDuration 20 s)
+  };
+
+  // compute per-tank thermodynamics from V (mL) and T (deg C)
+  function tankThermo(V, Tinit){
+    const n = V * rhoWater / MW_water;      // mol water
+    const H1 = (Tinit - mpWater) * cpWater * n;   // sensible cooling of liquid
+    const H2 = gammaFusion * n;                    // fusion
+    const H3 = ICE_INT * n;                         // sensible cooling of ice
+    const HW = H1 + H2 + H3;
+    const molN2 = HW / gammaVapN2;
+    const volN2_L = molN2 * (MW_N2 / rhoN2vap);     // L of N2 gas produced
+    const v = volN2_L / 1000;                        // (m^3), display*1000 = L
+    return {n, H1, H2, H3, HW, v, volN2_L};
+  }
+
+  // ------- DOM -------
+  const $ = (id)=>document.getElementById(id);
+  const sVhW=$("sVhW"), sVcW=$("sVcW"), sThW=$("sThW"), sTcW=$("sTcW");
+  const vVhW=$("vVhW"), vVcW=$("vVcW"), vThW=$("vThW"), vTcW=$("vTcW");
+  const btnPlay=$("btnPlay"), btnReset=$("btnReset"),
+        btnFaster=$("btnFaster"), btnSlower=$("btnSlower");
+  const playicon=$("playicon");
+
+  function updateSliderLabels(){
+    vVhW.textContent = state.VhW.toFixed(1) + " mL";
+    vVcW.textContent = state.VcW.toFixed(1) + " mL";
+    vThW.innerHTML = state.ThW.toFixed(0) + " &deg;C";
+    vTcW.innerHTML = state.TcW.toFixed(0) + " &deg;C";
+  }
+  function slidersEnabled(en){
+    [sVhW,sVcW,sThW,sTcW].forEach(s=>{ s.disabled = !en; });
+  }
+  function readSliders(){
+    state.VhW = parseFloat(sVhW.value);
+    state.VcW = parseFloat(sVcW.value);
+    state.ThW = parseFloat(sThW.value);
+    state.TcW = parseFloat(sTcW.value);
+    updateSliderLabels();
+  }
+  [sVhW,sVcW,sThW,sTcW].forEach(s=> s.addEventListener("input", ()=>{ readSliders(); draw(); }));
+
+  function setPlayIcon(){
+    if (state.playing){
+      playicon.innerHTML = '<rect x="3" y="2" width="3" height="10" fill="#222"/><rect x="8" y="2" width="3" height="10" fill="#222"/>';
+    } else {
+      playicon.innerHTML = '<path d="M3 2 L12 7 L3 12 Z" fill="#222"/>';
+    }
+  }
+  btnPlay.addEventListener("click", ()=>{
+    if (state.evapProg >= 1){ return; } // at equilibrium, must reset
+    state.playing = !state.playing;
+    if (state.playing){ slidersEnabled(false); lastT = null; requestAnimationFrame(loop); }
+    setPlayIcon();
+  });
+  btnReset.addEventListener("click", ()=>{
+    state.evapProg = 0; state.playing = false; state.speed = 1;
+    setPlayIcon(); slidersEnabled(true); draw();
+  });
+  btnFaster.addEventListener("click", ()=>{ state.speed = Math.min(8, state.speed*1.5); });
+  btnSlower.addEventListener("click", ()=>{ state.speed = Math.max(0.125, state.speed/1.5); });
+
+  // ------- info panels -------
+  const panels = {
+    tabDirections: "panelDirections",
+    tabDetails: "panelDetails",
+    tabAbout: "panelAbout"
+  };
+  function closeAllPanels(){
+    Object.values(panels).forEach(pid=> $(pid).classList.remove("show"));
+    Object.keys(panels).forEach(tid=> $(tid).classList.remove("active"));
+  }
+  Object.keys(panels).forEach(tid=>{
+    $(tid).addEventListener("click", ()=>{
+      const pid = panels[tid];
+      const isOpen = $(pid).classList.contains("show");
+      closeAllPanels();
+      if (!isOpen){ $(pid).classList.add("show"); $(tid).classList.add("active"); }
+    });
+  });
+  document.querySelectorAll(".closebtn").forEach(b=>{
+    b.addEventListener("click", ()=>{ closeAllPanels(); });
+  });
+
+  // ------- canvas / coordinate transform -------
+  const cv = $("cv");
+  const ctx = cv.getContext("2d");
+  const CW = 680, CH = 450;          // logical size
+  // world plot range (slightly wider than Mathematica x[-1.1,1.1] for label margins)
+  const XMIN=-1.14, XMAX=1.14, YMIN=-1.2, YMAX=1.1;
+  const sx = CW/(XMAX-XMIN);
+  const sy = CH/(YMAX-YMIN);
+  function X(x){ return (x - XMIN)*sx; }
+  function Y(y){ return (YMAX - y)*sy; }
+  function LX(dx){ return dx*sx; }   // length in x
+  function LY(dy){ return dy*sy; }   // length in y
+
+  function setupHiDPI(){
+    const dpr = window.devicePixelRatio || 1;
+    cv.width = CW*dpr; cv.height = CH*dpr;
+    cv.style.width = CW+"px"; cv.style.height = CH+"px";
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+
+  // colors (approx Mathematica Lighter[] blends toward white)
+  function lighter(hex, f){ // f fraction toward white
+    const r=parseInt(hex.substr(1,2),16), g=parseInt(hex.substr(3,2),16), b=parseInt(hex.substr(5,2),16);
+    const R=Math.round(r+(255-r)*f), G=Math.round(g+(255-g)*f), B=Math.round(b+(255-b)*f);
+    return `rgb(${R},${G},${B})`;
+  }
+  const liqBlue   = lighter("#0000ff",0.70);  // liquid water / N2 liquid  (Lighter[Blue,0.7])
+  const iceBlue   = lighter("#0000ff",0.90);  // ice (a touch lighter, ~Lighter[Blue,0.95] tuned)
+  const balloonPink = lighter("#ff0000",0.70); // Lighter[Red,0.7]
+  const syrRed    = lighter("#ff0000",0.70);
+  const syrBlue   = lighter("#0000ff",0.70);
+  const frameGray = lighter("#808080",0.80);
+
+  // catmull-rom closed path through pts [[x,y],...] in world coords
+  function closedSpline(pts){
+    ctx.beginPath();
+    const n = pts.length;
+    const P = pts.map(p=>[X(p[0]),Y(p[1])]);
+    ctx.moveTo(P[0][0],P[0][1]);
+    for (let i=0;i<n;i++){
+      const p0=P[(i-1+n)%n], p1=P[i], p2=P[(i+1)%n], p3=P[(i+2)%n];
+      const c1x=p1[0]+(p2[0]-p0[0])/6, c1y=p1[1]+(p2[1]-p0[1])/6;
+      const c2x=p2[0]-(p3[0]-p1[0])/6, c2y=p2[1]-(p3[1]-p1[1])/6;
+      ctx.bezierCurveTo(c1x,c1y,c2x,c2y,p2[0],p2[1]);
+    }
+    ctx.closePath();
+  }
+
+  // ------- shape: liquid-nitrogen dewar (clean explicit path) -------
+  function containerPath(i,j,m,n){
+    const wx = (x)=>X(i+x*m), wy=(y)=>Y(j+y*n);
+    ctx.beginPath();
+    ctx.moveTo(wx(-0.1), wy(0.95));            // neck top-left
+    ctx.lineTo(wx(-0.1), wy(0.9));             // neck bottom-left
+    ctx.lineTo(wx(-0.22), wy(0.9));            // shoulder start
+    ctx.quadraticCurveTo(wx(-0.4), wy(0.9), wx(-0.4), wy(0.72)); // shoulder curve
+    ctx.lineTo(wx(-0.4), wy(0.1));             // left side
+    ctx.quadraticCurveTo(wx(-0.4), wy(0.0), wx(-0.28), wy(0.0)); // bottom-left corner
+    ctx.lineTo(wx(0.28), wy(0.0));             // bottom
+    ctx.quadraticCurveTo(wx(0.4), wy(0.0), wx(0.4), wy(0.1));    // bottom-right corner
+    ctx.lineTo(wx(0.4), wy(0.72));             // right side
+    ctx.quadraticCurveTo(wx(0.4), wy(0.9), wx(0.22), wy(0.9));   // shoulder curve
+    ctx.lineTo(wx(0.1), wy(0.9));              // neck bottom-right
+    ctx.lineTo(wx(0.1), wy(0.95));             // neck top-right
+    ctx.closePath();
+  }
+  function N2container(i,j,m,n,liquidLevel){
+    // liquid fill (clipped to container)
+    ctx.save();
+    containerPath(i,j,m,n);
+    ctx.clip();
+    ctx.fillStyle = liqBlue;
+    ctx.fillRect(X(i-0.5*m), Y(j+1.0*n), LX(1.0*m), LY(1.1*n));
+    const liqTop = j + 0.9*n*liquidLevel; // liquid surface (world y)
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(X(i-0.5*m), Y(j+1.05*n), LX(1.0*m), Y(liqTop)-Y(j+1.05*n));
+    // subtle liquid surface line
+    ctx.strokeStyle = lighter("#0000ff",0.45); ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(X(i-0.5*m), Y(liqTop)); ctx.lineTo(X(i+0.5*m), Y(liqTop)); ctx.stroke();
+    ctx.restore();
+    // translucent glass body + outline
+    containerPath(i,j,m,n);
+    ctx.fillStyle = "rgba(255,255,255,0.30)";
+    ctx.fill();
+    ctx.lineWidth = 1.4; ctx.strokeStyle = "#111"; ctx.stroke();
+    // rim (mouth ellipse)
+    ctx.beginPath();
+    ctx.ellipse(X(i), Y(j+0.92*n), LX(0.1*m), LY(0.02*n), 0, 0, Math.PI*2);
+    ctx.fillStyle="#e9e9e9"; ctx.fill();
+    ctx.lineWidth=1.0; ctx.strokeStyle="#111"; ctx.stroke();
+  }
+
+  // ------- shape: syringe (barrel tilted by theta about (i,j)) -------
+  function syringe(i,j,m,n,liquidColor,frac,theta){
+    ctx.save();
+    ctx.translate(X(i),Y(j));
+    ctx.rotate(-theta); // world CCW -> canvas
+    // helper to draw a rect given world-offset extents around (i,j)
+    const rw = (x0,y0,x1,y1)=>{
+      const px0=LX(x0*m), px1=LX(x1*m);
+      const py0=-LY(y0*n), py1=-LY(y1*n);
+      ctx.fillRect(Math.min(px0,px1),Math.min(py0,py1),Math.abs(px1-px0),Math.abs(py1-py0));
+    };
+    const strokeRw = (x0,y0,x1,y1)=>{
+      const px0=LX(x0*m), px1=LX(x1*m);
+      const py0=-LY(y0*n), py1=-LY(y1*n);
+      ctx.strokeRect(Math.min(px0,px1),Math.min(py0,py1),Math.abs(px1-px0),Math.abs(py1-py0));
+    };
+    // barrel outline (glass)
+    ctx.lineWidth = 1;
+    ctx.fillStyle = "rgba(180,180,180,0.18)";
+    ctx.strokeStyle = "#333";
+    rw(-0.15,-0.6,0.15,0.2); strokeRw(-0.15,-0.6,0.15,0.2);
+    // liquid inside barrel
+    ctx.fillStyle = liquidColor;
+    rw(-0.15,-0.6,0.15,-0.58+0.75*frac);
+    // plunger disk line (top of liquid)
+    ctx.fillStyle = "#cfcfcf"; ctx.strokeStyle="#000";
+    rw(-0.15,-0.58+0.75*frac,0.15,-0.6+0.75*frac);
+    // plunger rod
+    ctx.fillStyle = "#e6e6e6"; ctx.strokeStyle="#333";
+    rw(-0.01,-0.58+0.75*frac,0.01,0.23+0.75*frac); strokeRw(-0.01,-0.58+0.75*frac,0.01,0.23+0.75*frac);
+    // thumb rest
+    ctx.fillStyle = "#e6e6e6";
+    rw(-0.13,0.23+0.75*frac,0.13,0.25+0.75*frac); strokeRw(-0.13,0.23+0.75*frac,0.13,0.25+0.75*frac);
+    // flange near barrel top
+    ctx.fillStyle = "#d8d8d8";
+    rw(-0.04,-0.58+0.75*frac,0.04,0.23+0.75*frac); // inner rod housing hint
+    // needle
+    ctx.fillStyle = "#e9e9e9"; ctx.strokeStyle="#666"; ctx.lineWidth=0.6;
+    ctx.beginPath();
+    ctx.moveTo(LX(-0.005*m), -(-LY(0.64*n)));
+    // draw needle as a thin polygon downward from barrel bottom
+    const nx = LX(0.02*m);
+    const y_top = -LY(-0.6*n)*0;   // not used
+    ctx.beginPath();
+    ctx.moveTo(LX(-0.01*m), LY(0.64*n));
+    ctx.lineTo(LX(-0.01*m), LY(0.9*n));
+    ctx.lineTo(LX(0.01*m), LY(0.88*n));
+    ctx.lineTo(LX(0.01*m), LY(0.64*n));
+    ctx.closePath();
+    ctx.fillStyle="#c9c9c9"; ctx.fill(); ctx.stroke();
+    ctx.restore();
+  }
+
+  // ------- closed uniform B-spline evaluator (de Boor) -------
+  function bsplineClosed(ctrl, degree, samplesPerSeg){
+    const n = ctrl.length, p = degree;
+    const cp = [];
+    for (let k=0;k<n+p;k++) cp.push(ctrl[k%n]);
+    const m = cp.length;              // = n + p
+    const knots = [];
+    for (let k=0;k<=m+p;k++) knots.push(k);
+    const out = [];
+    const total = n*samplesPerSeg;
+    const u0 = knots[p], u1 = knots[m];
+    for (let s=0;s<=total;s++){
+      const u = u0 + (u1-u0)*s/total;
+      let kk = Math.min(Math.floor(u), m-1);
+      if (kk < p) kk = p;
+      const d = [];
+      for (let j=0;j<=p;j++){ const idx=j+kk-p; d.push({x:cp[idx].x, y:cp[idx].y}); }
+      for (let r=1;r<=p;r++){
+        for (let j=p;j>=r;j--){
+          const denom = knots[j+1+kk-r]-knots[j+kk-p];
+          const a = denom===0?0:(u-knots[j+kk-p])/denom;
+          d[j] = {x:(1-a)*d[j-1].x+a*d[j].x, y:(1-a)*d[j-1].y+a*d[j].y};
+        }
+      }
+      out.push(d[p]);
+    }
+    return out;
+  }
+
+  // ------- shape: inflating balloon (ported from CDF infBalloon) -------
+  // Control points depend on fractionFull; at frac=0 a small empty balloon
+  // is visible at the tank neck, matching the original Mathematica figure.
+  const BAL_J = 0.27, BAL_M = 0.55, BAL_N = 0.52;
+  function balloonCtrlPts(i, f){
+    const defs = [
+      [0.4 - 0.5*f*f,            -0.37 + 1.77*Math.pow(f,1.2)],
+      [0.3 + 0.35*Math.pow(f,0.7), -0.47 + 1.07*Math.pow(f,1.5)],
+      [0.2 + 0.06*f,             -0.42 + 0.62*Math.pow(f,1.5)],
+      [0.08 - 0.08*f,            -0.35 + 0.2*f],
+      [-0.01,-0.33],[-0.02,-0.36],[-0.02,-0.39],[-0.02,-0.41],
+      [0.02,-0.42],[0.04,-0.45],[0.04,-0.46],[0.02,-0.47],
+      [0,-0.48],[-0.2,-0.48],[-0.22,-0.47],[-0.24,-0.46],
+      [-0.24,-0.45],[-0.22,-0.42],[-0.18,-0.41],[-0.18,-0.39],
+      [-0.18,-0.36],[-0.19,-0.33],
+      [-0.12 - 0.08*f,           -0.25 + 0.1*f],
+      [0.16 - 0.64*f,            -0.21 + 0.41*f],
+      [0.3 - 1.2*Math.pow(f,1.3), -0.27 + 0.87*Math.pow(f,0.8)]
+    ];
+    return defs.map(d=>({x:X(i + d[0]*BAL_M), y:Y(BAL_J + d[1]*BAL_N)}));
+  }
+  function balloon(i, frac){
+    const f = Math.max(0, Math.min(1, frac));
+    const pts = balloonCtrlPts(i, f);
+    const body = bsplineClosed(pts, 5, 12);
+    ctx.save();
+    // filled balloon body
+    ctx.beginPath();
+    body.forEach((p,idx)=> idx? ctx.lineTo(p.x,p.y): ctx.moveTo(p.x,p.y));
+    ctx.closePath();
+    ctx.fillStyle = balloonPink; ctx.strokeStyle = "#000"; ctx.lineWidth = 1.2;
+    ctx.fill(); ctx.stroke();
+    // knot detail (CDF: closed spline through control points 8..19)
+    const knot = bsplineClosed(pts.slice(7,19), 5, 12);
+    ctx.beginPath();
+    knot.forEach((p,idx)=> idx? ctx.lineTo(p.x,p.y): ctx.moveTo(p.x,p.y));
+    ctx.closePath();
+    ctx.lineWidth = 1.3; ctx.strokeStyle = "#000"; ctx.stroke();
+    // subtle highlight once inflated
+    if (f > 0.15){
+      let minx=1e9,miny=1e9,maxx=-1e9,maxy=-1e9;
+      body.forEach(p=>{ if(p.x<minx)minx=p.x; if(p.x>maxx)maxx=p.x; if(p.y<miny)miny=p.y; if(p.y>maxy)maxy=p.y; });
+      const bw=maxx-minx, bh=maxy-miny;
+      ctx.beginPath();
+      ctx.ellipse(minx+bw*0.34, miny+bh*0.30, bw*0.13, bh*0.16, -0.3, 0, Math.PI*2);
+      ctx.fillStyle = "rgba(255,255,255,0.5)"; ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  // ------- shape: hexagonal ice cube -------
+  function iceCube(cx_w, cy_w, r_w, rot){
+    ctx.save();
+    ctx.translate(X(cx_w), Y(cy_w));
+    ctx.rotate(rot);
+    ctx.beginPath();
+    for (let k=0;k<6;k++){
+      const a = Math.PI/3*k + Math.PI/6;
+      const px = Math.cos(a)*LX(r_w);
+      const py = Math.sin(a)*LY(r_w);
+      if (k===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+    }
+    ctx.closePath();
+    ctx.fillStyle = "rgba(210,225,255,0.75)";
+    ctx.strokeStyle = "#3a3a3a"; ctx.lineWidth = 0.8;
+    ctx.fill(); ctx.stroke();
+    // facet lines
+    ctx.beginPath();
+    ctx.moveTo(-LX(r_w*0.4),-LY(r_w*0.2)); ctx.lineTo(LX(r_w*0.2),LY(r_w*0.1));
+    ctx.strokeStyle="rgba(80,80,80,0.6)"; ctx.lineWidth=0.6; ctx.stroke();
+    ctx.restore();
+  }
+
+  // ice cube layout (world positions), relative like the CDF
+  function iceCubes(baseX, phase, V){
+    const offs = [
+      [0.00,-0.83,0],[-0.11,-0.83,3],[0.12,-0.83,0.9],[-0.04,-0.76,1.1],
+      [0.07,-0.75,2.1],[-0.18,-0.76,-0.1],[0.16,-0.74,-0.8],[0.00,-0.67,0.13],
+      [-0.12,-0.68,2],[0.10,-0.65,0.85]
+    ];
+    let count = Math.round((100-phase)*(V/100));
+    count = Math.max(0, Math.min(10, count));
+    if (phase >= 100) count = 0;
+    for (let k=0;k<count;k++){
+      const o = offs[k];
+      const cxw = baseX + o[0];
+      const cyw = (o[1])/1.4 - 0.25;
+      iceCube(cxw, cyw, 0.045, o[2]);
+    }
+  }
+
+  // ------- bar chart (mass g) : coordinates taken from the CDF -------
+  // cfg: { axisX, axisTop, xBot, liqL,liqR, iceL,iceR, h2oX, massX }
+  function barChart(cfg, phase, V, curT){
+    const yBot = -0.8;
+    // L-shaped axis
+    ctx.strokeStyle = "#000"; ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.moveTo(X(cfg.axisX), Y(cfg.axisTop));
+    ctx.lineTo(X(cfg.axisX), Y(yBot));
+    ctx.lineTo(X(cfg.xBot), Y(yBot));
+    ctx.stroke();
+    // ticks 0,5,10 g  (0.15 world units per gram)
+    ctx.fillStyle="#000"; ctx.font = "14.4px Helvetica, Arial, sans-serif";
+    ctx.textAlign="right"; ctx.textBaseline="middle"; ctx.lineWidth=1;
+    [0,5,10].forEach(g=>{
+      const yw = yBot + 0.15*g;
+      ctx.beginPath(); ctx.moveTo(X(cfg.axisX)-4, Y(yw)); ctx.lineTo(X(cfg.axisX), Y(yw)); ctx.stroke();
+      ctx.fillText(String(g), X(cfg.axisX)-6, Y(yw));
+    });
+    // bars
+    const liqH = 0.0015*V*phase;
+    const iceH = 0.0015*V*(100-phase);
+    ctx.strokeStyle="#000"; ctx.lineWidth=1;
+    ctx.fillStyle = liqBlue;
+    ctx.fillRect(X(cfg.liqL), Y(yBot+liqH), X(cfg.liqR)-X(cfg.liqL), Y(yBot)-Y(yBot+liqH));
+    ctx.strokeRect(X(cfg.liqL), Y(yBot+liqH), X(cfg.liqR)-X(cfg.liqL), Y(yBot)-Y(yBot+liqH));
+    ctx.fillStyle = iceBlue;
+    ctx.fillRect(X(cfg.iceL), Y(yBot+iceH), X(cfg.iceR)-X(cfg.iceL), Y(yBot)-Y(yBot+iceH));
+    ctx.strokeRect(X(cfg.iceL), Y(yBot+iceH), X(cfg.iceR)-X(cfg.iceL), Y(yBot)-Y(yBot+iceH));
+    // labels above bars: "liquid"/temp and "ice"/temp
+    ctx.textAlign="center"; ctx.textBaseline="alphabetic";
+    ctx.font = "15.6px Helvetica, Arial, sans-serif"; ctx.fillStyle="#000";
+    const liqCx=(cfg.liqL+cfg.liqR)/2, iceCx=(cfg.iceL+cfg.iceR)/2;
+    ctx.fillText("liquid", X(liqCx), Y(yBot+liqH)-19);
+    if (phase > 5) ctx.fillText(curT+"\u00B0C", X(liqCx), Y(yBot+liqH)-4);
+    ctx.fillText("ice", X(iceCx), Y(yBot+iceH)-19);
+    if (phase < 95) ctx.fillText(curT+"\u00B0C", X(iceCx), Y(yBot+iceH)-4);
+    // H2O label under bars
+    drawH2O(cfg.h2oX, -0.9);
+    // rotated y-axis label "mass (g)"
+    ctx.save();
+    ctx.translate(X(cfg.massX), Y(0.0));
+    ctx.rotate(-Math.PI/2);
+    ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.font="15.6px Helvetica, Arial, sans-serif";
+    ctx.fillText("mass (g)", 0, 0);
+    ctx.restore();
+  }
+  const HOT_CHART = { axisX:-1.0, axisTop:0.7, xBot:-0.63, liqL:-0.97, liqR:-0.82, iceL:-0.78, iceR:-0.63, h2oX:-0.8, massX:-1.07 };
+  const COLD_CHART= { axisX:0.68, axisTop:0.7, xBot:1.04, liqL:0.71, liqR:0.86, iceL:0.89, iceR:1.04, h2oX:0.88, massX:0.61 };
+
+  function drawH2O(xw, yw){
+    ctx.save();
+    ctx.font="15.6px Helvetica, Arial, sans-serif"; ctx.fillStyle="#000";
+    ctx.textAlign="left"; ctx.textBaseline="alphabetic";
+    const px = X(xw), py = Y(yw);
+    const t1 = "H"; const sub="2"; const t2="O";
+    const w1 = ctx.measureText(t1).width;
+    ctx.font="12px Helvetica, Arial, sans-serif";
+    const ws = ctx.measureText(sub).width;
+    ctx.font="15.6px Helvetica, Arial, sans-serif";
+    const w2 = ctx.measureText(t2).width;
+    const total = w1+ws+w2;
+    let x = px-total/2;
+    ctx.fillText(t1, x, py); x+=w1;
+    ctx.font="12px Helvetica, Arial, sans-serif";
+    ctx.fillText(sub, x, py+4); x+=ws;
+    ctx.font="15.6px Helvetica, Arial, sans-serif";
+    ctx.fillText(t2, x, py);
+    ctx.restore();
+  }
+
+  // subscript-capable text: draws "N2 gas: X L" style around world point (left aligned)
+  function drawGasReadout(xw, yw, volL){
+    ctx.save();
+    ctx.font="18px Helvetica, Arial, sans-serif"; ctx.fillStyle="#000";
+    ctx.textAlign="left"; ctx.textBaseline="middle";
+    let x = X(xw), y=Y(yw);
+    ctx.fillText("N", x, y); x+=ctx.measureText("N").width;
+    ctx.font="13.2px Helvetica, Arial, sans-serif";
+    ctx.fillText("2", x, y+6); x+=ctx.measureText("2").width;
+    ctx.font="18px Helvetica, Arial, sans-serif";
+    const rest = " gas: " + volL.toFixed(1) + " L";
+    ctx.fillText(rest, x, y);
+    ctx.restore();
+  }
+
+  // framed info text below a tank
+  function infoText(xw, yw, msgParts){
+    ctx.save();
+    ctx.font="16.8px Helvetica, Arial, sans-serif";
+    ctx.textBaseline="middle"; ctx.textAlign="left";
+    // measure
+    let w=0;
+    msgParts.forEach(p=>{
+      ctx.font = p.italic ? "italic 16.8px Helvetica, Arial, sans-serif" : (p.sub?"12px Helvetica, Arial, sans-serif":"16.8px Helvetica, Arial, sans-serif");
+      w += ctx.measureText(p.t).width;
+    });
+    const padx=9, pady=5, h=26;
+    const cx=X(xw), cy=Y(yw);
+    const bx=cx-w/2-padx, by=cy-h/2;
+    ctx.fillStyle = frameGray;
+    ctx.strokeStyle = lighter("#808080",0.6); ctx.lineWidth=1;
+    roundRect(bx,by,w+2*padx,h,4); ctx.fill(); ctx.stroke();
+    // text
+    let x=cx-w/2;
+    ctx.fillStyle="#000";
+    msgParts.forEach(p=>{
+      ctx.font = p.italic ? "italic 16.8px Helvetica, Arial, sans-serif" : (p.sub?"12px Helvetica, Arial, sans-serif":"16.8px Helvetica, Arial, sans-serif");
+      const yy = p.sub ? cy+5 : cy;
+      ctx.fillText(p.t, x, yy);
+      x += ctx.measureText(p.t).width;
+    });
+    ctx.restore();
+  }
+  function roundRect(x,y,w,h,r){
+    ctx.beginPath();
+    ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath();
+  }
+
+  function phaseMsg(evapProg, phase){
+    if (evapProg >= 1) return [{t:"equilibrium"}];
+    if (phase === 100) return [{t:"T",italic:true},{t:"water",sub:true},{t:" decreasing"}];
+    if (phase > 0 && phase < 100) return [{t:"water freezing"}];
+    return [{t:"T",italic:true},{t:"ice",sub:true},{t:" decreasing"}];
+  }
+
+  // ------- main draw -------
+  function statusFor(V,Tinit,evapProg){
+    const th = tankThermo(V,Tinit);
+    const {H1,H2,HW} = th;
+    const f1=H1/HW, f12=(H1+H2)/HW;
+    let T, phase;
+    if (evapProg < f1){
+      T = Tinit*(1 - HW*(evapProg/H1));
+      phase = 100;
+    } else if (evapProg <= f12){
+      T = 0;
+      phase = (1 - (evapProg - f1)/((H2)/HW))*100;
+    } else {
+      T = bpNitrogen * ((evapProg - f12)/(th.H3/HW));
+      phase = 0;
+    }
+    return { th, T: Math.round(T), phase: Math.round(phase) };
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,CW,CH);
+    const ep = state.evapProg;
+
+    const hot = statusFor(state.VhW, state.ThW, ep);
+    const cold = statusFor(state.VcW, state.TcW, ep);
+    const vH = hot.th.v, vC = cold.th.v;
+
+    const hotNitro = 0.6 - (vH/22.4)*0.1;
+    const coldNitro = 0.6 - (vC/22.4)*0.1;
+
+    // layout world centers
+    const hotTankX = -0.35, coldTankX = 0.30;
+    const hotBalloonX = -0.29, coldBalloonX = 0.36;
+    const hotSyrX = -0.55, coldSyrX = 0.10;
+
+    // syringe injection fraction
+    const hInject = Math.max(0, Math.min(1, state.VhW/10 - 5*ep*state.VhW));
+    const cInject = Math.max(0, Math.min(1, state.VcW/10 - 5*ep*state.VcW));
+
+    // balloon fractions
+    const fH = ep * (vH >= vC ? 1 : vH/vC);
+    const fC = ep * (vC >= vH ? 1 : vC/vH);
+
+    // draw tanks (liquid nitrogen dewars)
+    N2container(hotTankX, -0.9, 0.6, 1.0, hotNitro);
+    N2container(coldTankX, -0.9, 0.6, 1.0, coldNitro);
+
+    // ice cubes inside tanks
+    iceCubes(hotTankX+0.0, hot.phase, state.VhW);
+    iceCubes(coldTankX+0.01, cold.phase, state.VcW);
+
+    // balloons (ported infBalloon; empty balloon visible at start)
+    balloon(hotBalloonX, fH);
+    balloon(coldBalloonX, fC);
+
+    // syringes
+    syringe(hotSyrX, 0.27, 0.22, 0.35, syrRed, hInject, Math.PI/30);
+    syringe(coldSyrX, 0.27, 0.22, 0.35, syrBlue, cInject, Math.PI/30);
+
+    // gas readouts (top)
+    drawGasReadout(-0.62, 1.03, ep*vH*1000);
+    drawGasReadout(0.22, 1.03, ep*vC*1000);
+
+    // bar charts (outer)
+    barChart(HOT_CHART, hot.phase, state.VhW, hot.T);
+    barChart(COLD_CHART, cold.phase, state.VcW, cold.T);
+
+    // info text under tanks
+    if (ep > 0){
+      infoText(hotTankX, -1.12, phaseMsg(ep, hot.phase));
+      infoText(coldTankX, -1.12, phaseMsg(ep, cold.phase));
+    }
+  }
+
+  // ------- animation loop -------
+  let lastT = null;
+  function loop(t){
+    if (!state.playing) return;
+    if (lastT === null) lastT = t;
+    const dt = (t - lastT)/1000;
+    lastT = t;
+    state.evapProg += state.baseRate * state.speed * dt;
+    if (state.evapProg >= 1){
+      state.evapProg = 1;
+      state.playing = false;
+      setPlayIcon();
+      slidersEnabled(false); // remain disabled at equilibrium
+    }
+    draw();
+    if (state.playing) requestAnimationFrame(loop);
+  }
+
+  // ------- init -------
+  function init(){
+    setupHiDPI();
+    readSliders();
+    setPlayIcon();
+    draw();
+    window.addEventListener("resize", ()=>{ setupHiDPI(); draw(); });
+  }
+  init();
+
+})();
+</script>
+</body>
+</html>

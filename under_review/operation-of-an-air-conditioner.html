@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Operation of an Air Conditioner</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+  svg: { fontCache: 'global', displayAlign: 'left', displayIndent: '0' },
+  options: { renderActions: { addMenu: [] } }
+};
+</script>
+<script id="MathJax-script" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-svg.min.js"></script>
+<style>
+  :root{
+    --darkred:#98000D;
+    --base:15px;            /* baseline font */
+    --slider:17.25px;       /* slider labels = baseline + 15% */
+    --red:#c00000;
+    --blue:#0000cc;
+  }
+  html,body{margin:0;padding:0;background:#ffffff;}
+  #app{
+    font-family:Helvetica,Arial,sans-serif;
+    color:#000;
+    width:740px;
+    margin:14px auto;
+    -webkit-font-smoothing:antialiased;
+    position:relative;
+  }
+  #title{
+    font-size:21px;
+    font-weight:bold;
+    text-align:center;
+    margin:2px 0 10px 0;
+  }
+  .sectionLabel{ font-size:var(--slider); font-weight:bold; margin:6px 0 4px 2px; }
+  .sectionLabel.inlet{ color:var(--red); }
+  .sectionLabel.outlet{ color:var(--blue); }
+
+  .sliderRow{ display:flex; align-items:center; margin:5px 0; }
+  .sliderRow label{ font-size:var(--slider); width:185px; }
+  .sliderRow input[type=range]{ width:195px; vertical-align:middle; accent-color:#666; }
+  .sliderRow .val{
+    font-size:var(--slider); margin-left:12px; min-width:54px;
+    display:inline-block; text-align:left;
+  }
+
+  hr.div{ border:none; border-top:1px solid #cfcfcf; margin:10px 0; }
+
+  /* outlet row that also holds the flyout buttons */
+  #outletRow{ display:flex; align-items:center; }
+  #outletSliderBlock{ display:flex; align-items:center; }
+  #btnGroup{ margin-left:26px; position:relative; white-space:nowrap; flex-shrink:0; }
+  #btnGroup button{
+    font-family:Helvetica,Arial,sans-serif;
+    font-size:14px;
+    color:#fff;
+    background:var(--darkred);
+    border:none;
+    border-radius:3px;
+    padding:6px 12px;
+    margin-right:6px;
+    cursor:pointer;
+  }
+  #btnGroup button:hover{ background:#7d000b; }
+  #btnGroup button.active{ background:#5f0008; }
+
+  /* flyout panels: absolutely positioned overlays anchored below the buttons */
+  .panel{
+    display:none;
+    position:absolute;
+    top:42px;
+    right:0;
+    left:auto;
+    width:620px;
+    background:#fbfbfb;
+    border:1px solid #b7b7b7;
+    border-radius:4px;
+    box-shadow:0 6px 18px rgba(0,0,0,0.18);
+    padding:14px 40px 16px 16px;
+    font-size:var(--base);
+    line-height:1.45;
+    z-index:40;
+    box-sizing:border-box;
+    white-space:normal;
+    max-height:440px;
+    overflow-y:auto;
+  }
+  .panel.show{ display:block; }
+  .panel .closeX{
+    position:absolute; top:6px; right:9px;
+    font-size:19px; line-height:1; color:#555;
+    cursor:pointer; font-weight:bold; user-select:none;
+  }
+  .panel .closeX:hover{ color:#000; }
+  .panel h3{ margin:2px 0 8px 0; font-size:16px; }
+  .panel p{ margin:7px 0; }
+  .panel ol{ margin:6px 0 6px 22px; padding:0; }
+  .panel ol li{ margin:3px 0; }
+  .panel a{ color:var(--darkred); }
+  .eqn{ margin:8px 0; text-align:left; }
+  .panel mjx-container[display="true"]{ text-align:left !important; margin:8px 0 !important; }
+
+  /* view selector (SetterBar) + radios */
+  #viewControls{ display:flex; align-items:center; margin:12px 0 6px 0; }
+  .setter{ display:inline-flex; border:1px solid #9a9a9a; border-radius:4px; overflow:hidden; }
+  .setter button{
+    font-family:Helvetica,Arial,sans-serif; font-size:14px;
+    border:none; background:#eee; color:#222; padding:6px 14px; cursor:pointer;
+  }
+  .setter button + button{ border-left:1px solid #9a9a9a; }
+  .setter button.on{ background:var(--darkred); color:#fff; }
+  #radioGroup{ margin-left:22px; font-size:14px; color:#000; }
+  #radioGroup.disabled{ color:#aaa; }
+  #radioGroup label{ margin-right:14px; cursor:pointer; }
+  #radioGroup.disabled label{ cursor:default; }
+  #radioGroup input{ vertical-align:middle; margin-right:4px; }
+
+  /* display area */
+  #display{ position:relative; width:660px; min-height:420px; margin-top:4px; }
+  #diagram{ display:block; }
+  #tableWrap{ display:none; padding:14px 0 0 4px; }
+
+  table.psychro{ border-collapse:collapse; font-size:15px; }
+  table.psychro td, table.psychro th{
+    border:1px solid #4d4d4d;
+    padding:5px 12px;
+    text-align:left;
+  }
+  table.psychro th{ font-weight:bold; background:#e7dced; }
+  table.psychro td.val{ text-align:left; min-width:90px; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="title">Operation of an Air Conditioner</div>
+
+  <div class="sectionLabel inlet">inlet air conditions:</div>
+
+  <div class="sliderRow">
+    <label>temperature (&deg;C)</label>
+    <input id="Tin" type="range" min="30" max="50" step="1" value="30">
+    <span class="val" id="TinVal">30</span>
+  </div>
+  <div class="sliderRow">
+    <label>relative humidity (%)</label>
+    <input id="RHi" type="range" min="60" max="85" step="1" value="80">
+    <span class="val" id="RHiVal">80</span>
+  </div>
+
+  <hr class="div">
+
+  <div class="sectionLabel outlet">outlet air conditions:</div>
+
+  <div id="outletRow">
+    <div id="outletSliderBlock" class="sliderRow" style="margin:5px 0;">
+      <label>temperature (&deg;C)</label>
+      <input id="Tout" type="range" min="10" max="20" step="1" value="10">
+      <span class="val" id="ToutVal">10</span>
+    </div>
+
+    <div id="btnGroup">
+      <button id="bDir">Directions</button>
+      <button id="bDet">Details</button>
+      <button id="bAbt">About</button>
+
+      <!-- flyout panels (open below the buttons) -->
+      <div class="panel" id="pDir">
+        <span class="closeX" data-close="pDir">&times;</span>
+        <h3>Directions</h3>
+        <p>Consider an air cooler operating at a constant pressure of 1&nbsp;atm. Use the sliders to
+        set the temperature and relative humidity <i>h</i><sub>r</sub> of the inlet air stream.</p>
+        <p>This simulation computes the amount of water condensed (in kg) and heat removed (in kJ)
+        after you set the temperature of the cooled outlet air stream. It also gives the fraction of
+        water that is condensed during the cooling process. Note that a basis for the calculation of
+        1&nbsp;kg dry air is taken.</p>
+        <p>In addition, these thermal properties of both the inlet and outlet air streams are listed:</p>
+        <ol>
+          <li>the dry-bulb temperature</li>
+          <li>the wet-bulb temperature</li>
+          <li>the dew point temperature</li>
+          <li>the relative humidity</li>
+          <li>the absolute humidity or moisture content</li>
+          <li>the humid volume</li>
+          <li>the specific enthalpy</li>
+        </ol>
+        <p>Things to try out or check:</p>
+        <ol>
+          <li>For a fixed temperature of the cold outlet air stream, increase the value of the
+          relative humidity of the inlet air stream. As expected, you will observe an increase in the
+          amount of condensed water.</li>
+          <li>The values of the wet-bulb, dry-bulb and dew point temperatures of the outlet air stream
+          are identical. This is expected because we assume that this stream is saturated
+          (i.e. the relative humidity is 100%).</li>
+          <li>For fixed temperature and relative humidity values of the inlet air stream, decrease the
+          temperature of the cooled outlet air stream. As expected, you will observe an increase in
+          the amount of heat removed.</li>
+        </ol>
+      </div>
+
+      <div class="panel" id="pDet">
+        <span class="closeX" data-close="pDet">&times;</span>
+        <h3>Details</h3>
+        <p>Moist air is cooled at a constant total pressure \(P = 1.01325\ \text{bar}\) (1&nbsp;atm).
+        The saturation pressure of water (bar) is found from an Antoine equation, with temperature
+        \(T\) in \(^\circ\text{C}\):</p>
+        <div class="eqn">\[ P_\text{sat} = 10^{\,5.40221 \,-\, 1838.675/(T+241.263)} \]</div>
+
+        <p>The moisture content (absolute humidity) \(S_H\) (kg&nbsp;H\(_2\)O per kg dry air) is related
+        to relative humidity \(h_r\) by:</p>
+        <div class="eqn">\[ \frac{h_r}{100} \;=\; \frac{S_H\,P}{(0.622 + 0.378\,S_H)\,P_\text{sat}} \]</div>
+
+        <p>For the inlet stream, \(S_{H,\text{in}}\) is evaluated at \(T_\text{in}\) and \(h_{r,\text{in}}\).
+        The outlet stream leaves saturated \((h_r = 100\%)\), so \(S_{H,\text{out}}\) is evaluated at
+        \(T_\text{out}\). The water condensed (per kg dry air) and the fraction condensed are:</p>
+        <div class="eqn">\[ m = S_{H,\text{in}} - S_{H,\text{out}}, \qquad
+             \text{fraction condensed} = \frac{m}{S_{H,\text{in}}} \]</div>
+
+        <p>The specific enthalpy of moist air (kJ per kg dry air, reference \(0\,^\circ\text{C}\)) and of
+        the liquid condensate are:</p>
+        <div class="eqn">\[ h = 1.006\,T + S_H\,(1.84\,T + 2501), \qquad h_\ell = 4.1855\,T \]</div>
+
+        <p>An energy balance on the cooler gives the heat removed \(Q\) (kJ, per kg dry air):</p>
+        <div class="eqn">\[ Q = h_\text{out} + h_\ell\,m - h_\text{in} \]</div>
+
+        <p>The humid volume \(v_H\) (m\(^3\) per kg dry air) uses gas constants
+        \(R_a = 286.9\) and \(R_w = 455\ \text{J kg}^{-1}\text{K}^{-1}\) and \(p = 1.01325\times10^{5}\ \text{Pa}\):</p>
+        <div class="eqn">\[ v_H = \frac{(T+273.15)\,(R_a + S_H\,R_w)}{p} \]</div>
+
+        <p>The dew point \(T_\text{dp}\) is the saturation temperature at fixed \(S_H\); the wet-bulb
+        temperature \(T_\text{wb}\) is found by requiring a saturated state of equal enthalpy:</p>
+        <div class="eqn">\[ P_\text{sat}(T_\text{dp}) = \frac{S_H\,P}{0.622 + 0.378\,S_H}, \qquad
+           h\big(T_\text{wb},\,S_H^{\text{sat}}(T_\text{wb})\big) = h_\text{stream} \]</div>
+
+        <p style="margin-top:12px;"><b>Reference</b><br>
+        [1]&nbsp;R.&nbsp;M.&nbsp;Felder and R.&nbsp;W.&nbsp;Rousseau, <i>Elementary Principles of Chemical
+        Processes</i>, 3rd&nbsp;ed., New York: John Wiley &amp; Sons, 2005.</p>
+      </div>
+
+      <div class="panel" id="pAbt">
+        <span class="closeX" data-close="pAbt">&times;</span>
+        <h3>About</h3>
+        <p>This simulation was created in the
+        <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical
+        and Biological Engineering</a> at University of Colorado Boulder for
+        <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by
+        John&nbsp;L.&nbsp;Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a
+        <a href="https://demonstrations.wolfram.com/OperationOfAnAirConditioner/" target="_blank" rel="noopener">Mathematica
+        simulation</a> by Housam Binous and Ahmed Bellagi. It was prepared with financial support from
+        the National Science Foundation (DUE&nbsp;2336987 and 2336988). Address any questions or
+        comments to LearnChemE@gmail.com.</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="viewControls">
+    <div class="setter" id="viewSetter">
+      <button id="vDiagram" class="on">diagram</button>
+      <button id="vData">psychrometric data</button>
+    </div>
+    <div id="radioGroup" class="disabled">
+      <label><input type="radio" name="stream" value="in" checked disabled> inlet air</label>
+      <label><input type="radio" name="stream" value="out" disabled> outlet air</label>
+    </div>
+  </div>
+
+  <div id="display">
+    <canvas id="diagram"></canvas>
+    <div id="tableWrap"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- physics ----------
+  var P = 1.01325;                 // total pressure, bar
+  var Ra = 286.9, Rw = 455.0, pPa = 1.01325e5;
+
+  function Psat(T){ return Math.pow(10, 5.40221 - 1838.675/(T + 241.263)); } // bar
+  function SHfromRH(RH, T){
+    var ps = Psat(T), r = RH/100;
+    return (r*ps*0.622)/(P - r*ps*0.378);
+  }
+  function SHsat(T){ var ps = Psat(T); return 0.622*ps/(P - 0.378*ps); }
+  function hMoist(T, SH){ return 1.006*T + SH*(1.84*T + 2501); }
+  function dewPoint(SH){
+    var val = SH*P/(0.622 + 0.378*SH);
+    return 1838.675/(5.40221 - Math.log(val)/Math.LN10) - 241.263;
+  }
+  function wetBulb(hStream){
+    var lo = -20, hi = 60, mid, h;
+    for (var i=0;i<200;i++){
+      mid = 0.5*(lo+hi);
+      h = hMoist(mid, SHsat(mid));
+      if (h < hStream) lo = mid; else hi = mid;
+    }
+    return 0.5*(lo+hi);
+  }
+
+  function compute(){
+    var Tin = +Tin_el.value, RHi = +RHi_el.value, Tout = +Tout_el.value;
+    var SHi = SHfromRH(RHi, Tin);
+    var SHo = SHfromRH(100, Tout);
+    var m3 = SHi - SHo;
+    var frac = m3/SHi;
+    var hin = hMoist(Tin, SHi);
+    var hout2 = hMoist(Tout, SHo);
+    var hout1 = 4.1855*Tout;
+    var Q = hout2 + hout1*m3 - hin;
+    var vHi = (Tin+273.15)*(Ra + SHi*Rw)/pPa;
+    var vHo = (Tout+273.15)*(Ra + SHo*Rw)/pPa;
+    return {
+      Tin:Tin, RHi:RHi, Tout:Tout, RHo:100,
+      SHi:SHi, SHo:SHo, m3:m3, frac:frac,
+      hin:hin, hout2:hout2, Q:Q, vHi:vHi, vHo:vHo,
+      inWB:wetBulb(hin), inDP:dewPoint(SHi),
+      outWB:wetBulb(hout2), outDP:dewPoint(SHo)
+    };
+  }
+
+  // ---------- elements ----------
+  var Tin_el = document.getElementById('Tin');
+  var RHi_el = document.getElementById('RHi');
+  var Tout_el = document.getElementById('Tout');
+  var TinVal = document.getElementById('TinVal');
+  var RHiVal = document.getElementById('RHiVal');
+  var ToutVal = document.getElementById('ToutVal');
+
+  var canvas = document.getElementById('diagram');
+  var ctx = canvas.getContext('2d');
+  var tableWrap = document.getElementById('tableWrap');
+
+  var CW = 660, CH = 430;
+
+  function setupCanvas(){
+    var dpr = window.devicePixelRatio || 1;
+    canvas.style.width = CW + 'px';
+    canvas.style.height = CH + 'px';
+    canvas.width = Math.round(CW*dpr);
+    canvas.height = Math.round(CH*dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+
+  // data-coordinate bounds for the schematic
+  var xMin=-1.45, xMax=3.25, yMin=-0.70, yMax=2.80;
+  var scale, x0, y0;
+  function computeTransform(){
+    var sx = CW/(xMax-xMin), sy = CH/(yMax-yMin);
+    scale = Math.min(sx, sy);
+    var usedW = scale*(xMax-xMin), usedH = scale*(yMax-yMin);
+    x0 = (CW-usedW)/2;
+    y0 = (CH-usedH)/2;
+  }
+  function X(x){ return x0 + (x-xMin)*scale; }
+  function Y(y){ return CH - y0 - (y-yMin)*scale; }
+
+  function arrow(pts, color){
+    ctx.strokeStyle = color; ctx.fillStyle = color;
+    ctx.lineWidth = 2.2; ctx.lineJoin='round'; ctx.lineCap='round';
+    ctx.beginPath();
+    ctx.moveTo(X(pts[0][0]), Y(pts[0][1]));
+    for (var i=1;i<pts.length;i++) ctx.lineTo(X(pts[i][0]), Y(pts[i][1]));
+    ctx.stroke();
+    // arrowhead at last segment
+    var a = pts[pts.length-2], b = pts[pts.length-1];
+    var ax=X(a[0]), ay=Y(a[1]), bx=X(b[0]), by=Y(b[1]);
+    var ang = Math.atan2(by-ay, bx-ax);
+    var hl = 12, hw = 6;
+    ctx.beginPath();
+    ctx.moveTo(bx, by);
+    ctx.lineTo(bx - hl*Math.cos(ang) + hw*Math.sin(ang), by - hl*Math.sin(ang) - hw*Math.cos(ang));
+    ctx.lineTo(bx - hl*Math.cos(ang) - hw*Math.sin(ang), by - hl*Math.sin(ang) + hw*Math.cos(ang));
+    ctx.closePath(); ctx.fill();
+  }
+
+  // normalize a line into an array of segment objects {t, sub, sup, it}
+  function normLine(line){
+    if (typeof line === 'string') return [{t:line}];
+    return line.map(function(s){ return (typeof s === 'string') ? {t:s} : s; });
+  }
+
+  // multi-line rich text; ha: 'left'|'center'|'right', va: 'top'|'middle'|'bottom'
+  function textBlock(lines, x, y, color, ha, va, fs){
+    ctx.fillStyle = color;
+    ctx.textBaseline = 'alphabetic';
+    var lh = fs*1.25;
+    var total = lines.length*lh;
+    var py;
+    if (va==='top') py = Y(y) + fs;
+    else if (va==='bottom') py = Y(y) - total + fs;
+    else py = Y(y) - total/2 + fs;   // middle
+    for (var i=0;i<lines.length;i++){
+      drawRich(normLine(lines[i]), X(x), py, ha, fs, color);
+      py += lh;
+    }
+  }
+
+  // draw a line made of rich segments with optional subscript/superscript/italic
+  function drawRich(parts, cx, baseline, ha, fs, color){
+    if (color) ctx.fillStyle = color;
+    // measure total width
+    var subfs = fs*0.72;
+    var widths = [], total=0;
+    for (var i=0;i<parts.length;i++){
+      var p = parts[i];
+      ctx.font = (p.it?'italic ':'') + ((p.sub||p.sup)?subfs:fs) + 'px Helvetica, Arial, sans-serif';
+      var w = ctx.measureText(p.t).width;
+      widths.push(w); total += w;
+    }
+    var sx;
+    if (ha==='center') sx = cx - total/2;
+    else if (ha==='right') sx = cx - total;
+    else sx = cx;
+    ctx.textAlign = 'left';
+    for (var j=0;j<parts.length;j++){
+      var q = parts[j];
+      ctx.font = (q.it?'italic ':'') + ((q.sub||q.sup)?subfs:fs) + 'px Helvetica, Arial, sans-serif';
+      var dy = q.sub ? fs*0.22 : (q.sup ? -fs*0.42 : 0);
+      ctx.fillText(q.t, sx, baseline + dy);
+      sx += widths[j];
+    }
+    ctx.textAlign = ha;
+  }
+
+  var GRAY='#595959', DKGREEN='#2f6b2f', GREEN='rgba(60,150,60,0.30)';
+
+  var BLUE='#0000b3', RED='#b30000';
+
+  function drawDiagram(d){
+    ctx.clearRect(0,0,CW,CH);
+    computeTransform();
+
+    // cooler box (green, semi-transparent) 0..1 x 0..2
+    ctx.fillStyle = GREEN;
+    ctx.strokeStyle = DKGREEN; ctx.lineWidth = 2.5;
+    var bx=X(0), bytop=Y(2), bw=(1)*scale, bh=(2)*scale;
+    ctx.fillRect(bx, bytop, bw, bh);
+    ctx.strokeRect(bx, bytop, bw, bh);
+
+    // labels inside the box
+    textBlock(['air','cooler'], 0.5, 1.02, GRAY, 'center', 'middle', 17.25);
+    textBlock(['basis: 1 kg DA'], 0.5, 1.55, '#000', 'center', 'middle', 16.1);
+
+    // arrows
+    arrow([[0.5,0],[0.5,-0.28],[1.05,-0.28]], BLUE);           // condensate out bottom (blue)
+    arrow([[0.5,2],[0.5,2.28],[1.05,2.28]], BLUE);            // saturated air out top (blue, per request)
+    arrow([[-0.60,1.1],[0.02,1.1]], RED);                    // inlet air from left (red)
+
+    // top label: saturated air (BLUE) - left-aligned to the right of the arrow tip
+    textBlock([
+      [{t:'saturated air, '},{t:d.Tout.toFixed(1)},{t:' \u00B0C'}],
+      [{t:'h', it:true},{t:'r', sub:true},{t:' = '},{t:d.RHo.toFixed(0)},{t:'%'}]
+    ], 1.12, 2.28, BLUE, 'left', 'middle', 16.1);
+
+    // inlet label (red) - to the left, below the arrow
+    textBlock([
+      [{t:'inlet air, '},{t:d.Tin.toFixed(1)},{t:' \u00B0C'}],
+      [{t:'h', it:true},{t:'r', sub:true},{t:' = '},{t:d.RHi.toFixed(0)},{t:'%'}]
+    ], -0.62, 0.80, RED, 'center', 'middle', 16.1);
+
+    // condensate label (blue) - left-aligned to the right of the bottom arrow
+    textBlock([
+      [{t:'condensed H'},{t:'2', sub:true},{t:'O (l), '},{t:d.Tout.toFixed(1)},{t:' \u00B0C'}],
+      [{t:d.m3.toFixed(4)},{t:' kg'}]
+    ], 1.12, -0.28, BLUE, 'left', 'middle', 16.1);
+
+    // right-side gray result boxes
+    function grayBox(x1,y1,x2,y2){
+      ctx.fillStyle = 'rgba(150,150,150,0.26)';
+      ctx.strokeStyle = '#333'; ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      ctx.rect(X(x1), Y(y2), (x2-x1)*scale, (y2-y1)*scale);
+      ctx.fill(); ctx.stroke();
+    }
+    grayBox(1.35,1.05,2.55,1.72);
+    grayBox(1.35,0.28,2.55,0.95);
+
+    // fraction condensed (red) inside upper box
+    textBlock([
+      [{t:'fraction of H'},{t:'2',sub:true},{t:'O'}],
+      'condensed',
+      d.frac.toFixed(3)
+    ], 1.95, 1.385, RED, 'center', 'middle', 16.1);
+
+    // heat removed (blue) inside lower box
+    textBlock([
+      'heat removed',
+      [{t:d.Q.toFixed(1)},{t:' kJ'}]
+    ], 1.95, 0.615, BLUE, 'center', 'middle', 16.1);
+  }
+
+  // ---------- table ----------
+  function fmt(v, dec){ return v.toFixed(dec); }
+  function buildTable(d, stream){
+    var rows;
+    if (stream==='in'){
+      rows = [
+        ['dry&#8209;bulb temperature in &deg;C', fmt(d.Tin,1)],
+        ['wet&#8209;bulb temperature in &deg;C', fmt(d.inWB,1)],
+        ['dew point temperature in &deg;C', fmt(d.inDP,1)],
+        ['relative humidity in %', fmt(d.RHi,1)],
+        ['moisture content in kg H<sub>2</sub>O/kg DA', fmt(d.SHi,4)],
+        ['humid volume in m<sup>3</sup>/kg DA', fmt(d.vHi,3)],
+        ['specific enthalpy in kJ/kg DA', fmt(d.hin,1)]
+      ];
+    } else {
+      rows = [
+        ['dry&#8209;bulb temperature in &deg;C', fmt(d.Tout,1)],
+        ['wet&#8209;bulb temperature in &deg;C', fmt(d.outWB,1)],
+        ['dew point temperature in &deg;C', fmt(d.outDP,1)],
+        ['relative humidity in %', fmt(d.RHo,1)],
+        ['moisture content in kg H<sub>2</sub>O/kg DA', fmt(d.SHo,4)],
+        ['humid volume in m<sup>3</sup>/kg DA', fmt(d.vHo,3)],
+        ['specific enthalpy in kJ/kg DA', fmt(d.hout2,1)]
+      ];
+    }
+    var html = '<table class="psychro"><tr><th>property</th><th>value</th></tr>';
+    for (var i=0;i<rows.length;i++){
+      var bg = (i%2===0) ? '#eaf3ea' : '#e6eef0';
+      html += '<tr><td style="background:'+bg+'">'+rows[i][0]+
+              '</td><td class="val" style="background:'+bg+'">'+rows[i][1]+'</td></tr>';
+    }
+    html += '</table>';
+    tableWrap.innerHTML = html;
+  }
+
+  // ---------- state / render ----------
+  var view = 'diagram';        // 'diagram' | 'data'
+  var stream = 'in';
+
+  function render(){
+    var d = compute();
+    TinVal.textContent = d.Tin.toFixed(0);
+    RHiVal.textContent = d.RHi.toFixed(0);
+    ToutVal.textContent = d.Tout.toFixed(0);
+    if (view === 'diagram'){
+      canvas.style.display = 'block';
+      tableWrap.style.display = 'none';
+      drawDiagram(d);
+    } else {
+      canvas.style.display = 'none';
+      tableWrap.style.display = 'block';
+      buildTable(d, stream);
+    }
+  }
+
+  // ---------- events ----------
+  [Tin_el, RHi_el, Tout_el].forEach(function(el){ el.addEventListener('input', render); });
+
+  var vDiagram = document.getElementById('vDiagram');
+  var vData = document.getElementById('vData');
+  var radioGroup = document.getElementById('radioGroup');
+  var radios = radioGroup.querySelectorAll('input');
+
+  function setView(v){
+    view = v;
+    vDiagram.classList.toggle('on', v==='diagram');
+    vData.classList.toggle('on', v==='data');
+    var disabled = (v!=='data');
+    radioGroup.classList.toggle('disabled', disabled);
+    radios.forEach(function(r){ r.disabled = disabled; });
+    render();
+  }
+  vDiagram.addEventListener('click', function(){ setView('diagram'); });
+  vData.addEventListener('click', function(){ setView('data'); });
+  radios.forEach(function(r){
+    r.addEventListener('change', function(){ if(r.checked){ stream = r.value; render(); } });
+  });
+
+  // flyout panels
+  var panels = { bDir:'pDir', bDet:'pDet', bAbt:'pAbt' };
+  function closeAll(){
+    ['pDir','pDet','pAbt'].forEach(function(id){ document.getElementById(id).classList.remove('show'); });
+    ['bDir','bDet','bAbt'].forEach(function(id){ document.getElementById(id).classList.remove('active'); });
+  }
+  Object.keys(panels).forEach(function(btnId){
+    document.getElementById(btnId).addEventListener('click', function(){
+      var panel = document.getElementById(panels[btnId]);
+      var isOpen = panel.classList.contains('show');
+      closeAll();
+      if (!isOpen){
+        panel.classList.add('show');
+        document.getElementById(btnId).classList.add('active');
+        if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([panel]);
+      }
+    });
+  });
+  document.querySelectorAll('.closeX').forEach(function(x){
+    x.addEventListener('click', function(){ closeAll(); });
+  });
+
+  // ---------- init ----------
+  setupCanvas();
+  window.addEventListener('resize', function(){ setupCanvas(); render(); });
+  render();
+})();
+</script>
+</body>
+</html>

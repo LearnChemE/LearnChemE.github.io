@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>First- and Second-Order Transfer Functions</title>
+<style>
+  :root{
+    --panel-red:#98000D;
+    --panel-red-dark:#7a0009;
+    --border-gray:#b8b8b8;
+    --bg:#ffffff;
+    --text:#1a1a1a;
+  }
+  html,body{
+    margin:0; padding:0; background:#ffffff; color:var(--text);
+    font-family:Helvetica, Arial, sans-serif;
+  }
+  #app{
+    max-width:700px;
+    margin:0 auto;
+    padding:14px 16px 24px 16px;
+    box-sizing:border-box;
+    position:relative;
+  }
+  h1{
+    font-family:Helvetica, Arial, sans-serif;
+    font-size:19px;
+    font-weight:bold;
+    text-align:center;
+    margin:4px 0 12px 0;
+    color:#000;
+  }
+  #controls{
+    border:1px solid var(--border-gray);
+    border-radius:4px;
+    padding:10px 14px 12px 14px;
+    margin-bottom:10px;
+    background:#fafafa;
+  }
+  .dropdown-row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:8px;
+    flex-wrap:wrap;
+  }
+  .dropdown-row label{
+    font-size:15.6px;
+    font-weight:bold;
+  }
+  select{
+    font-family:Helvetica, Arial, sans-serif;
+    font-size:13px;
+    padding:3px 4px;
+  }
+  .sliders-row{
+    display:flex;
+    gap:22px;
+    flex-wrap:wrap;
+  }
+  .slider-block{
+    flex:1 1 260px;
+    min-width:230px;
+  }
+  .slider-label{
+    font-size:17.2px;
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:2px;
+  }
+  .slider-label .name{
+    font-weight:normal;
+  }
+  .slider-label .val{
+    font-weight:normal;
+    font-variant-numeric: tabular-nums;
+  }
+  input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+  input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  #canvasWrap{
+    width:100%;
+    border:1px solid var(--border-gray);
+    box-sizing:border-box;
+    background:#fff;
+    position:relative;
+  }
+  #yAxisLabel{
+    position:absolute;
+    left:22px;
+    top:50%;
+    transform:translate(-50%,-50%) rotate(-90deg);
+    font-family:Helvetica, Arial, sans-serif;
+    font-size:17.4px;
+    color:#000;
+    white-space:nowrap;
+    pointer-events:none;
+  }
+  canvas{
+    display:block;
+    width:100%;
+    height:auto;
+  }
+  .panelBtnRow{
+    display:flex;
+    justify-content:flex-start;
+    align-items:center;
+    gap:12px;
+    flex:1 1 260px;
+    min-width:230px;
+    flex-wrap:wrap;
+  }
+  .panelBtn{
+    flex:0 0 auto;
+    background:var(--panel-red);
+    color:#fff;
+    border:none;
+    border-radius:4px;
+    padding:8.8px 19.8px;
+    font-family:Helvetica, Arial, sans-serif;
+    font-size:15.4px;
+    font-weight:normal;
+    cursor:pointer;
+    text-align:center;
+  }
+  .panelBtn:hover{
+    background:var(--panel-red-dark);
+  }
+  .panelContent{
+    display:none;
+    position:absolute;
+    z-index:30;
+    width:520px;
+    max-width:calc(100% - 16px);
+    box-sizing:border-box;
+    border:1px solid var(--border-gray);
+    border-radius:4px;
+    padding:10px 14px;
+    font-size:13.5px;
+    line-height:1.45;
+    background:#fdfdfd;
+    box-shadow:0 3px 10px rgba(0,0,0,0.25);
+  }
+  .panelContent.open{
+    display:block;
+  }
+  .panelClose{
+    position:absolute;
+    top:6px;
+    right:8px;
+    background:none;
+    border:none;
+    padding:2px 6px;
+    font-family:Helvetica, Arial, sans-serif;
+    font-size:18px;
+    line-height:1;
+    color:#555;
+    cursor:pointer;
+  }
+  .panelClose:hover{
+    color:#000;
+  }
+  .panelTitle{
+    margin:0 28px 8px 0;
+    font-size:16px;
+    font-weight:bold;
+    color:#000;
+  }
+  .symList{
+    margin:4px 0 0 0;
+    padding:0;
+    list-style:none;
+  }
+  .symList li{
+    margin:2px 0;
+  }
+  .panelGroup{
+    margin-bottom:2px;
+  }
+  .eq{
+    text-align:left;
+    margin:12px 0;
+    font-size:15px;
+  }
+  .tauSym{
+    font-family:Georgia, "Times New Roman", serif;
+    font-style:italic;
+  }
+  .refs{
+    font-size:12.5px;
+    margin-top:10px;
+  }
+  a{ color:#0645AD; }
+  .aboutLine{
+    margin-bottom:6px;
+  }
+</style>
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)']],
+      displayMath: [['\\[', '\\]']]
+    },
+    options: {
+      skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    chtml: {
+      displayAlign: 'left'
+    }
+  };
+</script>
+<script id="MathJax-script" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+<div id="app">
+  <h1>First- and Second-Order Transfer Functions</h1>
+
+  <div id="controls">
+    <div class="dropdown-row">
+      <label for="modelSelect">transfer function model</label>
+      <select id="modelSelect">
+        <option value="1">first order plus dead time (FOPDT)</option>
+        <option value="2">second order plus dead time (SOPDT)</option>
+      </select>
+    </div>
+    <div class="sliders-row">
+      <div class="slider-block">
+        <div class="slider-label"><span class="name">time constant, <span class="tauSym">&tau;</span></span><span class="val" id="tauVal">7.0</span></div>
+        <input type="range" id="tauSlider" min="1" max="10" step="0.1" value="7">
+      </div>
+      <div class="slider-block">
+        <div class="slider-label"><span class="name">process gain, <i>K</i></span><span class="val" id="kVal">10</span></div>
+        <input type="range" id="kSlider" min="1" max="13" step="1" value="10">
+      </div>
+    </div>
+    <div class="sliders-row" style="margin-top:8px;">
+      <div class="slider-block">
+        <div class="slider-label"><span class="name">dead time, <i>&theta;</i></span><span class="val" id="thetaVal">2.0</span></div>
+        <input type="range" id="thetaSlider" min="1" max="10" step="0.1" value="2">
+      </div>
+      <div class="panelBtnRow">
+        <button class="panelBtn" id="btnDirections">Directions</button>
+        <button class="panelBtn" id="btnDetails">Details</button>
+        <button class="panelBtn" id="btnAbout">About</button>
+      </div>
+    </div>
+    <div class="sliders-row" id="zetaRow" style="margin-top:8px;">
+      <div class="slider-block" id="zetaBlock">
+        <div class="slider-label"><span class="name">damping coefficient, <i>&zeta;</i></span><span class="val" id="zetaVal">0.20</span></div>
+        <input type="range" id="zetaSlider" min="-0.05" max="2" step="0.05" value="0.2">
+      </div>
+      <div class="slider-block"></div>
+    </div>
+  </div>
+
+  <div id="canvasWrap">
+    <canvas id="plotCanvas"></canvas>
+    <div id="yAxisLabel">time-domain response y(t)</div>
+  </div>
+
+  <div class="panelContent" id="panelDirections">
+    <button class="panelClose" aria-label="Close">&times;</button>
+    <h3 class="panelTitle">Directions</h3>
+    <p>This Demonstration plots the time-domain response of a system with a step input of unity. Select either a first-order plus dead time (FOPDT) model or a second-order plus dead time (SOPDT) model. Set the time constant &tau; to change how quickly the system reaches a new steady state, the process gain <i>K</i> to change how aggressively the system responds to the unity step input, and the dead time &theta; that delays the system response by a value of &theta;. For the second-order process, change the damping coefficient &zeta; with a slider. The damping coefficient is a measure of the magnitude of damping, which affects the degree of oscillation in the response. Dimensionless time is used.</p>
+  </div>
+
+  <div class="panelContent" id="panelDetails">
+    <button class="panelClose" aria-label="Close">&times;</button>
+    <h3 class="panelTitle">Details</h3>
+    <p>The general first-order transfer function in the Laplace domain is:</p>
+    <div class="eq">\[ G(s) = \frac{Y(s)}{U(s)} = \frac{K e^{-\theta s}}{\tau s + 1}, \]</div>
+    <p>where \(K\) is the process gain, \(\tau\) is the time constant, \(\theta\) is the system dead time or lag and \(s\) is a Laplace variable. The process gain is the ratio of the output response to the input (unit step for this Demonstration), the time constant determines how quickly the process responds or how rapidly the output changes and the dead time delays the system response by the amount \(\theta\).</p>
+    <p>This Demonstration converts from the Laplace domain to the time domain for a step-response input. For a first-order transfer function, the time-domain response is:</p>
+    <div class="eq">\[ y(t) = K\left(1 - e^{-(t-\theta)/\tau}\right). \]</div>
+    <p>The general second-order transfer function in the Laplace domain is:</p>
+    <div class="eq">\[ G(s) = \frac{K e^{-\theta s}}{\tau^2 s^2 + 2\zeta \tau s + 1}, \]</div>
+    <p>where \(\zeta\) is the (dimensionless) damping coefficient.</p>
+    <p>For a step-response input, the time-domain response for various damping coefficients are:</p>
+    <p>Overdamped (\(\zeta > 1\)):</p>
+    <div class="eq">\[ y(t) = K\left(1 - e^{-\zeta(t-\theta)/\tau}\left(\cosh\!\left[\sqrt{\zeta^2-1}\,\frac{t-\theta}{\tau}\right] + \frac{\zeta}{\sqrt{\zeta^2-1}}\sinh\!\left[\sqrt{\zeta^2-1}\,\frac{t-\theta}{\tau}\right]\right)\right). \]</div>
+    <p>Critically damped (\(\zeta = 1\)):</p>
+    <div class="eq">\[ y(t) = K\left(1 + \left(1-\frac{t-\theta}{\tau}\right) e^{-(t-\theta)/\tau}\right). \]</div>
+    <p>Underdamped (\(\zeta < 1\)):</p>
+    <div class="eq">\[ y(t) = K\left(1 - e^{-\zeta(t-\theta)/\tau}\left(\cos\!\left[\sqrt{1-\zeta^2}\,\frac{t-\theta}{\tau}\right] + \frac{\zeta}{\sqrt{1-\zeta^2}}\sin\!\left[\sqrt{1-\zeta^2}\,\frac{t-\theta}{\tau}\right]\right)\right). \]</div>
+    <p class="refs">[1] D. E. Seborg, D. A. Mellichamp, T. F. Edgar and F. J. Doyle, III, <i>Process Dynamics and Control</i>, 3rd ed., Hoboken: John Wiley &amp; Sons, 2011 pp. 76, 81.</p>
+    <p style="margin-bottom:2px;"><b>Symbols</b></p>
+    <ul class="symList">
+      <li>\(G(s)\) = transfer function</li>
+      <li>\(K\) = process gain</li>
+      <li>\(s\) = Laplace variable</li>
+      <li>\(t\) = dimensionless time</li>
+      <li>\(U(s)\) = input in the Laplace domain</li>
+      <li>\(Y(s)\) = output in the Laplace domain</li>
+      <li>\(y(t)\) = time-domain response</li>
+      <li>\(\zeta\) = damping coefficient (dimensionless)</li>
+      <li>\(\theta\) = dead time</li>
+      <li>\(\tau\) = time constant</li>
+    </ul>
+  </div>
+
+  <div class="panelContent" id="panelAbout">
+    <button class="panelClose" aria-label="Close">&times;</button>
+    <h3 class="panelTitle">About</h3>
+    <p class="aboutLine">This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/FirstAndSecondOrderTransferFunctions/" target="_blank" rel="noopener">Mathematica simulation</a> by Rachael L. Baumann and Adam J. Johnston. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.</p>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- DOM ----------
+  var modelSelect = document.getElementById('modelSelect');
+  var tauSlider = document.getElementById('tauSlider');
+  var kSlider = document.getElementById('kSlider');
+  var thetaSlider = document.getElementById('thetaSlider');
+  var zetaSlider = document.getElementById('zetaSlider');
+  var tauVal = document.getElementById('tauVal');
+  var kVal = document.getElementById('kVal');
+  var thetaVal = document.getElementById('thetaVal');
+  var zetaVal = document.getElementById('zetaVal');
+  var zetaBlock = document.getElementById('zetaBlock');
+  var zetaRow = document.getElementById('zetaRow');
+
+  var canvas = document.getElementById('plotCanvas');
+  var ctx = canvas.getContext('2d');
+  var yAxisLabel = document.getElementById('yAxisLabel');
+
+  var btnDirections = document.getElementById('btnDirections');
+  var btnDetails = document.getElementById('btnDetails');
+  var btnAbout = document.getElementById('btnAbout');
+  var panelDirections = document.getElementById('panelDirections');
+  var panelDetails = document.getElementById('panelDetails');
+  var panelAbout = document.getElementById('panelAbout');
+
+  var appEl = document.getElementById('app');
+
+  function positionPanel(panel, btn){
+    var a = appEl.getBoundingClientRect();
+    var b = btn.getBoundingClientRect();
+    // A few pixels below the button, with the panel extending to the LEFT of
+    // the button (its right edge aligned with the button's right edge).
+    // Clamp the width so the panel never runs past the app's left edge.
+    var maxW = (panel === panelDetails) ? 686 : 520; // Details widened so equations fit
+    var rightOff = Math.max(8, a.right - b.right);
+    var w;
+    if (panel === panelDetails){
+      // Details may use the full app width (shifting right past the button's
+      // right edge if necessary) so the wider equations fit.
+      w = Math.min(maxW, a.width - 16);
+      var maxRightOff = a.width - 8 - w; // keep left edge inside the app
+      rightOff = Math.min(rightOff, Math.max(8, maxRightOff));
+    } else {
+      var avail = b.right - a.left - 12;
+      w = Math.min(maxW, avail);
+      if (panel === panelDirections){
+        // Directions is 15% wider; it may extend right past the button so its
+        // left edge stays inside the app.
+        w = Math.min(Math.round(w * 1.15), a.width - 16);
+        rightOff = Math.min(rightOff, Math.max(8, a.width - 8 - w));
+      }
+    }
+    panel.style.width = w + 'px';
+    panel.style.top = (b.bottom - a.top + 6) + 'px';
+    panel.style.right = rightOff + 'px';
+    panel.style.left = 'auto';
+  }
+
+  var panelButtonMap = [];
+
+  function togglePanel(panel, btn, others){
+    var willOpen = !panel.classList.contains('open');
+    [panel].concat(others).forEach(function(p){ p.classList.remove('open'); });
+    if (willOpen){
+      panel.classList.add('open');
+      positionPanel(panel, btn);
+    }
+  }
+  btnDirections.addEventListener('click', function(){
+    togglePanel(panelDirections, btnDirections, [panelDetails, panelAbout]);
+  });
+  btnDetails.addEventListener('click', function(){
+    togglePanel(panelDetails, btnDetails, [panelDirections, panelAbout]);
+  });
+  btnAbout.addEventListener('click', function(){
+    togglePanel(panelAbout, btnAbout, [panelDirections, panelDetails]);
+  });
+  panelButtonMap = [
+    [panelDirections, btnDirections],
+    [panelDetails, btnDetails],
+    [panelAbout, btnAbout]
+  ];
+  function repositionOpenPanels(){
+    panelButtonMap.forEach(function(pair){
+      if (pair[0].classList.contains('open')) positionPanel(pair[0], pair[1]);
+    });
+  }
+  window.addEventListener('resize', repositionOpenPanels);
+
+  // close (x) buttons in the upper-right corner of each panel
+  Array.prototype.forEach.call(document.querySelectorAll('.panelClose'), function(btn){
+    btn.addEventListener('click', function(){
+      btn.closest('.panelContent').classList.remove('open');
+    });
+  });
+
+  // ---------- state ----------
+  var state = {
+    tab: 1,       // 1 = FOPDT, 2 = SOPDT
+    tau: 7,
+    k: 10,
+    theta: 2,
+    zeta: 0.2
+  };
+
+  // ---------- plot constants (mirrors Mathematica PlotRange) ----------
+  var X_MIN = -1, X_MAX = 100;
+  var Y_MIN = 0, Y_MAX = 20;
+
+  // logical (CSS) canvas size, hi-DPI backing store handled in resize()
+  var CSS_W = 605, CSS_H = 380;
+  var MARGIN = { left: 68, right: 18, top: 16, bottom: 56 };
+
+  function resizeCanvas(){
+    var wrapWidth = canvas.parentElement.clientWidth;
+    CSS_W = wrapWidth;
+    CSS_H = Math.round(wrapWidth * (380/605));
+    var dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.round(CSS_W * dpr);
+    canvas.height = Math.round(CSS_H * dpr);
+    canvas.style.width = CSS_W + 'px';
+    canvas.style.height = CSS_H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    var plotMidY = MARGIN.top + (CSS_H - MARGIN.top - MARGIN.bottom) / 2;
+    yAxisLabel.style.top = plotMidY + 'px';
+    draw();
+  }
+
+  function plotX(x){
+    var pw = CSS_W - MARGIN.left - MARGIN.right;
+    return MARGIN.left + (x - X_MIN) / (X_MAX - X_MIN) * pw;
+  }
+  function plotY(y){
+    var ph = CSS_H - MARGIN.top - MARGIN.bottom;
+    return MARGIN.top + (1 - (y - Y_MIN) / (Y_MAX - Y_MIN)) * ph;
+  }
+
+  // ---------- physics ----------
+  function yFOPDT(t, K, tau, theta){
+    if (t < theta) return 0;
+    return K * (1 - Math.exp(-(t - theta)/tau));
+  }
+  function ySOPDT(t, K, tau, theta, zeta){
+    if (t < theta) return 0;
+    var tr = (t - theta) / tau;
+    if (zeta > 1.0000001){
+      var s = Math.sqrt(zeta*zeta - 1);
+      return K * (1 - Math.exp(-zeta*tr) * (Math.cosh(s*tr) + (zeta/s)*Math.sinh(s*tr)));
+    } else if (Math.abs(zeta - 1) <= 0.0000001){
+      return K * (1 + (1 - tr) * Math.exp(-tr));
+    } else {
+      var s2 = Math.sqrt(1 - zeta*zeta);
+      return K * (1 - Math.exp(-zeta*tr) * (Math.cos(s2*tr) + (zeta/s2)*Math.sin(s2*tr)));
+    }
+  }
+  function response(t){
+    if (state.tab === 1) return yFOPDT(t, state.k, state.tau, state.theta);
+    return ySOPDT(t, state.k, state.tau, state.theta, state.zeta);
+  }
+
+  // ---------- drawing helpers ----------
+  function setFont(px, weight, italic){
+    var w = weight || 'normal';
+    var it = italic ? 'italic ' : '';
+    ctx.font = it + w + ' ' + px + 'px Helvetica, Arial, sans-serif';
+  }
+
+  // Serif tau: Helvetica/Arial render lowercase tau (\u03C4) as a near-perfect
+  // capital "T" lookalike, and synthetic (faux) italic doesn't change the
+  // glyph shape enough to fix that. A serif font's tau has a distinct
+  // curved foot, so we render just the tau character(s) in a serif face
+  // while the rest of the expression stays in Helvetica/Arial.
+  function setFontTau(px, italic){
+    var it = italic ? 'italic ' : '';
+    ctx.font = it + 'normal ' + px + 'px Georgia, "Times New Roman", serif';
+  }
+
+  function splitOnTau(text){
+    var parts = [];
+    var lastIndex = 0;
+    for (var i = 0; i < text.length; i++){
+      if (text[i] === '\u03C4'){
+        if (i > lastIndex) parts.push({ text: text.slice(lastIndex, i), tau: false });
+        parts.push({ text: '\u03C4', tau: true });
+        lastIndex = i + 1;
+      }
+    }
+    if (lastIndex < text.length) parts.push({ text: text.slice(lastIndex), tau: false });
+    return parts;
+  }
+
+  function measureMixedWidth(parts, px, italic){
+    var total = 0;
+    parts.forEach(function(p){
+      if (p.tau) setFontTau(px, italic); else setFont(px, 'normal', italic);
+      total += ctx.measureText(p.text).width;
+    });
+    return total;
+  }
+
+  function fitFontSizeMixed(text, maxWidth, startSize, minSize, italic){
+    var parts = splitOnTau(text);
+    var size = startSize;
+    while (size > minSize){
+      if (measureMixedWidth(parts, size, italic) <= maxWidth) break;
+      size -= 0.5;
+    }
+    return size;
+  }
+
+  // Draws text horizontally centered on cx, rendering any tau characters in
+  // the serif face for clarity while the rest stays in Helvetica/Arial.
+  function drawMixedCentered(text, cx, y, px, italic, baseline){
+    ctx.save();
+    var parts = splitOnTau(text);
+    var totalW = measureMixedWidth(parts, px, italic);
+    var x = cx - totalW / 2;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = baseline || 'middle';
+    parts.forEach(function(p){
+      if (p.tau) setFontTau(px, italic); else setFont(px, 'normal', italic);
+      ctx.fillText(p.text, x, y);
+      x += ctx.measureText(p.text).width;
+    });
+    ctx.restore();
+  }
+
+  function drawFrame(){
+    var x0 = plotX(0), x100 = plotX(100);
+    var y0 = plotY(0), y20 = plotY(20);
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 1.2;
+    ctx.strokeRect(plotX(X_MIN), plotY(Y_MAX), plotX(X_MAX)-plotX(X_MIN), plotY(Y_MIN)-plotY(Y_MAX));
+
+    // ticks (font size increased 20%: 13 -> 15.6)
+    ctx.fillStyle = '#000';
+    setFont(15.6, 'normal', false);
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    var xt;
+    for (xt = 0; xt <= 100; xt += 20){
+      var px = plotX(xt);
+      ctx.beginPath();
+      ctx.moveTo(px, plotY(0));
+      ctx.lineTo(px, plotY(0)-6);
+      ctx.stroke();
+      ctx.fillText(String(xt), px, plotY(0)+8);
+    }
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    var yt;
+    for (yt = 0; yt <= 20; yt += 5){
+      var py = plotY(yt);
+      ctx.beginPath();
+      ctx.moveTo(plotX(0), py);
+      ctx.lineTo(plotX(0)+6, py);
+      ctx.stroke();
+      ctx.fillText(String(yt), plotX(X_MIN)-8, py);
+    }
+
+    // axis labels (font size increased 20%: 14.5 -> 17.4).
+    // The y-axis title is rendered as a DOM overlay (#yAxisLabel) instead of
+    // rotated canvas text, since canvas text rotation renders with different
+    // anti-aliasing than horizontal text and looked like a different font.
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'alphabetic';
+    setFont(17.4, 'normal', false);
+    ctx.fillText('dimensionless time t', (plotX(X_MIN)+plotX(X_MAX))/2, CSS_H - 14);
+  }
+
+  function drawCurve(){
+    var K = state.k, tau = state.tau, theta = state.theta, zeta = state.zeta;
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 2.4;
+    ctx.beginPath();
+    var n = 700;
+    for (var i = 0; i <= n; i++){
+      var t = X_MIN + (X_MAX - X_MIN) * i / n;
+      var tt = Math.max(t, 0);
+      var y = response(tt);
+      if (y > Y_MAX + 2) y = Y_MAX + 2;
+      if (y < Y_MIN - 2) y = Y_MIN - 2;
+      var px = plotX(t), py = plotY(y);
+      if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    ctx.stroke();
+  }
+
+  function drawAnnotations(){
+    var K = state.k, tau = state.tau, theta = state.theta;
+    var stepVal = 1; // response of G=1 to unit step
+
+    // Blue step input line: (0,0) -> (theta,0) -> (theta,step) -> (100,step)
+    ctx.strokeStyle = '#0000FF';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(plotX(0), plotY(0));
+    ctx.lineTo(plotX(theta), plotY(0));
+    ctx.lineTo(plotX(theta), plotY(stepVal));
+    ctx.lineTo(plotX(100), plotY(stepVal));
+    ctx.stroke();
+
+    // green dashed steady-state K line
+    ctx.strokeStyle = 'rgb(0,153,0)';
+    ctx.setLineDash([6,5]);
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    ctx.moveTo(plotX(0), plotY(K));
+    ctx.lineTo(plotX(100), plotY(K));
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // purple vertical dead-time boundary line (dashed)
+    ctx.strokeStyle = 'purple';
+    ctx.lineWidth = 1.6;
+    ctx.setLineDash([6,5]);
+    ctx.beginPath();
+    ctx.moveTo(plotX(theta), plotY(0));
+    ctx.lineTo(plotX(theta), plotY(20));
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // purple double-headed arrow from t=0 to t=theta indicating dead time span
+    var dtY = plotY(13.5);
+    ctx.strokeStyle = 'purple';
+    ctx.setLineDash([6,5]);
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.moveTo(plotX(0), dtY);
+    ctx.lineTo(plotX(theta), dtY);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    drawArrowhead(plotX(0), dtY, 1, 'purple');
+    drawArrowhead(plotX(theta), dtY, -1, 'purple');
+
+    // dead time label, placed to the RIGHT of the dead-time line (font size increased another 15%: 15.6 -> 17.9)
+    ctx.fillStyle = 'purple';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    drawTextWithBg('dead time \u03B8 = ' + theta.toFixed(1), plotX(theta)+8, dtY, 'left', 'purple', false, 17.9, true);
+
+    // FOPDT-only: time-constant construction
+    if (state.tab === 1){
+      var tau0 = 0.632 * K;
+      ctx.strokeStyle = 'magenta';
+      ctx.setLineDash([6,5]);
+      ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      ctx.moveTo(plotX(tau+theta), plotY(0));
+      ctx.lineTo(plotX(tau+theta), plotY(tau0));
+      ctx.lineTo(plotX(theta), plotY(tau0));
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // double-headed arrow between theta and tau+theta at height tau0/2
+      var ay = plotY(tau0/2);
+      var ax1 = plotX(theta), ax2 = plotX(tau+theta);
+      ctx.strokeStyle = 'magenta';
+      ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.moveTo(ax1, ay);
+      ctx.lineTo(ax2, ay);
+      ctx.stroke();
+      drawArrowhead(ax1, ay, -1, 'magenta');
+      drawArrowhead(ax2, ay, 1, 'magenta');
+
+      // "time constant" label font size increased another 20%: 15 -> 18; italic tau for clarity
+      ctx.fillStyle = '#000';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'bottom';
+      var labelBoxText = 'time constant, \u03C4 = ' + tau.toFixed(1);
+      drawTextWithBg(labelBoxText, plotX(theta+tau)+4, ay-3, 'left', '#000', false, 18, false, true);
+
+      var tau0Text = '0.632K = ' + tau0.toFixed(1);
+      drawTextWithBg(tau0Text, plotX(tau+theta)-4, plotY(tau0)+16, 'right', '#000', false, 15);
+    }
+
+    // Text: step input = 1 (blue), ABOVE the blue step line near t=50 (font size increased 40%: 13 -> 18.2)
+    setFont(18.2, 'normal', false);
+    ctx.fillStyle = '#0000FF';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+    ctx.fillText('step input = 1', plotX(50), plotY(stepVal)-6);
+
+    // Text: gain K = value (green), near t=75, y=K (font size increased another 15%: 15.6 -> 17.9)
+    drawTextWithBg('gain K = ' + K, plotX(75), plotY(K)-8, 'center', 'rgb(0,153,0)', true, 17.9);
+  }
+
+  function drawTextWithBg(text, x, y, align, color, aboveBaseline, fontSize, centerVertically, italic){
+    ctx.save();
+    var size = fontSize || 13;
+    var parts = splitOnTau(text);
+    var w = measureMixedWidth(parts, size, italic || false);
+    ctx.textAlign = align || 'left';
+    var h = size + 3;
+    var bx = x, by = y;
+    if (align === 'center') bx = x - w/2;
+    else if (align === 'right') bx = x - w;
+    var ty;
+    if (centerVertically){
+      ty = by - h/2;
+    } else {
+      ty = aboveBaseline ? by - h : by;
+    }
+    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    ctx.fillRect(bx-2, ty-2, w+4, h+3);
+    ctx.fillStyle = color || '#000';
+    var baseline;
+    if (centerVertically){
+      baseline = 'middle';
+    } else {
+      baseline = aboveBaseline ? 'bottom' : 'top';
+    }
+    // draw left-to-right starting at bx (the same left edge used for the background box)
+    var drawX = bx;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = baseline;
+    parts.forEach(function(p){
+      if (p.tau) setFontTau(size, italic || false); else setFont(size, 'normal', italic || false);
+      ctx.fillStyle = color || '#000';
+      ctx.fillText(p.text, drawX, by);
+      drawX += ctx.measureText(p.text).width;
+    });
+    ctx.restore();
+  }
+
+  function drawArrowhead(x, y, dir, color){
+    var size = 5;
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + dir*size, y - size*0.6);
+    ctx.lineTo(x + dir*size, y + size*0.6);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  // ---------- block diagram (inset near top of plot) ----------
+  function fitFontSize(text, maxWidth, startSize, minSize, italic){
+    var size = startSize;
+    while (size > minSize){
+      setFont(size, 'normal', italic || false);
+      if (ctx.measureText(text).width <= maxWidth) break;
+      size -= 0.5;
+    }
+    return size;
+  }
+
+  // Draws a stacked fraction: numerator, a horizontal bar, denominator - all
+  // horizontally centered on cx and vertically centered on cy, auto-shrinking
+  // the font so both lines fit within maxWidth AND the whole stack fits within maxHeight.
+  function drawFraction(numText, denText, cx, cy, maxWidth, maxHeight, startSize, minSize, numItalic, denItalic){
+    ctx.save();
+    minSize = minSize || 7;
+    var size = startSize;
+    var numW, denW;
+    var denParts = splitOnTau(denText);
+    while (size > minSize){
+      setFont(size, 'normal', numItalic || false);
+      numW = ctx.measureText(numText).width;
+      denW = measureMixedWidth(denParts, size, denItalic || false);
+      var stackH = 2 * size * 1.16; // approx total height of numerator+gap+gap+denominator
+      if (Math.max(numW, denW) <= maxWidth && stackH <= maxHeight) break;
+      size -= 0.5;
+    }
+
+    var barW = Math.max(numW, denW) + 6;
+    var gap = size * 0.16;
+
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+    setFont(size, 'normal', numItalic || false);
+    ctx.fillText(numText, cx, cy - gap);
+
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 1.3;
+    ctx.beginPath();
+    ctx.moveTo(cx - barW/2, cy);
+    ctx.lineTo(cx + barW/2, cy);
+    ctx.stroke();
+
+    drawMixedCentered(denText, cx, cy + gap, size, denItalic || false, 'top');
+    ctx.restore();
+  }
+
+  function drawBlockDiagram(){
+    // place block diagram centered at (t=50, y=17.5) spanning ~ x in [4,96]
+    // Rectangles narrowed (and fractions corrected so the diagram always
+    // fits within totalW: 4*wArrow + wRect2 + 2*wRect13 <= totalW).
+    var cx = plotX(50);
+    var cy = plotY(17.5);
+    var totalW = plotX(96) - plotX(4);
+    var h = 34; // block height in px
+    var wArrow = totalW * 0.08;
+    var wRect13 = totalW * 0.16;
+    var wRect2 = totalW * 0.28;
+    var startX = cx - totalW/2;
+    var y0 = cy - h/2;
+
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    var xA = startX;
+    var xB = xA + wArrow;              // start rect1
+    var xC = xB + wRect13;             // end rect1 / start arrow2
+    var xD = xC + wArrow;              // start rect2
+    var xE = xD + wRect2;              // end rect2 / start arrow3
+    var xF = xE + wArrow;              // start rect3
+    var xG = xF + wRect13;             // end rect3
+    var xH = xG + wArrow;              // end (final arrow end)
+
+    // arrows entering/leaving each rectangle (entering rect1, rect2, rect3; leaving rect3)
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 2.0;
+    drawSegArrow(xA, cy, xB, cy);   // entering rect1
+    drawSegArrow(xC, cy, xD, cy);   // leaving rect1 / entering rect2
+    drawSegArrow(xE, cy, xF, cy);   // leaving rect2 / entering rect3
+    drawSegArrow(xG, cy, xH, cy);   // leaving rect3
+
+    // rectangles
+    ctx.fillStyle = 'rgb(204,204,204)';
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 1.8;
+    ctx.fillRect(xB, y0, xC-xB, h);
+    ctx.strokeRect(xB, y0, xC-xB, h);
+    ctx.fillRect(xD, y0, xE-xD, h);
+    ctx.strokeRect(xD, y0, xE-xD, h);
+    ctx.fillRect(xF, y0, xG-xF, h);
+    ctx.strokeRect(xF, y0, xG-xF, h);
+
+    // connector labels ("step = 1", "1/s", "Y(s)", "y(t)") - font size increased
+    // another 30% (~15 -> ~19.4), and moved down closer to the arrow line (cy)
+    // that they sit above, instead of hovering near the rectangle tops.
+    var connFont = 11.5 * 1.3 * 1.3;
+    setFont(connFont, 'normal', false);
+    ctx.fillStyle = '#000';
+    drawTextWithBg('step = 1', (xA+xB)/2, cy - 4, 'center', '#000', true, connFont);
+    drawTextWithBg('1/s', (xC+xD)/2, cy - 4, 'center', '#000', true, connFont);
+    drawTextWithBg('Y(s)', (xE+xF)/2, cy - 4, 'center', '#000', true, connFont);
+    drawTextWithBg('y(t)', (xG+xH)/2, cy - 4, 'center', '#000', true, connFont);
+
+    // rectangle interior text: 50% bigger than original base sizes, auto-shrunk
+    // to fit the (now narrower) rectangles, and vertically centered.
+    var pad = 10;
+    ctx.fillStyle = '#000';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    var t1 = '\u2112(1)';
+    var s1 = fitFontSize(t1, (xC-xB) - pad, 11.5*1.5, 8);
+    setFont(s1, 'normal', false);
+    ctx.fillText(t1, (xB+xC)/2, cy);
+
+    if (state.tab === 1){
+      // FOPDT: stacked fraction  K e^(-theta s) / (tau s + 1)
+      drawFraction('K e^(\u2212\u03B8s)', '\u03C4s + 1', (xD+xE)/2, cy, (xE-xD) - pad, h - 6, 12*1.5, 7, false, true);
+    } else {
+      // SOPDT: stacked fraction  K e^(-theta s) / ((tau s)^2 + 2*zeta*tau s + 1)
+      drawFraction('K e^(\u2212\u03B8s)', '(\u03C4s)\u00B2 + 2\u03B6\u03C4s + 1', (xD+xE)/2, cy, (xE-xD) - pad, h - 6, 12*1.5, 7, false, true);
+    }
+
+    var t3 = '\u2112\u207B\u00B9(Y(s))';
+    var s3 = fitFontSize(t3, (xG-xF) - pad, 12*1.5, 8);
+    setFont(s3, 'normal', false);
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(t3, (xF+xG)/2, cy);
+
+    ctx.restore();
+  }
+
+  function drawSegArrow(x1, y1, x2, y2){
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y1);
+    ctx.stroke();
+    drawArrowhead(x2, y1, 1, '#000');
+  }
+
+  // ---------- main draw ----------
+  function draw(){
+    ctx.clearRect(0,0,CSS_W,CSS_H);
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0,0,CSS_W,CSS_H);
+    drawFrame();
+    drawCurve();
+    drawAnnotations();
+    drawBlockDiagram();
+  }
+
+  // ---------- controls wiring ----------
+  function updateLabels(){
+    tauVal.textContent = state.tau.toFixed(1);
+    kVal.textContent = String(state.k);
+    thetaVal.textContent = state.theta.toFixed(1);
+    zetaVal.textContent = state.zeta.toFixed(2);
+  }
+
+  function updateZetaVisibility(){
+    zetaRow.style.display = (state.tab === 2) ? 'flex' : 'none';
+  }
+
+  modelSelect.addEventListener('change', function(){
+    state.tab = parseInt(modelSelect.value, 10);
+    updateZetaVisibility();
+    draw();
+  });
+  tauSlider.addEventListener('input', function(){
+    state.tau = parseFloat(tauSlider.value);
+    updateLabels();
+    draw();
+  });
+  kSlider.addEventListener('input', function(){
+    state.k = parseFloat(kSlider.value);
+    updateLabels();
+    draw();
+  });
+  thetaSlider.addEventListener('input', function(){
+    state.theta = parseFloat(thetaSlider.value);
+    updateLabels();
+    draw();
+  });
+  zetaSlider.addEventListener('input', function(){
+    state.zeta = parseFloat(zetaSlider.value);
+    updateLabels();
+    draw();
+  });
+
+  window.addEventListener('resize', resizeCanvas);
+
+  // ---------- init ----------
+  updateLabels();
+  updateZetaVisibility();
+  resizeCanvas();
+})();
+</script>
+</body>
+</html>

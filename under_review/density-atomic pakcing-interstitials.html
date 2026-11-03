@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Crystal Packing and Interstitials</title>
+
+<style>
+/* Layout: LearnChemE sim frame — button row with overlay panels, control strip, 3D unit cell left, planar section + calculations right */
+:root{
+  --bg:#ffffff; --fg:#000000; --muted:#5d5a62; --line:#dcd8d9; --panel:#f7f5f5;
+  --accent:#98000D; --accent-text:#98000D; --canvas:#ffffff; --cell:#2b2a2e;
+  --c-corner:#3b6db3; --c-face:#e0892b; --c-body:#3a9a5b; --c-edge:#8a5cb8;
+  --c-host:#9ea3ab; --c-coord:#3b6db3; --c-oct:#e0892b; --c-tet:#1f9b8f; --c-inter:#7a2fb8;
+  --ok-bg:#e3f3e6; --ok-fg:#1d6b32; --bad-bg:#fbe5e6; --bad-fg:#98000D;
+  --font:"Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#151517; --fg:#ececef; --muted:#a6a3ad; --line:#3a383f; --panel:#1f1e23;
+  --accent:#a8101e; --accent-text:#ff7a84; --canvas:#1b1a1e; --cell:#d6d4da;
+  --c-corner:#5b8fd8; --c-face:#f0a14a; --c-body:#4fbf76; --c-edge:#a97fd6;
+  --c-host:#7f848d; --c-coord:#5b8fd8; --c-oct:#f0a14a; --c-tet:#35c2b3; --c-inter:#b074ea;
+  --ok-bg:#16301d; --ok-fg:#7fd699; --bad-bg:#3a1418; --bad-fg:#ff8c94; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#151517; --fg:#ececef; --muted:#a6a3ad; --line:#3a383f; --panel:#1f1e23;
+  --accent:#a8101e; --accent-text:#ff7a84; --canvas:#1b1a1e; --cell:#d6d4da;
+  --c-corner:#5b8fd8; --c-face:#f0a14a; --c-body:#4fbf76; --c-edge:#a97fd6;
+  --c-host:#7f848d; --c-coord:#5b8fd8; --c-oct:#f0a14a; --c-tet:#35c2b3; --c-inter:#b074ea;
+  --ok-bg:#16301d; --ok-fg:#7fd699; --bad-bg:#3a1418; --bad-fg:#ff8c94; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--font);font-size:15px}
+.wrap{max-width:1140px;margin:0 auto;padding-inline:16px;padding-block:14px 28px}
+h1{font-size:20px;font-weight:600;margin:0 0 10px;text-wrap:balance}
+.toprow{position:relative;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+.btn{background:var(--accent);color:#fff;border:0;border-radius:4px;padding:6px 13px;font:inherit;font-size:15.4px;cursor:pointer}
+.btn:hover{filter:brightness(1.12)}
+.btn:focus-visible,.seg button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+.btn.small{padding:4px 10px;font-size:14.3px}
+#resetView{font-size:15.6px}
+#next2{font-size:15.4px;padding:6px 13px}
+.seg{display:inline-flex;border:1px solid var(--accent);border-radius:5px;overflow:hidden}
+.seg button{background:transparent;color:var(--accent-text);border:0;padding:6px 13px;font:inherit;font-size:15.4px;cursor:pointer}
+.seg button+button{border-left:1px solid var(--accent)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:#fff}
+.panel{position:absolute;top:calc(100% + 6px);left:0;z-index:40;width:min(700px,100%);background:var(--panel);border:1px solid var(--line);border-radius:6px;box-shadow:0 10px 30px rgba(0,0,0,.22)}
+.panel .close{position:absolute;top:4px;right:6px;background:none;border:0;color:var(--fg);font-size:22px;line-height:1;cursor:pointer;padding:4px 8px;z-index:2}
+.panel .inner{padding:14px 44px 16px 18px;max-height:min(72vh,600px);overflow:auto;line-height:1.5;font-size:14.5px}
+.panel h3{margin:14px 0 4px;font-size:15px}
+.panel h3:first-child{margin-top:0}
+.panel p{margin:6px 0;max-width:68ch}
+.panel table.defs td{vertical-align:top}
+.panel table.defs td:first-child{width:9em;padding-right:14px}
+.panel a{color:var(--accent-text)}
+.panel table{border-collapse:collapse;margin:6px 0;font-size:14px}
+.panel td,.panel th{border-bottom:1px solid var(--line);padding:3px 10px 3px 0;text-align:left}
+.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px 22px;margin-top:12px;padding:12px 14px;border:1px solid var(--line);border-radius:6px;background:var(--panel)}
+.ctl{display:flex;flex-direction:column;gap:4px;min-width:0}
+.ctl>label,.ctl>.lab{font-size:17px;color:var(--fg);display:flex;justify-content:space-between;gap:8px}
+.ctl .val{color:var(--fg);font-variant-numeric:tabular-nums}
+select{font:inherit;font-size:16px;padding:4px 6px;border:1px solid var(--line);border-radius:4px;background:var(--bg);color:var(--fg);width:100%}
+.ctl.sl>label{justify-content:flex-start;gap:12px;white-space:nowrap}
+.ctl.sl>input{width:80%}
+input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+.checks{display:flex;flex-direction:column;gap:6px;font-size:17px}
+.ctl.checks>label{display:flex;justify-content:flex-start;gap:6px;align-items:center;cursor:pointer;color:var(--fg);font-size:17px}
+input[type=checkbox]{accent-color:var(--accent);width:16px;height:16px}
+.main{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:16px;margin-top:14px}
+@media (max-width:840px){.main{grid-template-columns:1fr}}
+.col{min-width:0;display:flex;flex-direction:column;gap:8px}
+canvas{width:100%;display:block;border:1px solid var(--line);border-radius:6px;background:var(--canvas)}
+#c3d{aspect-ratio:1/1;touch-action:none;cursor:grab}
+#c3d.dragging{cursor:grabbing}
+#c2d{aspect-ratio:5/4}
+.cap{font-size:17px;color:var(--fg);line-height:1.4;min-height:2.8em}
+.cap b{color:var(--fg);font-weight:600}
+.below{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:16px;color:var(--fg)}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.legend i{width:12px;height:12px;border-radius:50%;display:inline-block}
+.results{border:1px solid var(--line);border-radius:6px;padding:10px 14px;background:var(--panel)}
+.results h2{font-size:17px;margin:0 0 6px;font-weight:600}
+.results table{border-collapse:collapse;width:100%;font-size:16px;font-variant-numeric:tabular-nums}
+.results td{padding:4px 8px 4px 0;vertical-align:top;border-bottom:1px solid var(--line)}
+.results tr:last-child td{border-bottom:0}
+.results td:first-child{color:var(--muted);white-space:nowrap;width:1%}
+.results .big{font-weight:600;color:var(--fg)}
+.var{font-family:"Times New Roman",Times,serif;font-style:italic;font-size:1.08em}
+.pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:15px;font-weight:600}
+.pill.ok{background:var(--ok-bg);color:var(--ok-fg)}
+.pill.bad{background:var(--bad-bg);color:var(--bad-fg)}
+.sitetab{margin-top:8px;overflow-x:auto}
+.sitetab table td,.sitetab table th{padding:3px 10px 3px 0;border-bottom:1px solid var(--line);text-align:left;font-size:16px;white-space:nowrap}
+.sitetab th{color:var(--muted);font-weight:500}
+.sitetab tr.cur td{color:var(--accent-text);font-weight:600}
+[hidden]{display:none!important}
+.ctl .seg{align-self:flex-start}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<style>body{margin:0}</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <h1>Density, Atomic Packing Factor, and Interstitial Sites</h1>
+  <div class="toprow">
+    <div class="btns">
+      <button class="btn" id="bDir" aria-controls="pDir">Directions</button>
+      <button class="btn" id="bDet" aria-controls="pDet">Details</button>
+      <button class="btn" id="bAbout" aria-controls="pAbout">About</button>
+    </div>
+    <div class="seg" role="group" aria-label="Mode">
+      <button id="mode1" aria-pressed="true">Density &amp; APF</button>
+      <button id="mode2" aria-pressed="false">Interstitial sites</button>
+    </div>
+
+    <div class="panel" id="pDir" hidden>
+      <button class="close" aria-label="Close">×</button>
+      <div class="inner">
+        <h3>Directions</h3>
+        <p>Select <b>Density &amp; APF</b> or <b>Interstitial sites</b> with the buttons at the top right. Drag in the 3D view to rotate the unit cell; press <b>Reset view</b> to return to the starting orientation.</p>
+        <p><b>Density &amp; APF:</b> choose a crystal structure and an element, or move the atomic radius and atomic weight sliders to make a custom element. Atoms are colored by where they sit in the unit cell, which sets the fraction of each atom that belongs to the cell. The right panel shows the plane in which the atoms touch; the table below it calculates the lattice parameter, cell volume, atomic packing factor, and density, and compares the density with the measured value.</p>
+        <p><b>Interstitial sites:</b> choose an FCC or BCC host, an octahedral or tetrahedral site, and an interstitial atom. Click any site in the 3D view (or press <b>Next site</b>) to show its coordinating host atoms and coordination polyhedron. The right panel is a planar section through the site: the dashed circle is the largest sphere that fits without moving the host atoms, and the filled circle is the interstitial atom.</p>
+      </div>
+    </div>
+
+    <div class="panel" id="pDet" hidden>
+      <button class="close" aria-label="Close">×</button>
+      <div class="inner" id="detInner">
+        <h3>Hard-sphere model</h3>
+        <p>Atoms are rigid spheres of radius \(R\) that touch along the close-packed direction of each structure. The touching condition gives the lattice parameter \(a\):</p>
+        $$\text{SC: } a = 2R \qquad \text{BCC: } \sqrt{3}\,a = 4R \qquad \text{FCC: } \sqrt{2}\,a = 4R$$
+        $$\text{HCP: } a = 2R, \qquad c = \left(\tfrac{c}{a}\right) a, \qquad \left(\tfrac{c}{a}\right)_{\text{ideal}} = \sqrt{8/3} = 1.633$$
+        <h3>Atoms per unit cell</h3>
+        <p>An atom at a cube corner is shared by 8 cells, on an edge by 4, on a face by 2, and inside the cell by 1. In the HCP hexagonal prism, corner atoms are shared by 6 cells.</p>
+        $$n = N_{\text{inside}} + \tfrac{1}{2}N_{\text{face}} + \tfrac{1}{4}N_{\text{edge}} + \tfrac{1}{8}N_{\text{corner}}$$
+        <p>This gives \(n\) = 1 (SC), 2 (BCC), 4 (FCC), and 6 (HCP).</p>
+        <h3>Cell volume, packing factor, and density</h3>
+        $$V_C = a^3 \;\;\text{(cubic)} \qquad V_C = \frac{3\sqrt{3}}{2}\,a^2 c \;\;\text{(HCP)}$$
+        $$\text{APF} = \frac{n\,\tfrac{4}{3}\pi R^3}{V_C} \qquad \rho = \frac{n A}{V_C\,N_A}$$
+        <p>where \(A\) is the atomic weight (g/mol) and \(N_A = 6.022\times10^{23}\) atoms/mol. The APF is 0.52 for SC, 0.68 for BCC, and 0.74 for FCC and ideal HCP, independent of \(R\). For HCP with a nonideal ratio, \(\text{APF} = 0.7405\,(1.633)/(c/a)\).</p>
+        <h3>Interstitial sites</h3>
+        <p>An interstitial site is a hole between host atoms. The largest sphere of radius \(r\) that fits without displacing the host atoms touches its nearest neighbors, so \(R + r\) equals the distance from the site center to the nearest host-atom center.</p>
+        $$\text{FCC octahedral: } 2R + 2r = a = 2\sqrt{2}R \;\Rightarrow\; r = (\sqrt{2}-1)R = 0.414R$$
+        $$\text{FCC tetrahedral: } R + r = \tfrac{\sqrt{3}}{4}a \;\Rightarrow\; r = \left(\sqrt{3/2}-1\right)R = 0.225R$$
+        $$\text{BCC octahedral: } R + r = \tfrac{a}{2} \;\Rightarrow\; r = \left(2/\sqrt{3}-1\right)R = 0.155R$$
+        $$\text{BCC tetrahedral: } R + r = \tfrac{\sqrt{5}}{4}a \;\Rightarrow\; r = \left(\sqrt{5/3}-1\right)R = 0.291R$$
+        <table>
+          <tr><th>Site</th><th>Location in cell</th><th>Sites/cell</th><th>Sites/host atom</th><th>CN</th></tr>
+          <tr><td>FCC octahedral</td><td>body center, edge centers</td><td>1 + 12(¼) = 4</td><td>1</td><td>6</td></tr>
+          <tr><td>FCC tetrahedral</td><td>(¼,¼,¼) type</td><td>8</td><td>2</td><td>4</td></tr>
+          <tr><td>BCC octahedral</td><td>face centers, edge centers</td><td>6(½) + 12(¼) = 6</td><td>3</td><td>6</td></tr>
+          <tr><td>BCC tetrahedral</td><td>(½,¼,0) type</td><td>24(½) = 12</td><td>6</td><td>4</td></tr>
+        </table>
+        <p>BCC octahedral sites are distorted: two host atoms are at \(a/2\) and four at \(a/\sqrt{2}\). An interstitial atom pushes only the two close atoms apart, which produces a tetragonal distortion.</p>
+        <p>Although FCC packs more densely than BCC, its largest hole (octahedral, 0.414\(R\)) is larger than the largest BCC hole (tetrahedral, 0.291\(R\)). This is why carbon (\(r\) ≈ 0.071 nm) is far more soluble in FCC austenite (up to 2.14 wt%) than in BCC ferrite (0.022 wt%).</p>
+        <p>Atomic radii are hard-sphere values from lattice parameters at room temperature, except γ-Fe, which is stable above 912 °C.</p>
+        <h3>Definitions of terms</h3>
+        <table class="defs">
+          <tr><td>\(a\)</td><td>lattice parameter: edge length of the cubic cell, or edge of the basal hexagon for HCP (nm)</td></tr>
+          <tr><td>\(A\)</td><td>atomic weight (g/mol)</td></tr>
+          <tr><td>APF</td><td>atomic packing factor: fraction of the cell volume occupied by hard-sphere atoms</td></tr>
+          <tr><td>BCC</td><td>body-centered cubic structure</td></tr>
+          <tr><td>\(c\)</td><td>height of the HCP hexagonal prism (nm)</td></tr>
+          <tr><td>\(c/a\)</td><td>axial ratio of the HCP cell</td></tr>
+          <tr><td>CN</td><td>coordination number: number of nearest-neighbor atoms that touch an atom or surround an interstitial site</td></tr>
+          <tr><td>coordinating atom</td><td>host atom that is a nearest neighbor of the selected interstitial site</td></tr>
+          <tr><td>FCC</td><td>face-centered cubic structure</td></tr>
+          <tr><td>HCP</td><td>hexagonal close-packed structure</td></tr>
+          <tr><td>host atom</td><td>atom of the parent crystal (solvent) that forms the lattice</td></tr>
+          <tr><td>interstitial atom</td><td>small atom (C, N, O, H) that sits in a hole between host atoms</td></tr>
+          <tr><td>interstitial site</td><td>hole between host atoms in which a small atom can sit</td></tr>
+          <tr><td>\(n\)</td><td>number of atoms per unit cell</td></tr>
+          <tr><td>\(N_A\)</td><td>Avogadro's number, \(6.022\times10^{23}\) atoms/mol</td></tr>
+          <tr><td>\(N_{\text{corner}}, N_{\text{edge}}, N_{\text{face}}, N_{\text{inside}}\)</td><td>numbers of atoms at corners, on edges, on faces, and inside the cell</td></tr>
+          <tr><td>octahedral site</td><td>interstitial site surrounded by 6 host atoms at the corners of an octahedron</td></tr>
+          <tr><td>\(r\)</td><td>radius of the interstitial atom (nm)</td></tr>
+          <tr><td>\(r_{\text{max}}\)</td><td>radius of the largest sphere that fits in a site without displacing the host atoms (nm)</td></tr>
+          <tr><td>\(R\)</td><td>atomic radius of the host atom (nm)</td></tr>
+          <tr><td>SC</td><td>simple cubic structure</td></tr>
+          <tr><td>tetrahedral site</td><td>interstitial site surrounded by 4 host atoms at the corners of a tetrahedron</td></tr>
+          <tr><td>unit cell</td><td>smallest repeating volume that generates the crystal by translation</td></tr>
+          <tr><td>\(V_C\)</td><td>volume of the unit cell (nm<sup>3</sup> or cm<sup>3</sup>)</td></tr>
+          <tr><td>\((hkl)\)</td><td>Miller indices of a crystal plane, such as (001) or (110)</td></tr>
+          <tr><td>\(\rho\)</td><td>density (g/cm<sup>3</sup>)</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="panel" id="pAbout" hidden>
+      <button class="close" aria-label="Close">×</button>
+      <div class="inner">
+        <h3>About</h3>
+        <p>This simulation was created in the <a href="https://www.colorado.edu/chbe/" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="https://learncheme.com/" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mode 1 controls -->
+  <div class="controls" id="ctl1">
+    <div class="ctl"><label for="s1">Crystal structure</label>
+      <select id="s1"><option value="SC">Simple cubic (SC)</option><option value="BCC">Body-centered cubic (BCC)</option><option value="FCC">Face-centered cubic (FCC)</option><option value="HCP">Hexagonal close-packed (HCP)</option></select></div>
+    <div class="ctl"><label for="e1">Element</label><select id="e1"></select></div>
+    <div class="ctl sl"><label for="R1"><span>atomic radius <span class="var">R</span></span><span class="val" id="R1v"></span></label>
+      <input type="range" id="R1" min="0.1" max="0.25" step="0.0001"></div>
+    <div class="ctl sl"><label for="A1"><span>atomic weight <span class="var">A</span></span><span class="val" id="A1v"></span></label>
+      <input type="range" id="A1" min="1" max="250" step="0.01"></div>
+    <div class="ctl sl" id="caBox"><label for="ca1"><span>axial ratio <span class="var">c</span>/<span class="var">a</span></span><span class="val" id="ca1v"></span></label>
+      <input type="range" id="ca1" min="1.55" max="1.95" step="0.001"></div>
+    <div class="ctl checks"><label><input type="checkbox" id="hard1" checked> hard-sphere atoms (full size)</label></div>
+  </div>
+
+  <!-- Mode 2 controls -->
+  <div class="controls" id="ctl2" hidden>
+    <div class="ctl"><label for="s2">Host structure</label>
+      <select id="s2"><option value="FCC">Face-centered cubic (FCC)</option><option value="BCC">Body-centered cubic (BCC)</option></select></div>
+    <div class="ctl"><label for="e2">Host element</label><select id="e2"></select></div>
+    <div class="ctl sl"><label for="R2"><span>host radius <span class="var">R</span></span><span class="val" id="R2v"></span></label>
+      <input type="range" id="R2" min="0.1" max="0.25" step="0.0001"></div>
+    <div class="ctl"><span class="lab">Site type</span>
+      <div class="seg" role="group" aria-label="Site type"><button id="tOct" aria-pressed="true">octahedral</button><button id="tTet" aria-pressed="false">tetrahedral</button></div></div>
+    <div class="ctl"><label for="i2">Interstitial atom</label><select id="i2"></select></div>
+    <div class="ctl sl"><label for="r2"><span>interstitial radius <span class="var">r</span></span><span class="val" id="r2v"></span></label>
+      <input type="range" id="r2" min="0.02" max="0.12" step="0.0005"></div>
+    <div class="ctl checks">
+      <label><input type="checkbox" id="all2" checked> show all sites of this type</label>
+      <label><input type="checkbox" id="hard2"> hard-sphere host atoms</label>
+    </div>
+    <div class="ctl" style="justify-content:flex-end"><button class="btn small" id="next2" style="align-self:flex-start">Next site</button></div>
+  </div>
+
+  <div class="main">
+    <div class="col">
+      <canvas id="c3d" aria-label="Rotatable 3D unit cell"></canvas>
+      <div class="below"><div class="legend" id="legend"></div><button class="btn small" id="resetView">Reset view</button></div>
+    </div>
+    <div class="col">
+      <div class="cap" id="cap2d"></div>
+      <canvas id="c2d" aria-label="Planar section of the unit cell"></canvas>
+      <div class="results" id="results"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+window.MathJax = { tex:{inlineMath:[['\\(','\\)']]}, chtml:{displayAlign:'left', displayIndent:'0.5em'}, startup:{typeset:false} };
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-chtml.js" async></script>
+<script>
+(function(){
+const $ = id => document.getElementById(id);
+const NA = 6.02214076e23, S2 = Math.SQRT2, S3 = Math.sqrt(3);
+
+/* ---------- data ---------- */
+const STRUCT = {
+  SC:{short:'SC', n:1, CN:6, aR:2, aTxt:'2<span class="var">R</span>', touch:'along the cube edge',
+      count:'8 corners × ⅛ = 1', basis:[[0,0,0]]},
+  BCC:{short:'BCC', n:2, CN:8, aR:4/S3, aTxt:'4<span class="var">R</span>/√3', touch:'along the body diagonal',
+      count:'8 corners × ⅛ + 1 body center × 1 = 2', basis:[[0,0,0],[.5,.5,.5]]},
+  FCC:{short:'FCC', n:4, CN:12, aR:2*S2, aTxt:'2√2 <span class="var">R</span>', touch:'along the face diagonal',
+      count:'8 corners × ⅛ + 6 face centers × ½ = 4', basis:[[0,0,0],[.5,.5,0],[.5,0,.5],[0,.5,.5]]},
+  HCP:{short:'HCP', n:6, CN:12, aR:2, aTxt:'2<span class="var">R</span>', touch:'along the edges of the basal hexagon',
+      count:'12 corners × ⅙ + 2 basal centers × ½ + 3 inside × 1 = 6'}
+};
+const EL = [
+  {id:'Po',s:'Po',name:'Polonium',st:'SC',R:0.167,A:208.98,rho:9.32},
+  {id:'Fe-a',s:'Fe',name:'α-Iron (ferrite)',st:'BCC',R:0.1241,A:55.845,rho:7.87},
+  {id:'Cr',s:'Cr',name:'Chromium',st:'BCC',R:0.1249,A:51.996,rho:7.19},
+  {id:'Mo',s:'Mo',name:'Molybdenum',st:'BCC',R:0.1363,A:95.95,rho:10.22},
+  {id:'W',s:'W',name:'Tungsten',st:'BCC',R:0.1371,A:183.84,rho:19.3},
+  {id:'Ta',s:'Ta',name:'Tantalum',st:'BCC',R:0.1430,A:180.95,rho:16.6},
+  {id:'Na',s:'Na',name:'Sodium',st:'BCC',R:0.186,A:22.990,rho:0.971},
+  {id:'K',s:'K',name:'Potassium',st:'BCC',R:0.231,A:39.098,rho:0.862},
+  {id:'Cu',s:'Cu',name:'Copper',st:'FCC',R:0.1278,A:63.546,rho:8.96},
+  {id:'Al',s:'Al',name:'Aluminum',st:'FCC',R:0.1431,A:26.982,rho:2.70},
+  {id:'Ni',s:'Ni',name:'Nickel',st:'FCC',R:0.1246,A:58.693,rho:8.90},
+  {id:'Ag',s:'Ag',name:'Silver',st:'FCC',R:0.1445,A:107.87,rho:10.49},
+  {id:'Au',s:'Au',name:'Gold',st:'FCC',R:0.1442,A:196.97,rho:19.32},
+  {id:'Pt',s:'Pt',name:'Platinum',st:'FCC',R:0.1387,A:195.08,rho:21.45},
+  {id:'Pb',s:'Pb',name:'Lead',st:'FCC',R:0.1750,A:207.2,rho:11.35},
+  {id:'Fe-g',s:'Fe',name:'γ-Iron (austenite, 912 °C)',st:'FCC',R:0.1292,A:55.845,rho:null},
+  {id:'Mg',s:'Mg',name:'Magnesium',st:'HCP',R:0.1605,A:24.305,rho:1.74,ca:1.624},
+  {id:'Ti',s:'Ti',name:'α-Titanium',st:'HCP',R:0.1475,A:47.867,rho:4.51,ca:1.587},
+  {id:'Co',s:'Co',name:'Cobalt',st:'HCP',R:0.1253,A:58.933,rho:8.90,ca:1.623},
+  {id:'Zn',s:'Zn',name:'Zinc',st:'HCP',R:0.1332,A:65.38,rho:7.13,ca:1.856},
+  {id:'Cd',s:'Cd',name:'Cadmium',st:'HCP',R:0.1490,A:112.41,rho:8.65,ca:1.886},
+  {id:'Zr',s:'Zr',name:'Zirconium',st:'HCP',R:0.1616,A:91.224,rho:6.51,ca:1.593}
+];
+const INTER = [
+  {id:'C',name:'Carbon',r:0.071},{id:'N',name:'Nitrogen',r:0.065},
+  {id:'O',name:'Oxygen',r:0.060},{id:'H',name:'Hydrogen',r:0.046}
+];
+const SITE = {
+  'FCC-oct':{CN:6,k:S2-1,kTxt:'(√2 − 1)',geo:'2<span class="var">R</span> + 2<span class="var">r</span> = <span class="var">a</span>',
+    count:'1 body center × 1 + 12 edge centers × ¼ = 4',perCell:4,perAtom:1},
+  'FCC-tet':{CN:4,k:Math.sqrt(1.5)-1,kTxt:'(√(3/2) − 1)',geo:'<span class="var">R</span> + <span class="var">r</span> = √3<span class="var">a</span>/4',
+    count:'8 inside × 1 = 8',perCell:8,perAtom:2},
+  'BCC-oct':{CN:6,k:2/S3-1,kTxt:'(2/√3 − 1)',geo:'<span class="var">R</span> + <span class="var">r</span> = <span class="var">a</span>/2',
+    count:'6 face centers × ½ + 12 edge centers × ¼ = 6',perCell:6,perAtom:3},
+  'BCC-tet':{CN:4,k:Math.sqrt(5/3)-1,kTxt:'(√(5/3) − 1)',geo:'<span class="var">R</span> + <span class="var">r</span> = √5<span class="var">a</span>/4',
+    count:'24 on faces × ½ = 12',perCell:12,perAtom:6}
+};
+
+const S = {
+  mode:1,
+  m1:{st:'FCC', el:'Cu', R:0.1278, A:63.546, ca:1.633, hard:true},
+  m2:{st:'BCC', el:'Fe-a', R:0.1241, site:'oct', inter:'C', r:0.071, all:true, hard:false, sel:0},
+  yaw:-0.62, pitch:0.38
+};
+
+/* ---------- helpers ---------- */
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function hex2rgb(h){h=h.replace('#','');if(h.length===3)h=h.split('').map(c=>c+c).join('');const v=parseInt(h,16);return[(v>>16)&255,(v>>8)&255,v&255];}
+function mix(h1,h2,t){const a=hex2rgb(h1),b=hex2rgb(h2);return 'rgb('+a.map((x,i)=>Math.round(x+(b[i]-x)*t)).join(',')+')';}
+function rgba(h,al){const a=hex2rgb(h);return `rgba(${a[0]},${a[1]},${a[2]},${al})`;}
+function sig(x,n){return Number(x.toPrecision(n)).toString();}
+function fix(x,n){return x.toFixed(n);}
+function sci(x,n){const e=Math.floor(Math.log10(Math.abs(x)));const m=x/Math.pow(10,e);return `${m.toFixed(n-1)} × 10<sup>${e<0?'−'+(-e):e}</sup>`;}
+const FR = v => {const m={0:'0',0.25:'¼',0.5:'½',0.75:'¾',1:'1'};const k=Math.round(v*4)/4;return m[k]!==undefined?m[k]:v.toFixed(2);};
+const sub=(v,a)=>[v[0]-a[0],v[1]-a[1],v[2]-a[2]], dot=(u,v)=>u[0]*v[0]+u[1]*v[1]+u[2]*v[2];
+const nrm=v=>{const L=Math.hypot(...v);return v.map(x=>x/L);}, cross=(u,v)=>[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]];
+
+function setup(cv){
+  const dpr=window.devicePixelRatio||1, W=cv.clientWidth, H=cv.clientHeight;
+  if(cv.width!==Math.round(W*dpr)||cv.height!==Math.round(H*dpr)){cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);}
+  const ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,W,H);
+  ctx.fillStyle=css('--canvas');ctx.fillRect(0,0,W,H);
+  return {ctx,W,H};
+}
+function posType(f){let k=0;for(const x of f){if(Math.abs(x)<1e-6||Math.abs(x-1)<1e-6)k++;}return ['body','face','edge','corner'][k];}
+
+/* cubic lattice points (fractional) in a range */
+function latticeFrac(st,lo,hi){
+  const out=[];for(const b of STRUCT[st].basis)for(let i=lo;i<=hi;i++)for(let j=lo;j<=hi;j++)for(let k=lo;k<=hi;k++)out.push([b[0]+i,b[1]+j,b[2]+k]);return out;
+}
+function cellFrac(st){return latticeFrac(st,-1,1).filter(f=>f.every(x=>x>-1e-6&&x<1+1e-6));}
+
+/* interstitial sites (fractional) with sharing weight; canonical site first */
+function sitesFor(st,type){
+  const out=[], edges=[], faces=[];
+  for(let d=0;d<3;d++)for(const p of[0,1])for(const q of[0,1]){const f=[0,0,0];const o=[0,1,2].filter(x=>x!==d);f[d]=.5;f[o[0]]=p;f[o[1]]=q;edges.push(f);}
+  for(let d=0;d<3;d++)for(const v of[0,1]){const f=[.5,.5,.5];f[d]=v;faces.push(f);}
+  if(st==='FCC'&&type==='oct'){out.push({f:[.5,.5,.5],w:1});edges.forEach(f=>out.push({f,w:.25}));}
+  else if(st==='FCC'&&type==='tet'){for(const x of[.25,.75])for(const y of[.25,.75])for(const z of[.25,.75])out.push({f:[x,y,z],w:1});}
+  else if(st==='BCC'&&type==='oct'){const c=[.5,.5,0];out.push({f:c,w:.5});faces.forEach(f=>{if(f.join()!==c.join())out.push({f,w:.5});});edges.forEach(f=>out.push({f,w:.25}));}
+  else {const pq=[[.5,.25],[.5,.75],[.25,.5],[.75,.5]];
+    const list=[];for(let d=2;d>=0;d--)for(const v of[0,1])for(const [p,q] of pq){const f=[0,0,0];const o=[0,1,2].filter(x=>x!==d);f[d]=v;f[o[0]]=p;f[o[1]]=q;list.push({f,w:.5});}
+    const i0=list.findIndex(s=>s.f.join()==='0.5,0.25,0');out.push(list[i0]);list.forEach((s,i)=>{if(i!==i0)out.push(s);});}
+  return out;
+}
+function neighborsOf(st,f,N){
+  return latticeFrac(st,-1,2).map(p=>({p,d:Math.hypot(...sub(p,f))})).sort((a,b)=>a.d-b.d).slice(0,N).map(o=>o.p);
+}
+
+/* ---------- 3D ---------- */
+const c3d=$('c3d'), c2d=$('c2d');
+let siteScreen=[];
+function render3D(){
+  const {ctx,W,H}=setup(c3d);
+  const items=[]; // {kind,p,r,col,alpha} | {kind:'seg',a,b,col,w} | {kind:'face',pts,col}
+  const cellCol=css('--cell');
+  const addEdge=(a,b,col,w,dash)=>{const n=40;for(let i=0;i<n;i++){const t0=i/n,t1=(i+1)/n;items.push({kind:'seg',a:a.map((x,k)=>x+(b[k]-x)*t0),b:a.map((x,k)=>x+(b[k]-x)*t1),col,w,dash});}};
+  let extent=0;
+  if(S.mode===1){
+    const m=S.m1, T=STRUCT[m.st], R=m.R, a=T.aR*R, disp=m.hard?R:0.32*R;
+    const colOf={corner:css('--c-corner'),face:css('--c-face'),body:css('--c-body'),edge:css('--c-edge')};
+    if(m.st==='HCP'){
+      const c=m.ca*a, V=[];for(let k=0;k<6;k++)V.push([a*Math.cos(k*Math.PI/3),a*Math.sin(k*Math.PI/3)]);
+      for(const z of[-c/2,c/2]){for(let k=0;k<6;k++){addEdge([...V[k],z],[...V[(k+1)%6],z],cellCol,1.6);items.push({kind:'sph',p:[...V[k],z],r:disp,col:colOf.corner,alpha:1});}
+        items.push({kind:'sph',p:[0,0,z],r:disp,col:colOf.face,alpha:1});}
+      for(let k=0;k<6;k++)addEdge([...V[k],-c/2],[...V[k],c/2],cellCol,1.6);
+      for(const ang of[30,150,270]){const t=ang*Math.PI/180;items.push({kind:'sph',p:[a/S3*Math.cos(t),a/S3*Math.sin(t),0],r:disp,col:colOf.body,alpha:1});}
+      extent=Math.hypot(a,c/2)+R;
+    } else {
+      cubeEdges(a,cellCol,addEdge);
+      for(const f of cellFrac(m.st)){items.push({kind:'sph',p:f.map(x=>(x-.5)*a),r:disp,col:colOf[posType(f)],alpha:1});}
+      extent=a*S3/2+R;
+    }
+  } else {
+    const m=S.m2, R=m.R, a=STRUCT[m.st].aR*R, key=m.st+'-'+m.site, sites=sitesFor(m.st,m.site);
+    if(m.sel>=sites.length)m.sel=0;
+    const sel=sites[m.sel], N=SITE[key].CN, nb=neighborsOf(m.st,sel.f,N);
+    const isNb=f=>nb.some(p=>Math.hypot(...sub(p,f))<1e-6);
+    cubeEdges(a,cellCol,addEdge);
+    const host=css('--c-host'), coord=css('--c-coord'), sc=css(m.site==='oct'?'--c-oct':'--c-tet');
+    const small=0.3*R;
+    for(const f of cellFrac(m.st)){const nbh=isNb(f);
+      items.push({kind:'sph',p:f.map(x=>(x-.5)*a),r:m.hard?R:(nbh?0.4*R:small),col:nbh?coord:host,alpha:m.hard?(nbh?0.8:0.28):1});}
+    for(const f of nb){if(!f.every(x=>x>-1e-6&&x<1+1e-6))items.push({kind:'sph',p:f.map(x=>(x-.5)*a),r:m.hard?R:0.4*R,col:coord,alpha:m.hard?0.8:1});}
+    // polyhedron
+    const P=nb.map(f=>f.map(x=>(x-.5)*a)), n=P.length, adj=[];
+    for(let i=0;i<n;i++){adj.push([]);let far=-1,fd=-1;for(let j=0;j<n;j++){const d=Math.hypot(...sub(P[i],P[j]));if(d>fd){fd=d;far=j;}}
+      for(let j=0;j<n;j++)if(j!==i&&(n===4||j!==far))adj[i].push(j);}
+    const ecol=css('--accent-text');
+    for(let i=0;i<n;i++)for(const j of adj[i])if(j>i)addEdge(P[i],P[j],ecol,1.8);
+    for(let i=0;i<n;i++)for(let j=i+1;j<n;j++)for(let k=j+1;k<n;k++)
+      if(adj[i].includes(j)&&adj[i].includes(k)&&adj[j].includes(k))items.push({kind:'face',pts:[P[i],P[j],P[k]],col:sc});
+    // sites
+    sites.forEach((s,i)=>{if(i===m.sel)return;if(m.all)items.push({kind:'sph',p:s.f.map(x=>(x-.5)*a),r:0.055*a,col:sc,alpha:1,site:i});});
+    items.push({kind:'sph',p:sel.f.map(x=>(x-.5)*a),r:m.r,col:css('--c-inter'),alpha:0.95,site:m.sel,ring:true});
+    extent=a*S3/2+(m.hard?R:0.45*R)+0.1*a;
+  }
+  // drop line pieces that lie inside an opaque atom (they would otherwise paint over it as spokes)
+  const solids=items.filter(it=>it.kind==='sph'&&it.alpha>=0.99);
+  for(let i=items.length-1;i>=0;i--){const it=items[i];if(it.kind!=='seg')continue;
+    const mid=it.a.map((x,k)=>(x+it.b[k])/2);
+    if(solids.some(sp=>Math.hypot(...sub(mid,sp.p))<sp.r*0.995))items.splice(i,1);}
+  const scale=0.47*Math.min(W,H)/extent, D=6*extent, cx=W/2, cy=H/2+4;
+  const cy_=Math.cos(S.yaw), sy=Math.sin(S.yaw), cp=Math.cos(S.pitch), sp=Math.sin(S.pitch);
+  const proj=p=>{const x1=p[0]*cy_-p[1]*sy, y1=p[0]*sy+p[1]*cy_, z=p[2];const y2=y1*cp-z*sp, z2=y1*sp+z*cp;const f=D/(D+y2);return{x:cx+x1*scale*f,y:cy-z2*scale*f,d:y2,f};};
+  for(const it of items){
+    if(it.kind==='sph'){it.P=proj(it.p);it.d=it.P.d;}
+    else if(it.kind==='seg'){it.A=proj(it.a);it.B=proj(it.b);it.d=(it.A.d+it.B.d)/2;}
+    else {it.Q=it.pts.map(proj);it.d=it.Q.reduce((s,q)=>s+q.d,0)/3+1e-3;}
+  }
+  items.sort((u,v)=>v.d-u.d);
+  siteScreen=[];
+  for(const it of items){
+    if(it.kind==='seg'){ctx.strokeStyle=it.col;ctx.lineWidth=it.w;ctx.beginPath();ctx.moveTo(it.A.x,it.A.y);ctx.lineTo(it.B.x,it.B.y);ctx.stroke();}
+    else if(it.kind==='face'){ctx.fillStyle=rgba(it.col,0.16);ctx.beginPath();it.Q.forEach((q,i)=>i?ctx.lineTo(q.x,q.y):ctx.moveTo(q.x,q.y));ctx.closePath();ctx.fill();}
+    else {const r=Math.max(it.r*scale*it.P.f,1.5);sphere(ctx,it.P.x,it.P.y,r,it.col,it.alpha);
+      if(it.ring){ctx.strokeStyle=css('--fg');ctx.lineWidth=1.2;ctx.setLineDash([3,3]);ctx.beginPath();ctx.arc(it.P.x,it.P.y,r+4,0,2*Math.PI);ctx.stroke();ctx.setLineDash([]);}
+      if(it.site!==undefined)siteScreen.push({i:it.site,x:it.P.x,y:it.P.y});}
+  }
+  ctx.fillStyle=css('--fg');ctx.font='16px '+css('--font');ctx.textAlign='left';
+  ctx.fillText('drag to rotate'+(S.mode===2?' · click a site to select it':''),10,H-10);
+}
+function cubeEdges(a,col,add){const h=a/2;const v=[];for(const x of[-h,h])for(const y of[-h,h])for(const z of[-h,h])v.push([x,y,z]);
+  for(let i=0;i<8;i++)for(let j=i+1;j<8;j++){const d=sub(v[i],v[j]);if(d.filter(x=>Math.abs(x)>1e-9).length===1)add(v[i],v[j],col,1.6);}}
+function sphere(ctx,x,y,r,col,alpha){
+  const c=col.startsWith('#')?col:'#888888';
+  const g=ctx.createRadialGradient(x-r*.35,y-r*.4,r*.06,x,y,r);
+  g.addColorStop(0,mix(c,'#ffffff',.7));g.addColorStop(.5,c);g.addColorStop(1,mix(c,'#000000',.5));
+  ctx.globalAlpha=alpha;ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,2*Math.PI);ctx.fill();
+  if(alpha<1){ctx.globalAlpha=Math.min(1,alpha+.3);ctx.strokeStyle=mix(c,'#000000',.3);ctx.lineWidth=.8;ctx.stroke();}
+  ctx.globalAlpha=1;
+}
+
+/* ---------- 2D section ---------- */
+function render2D(){
+  const {ctx,W,H}=setup(c2d);
+  const font=css('--font'), fg=css('--fg'), muted=css('--muted'), line=css('--cell');
+  let cfg;
+  if(S.mode===1)cfg=section1(); else cfg=section2();
+  const {o,e1,e2,win,atoms,R}=cfg, nrmv=cross(e1,e2);
+  const m=52, us=win.u1-win.u0, ws=win.w1-win.w0;
+  const s=Math.min((W-2*m)/us,(H-2*m)/ws), uc=(win.u0+win.u1)/2, wc=(win.w0+win.w1)/2;
+  const T=(u,w)=>[W/2+(u-uc)*s, H/2-(w-wc)*s];
+  const clipPath=()=>{ctx.beginPath();if(cfg.poly){cfg.poly.forEach((p,i)=>{const q=T(...p);i?ctx.lineTo(...q):ctx.moveTo(...q);});ctx.closePath();}
+    else{const a=T(win.u0,win.w1);ctx.rect(a[0],a[1],us*s,ws*s);}};
+  ctx.save();clipPath();ctx.clip();
+  // cell outline inside window
+  for(const at of atoms){const d=dot(sub(at.p,o),nrmv);if(Math.abs(d)>=R-1e-9)continue;
+    const rr=Math.sqrt(R*R-d*d), u=dot(sub(at.p,o),e1), w=dot(sub(at.p,o),e2);
+    if(u+rr<win.u0-1e-9||u-rr>win.u1+1e-9||w+rr<win.w0-1e-9||w-rr>win.w1+1e-9)continue;
+    const [x,y]=T(u,w), inPlane=Math.abs(d)<1e-9;
+    const col=cfg.colorOf(at);
+    ctx.globalAlpha=inPlane?0.9:0.4;ctx.fillStyle=col;ctx.beginPath();ctx.arc(x,y,rr*s,0,2*Math.PI);ctx.fill();
+    ctx.globalAlpha=1;ctx.strokeStyle=mix(col,'#000000',.35);ctx.lineWidth=1.2;if(!inPlane)ctx.setLineDash([4,3]);ctx.stroke();ctx.setLineDash([]);
+    if(inPlane){ctx.fillStyle=mix(col,'#000000',.5);ctx.beginPath();ctx.arc(x,y,2,0,2*Math.PI);ctx.fill();}
+  }
+  if(cfg.site){const [x,y]=T(0,0), st=cfg.site;
+    ctx.fillStyle=rgba(css('--c-inter'),0.75);ctx.beginPath();ctx.arc(x,y,st.r*s,0,2*Math.PI);ctx.fill();
+    ctx.strokeStyle=fg;ctx.lineWidth=1.6;ctx.setLineDash([5,4]);ctx.beginPath();ctx.arc(x,y,st.rmax*s,0,2*Math.PI);ctx.stroke();ctx.setLineDash([]);}
+  // unit-cell outline through atom centers, drawn on top of the atoms so it stays visible
+  if(cfg.cell){const a=T(cfg.cell.u0,cfg.cell.w1),wd=(cfg.cell.u1-cfg.cell.u0)*s,ht=(cfg.cell.w1-cfg.cell.w0)*s;
+    ctx.setLineDash([6,4]);ctx.strokeStyle=css('--canvas');ctx.lineWidth=3.5;ctx.strokeRect(a[0],a[1],wd,ht);
+    ctx.strokeStyle=fg;ctx.lineWidth=1.6;ctx.strokeRect(a[0],a[1],wd,ht);ctx.setLineDash([]);}
+  ctx.restore();
+  // frame
+  ctx.strokeStyle=line;ctx.lineWidth=1.8;clipPath();ctx.stroke();
+  // annotations
+  ctx.font='17px '+font;
+  for(const dm of cfg.dims||[]){dimLine(ctx,T(...dm.p1),T(...dm.p2),dm.label,dm.off,dm.col||fg,dm.dash);}
+  if(cfg.radius){const r=cfg.radius;const p=T(r.u,r.w), q=T(r.u+R*Math.cos(r.ang),r.w+R*Math.sin(r.ang));
+    ctx.strokeStyle=fg;ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(...p);ctx.lineTo(...q);ctx.stroke();
+    label(ctx,'R',(p[0]+q[0])/2+10*Math.sin(r.ang),(p[1]+q[1])/2+10*Math.cos(r.ang),fg,true);}
+}
+function label(ctx,txt,x,y,col,ital){
+  ctx.font=(ital?'italic 17px "Times New Roman",Times,serif':'17px '+css('--font'));
+  const w=ctx.measureText(txt).width;ctx.fillStyle=css('--canvas');ctx.globalAlpha=.85;ctx.fillRect(x-w/2-4,y-12,w+8,23);ctx.globalAlpha=1;
+  ctx.fillStyle=col;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(txt,x,y);ctx.textBaseline='alphabetic';
+}
+function dimLine(ctx,p1,p2,txt,off,col,dash){
+  const dx=p2[0]-p1[0],dy=p2[1]-p1[1],L=Math.hypot(dx,dy),nx=-dy/L,ny=dx/L,ux=dx/L,uy=dy/L;
+  const a=[p1[0]+nx*off,p1[1]+ny*off],b=[p2[0]+nx*off,p2[1]+ny*off];
+  ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=1.4;
+  if(off){ctx.lineWidth=0.8;ctx.beginPath();ctx.moveTo(p1[0]+nx*off*0.2,p1[1]+ny*off*0.2);ctx.lineTo(a[0]+nx*Math.sign(off)*4,a[1]+ny*Math.sign(off)*4);
+    ctx.moveTo(p2[0]+nx*off*0.2,p2[1]+ny*off*0.2);ctx.lineTo(b[0]+nx*Math.sign(off)*4,b[1]+ny*Math.sign(off)*4);ctx.stroke();ctx.lineWidth=1.4;}
+  if(dash)ctx.setLineDash([5,4]);ctx.beginPath();ctx.moveTo(...a);ctx.lineTo(...b);ctx.stroke();ctx.setLineDash([]);
+  const ah=(p,sx)=>{ctx.beginPath();ctx.moveTo(p[0],p[1]);ctx.lineTo(p[0]+sx*(ux*9)+nx*3.5,p[1]+sx*(uy*9)+ny*3.5);ctx.lineTo(p[0]+sx*(ux*9)-nx*3.5,p[1]+sx*(uy*9)-ny*3.5);ctx.closePath();ctx.fill();};
+  ah(a,1);ah(b,-1);
+  const sgn=off>=0?1:-1, mx=(a[0]+b[0])/2+nx*16*sgn, my=(a[1]+b[1])/2+ny*16*sgn;
+  label(ctx,txt,mx,my,col,false);
+}
+function section1(){
+  const m=S.m1, T=STRUCT[m.st], R=m.R, a=T.aR*R;
+  const colOf={corner:css('--c-corner'),face:css('--c-face'),body:css('--c-body'),edge:css('--c-edge')};
+  const fg=css('--fg');
+  if(m.st==='HCP'){
+    const atoms=[];for(let i=-3;i<=3;i++)for(let j=-3;j<=3;j++)for(let k=-1;k<=1;k++){
+      atoms.push({p:[(i+j/2)*a,j*S3/2*a,k*m.ca*a]});atoms.push({p:[(i+j/2+0.5)*a,(j+1/3)*S3/2*a,(k+.5)*m.ca*a]});}
+    const poly=[];for(let k=0;k<6;k++)poly.push([a*Math.cos(k*Math.PI/3),a*Math.sin(k*Math.PI/3)]);
+    $('cap2d').innerHTML='<b>Basal plane (0001)</b> of the HCP cell. Atoms touch '+T.touch+', so <span class="var">a</span> = 2<span class="var">R</span>. The three interior atoms sit <span class="var">c</span>/2 above this plane.';
+    return {o:[0,0,0],e1:[1,0,0],e2:[0,1,0],win:{u0:-a,u1:a,w0:-a*S3/2,w1:a*S3/2},poly,atoms,R,
+      colorOf:at=>Math.hypot(at.p[0],at.p[1])<1e-9?colOf.face:colOf.corner,
+      dims:[{p1:poly[4],p2:poly[5],label:'a = 2R',off:24}],
+      radius:{u:0,w:0,ang:Math.PI/2}};
+  }
+  const atoms=latticeFrac(m.st,-1,2).map(f=>({f,p:f.map(x=>x*a)}));
+  const colorOf=at=>colOf[at.f.every(x=>x>-1e-6&&x<1+1e-6)?posType(at.f):'corner'];
+  if(m.st==='BCC'){
+    $('cap2d').innerHTML='<b>(110) plane</b> through opposite cube edges. Atoms touch '+T.touch+': 4<span class="var">R</span> = √3 <span class="var">a</span>.';
+    return {o:[0,0,0],e1:nrm([1,1,0]),e2:[0,0,1],win:{u0:0,u1:S2*a,w0:0,w1:a},atoms,R,colorOf,
+      dims:[{p1:[0,0],p2:[S2*a,a],label:'4R = √3 a',off:0},{p1:[0,0],p2:[S2*a,0],label:'√2 a',off:22},{p1:[0,a],p2:[0,0],label:'a',off:22}]};
+  }
+  $('cap2d').innerHTML='<b>Cube face (001).</b> Atoms touch '+T.touch+(m.st==='SC'?': <span class="var">a</span> = 2<span class="var">R</span>.':': 4<span class="var">R</span> = √2 <span class="var">a</span>.');
+  const dims=[{p1:[0,0],p2:[a,0],label:m.st==='SC'?'a = 2R':'a',off:22}];
+  if(m.st==='FCC')dims.push({p1:[0,0],p2:[a,a],label:'4R = √2 a',off:0});
+  return {o:[0,0,0],e1:[1,0,0],e2:[0,1,0],win:{u0:0,u1:a,w0:0,w1:a},atoms,R,colorOf,dims,
+    radius:m.st==='SC'?{u:a,w:a,ang:-3*Math.PI/4}:null};
+}
+function section2(){
+  const m=S.m2, R=m.R, a=STRUCT[m.st].aR*R, key=m.st+'-'+m.site, info=SITE[key], rmax=info.k*R;
+  const atoms=latticeFrac(m.st,-1,2).map(f=>({f,p:f.map(x=>x*a)}));
+  let site,e1,e2,cell,win,nbTo,lab,cap,extra=[];
+  if(key==='FCC-oct'){site=[.5,.5,.5];e1=[1,0,0];e2=[0,1,0];cell={u0:-.5,u1:.5,w0:-.5,w1:.5};win={u0:-.78,u1:.78,w0:-.78,w1:.78};nbTo=[-.5,0];lab='a/2 = R + r';
+    cap='<b>(001) section at <span class="var">z</span> = <span class="var">a</span>/2</b> through the body-center octahedral site. Four of the six neighbors lie in this plane; the other two are directly above and below.';}
+  else if(key==='FCC-tet'){site=[.25,.25,.25];e1=nrm([1,1,0]);e2=[0,0,1];cell={u0:-.3536,u1:1.0607,w0:-.25,w1:.75};win={u0:-.56,u1:1.26,w0:-.47,w1:.97};nbTo=[-.3536,-.25];lab='√3a/4 = R + r';
+    cap='<b>(1̄10) section</b> (plane <span class="var">x</span> = <span class="var">y</span>) through the tetrahedral site at (¼,¼,¼). Two of the four neighbors lie in this plane; the other two sit one in front of and one behind this plane.';}
+  else if(key==='BCC-oct'){site=[.5,.5,0];e1=nrm([1,1,0]);e2=[0,0,1];cell={u0:-.7071,u1:.7071,w0:0,w1:1};win={u0:-.93,u1:.93,w0:-.72,w1:1.12};nbTo=[0,.5];lab='a/2 = R + r';
+    extra.push({p1:[0,0],p2:[-.7071,0],label:'a/√2',off:0,dash:true});
+    cap='<b>(1̄10) section</b> through the face-center octahedral site at (½,½,0). The octahedron is distorted: two neighbors at <span class="var">a</span>/2 (vertical) and four at <span class="var">a</span>/√2, two of which appear here.';}
+  else {site=[.5,.25,0];e1=[1,0,0];e2=[0,1,0];cell={u0:-.5,u1:.5,w0:-.25,w1:.75};win={u0:-.74,u1:.74,w0:-.5,w1:1.0};nbTo=[-.5,-.25];lab='√5a/4 = R + r';
+    cap='<b>Cube face (001)</b> through the tetrahedral site at (½,¼,0). Two of the four neighbors are corner atoms in this plane; the other two are body-center atoms <span class="var">a</span>/2 above and below.';}
+  $('cap2d').innerHTML=cap;
+  const nb=neighborsOf(m.st,site,info.CN);
+  const host=css('--c-host'),coord=css('--c-coord');
+  const sc=v=>v.map(x=>x*a), W={u0:win.u0*a,u1:win.u1*a,w0:win.w0*a,w1:win.w1*a}, C={u0:cell.u0*a,u1:cell.u1*a,w0:cell.w0*a,w1:cell.w1*a};
+  return {o:sc(site),e1,e2,win:W,cell:C,atoms,R,
+    colorOf:at=>nb.some(p=>Math.hypot(...sub(p,at.f))<1e-6)?coord:host,
+    site:{r:m.r,rmax},
+    dims:[{p1:[0,0],p2:sc(nbTo),label:lab,off:0},...extra.map(d=>({...d,p2:sc(d.p2)}))]};
+}
+
+/* ---------- results ---------- */
+function results(){
+  const box=$('results');
+  if(S.mode===1){
+    const m=S.m1, T=STRUCT[m.st], R=m.R, a=T.aR*R, isH=m.st==='HCP', c=isH?m.ca*a:a;
+    const V=isH?1.5*S3*a*a*c:a*a*a, Vcm=V*1e-21, apf=T.n*4/3*Math.PI*R**3/V, rho=T.n*m.A/(Vcm*NA);
+    const el=EL.find(e=>e.id===m.el); const name=el?`${el.name} (${el.s})`:'Custom element';
+    const Vr=`${sig(V,4)} nm<sup>3</sup> = ${sci(Vcm,4)} cm<sup>3</sup>`;
+    let rows=`<tr><td>Atoms per cell</td><td><span class="var">n</span> = ${T.count}</td></tr>
+      <tr><td>Coordination no.</td><td>${T.CN}</td></tr>
+      <tr><td>Lattice parameter</td><td><span class="var">a</span> = ${T.aTxt} = ${T.aTxt.replace('<span class="var">R</span>','('+fix(R,4)+' nm)')} = <b>${fix(a,4)} nm</b></td></tr>`;
+    if(isH)rows+=`<tr><td></td><td><span class="var">c</span> = (${fix(m.ca,3)})<span class="var">a</span> = <b>${fix(c,4)} nm</b></td></tr>
+      <tr><td>Cell volume</td><td><span class="var">V<sub>C</sub></span> = (3√3/2)<span class="var">a</span><sup>2</sup><span class="var">c</span> = ${Vr}</td></tr>`;
+    else rows+=`<tr><td>Cell volume</td><td><span class="var">V<sub>C</sub></span> = <span class="var">a</span><sup>3</sup> = ${Vr}</td></tr>`;
+    rows+=`<tr><td>Packing factor</td><td>APF = <span class="var">n</span>(4/3)π<span class="var">R</span><sup>3</sup>/<span class="var">V<sub>C</sub></span> = ${T.n}(4/3)π(${fix(R,4)})<sup>3</sup>/${sig(V,4)} = <span class="big">${fix(apf,3)}</span></td></tr>
+      <tr><td>Density</td><td><span class="var">ρ</span> = <span class="var">nA</span>/(<span class="var">V<sub>C</sub>N<sub>A</sub></span>) = ${T.n}(${sig(m.A,5)}) / [(${sci(Vcm,4)})(6.022 × 10<sup>23</sup>)] = <span class="big">${sig(rho,3)} g/cm<sup>3</sup></span></td></tr>`;
+    if(el&&el.rho)rows+=`<tr><td>Measured</td><td>${el.rho} g/cm<sup>3</sup> (calculated value differs by ${((rho-el.rho)/el.rho*100).toFixed(1).replace('-','−')}%)</td></tr>`;
+    box.innerHTML=`<h2>${name}, ${T.short}</h2><table>${rows}</table>`;
+  } else {
+    const m=S.m2, R=m.R, a=STRUCT[m.st].aR*R, key=m.st+'-'+m.site, info=SITE[key], rmax=info.k*R;
+    const sites=sitesFor(m.st,m.site), sel=sites[m.sel]||sites[0];
+    const el=EL.find(e=>e.id===m.el), it=INTER.find(i=>i.id===m.inter);
+    const where=sel.w===1?'inside the cell (not shared)':sel.w===.5?'on a face, shared by 2 cells':'on an edge, shared by 4 cells';
+    const fits=m.r<=rmax+1e-9, strain=((R+m.r)/(R+rmax)-1)*100;
+    const tname=m.site==='oct'?'Octahedral':'Tetrahedral';
+    let rows=`<tr><td>Host lattice</td><td><span class="var">a</span> = ${STRUCT[m.st].aTxt} = ${fix(a,4)} nm</td></tr>
+      <tr><td>Selected site</td><td>(${sel.f.map(FR).join(', ')}), ${where}</td></tr>
+      <tr><td>Sites per cell</td><td>${info.count} (${info.perAtom} per host atom)</td></tr>
+      <tr><td>Coordination no.</td><td>${info.CN}</td></tr>
+      <tr><td>Touching condition</td><td>${info.geo}</td></tr>
+      <tr><td>Largest sphere</td><td><span class="var">r</span><sub>max</sub> = ${info.kTxt}<span class="var">R</span> = ${fix(info.k,3)}(${fix(R,4)} nm) = <span class="big">${fix(rmax,4)} nm</span></td></tr>
+      <tr><td>${it?it.name:'Interstitial'}</td><td><span class="var">r</span> = ${fix(m.r,3)} nm, <span class="var">r</span>/<span class="var">r</span><sub>max</sub> = ${fix(m.r/rmax,2)} &nbsp;
+        ${fits?'<span class="pill ok">fits without distortion</span>':`<span class="pill bad">too large: neighbors pushed ${fix(strain,1)}% farther apart</span>`}</td></tr>`;
+    if(key==='BCC-oct'&&!fits)rows+=`<tr><td></td><td>Only the 2 neighbors at <span class="var">a</span>/2 must move, which stretches the cell along one axis (tetragonal distortion, as in martensite).</td></tr>`;
+    let tab='<div class="sitetab"><table><tr><th>Site</th><th>CN</th><th>per host atom</th><th><span class="var">r</span><sub>max</sub>/<span class="var">R</span></th><th><span class="var">r</span><sub>max</sub> for this <span class="var">R</span></th></tr>';
+    for(const k of['FCC-oct','FCC-tet','BCC-oct','BCC-tet']){const I=SITE[k];tab+=`<tr class="${k===key?'cur':''}"><td>${k.replace('-oct',' octahedral').replace('-tet',' tetrahedral')}</td><td>${I.CN}</td><td>${I.perAtom}</td><td>${fix(I.k,3)}</td><td>${fix(I.k*R,4)} nm</td></tr>`;}
+    tab+='</table></div>';
+    box.innerHTML=`<h2>${tname} sites in ${el?el.name+' ('+el.s+')':'custom host'}, ${m.st}</h2><table>${rows}</table>${tab}`;
+  }
+}
+
+/* ---------- legend ---------- */
+function legend(){
+  const L=$('legend');const chip=(v,t)=>`<span><i style="background:var(${v})"></i>${t}</span>`;
+  if(S.mode===1){L.innerHTML=S.m1.st==='HCP'?chip('--c-corner','corner (× ⅙)')+chip('--c-face','basal center (× ½)')+chip('--c-body','inside (× 1)')
+    :chip('--c-corner','corner (× ⅛)')+(S.m1.st==='FCC'?chip('--c-face','face center (× ½)'):'')+(S.m1.st==='BCC'?chip('--c-body','body center (× 1)'):'');}
+  else L.innerHTML=chip('--c-host','host atom')+chip('--c-coord','coordinating atom')+chip(S.m2.site==='oct'?'--c-oct':'--c-tet',(S.m2.site==='oct'?'octahedral':'tetrahedral')+' site')+chip('--c-inter','interstitial atom');
+}
+
+/* ---------- controls ---------- */
+function fillElements(sel,st,cur){
+  sel.innerHTML=EL.filter(e=>e.st===st).map(e=>`<option value="${e.id}">${e.name} (${e.s})</option>`).join('')+'<option value="custom">Custom</option>';
+  sel.value=cur;
+}
+function syncUI(){
+  const m1=S.m1,m2=S.m2;
+  $('s1').value=m1.st;fillElements($('e1'),m1.st,m1.el);
+  $('R1').value=m1.R;$('R1v').textContent=fix(m1.R,4)+' nm';
+  $('A1').value=m1.A;$('A1v').textContent=fix(m1.A,2)+' g/mol';
+  $('ca1').value=m1.ca;$('ca1v').textContent=fix(m1.ca,3);$('caBox').hidden=m1.st!=='HCP';
+  $('hard1').checked=m1.hard;
+  $('s2').value=m2.st;fillElements($('e2'),m2.st,m2.el);
+  $('R2').value=m2.R;$('R2v').textContent=fix(m2.R,4)+' nm';
+  $('i2').innerHTML=INTER.map(i=>`<option value="${i.id}">${i.name} (${i.id})</option>`).join('')+'<option value="custom">Custom</option>';$('i2').value=m2.inter;
+  $('r2').value=m2.r;$('r2v').textContent=fix(m2.r,3)+' nm';
+  $('tOct').setAttribute('aria-pressed',m2.site==='oct');$('tTet').setAttribute('aria-pressed',m2.site==='tet');
+  $('all2').checked=m2.all;$('hard2').checked=m2.hard;
+  $('mode1').setAttribute('aria-pressed',S.mode===1);$('mode2').setAttribute('aria-pressed',S.mode===2);
+  $('ctl1').hidden=S.mode!==1;$('ctl2').hidden=S.mode!==2;
+}
+function draw(){render3D();render2D();results();legend();}
+function update(){syncUI();draw();}
+function pickEl(m,st){const e=EL.find(x=>x.st===st);m.el=e.id;m.R=e.R;m.A=e.A;if(e.ca)m.ca=e.ca;else if(st==='HCP')m.ca=1.633;}
+
+$('s1').onchange=e=>{S.m1.st=e.target.value;pickEl(S.m1,S.m1.st);update();};
+$('e1').onchange=e=>{const v=e.target.value;S.m1.el=v;const el=EL.find(x=>x.id===v);if(el){S.m1.R=el.R;S.m1.A=el.A;if(el.ca)S.m1.ca=el.ca;}update();};
+$('R1').oninput=e=>{S.m1.R=+e.target.value;S.m1.el='custom';update();};
+$('A1').oninput=e=>{S.m1.A=+e.target.value;S.m1.el='custom';update();};
+$('ca1').oninput=e=>{S.m1.ca=+e.target.value;S.m1.el='custom';update();};
+$('hard1').onchange=e=>{S.m1.hard=e.target.checked;update();};
+$('s2').onchange=e=>{S.m2.st=e.target.value;const e0=EL.find(x=>x.st===S.m2.st&&(x.s==='Fe'));S.m2.el=e0.id;S.m2.R=e0.R;S.m2.sel=0;update();};
+$('e2').onchange=e=>{const v=e.target.value;S.m2.el=v;const el=EL.find(x=>x.id===v);if(el)S.m2.R=el.R;update();};
+$('R2').oninput=e=>{S.m2.R=+e.target.value;S.m2.el='custom';update();};
+$('i2').onchange=e=>{const v=e.target.value;S.m2.inter=v;const it=INTER.find(x=>x.id===v);if(it)S.m2.r=it.r;update();};
+$('r2').oninput=e=>{S.m2.r=+e.target.value;S.m2.inter='custom';update();};
+$('tOct').onclick=()=>{S.m2.site='oct';S.m2.sel=0;update();};
+$('tTet').onclick=()=>{S.m2.site='tet';S.m2.sel=0;update();};
+$('all2').onchange=e=>{S.m2.all=e.target.checked;update();};
+$('hard2').onchange=e=>{S.m2.hard=e.target.checked;update();};
+$('next2').onclick=()=>{const n=sitesFor(S.m2.st,S.m2.site).length;S.m2.sel=(S.m2.sel+1)%n;update();};
+$('mode1').onclick=()=>{S.mode=1;update();};
+$('mode2').onclick=()=>{S.mode=2;update();};
+$('resetView').onclick=()=>{S.yaw=-0.62;S.pitch=0.38;render3D();};
+
+/* drag rotate + click select */
+let drag=null;
+c3d.addEventListener('pointerdown',e=>{c3d.setPointerCapture(e.pointerId);drag={x:e.clientX,y:e.clientY,x0:e.clientX,y0:e.clientY};c3d.classList.add('dragging');});
+c3d.addEventListener('pointermove',e=>{if(!drag)return;S.yaw+=(e.clientX-drag.x)*0.01;S.pitch=Math.max(-1.45,Math.min(1.45,S.pitch+(e.clientY-drag.y)*0.01));drag.x=e.clientX;drag.y=e.clientY;render3D();});
+const endDrag=e=>{if(!drag)return;const moved=Math.hypot(e.clientX-drag.x0,e.clientY-drag.y0);drag=null;c3d.classList.remove('dragging');
+  if(moved<5&&S.mode===2){const r=c3d.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;let best=null,bd=16;
+    for(const s of siteScreen){const d=Math.hypot(s.x-x,s.y-y);if(d<bd){bd=d;best=s;}}
+    if(best&&best.i!==S.m2.sel){S.m2.sel=best.i;update();}}};
+c3d.addEventListener('pointerup',endDrag);c3d.addEventListener('pointercancel',()=>{drag=null;c3d.classList.remove('dragging');});
+
+/* panels: overlays that never move the button row */
+const panels={bDir:'pDir',bDet:'pDet',bAbout:'pAbout'};let mjDone=false;
+for(const [b,p] of Object.entries(panels)){
+  $(b).onclick=()=>{const el=$(p),open=el.hidden;for(const q of Object.values(panels))$(q).hidden=true;el.hidden=!open;
+    if(p==='pDet'&&open&&!mjDone&&window.MathJax&&MathJax.typesetPromise){MathJax.typesetPromise([$('detInner')]).then(()=>{mjDone=true;}).catch(()=>{});}};
+  $(p).querySelector('.close').onclick=()=>{$(p).hidden=true;};
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')for(const q of Object.values(panels))$(q).hidden=true;});
+
+new ResizeObserver(()=>draw()).observe(c3d);
+new ResizeObserver(()=>render2D()).observe(c2d);
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',draw);
+new MutationObserver(draw).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+update();
+})();
+</script>
+
+</body>
+</html>

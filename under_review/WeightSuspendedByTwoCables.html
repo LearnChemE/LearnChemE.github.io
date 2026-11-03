@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weight Suspended by Two Cables</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+  chtml: { displayAlign: 'left', displayIndent: '1.5em' },
+  svg: { fontCache: 'global', displayAlign: 'left', displayIndent: '1.5em' }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+<style>
+  body {
+    font-family: Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 15px;
+    background-color: #ffffff;
+  }
+  .app {
+    width: 540px;
+    margin: 0 auto;
+  }
+  h1.title {
+    font-size: 22px;
+    text-align: center;
+    margin: 5px 0 12px 0;
+    font-weight: bold;
+  }
+  .controls {
+    width: 540px;
+    margin: 0 auto 6px auto;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 8px 10px;
+    background: #fafafa;
+    box-sizing: border-box;
+  }
+  .control-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 4px 0;
+    flex-wrap: nowrap;
+  }
+  .control-row .ctl-label {
+    font-size: 16.5px;
+    white-space: nowrap;
+  }
+  input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+  input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  /* keep sliders vertically centered with their labels in the control rows */
+  .control-row input[type="range"] { margin-top: 0; margin-bottom: 0; }
+  #massSlider { width: 112px; }
+  #angle3Slider { width: 190px; }
+  #angle1Slider, #angle2Slider { width: 90px; }
+  .value-label {
+    font-size: 16.5px;
+    min-width: 42px;
+    display: inline-block;
+  }
+  .setter-group {
+    display: inline-flex;
+    margin-left: 6px;
+  }
+  .setter-btn {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    padding: 3px 10px;
+    border: 1px solid #999;
+    background: #f2f2f2;
+    cursor: pointer;
+  }
+  .setter-btn:first-child { border-radius: 4px 0 0 4px; border-right: none; }
+  .setter-btn:last-child { border-radius: 0 4px 4px 0; }
+  .setter-btn.selected {
+    background: #cfcfcf;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+  }
+  .figure-and-panels {
+    position: relative;
+    width: 540px;
+  }
+  #simCanvas {
+    display: block;
+    margin: 0 auto;
+    width: 500px;
+    height: 400px;
+  }
+  .button-row {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin: 10px 0 4px 0;
+  }
+  .panel-btn {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    color: #ffffff;
+    background-color: #98000D;
+    border: none;
+    border-radius: 5px;
+    padding: 7px 16px;
+    cursor: pointer;
+  }
+  .panel-btn:hover { background-color: #7a000a; }
+  .overlay-panel {
+    display: none;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    max-height: 430px;
+    overflow-y: auto;
+    background: #ffffff;
+    border: 2px solid #98000D;
+    border-radius: 6px;
+    padding: 12px 34px 12px 15px;
+    box-sizing: border-box;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.30);
+    z-index: 10;
+    font-size: 15px;
+    line-height: 1.45;
+  }
+  .overlay-panel.open { display: block; }
+  .overlay-panel p { margin: 7px 0; }
+  .overlay-panel h2 {
+    font-size: 15px;
+    font-weight: bold;
+    color: #000;
+    margin: 2px 0 8px 0;
+  }
+  .overlay-panel mjx-container[display="true"] { text-align: left !important; }
+  .symbol-list p { margin: 3px 0; }
+  .close-x {
+    position: absolute;
+    top: 6px;
+    right: 9px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #98000D;
+    background: none;
+    border: none;
+    cursor: pointer;
+    line-height: 1;
+    padding: 2px 5px;
+  }
+  .close-x:hover { color: #000; }
+  .overlay-panel a { color: #0645ad; }
+</style>
+</head>
+<body>
+<div class="app">
+  <h1 class="title">Weight Suspended by Two Cables</h1>
+
+  <div class="controls">
+    <div class="control-row">
+      <label class="ctl-label" for="massSlider">ball mass (kg)</label>
+      <input type="range" id="massSlider" min="100" max="1000" step="10" value="510">
+      <span class="value-label" id="massValue">510</span>
+      <span class="ctl-label" style="margin-left:8px;">cable lengths:</span>
+      <span class="setter-group">
+        <button type="button" class="setter-btn selected" id="btnEqual">equal</button>
+        <button type="button" class="setter-btn" id="btnUnequal">unequal</button>
+      </span>
+    </div>
+    <div class="control-row" id="rowEqual">
+      <label class="ctl-label" for="angle3Slider">angle (degrees)</label>
+      <input type="range" id="angle3Slider" min="20" max="160" step="5" value="90">
+      <span class="value-label" id="angle3Value">90&deg;</span>
+    </div>
+    <div class="control-row" id="rowUnequal" style="display:none;">
+      <span class="ctl-label">angle (degrees)</span>
+      <label class="ctl-label" for="angle1Slider" style="margin-left:8px;">left</label>
+      <input type="range" id="angle1Slider" min="0" max="50" step="1" value="45">
+      <span class="value-label" id="angle1Value">45&deg;</span>
+      <label class="ctl-label" for="angle2Slider">right</label>
+      <input type="range" id="angle2Slider" min="5" max="50" step="1" value="35">
+      <span class="value-label" id="angle2Value">35&deg;</span>
+    </div>
+  </div>
+
+  <div class="figure-and-panels">
+    <canvas id="simCanvas"></canvas>
+
+    <div class="overlay-panel" id="panelDirections">
+      <button class="close-x" aria-label="close" onclick="closePanel('panelDirections')">&times;</button>
+      <h2>Directions</h2>
+      <p>This Demonstration calculates the tension forces in two cables that support a weight. Select equal cable lengths and the tension is the same in each cable; the tension changes as a slider changes the angle between the cables. Select unequal cable lengths and the tension in the cables is different. Changing the angle of each cable to the horizontal with a slider changes the cable length. Change the mass of the ball with a slider.</p>
+    </div>
+
+    <div class="overlay-panel" id="panelDetails">
+      <button class="close-x" aria-label="close" onclick="closePanel('panelDetails')">&times;</button>
+      <h2>Details</h2>
+      <p>For equal cable lengths, a force balance in the \(y\) direction is done to determine the cable tension:</p>
+      <p>\[\sum F_y = 0 = 2\,T \sin(90^\circ - \theta/2) - m\,g.\]</p>
+      <p>Rearranging to solve for tension:</p>
+      <p>\[T = \frac{m\,g}{2 \sin(90^\circ - \theta/2)}.\]</p>
+      <p>When the cable lengths are unequal, force balances in the \(x\) and \(y\) directions are done to calculate the tension in each cable:</p>
+      <p>\[\sum F_y = 0 = T_1 \sin\theta_1 + T_2 \sin\theta_2 - m\,g,\]</p>
+      <p>\[\sum F_x = 0 = -T_1 \cos\theta_1 + T_2 \cos\theta_2.\]</p>
+      <p>Solving these two equations simultaneously:</p>
+      <p>\[T_1 = \frac{m\,g\cos\theta_2}{\sin(\theta_1 + \theta_2)}, \qquad T_2 = \frac{m\,g\cos\theta_1}{\sin(\theta_1 + \theta_2)}.\]</p>
+      <p style="margin-top:12px;"><b>Symbols</b></p>
+      <div class="symbol-list">
+        <p>\(F_x, F_y\) = forces in the horizontal and vertical directions (N)</p>
+        <p>\(T\) = tension in each cable when the cables are equal length (N)</p>
+        <p>\(T_1, T_2\) = tensions in the left and right cables (N)</p>
+        <p>\(\theta\) = angle between the two cables (degrees)</p>
+        <p>\(\theta_1, \theta_2\) = angles of the left and right cables from the horizontal (degrees)</p>
+        <p>\(m\) = mass of the ball (kg)</p>
+        <p>\(g\) = acceleration due to gravity, 9.8 m/s\(^2\)</p>
+      </div>
+    </div>
+
+    <div class="overlay-panel" id="panelAbout">
+      <button class="close-x" aria-label="close" onclick="closePanel('panelAbout')">&times;</button>
+      <h2>About</h2>
+      <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/WeightSuspendedByTwoCables/" target="_blank" rel="noopener">Mathematica simulation</a> by Rachael L. Baumann. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.</p>
+    </div>
+  </div>
+
+  <div class="button-row">
+    <button class="panel-btn" id="btnDirections" onclick="togglePanel('panelDirections')">Directions</button>
+    <button class="panel-btn" id="btnDetails" onclick="togglePanel('panelDetails')">Details</button>
+    <button class="panel-btn" id="btnAbout" onclick="togglePanel('panelAbout')">About</button>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+/* ---------- state ---------- */
+const state = {
+  m: 510,           // ball mass (kg)
+  AG: 1,            // 1 = equal, 2 = unequal
+  theta3: 90,       // angle between cables (deg), equal case
+  theta1: 45,       // left angle (deg), unequal case
+  theta2: 35        // right angle (deg), unequal case
+};
+const g = 9.8;
+const DEG = Math.PI / 180;
+
+/* ---------- canvas setup (hi-DPI) ---------- */
+const canvas = document.getElementById('simCanvas');
+const ctx = canvas.getContext('2d');
+const CSS_W = 500, CSS_H = 400;
+const dpr = window.devicePixelRatio || 1;
+canvas.width = CSS_W * dpr;
+canvas.height = CSS_H * dpr;
+canvas.style.width = CSS_W + 'px';
+canvas.style.height = CSS_H + 'px';
+ctx.scale(dpr, dpr);
+
+/* NumberForm[x, {4, 2}] equivalent: 2 digits after the decimal */
+function fmt(x) { return x.toFixed(2); }
+
+/* ---------- drawing helpers ---------- */
+function makeMapper(xmin, xmax, ymin, ymax) {
+  // uniform scale, centered in 500 x 400, y up
+  const s = Math.min(CSS_W / (xmax - xmin), CSS_H / (ymax - ymin));
+  const xc = (xmin + xmax) / 2, yc = (ymin + ymax) / 2;
+  return {
+    s: s,
+    X: u => CSS_W / 2 + (u - xc) * s,
+    Y: v => CSS_H / 2 - (v - yc) * s
+  };
+}
+
+function drawArrowHead(px, py, ang, len, halfw) {
+  // ang: screen-space direction the head points (radians, screen coords)
+  ctx.save();
+  ctx.translate(px, py);
+  ctx.rotate(ang);
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(-len, -halfw);
+  ctx.quadraticCurveTo(-len * 0.72, 0, -len, halfw);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
+/* double-headed tension arrow: head at frac f1 pointing to end, head at f2 pointing to start */
+function tensionArrow(M, x1, y1, x2, y2, lw, f1, f2, headLen) {
+  const px1 = M.X(x1), py1 = M.Y(y1), px2 = M.X(x2), py2 = M.Y(y2);
+  ctx.strokeStyle = '#000';
+  ctx.fillStyle = '#000';
+  ctx.lineWidth = lw;
+  ctx.beginPath();
+  ctx.moveTo(px1, py1);
+  ctx.lineTo(px2, py2);
+  ctx.stroke();
+  const angFwd = Math.atan2(py2 - py1, px2 - px1);
+  const hx1 = px1 + (px2 - px1) * f1, hy1 = py1 + (py2 - py1) * f1;
+  drawArrowHead(hx1, hy1, angFwd, headLen, headLen * 0.42);
+  const hx2 = px1 + (px2 - px1) * f2, hy2 = py1 + (py2 - py1) * f2;
+  drawArrowHead(hx2, hy2, angFwd + Math.PI, headLen, headLen * 0.42);
+}
+
+function singleArrow(M, x1, y1, x2, y2, lw, headLen) {
+  const px1 = M.X(x1), py1 = M.Y(y1), px2 = M.X(x2), py2 = M.Y(y2);
+  ctx.strokeStyle = '#000';
+  ctx.fillStyle = '#000';
+  ctx.lineWidth = lw;
+  const ang = Math.atan2(py2 - py1, px2 - px1);
+  ctx.beginPath();
+  ctx.moveTo(px1, py1);
+  ctx.lineTo(px2 - Math.cos(ang) * headLen * 0.6, py2 - Math.sin(ang) * headLen * 0.6);
+  ctx.stroke();
+  drawArrowHead(px2, py2, ang, headLen, headLen * 0.42);
+}
+
+function drawJoint(M, x, y) {
+  const px = M.X(x), py = M.Y(y);
+  ctx.fillStyle = '#000';
+  ctx.beginPath(); ctx.arc(px, py, 6.2, 0, 2 * Math.PI); ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.beginPath(); ctx.arc(px, py, 3.7, 0, 2 * Math.PI); ctx.fill();
+}
+
+function drawBall(M, cx, cy, r) {
+  const px = M.X(cx), py = M.Y(cy), pr = r * M.s;
+  ctx.beginPath();
+  ctx.arc(px, py, pr, 0, 2 * Math.PI);
+  ctx.fillStyle = '#00ffff';
+  ctx.fill();
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = '#000';
+  ctx.stroke();
+}
+
+function labelText(px, py, txt, rot, withBg) {
+  ctx.save();
+  ctx.translate(px, py);
+  if (rot) ctx.rotate(rot);
+  ctx.font = '18px Helvetica, Arial, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  if (withBg) {
+    const w = ctx.measureText(txt).width;
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(-w / 2 - 4, -11, w + 8, 22);
+  }
+  ctx.fillStyle = '#000';
+  ctx.fillText(txt, 0, 0);
+  ctx.restore();
+}
+
+/* ---------- equal-length case ---------- */
+function drawEqual() {
+  const m = state.m;
+  const th3 = state.theta3 * DEG;
+  const th4 = Math.PI / 2 - 0.5 * th3;
+  const T = m * g / (2 * Math.sin(th4));           // N
+  const r = 0.175 + 0.2 * (m - 100) / 900;
+
+  const M = makeMapper(-1, 1, -1, 1.1);
+  const jx = 0, jy = 1 - Math.sin(th4);
+
+  // ceiling
+  ctx.fillStyle = '#b3b3b3';
+  ctx.fillRect(M.X(-1.2), M.Y(1.1), (2.4) * M.s, 0.1 * M.s);
+  ctx.strokeStyle = '#000';
+  ctx.lineWidth = 4.5;
+  ctx.beginPath();
+  ctx.moveTo(M.X(-1.2), M.Y(1));
+  ctx.lineTo(M.X(1.2), M.Y(1));
+  ctx.stroke();
+  // hatch marks
+  ctx.lineWidth = 1;
+  for (let x = -1.2; x <= 1.201; x += 0.2) {
+    ctx.beginPath();
+    ctx.moveTo(M.X(x), M.Y(1));
+    ctx.lineTo(M.X(x + 0.1), M.Y(1.1));
+    ctx.stroke();
+  }
+
+  // cables with double tension arrowheads
+  tensionArrow(M, jx, jy, -Math.cos(th4), 1, 3.5, 0.4, 0.75, 15);
+  tensionArrow(M, jx, jy, Math.cos(th4), 1, 3.5, 0.4, 0.75, 15);
+
+  // weight arrow down from junction to top of ball
+  singleArrow(M, jx, jy, 0, 0.75 - Math.sin(th4), 3.5, 15);
+
+  // ball
+  const bx = 0, by = 0.75 - Math.sin(th4) - r;
+  drawBall(M, bx, by, r);
+  labelText(M.X(bx), M.Y(by), fmt(m * g / 1000) + ' kN', 0, false);
+
+  // tension labels along cables (framed, white background)
+  labelText(M.X(-0.57 * Math.cos(th4)), M.Y(1 - 0.43 * Math.sin(th4)),
+            ' ' + fmt(T / 1000) + ' kN ', th4, true);
+  labelText(M.X(0.57 * Math.cos(th4)), M.Y(1 - 0.43 * Math.sin(th4)),
+            ' ' + fmt(T / 1000) + ' kN ', -th4, true);
+
+  // angle arc between cables
+  ctx.strokeStyle = '#000';
+  ctx.lineWidth = 1.3;
+  ctx.beginPath();
+  ctx.arc(M.X(jx), M.Y(jy), 0.125 * M.s, -(Math.PI - th4), -th4, false);
+  ctx.stroke();
+
+  // angle value above junction
+  labelText(M.X(jx), M.Y(jy) - 38, state.theta3 + '\u00B0', 0, true);
+
+  // connection points
+  drawJoint(M, jx, jy);
+  drawJoint(M, -Math.cos(th4), 1);
+  drawJoint(M, Math.cos(th4), 1);
+}
+
+/* ---------- unequal-length case ---------- */
+function drawUnequal() {
+  const m = state.m;
+  const th1 = state.theta1 * DEG;
+  const th2 = state.theta2 * DEG;
+  // solve T1 sin(th1) + T2 sin(th2) = m g ;  -T1 cos(th1) + T2 cos(th2) = 0
+  const denom = Math.sin(th1 + th2);
+  const T1 = m * g * Math.cos(th2) / denom;   // N
+  const T2 = m * g * Math.cos(th1) / denom;   // N
+  const r = 0.175 + 0.2 * (m - 100) / 900;
+  const L = 1;
+
+  const M = makeMapper(-1.25, 1.25, -1.05, 1.25);
+
+  // walls
+  ctx.fillStyle = '#b3b3b3';
+  ctx.fillRect(M.X(-L - 0.25), M.Y(1.25), 0.25 * M.s, 2.25 * M.s);
+  ctx.fillRect(M.X(L), M.Y(1.25), 0.25 * M.s, 2.25 * M.s);
+  // hatch marks
+  ctx.strokeStyle = '#000';
+  ctx.lineWidth = 1;
+  for (let y = -1; y <= 1.001; y += 0.25) {
+    ctx.beginPath();
+    ctx.moveTo(M.X(L), M.Y(y));
+    ctx.lineTo(M.X(L + 0.25), M.Y(y + 0.25));
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(M.X(-L), M.Y(y));
+    ctx.lineTo(M.X(-L - 0.25), M.Y(y + 0.25));
+    ctx.stroke();
+  }
+  // thick wall faces
+  ctx.lineWidth = 0.02 * CSS_W;
+  ctx.lineCap = 'butt';
+  ctx.beginPath(); ctx.moveTo(M.X(-L), M.Y(-1)); ctx.lineTo(M.X(-L), M.Y(1.25)); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(M.X(L), M.Y(-1)); ctx.lineTo(M.X(L), M.Y(1.25)); ctx.stroke();
+
+  const aLx = -L, aLy = L * Math.tan(th1);
+  const aRx = L, aRy = L * Math.tan(th2);
+
+  // cables with double tension arrowheads
+  tensionArrow(M, 0, 0, aLx, aLy, 2, 0.4, 0.8, 15);
+  tensionArrow(M, 0, 0, aRx, aRy, 2, 0.4, 0.8, 15);
+
+  // tension labels along cables
+  labelText(M.X(-0.6 * L), M.Y(0.6 * L * Math.tan(th1)),
+            ' ' + fmt(T1 / 1000) + ' kN ', th1, true);
+  labelText(M.X(0.6 * L), M.Y(0.6 * L * Math.tan(th2)),
+            ' ' + fmt(T2 / 1000) + ' kN ', -th2, true);
+
+  // weight arrow
+  singleArrow(M, 0, 0, 0, -0.25, 2, 15);
+
+  // ball
+  drawBall(M, 0, -0.25 - r, r);
+  labelText(M.X(0), M.Y(-0.25 - r), fmt(m * g / 1000) + ' kN', 0, false);
+
+  // horizontal reference lines
+  ctx.strokeStyle = '#000';
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(M.X(-0.25 * L), M.Y(0)); ctx.lineTo(M.X(0), M.Y(0)); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(M.X(0), M.Y(0)); ctx.lineTo(M.X(0.25 * L), M.Y(0)); ctx.stroke();
+
+  // angle arcs at the junction
+  ctx.lineWidth = 2;
+  if (state.theta1 !== 0) {
+    ctx.beginPath();
+    ctx.arc(M.X(0), M.Y(0), 0.15 * M.s, -Math.PI, -(Math.PI - th1), false);
+    ctx.stroke();
+  }
+  if (state.theta2 !== 0) {
+    ctx.beginPath();
+    ctx.arc(M.X(0), M.Y(0), 0.15 * M.s, -th2, 0, false);
+    ctx.stroke();
+  }
+
+  // angle value labels
+  if (state.theta1 !== 0) {
+    labelText(M.X(0) - 48, M.Y(0) - 13, state.theta1 + '\u00B0', 0, true);
+  }
+  if (state.theta2 !== 0) {
+    labelText(M.X(0) + 48, M.Y(0) - 13, state.theta2 + '\u00B0', 0, true);
+  }
+
+  // connection points
+  drawJoint(M, 0, 0);
+  drawJoint(M, aLx, aLy);
+  drawJoint(M, aRx, aRy);
+}
+
+function draw() {
+  ctx.clearRect(0, 0, CSS_W, CSS_H);
+  if (state.AG === 1) drawEqual(); else drawUnequal();
+}
+
+/* ---------- controls ---------- */
+const massSlider = document.getElementById('massSlider');
+const angle3Slider = document.getElementById('angle3Slider');
+const angle1Slider = document.getElementById('angle1Slider');
+const angle2Slider = document.getElementById('angle2Slider');
+
+massSlider.addEventListener('input', () => {
+  state.m = parseFloat(massSlider.value);
+  document.getElementById('massValue').textContent = massSlider.value;
+  draw();
+});
+angle3Slider.addEventListener('input', () => {
+  state.theta3 = parseFloat(angle3Slider.value);
+  document.getElementById('angle3Value').innerHTML = angle3Slider.value + '&deg;';
+  draw();
+});
+angle1Slider.addEventListener('input', () => {
+  state.theta1 = parseFloat(angle1Slider.value);
+  document.getElementById('angle1Value').innerHTML = angle1Slider.value + '&deg;';
+  draw();
+});
+angle2Slider.addEventListener('input', () => {
+  state.theta2 = parseFloat(angle2Slider.value);
+  document.getElementById('angle2Value').innerHTML = angle2Slider.value + '&deg;';
+  draw();
+});
+
+document.getElementById('btnEqual').addEventListener('click', () => setAG(1));
+document.getElementById('btnUnequal').addEventListener('click', () => setAG(2));
+
+function setAG(v) {
+  state.AG = v;
+  document.getElementById('btnEqual').classList.toggle('selected', v === 1);
+  document.getElementById('btnUnequal').classList.toggle('selected', v === 2);
+  document.getElementById('rowEqual').style.display = (v === 1) ? 'flex' : 'none';
+  document.getElementById('rowUnequal').style.display = (v === 2) ? 'flex' : 'none';
+  draw();
+}
+
+/* ---------- panels ---------- */
+const panelIds = ['panelDirections', 'panelDetails', 'panelAbout'];
+function togglePanel(id) {
+  const el = document.getElementById(id);
+  const willOpen = !el.classList.contains('open');
+  panelIds.forEach(p => document.getElementById(p).classList.remove('open'));
+  if (willOpen) {
+    el.classList.add('open');
+    if (window.MathJax && MathJax.typesetPromise) {
+      MathJax.typesetPromise([el]).catch(() => {});
+    }
+  }
+}
+function closePanel(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+draw();
+</script>
+</body>
+</html>

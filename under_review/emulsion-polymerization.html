@@ -1,0 +1,750 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Emulsion Polymerization (Smith–Ewart)</title>
+<style>
+/* Layout: LearnChemE sim — view and info buttons, one row of short sliders, one hi-DPI canvas; flyout panels overlay the canvas. Single light look by design. */
+:root{
+  --bg:#ffffff; --fg:#000000; --line:#c9c9c9;
+  --red:#98000D; --redhover:#7a000a; --panel:#ffffff; --soft:#f2f2f2;
+  --font:Helvetica, Arial, sans-serif;
+  color-scheme: light;
+}
+html,body{background:var(--bg);color:var(--fg)}
+[hidden]{display:none!important}
+body{font-family:var(--font);font-size:17px;font-weight:normal;padding:12px 16px}
+h1.title{font-size:18px;font-weight:bold;color:#000;text-align:center;margin:0 0 14px;line-height:22px}
+.app{max-width:980px;margin:0 auto;position:relative}
+.toprow{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+button{font-family:var(--font);font-size:17px;font-weight:normal;border-radius:4px;cursor:pointer;padding:5px 12px;border:1px solid var(--red);background:var(--red);color:#fff}
+button:hover{background:var(--redhover)}
+button:focus-visible,input:focus-visible{outline:2px solid #1a5fb4;outline-offset:2px}
+.seg button{background:#fff;color:var(--red)}
+.seg button.on{background:var(--red);color:#fff}
+.seg button:hover{background:#f6e6e7}
+.seg button.on:hover{background:var(--redhover)}
+.info{display:flex;gap:6px}
+.controls{display:flex;flex-wrap:wrap;gap:8px 28px;align-items:center;margin:12px 0 8px;min-height:36px}
+.ctl{display:flex;align-items:center;gap:8px;white-space:nowrap}
+.ctl label{font-size:17px;color:#000}
+.ctl .val{font-variant-numeric:tabular-nums;color:#000}
+.ctl input[type=checkbox]{width:16px;height:16px;margin:0 4px 0 0;accent-color:var(--red);vertical-align:-2px}
+
+input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+.ctl input[type="range"]{width:140px;margin-bottom:0}
+#tctl input[type="range"]{width:220px}
+
+canvas{display:block;width:100%;max-width:980px;aspect-ratio:960/600;height:auto;border:1px solid var(--line);background:#fff}
+.panel{position:absolute;right:0;z-index:20;width:max-content;max-width:min(680px,100%);box-sizing:border-box;background:var(--panel);color:#000;border:1px solid #999;border-radius:4px;box-shadow:0 6px 24px rgba(0,0,0,.25);font-size:17px;line-height:1.45}
+.panel .close{position:absolute;right:6px;top:4px;background:none;border:none;color:#000;font-size:26px;line-height:1;padding:2px 8px;z-index:2}
+.panel .close:hover{background:var(--soft)}
+.panel .body{padding:12px 38px 14px 18px;max-height:min(560px,75vh);overflow-y:auto}
+.panel h3{margin:.1em 0 .4em;font-size:17px;font-weight:normal;color:#000;text-decoration:underline;text-underline-offset:3px}
+.panel h4{margin:.9em 0 .2em;font-size:17px;font-weight:normal;font-style:italic;color:#000}
+.panel p{margin:.45em 0}
+.panel mjx-container[display="true"]{text-align:left!important;margin:.5em 0 .5em 1em!important}
+.panel table{border-collapse:collapse;font-size:17px;margin:.3em 0}
+.panel td{padding:2px 14px 2px 0;vertical-align:top;font-weight:normal}
+.panel td:first-child{white-space:nowrap}
+.panel a{color:var(--red)}
+.ov{text-decoration:overline}
+@media (max-width:640px){ .ctl input[type="range"]{width:110px} #tctl input[type="range"]{width:150px} }
+</style>
+<script>
+window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},svg:{displayAlign:'left',displayIndent:'1em',fontCache:'global'}};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.min.js" async></script>
+</head>
+<body>
+<div class="app" id="app">
+  <h1 class="title">Emulsion Polymerization (Smith–Ewart Kinetics)</h1>
+  <div class="toprow" id="toprow">
+    <div class="seg" id="views">
+      <button id="v0" class="on" data-v="0">Stages I–III</button>
+      <button id="v1" data-v="1">Particle number</button>
+      <button id="v2" data-v="2"><span class="ov">n</span> = 0.5</button>
+      <button id="v3" data-v="3">Emulsion vs. bulk</button>
+    </div>
+    <div class="info">
+      <button id="bDir">Directions</button>
+      <button id="bDet">Details</button>
+      <button id="bAbout">About</button>
+    </div>
+  </div>
+
+  <div class="panel" id="pDir" hidden><button class="close" aria-label="Close">×</button><div class="body">
+    <h3>Directions</h3>
+    <p>This simulation shows how emulsion polymerization works, using styrene at 60 °C with sodium dodecyl sulfate as the surfactant and potassium persulfate as the initiator. It follows the three stages of the process, shows how the number of polymer particles depends on surfactant and initiator concentrations, shows why each particle contains an average of 0.5 radicals (Smith–Ewart Case 2), and shows why polymerization rate and molecular weight both increase with the number of particles, which is the key advantage over bulk polymerization.</p>
+    <p>Select a view with the four buttons at the top left. The surfactant and initiator sliders apply to every view except the <span class="ov">n</span> = 0.5 view.</p>
+    <p><i>Stages I–III:</i> drag the time slider or press "play". The left side is a schematic of monomer droplets, micelles, and polymer particles. The plots show conversion, polymerization rate, and particle number versus time. Stage I (particle formation) ends when the micelles are used up. In Stage II, the rate is constant because the particle number is fixed and the particles stay saturated with monomer. Stage III begins when the monomer droplets disappear. Arrows on each plot show the time range of each stage. Check "log time axis" to expand Stage I. With high surfactant and low initiator, the droplets can disappear before the micelles are used up, and then there is no Stage II.</p>
+    <p><i>Particle number:</i> particle number versus surfactant in micelles and versus initiator concentration, on log–log axes. The slopes are 0.6 and 0.4.</p>
+    <p><i><span class="ov">n</span> = 0.5:</i> radicals enter 64 particles at random. In Case 2, a radical that enters a particle that already contains a radical terminates both immediately, so each particle is active half the time. Cases 1 and 3 show what happens when radicals can leave the particles, or when particles are large enough to hold several radicals.</p>
+    <p><i>Emulsion vs. bulk:</i> polymerization rate versus degree of polymerization. In bulk polymerization, more initiator increases the rate but decreases molecular weight. In emulsion polymerization, more surfactant increases the particle number, so rate and molecular weight both increase.</p>
+  </div></div>
+
+  <div class="panel" id="pDet" hidden><button class="close" aria-label="Close">×</button><div class="body" id="detBody">
+    <h3>Details</h3>
+    <p>Monomer is dispersed as droplets (1–10 μm) in water that contains surfactant micelles (5–10 nm) swollen with monomer. Initiator decomposes in the water, and radicals enter micelles, which become polymer particles. Monomer diffuses from the droplets through the water to the growing particles.</p>
+    <h4>Radical generation</h4>
+    <p>Radicals formed per cm³ of water per second:</p>
+    \[\rho = \frac{2 f k_d [I] N_A}{1000}\]
+    <h4>Particle growth</h4>
+    <p>Volume growth rate of one particle in Stages I and II:</p>
+    \[\mu = \frac{k_p [M]_p\, \bar{n}\, M_0}{N_A\, \rho_p\, \phi_p}\]
+    <h4>Stage I: particle formation</h4>
+    <p>Radicals form new particles in proportion to the fraction of surfactant still in micelles:</p>
+    \[\frac{dN}{dt} = \rho\left(1-\frac{A_p}{a_s S}\right)\]
+    \[A_p = (36\pi)^{1/3}\sum_j \Delta N_j\,\left[\mu\,(t-t_j)\right]^{2/3}\]
+    <p>The simulation integrates these equations numerically. Stage I ends when the particle surface area \(A_p\) equals the area that the surfactant can cover, \(a_s S\). The result agrees with the Smith–Ewart expression:</p>
+    \[N = 0.37 \left(\frac{\rho}{\mu}\right)^{2/5} (a_s S)^{3/5}\]
+    <h4>Stage II: constant rate</h4>
+    <p>The particle number is fixed, monomer droplets keep the particles saturated at \([M]_p\), and \(\bar n = 0.5\):</p>
+    \[R_p = \frac{1000\, k_p [M]_p\, \bar{n}\, N}{N_A}\]
+    <p>A growing chain stops when the next radical enters its particle. Radicals enter each particle at the rate \(\rho/N\), so the degree of polymerization is:</p>
+    \[X_n = \frac{k_p [M]_p\, N}{\rho}\]
+    <p>Both \(R_p\) and \(X_n\) are proportional to \(N\), so increasing the surfactant concentration increases both the rate and the molecular weight.</p>
+    <h4>Stage III: monomer depletion</h4>
+    <p>The droplets disappear at conversion \(X_c\), when the remaining monomer just saturates the particles:</p>
+    \[X_c = \frac{1}{1 + \dfrac{\phi_m \rho_m}{(1-\phi_m)\,\rho_p}}\]
+    <p>After that, \([M]_p\) is calculated from the monomer and polymer left in the particles, and the rate decreases:</p>
+    \[[M]_p = \frac{1000\,\rho_m}{M_0}\;\frac{(1-X)/\rho_m}{(1-X)/\rho_m + X/\rho_p}\]
+    <p>If the droplets disappear before the micelles are used up (high surfactant, low initiator), particle formation stops at \(X_c\), there is no Stage II, and the reaction goes directly from Stage I to Stage III.</p>
+    <p>The gel effect, which can raise \(\bar n\) above 0.5 late in Stage III, is not included.</p>
+    <h4>Bulk polymerization</h4>
+    <p>With the same initiator and termination by combination:</p>
+    \[R_p = k_p [M]\left(\frac{f k_d [I]}{k_t}\right)^{1/2}\]
+    \[X_n = \frac{k_p [M]}{\left(f k_d k_t [I]\right)^{1/2}}\]
+    <p>The product \(R_p X_n\) does not depend on \([I]\), so any increase in rate decreases the molecular weight.</p>
+    <h4>Average number of radicals per particle</h4>
+    <p>Case 1, small particles with radical desorption:</p>
+    \[\bar n = \frac{\rho'}{2\rho' + k_{des}}\]
+    <p>Case 2, no desorption and immediate termination when a second radical enters:</p>
+    \[\bar n = 0.5\]
+    <p>Case 3, large particles where several radicals coexist and terminate at the rate \(c\,n(n-1)\). For \(\bar n \gg 1\):</p>
+    \[\bar n \approx \left(\frac{\rho'}{2c}\right)^{1/2}\]
+    <p>The theory value shown for Case 3 comes from the steady-state solution of the population balance for \(n\) radicals per particle, which is slightly larger than this approximation.</p>
+    <h4>Parameters (styrene at 60 °C)</h4>
+    <table>
+      <tr><td>\(k_p\)</td><td>341 L/(mol s)</td></tr>
+      <tr><td>\(k_t\)</td><td>6.0 × 10⁷ L/(mol s)</td></tr>
+      <tr><td>\(k_d\)</td><td>3.2 × 10⁻⁶ s⁻¹</td></tr>
+      <tr><td>\(f\)</td><td>0.5</td></tr>
+      <tr><td>\([M]_p\) before Stage III</td><td>5.2 mol/L</td></tr>
+      <tr><td>\([M]\) in bulk</td><td>8.70 mol/L</td></tr>
+      <tr><td>\(a_s\)</td><td>0.50 nm²</td></tr>
+      <tr><td>critical micelle concentration</td><td>8.2 mmol/L (2.36 g/L)</td></tr>
+      <tr><td>\(\rho_m\), \(\rho_p\)</td><td>0.906 g/cm³, 1.05 g/cm³</td></tr>
+      <tr><td>monomer charge</td><td>30 g styrene per 100 cm³ water</td></tr>
+    </table>
+    <p>Emulsion rates are per liter of water; bulk rates are per liter of monomer. The calculated degrees of polymerization neglect chain transfer to monomer, which limits \(X_n\) for styrene to roughly 10⁴ in practice. Chain transfer lowers both the emulsion and bulk values but does not change the trends.</p>
+    <h4>Symbols</h4>
+    <table>
+      <tr><td>\(A_p\)</td><td>total surface area of particles (cm² per cm³ water)</td></tr>
+      <tr><td>\(a_s\)</td><td>area covered by one surfactant molecule (cm²)</td></tr>
+      <tr><td>\(c\)</td><td>termination rate constant within a particle (s⁻¹)</td></tr>
+      <tr><td>\(f\)</td><td>initiator efficiency</td></tr>
+      <tr><td>\([I]\)</td><td>initiator concentration (mol/L)</td></tr>
+      <tr><td>\(k_d\)</td><td>initiator decomposition rate constant (s⁻¹)</td></tr>
+      <tr><td>\(k_{des}\)</td><td>radical desorption rate constant (s⁻¹)</td></tr>
+      <tr><td>\(k_p\)</td><td>propagation rate constant (L/(mol s))</td></tr>
+      <tr><td>\(k_t\)</td><td>termination rate constant in bulk (L/(mol s))</td></tr>
+      <tr><td>\([M]\)</td><td>monomer concentration in bulk polymerization (mol/L)</td></tr>
+      <tr><td>\([M]_p\)</td><td>monomer concentration in the particles (mol/L)</td></tr>
+      <tr><td>\(M_0\)</td><td>monomer molecular weight (g/mol)</td></tr>
+      <tr><td>\(N\)</td><td>number of particles per cm³ of water</td></tr>
+      <tr><td>\(\Delta N_j\)</td><td>particles formed at time \(t_j\) (per cm³ water)</td></tr>
+      <tr><td>\(N_A\)</td><td>Avogadro's number (mol⁻¹)</td></tr>
+      <tr><td>\(n\)</td><td>number of radicals in a particle</td></tr>
+      <tr><td>\(\bar n\)</td><td>average number of radicals per particle</td></tr>
+      <tr><td>\(R_p\)</td><td>polymerization rate (mol/(L s))</td></tr>
+      <tr><td>\(S\)</td><td>surfactant in micelles, above the critical micelle concentration (molecules per cm³ water)</td></tr>
+      <tr><td>\(t\)</td><td>time (s)</td></tr>
+      <tr><td>\(X\)</td><td>monomer conversion</td></tr>
+      <tr><td>\(X_c\)</td><td>conversion at which the monomer droplets disappear</td></tr>
+      <tr><td>\(X_n\)</td><td>number-average degree of polymerization</td></tr>
+      <tr><td>\(\mu\)</td><td>volume growth rate of a particle (cm³/s)</td></tr>
+      <tr><td>\(\rho\)</td><td>rate of radical generation (radicals per cm³ water per s)</td></tr>
+      <tr><td>\(\rho'\)</td><td>rate at which radicals enter one particle, \(\rho/N\) (s⁻¹)</td></tr>
+      <tr><td>\(\rho_m\), \(\rho_p\)</td><td>monomer and polymer densities (g/cm³)</td></tr>
+      <tr><td>\(\phi_m\), \(\phi_p\)</td><td>volume fractions of monomer and polymer in a saturated particle</td></tr>
+    </table>
+  </div></div>
+
+  <div class="panel" id="pAbout" hidden><button class="close" aria-label="Close">×</button><div class="body">
+    <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="https://learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.</p>
+  </div></div>
+
+  <div class="controls" id="controls">
+    <div class="ctl" id="sctl"><label for="sS">surfactant</label><input type="range" id="sS" min="3" max="30" step="0.5" value="6"><span class="val" id="vS"></span></div>
+    <div class="ctl" id="ictl"><label for="sI">initiator</label><input type="range" id="sI" min="0.5" max="20" step="0.5" value="5"><span class="val" id="vI"></span></div>
+    <div class="ctl" id="tctl"><button id="bPlay">play</button><label for="sT">time</label><input type="range" id="sT" min="0" max="1000" step="1" value="120"><label for="cLog"><input type="checkbox" id="cLog">log time axis</label></div>
+    <div class="ctl" id="nctl" hidden>
+      <div class="seg" id="cases">
+        <button data-c="1">Case 1</button>
+        <button data-c="2" class="on">Case 2</button>
+        <button data-c="3">Case 3</button>
+      </div>
+      <button id="bPause">pause</button><button id="bReset">reset</button>
+    </div>
+  </div>
+
+  <canvas id="cv" aria-label="Emulsion polymerization simulation"></canvas>
+</div>
+
+<script>
+(function(){
+"use strict";
+// ---------- physical model (styrene, 60 C, SDS + K2S2O8) ----------
+const NA=6.022e23, kp=341, Mpsat=5.2, kd=3.2e-6, fI=0.5, kt=6.0e7, aS=5e-15,
+      CMC=8.2e-3, MWS=288.4, MWm=104.15, rhom=0.906, rhop=1.05, mload=0.30, Mbulk=8.70;
+const phimSat=Mpsat*MWm/1000/rhom;
+const mu=kp*Mpsat*0.5*(MWm/NA)/rhop/(1-phimSat);   // cm3/s per particle
+const M0=mload/MWm;                                 // mol monomer per cm3 water
+const rr=phimSat*rhom/((1-phimSat)*rhop);
+const Xc=1/(1+rr);                                  // droplets vanish
+const rhoOf=I=>2*fI*kd*(I/1000)*NA/1000;            // radicals/(cm3 water s), I in mmol/L
+const AsOf=S=>aS*Math.max(S/MWS-CMC,0)*NA/1000;    // cm2/cm3, S in g/L
+const Nse=(S,I)=>0.37*Math.pow(rhoOf(I)/mu,0.4)*Math.pow(AsOf(S),0.6);
+const NseM=(Sm_mM,I)=>0.37*Math.pow(rhoOf(I)/mu,0.4)*Math.pow(aS*Sm_mM/1000*NA/1000,0.6);
+const RpEm=(N,Mp)=>kp*Mp*0.5*N/NA*1000;             // mol/(L water s)
+const XnEm=(N,Mp,I)=>kp*Mp*N/rhoOf(I);
+const bulk=I=>{const c=I/1000;return{Rp:kp*Mbulk*Math.sqrt(fI*kd*c/kt),Xn:kp*Mbulk/Math.sqrt(fI*kd*kt*c)};};
+const MpOf=X=>{if(X<=Xc)return Mpsat;const vm=(1-X)/rhom,vp=X/rhop;return vm/(vm+vp)*rhom/MWm*1000;};
+const NREF=Nse(6,5);
+
+let S=6,I=5,sim=null;
+function simulate(){
+  const rho=rhoOf(I),As=AsOf(S),Ne=Nse(S,I);
+  const dt=(Ne/rho)/260, c=4.836*Math.pow(mu,2/3);
+  const pts=[]; let t=0,N=0,X=0; const tb=[],dn=[];
+  while(true){
+    let Ap=0; for(let j=0;j<tb.length;j++) Ap+=dn[j]*Math.pow(t-tb[j],2/3); Ap*=c;
+    const fr=Math.max(0,1-Ap/As);
+    pts.push({t,X,N,Mp:Mpsat,st:1,mic:fr});
+    if(fr<=0||X>=Xc||tb.length>4000) break;   // micelles used up, or droplets gone before nucleation ends
+    const d=rho*fr*dt; X+=kp*Mpsat*0.5*N/NA/M0*dt; tb.push(t); dn.push(d); N+=d; t+=dt;
+  }
+  const t1=t, X1=X, Nf=N;
+  // Stage II exists only if the micelles are used up before the droplets disappear
+  const r2=kp*Mpsat*0.5*Nf/NA/M0, t2=X1<Xc?t1+(Xc-X1)/r2:t1;
+  if(t2>t1) for(let k=1;k<=120;k++){const tt=t1+(t2-t1)*k/120; pts.push({t:tt,X:X1+r2*(tt-t1),N:Nf,Mp:Mpsat,st:2,mic:0});}
+  let Xs=Math.max(Xc,X1); t=t2;
+  const rate=X=>kp*MpOf(X)*0.5*Nf/NA/M0;
+  while(Xs<0.985){
+    const h=0.004/rate(Xs);
+    const k1=rate(Xs),k2=rate(Xs+h*k1/2),k3=rate(Xs+h*k2/2),k4=rate(Xs+h*k3);
+    Xs+=h*(k1+2*k2+2*k3+k4)/6; t+=h;
+    pts.push({t,X:Math.min(Xs,1),N:Nf,Mp:MpOf(Xs),st:3,mic:0});
+  }
+  for(const p of pts){
+    p.Rp=RpEm(p.N,p.Mp);
+    p.Xn=p.st>1?XnEm(p.N,p.Mp,I):NaN;
+    let V,drop;
+    if(p.X<=Xc){V=p.X*mload/rhop/(1-phimSat); drop=((1-p.X)/rhom-p.X/rhop*phimSat/(1-phimSat))*rhom;}
+    else {V=(1-p.X)*mload/rhom+p.X*mload/rhop; drop=0;}
+    p.d=p.N>0?Math.cbrt(6*V/(Math.PI*p.N))*1e7:0;
+    p.drop=Math.max(0,drop);
+    p.phim=p.X<=Xc?phimSat:((1-p.X)/rhom)/((1-p.X)/rhom+p.X/rhop);
+  }
+  sim={pts,t1,t2,tend:t,Nf,X1};
+}
+function at(t){
+  const P=sim.pts; if(t<=P[0].t) return P[0]; if(t>=P[P.length-1].t) return P[P.length-1];
+  let lo=0,hi=P.length-1; while(hi-lo>1){const m=(lo+hi)>>1; if(P[m].t<=t) lo=m; else hi=m;}
+  const a=P[lo],b=P[hi],w=(t-a.t)/(b.t-a.t),o={};
+  for(const k in a) o[k]=(typeof a[k]==='number'&&!isNaN(a[k])&&!isNaN(b[k]))?a[k]+(b[k]-a[k])*w:a[k];
+  o.st=a.st; o.Xn=a.st>1&&b.st>1?o.Xn:(b.st>1?b.Xn:NaN); return o;
+}
+
+// ---------- canvas ----------
+const W=960,H=600, cv=document.getElementById('cv'); let ctx=cv.getContext('2d'); const mainCtx=ctx;
+function resize(){
+  const dpr=window.devicePixelRatio||1, cw=cv.clientWidth||W, scl=cw/W;
+  cv.width=Math.round(cw*dpr); cv.height=Math.round(cw*H/W*dpr);
+  ctx.setTransform(scl*dpr,0,0,scl*dpr,0,0);
+}
+const FONT='Helvetica, Arial, sans-serif';
+const FS=17, TICK=16, CL=16;   // text, tick numbers, curve labels
+const C={ink:'#000',grid:'#e6e6e6',axis:'#333',red:'#98000D',blue:'#1f5fa8',green:'#2e7d32',orange:'#d9822b',
+  water:'#e3eef8',waterEdge:'#7aa6c9',mono:'#f2c86b',monoEdge:'#b8892a',polyEdge:'#7d8592',
+  s1:'rgba(152,0,13,0.07)',s2:'rgba(31,95,168,0.07)',s3:'rgba(46,125,50,0.08)'};
+
+// rich text: _{sub} ^{sup}, ‾x = overlined x
+function parseRT(s){
+  const runs=[]; let i=0, cur='';
+  const push=(t,l,b)=>{if(t) runs.push({t,l,b});};
+  while(i<s.length){
+    const ch=s[i];
+    if((ch==='_'||ch==='^')&&i+1<s.length){
+      push(cur,0,false); cur='';
+      const lv=ch==='_'?-1:1; let txt;
+      if(s[i+1]==='{'){const j=s.indexOf('}',i+2); txt=s.slice(i+2,j); i=j+1;} else {txt=s[i+1]; i+=2;}
+      push(txt,lv,false); continue;
+    }
+    if(ch==='‾'){push(cur,0,false); cur=''; push(s[i+1],0,true); i+=2; continue;}
+    cur+=ch; i++;
+  }
+  push(cur,0,false); return runs;
+}
+function rtWidth(s,size,wt){
+  let w=0; for(const r of parseRT(s)){ctx.font=`${wt||''}${r.l?size*0.7:size}px ${FONT}`; w+=ctx.measureText(r.t).width;} return w;
+}
+function rt(s,x,y,o){
+  o=o||{}; const size=o.size||FS, col=C.ink, wt=o.wt?o.wt+' ':'';
+  const w=rtWidth(s,size,wt); let xx=o.align==='center'?x-w/2:o.align==='right'?x-w:x;
+  if(o.bg){ctx.fillStyle='rgba(255,255,255,0.9)'; ctx.fillRect(xx-3,y-size*0.95,w+6,size*1.3);}
+  ctx.fillStyle=col; ctx.textBaseline='alphabetic'; ctx.textAlign='left';
+  for(const r of parseRT(s)){
+    const sz=r.l?size*0.7:size; ctx.font=`${wt}${sz}px ${FONT}`;
+    const yy=y+(r.l<0?size*0.28:r.l>0?-size*0.42:0);
+    ctx.fillText(r.t,xx,yy); const rw=ctx.measureText(r.t).width;
+    if(r.b){ctx.strokeStyle=col;ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(xx+0.5,yy-size*0.8);ctx.lineTo(xx+rw-0.5,yy-size*0.8);ctx.stroke();}
+    xx+=rw;
+  }
+  return w;
+}
+function sci(v,sig){
+  if(!isFinite(v)) return '—';
+  if(v===0) return '0';
+  const e=Math.floor(Math.log10(Math.abs(v))); let m=v/Math.pow(10,e);
+  let ms=m.toPrecision(sig||2); if(parseFloat(ms)>=10){ms=(m/10).toPrecision(sig||2);return `${ms} × 10^{${e+1}}`;}
+  if(e>=-2&&e<=3) return Number(v.toPrecision(sig||2)).toString();
+  return `${ms} × 10^{${e<0?'−'+(-e):e}}`;
+}
+function wrap(text,x,y,maxW,lh,o){
+  o=o||{}; const size=o.size||FS;
+  const words=text.split(' '); let line='';
+  for(const w of words){const test=line?line+' '+w:w; if(rtWidth(test,size)>maxW&&line){rt(line,x,y,o);y+=lh;line=w;} else line=test;}
+  if(line){rt(line,x,y,o);y+=lh;} return y;
+}
+
+// axes
+function makeAxis(x0,y0,x1,y1,xr,yr,opt){return Object.assign({x0,y0,x1,y1,xr,yr,xlog:false,ylog:false},opt||{});}
+function px(a,x){const v=a.xlog?Math.log10(x):x, lo=a.xlog?Math.log10(a.xr[0]):a.xr[0], hi=a.xlog?Math.log10(a.xr[1]):a.xr[1]; return a.x0+(v-lo)/(hi-lo)*(a.x1-a.x0);}
+function py(a,y){const v=a.ylog?Math.log10(y):y, lo=a.ylog?Math.log10(a.yr[0]):a.yr[0], hi=a.ylog?Math.log10(a.yr[1]):a.yr[1]; return a.y1-(v-lo)/(hi-lo)*(a.y1-a.y0);}
+function linTicks(lo,hi,n){const span=hi-lo, step0=span/n, mag=Math.pow(10,Math.floor(Math.log10(step0))), r=step0/mag;
+  const step=(r<1.5?1:r<3?2:r<7?5:10)*mag; const t=[]; for(let v=Math.ceil(lo/step-1e-9)*step; v<=hi+step*1e-6; v+=step) t.push(Math.abs(v)<step*1e-9?0:v); return t;}
+function decOf(v){const t=parseFloat(v.toPrecision(6)).toString(); const i=t.indexOf('.'); return i<0?0:t.length-i-1;}
+// all nonzero ticks on an axis get the same number of decimals (1.0 beside 0.8, 2.0 beside 1.5); zero stays 0
+function fmtTick(v,dec){if(Math.abs(v)<1e-12) return '0'; const s=dec!=null?v.toFixed(dec):parseFloat(v.toPrecision(6)).toString(); return s.replace('-','−');}
+function ticksDec(ts){return Math.max(0,...ts.filter(v=>Math.abs(v)>1e-12).map(decOf));}
+function logTicks(r){const lo=Math.floor(Math.log10(r[0])-1e-9), hi=Math.ceil(Math.log10(r[1])+1e-9), major=[],minor=[];
+  for(let e=lo;e<=hi;e++){const v=Math.pow(10,e); if(v>=r[0]*0.999&&v<=r[1]*1.001) major.push(v); for(let m=2;m<10;m++){const w=m*v; if(w>r[0]&&w<r[1]) minor.push(w);}}
+  return {major,minor};}
+function logLab(v){const e=Math.round(Math.log10(v)); return `10^{${e<0?'−'+(-e):e}}`;}
+// o.ylabel: string or [line1, line2]; o.yoff: distance from axis to the label line nearest the axis
+function drawAxes(a,o){
+  o=o||{};
+  const xt=a.xlog?logTicks(a.xr):linTicks(a.xr[0],a.xr[1],o.nx||6);
+  const yt=a.ylog?logTicks(a.yr):linTicks(a.yr[0],a.yr[1],o.ny||5);
+  ctx.save(); ctx.beginPath(); ctx.rect(a.x0,a.y0,a.x1-a.x0,a.y1-a.y0); ctx.clip();
+  ctx.strokeStyle=C.grid; ctx.lineWidth=1;
+  for(const t of xt.major||xt){const X=px(a,t); ctx.beginPath(); ctx.moveTo(X,a.y0); ctx.lineTo(X,a.y1); ctx.stroke();}
+  for(const t of yt.major||yt){const Y=py(a,t); ctx.beginPath(); ctx.moveTo(a.x0,Y); ctx.lineTo(a.x1,Y); ctx.stroke();}
+  ctx.restore();
+  ctx.strokeStyle=C.axis; ctx.lineWidth=1.2; ctx.strokeRect(a.x0,a.y0,a.x1-a.x0,a.y1-a.y0);
+  const tickX=(t,len)=>{const X=px(a,t); ctx.beginPath(); ctx.moveTo(X,a.y1); ctx.lineTo(X,a.y1-len); ctx.moveTo(X,a.y0); ctx.lineTo(X,a.y0+len); ctx.stroke();};
+  const tickY=(t,len)=>{const Y=py(a,t); ctx.beginPath(); ctx.moveTo(a.x0,Y); ctx.lineTo(a.x0+len,Y); ctx.moveTo(a.x1,Y); ctx.lineTo(a.x1-len,Y); ctx.stroke();};
+  const xd=a.xlog?0:ticksDec(xt), yd=a.ylog?0:ticksDec(yt);
+  for(const t of xt.major||xt){tickX(t,6); if(!o.noXlab) rt(a.xlog?logLab(t):fmtTick(t,xd),px(a,t),a.y1+TICK+5,{size:TICK,align:'center'});}
+  if(xt.minor) for(const t of xt.minor) tickX(t,3);
+  for(const t of yt.major||yt){tickY(t,6); rt(a.ylog?logLab(t):fmtTick(t,yd),a.x0-7,py(a,t)+TICK*0.35,{size:TICK,align:'right'});}
+  if(yt.minor) for(const t of yt.minor) tickY(t,3);
+  if(o.xlabel) rt(o.xlabel,(a.x0+a.x1)/2,a.y1+TICK+30,{size:FS,align:'center'});
+  if(o.ylabel){
+    const lines=Array.isArray(o.ylabel)?o.ylabel:[o.ylabel], off=o.yoff||46;
+    rotLabel(lines,a.x0-off,(a.y0+a.y1)/2);
+  }
+}
+// y-axis labels: draw the text horizontally on an offscreen canvas, then turn the bitmap 90° on whole
+// device pixels, so the rotated label renders exactly like the horizontal x-axis labels
+const offCv=document.createElement('canvas');
+function rotLabel(lines,cx,cy){
+  const k=cv.width/W, lh=24, pad=4;
+  const w=Math.max(...lines.map(s=>rtWidth(s,FS)))+2*pad, h=(lines.length-1)*lh+FS*1.45+2*pad;
+  offCv.width=Math.ceil(w*k); offCv.height=Math.ceil(h*k);
+  const o=offCv.getContext('2d'); o.setTransform(k,0,0,k,0,0); o.clearRect(0,0,w,h);
+  const yb=pad+FS*1.05+(lines.length-1)*lh;           // baseline of the last line (nearest the axis)
+  ctx=o; lines.forEach((s,i)=>rt(s,w/2,yb-(lines.length-1-i)*lh,{size:FS,align:'center'})); ctx=mainCtx;
+  ctx.save(); ctx.setTransform(1,0,0,1,0,0);
+  ctx.translate(Math.round(cx*k),Math.round(cy*k)); ctx.rotate(-Math.PI/2);
+  ctx.drawImage(offCv,-Math.round(offCv.width/2),-Math.round(yb*k));
+  ctx.restore();
+}
+function line(a,xs,ys,col,lw,dash){ctx.save(); ctx.beginPath(); ctx.rect(a.x0,a.y0,a.x1-a.x0,a.y1-a.y0); ctx.clip();
+  ctx.strokeStyle=col; ctx.lineWidth=lw||2; ctx.setLineDash(dash||[]); ctx.beginPath();
+  let started=false; for(let i=0;i<xs.length;i++){if(!isFinite(ys[i])||!isFinite(xs[i])){started=false;continue;} const X=px(a,xs[i]),Y=py(a,ys[i]); if(!started){ctx.moveTo(X,Y);started=true;} else ctx.lineTo(X,Y);} ctx.stroke(); ctx.restore();}
+function dot(x,y,r,fill,stroke){ctx.beginPath(); ctx.arc(x,y,r,0,2*Math.PI); ctx.fillStyle=fill; ctx.fill(); if(stroke){ctx.strokeStyle=stroke; ctx.lineWidth=1.3; ctx.stroke();}}
+function decadeRange(vals){const f=vals.filter(v=>isFinite(v)&&v>0); const lo=Math.min(...f),hi=Math.max(...f);
+  return [Math.pow(10,Math.floor(Math.log10(lo))),Math.pow(10,Math.ceil(Math.log10(hi)))];}
+// label drawn parallel to a curve; pts are data [x,y]; side +1 = above the curve, −1 = below
+function labelAlong(a,pts,frac,text,side,gap){
+  const P=pts.map(p=>[px(a,p[0]),py(a,p[1])]);
+  const k=Math.max(1,Math.min(P.length-2,Math.round(frac*(P.length-1))));
+  let ang=Math.atan2(P[k+1][1]-P[k-1][1],P[k+1][0]-P[k-1][0]);
+  if(ang>Math.PI/2||ang<-Math.PI/2){ang+=Math.PI; side=-side;}   // keep text upright
+  ctx.save(); ctx.translate(P[k][0],P[k][1]); ctx.rotate(ang);
+  rt(text,0,side>0?-(gap||6):(gap||6)+CL*0.75,{size:CL,align:'center'}); ctx.restore();
+}
+function leader(x0,y0,x1,y1){ctx.strokeStyle='#000'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(x0,y0); ctx.lineTo(x1,y1); ctx.stroke();}
+
+// seeded RNG for schematic layout
+let seed=12345; const rnd=()=>{seed=(seed*16807)%2147483647; return (seed-1)/2147483646;};
+const BOX={x:20,y:40,w:440,h:330};
+const DROPS=[{x:110,y:110},{x:335,y:125},{x:225,y:250}], DR=40;
+function place(n,minD,avoid){const out=[]; let guard=0;
+  while(out.length<n&&guard<20000){guard++; const p={x:BOX.x+16+rnd()*(BOX.w-32),y:BOX.y+16+rnd()*(BOX.h-32)};
+    if(DROPS.some(d=>Math.hypot(p.x-(BOX.x+d.x),p.y-(BOX.y+d.y))<DR+avoid)) continue;
+    if(out.some(q=>Math.hypot(p.x-q.x,p.y-q.y)<minD)) continue; out.push(p);} return out;}
+const PPOS=place(130,19,16); const MPOS=place(80,13,12);
+// put labeled objects first so they appear first and stay longest
+function bringFirst(arr,idx,tx,ty,limit){let b=idx,bd=1e9; for(let i=idx;i<Math.min(arr.length,limit);i++){const d=Math.hypot(arr[i].x-tx,arr[i].y-ty); if(d<bd){bd=d;b=i;}} const t=arr[idx]; arr[idx]=arr[b]; arr[b]=t;}
+bringFirst(PPOS,0,BOX.x+40,BOX.y+300,12);   // labeled particle
+bringFirst(PPOS,1,BOX.x+300,BOX.y+305,12);  // labeled radical
+bringFirst(MPOS,0,BOX.x+300,BOX.y+40,80);   // labeled micelle
+const PRAD=PPOS.map(()=>({on:rnd()<0.5,next:rnd()*0.6}));
+
+// ---------- state ----------
+let view=0, playing=false, tU=0.12, logT=false, lastTS=0;
+function tFromU(u){ if(!logT) return u*sim.tend; const tmin=sim.t1/40; return tmin*Math.pow(sim.tend/tmin,u); }
+function uFromT(t){ if(!logT) return t/sim.tend; const tmin=sim.t1/40; return Math.log(Math.max(t,tmin)/tmin)/Math.log(sim.tend/tmin); }
+
+// ---------- view 0: stages ----------
+function drawStages(dtSec){
+  const t=tFromU(tU), p=at(t), stName=['','Stage I: particle formation','Stage II: constant rate','Stage III: monomer depletion'][p.st];
+  rt(stName,BOX.x+BOX.w/2,28,{align:'center'});
+  ctx.fillStyle=C.water; ctx.strokeStyle=C.waterEdge; ctx.lineWidth=1.5;
+  ctx.fillRect(BOX.x,BOX.y,BOX.w,BOX.h); ctx.strokeRect(BOX.x,BOX.y,BOX.w,BOX.h);
+  // droplets
+  const dr=p.X<Xc?DR*Math.cbrt(Math.max(p.drop,0)):0;
+  if(dr>0.6) for(const d of DROPS){const X=BOX.x+d.x,Y=BOX.y+d.y;
+    dot(X,Y,dr,C.mono,C.monoEdge);
+    const nh=Math.max(10,Math.round(dr*1.1)); ctx.fillStyle='#3d5a80';
+    for(let k=0;k<nh;k++){const a=2*Math.PI*k/nh; ctx.beginPath(); ctx.arc(X+(dr+1.5)*Math.cos(a),Y+(dr+1.5)*Math.sin(a),1.3,0,2*Math.PI); ctx.fill();}
+  }
+  // micelles
+  const nm=Math.round(MPOS.length*p.mic);
+  for(let i=0;i<nm;i++){const m=MPOS[i]; dot(m.x,m.y,3.6,'#f7dc9a','#a8823a'); ctx.fillStyle='#3d5a80';
+    for(let k=0;k<8;k++){const a=2*Math.PI*k/8; ctx.beginPath(); ctx.arc(m.x+5.2*Math.cos(a),m.y+5.2*Math.sin(a),1.1,0,2*Math.PI); ctx.fill();}}
+  // particles
+  const nMax=Math.max(12,Math.min(PPOS.length,Math.round(45*Math.pow(sim.Nf/NREF,0.7))));
+  const np=Math.round(nMax*p.N/sim.Nf);
+  const rpx=Math.min(15,1.8+0.07*p.d);
+  const w=Math.min(1,Math.max(0,p.phim/phimSat));
+  const col=`rgb(${Math.round(236+(245-236)*w)},${Math.round(238+(208-238)*w)},${Math.round(242+(125-242)*w)})`;
+  for(let i=0;i<np;i++){
+    const q=PPOS[i], R=PRAD[i];
+    R.next-=dtSec; if(R.next<=0){R.on=!R.on; R.next=0.15+rnd()*0.9;}
+    const on=i===1?true:i===0?false:R.on;
+    dot(q.x,q.y,rpx,col,C.polyEdge);
+    if(on) dot(q.x,q.y,Math.max(1.6,rpx*0.32),'#d62d20');
+  }
+  // labels on the schematic objects
+  if(dr>0.6){const X=BOX.x+DROPS[0].x,Y=BOX.y+DROPS[0].y; rt('monomer droplet',X,Y-dr-9,{size:CL,align:'center',bg:true});}
+  if(nm>0){const m=MPOS[0]; leader(m.x+6,m.y,m.x+22,m.y); rt('micelle',m.x+25,m.y+5,{size:CL,bg:true});}
+  if(np>0){const q=PPOS[0]; leader(q.x+rpx,q.y,q.x+rpx+14,q.y); rt('polymer particle',q.x+rpx+17,q.y+5,{size:CL,bg:true});}
+  if(np>1){const q=PPOS[1]; leader(q.x-2,q.y,q.x-rpx-14,q.y); rt('radical',q.x-rpx-17,q.y+5,{size:CL,align:'right',bg:true});}
+  // readouts
+  const c1=BOX.x+2, c2=BOX.x+196; const y=BOX.y+BOX.h+34, lh=27;
+  const rows1=[`time = ${(t/60).toFixed(1)} min`,`conversion = ${p.X.toFixed(3)}`,`‾n = 0.5`,`diameter = ${p.d.toFixed(0)} nm`];
+  const rows2=[`particles N = ${sci(p.N,3)} cm^{−3}`,`[M]_{p} = ${p.Mp.toFixed(2)} mol/L`,`rate R_{p} = ${sci(p.Rp,3)} mol/(L s)`,`X_{n} = ${p.st>1?sci(p.Xn,3):'— (Stage I)'}`];
+  rows1.forEach((s,i)=>rt(s,c1,y+i*lh)); rows2.forEach((s,i)=>rt(s,c2,y+i*lh));
+  rt('schematic is not to scale; N is per cm³ of water',c1,y+4*lh+6);
+  rt('and R_{p} is per liter of water',c1,y+5*lh+6);
+
+  // plots
+  const xr=logT?[sim.t1/40/60,sim.tend/60]:[0,sim.tend/60];
+  const P=sim.pts.filter(q=>!logT||q.t>=sim.t1/40);
+  const tx=P.map(q=>q.t/60);
+  const eN=Math.floor(Math.log10(sim.Nf)), RpMax=Math.max(...P.map(q=>q.Rp)), eR=Math.floor(Math.log10(RpMax));
+  const L=580,R=942;
+  const axs=[
+    makeAxis(L,26,R,170,xr,[0,1],{xlog:logT}),
+    makeAxis(L,192,R,336,xr,[0,niceMax(RpMax/Math.pow(10,eR))],{xlog:logT}),
+    makeAxis(L,358,R,502,xr,[0,niceMax(sim.Nf/Math.pow(10,eN))],{xlog:logT})];
+  const shade=a=>{const b=[[xr[0],sim.t1/60,C.s1,'I'],[sim.t1/60,sim.t2/60,C.s2,'II'],[sim.t2/60,xr[1],C.s3,'III']];
+    for(const [s0,s1,c] of b){const X0=px(a,Math.max(s0,xr[0])),X1=px(a,Math.min(s1,xr[1])); if(X1>X0){ctx.fillStyle=c; ctx.fillRect(X0,a.y0,X1-X0,a.y1-a.y0);}}
+    return b;};
+  const eRs=eR<0?'−'+(-eR):String(eR);
+  const labels=['conversion X',['rate R_{p}',`(10^{${eRs}} mol/(L s))`],['particles N',`(10^{${eN}} cm^{−3})`]];
+  const ys=[P.map(q=>q.X),P.map(q=>q.Rp/Math.pow(10,eR)),P.map(q=>q.N/Math.pow(10,eN))];
+  const cols=[C.red,C.blue,C.green];
+  axs.forEach((a,i)=>{const b=shade(a);
+    drawAxes(a,{noXlab:i<2,ny:4,xlabel:i===2?'time (min)':'',ylabel:labels[i],yoff:i===0?44:46});
+    line(a,tx,ys[i],cols[i],2.2);
+    stageMarks(a,b,tx,ys[i]);
+    const tm=Math.max(t,xr[0]*60)/60; const X=px(a,tm);
+    ctx.strokeStyle='#444'; ctx.setLineDash([4,3]); ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(X,a.y0); ctx.lineTo(X,a.y1); ctx.stroke(); ctx.setLineDash([]);
+    const yv=[p.X,p.Rp/Math.pow(10,eR),p.N/Math.pow(10,eN)][i]; dot(X,py(a,yv),4.5,cols[i],'#fff');
+  });
+}
+// stage labels with double-headed arrows spanning each stage, at a height clear of the curve
+function stageMarks(a,bands,xs,ys){
+  const pix=[]; for(let i=1;i<xs.length;i++){const x0=px(a,xs[i-1]),y0=py(a,ys[i-1]),x1=px(a,xs[i]),y1=py(a,ys[i]);
+    if(!isFinite(x0)||!isFinite(x1)) continue; const n=Math.max(1,Math.ceil(Math.hypot(x1-x0,y1-y0)/2)); for(let k=0;k<=n;k++) pix.push([x0+(x1-x0)*k/n,y0+(y1-y0)*k/n]);}
+  const hit=r=>{let c=0; for(const q of pix) if(q[0]>r[0]&&q[0]<r[0]+r[2]&&q[1]>r[1]&&q[1]<r[1]+r[3]) c++; return c;};
+  const ov=(r,q)=>Math.max(0,Math.min(r[0]+r[2],q[0]+q[2])-Math.max(r[0],q[0]))*Math.max(0,Math.min(r[1]+r[3],q[1]+q[3])-Math.max(r[1],q[1]));
+  const used=[];
+  for(const [s0,s1,,lab] of bands){
+    const lo=Math.max(s0,a.xr[0]), hi=Math.min(s1,a.xr[1]); if(!(hi>lo)) continue;
+    const X0=px(a,lo)+1, X1=px(a,hi)-1, text='Stage '+lab, w=rtWidth(text,CL), narrow=X1-X0<w*0.75, tiny=X1-X0<22;
+    let best=null;
+    for(let y=a.y0+24;y<=a.y1-8;y+=3){
+      const ex=tiny?12:0;                                   // outside arrows for very short stages
+      const ar=[X0-ex-2,y-5,X1-X0+2*ex+4,10];
+      const tr=narrow?[X1+ex+4,y-CL*0.8,w+6,CL*1.1]:[(X0+X1)/2-w/2-3,y-CL*1.25-4,w+6,CL*1.15];
+      if(tr[0]+tr[2]>a.x1-2||tr[1]<a.y0+2) continue;
+      let c=(hit(ar)+hit(tr))*50;
+      for(const q of used) c+=(ov(ar,q)+ov(tr,q))*100;
+      c+=Math.abs(y-(a.y0+a.y1)/2)*0.002;
+      if(!best||c<best.c) best={c,y,ar,tr};
+    }
+    if(!best) continue;
+    used.push(best.ar,best.tr);
+    const y=best.y; ctx.strokeStyle='#000'; ctx.fillStyle='#000'; ctx.lineWidth=1.2;
+    const head=(x,dir)=>{ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x-dir*6,y-3.5); ctx.lineTo(x-dir*6,y+3.5); ctx.closePath(); ctx.fill();};
+    if(tiny){ // |<- ->| form: boundary ticks with arrows pointing in from outside
+      const leftOK=X0-14>a.x0;   // at the axis, the axis itself marks the start of the stage
+      ctx.beginPath(); ctx.moveTo(X1,y-6); ctx.lineTo(X1,y+6); ctx.moveTo(X1,y); ctx.lineTo(X1+12,y);
+      if(leftOK){ctx.moveTo(X0,y-6); ctx.lineTo(X0,y+6); ctx.moveTo(X0-12,y); ctx.lineTo(X0,y);}
+      ctx.stroke(); head(X1,-1); if(leftOK) head(X0,1);
+    } else { ctx.beginPath(); ctx.moveTo(X0+2,y); ctx.lineTo(X1-2,y); ctx.stroke(); head(X0,-1); head(X1,1); }
+    if(narrow) rt(text,best.tr[0]+3,y+CL*0.35,{size:CL}); else rt(text,(X0+X1)/2,y-9,{size:CL,align:'center'});
+  }
+}
+function niceMax(v){const e=Math.pow(10,Math.floor(Math.log10(v))), m=v/e; return (m<=1?1:m<=1.2?1.2:m<=1.5?1.5:m<=2?2:m<=2.5?2.5:m<=3?3:m<=4?4:m<=5?5:m<=6?6:m<=8?8:10)*e;}
+
+// ---------- view 1: particle number ----------
+function drawPN(){
+  const Sm=(S/MWS-CMC)*1000; // mmol/L in micelles
+  const sx=[]; for(let k=0;k<=60;k++) sx.push(Math.pow(10,2*k/60));
+  const ix=[]; for(let k=0;k<=60;k++) ix.push(0.5*Math.pow(40,k/60));
+  const Is=[I/4,I,I*4], Sms=[Sm/4,Sm,Sm*4];
+  const all=[]; Is.forEach(i=>sx.forEach(s=>all.push(NseM(s,i)))); Sms.forEach(s=>ix.forEach(i=>all.push(NseM(s,i))));
+  const yr=[Math.min(...all)/1.25,Math.max(...all)*1.25];
+  const A=makeAxis(112,44,452,410,[1,100],yr,{xlog:true,ylog:true});
+  const B=makeAxis(600,44,940,410,[0.5,20],yr,{xlog:true,ylog:true});
+  drawAxes(A,{xlabel:'surfactant in micelles (mmol/L)',ylabel:'particle number N (cm^{−3})',yoff:56});
+  drawAxes(B,{xlabel:'initiator concentration (mmol/L)',ylabel:'particle number N (cm^{−3})',yoff:56});
+  rt('particle number versus surfactant',(A.x0+A.x1)/2,28,{align:'center',wt:'bold'});
+  rt('particle number versus initiator',(B.x0+B.x1)/2,28,{align:'center',wt:'bold'});
+  Is.forEach((i,k)=>{const pts=sx.map(s=>[s,NseM(s,i)]);
+    line(A,sx,pts.map(v=>v[1]),k===1?C.red:'#b9858a',k===1?2.6:1.5,k===1?[]:[6,4]);
+    labelAlong(A,pts,[0.3,0.5,0.72][k],`initiator ${fmtNum(i)} mmol/L`,1,6);});
+  Sms.forEach((s,k)=>{const pts=ix.map(i=>[i,NseM(s,i)]);
+    line(B,ix,pts.map(v=>v[1]),k===1?C.blue:'#8aa6c8',k===1?2.6:1.5,k===1?[]:[6,4]);
+    labelAlong(B,pts,[0.3,0.5,0.72][k],`surfactant ${fmtNum(s/1000*MWS+CMC*MWS)} g/L`,1,6);});
+  const Nc=NseM(Sm,I);
+  dot(px(A,Sm),py(A,Nc),6,C.red,'#fff'); dot(px(B,I),py(B,Nc),6,C.blue,'#fff');
+  rt('slope = 0.6',A.x0+14,A.y0+26);
+  rt('slope = 0.4',B.x0+14,B.y0+26);
+  const x=40; let y=488;
+  rt(`N = 0.37(ρ/μ)^{0.4}(a_{s}S)^{0.6} = ${sci(Nc,3)} particles per cm³ of water`,x,y); y+=27;
+  rt(`doubling the surfactant multiplies N by 2^{0.6} = 1.52; doubling the initiator multiplies N by 2^{0.4} = 1.32`,x,y); y+=27;
+  rt(`rate R_{p} = ${sci(RpEm(Nc,Mpsat),3)} mol/(L s)      degree of polymerization X_{n} = ${sci(XnEm(Nc,Mpsat,I),3)}      final particle diameter = ${finalD(Nc).toFixed(0)} nm`,x,y);
+}
+function fmtNum(v){return v>=10?v.toFixed(0):v>=1?v.toFixed(1):v.toFixed(2);}
+function finalD(N){const V=0.985*mload/rhop+0.015*mload/rhom; return Math.cbrt(6*V/(Math.PI*N))*1e7;}
+
+// ---------- view 2: n-bar Monte Carlo ----------
+const NBP=64; const NBc={1:{kdes:3},2:{},3:{c:0.08}};
+// exact steady-state average for Case 3 (entry rate 1, pair termination c n(n-1))
+const nbarCase3=(function(){const c=NBc[3].c,M=40;const P=new Array(M).fill(0);P[0]=1;const h=0.02;
+  for(let it=0;it<60000;it++){const d=new Array(M).fill(0);for(let n=0;n<M;n++){const p=P[n];if(n+1<M){d[n]-=p;d[n+1]+=p;}const r=c*n*(n-1);if(n>=2){d[n]-=r*p;d[n-2]+=r*p;}}for(let n=0;n<M;n++)P[n]+=h*d[n];}
+  let s=0;for(let n=0;n<M;n++)s+=n*P[n];return s;})();
+let nb={cs:2,parts:[],t:0,integ:0,series:[],run:true,sinceRec:0};
+function nbReset(){nb.parts=[];for(let i=0;i<NBP;i++)nb.parts.push({n:0,fl:0,fk:0}); nb.t=0; nb.integ=0; nb.series=[]; nb.sinceRec=0;}
+function nbStep(D){
+  for(const q of nb.parts){
+    let tl=D;
+    while(true){
+      const re=1, rx=nb.cs===1?NBc[1].kdes*q.n:0, rtm=nb.cs===3?NBc[3].c*q.n*(q.n-1):0, R=re+rx+rtm;
+      const tau=-Math.log(1-Math.random())/R;
+      if(tau>tl){nb.integ+=q.n*tl; break;}
+      nb.integ+=q.n*tau; tl-=tau; const u=Math.random()*R;
+      if(u<re){ if(nb.cs!==3&&q.n===1){q.n=0;q.fl=0.35;q.fk=2;} else {q.n=Math.min(q.n+1,14);q.fl=0.35;q.fk=1;} }
+      else if(u<re+rx){q.n--;q.fl=0.35;q.fk=3;}
+      else {q.n-=2;q.fl=0.35;q.fk=2;}
+    }
+    q.fl=Math.max(0,q.fl-D*0.6);
+  }
+  nb.t+=D; nb.sinceRec+=D;
+  if(nb.sinceRec>=0.1){nb.sinceRec=0; nb.series.push([nb.t,nb.integ/(NBP*nb.t)]); if(nb.series.length>800) nb.series.shift();}
+}
+function drawNbar(){
+  const g0x=30,g0y=50,cell=40, big=nb.cs===3;
+  rt(['','Case 1: radicals leave small particles','Case 2: Smith–Ewart','Case 3: large particles'][nb.cs],g0x+cell*4,28,{align:'center'});
+  ctx.fillStyle=C.water; ctx.fillRect(g0x-8,g0y-8,cell*8+16,cell*8+16); ctx.strokeStyle=C.waterEdge; ctx.strokeRect(g0x-8,g0y-8,cell*8+16,cell*8+16);
+  nb.parts.forEach((q,i)=>{
+    const cx=g0x+cell*(i%8)+cell/2, cy=g0y+cell*Math.floor(i/8)+cell/2, R=big?18:13;
+    if(q.fl>0){ctx.beginPath(); ctx.arc(cx,cy,R+4,0,2*Math.PI); ctx.strokeStyle=q.fk===1?`rgba(46,125,50,${q.fl/0.35})`:q.fk===2?`rgba(152,0,13,${q.fl/0.35})`:`rgba(31,95,168,${q.fl/0.35})`; ctx.lineWidth=3; ctx.stroke();}
+    dot(cx,cy,R,q.n>0?'rgb(245,208,125)':'#f0f1f4',C.polyEdge);
+    const k=Math.min(q.n,12);
+    for(let j=0;j<k;j++){const a=k===1?0:2*Math.PI*j/k, rr2=k===1?0:(big?10:6); dot(cx+rr2*Math.cos(a),cy+rr2*Math.sin(a),k>6?2.2:3,'#d62d20');}
+  });
+  let y=g0y+cell*8+32;
+  const note=nb.cs===1?'Red dots are radicals. A green ring shows a radical entering, a red ring shows termination, and a blue ring shows a radical leaving.'
+                      :'Red dots are radicals. A green ring shows a radical entering, and a red ring shows termination.';
+  y=wrap(note,g0x-6,y,345,23)+8;
+  // histogram of particles with n radicals
+  const maxn=nb.cs===3?8:1, counts=new Array(maxn+1).fill(0); nb.parts.forEach(q=>counts[Math.min(q.n,maxn)]++);
+  rt('number of particles with n radicals',g0x-6,y);
+  const hx=g0x, base=y+70, hh=46, bw=cell*8/(maxn+1);
+  counts.forEach((c,k)=>{const h=hh*c/NBP; ctx.fillStyle=C.orange; ctx.fillRect(hx+k*bw+bw*0.2,base-h,bw*0.6,h);
+    rt(String(c),hx+k*bw+bw/2,base-h-4,{size:TICK,align:'center'});
+    rt(String(k)+(k===maxn&&nb.cs===3?'+':''),hx+k*bw+bw/2,base+19,{size:TICK,align:'center'});});
+
+  // plot of the time-average radicals per particle
+  const theo=nb.cs===1?1/(2+NBc[1].kdes):nb.cs===2?0.5:nbarCase3;
+  const ymax=nb.cs===3?5:1, tw=40, t1=Math.max(tw,nb.t);
+  const A=makeAxis(470,40,940,300,[t1-tw,t1],[0,ymax]);
+  drawAxes(A,{xlabel:'dimensionless time (time × entry rate)',ylabel:'radicals per particle',yoff:46,ny:5});
+  const s=nb.series;
+  line(A,[t1-tw,t1],[theo,theo],'#333',1.6,[7,5]);
+  line(A,s.map(r=>r[0]),s.map(r=>r[1]),C.red,2.6);
+  // curve labels: theory near the left, time average at the end of its curve
+  const span=(xa,xb)=>s.filter(r=>r[0]>=xa&&r[0]<=xb).map(r=>r[1]);
+  const tLab=`theory ‾n = ${theo.toFixed(nb.cs===2?1:2)}`, wT=rtWidth(tLab,CL);
+  const tx0=t1-tw+0.5, tx1=tx0+(wT+10)/(A.x1-A.x0)*tw, sv=span(tx0,tx1);
+  // put the theory label on the side of the line that the data curve does not reach
+  if(sv.length===0||Math.max(...sv)<=theo) rt(tLab,A.x0+6,py(A,theo)-7,{size:CL});
+  else if(Math.min(...sv)>=theo) rt(tLab,A.x0+6,py(A,theo)+CL+5,{size:CL});
+  else rt(tLab,A.x0+6,py(A,Math.max(...sv))-7,{size:CL});
+  if(nb.t>12&&s.length){
+    const last=s[s.length-1], aLab='time average ‾n', wA=rtWidth(aLab,CL);
+    const Xe=px(A,last[0]), xa=last[0]-(wA+12)/(A.x1-A.x0)*tw, av=span(xa,last[0]);
+    const lo=Math.min(...av,theo), hi=Math.max(...av,theo);
+    // label goes on the side of the curve away from the theory line
+    if(last[1]>=theo) rt(aLab,Xe-6,py(A,hi)-8,{size:CL,align:'right'});
+    else rt(aLab,Xe-6,py(A,lo)+CL+6,{size:CL,align:'right'});
+  }
+  const avg=s.length?s[s.length-1][1]:0, active=nb.parts.filter(q=>q.n>0).length;
+  let ty=388;
+  rt(`‾n from simulation = ${avg.toFixed(3)}`,470,ty); rt(`‾n from theory = ${theo.toFixed(nb.cs===2?1:2)}`,720,ty); ty+=27;
+  rt(`particles with radicals right now: ${active} of ${NBP}`,470,ty); ty+=34;
+  const txt={1:'Small particles: a radical can diffuse out (at 3 times the entry rate) before the next radical enters, so particles are inactive most of the time and ‾n = ρ′/(2ρ′ + k_{des}) = 0.2.',
+    2:'Each particle holds zero or one radical. A radical that enters an empty particle starts a chain, and the next radical to enter terminates it immediately. Each entry switches a particle on or off, so on average half the particles are growing and ‾n = 0.5.',
+    3:'Large particles (or a viscous Stage III with the gel effect): termination inside a particle is slow, so several radicals coexist and ‾n rises well above 0.5.'}[nb.cs];
+  wrap(txt,470,ty,465,24);
+}
+
+// ---------- curve-label placement ----------
+// Each label is horizontal text placed next to a point on its own curve. Many candidate spots are scored;
+// a spot loses points for covering any curve, a marker, another label, or leaving the plot, so the
+// chosen spot is clear of everything for any slider setting.
+function placeLabels(a,items,marks){
+  const pix=[];   // dense pixel samples of every curve
+  items.forEach(([pts])=>{for(let i=1;i<pts.length;i++){const x0=px(a,pts[i-1][0]),y0=py(a,pts[i-1][1]),x1=px(a,pts[i][0]),y1=py(a,pts[i][1]);
+    const n=Math.max(1,Math.ceil(Math.hypot(x1-x0,y1-y0)/2)); for(let k=0;k<=n;k++) pix.push([x0+(x1-x0)*k/n,y0+(y1-y0)*k/n]);}});
+  const placed=[]; let total=0;
+  const hit=(r,pad)=>{let c=0; for(const q of pix) if(q[0]>r[0]-pad&&q[0]<r[0]+r[2]+pad&&q[1]>r[1]-pad&&q[1]<r[1]+r[3]+pad) c++; return c;};
+  const ov=(r,q)=>Math.max(0,Math.min(r[0]+r[2],q[0]+q[2])-Math.max(r[0],q[0]))*Math.max(0,Math.min(r[1]+r[3],q[1]+q[3])-Math.max(r[1],q[1]));
+  for(const [pts,text] of items){
+    const w=rtWidth(text,CL), h=CL*1.05; let best=null;
+    for(let f=0.04;f<=0.96;f+=0.04){
+      const k=Math.round(f*(pts.length-1)), X=px(a,pts[k][0]), Y=py(a,pts[k][1]);
+      for(const [dx,dy] of [[8,-8],[-8-w,-8],[8,8+h],[-8-w,8+h],[-w/2,-10],[-w/2,10+h],[12,h/2-3],[-12-w,h/2-3]]){
+        const x=X+dx, yb=Y+dy, r=[x-2,yb-CL*0.82,w+4,h];
+        let c=0;
+        if(r[0]<a.x0+3||r[0]+r[2]>a.x1-3||r[1]<a.y0+3||r[1]+r[3]>a.y1-3) c+=1e6;
+        c+=hit(r,3)*50;
+        for(const m of marks) if(m[0]>r[0]-12&&m[0]<r[0]+r[2]+12&&m[1]>r[1]-12&&m[1]<r[1]+r[3]+12) c+=5000;
+        for(const q of placed) c+=ov([r[0]-4,r[1]-4,r[2]+8,r[3]+8],q)*100;
+        c+=Math.abs(f-0.7)*4;        // mild preference for the arrow end of the curve
+        if(!best||c<best.c) best={c,x,yb,r};
+      }
+    }
+    placed.push(best.r); total+=best.c;
+    rt(text,best.x,best.yb,{size:CL});
+  }
+  window.__labelCost=total; return total;
+}
+
+// ---------- view 3: emulsion vs. bulk ----------
+function drawBulk(){
+  const Sv=[]; for(let k=0;k<=50;k++) Sv.push(2.6*Math.pow(30/2.6,k/50));
+  const Iv=[]; for(let k=0;k<=50;k++) Iv.push(0.5*Math.pow(40,k/50));
+  const emS=Sv.map(s=>{const N=Nse(s,I); return [XnEm(N,Mpsat,I),RpEm(N,Mpsat)];});
+  const emI=Iv.map(i=>{const N=Nse(S,i); return [XnEm(N,Mpsat,i),RpEm(N,Mpsat)];});
+  const bk=Iv.map(i=>{const b=bulk(i); return [b.Xn,b.Rp];});
+  const xr=decadeRange([...emS,...emI,...bk].map(v=>v[0])), yr=decadeRange([...emS,...emI,...bk].map(v=>v[1]));
+  const A=makeAxis(100,30,580,500,xr,yr,{xlog:true,ylog:true});
+  drawAxes(A,{xlabel:'degree of polymerization X_{n}',ylabel:'polymerization rate R_{p} (mol/(L s))',yoff:54});
+  line(A,bk.map(v=>v[0]),bk.map(v=>v[1]),'#333',2.4);
+  line(A,emI.map(v=>v[0]),emI.map(v=>v[1]),C.blue,2,[7,5]);
+  line(A,emS.map(v=>v[0]),emS.map(v=>v[1]),C.red,2.8);
+  const arrow=(pts,col)=>{const n=pts.length, a=pts[n-6], b=pts[n-1], X0=px(A,a[0]),Y0=py(A,a[1]),X1=px(A,b[0]),Y1=py(A,b[1]); const ang=Math.atan2(Y1-Y0,X1-X0);
+    ctx.fillStyle=col; ctx.beginPath(); ctx.moveTo(X1+7*Math.cos(ang),Y1+7*Math.sin(ang)); ctx.lineTo(X1-9*Math.cos(ang-0.45),Y1-9*Math.sin(ang-0.45)); ctx.lineTo(X1-9*Math.cos(ang+0.45),Y1-9*Math.sin(ang+0.45)); ctx.closePath(); ctx.fill();};
+  arrow(emS,C.red); arrow(emI,C.blue); arrow(bk,'#333');
+  const Nc=Nse(S,I), e={Xn:XnEm(Nc,Mpsat,I),Rp:RpEm(Nc,Mpsat)}, b=bulk(I);
+  const marks=[[px(A,e.Xn),py(A,e.Rp)],[px(A,b.Xn),py(A,b.Rp)]];
+  placeLabels(A,[[emS,'emulsion, more surfactant'],[emI,'emulsion, more initiator'],[bk,'bulk, more initiator']],marks);
+  dot(px(A,e.Xn),py(A,e.Rp),7,C.red,'#fff');
+  ctx.fillStyle='#333'; ctx.fillRect(px(A,b.Xn)-6,py(A,b.Rp)-6,12,12); ctx.strokeStyle='#fff'; ctx.lineWidth=1.5; ctx.strokeRect(px(A,b.Xn)-6,py(A,b.Rp)-6,12,12);
+  // table
+  const x0=624, cE=x0+232, cB=x0+322; let y=40;
+  rt(`surfactant ${S.toFixed(1)} g/L, initiator ${I.toFixed(1)} mmol/L`,x0,y); y+=36;
+  rt('emulsion',cE,y,{align:'right'}); rt('bulk',cB,y,{align:'right'}); y+=9;
+  ctx.strokeStyle='#999'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(x0,y); ctx.lineTo(cB+2,y); ctx.stroke(); y+=25;
+  rt('rate R_{p}',x0,y); rt(sci(e.Rp,2),cE,y,{align:'right'}); rt(sci(b.Rp,2),cB,y,{align:'right'}); y+=28;
+  rt('chain length X_{n}',x0,y); rt(sci(e.Xn,2),cE,y,{align:'right'}); rt(sci(b.Xn,2),cB,y,{align:'right'}); y+=28;
+  rt('particles N',x0,y); rt(sci(Nc,2),cE,y,{align:'right'}); rt('—',cB,y,{align:'right'}); y+=12;
+  ctx.beginPath(); ctx.moveTo(x0,y); ctx.lineTo(cB+2,y); ctx.stroke(); y+=26;
+  rt('rate in mol/(L s); N per cm³ of water',x0,y); y+=34;
+  rt(`emulsion rate is ${(e.Rp/b.Rp).toFixed(0)} times bulk rate`,x0,y); y+=26;
+  rt(`emulsion X_{n} is ${(e.Xn/b.Xn).toFixed(0)} times bulk X_{n}`,x0,y); y+=36;
+  y=wrap('Bulk: more initiator raises the rate but lowers X_{n}, because R_{p}X_{n} is constant (slope of −1).',x0,y,320,24)+10;
+  y=wrap('Emulsion: more surfactant gives more particles. R_{p} and X_{n} are both proportional to N, so both increase (slope of +1).',x0,y,320,24)+10;
+  wrap('Emulsion rates are per liter of water; bulk rates are per liter of monomer.',x0,y,320,24);
+}
+
+// ---------- main loop ----------
+function frame(ts){
+  const dtSec=lastTS?Math.min(0.1,(ts-lastTS)/1000):0; lastTS=ts;
+  if(view===0&&playing){tU+=dtSec/14; if(tU>=1){tU=1; playing=false; bPlay.textContent='play';} sT.value=Math.round(tU*1000);}
+  if(view===2&&nb.run) nbStep(dtSec*3.5);
+  ctx.clearRect(0,0,W,H); ctx.fillStyle='#fff'; ctx.fillRect(0,0,W,H);
+  if(view===0) drawStages(dtSec); else if(view===1) drawPN(); else if(view===2) drawNbar(); else drawBulk();
+  requestAnimationFrame(frame);
+}
+
+// ---------- UI ----------
+const $=id=>document.getElementById(id);
+const sS=$('sS'),sI=$('sI'),sT=$('sT'),bPlay=$('bPlay');
+function updLabels(){$('vS').textContent=S.toFixed(1)+' g/L'; $('vI').textContent=I.toFixed(1)+' mmol/L';}
+function onParam(){
+  const tcur=sim?tFromU(tU)/sim.tend:0.12;
+  S=+sS.value; I=+sI.value; updLabels(); simulate();
+  tU=Math.min(1,Math.max(0,uFromT(tcur*sim.tend))); sT.value=Math.round(tU*1000);
+}
+sS.addEventListener('input',onParam); sI.addEventListener('input',onParam);
+sT.addEventListener('input',()=>{tU=+sT.value/1000;});
+bPlay.addEventListener('click',()=>{ if(playing){playing=false;bPlay.textContent='play';} else {if(tU>=1)tU=0; playing=true; bPlay.textContent='pause';}});
+$('cLog').addEventListener('change',e=>{const t=tFromU(tU); logT=e.target.checked; tU=Math.min(1,Math.max(0,uFromT(t))); sT.value=Math.round(tU*1000);});
+document.querySelectorAll('#views button').forEach(b=>b.addEventListener('click',()=>{
+  view=+b.dataset.v; document.querySelectorAll('#views button').forEach(x=>x.classList.toggle('on',x===b));
+  $('tctl').hidden=view!==0; $('nctl').hidden=view!==2; $('sctl').hidden=view===2; $('ictl').hidden=view===2;
+}));
+document.querySelectorAll('#cases button').forEach(b=>b.addEventListener('click',()=>{
+  nb.cs=+b.dataset.c; document.querySelectorAll('#cases button').forEach(x=>x.classList.toggle('on',x===b)); nbReset();
+}));
+$('bPause').addEventListener('click',e=>{nb.run=!nb.run; e.target.textContent=nb.run?'pause':'resume';});
+$('bReset').addEventListener('click',()=>nbReset());
+// flyout panels: overlay the simulation just below the button row; clicking the button again closes it
+const panels={bDir:'pDir',bDet:'pDet',bAbout:'pAbout'};
+function placePanel(el){const r=$('toprow'); el.style.top=(r.offsetTop+r.offsetHeight+6)+'px';}
+for(const [b,p] of Object.entries(panels)){
+  $(b).addEventListener('click',()=>{const el=$(p), open=el.hidden; for(const q of Object.values(panels)) $(q).hidden=true; if(open){placePanel(el); el.hidden=false;}});
+  $(p).querySelector('.close').addEventListener('click',()=>{$(p).hidden=true;});
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape') for(const q of Object.values(panels)) $(q).hidden=true;});
+
+window.addEventListener('resize',()=>{resize(); for(const q of Object.values(panels)) if(!$(q).hidden) placePanel($(q));});
+updLabels(); simulate(); nbReset(); resize(); requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

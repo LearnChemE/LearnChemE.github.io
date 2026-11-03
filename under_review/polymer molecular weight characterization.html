@@ -1,0 +1,492 @@
+<title>Polymer Molecular Weight Characterization</title>
+<style>
+/* Layout: LearnChemE house style — title strip, view switch + menu row, control band, hi-DPI canvas, readout row */
+:root{
+  --red:#98000D; --ink:#000000; --muted:#000000; --line:#d9d3d3; --soft:#f5f2f2; --bg:#ffffff;
+  --blue:#1d4fb8; --green:#1d7a3a; --orange:#c86a00;
+  --sans:Helvetica, Arial, sans-serif;
+  color-scheme:light;
+}
+[hidden]{display:none!important}
+sub,sup{font-size:0.75em;line-height:0;position:relative;vertical-align:baseline;font-style:normal;font-weight:normal}
+sub{bottom:-0.3em}
+sub.mj{font-family:'Times New Roman',Times,serif;font-style:italic;font-size:0.8em}
+sup{top:-0.45em}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px}
+#app{max-width:980px;margin:0 auto;padding-block:4px 28px;padding-inline:16px}
+h1{font-size:17px;font-weight:600;margin:0;min-height:40px;display:flex;align-items:center;text-wrap:balance}
+.bar{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;margin-top:6px}
+.seg{display:flex;border:1px solid var(--red);border-radius:6px;overflow:hidden}
+.seg button{background:var(--bg);color:var(--red);border:0;padding:7px 14px;font:17px var(--sans);cursor:pointer}
+.seg button+button{border-left:1px solid var(--red)}
+.seg button[aria-pressed="true"]{background:var(--red);color:#fff}
+.menu{position:relative;display:flex;gap:8px}
+.btn{background:var(--red);color:#fff;border:0;border-radius:5px;padding:7px 14px;font:17px var(--sans);cursor:pointer}
+.btn:hover,.seg button:hover{filter:brightness(1.12)}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.panel{position:absolute;top:calc(100% + 8px);right:0;width:min(620px,calc(100vw - 32px));background:var(--bg);border:1px solid var(--line);border-radius:8px;box-shadow:0 12px 30px rgba(40,0,0,.18);z-index:30;display:flex;flex-direction:column;max-height:74vh}
+#pDet{width:min(713px,calc(100vw - 32px))}
+.panel .x{position:absolute;top:4px;right:6px;background:none;border:0;font-size:24px;line-height:1;color:var(--muted);cursor:pointer;padding:4px 8px;z-index:2}
+.panel .body{overflow:auto;padding:16px 22px 18px;line-height:1.5;font-size:17px}
+.panel h2{font-size:17px;margin:14px 0 4px;color:var(--red)}
+.panel h2:first-child{margin-top:0}
+.panel p{margin:6px 0}
+.panel a{color:var(--red)}
+mjx-container[display="true"]{margin:6px 0 !important}
+.controls{display:flex;flex-direction:column;gap:8px;margin-top:12px;padding:10px 12px;background:var(--soft);border-radius:6px}
+.row{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center}
+.ctl{display:flex;align-items:center;gap:8px;font-size:17px}
+input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+.ctl input[type=range]{width:120px;margin-bottom:0}
+.ctl select{font:17px var(--sans);color:var(--ink);padding:3px 4px}
+.ctl input[type=checkbox]{accent-color:var(--red);width:16px;height:16px}
+.val{min-width:44px;font-variant-numeric:tabular-nums}
+.tag{font-size:17px;font-weight:600;color:var(--ink);min-width:68px}
+#plotWrap{margin-top:10px}
+canvas{display:block;width:100%}
+.readout{display:flex;flex-wrap:wrap;gap:6px 26px;margin-top:6px;font-size:17px;font-variant-numeric:tabular-nums;align-items:baseline}
+.readout .k{color:var(--muted)}
+.sw{display:inline-block;width:22px;height:3px;vertical-align:middle;margin-right:6px}
+table.t{border-collapse:collapse;font-size:17px;font-variant-numeric:tabular-nums}
+table.t td,table.t th{padding:3px 10px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+table.t th{font-weight:600;color:var(--ink)}
+table.t td:first-child,table.t th:first-child{text-align:left}
+.tw{overflow-x:auto;max-width:100%}
+.warn{font-weight:700}
+@media (max-width:520px){.ctl input[type=range]{width:120px}.seg button{padding:7px 10px}}
+</style>
+<script>
+window.MathJax={tex:{inlineMath:[['\\(','\\)']]},svg:{fontCache:'global',displayAlign:'left',displayIndent:'1em'}};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js" async></script>
+
+<div id="app">
+  <h1>Polymer Molecular Weight Characterization</h1>
+  <div class="bar">
+    <div class="seg" id="viewSeg" role="group" aria-label="View">
+      <button id="vDist" aria-pressed="true" data-v="dist">distribution</button>
+      <button id="vGpc" aria-pressed="false" data-v="gpc">chromatography GPC / SEC</button>
+      <button id="vVisc" aria-pressed="false" data-v="visc">viscometry</button>
+    </div>
+    <div class="menu">
+      <button class="btn" data-p="pDir">Directions</button>
+      <button class="btn" data-p="pDet">Details</button>
+      <button class="btn" data-p="pAbout">About</button>
+      <div class="panel" id="pDir" hidden><button class="x" aria-label="Close">×</button><div class="body">
+        <p>A synthetic polymer is not a single molecule but a mixture of chains with different lengths, so its molar mass is described by a distribution and by several averages. This simulation shows how that distribution is defined and how it is measured by two common characterization methods: gel permeation (size-exclusion) chromatography, which separates chains by size, and dilute-solution viscometry, which gives the intrinsic viscosity and the viscosity-average molar mass. You can see how the shape and breadth of the distribution change each average and how limitations of the measurements cause the measured values to differ from the true values.</p>
+        <p>The sliders in the top row define a polymer sample: the shape of its molar-mass distribution, its number-average molar mass <i>M</i><sub>n</sub>, and its dispersity Đ = <i>M</i><sub>w</sub>/<i>M</i><sub>n</sub>. Choose "two populations" to blend a second Schulz–Zimm population into the sample.</p>
+        <p><b>distribution</b> plots the number and weight distributions per decade of molar mass and marks <i>M</i><sub>n</sub>, <i>M</i><sub>v</sub>, <i>M</i><sub>w</sub>, and <i>M</i><sub>z</sub>.</p>
+        <p><b>chromatography GPC / SEC</b> (GPC = gel permeation chromatography, SEC = size-exclusion chromatography) shows the refractive-index chromatogram the sample would give on a size-exclusion column, with the calibration line on the right axis. Lower the exclusion limit or increase band broadening to see how the averages calculated from the chromatogram differ from the true values.</p>
+        <p><b>viscometry</b> simulates dilute-solution measurements at five concentrations. Huggins and Kraemer plots are extrapolated to zero concentration to obtain the intrinsic viscosity [η], and the Mark–Houwink equation converts [η] to the viscosity-average molar mass <i>M</i><sub>v</sub>.</p>
+      </div></div>
+      <div class="panel" id="pDet" hidden><button class="x" aria-label="Close">×</button><div class="body">
+        <h2>Molar-mass averages</h2>
+        <p>For chains of molar mass \(M_i\), with \(N_i\) moles and mass \(w_i=N_iM_i\):</p>
+        \[M_n=\frac{\sum N_iM_i}{\sum N_i}=\frac{\sum w_i}{\sum w_i/M_i}\]
+        \[M_w=\frac{\sum N_iM_i^2}{\sum N_iM_i}=\frac{\sum w_iM_i}{\sum w_i}\]
+        \[M_z=\frac{\sum N_iM_i^3}{\sum N_iM_i^2}\]
+        \[M_v=\left(\frac{\sum N_iM_i^{1+a}}{\sum N_iM_i}\right)^{1/a}\]
+        <p>The dispersity is Đ = \(M_w/M_n\). For any distribution \(M_n\le M_v\le M_w\le M_z\); \(M_v=M_w\) when \(a=1\).</p>
+        <h2>Distribution shapes</h2>
+        <p>Schulz–Zimm (gamma) distribution of number fraction:</p>
+        \[n(M)\propto M^{k-1}\exp\!\left(-\frac{kM}{M_n}\right),\qquad \frac{M_w}{M_n}=1+\frac{1}{k}\]
+        <p>Đ = 2 (\(k=1\)) is the Flory most-probable distribution of step-growth polymerization. Đ near 1 (large \(k\)) is typical of living anionic polymerization.</p>
+        <p>Log-normal distribution:</p>
+        \[n(M)\propto\frac{1}{M}\exp\!\left[-\frac{(\ln M-\mu)^2}{2\sigma^2}\right],\qquad \sigma^2=\ln\frac{M_w}{M_n}\]
+        <p>The plots show the fraction per decade of \(M\). The weight distribution is the number distribution multiplied by \(M/M_n\), so it is shifted toward high \(M\).</p>
+        <h2>Size-exclusion chromatography</h2>
+        <p>Large coils sample less of the pore volume and elute first. Between the exclusion volume \(V_0\) and the total permeation volume \(V_t\) the calibration is linear:</p>
+        \[\log_{10}M=A-B\,V_e\]
+        <p>The refractive-index signal \(h_i\) at each elution slice is proportional to the mass of polymer in that slice, so</p>
+        \[M_n=\frac{\sum h_i}{\sum h_i/M_i},\qquad M_w=\frac{\sum h_iM_i}{\sum h_i}\]
+        <p>Band broadening spreads each species into a Gaussian of standard deviation σ (mL), which lowers the measured \(M_n\) and raises the measured \(M_w\). All chains above the exclusion limit elute together at \(V_0\) and are assigned the exclusion molar mass, so \(M_w\) is underestimated. The simulation assumes the calibration (normally made with narrow standards) applies to the sample.</p>
+        <h2>Dilute-solution viscometry</h2>
+        \[\eta_r=\frac{\eta}{\eta_0}\approx\frac{t}{t_0},\qquad \eta_{sp}=\eta_r-1\]
+        \[\text{Huggins:}\quad \frac{\eta_{sp}}{c}=[\eta]+k_H[\eta]^2c\]
+        \[\text{Kraemer:}\quad \frac{\ln\eta_r}{c}=[\eta]+k_K[\eta]^2c,\qquad k_H-k_K\approx0.5\]
+        \[\text{Mark–Houwink:}\quad [\eta]=K\,M_v^{\,a}\]
+        <p>Here \(t/t_0\) is the efflux-time ratio in a capillary viscometer. The exponent \(a\) is 0.5 in a theta solvent and about 0.7–0.8 in a good solvent. The simulation generates \(\eta_{sp}\) from the Huggins equation; the Kraemer points come from the same data, so they curve slightly and their intercept differs a little from [η]. The reported [η] is the average of the two intercepts. The Mark–Houwink constants are representative values; published values depend on the molar-mass range and method.</p>
+        <h2>Symbols</h2>
+        <p>\(a\) = Mark–Houwink exponent (dimensionless)<br>
+        \(A,\,B\) = calibration constants for size-exclusion chromatography (\(B\) in mL\(^{-1}\))<br>
+        \(c\) = polymer concentration (g/dL)<br>
+        Đ = dispersity, \(M_w/M_n\) (dimensionless)<br>
+        GPC = gel permeation chromatography<br>
+        \(h_i\) = refractive-index detector signal for elution slice \(i\)<br>
+        \(k\) = Schulz–Zimm shape parameter (dimensionless)<br>
+        \(k_H\) = Huggins constant (dimensionless)<br>
+        \(k_K\) = Kraemer constant (dimensionless)<br>
+        \(K\) = Mark–Houwink constant (mL/g)<br>
+        \(M\) = molar mass of a chain (g/mol)<br>
+        \(M_i\) = molar mass of species or elution slice \(i\) (g/mol)<br>
+        \(M_n\) = number-average molar mass (g/mol)<br>
+        \(M_v\) = viscosity-average molar mass (g/mol)<br>
+        \(M_w\) = weight-average molar mass (g/mol)<br>
+        \(M_z\) = z-average molar mass (g/mol)<br>
+        \(n(M)\) = number fraction of chains with molar mass \(M\)<br>
+        \(N_i\) = moles of chains with molar mass \(M_i\) (mol)<br>
+        PMMA = poly(methyl methacrylate)<br>
+        SEC = size-exclusion chromatography<br>
+        \(t\) = efflux time of polymer solution (s)<br>
+        \(t_0\) = efflux time of pure solvent (s)<br>
+        \(V_0\) = exclusion volume (mL)<br>
+        \(V_e\) = elution volume (mL)<br>
+        \(V_t\) = total permeation volume (mL)<br>
+        \(w_i\) = mass of chains with molar mass \(M_i\) (g)<br>
+        \(\eta\) = viscosity of polymer solution (Pa·s)<br>
+        \(\eta_0\) = viscosity of pure solvent (Pa·s)<br>
+        \(\eta_r\) = relative viscosity (dimensionless)<br>
+        \(\eta_{sp}\) = specific viscosity (dimensionless)<br>
+        \(\eta_{sp}/c\) = reduced viscosity (dL/g)<br>
+        \(\ln\eta_r/c\) = inherent viscosity (dL/g)<br>
+        [η] = intrinsic viscosity (dL/g)<br>
+        \(\mu\) = mean of \(\ln M\) for the log-normal distribution<br>
+        \(\sigma\) = standard deviation of \(\ln M\) for the log-normal distribution; for chromatography, band-broadening standard deviation (mL)</p>
+      </div></div>
+      <div class="panel" id="pAbout" hidden><button class="x" aria-label="Close">×</button><div class="body">
+        <p>This simulation was created in the <a href="https://www.colorado.edu/chbe/" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="https://learncheme.com/" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.</p>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="row">
+      <span class="tag">sample</span>
+      <label class="ctl" for="dtype">distribution
+        <select id="dtype">
+          <option value="sz">Schulz–Zimm</option>
+          <option value="ln">log-normal</option>
+          <option value="blend">two populations</option>
+        </select>
+      </label>
+      <label class="ctl" for="sMn"><span><i>M</i><sub>n</sub></span><input type="range" id="sMn" min="3" max="6" step="0.01" value="4.7"><span class="val" id="vMn" style="min-width:84px"></span></label>
+      <label class="ctl" for="sD"><span>dispersity Đ</span><input type="range" id="sD" min="1.01" max="3" step="0.01" value="1.8"><span class="val" id="vD"></span></label>
+    </div>
+    <div class="row" id="blendRow" hidden>
+      <span class="tag"></span>
+      <label class="ctl" for="sMn2"><span>second <i>M</i><sub>n</sub></span><input type="range" id="sMn2" min="3" max="6.5" step="0.01" value="5.8"><span class="val" id="vMn2" style="min-width:84px"></span></label>
+      <label class="ctl" for="sW2"><span>weight fraction</span><input type="range" id="sW2" min="0" max="1" step="0.01" value="0.3"><span class="val" id="vW2"></span></label>
+    </div>
+    <div class="row" id="rowDist">
+      <span class="tag">display</span>
+      <label class="ctl" for="cN"><input type="checkbox" id="cN" checked>number distribution</label>
+      <label class="ctl" for="cW"><input type="checkbox" id="cW" checked>weight distribution</label>
+    </div>
+    <div class="row" id="rowGpc" hidden>
+      <span class="tag">column</span>
+      <label class="ctl" for="sLex"><span>exclusion limit</span><input type="range" id="sLex" min="4.5" max="7.5" step="0.05" value="7"><span class="val" id="vLex"></span></label>
+      <label class="ctl" for="sSig"><span>band broadening σ</span><input type="range" id="sSig" min="0.02" max="0.5" step="0.01" value="0.05"><span class="val" id="vSig"></span></label>
+    </div>
+    <div class="row" id="rowVisc" hidden>
+      <span class="tag">solution</span>
+      <label class="ctl" for="sys">polymer / solvent
+        <select id="sys">
+          <option value="0">polystyrene / toluene, 25 °C</option>
+          <option value="1">polystyrene / cyclohexane, 34.5 °C (θ)</option>
+          <option value="2">PMMA / acetone, 25 °C</option>
+        </select>
+      </label>
+      <label class="ctl" for="sKH"><span>Huggins constant <i>k</i><sub>H</sub></span><input type="range" id="sKH" min="0.25" max="0.6" step="0.01" value="0.35"><span class="val" id="vKH"></span></label>
+    </div>
+  </div>
+
+  <div id="plotWrap"><canvas id="cv" aria-label="Simulation plot"></canvas></div>
+  <div id="readout"></div>
+</div>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const INK='#000000', MUTED='#000000', GRID='#e7e2e2', RED='#98000D', BLUE='#1d4fb8', GREEN='#1d7a3a', ORANGE='#c86a00';
+const SANS='Helvetica, Arial, sans-serif';
+
+/* ---------- molar-mass grid ---------- */
+const N=1801, L0=0, L1=9, DL=(L1-L0)/(N-1);
+const LG=new Float64Array(N), MM=new Float64Array(N), LN=new Float64Array(N);
+for(let i=0;i<N;i++){LG[i]=L0+i*DL;MM[i]=Math.pow(10,LG[i]);LN[i]=Math.log(MM[i]);}
+
+// number fraction per d(ln M), normalized to unit mass
+function component(type,Mn,D){
+  const f=new Float64Array(N);let mx=-Infinity;
+  if(type==='ln'){const s2=Math.log(D),mu=Math.log(Mn)-s2/2;for(let i=0;i<N;i++)f[i]=-(LN[i]-mu)*(LN[i]-mu)/(2*s2);}
+  else{const k=1/(D-1);for(let i=0;i<N;i++)f[i]=k*LN[i]-k*MM[i]/Mn;}
+  for(let i=0;i<N;i++)if(f[i]>mx)mx=f[i];
+  let W=0;for(let i=0;i<N;i++){f[i]=Math.exp(f[i]-mx);W+=f[i]*MM[i];}
+  for(let i=0;i<N;i++)f[i]/=W;
+  return f;
+}
+
+const SYS=[
+  {K:7.5e-3,a:0.75,kH:0.35},
+  {K:8.2e-2,a:0.50,kH:0.50},
+  {K:7.5e-3,a:0.70,kH:0.40}
+];
+
+const st={view:'dist',type:'sz',lMn:4.7,D:1.8,lMn2:5.8,w2:0.3,showN:true,showW:true,Lex:7,sig:0.05,sys:0,kH:0.35};
+
+function sample(){
+  const f1=component(st.type==='ln'?'ln':'sz',Math.pow(10,st.lMn),st.D);
+  let f=f1;
+  if(st.type==='blend'){const f2=component('sz',Math.pow(10,st.lMn2),st.D);f=new Float64Array(N);for(let i=0;i<N;i++)f[i]=(1-st.w2)*f1[i]+st.w2*f2[i];}
+  let S0=0,S1=0,S2=0,S3=0;
+  for(let i=0;i<N;i++){const m=MM[i],x=f[i];S0+=x;S1+=x*m;S2+=x*m*m;S3+=x*m*m*m;}
+  const Mv=a=>{let s=0;for(let i=0;i<N;i++)s+=f[i]*Math.pow(MM[i],1+a);return Math.pow(s/S1,1/a);};
+  return {f,S0,S1,Mn:S1/S0,Mw:S2/S1,Mz:S3/S2,Mv};
+}
+
+/* ---------- formatting ---------- */
+function sci(x,p=3){const e=Math.floor(Math.log10(x)+1e-12);let m=x/Math.pow(10,e);let ms=m.toPrecision(p);if(parseFloat(ms)>=10){m/=10;ms=m.toPrecision(p);return ms+' × 10<sup>'+(e+1)+'</sup>';}return ms+' × 10<sup>'+e+'</sup>';}
+function sciSegs(x,p=3){const e=Math.floor(Math.log10(x)+1e-12);let ms=(x/Math.pow(10,e)).toPrecision(p),ee=e;if(parseFloat(ms)>=10){ms=(x/Math.pow(10,e+1)).toPrecision(p);ee=e+1;}return [[ms+' × 10'],[String(ee),'p']];}
+const Mi=s=>'<i>M</i><sub>'+s+'</sub>';
+const Mj=s=>'<i>M</i><sub class="mj">'+s+'</sub>';
+
+/* ---------- canvas ---------- */
+const cv=$('cv');let ctx=cv.getContext('2d');let W=800,H=460;
+function resize(){
+  const dpr=window.devicePixelRatio||1;W=Math.max(300,cv.parentElement.clientWidth);
+  H=Math.round(Math.min(Math.max(W*0.58,340),500));
+  cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);cv.style.height=H+'px';
+  ctx.setTransform(dpr,0,0,dpr,0,0);draw();
+}
+const fnt=(s,it,b)=>(it?'italic ':'')+(b?'600 ':'')+s+'px '+SANS;
+// segs: [text, flags]; flags: i italic, b subscript, p superscript, w bold
+function rich(x,y,segs,align,size,color){
+  size=size||17;const parts=segs.map(s=>{const fl=s[1]||'';const sm=/[bp]/.test(fl);const sz=sm?Math.round(size*0.72):size;ctx.font=fnt(sz,fl.includes('i'),fl.includes('w'));return {t:s[0],fl,sz,w:ctx.measureText(s[0]).width};});
+  const tot=parts.reduce((a,p)=>a+p.w,0);
+  if(align==='center')x-=tot/2;else if(align==='right')x-=tot;
+  ctx.fillStyle=color||INK;ctx.textBaseline='alphabetic';
+  for(const p of parts){ctx.font=fnt(p.sz,p.fl.includes('i'),p.fl.includes('w'));const dy=p.fl.includes('b')?size*0.28:p.fl.includes('p')?-size*0.42:0;ctx.fillText(p.t,x,y+dy);x+=p.w;}
+  return tot;
+}
+function vlabel(x,y,segs,size){
+  size=size||AX;const dpr=window.devicePixelRatio||1;
+  const w=Math.ceil(rich(-1e5,-1e5,segs,'left',size))+8,h=Math.ceil(size*1.9);
+  const oc=document.createElement('canvas');oc.width=Math.ceil(w*dpr);oc.height=Math.ceil(h*dpr);
+  const o=oc.getContext('2d');o.setTransform(dpr,0,0,dpr,0,0);
+  const keep=ctx;ctx=o;rich(4,Math.round(size*1.25),segs,'left',size);ctx=keep;
+  ctx.save();ctx.translate(x,y);ctx.rotate(-Math.PI/2);ctx.drawImage(oc,-w/2,-h/2,w,h);ctx.restore();
+}
+function niceTicks(lo,hi,n){const span=hi-lo;const raw=span/n;const p=Math.pow(10,Math.floor(Math.log10(raw)));const m=raw/p;const step=(m<1.5?1:m<3?2:m<7?5:10)*p;const t=[];for(let v=Math.ceil(lo/step-1e-9)*step;v<=hi+step*1e-9;v+=step)t.push(+v.toPrecision(12));return {t,step};}
+function frame(px0,py0,pw,ph){ctx.strokeStyle=INK;ctx.lineWidth=1.2;ctx.strokeRect(px0,py0,pw,ph);}
+function fmtTick(v,step){const d=Math.max(0,-Math.floor(Math.log10(step)+1e-9));return v.toFixed(d);}
+function gpcCompute(){
+  const V0=6,Vt=14,Lp=2.0,Lex=st.Lex,va=4,vb=16,dv=0.01,NV=Math.round((vb-va)/dv)+1;
+  const h=new Float64Array(NV);let excl=0;
+  for(let i=0;i<N;i++){const w=S.f[i]*MM[i]/S.S1;if(w<1e-14)continue;const L=LG[i];let ve;
+    if(L>=Lex){ve=V0;excl+=w;}else if(L<=Lp)ve=Vt;else ve=V0+(Lex-L)/(Lex-Lp)*(Vt-V0);
+    const x=(ve-va)/dv,j=Math.floor(x),fr=x-j;if(j>=0&&j<NV-1){h[j]+=w*(1-fr);h[j+1]+=w*fr;}}
+  const sg=st.sig,hw=Math.ceil(4*sg/dv),ker=[];let ks=0;for(let k=-hw;k<=hw;k++){const v=Math.exp(-0.5*(k*dv/sg)*(k*dv/sg));ker.push(v);ks+=v;}
+  const g=new Float64Array(NV);
+  for(let j=0;j<NV;j++){if(h[j]===0)continue;for(let k=-hw;k<=hw;k++){const jj=j+k;if(jj>=0&&jj<NV)g[jj]+=h[j]*ker[k+hw]/ks;}}
+  const calL=ve=>ve<=V0?Lex:ve>=Vt?Lp:Lex-(ve-V0)/(Vt-V0)*(Lex-Lp);
+  let s0=0,s1=0,sm=0,gmax=0;
+  for(let j=0;j<NV;j++){const ve=va+j*dv,M=Math.pow(10,calL(ve));s0+=g[j];s1+=g[j]/M;sm+=g[j]*M;if(g[j]>gmax)gmax=g[j];}
+  return {V0,Vt,Lp,Lex,va,vb,dv,NV,g,gmax,excl,Mn:s0/s1,Mw:sm/s0};
+}
+
+function viscCompute(){
+  const s=SYS[st.sys],a=s.a,Kd=s.K/100;const MvT=S.Mv(a);const eta=Kd*Math.pow(MvT,a);
+  const cmax=Math.min(0.75/eta,2.0);const pts=[];
+  for(let j=1;j<=5;j++){const c=cmax*j/5,x=eta*c,sp=x+st.kH*x*x,r=1+sp;pts.push({c,r,hug:sp/c,kra:Math.log(r)/c});}
+  const fit=key=>{let n=pts.length,sx=0,sy=0,sxx=0,sxy=0;for(const p of pts){sx+=p.c;sy+=p[key];sxx+=p.c*p.c;sxy+=p.c*p[key];}const m=(n*sxy-sx*sy)/(n*sxx-sx*sx);return {m,b:(sy-m*sx)/n};};
+  const fh=fit('hug'),fk=fit('kra');const etaM=(fh.b+fk.b)/2;const MvM=Math.pow(etaM/Kd,1/a);
+  return {s,a,K:s.K,eta,MvT,cmax,pts,fh,fk,etaM,MvM};
+}
+
+const FS=17, AX=19.5;
+const yLabX=(px0,mw)=>px0-8-mw-10-AX*0.55;
+function logXAxis(X,py0,ph,lo,hi){
+  ctx.lineWidth=1;
+  for(let d=lo;d<=hi;d++){
+    const x=X(d);ctx.strokeStyle=GRID;ctx.beginPath();ctx.moveTo(x,py0);ctx.lineTo(x,py0+ph);ctx.stroke();
+    ctx.strokeStyle=INK;ctx.beginPath();ctx.moveTo(x,py0+ph);ctx.lineTo(x,py0+ph-7);ctx.stroke();
+    rich(x,py0+ph+24,[['10'],[String(d),'p']],'center',FS);
+    if(d<hi)for(let k=2;k<10;k++){const xm=X(d+Math.log10(k));ctx.beginPath();ctx.moveTo(xm,py0+ph);ctx.lineTo(xm,py0+ph-4);ctx.stroke();}
+  }
+}
+function yTicks(px0,pw,Y,ticks,step,lo,hi){
+  ctx.lineWidth=1;let mw=0;
+  for(const v of ticks){if(v<lo-1e-12||v>hi+1e-12)continue;const y=Y(v);ctx.strokeStyle=GRID;ctx.beginPath();ctx.moveTo(px0,y);ctx.lineTo(px0+pw,y);ctx.stroke();ctx.strokeStyle=INK;ctx.beginPath();ctx.moveTo(px0,y);ctx.lineTo(px0+6,y);ctx.stroke();mw=Math.max(mw,rich(px0-8,y+6,[[fmtTick(v,step)]],'right',FS));}
+  return mw;
+}
+function tagBox(x,y,segs,align,color){ // label with white backing, y = baseline
+  ctx.font=fnt(FS);const w=rich(-1e5,-1e5,segs,'left',FS);
+  const x0=align==='center'?x-w/2:align==='right'?x-w:x;
+  ctx.fillStyle='rgba(255,255,255,0.88)';ctx.fillRect(x0-3,y-FS,w+6,FS+8);
+  rich(x0,y,segs,'left',FS,color||INK);
+}
+
+/* ---------- views ---------- */
+let S=null;
+function draw(){
+  if(!S)return;
+  ctx.clearRect(0,0,W,H);ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);
+  if(st.view==='dist')drawDist();else if(st.view==='gpc')drawGpc();else drawVisc();
+}
+
+function drawDist(){
+  const px0=90,py0=20,pw=W-px0-26,ph=H-py0-66;
+  const lo=2,hi=8,X=l=>px0+(l-lo)/(hi-lo)*pw;
+  const nN=new Float64Array(N),nW=new Float64Array(N);let ymax=0;
+  for(let i=0;i<N;i++){nN[i]=S.f[i]/(S.S0*DL);nW[i]=S.f[i]*MM[i]/(S.S1*DL);if(LG[i]>=lo&&LG[i]<=hi){if(st.showN)ymax=Math.max(ymax,nN[i]);if(st.showW)ymax=Math.max(ymax,nW[i]);}}
+  if(ymax<=0)ymax=1;
+  const ytopRaw=ymax*1.42; // headroom for average labels
+  const tk=niceTicks(0,ytopRaw,5);const ytop=tk.t[tk.t.length-1]>=ytopRaw?tk.t[tk.t.length-1]:ytopRaw;
+  const Y=v=>py0+ph-v/ytop*ph;
+  const mwY=yTicks(px0,pw,Y,tk.t,tk.step,0,ytop);
+  logXAxis(X,py0,ph,lo,hi);
+  const curve=(arr,col,fill)=>{ctx.beginPath();let first=true;for(let i=0;i<N;i++){if(LG[i]<lo||LG[i]>hi)continue;const x=X(LG[i]),y=Y(arr[i]);if(first){ctx.moveTo(x,y);first=false;}else ctx.lineTo(x,y);}
+    ctx.strokeStyle=col;ctx.lineWidth=2.4;ctx.stroke();ctx.lineTo(X(hi),Y(0));ctx.lineTo(X(lo),Y(0));ctx.closePath();ctx.fillStyle=fill;ctx.fill();};
+  ctx.save();ctx.beginPath();ctx.rect(px0,py0,pw,ph);ctx.clip();
+  if(st.showN)curve(nN,BLUE,'rgba(29,79,184,0.08)');
+  if(st.showW)curve(nW,RED,'rgba(152,0,13,0.08)');
+  // label each curve on its outer flank at half height: number on the low-M side, weight on the high-M side
+  const i0=Math.ceil((lo-L0)/DL),i1=Math.floor((hi-L0)/DL);
+  const flank=(arr,left)=>{let mx=0;for(let i=i0;i<=i1;i++)mx=Math.max(mx,arr[i]);const h=0.55*mx;
+    if(left){for(let i=i0;i<=i1;i++)if(arr[i]>=h)return [X(LG[i]),Y(arr[i])];}
+    else{let pk=-1;for(let i=i1-1;i>i0;i--)if(arr[i]>0.05*mx&&arr[i]>=arr[i-1]&&arr[i]>=arr[i+1]){pk=i;break;}
+      if(pk<0)return null;const h2=0.5*arr[pk];for(let i=pk;i<=i1;i++)if(arr[i]<=h2)return [X(LG[i]),Y(arr[i])];}return null;};
+  if(st.showN){const q=flank(nN,true);if(q)rich(q[0]-10,q[1]+6,[['number distribution']],'right',FS,BLUE);}
+  if(st.showW){const q=flank(nW,false);if(q)rich(q[0]+10,q[1]+6,[['weight distribution']],'left',FS,RED);}
+  const a=SYS[st.sys].a;
+  const marks=[['n',S.Mn,BLUE],['v',S.Mv(a),GREEN],['w',S.Mw,RED],['z',S.Mz,ORANGE]];
+  const lastX=[-1e9,-1e9,-1e9,-1e9];const lv=[];
+  marks.forEach(m=>{const x=X(Math.log10(m[1]));let L=0;while(L<3&&x-lastX[L]<44)L++;lastX[L]=x;lv.push(L);});
+  marks.forEach((m,k)=>{const x=X(Math.log10(m[1]));const ty=py0+24+lv[k]*24;
+    ctx.setLineDash([6,4]);ctx.strokeStyle=m[2];ctx.lineWidth=1.6;ctx.beginPath();ctx.moveTo(x,ty+8);ctx.lineTo(x,py0+ph);ctx.stroke();ctx.setLineDash([]);
+    tagBox(x,ty,[['M','i'],[m[0],'b']],'center');});
+  ctx.restore();
+  frame(px0,py0,pw,ph);
+  rich(px0+pw/2,H-10,[['molar mass, '],['M','i'],[' (g/mol)']],'center',AX);
+  vlabel(yLabX(px0,mwY),py0+ph/2,[['fraction per decade of '],['M','i']],AX);
+}
+
+function drawGpc(){
+  const G=gpcCompute();
+  const px0=72,py0=34,pw=W-px0-90,ph=H-py0-66;
+  const X=v=>px0+(v-G.va)/(G.vb-G.va)*pw,Y=v=>py0+ph-v/1.1*ph,YL=l=>py0+ph-(l-1)/(9-1)*ph;
+  ctx.fillStyle='#f3efef';ctx.fillRect(px0,py0,X(G.V0)-px0,ph);ctx.fillRect(X(G.Vt),py0,px0+pw-X(G.Vt),ph);
+  ctx.lineWidth=1;
+  for(let v=4;v<=16;v+=2){const x=X(v);ctx.strokeStyle=GRID;ctx.beginPath();ctx.moveTo(x,py0);ctx.lineTo(x,py0+ph);ctx.stroke();ctx.strokeStyle=INK;ctx.beginPath();ctx.moveTo(x,py0+ph);ctx.lineTo(x,py0+ph-6);ctx.stroke();rich(x,py0+ph+24,[[String(v)]],'center',FS);}
+  const mwY=yTicks(px0,pw,Y,[0,0.2,0.4,0.6,0.8,1.0],0.1,0,1.1);
+  let mwR=0;
+  for(let d=1;d<=9;d++){const y=YL(d);ctx.strokeStyle=INK;ctx.beginPath();ctx.moveTo(px0+pw,y);ctx.lineTo(px0+pw-6,y);ctx.stroke();mwR=Math.max(mwR,rich(px0+pw+8,y+6,[['10'],[String(d),'p']],'left',FS));}
+  ctx.strokeStyle='#555';ctx.lineWidth=1.6;ctx.setLineDash([7,5]);ctx.beginPath();ctx.moveTo(X(G.V0),YL(G.Lex));ctx.lineTo(X(G.Vt),YL(G.Lp));ctx.stroke();
+  ctx.setLineDash([2,4]);ctx.beginPath();ctx.moveTo(X(G.va),YL(G.Lex));ctx.lineTo(X(G.V0),YL(G.Lex));ctx.moveTo(X(G.Vt),YL(G.Lp));ctx.lineTo(X(G.vb),YL(G.Lp));ctx.stroke();ctx.setLineDash([]);
+  ctx.strokeStyle=INK;ctx.lineWidth=1;[[G.V0,'0'],[G.Vt,'t']].forEach(p=>{const x=X(p[0]);ctx.beginPath();ctx.moveTo(x,py0);ctx.lineTo(x,py0+ph);ctx.stroke();rich(x,py0-10,[['V','i'],[p[1],'b']],'center',FS);});
+  rich(X((G.va+G.V0)/2),py0+24,[['excluded']],'center',FS);
+  rich(X((G.Vt+G.vb)/2),py0+24,[['permeated']],'center',FS);
+  ctx.save();ctx.beginPath();ctx.rect(px0,py0,pw,ph);ctx.clip();
+  ctx.beginPath();for(let j=0;j<G.NV;j++){const x=X(G.va+j*G.dv),y=Y(G.g[j]/G.gmax);if(j===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);}
+  ctx.strokeStyle=RED;ctx.lineWidth=2.4;ctx.stroke();ctx.lineTo(X(G.vb),Y(0));ctx.lineTo(X(G.va),Y(0));ctx.closePath();ctx.fillStyle='rgba(152,0,13,0.10)';ctx.fill();
+  [['n',G.Mn,BLUE],['w',G.Mw,RED]].forEach(m=>{const L=Math.log10(m[1]);const ve=G.V0+(G.Lex-L)/(G.Lex-G.Lp)*(G.Vt-G.V0);const x=X(ve),y=YL(L);ctx.fillStyle=m[2];ctx.beginPath();ctx.arc(x,y,5.5,0,2*Math.PI);ctx.fill();
+    tagBox(x+8,y-10,[['M','i'],[m[0],'b']],'left');});
+  ctx.restore();
+  frame(px0,py0,pw,ph);
+  rich(px0+pw/2,H-10,[['elution volume, '],['V','i'],['e','b'],[' (mL)']],'center',AX);
+  vlabel(yLabX(px0,mwY),py0+ph/2,[['refractive-index signal (normalized)']],AX);
+  vlabel(px0+pw+8+mwR+10+AX*0.55,py0+ph/2,[['calibration '],['M','i'],[' (g/mol)']],AX);
+  return G;
+}
+
+function drawVisc(){
+  const V=viscCompute();
+  const px0=92,py0=20,pw=W-px0-26,ph=H-py0-66;
+  const xmax=V.cmax*1.08;let lo=Infinity,hi=-Infinity;
+  for(const p of V.pts){lo=Math.min(lo,p.kra);hi=Math.max(hi,p.hug);}lo=Math.min(lo,V.fk.b,V.fh.b);hi=Math.max(hi,V.fh.b+V.fh.m*xmax);
+  let span=hi-lo;if(span<1e-9)span=Math.abs(hi)*0.1;lo-=span*0.35;hi+=span*0.35;
+  const yt=niceTicks(lo,hi,5),xt=niceTicks(0,xmax,5);
+  const X=c=>px0+c/xmax*pw,Y=v=>py0+ph-(v-lo)/(hi-lo)*ph;
+  ctx.lineWidth=1;
+  for(const v of xt.t){if(v>xmax)continue;const x=X(v);ctx.strokeStyle=GRID;ctx.beginPath();ctx.moveTo(x,py0);ctx.lineTo(x,py0+ph);ctx.stroke();ctx.strokeStyle=INK;ctx.beginPath();ctx.moveTo(x,py0+ph);ctx.lineTo(x,py0+ph-6);ctx.stroke();rich(x,py0+ph+24,[[fmtTick(v,xt.step)]],'center',FS);}
+  const mwY=yTicks(px0,pw,Y,yt.t,yt.step,lo,hi);
+  ctx.save();ctx.beginPath();ctx.rect(px0,py0,pw,ph);ctx.clip();
+  const line=(f,col)=>{ctx.strokeStyle=col;ctx.lineWidth=1.84;ctx.setLineDash([7,5]);ctx.beginPath();ctx.moveTo(X(0),Y(f.b));ctx.lineTo(X(xmax),Y(f.b+f.m*xmax));ctx.stroke();ctx.setLineDash([]);};
+  // curve labels sit between the 2nd and 3rd points: Huggins above its line, Kraemer below
+  const cl=(V.pts[1].c+V.pts[2].c)/2;
+  rich(X(cl),Y(V.fh.b+V.fh.m*cl)-16,[['Huggins, '],['η','i'],['sp','b'],[' / '],['c','i']],'center',FS,RED);
+  rich(X(cl),Y(V.fk.b+V.fk.m*cl)+32,[['Kraemer, ln '],['η','i'],['r','b'],[' / '],['c','i']],'center',FS,BLUE);
+  line(V.fh,RED);line(V.fk,BLUE);
+  for(const p of V.pts){ctx.fillStyle=RED;ctx.beginPath();ctx.arc(X(p.c),Y(p.hug),5.5,0,2*Math.PI);ctx.fill();ctx.fillStyle=BLUE;ctx.fillRect(X(p.c)-5,Y(p.kra)-5,10,10);}
+  ctx.fillStyle=INK;ctx.beginPath();ctx.arc(X(0)+1,Y(V.etaM),6,0,2*Math.PI);ctx.fill();
+  // [η] label below and right of the intercept, with a leader line to the intercept point
+  const ex=X(0)+30,ey=Y(V.etaM)+52;
+  ctx.strokeStyle=INK;ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(ex+2,ey-FS*1.15+2);ctx.lineTo(X(0)+5,Y(V.etaM)+5);ctx.stroke();
+  rich(ex,ey,[['[η]']],'left',FS*1.15);
+  ctx.restore();
+  frame(px0,py0,pw,ph);
+  rich(px0+pw/2,H-10,[['concentration, '],['c','i'],[' (g/dL)']],'center',AX);
+  vlabel(yLabX(px0,mwY),py0+ph/2,[['reduced and inherent viscosity (dL/g)']],AX);
+  return V;
+}
+
+/* ---------- readouts ---------- */
+function readout(){
+  const r=$('readout');
+  if(st.view==='dist'){
+    const a=SYS[st.sys].a;
+    r.innerHTML='<div class="readout">'+
+      '<span>'+Mi('n')+' = '+sci(S.Mn)+'</span>'+
+      '<span>'+Mi('v')+' = '+sci(S.Mv(a))+' <span class="k">(<i>a</i> = '+a.toFixed(2)+')</span></span>'+
+      '<span>'+Mi('w')+' = '+sci(S.Mw)+'</span>'+
+      '<span>'+Mi('z')+' = '+sci(S.Mz)+'</span>'+
+      '<span>Đ = '+(S.Mw/S.Mn).toFixed(2)+'</span>'+
+      '<span class="k">molar masses in g/mol</span></div>'+
+      '<div class="readout"><span>'+Mi('n')+' = number-average molar mass</span>'+
+      '<span>'+Mi('v')+' = viscosity-average molar mass</span>'+
+      '<span>'+Mi('w')+' = weight-average molar mass</span>'+
+      '<span>'+Mi('z')+' = z-average molar mass</span>'+
+      '<span>Đ = dispersity = '+Mi('w')+'/'+Mi('n')+'</span></div>';
+  }else if(st.view==='gpc'){
+    const G=gpcCompute();
+    const er=(m,t)=>{const e=(m/t-1)*100;return (e>=0?'+':'')+e.toFixed(1)+'%';};
+    r.innerHTML='<div class="tw"><table class="t"><tr><th></th><th>'+Mi('n')+' (g/mol)</th><th>'+Mi('w')+' (g/mol)</th><th>Đ</th></tr>'+
+      '<tr><td>exact values from the distribution</td><td>'+sci(S.Mn)+'</td><td>'+sci(S.Mw)+'</td><td>'+(S.Mw/S.Mn).toFixed(2)+'</td></tr>'+
+      '<tr><td>from chromatogram</td><td>'+sci(G.Mn)+'</td><td>'+sci(G.Mw)+'</td><td>'+(G.Mw/G.Mn).toFixed(2)+'</td></tr>'+
+      '<tr><td>error</td><td>'+er(G.Mn,S.Mn)+'</td><td>'+er(G.Mw,S.Mw)+'</td><td>'+er(G.Mw/G.Mn,S.Mw/S.Mn)+'</td></tr></table></div>'+
+      '<div class="readout"><span>mass above exclusion limit: <span class="'+(G.excl>0.01?'warn':'')+'">'+(G.excl*100).toFixed(1)+'%</span></span>'+
+      '<span class="k">calibration: 10<sup>'+G.Lex.toFixed(2)+'</sup> g/mol at <i>V</i><sub>0</sub> = 6 mL to 10<sup>2</sup> g/mol at <i>V</i><sub>t</sub> = 14 mL</span></div>'+
+      '<div class="readout"><span>'+Mi('n')+' = number-average molar mass</span><span>'+Mi('w')+' = weight-average molar mass</span><span>Đ = dispersity = '+Mi('w')+'/'+Mi('n')+'</span></div>';
+  }else{
+    const V=viscCompute();
+    let t='<div class="tw"><table class="t"><tr><th>concentration, <i>c</i> (g/dL)</th>'+V.pts.map(p=>'<td>'+p.c.toPrecision(3)+'</td>').join('')+'</tr>'+
+      '<tr><th><i>t</i>/<i>t</i><sub>0</sub> = relative viscosity, <i>η</i><sub>r</sub></th>'+V.pts.map(p=>'<td>'+p.r.toPrecision(3)+'</td>').join('')+'</tr></table></div>';
+    r.innerHTML='<div style="margin-left:96px">'+t+'<div class="readout"><span><i>t</i>/<i>t</i><sub>0</sub> = (efflux time of polymer solution)/(efflux time of pure solvent)</span></div><div class="readout">'+
+      '<span>Mark–Houwink constant <i>K</i> and exponent <i>a</i>: <i>K</i> = '+sci(V.K,2)+' mL/g, <i>a</i> = '+V.a.toFixed(2)+'</span>'+
+      '<span>intrinsic viscosity [<i>η</i>] = '+V.etaM.toPrecision(3)+' dL/g</span>'+
+      '<span>viscosity-average molecular mass '+Mj('v')+' from [<i>η</i>] = '+sci(V.MvM)+'</span>'+
+      '<span class="k">exact values from the distribution: '+Mj('n')+' = '+sci(S.Mn)+', '+Mj('v')+' = '+sci(V.MvT)+', '+Mj('w')+' = '+sci(S.Mw)+'</span></div></div>';
+  }
+}
+
+/* ---------- controls ---------- */
+function syncLabels(){
+  $('vMn').innerHTML=sci(Math.pow(10,st.lMn),2);$('vD').textContent=st.D.toFixed(2);
+  $('vMn2').innerHTML=sci(Math.pow(10,st.lMn2),2);$('vW2').textContent=st.w2.toFixed(2);
+  $('vLex').innerHTML='10<sup>'+st.Lex.toFixed(2)+'</sup>';$('vSig').textContent=st.sig.toFixed(2)+' mL';
+  $('vKH').textContent=st.kH.toFixed(2);
+}
+function update(recompute){if(recompute!==false)S=sample();syncLabels();draw();readout();}
+const bind=(id,key,parse)=>$(id).addEventListener('input',e=>{st[key]=parse(e.target.value);update();});
+bind('sMn','lMn',parseFloat);bind('sD','D',parseFloat);bind('sMn2','lMn2',parseFloat);bind('sW2','w2',parseFloat);
+bind('sLex','Lex',parseFloat);bind('sSig','sig',parseFloat);bind('sKH','kH',parseFloat);
+$('dtype').addEventListener('change',e=>{st.type=e.target.value;$('blendRow').hidden=st.type!=='blend';update();});
+$('sys').addEventListener('change',e=>{st.sys=+e.target.value;st.kH=SYS[st.sys].kH;$('sKH').value=st.kH;update();});
+$('cN').addEventListener('change',e=>{st.showN=e.target.checked;update(false);});
+$('cW').addEventListener('change',e=>{st.showW=e.target.checked;update(false);});
+document.querySelectorAll('#viewSeg button').forEach(b=>b.addEventListener('click',()=>{
+  st.view=b.dataset.v;document.querySelectorAll('#viewSeg button').forEach(o=>o.setAttribute('aria-pressed',o===b?'true':'false'));
+  $('rowDist').hidden=st.view!=='dist';$('rowGpc').hidden=st.view!=='gpc';$('rowVisc').hidden=st.view!=='visc';update(false);}));
+
+/* ---------- flyout panels ---------- */
+const panels=['pDir','pDet','pAbout'];
+function openPanel(id){panels.forEach(p=>{if(p!==id)$(p).hidden=true;});const el=$(id);el.hidden=!el.hidden;if(!el.hidden){el.style.right='0px';const r=el.getBoundingClientRect();if(r.left<8)el.style.right=(r.left-8)+'px';if(id==='pDet'&&window.MathJax&&MathJax.typesetPromise)MathJax.typesetPromise([el]).catch(()=>{});}}
+document.querySelectorAll('.menu .btn').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();openPanel(b.dataset.p);}));
+document.querySelectorAll('.panel .x').forEach(b=>b.addEventListener('click',()=>{b.parentElement.hidden=true;}));
+document.querySelectorAll('.panel').forEach(p=>p.addEventListener('click',e=>e.stopPropagation()));
+document.addEventListener('click',()=>panels.forEach(p=>$(p).hidden=true));
+
+S=sample();syncLabels();readout();
+new ResizeObserver(resize).observe(cv.parentElement);resize();
+})();
+</script>

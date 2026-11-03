@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Uranium Isotope Decay</title>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['\\(', '\\)']], displayMath: [['$$', '$$']] },
+    svg: { fontCache: 'global', displayAlign: 'left', displayIndent: '0' }
+  };
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.min.js"></script>
+<style>
+  :root{
+    --sf: 16px;            /* slider font */
+    --tf: 18.4px;          /* general/panel text = slider font + 15% */
+    --red: #98000D;
+  }
+  html,body{margin:0;padding:0;background:#fff;}
+  #app{
+    font-family: Helvetica, Arial, sans-serif;
+    color:#000;
+    width:660px;
+    max-width:100%;
+    margin:10px auto;
+    padding:0 6px;
+    -webkit-font-smoothing:antialiased;
+  }
+  #plot-wrap{ width:100%; }
+  canvas#plot{ display:block; width:660px; max-width:100%; height:440px; }
+
+  .control-wrap{ position:relative; margin-top:6px; }
+  .controls{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:14px;
+  }
+  .sliders{ flex:0 0 auto; width:300px; }
+  .slider-row{ margin:6px 0 14px 0; }
+  .slider-label{ font-size:var(--tf); margin-bottom:4px; }
+  .slider-line{ display:flex; align-items:center; gap:10px; }
+  .slider-line input[type=range]{
+    width:180px;               /* shortened so buttons fit to the right */
+    accent-color:var(--red);
+    cursor:pointer;
+  }
+  .slider-val{
+    font-size:var(--sf);
+    min-width:84px;
+    white-space:nowrap;
+    font-variant-numeric:tabular-nums;
+  }
+
+  .buttons{ flex:0 0 auto; display:flex; flex-direction:row; gap:8px; }
+  .buttons button{
+    background:var(--red);
+    color:#fff;
+    font-weight:normal;
+    font-family:Helvetica, Arial, sans-serif;
+    font-size:var(--sf);
+    border:none;
+    border-radius:2px;
+    padding:7px 12px;
+    cursor:pointer;
+    line-height:1.1;
+  }
+  .buttons button:hover{ background:#7d000b; }
+
+  .panel{
+    position:absolute;
+    top:calc(100% + 8px);
+    left:0;
+    right:0;
+    background:#fff;
+    border:1px solid #b9b9b9;
+    border-radius:4px;
+    box-shadow:0 3px 12px rgba(0,0,0,0.16);
+    padding:16px 40px 18px 18px;
+    font-size:var(--tf);
+    line-height:1.42;
+    z-index:20;
+    display:none;
+  }
+  .panel.open{ display:block; }
+  .panel .close{
+    position:absolute;
+    top:6px; right:10px;
+    border:none; background:none;
+    font-size:22px; line-height:1;
+    color:#444; cursor:pointer;
+    padding:2px 6px;
+  }
+  .panel .close:hover{ color:#000; }
+  .panel a{ color:var(--red); text-decoration:none; }
+  .panel a:hover{ text-decoration:underline; }
+  .panel p{ margin:0 0 10px 0; }
+  .panel p:last-child{ margin-bottom:0; }
+  mjx-container{ margin:2px 0 !important; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="plot-wrap"><canvas id="plot" width="660" height="440"></canvas></div>
+
+  <div class="control-wrap">
+    <div class="controls">
+      <div class="sliders">
+        <div class="slider-row">
+          <div class="slider-label">initial number of atoms</div>
+          <div class="slider-line">
+            <input id="n0" type="range" min="5e9" max="1e10" step="1e7" value="7.5e9">
+            <span class="slider-val" id="n0val"></span>
+          </div>
+        </div>
+        <div class="slider-row">
+          <div class="slider-label">generic decay constant <em>&#955;</em></div>
+          <div class="slider-line">
+            <input id="k" type="range" min="1e-10" max="3e-9" step="5.8e-12" value="2.3e-9">
+            <span class="slider-val" id="kval"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="buttons">
+        <button data-panel="directions">Directions</button>
+        <button data-panel="details">Details</button>
+        <button data-panel="about">About</button>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-directions">
+      <button class="close" aria-label="close">&times;</button>
+      <p>This simulation shows radioactive decay for the two most abundant uranium
+      isotopes, U-235 and U-238. Use the sliders to set the initial number of atoms
+      <em>N</em><sub>0</sub> and the generic decay constant <em>k</em>. Decay curves for
+      U-235 (blue) and U-238 (orange) are plotted, together with a generic decay curve
+      (green) for the selected decay constant. The red dots mark the half-life of each
+      decay.</p>
+    </div>
+
+    <div class="panel" id="panel-details">
+      <button class="close" aria-label="close">&times;</button>
+      <p>Radioactive decay has the form of exponential decay:</p>
+      <p>$$N(t) = N_0\, e^{-\lambda t}$$</p>
+      <p>where \(N(t)\) is the number of nuclei remaining at time \(t\) (in years) for an
+      initial number \(N_0\) in the sample, and \(\lambda\) is the decay constant, which is
+      specific to the individual isotope:</p>
+      <p>$$\lambda_{238} = 1.54\times10^{-10}\ \text{yr}^{-1}\ \ \text{for U-238}$$</p>
+      <p>$$\lambda_{235} = 9.90\times10^{-10}\ \text{yr}^{-1}\ \ \text{for U-235}$$</p>
+      <p>The half-life \(t_{1/2}\) is the time for half of the sample to decay:</p>
+      <p>$$N(t_{1/2}) = \frac{N_0}{2} = N_0\, e^{-\lambda t_{1/2}}$$</p>
+      <p>$$t_{1/2} = \frac{\ln 2}{\lambda}$$</p>
+      <p>where \(N_0\) is the initial number of nuclei.</p>
+      <p>The green curve is a generic decay for the decay constant \(\lambda\) set with the slider.</p>
+    </div>
+
+    <div class="panel" id="panel-about">
+      <button class="close" aria-label="close">&times;</button>
+      <p>This simulation was created in the
+      <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a>
+      at University of Colorado Boulder for
+      <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a>
+      by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a
+      <a href="https://demonstrations.wolfram.com/UraniumIsotopeDecay/" target="_blank" rel="noopener">Mathematica simulation</a>
+      by Anushka Dalvi, Mindy Huang, and Jack Rickle. It was prepared with financial
+      support from the National Science Foundation (DUE 2336987 and 2336988). Address any
+      questions or comments to LearnChemE@gmail.com.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---- constants / physics ----
+  var K235 = 9.90e-10;   // U-235 decay constant (yr^-1)  -> blue
+  var K238 = 1.54e-10;   // U-238 decay constant (yr^-1)  -> orange
+  var TMAX = 1e10;       // time axis max (years)
+  var YMAX = 1e10;       // atoms axis max
+  var LN2  = Math.LN2;
+
+  var COL235 = '#5E81B5';   // Mathematica default blue
+  var COL238 = '#E19C24';   // Mathematica default orange
+  var COLGEN = '#8EB032';   // Mathematica default green
+  var COLRED = '#e11414';
+
+  var FONT = 'Helvetica, Arial, sans-serif';
+  var TICK_FONT = 15.6;     // axis numbers  (+20%)
+  var AXLBL_FONT = 18;      // axis labels   (+20%)
+  var CURVE_LBL_FONT = 16;  // on-curve labels
+
+  var SUP = {'-':'\u207B','0':'\u2070','1':'\u00B9','2':'\u00B2','3':'\u00B3',
+             '4':'\u2074','5':'\u2075','6':'\u2076','7':'\u2077','8':'\u2078','9':'\u2079'};
+  function sup(n){ return String(n).split('').map(function(c){return SUP[c]||c;}).join(''); }
+
+  // scientific notation, one decimal in the mantissa: 7.5 \u00D7 10\u2079
+  function sci1(v){
+    if(v===0) return '0';
+    var neg=v<0; v=Math.abs(v);
+    var e=Math.floor(Math.log10(v));
+    var m=v/Math.pow(10,e);
+    m=Math.round(m*10)/10;
+    if(m>=10){ m/=10; e++; }
+    return (neg?'\u2212':'') + m.toFixed(1) + ' \u00D7 10' + sup(e);
+  }
+  // tick label: clean integer mantissa (2\u00D710\u2079, 10\u00B9\u2070, 0)
+  function sciTick(v){
+    if(v===0) return '0';
+    var e=Math.floor(Math.log10(v));
+    var m=Math.round(v/Math.pow(10,e));
+    if(m>=10){ m/=10; e++; }
+    return (m===1?'':m+'\u00D7') + '10' + sup(e);
+  }
+  // snap to one-decimal mantissa (used for both display and physics)
+  function snap1(v){
+    if(v<=0) return 0;
+    var e=Math.floor(Math.log10(v));
+    var m=v/Math.pow(10,e);
+    m=Math.round(m*10)/10;
+    if(m>=10){ m/=10; e++; }
+    return m*Math.pow(10,e);
+  }
+
+  // ---- canvas setup (hi-DPI) ----
+  var canvas=document.getElementById('plot');
+  var ctx=canvas.getContext('2d');
+  var CSSW=660, CSSH=440;
+  var M={top:26, right:26, bottom:74, left:104};
+  var plotW, plotH;
+
+  function setupCanvas(){
+    var dpr=window.devicePixelRatio||1;
+    var rect=canvas.getBoundingClientRect();
+    CSSW=rect.width||660; CSSH=440;
+    canvas.width=Math.round(CSSW*dpr);
+    canvas.height=Math.round(CSSH*dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    plotW=CSSW-M.left-M.right;
+    plotH=CSSH-M.top-M.bottom;
+  }
+
+  function xToPx(t){ return M.left + (t/TMAX)*plotW; }
+  function yToPx(y){ return M.top + plotH - (y/YMAX)*plotH; }
+
+  // rotated y-axis label rendered via offscreen bitmap (avoids glyph-weight artifacts)
+  function drawYAxisLabel(text, cx, cy){
+    var dpr=window.devicePixelRatio||1;
+    var pad=6;
+    var off=document.createElement('canvas');
+    var octx=off.getContext('2d');
+    octx.font=AXLBL_FONT+'px '+FONT;
+    var w=Math.ceil(octx.measureText(text).width)+pad*2;
+    var h=Math.ceil(AXLBL_FONT*1.5);
+    off.width=Math.round(w*dpr); off.height=Math.round(h*dpr);
+    octx.setTransform(dpr,0,0,dpr,0,0);
+    octx.font=AXLBL_FONT+'px '+FONT;
+    octx.fillStyle='#000';
+    octx.textAlign='center';
+    octx.textBaseline='middle';
+    octx.fillText(text, w/2, h/2);
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(-Math.PI/2);
+    ctx.drawImage(off, -w/2, -h/2, w, h);
+    ctx.restore();
+  }
+
+  function drawCurve(rate, n0, color){
+    var Npts=420;
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(M.left, M.top, plotW, plotH);
+    ctx.clip();
+    ctx.beginPath();
+    for(var i=0;i<=Npts;i++){
+      var t=TMAX*i/Npts;
+      var y=n0*Math.exp(-rate*t);
+      var px=xToPx(t), py=yToPx(y);
+      if(i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+    }
+    ctx.lineWidth=2.5;
+    ctx.strokeStyle=color;
+    ctx.lineJoin='round';
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawCurveLabel(text, color, rate, n0, yFrac){
+    // place label where the curve crosses y = yFrac*n0
+    var t=Math.log(1/yFrac)/rate;
+    var y=yFrac*n0;
+    if(t>TMAX*0.985){ t=TMAX*0.985; y=n0*Math.exp(-rate*t); }
+    var px=xToPx(t), py=yToPx(y);
+    var align='left', ox=8;
+    if(px > M.left+plotW*0.6){ align='right'; ox=-8; }
+    px=Math.max(M.left+4, Math.min(M.left+plotW-4, px));
+    ctx.font=CURVE_LBL_FONT+'px '+FONT;
+    ctx.textAlign=align;
+    ctx.textBaseline='bottom';
+    ctx.lineWidth=4; ctx.strokeStyle='rgba(255,255,255,0.92)';
+    ctx.strokeText(text, px+ox, py-6);
+    ctx.fillStyle=color;
+    ctx.fillText(text, px+ox, py-6);
+  }
+
+  function draw(){
+    var n0=snap1(parseFloat(document.getElementById('n0').value));
+    var k =snap1(parseFloat(document.getElementById('k').value));
+
+    ctx.clearRect(0,0,CSSW,CSSH);
+    ctx.fillStyle='#fff';
+    ctx.fillRect(0,0,CSSW,CSSH);
+
+    var ticks=[0,2e9,4e9,6e9,8e9,1e10];
+
+    // gridlines
+    ctx.strokeStyle='#e4e4e4';
+    ctx.lineWidth=1;
+    ctx.beginPath();
+    ticks.forEach(function(t){
+      var px=Math.round(xToPx(t))+0.5;
+      ctx.moveTo(px, M.top); ctx.lineTo(px, M.top+plotH);
+      var py=Math.round(yToPx(t))+0.5;
+      ctx.moveTo(M.left, py); ctx.lineTo(M.left+plotW, py);
+    });
+    ctx.stroke();
+
+    // curves
+    drawCurve(K235, n0, COL235);   // U-235 blue
+    drawCurve(K238, n0, COL238);   // U-238 orange
+    drawCurve(k,    n0, COLGEN);   // generic green
+
+    // half-life red dots at (ln2/rate, n0/2)
+    var dots=[LN2/K235, LN2/K238, LN2/k];
+    ctx.fillStyle=COLRED;
+    dots.forEach(function(t){
+      if(t<=TMAX){
+        ctx.beginPath();
+        ctx.arc(xToPx(t), yToPx(n0/2), 5.5, 0, 2*Math.PI);
+        ctx.fill();
+      }
+    });
+
+    // axes
+    ctx.strokeStyle='#000';
+    ctx.lineWidth=1.4;
+    ctx.beginPath();
+    ctx.moveTo(M.left, M.top); ctx.lineTo(M.left, M.top+plotH);
+    ctx.lineTo(M.left+plotW, M.top+plotH);
+    ctx.stroke();
+
+    // ticks + numbers
+    ctx.fillStyle='#000';
+    ctx.strokeStyle='#000';
+    ctx.lineWidth=1.2;
+    ctx.font=TICK_FONT+'px '+FONT;
+    // x
+    ctx.textAlign='center'; ctx.textBaseline='top';
+    ticks.forEach(function(t){
+      var px=xToPx(t);
+      ctx.beginPath();
+      ctx.moveTo(px, M.top+plotH); ctx.lineTo(px, M.top+plotH+6);
+      ctx.stroke();
+      ctx.fillText(sciTick(t), px, M.top+plotH+9);
+    });
+    // y
+    ctx.textAlign='right'; ctx.textBaseline='middle';
+    ticks.forEach(function(t){
+      var py=yToPx(t);
+      ctx.beginPath();
+      ctx.moveTo(M.left, py); ctx.lineTo(M.left-6, py);
+      ctx.stroke();
+      ctx.fillText(sciTick(t), M.left-10, py);
+    });
+
+    // axis labels
+    ctx.font=AXLBL_FONT+'px '+FONT;
+    ctx.fillStyle='#000';
+    ctx.textAlign='center'; ctx.textBaseline='alphabetic';
+    ctx.fillText('time (years)', M.left+plotW/2, M.top+plotH+52);   // below x-axis
+    drawYAxisLabel('atoms remaining', M.left-66, M.top+plotH/2);    // left of y-axis
+
+    // on-curve labels (replace legend)
+    drawCurveLabel('generic', COLGEN, k,    n0, 0.78);
+    drawCurveLabel('U-235',   COL235, K235, n0, 0.55);
+    drawCurveLabel('U-238',   COL238, K238, n0, 0.30);
+  }
+
+  // ---- sliders ----
+  function updateVals(){
+    document.getElementById('n0val').textContent =
+      sci1(snap1(parseFloat(document.getElementById('n0').value)));
+    document.getElementById('kval').textContent =
+      sci1(snap1(parseFloat(document.getElementById('k').value)));
+  }
+  function onInput(){ updateVals(); draw(); }
+  document.getElementById('n0').addEventListener('input', onInput);
+  document.getElementById('k').addEventListener('input', onInput);
+
+  // ---- panels ----
+  var panels={
+    directions:document.getElementById('panel-directions'),
+    details:document.getElementById('panel-details'),
+    about:document.getElementById('panel-about')
+  };
+  function closeAll(){ for(var p in panels) panels[p].classList.remove('open'); }
+  document.querySelectorAll('.buttons button').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var name=btn.getAttribute('data-panel');
+      var wasOpen=panels[name].classList.contains('open');
+      closeAll();
+      if(!wasOpen) panels[name].classList.add('open');
+    });
+  });
+  document.querySelectorAll('.panel .close').forEach(function(x){
+    x.addEventListener('click', closeAll);
+  });
+
+  // ---- init ----
+  function init(){ setupCanvas(); updateVals(); draw(); }
+  window.addEventListener('resize', function(){ setupCanvas(); draw(); });
+  init();
+})();
+</script>
+</body>
+</html>
