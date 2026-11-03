@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dimensional analysis and similitude</title>
+<style>
+html,body{margin:0;padding:0}
+/* Layout: LearnChemE house style. Button row below the top 40 px, two views (Buckingham Pi, model testing), flyout panels overlay content. */
+:root{
+  --red:#98000D; --ink:#000; --bg:#fff; --line:#b9b4b4; --soft:#f5eeee; --blue:#0b4fb3; --mercury:#7a5a00;
+  --sans:Helvetica, Arial, sans-serif; color-scheme:light;
+}
+html,body{background:var(--bg);color:var(--ink)}
+body{font-family:var(--sans);font-size:17px;line-height:1.4}
+#wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 28px}
+h1{font-size:20px;font-weight:bold;line-height:1.3;margin:0 0 14px;color:#000}
+button,select,input{font-family:var(--sans);font-size:17px}
+button{background:var(--red);color:#fff;border:1px solid var(--red);border-radius:4px;padding:5px 12px;font-weight:normal;cursor:pointer}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid #333;outline-offset:2px}
+button.off{background:#fff;color:var(--red)}
+select{padding:3px 6px;border:1px solid #888;border-radius:4px;background:#fff;color:#000;width:auto}
+#bar{position:relative;display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:18px}
+#bar .sp{flex:0 0 28px}
+.panel{position:absolute;top:calc(100% + 6px);z-index:30;background:#fff;color:#000;border:1px solid #777;border-radius:4px;box-shadow:0 6px 18px rgba(0,0,0,.18);width:max-content;max-width:min(640px,calc(100vw - 32px));max-height:72vh;display:flex;flex-direction:column}
+.panel[hidden]{display:none!important}
+.panel .ph{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 12px 4px}
+.panel .ph h2{font-size:17px;font-weight:bold;margin:0;color:#000}
+.panel .x{background:none;border:none;color:#000;font-size:24px;line-height:1;padding:0 4px}
+.panel .pb{overflow:auto;padding:0 14px 12px}
+.panel p{margin:.5em 0}
+#details{max-width:min(720px,calc(100vw - 32px))}
+#details h3{font-size:17px;font-weight:normal;text-decoration:underline;margin:1em 0 .3em}
+#details mjx-container[display="true"]{text-align:left!important;margin:.5em 0 .5em 1em!important}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:12px}
+p{margin:.4em 0}
+/* Pi view */
+.tableWrap{overflow-x:auto;max-width:100%;margin:6px 0 4px}
+#dimTable{border-collapse:collapse;font-variant-numeric:tabular-nums}
+#dimTable th,#dimTable td{border:1px solid var(--line);padding:4px 10px;text-align:center;font-weight:normal;min-width:44px}
+#dimTable th.rl,#dimTable td.rl{text-align:left;white-space:nowrap}
+#dimTable .on{background:var(--soft)}
+#dimTable input{width:18px;height:18px;accent-color:var(--red);cursor:pointer}
+#varList{margin:6px 0 10px;display:grid;grid-auto-flow:column;grid-template-columns:repeat(2,max-content);column-gap:40px}
+@media (max-width:560px){#varList{grid-auto-flow:row;grid-template-columns:1fr;grid-template-rows:none!important}}
+#msg{color:var(--red)}
+#msg:empty{display:none}
+#groups{display:flex;flex-direction:column;gap:8px;margin-top:2px}
+.grp{display:flex;flex-wrap:wrap;align-items:center;gap:0}
+.frac{display:inline-flex;flex-direction:column;align-items:stretch;text-align:center;vertical-align:middle;margin:0;line-height:1.15}
+.frac>span:first-child{border-bottom:1px solid #000;padding:0 1px}
+.frac>span:last-child{padding:0 1px}
+.nm{color:#333}
+.pi{font-family:"Times New Roman",Times,serif;font-size:1.1em}
+.why{flex-basis:100%;margin:3px 0 0 18px;line-height:1.35}
+.ok{color:#1a7a1a}
+.bad{color:var(--red)}
+.blk{border:1px solid var(--line);border-radius:4px;padding:8px 12px;margin:10px 0}
+.blk h4{font-size:17px;font-weight:normal;text-decoration:underline;margin:0 0 4px}
+table.ro{margin:4px 0}
+/* model view */
+.mgrid{display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start}
+.ctrl{flex:0 1 430px;min-width:0}
+.plotBox{flex:1 1 420px;min-width:0}
+canvas{display:block;max-width:100%}
+.sl{display:flex;align-items:center;gap:10px;margin:7px 0;flex-wrap:wrap}
+.sl label{min-width:0}
+.sl.hd{margin-top:12px}
+.grpname{margin-right:14px;font-weight:bold}
+#sphereCtrls .sl:not(.hd),#shipCtrls .sl{padding-left:15px}
+#shipCtrls .sub{font-weight:bold}
+#scaleOut .blk{display:inline-block;max-width:100%;box-sizing:border-box}
+.val{font-variant-numeric:tabular-nums;min-width:56px}
+input[type=range]{-webkit-appearance:none;appearance:none;width:140px;height:18px;background:transparent;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:5px;background:#c8c8c8;border-radius:3px}
+input[type=range]::-moz-range-track{height:5px;background:#c8c8c8;border-radius:3px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--red);margin-top:-5.5px;border:none}
+input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--red);border:none}
+.sub{margin:12px 0 2px}
+table.ro{border-collapse:collapse;margin:10px 0;font-variant-numeric:tabular-nums}
+table.ro th,table.ro td{border-bottom:1px solid var(--line);padding:3px 10px;text-align:right;font-weight:normal}
+table.ro th:first-child,table.ro td:first-child{text-align:left;padding-left:0}
+.note{margin-top:8px}
+#sphereOut table.ro td:first-child,#scaleOut table.ro td:first-child{text-align:right}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <h1>Dimensional analysis and similitude</h1>
+  <div id="bar">
+    <button id="vPi">Buckingham Pi</button>
+    <button id="vModel" class="off">model testing</button>
+    <span class="sp"></span>
+    <button id="bDir">Directions</button>
+    <button id="bDet">Details</button>
+    <button id="bAbout">About</button>
+
+    <div class="panel" id="directions" hidden>
+      <div class="ph"><h2>Directions</h2><button class="x" aria-label="close">×</button></div>
+      <div class="pb">
+        <p>This simulation shows how the Buckingham Pi theorem turns a list of dimensional variables into a smaller set of dimensionless groups, and how matching those groups lets a scale model predict the behavior of a full-size prototype.</p>
+        <p>In the Buckingham Pi view, choose a problem. The table is the dimensional matrix: the exponents of mass (M), length (L) and time (t) for each variable. Check three repeating variables. The simulation solves for the exponents that make each remaining variable dimensionless and identifies each group in terms of named groups such as the Reynolds number. Try different repeating variables: the groups change, but each is always a product of the same named groups. Choose variables that are not dimensionally independent (for example, D and L in the pipe problem) to see why that choice fails.</p>
+        <p>In the model testing view, the sphere case predicts the drag on a prototype sphere from a smaller model, usually in another fluid. Change the model velocity and compare the predicted prototype drag with the actual drag; the prediction is exact only when the Reynolds numbers match. The ship case shows why a model tested in water cannot match both the Froude number and the Reynolds number.</p>
+      </div>
+    </div>
+
+    <div class="panel" id="details" hidden>
+      <div class="ph"><h2>Details</h2><button class="x" aria-label="close">×</button></div>
+      <div class="pb" id="detBody">
+        <h3>Buckingham Pi theorem</h3>
+        <p>If a physical relation involves \(n\) variables and the dimensional matrix has rank \(r\) (here \(r = 3\), for M, L and t), the relation can be written in terms of \(n - r\) independent dimensionless groups:</p>
+        \[ f(q_1, q_2, \ldots, q_n) = 0 \quad\Longrightarrow\quad \Pi_1 = \phi(\Pi_2, \ldots, \Pi_{n-r}) \]
+        <p>Choose \(r\) repeating variables \(x_1, x_2, x_3\) that are dimensionally independent (none can be formed from the others). Each remaining variable \(q_j\) forms one group:</p>
+        \[ \Pi_j = q_j\, x_1^{a_1} x_2^{a_2} x_3^{a_3} \]
+        <p>The exponents make the powers of M, L and t zero. If \(\mathbf{R}\) is the 3 × 3 dimensional matrix of the repeating variables and \(\mathbf{d}_j\) is the dimension vector of \(q_j\):</p>
+        \[ \mathbf{R}\,\mathbf{a} = -\mathbf{d}_j \]
+        <p>If \(\mathbf{R}\) is singular, the repeating variables are not independent and no solution exists. The dependent variable (the one to be predicted) is usually not chosen as a repeating variable, so that it appears in only one group.</p>
+        <h3>Named groups</h3>
+        \[ \mathrm{Re} = \frac{\rho V D}{\mu} \qquad \mathrm{Eu} = \frac{\Delta p}{\rho V^2} \qquad \mathrm{Fr} = \frac{V}{\sqrt{gL}} \qquad C_F = \frac{F}{\rho V^2 D^2} \]
+        \[ \psi = \frac{\Delta p}{\rho N^2 D^2} \qquad \phi = \frac{Q}{N D^3} \qquad C_P = \frac{P}{\rho N^3 D^5} \qquad \mathrm{Re} = \frac{\rho N D^2}{\mu}\ \text{(pump)} \]
+        <h3>Similitude</h3>
+        <p>A model and prototype are dynamically similar when all independent groups are equal. The dependent group is then also equal, so for sphere drag:</p>
+        \[ \frac{F_p}{\rho_p V_p^2 D_p^2} = \frac{F_m}{\rho_m V_m^2 D_m^2} \quad\Longrightarrow\quad F_p = F_m \frac{\rho_p}{\rho_m}\left(\frac{V_p}{V_m}\right)^2\left(\frac{D_p}{D_m}\right)^2 \]
+        <p>This prediction is exact only if \(\mathrm{Re}_m = \mathrm{Re}_p\), which requires</p>
+        \[ V_m = V_p\,\frac{\nu_m}{\nu_p}\,\frac{D_p}{D_m} \]
+        <p>The drag coefficient is \(C_D = F\big/\left(\tfrac{1}{2}\rho V^2 \tfrac{\pi}{4}D^2\right) = (8/\pi)\,C_F\). The simulation uses Morrison's correlation for a smooth sphere, valid for \(\mathrm{Re} < 10^6\):</p>
+        \[ C_D = \frac{24}{\mathrm{Re}} + \frac{2.6\,(\mathrm{Re}/5)}{1 + (\mathrm{Re}/5)^{1.52}} + \frac{0.411\,(\mathrm{Re}/263{,}000)^{-7.94}}{1 + (\mathrm{Re}/263{,}000)^{-8}} + \frac{0.25\,(\mathrm{Re}/10^6)}{1 + \mathrm{Re}/10^6} \]
+        <p>Where \(C_D\) changes slowly with Re (roughly \(10^3 < \mathrm{Re} < 2\times10^5\)), a mismatch in Re causes only a small error.</p>
+        <h3>Ship models</h3>
+        <p>Wave drag depends on Fr and friction drag depends on Re. Matching Fr with \(g\) fixed gives</p>
+        \[ V_m = V_p\left(\frac{L_m}{L_p}\right)^{1/2} \qquad \frac{\mathrm{Re}_p}{\mathrm{Re}_m} = \frac{\nu_m}{\nu_p}\left(\frac{L_p}{L_m}\right)^{3/2} \]
+        <p>so matching Re as well requires \(\nu_m = \nu_p\,(L_m/L_p)^{3/2}\). No practical liquid is that much less viscous than water, so towing tanks match Fr and correct the friction drag separately at each Re, for example with the ITTC-1957 line \(C_f = 0.075/(\log_{10}\mathrm{Re} - 2)^2\) (Froude's method).</p>
+        <h3>Fluid properties (20 °C)</h3>
+        <p>air: ρ = 1.204 kg/m³, μ = 1.825 × 10⁻⁵ Pa·s; water: ρ = 998 kg/m³, μ = 1.002 × 10⁻³ Pa·s; glycerin: ρ = 1260 kg/m³, μ = 1.41 Pa·s; mercury: ν = 1.15 × 10⁻⁷ m²/s.</p>
+        <h3>Symbols</h3>
+        <p>\(C_D\) = drag coefficient<br>\(C_F\) = force coefficient<br>\(C_P\) = power coefficient<br>\(D\) = diameter (m)<br>\(\mathrm{Eu}\) = Euler number<br>\(F\) = drag force (N)<br>\(\mathrm{Fr}\) = Froude number<br>\(g\) = gravitational acceleration (m/s²)<br>\(L\) = length (m); in the dimensional matrix, the length dimension<br>\(M\) = mass dimension<br>\(N\) = rotational speed (1/s)<br>\(n\) = number of variables<br>\(P\) = shaft power (W)<br>\(Q\) = volumetric flow rate (m³/s)<br>\(r\) = rank of the dimensional matrix<br>\(\mathrm{Re}\) = Reynolds number<br>\(t\) = time dimension<br>\(V\) = velocity (m/s)<br>\(\Delta p\) = pressure difference (Pa)<br>\(\varepsilon\) = wall roughness (m)<br>\(\mu\) = viscosity (Pa·s)<br>\(\nu\) = kinematic viscosity, \(\mu/\rho\) (m²/s)<br>\(\rho\) = density (kg/m³)<br>\(\phi\) = flow coefficient<br>\(\psi\) = head coefficient<br>\(\Pi\) = dimensionless group<br>subscripts \(m\), \(p\) = model, prototype</p>
+        <p>Reference: F. A. Morrison, <i>An Introduction to Fluid Mechanics</i>, Cambridge University Press, 2013.</p>
+      </div>
+    </div>
+
+    <div class="panel" id="about" hidden>
+      <div class="ph"><h2>About</h2><button class="x" aria-label="close">×</button></div>
+      <div class="pb" style="max-width:529px">
+        <p>This simulation was created in the <a href="https://www.colorado.edu/chbe/" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="https://learncheme.com/" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Buckingham Pi view -->
+  <section id="piView">
+    <div class="row">
+      <label for="prob">problem</label>
+      <select id="prob">
+        <option value="pipe">pressure drop in a pipe</option>
+        <option value="sphere">drag on a sphere</option>
+        <option value="pump">centrifugal pump</option>
+        <option value="ship">ship drag with waves</option>
+      </select>
+      <button id="stdBtn">standard repeating variables</button>
+    </div>
+    <p id="probText"></p>
+    <div class="tableWrap"><table id="dimTable"></table></div>
+    <div id="varList"></div>
+    <p id="dimKey" style="margin:0 0 10px">In the table, M = mass, L = length and t = time are the fundamental dimensions.</p>
+    <p id="count"></p>
+    <div id="msg"></div>
+    <div id="groups"></div>
+    <p id="relation"></p>
+  </section>
+
+  <!-- model testing view -->
+  <section id="modelView" hidden>
+    <div class="row">
+      <label for="caseSel">case</label>
+      <select id="caseSel">
+        <option value="sphere">sphere drag: match the Reynolds number</option>
+        <option value="ship">ship hull: Froude versus Reynolds number</option>
+      </select>
+    </div>
+    <div class="mgrid">
+      <div class="ctrl" id="sphereCtrls">
+        <div class="sl hd"><span class="grpname">prototype</span><label for="sPf">fluid</label><select id="sPf"><option value="air">air</option><option value="water">water</option></select></div>
+        <div class="sl"><label for="sDp">diameter, D<sub>p</sub> (m)</label><input type="range" id="sDp" min="0.05" max="0.5" step="0.01" value="0.3"><span class="val" id="sDpV"></span></div>
+        <div class="sl"><label for="sVp">velocity, V<sub>p</sub> (m/s)</label><input type="range" id="sVp" min="1" max="25" step="0.5" value="5"><span class="val" id="sVpV"></span></div>
+        <div class="sl hd"><span class="grpname">model</span><label for="sFl">fluid</label><select id="sFl"><option value="water">water</option><option value="air">air</option><option value="glycerin">glycerin</option></select></div>
+        <div class="sl"><label for="sRat">size ratio, D<sub>m</sub>/D<sub>p</sub></label><input type="range" id="sRat" min="0.02" max="1" step="0.01" value="0.25"><span class="val" id="sRatV"></span></div>
+        <div class="sl"><label for="sVm">velocity, V<sub>m</sub> (m/s)</label><input type="range" id="sVm" min="0" max="1000" step="1" value="500"><span class="val" id="sVmV"></span></div>
+        <div class="row" style="margin-top:8px"><button id="matchBtn">match Re</button></div>
+        <div id="sphereOut"></div>
+      </div>
+      <div class="ctrl" id="shipCtrls" hidden>
+        <p class="sub">prototype in water</p>
+        <div class="sl"><label for="hLp">length, L<sub>p</sub> (m)</label><input type="range" id="hLp" min="20" max="300" step="5" value="150"><span class="val" id="hLpV"></span></div>
+        <div class="sl"><label for="hVp">velocity, V<sub>p</sub> (m/s)</label><input type="range" id="hVp" min="1" max="15" step="0.5" value="10"><span class="val" id="hVpV"></span></div>
+        <p class="sub">model in water, Froude number matched</p>
+        <div class="sl"><label for="hN">scale, 1 : N</label><input type="range" id="hN" min="2" max="100" step="1" value="50"><span class="val" id="hNV"></span></div>
+        <div id="shipOut"></div>
+      </div>
+      <div class="plotBox"><canvas id="cv" aria-label="plot"></canvas><div id="scaleOut"></div></div>
+    </div>
+  </section>
+</div>
+
+<script>
+window.MathJax={tex:{inlineMath:[['\\(','\\)']]},svg:{fontCache:'global',displayAlign:'left'},startup:{typeset:false}};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js" async></script>
+<script>
+const $=id=>document.getElementById(id);
+
+/* ---------- panels ---------- */
+const panels={bDir:'directions',bDet:'details',bAbout:'about'};
+let typeset=false;
+function closeAll(){Object.values(panels).forEach(p=>$(p).hidden=true)}
+Object.entries(panels).forEach(([b,p])=>{
+  $(b).addEventListener('click',()=>{
+    const el=$(p), wasOpen=!el.hidden; closeAll(); if(wasOpen) return;
+    el.hidden=false;
+    const bar=$('bar'), btn=$(b);
+    const minL=8-bar.getBoundingClientRect().left;
+    el.style.left=Math.max(minL,btn.offsetLeft+btn.offsetWidth-el.offsetWidth)+'px';
+    if(p==='details'&&!typeset&&window.MathJax&&MathJax.typesetPromise){typeset=true;MathJax.typesetPromise([$('detBody')]).catch(()=>{typeset=false})}
+  });
+  $(p).querySelector('.x').addEventListener('click',()=>{$(p).hidden=true});
+});
+
+/* ---------- view switch ---------- */
+function setView(v){
+  $('piView').hidden=v!=='pi'; $('modelView').hidden=v!=='model';
+  $('vPi').classList.toggle('off',v!=='pi'); $('vModel').classList.toggle('off',v!=='model');
+  if(v==='model') resize();
+}
+$('vPi').onclick=()=>setView('pi'); $('vModel').onclick=()=>setView('model');
+
+/* ---------- exact fractions ---------- */
+function gcd(a,b){a=Math.abs(a);b=Math.abs(b);while(b){[a,b]=[b,a%b]}return a}
+class Q{constructor(n,d=1){if(d<0){n=-n;d=-d}const g=gcd(n,d)||1;this.n=n/g;this.d=d/g}
+  add(o){return new Q(this.n*o.d+o.n*this.d,this.d*o.d)} sub(o){return new Q(this.n*o.d-o.n*this.d,this.d*o.d)}
+  mul(o){return new Q(this.n*o.n,this.d*o.d)} div(o){return new Q(this.n*o.d,this.d*o.n)}
+  z(){return this.n===0} eq(o){return this.n===o.n&&this.d===o.d} one(){return this.n===1&&this.d===1}
+  str(){const s=this.d===1?String(Math.abs(this.n)):Math.abs(this.n)+'/'+this.d;return (this.n<0?'−':'')+s}}
+const q=(n,d=1)=>new Q(n,d);
+
+/* ---------- problems ---------- */
+const PROBLEMS={
+ pipe:{text:'How does the pressure drop for flow through a straight, rough pipe depend on the pipe and the fluid?',
+  vars:[{k:'dp',s:'Δp',n:'pressure drop',u:'Pa',dim:[1,-1,-2]},{k:'D',s:'D',n:'pipe diameter',u:'m',dim:[0,1,0]},{k:'L',s:'L',n:'pipe length',u:'m',dim:[0,1,0]},{k:'V',s:'V',n:'average velocity',u:'m/s',dim:[0,1,-1]},{k:'rho',s:'ρ',n:'density',u:'kg/m³',dim:[1,-3,0]},{k:'mu',s:'μ',n:'viscosity',u:'Pa·s',dim:[1,-1,-1]},{k:'eps',s:'ε',n:'wall roughness',u:'m',dim:[0,1,0]}],
+  dep:'dp',std:['D','V','rho'],
+  named:[{a:'Eu',n:'Euler number',u:'dp',w:'The dependent group: the pressure drop made dimensionless. A model test is run to find how it depends on the other groups.',e:{dp:q(1),rho:q(-1),V:q(-2)}},{a:'L/D',n:'length-to-diameter ratio',u:'L',w:'Geometric similarity. Matters for the total pressure drop; drops out if the pressure drop per unit length is used instead.',e:{L:q(1),D:q(-1)}},{a:'Re',n:'Reynolds number',u:'mu',w:'Inertial to viscous forces. Always matters in pipe flow; it sets laminar versus turbulent flow and the friction factor.',e:{rho:q(1),V:q(1),D:q(1),mu:q(-1)}},{a:'ε/D',n:'relative roughness',u:'eps',w:'Matters only in turbulent flow, where the roughness protrudes through the viscous sublayer. In laminar flow it has no effect and can be dropped.',e:{eps:q(1),D:q(-1)}}]},
+ sphere:{text:'How does the drag force on a smooth sphere depend on its size, its speed and the fluid?',
+  vars:[{k:'F',s:'F',n:'drag force',u:'N',dim:[1,1,-2]},{k:'D',s:'D',n:'sphere diameter',u:'m',dim:[0,1,0]},{k:'V',s:'V',n:'velocity',u:'m/s',dim:[0,1,-1]},{k:'rho',s:'ρ',n:'density',u:'kg/m³',dim:[1,-3,0]},{k:'mu',s:'μ',n:'viscosity',u:'Pa·s',dim:[1,-1,-1]}],
+  dep:'F',std:['D','V','rho'],
+  named:[{a:'C<sub>F</sub>',n:'force coefficient',u:'F',w:'The dependent group, proportional to the drag coefficient C<sub>D</sub> = (8/π)C<sub>F</sub>. Its value is what a model test is meant to find.',e:{F:q(1),rho:q(-1),V:q(-2),D:q(-2)}},{a:'Re',n:'Reynolds number',u:'mu',w:'Inertial to viscous forces. Always matters for a submerged body; model and prototype must have the same Re. Gravity, surface tension and compressibility were left out, so Fr, We and Ma do not appear; Ma would matter above about Ma = 0.3.',e:{rho:q(1),V:q(1),D:q(1),mu:q(-1)}}]},
+ pump:{text:'How do the pressure rise and the power of a centrifugal pump depend on flow rate, speed, size and the fluid?',
+  vars:[{k:'dp',s:'Δp',n:'pressure rise',u:'Pa',dim:[1,-1,-2]},{k:'Q',s:'Q',n:'volumetric flow rate',u:'m³/s',dim:[0,3,-1]},{k:'N',s:'N',n:'rotational speed',u:'1/s',dim:[0,0,-1]},{k:'D',s:'D',n:'impeller diameter',u:'m',dim:[0,1,0]},{k:'rho',s:'ρ',n:'density',u:'kg/m³',dim:[1,-3,0]},{k:'mu',s:'μ',n:'viscosity',u:'Pa·s',dim:[1,-1,-1]},{k:'P',s:'P',n:'shaft power',u:'W',dim:[1,2,-3]}],
+  dep:'dp',std:['N','D','rho'],
+  named:[{a:'ψ',n:'head coefficient',u:'dp',w:'The dependent group: dimensionless pressure rise (head). Pump curves are plotted as ψ versus φ.',e:{dp:q(1),rho:q(-1),N:q(-2),D:q(-2)}},{a:'φ',n:'flow coefficient',u:'Q',w:'Kinematic similarity of the flow through the impeller. Always matters; matching φ is the basis of the pump affinity laws.',e:{Q:q(1),N:q(-1),D:q(-3)}},{a:'Re',n:'Reynolds number',u:'mu',w:'Usually large (10<sup>5</sup> or more) for water pumps, where its effect on ψ is weak, so it is commonly ignored when scaling pumps. It matters for viscous liquids such as oils.',e:{rho:q(1),N:q(1),D:q(2),mu:q(-1)}},{a:'C<sub>P</sub>',n:'power coefficient',u:'P',w:'A second dependent group (power), related to ψ and φ through the efficiency: C<sub>P</sub> = ψφ/η.',e:{P:q(1),rho:q(-1),N:q(-3),D:q(-5)}}]},
+ ship:{text:'How does the drag on a ship hull depend on its length and speed when it makes surface waves?',
+  vars:[{k:'F',s:'F',n:'drag force',u:'N',dim:[1,1,-2]},{k:'V',s:'V',n:'ship speed',u:'m/s',dim:[0,1,-1]},{k:'L',s:'L',n:'hull length',u:'m',dim:[0,1,0]},{k:'rho',s:'ρ',n:'density',u:'kg/m³',dim:[1,-3,0]},{k:'mu',s:'μ',n:'viscosity',u:'Pa·s',dim:[1,-1,-1]},{k:'g',s:'g',n:'gravitational acceleration',u:'m/s²',dim:[0,1,-2]}],
+  dep:'F',std:['V','L','rho'],
+  named:[{a:'C<sub>F</sub>',n:'force coefficient',u:'F',w:'The dependent group: total hull drag made dimensionless.',e:{F:q(1),rho:q(-1),V:q(-2),L:q(-2)}},{a:'Re',n:'Reynolds number',u:'mu',w:'Governs the friction (viscous) part of the drag. Cannot be matched together with Fr in a water towing tank, so it is corrected for separately.',e:{rho:q(1),V:q(1),L:q(1),mu:q(-1)}},{a:'Fr',n:'Froude number',u:'g',w:'Inertial to gravity forces. Governs the wave-making drag, so it is the group matched in towing tanks. Drops out for a fully submerged body with no free surface.',e:{V:q(1),g:q(-1,2),L:q(-1,2)}}]}
+};
+const DIMS=['mass (M)','length (L)','time (t)'];
+let prob='pipe', rep=[...PROBLEMS.pipe.std];
+
+function rank(rows){
+  const M=rows.map(r=>r.map(x=>q(x))); let rk=0; const nc=M[0].length;
+  for(let c=0;c<nc&&rk<M.length;c++){
+    let p=-1; for(let r=rk;r<M.length;r++) if(!M[r][c].z()){p=r;break}
+    if(p<0) continue; [M[rk],M[p]]=[M[p],M[rk]];
+    for(let r=0;r<M.length;r++) if(r!==rk&&!M[r][c].z()){const f=M[r][c].div(M[rk][c]);for(let k=c;k<nc;k++)M[r][k]=M[r][k].sub(f.mul(M[rk][k]))}
+    rk++;
+  } return rk;
+}
+function gauss(A,b){
+  const n=3, M=A.map((r,i)=>[...r,b[i]]);
+  for(let c=0;c<n;c++){
+    let p=-1; for(let r=c;r<n;r++) if(!M[r][c].z()){p=r;break}
+    if(p<0) return null; [M[c],M[p]]=[M[p],M[c]];
+    for(let r=0;r<n;r++) if(r!==c&&!M[r][c].z()){const f=M[r][c].div(M[c][c]);for(let k=c;k<=n;k++)M[r][k]=M[r][k].sub(f.mul(M[c][k]))}
+  }
+  return M.map((r,i)=>r[n].div(r[i]));
+}
+function varOf(P,k){return P.vars.find(v=>v.k===k)}
+function powHTML(sym,ex){return ex.one()?sym:sym+'<sup>'+ex.str()+'</sup>'}
+function groupHTML(P,g){
+  const ORDER=['rho','N','V','Q','D','L','g','mu','eps','dp','F','P'];
+  const keys=[g.base,...ORDER.filter(k=>k!==g.base&&P.vars.some(v=>v.k===k))];
+  const num=[],den=[];
+  keys.forEach(k=>{const e=g.e[k]; if(!e||e.z())return; const s=varOf(P,k).s;
+    if(e.n>0) num.push(powHTML(s,e)); else den.push(powHTML(s,q(-e.n,e.d)));});
+  const nh=num.join('&thinsp;')||'1';
+  return den.length?`<span class="frac"><span>${nh}</span><span>${den.join('&thinsp;')}</span></span>`:nh;
+}
+function decompose(P,e){
+  const c=P.named.map(nm=>(e[nm.u]||q(0)).div(nm.e[nm.u]));
+  for(const v of P.vars){let s=q(0);P.named.forEach((nm,i)=>{if(nm.e[v.k])s=s.add(c[i].mul(nm.e[v.k]))});if(!s.eq(e[v.k]||q(0)))return null}
+  return c;
+}
+function namedHTML(P,c){
+  const parts=[];let single=null,cnt=0;
+  P.named.forEach((nm,i)=>{if(c[i].z())return;cnt++;single={nm,c:c[i]};
+    let a=(nm.a.includes('/')&&!c[i].one())?'('+nm.a+')':nm.a;
+    if(!c[i].one()) a+='<sup>'+c[i].str()+'</sup>';
+    parts.push(a);});
+  let note='';
+  if(cnt===1){
+    if(single.c.one()) note=single.nm.n;
+    else if(single.c.n===-1&&single.c.d===1) note='inverse of the '+single.nm.n;
+    else note='power of the '+single.nm.n;
+  } else note='product of named groups';
+  return {h:parts.join(' · '),note,why:cnt===1?single.nm.w:''};
+}
+function buildTable(){
+  const P=PROBLEMS[prob]; $('probText').textContent=P.text;
+  let h='<tr><th class="rl">variable</th>'+P.vars.map(v=>`<th data-k="${v.k}">${v.s}</th>`).join('')+'</tr>';
+  ['M','L','t'].forEach((d,i)=>{h+=`<tr><td>${d}</td>`+P.vars.map(v=>`<td data-k="${v.k}">${String(v.dim[i]).replace('-','−')}</td>`).join('')+'</tr>'});
+  h+='<tr><td class="rl">repeating</td>'+P.vars.map(v=>`<td data-k="${v.k}"><input type="checkbox" id="rep_${v.k}" aria-label="repeating ${v.n}"></td>`).join('')+'</tr>';
+  $('dimTable').innerHTML=h;
+  P.vars.forEach(v=>{$('rep_'+v.k).addEventListener('change',e=>{
+    if(e.target.checked){if(!rep.includes(v.k))rep.push(v.k)} else rep=rep.filter(k=>k!==v.k);
+    updatePi();});});
+  $('varList').style.gridTemplateRows=`repeat(${Math.ceil(P.vars.length/2)},auto)`;
+  $('varList').innerHTML=P.vars.map(v=>`<div>${v.s} = ${v.n} (${v.u})</div>`).join('');
+}
+function updatePi(){
+  const P=PROBLEMS[prob];
+  P.vars.forEach(v=>{$('rep_'+v.k).checked=rep.includes(v.k)});
+  const isStd=rep.length===P.std.length&&P.std.every(k=>rep.includes(k));
+  $('stdBtn').classList.toggle('off',!isStd); $('stdBtn').setAttribute('aria-pressed',isStd);
+  document.querySelectorAll('#dimTable [data-k]').forEach(c=>c.classList.toggle('on',rep.includes(c.dataset.k)));
+  const n=P.vars.length, r=rank([0,1,2].map(i=>P.vars.map(v=>v.dim[i])));
+  $('count').innerHTML=`n = ${n} variables and the dimensional matrix has rank r = ${r}, so there are n − r = ${n-r} dimensionless groups.`;
+  $('groups').innerHTML=''; $('relation').innerHTML=''; $('msg').innerHTML='';
+  if(rep.length!==r){$('msg').innerHTML=`Check ${r} repeating variables (${rep.length} checked).`;return}
+  for(let i=0;i<3;i++) if(rep.every(k=>varOf(P,k).dim[i]===0)){
+    $('msg').innerHTML=`None of the repeating variables contains ${DIMS[i]}, so ${DIMS[i].split(' ')[0]} cannot be cancelled. Choose a different set.`;return}
+  const R=[0,1,2].map(i=>rep.map(k=>q(varOf(P,k).dim[i])));
+  const groups=[];
+  for(const v of P.vars){ if(rep.includes(v.k)) continue;
+    const a=gauss(R,[0,1,2].map(i=>q(-v.dim[i])));
+    if(!a){ $('msg').innerHTML=`${rep.map(k=>varOf(P,k).s).join(', ')} are not dimensionally independent: one of them can be formed from the others, so the 3 × 3 matrix is singular. Choose a different set.`;return}
+    const e={}; e[v.k]=q(1); rep.forEach((k,j)=>{if(!a[j].z())e[k]=a[j]}); groups.push({base:v.k,e});
+  }
+  const depFirst=groups.findIndex(g=>g.base===P.dep);
+  if(depFirst>0){const [g]=groups.splice(depFirst,1);groups.unshift(g)}
+  groups.forEach((g,i)=>{
+    const c=decompose(P,g.e), nh=c?namedHTML(P,c):{h:'',note:''};
+    const div=document.createElement('div'); div.className='grp';
+    div.innerHTML=`<span><span class="pi">Π</span><sub>${i+1}</sub> = ${groupHTML(P,g)}`+(c?` = ${nh.h}&ensp;<span class="nm">(${nh.note})</span></span>`+(nh.why?`<div class="why">${nh.why}</div>`:''):'</span>');
+    $('groups').appendChild(div);
+  });
+  const dv=varOf(P,P.dep);
+  if(rep.includes(P.dep)){
+    $('relation').innerHTML=`${dv.s} is the quantity to predict, but it is a repeating variable, so it appears in every group. The groups are valid but awkward to use; leave ${dv.s} out of the repeating set.`;
+  } else {
+    const others=groups.slice(1).map((g,i)=>`<span class="pi">Π</span><sub>${i+2}</sub>`).join(', ');
+    $('relation').innerHTML=`Result: <span class="pi">Π</span><sub>1</sub> = f(${others}), so the ${dv.n} depends on ${n-r-1} dimensionless group${n-r-1>1?'s':''} instead of ${n-1} variables.`;
+  }
+}
+$('prob').addEventListener('change',e=>{prob=e.target.value;rep=[...PROBLEMS[prob].std];buildTable();updatePi()});
+$('stdBtn').addEventListener('click',()=>{rep=[...PROBLEMS[prob].std];updatePi()});
+
+/* ---------- number formatting ---------- */
+function fmt(x,sig=3){
+  if(!isFinite(x)) return '—'; if(x===0) return '0';
+  const a=Math.abs(x);
+  if(a>=1e4||a<1e-2){let e=Math.floor(Math.log10(a));let ms=(x/10**e).toPrecision(sig);if(Math.abs(parseFloat(ms))>=10){e++;ms=(x/10**e).toPrecision(sig)}
+    return ms.replace('-','−')+' × 10<sup>'+String(e).replace('-','−')+'</sup>'}
+  if(a>=10**sig) return String(Math.round(x));
+  return x.toPrecision(sig).replace('-','−');
+}
+
+/* ---------- model testing physics ---------- */
+const FLUIDS={air:{n:'air',rho:1.204,mu:1.825e-5},water:{n:'water',rho:998,mu:1.002e-3},glycerin:{n:'glycerin',rho:1260,mu:1.41}};
+const NU_W=1.0e-6, NU_HG=1.15e-7, G=9.81;
+function cdSphere(Re){return 24/Re+2.6*(Re/5)/(1+Math.pow(Re/5,1.52))+0.411*Math.pow(Re/2.63e5,-7.94)/(1+Math.pow(Re/2.63e5,-8))+0.25*(Re/1e6)/(1+Re/1e6)}
+const VMIN=1e-3, VMAX=100;
+let vm=0.3;
+const vmToS=v=>Math.round(1000*(Math.log10(v)-Math.log10(VMIN))/(Math.log10(VMAX)-Math.log10(VMIN)));
+const sToVm=s=>10**(Math.log10(VMIN)+s/1000*(Math.log10(VMAX)-Math.log10(VMIN)));
+$('sVm').value=vmToS(vm);
+let caseSel='sphere', matchMsg='';
+
+function sphereState(){
+  const Dp=+$('sDp').value, Vp=+$('sVp').value, f=FLUIDS[$('sFl').value], a=FLUIDS[$('sPf').value];
+  const Dm=Dp*+$('sRat').value;
+  const Rep=a.rho*Vp*Dp/a.mu, Rem=f.rho*vm*Dm/f.mu;
+  const Cdp=cdSphere(Rep), Cdm=cdSphere(Rem);
+  const area=d=>Math.PI*d*d/4;
+  const Fp=Cdp*0.5*a.rho*Vp*Vp*area(Dp), Fm=Cdm*0.5*f.rho*vm*vm*area(Dm);
+  const Fpred=Fm*(a.rho/f.rho)*(Vp/vm)**2*(Dp/Dm)**2;
+  const vmReq=Rep*(f.mu/f.rho)/Dm;
+  return {Dp,Vp,f,a,Dm,Rep,Rem,Cdp,Cdm,Fp,Fm,Fpred,vmReq};
+}
+function updateSphere(){
+  $('sDpV').textContent=(+$('sDp').value).toFixed(2);
+  $('sVpV').textContent=(+$('sVp').value).toFixed(1);
+  $('sRatV').textContent=(+$('sRat').value).toFixed(2);
+  $('sVmV').innerHTML=fmt(vm);
+  const s=sphereState(), err=(s.Fpred-s.Fp)/s.Fp*100, ratio=s.Rem/s.Rep;
+  let status;
+  if(Math.abs(ratio-1)<0.01) status='The Reynolds numbers match, so the model and prototype are dynamically similar and the model predicts the prototype drag exactly.';
+  else status=`Re not matched: Re<sub>m</sub>/Re<sub>p</sub> = ${fmt(ratio)}, so the drag coefficients differ and the prediction is in error. Matching Re needs V<sub>m</sub> = ${fmt(s.vmReq)} m/s${s.vmReq>VMAX?', which is not practical for this model fluid and size':''}.`;
+  const warn=(s.Rep>1e6||s.Rem>1e6)?'<p class="note">Re is above 10<sup>6</sup>, outside the range of the drag correlation.</p>':'';
+  const matched=Math.abs(ratio-1)<0.01;
+  $('sphereOut').innerHTML=`${matchMsg?'<p class="note bad">'+matchMsg+'</p>':''}
+  <div class="blk"><h4>operating points</h4>
+  <table class="ro"><tr><th></th><th>prototype</th><th>model</th></tr>
+  <tr><td>fluid</td><td>${s.a.n}</td><td>${s.f.n}</td></tr>
+  <tr><td>diameter (m)</td><td>${fmt(s.Dp)}</td><td>${fmt(s.Dm)}</td></tr>
+  <tr><td>velocity (m/s)</td><td>${fmt(s.Vp)}</td><td>${fmt(vm)}</td></tr>
+  <tr><td>Reynolds number</td><td>${fmt(s.Rep)}</td><td>${fmt(s.Rem)}</td></tr>
+  <tr><td>drag coefficient</td><td>${fmt(s.Cdp)}</td><td>${fmt(s.Cdm)}</td></tr></table></div>`;
+  $('scaleOut').innerHTML=`<div class="blk"><h4>scaling the measured drag</h4>
+  <table class="ro"><tr><td>measured model drag, F<sub>m</sub> (N)</td><td>${fmt(s.Fm)}</td></tr>
+  <tr><td>predicted prototype drag (N)</td><td>${fmt(s.Fpred)}</td></tr>
+  <tr><td>true prototype drag, F<sub>p</sub> (N)</td><td>${fmt(s.Fp)}</td></tr>
+  <tr><td>error in prediction</td><td>${Math.abs(err)<0.05?'0':fmt(err,2)} %</td></tr></table>
+  <p class="note ${matched?'ok':'bad'}">${status}</p>${warn}</div>`;
+  return s;
+}
+function shipState(){
+  const Lp=+$('hLp').value, Vp=+$('hVp').value, N=+$('hN').value;
+  const Lm=Lp/N, Vm=Vp/Math.sqrt(N), Fr=Vp/Math.sqrt(G*Lp);
+  const Rep=Vp*Lp/NU_W, Rem=Vm*Lm/NU_W, nuReq=NU_W*N**-1.5;
+  return {Lp,Vp,N,Lm,Vm,Fr,Rep,Rem,nuReq};
+}
+function updateShip(){
+  const s=shipState();
+  $('hLpV').textContent=s.Lp; $('hVpV').textContent=s.Vp.toFixed(1); $('hNV').textContent=s.N;
+  const nHg=(NU_W/NU_HG)**(2/3);
+  $('shipOut').innerHTML=`<table class="ro"><tr><th></th><th>prototype</th><th>model</th></tr>
+  <tr><td>length (m)</td><td>${fmt(s.Lp)}</td><td>${fmt(s.Lm)}</td></tr>
+  <tr><td>velocity (m/s)</td><td>${fmt(s.Vp)}</td><td>${fmt(s.Vm)}</td></tr>
+  <tr><td>Froude number</td><td>${fmt(s.Fr)}</td><td>${fmt(s.Fr)}</td></tr>
+  <tr><td>Reynolds number</td><td>${fmt(s.Rep)}</td><td>${fmt(s.Rem)}</td></tr></table>
+  <p>Matching Fr sets V<sub>m</sub> = V<sub>p</sub>/N<sup>1/2</sup>, so the model Re is N<sup>3/2</sup> = ${fmt(s.N**1.5)} times smaller than the prototype Re.</p>
+  <p>Matching Re as well needs a model fluid with ν = ${fmt(s.nuReq)} m²/s, ${fmt(NU_W/s.nuReq)} times less than water. Mercury works only for scales up to about 1 : ${nHg.toFixed(1)}, so towing tanks match Fr and correct the friction drag for Re.</p>`;
+  return s;
+}
+function updateModel(){ $('scaleOut').hidden=caseSel!=='sphere'; if(caseSel==='sphere') updateSphere(); else updateShip(); draw(); }
+['sDp','sVp','sRat','sFl','sPf'].forEach(id=>$(id).addEventListener('input',()=>{matchMsg='';updateModel()}));
+$('sVm').addEventListener('input',()=>{vm=sToVm(+$('sVm').value);matchMsg='';updateModel()});
+$('matchBtn').addEventListener('click',()=>{
+  const s=sphereState();
+  if(s.vmReq<VMIN||s.vmReq>VMAX){matchMsg=`Matching Re would need V<sub>m</sub> = ${fmt(s.vmReq)} m/s, outside the slider range. Change the fluid or the size ratio.`}
+  else{vm=s.vmReq;$('sVm').value=vmToS(vm);matchMsg=''}
+  updateModel();
+});
+['hLp','hVp','hN'].forEach(id=>$(id).addEventListener('input',updateModel));
+$('caseSel').addEventListener('change',e=>{caseSel=e.target.value;$('sphereCtrls').hidden=caseSel!=='sphere';$('shipCtrls').hidden=caseSel!=='ship';resize();updateModel()});
+
+/* ---------- canvas ---------- */
+const cv=$('cv'); let ctx=cv.getContext('2d'); let W=600,H=430;
+const SANS='Helvetica, Arial, sans-serif', SERIF='"Times New Roman", Times, serif';
+function resize(){
+  const box=cv.parentElement; if(!box.clientWidth) return;
+  W=Math.min(box.clientWidth,680); H=caseSel==='sphere'?Math.round(Math.max(280,W*0.56)):Math.round(Math.max(330,W*0.74));
+  const d=window.devicePixelRatio||1; cv.width=Math.round(W*d); cv.height=Math.round(H*d);
+  cv.style.width=W+'px'; cv.style.height=H+'px'; ctx.setTransform(d,0,0,d,0,0); draw();
+}
+window.addEventListener('resize',resize);
+function rich(segs,x,y,align='center',size=17,color='#000'){
+  const sm=Math.round(size*0.72); const fontOf=m=>(m==='sub'||m==='sup'?sm:size)+'px '+(m==='g'?SERIF:SANS);
+  let w=0; for(const [t,m] of segs){ctx.font=fontOf(m);w+=ctx.measureText(t).width}
+  let cx=align==='center'?x-w/2:align==='right'?x-w:x;
+  ctx.textAlign='left';ctx.textBaseline='alphabetic';ctx.fillStyle=color;
+  for(const [t,m] of segs){ctx.font=fontOf(m);const dy=m==='sub'?size*0.3:m==='sup'?-size*0.42:0;ctx.fillText(t,cx,y+dy);cx+=ctx.measureText(t).width}
+  return w;
+}
+function richW(segs,size){const sm=Math.round(size*0.72);let w=0;for(const [t,m] of segs){ctx.font=((m==='sub'||m==='sup')?sm:size)+'px '+(m==='g'?SERIF:SANS);w+=ctx.measureText(t).width}return w}
+// y-axis label: draw horizontally on an offscreen canvas, then rotate the image so it matches the x-axis text
+function yLabel(segs,cx,cy,size){
+  const d=window.devicePixelRatio||1, w=Math.ceil(richW(segs,size))+4, h=Math.ceil(size*1.6);
+  const off=document.createElement('canvas'); off.width=w*d; off.height=h*d;
+  const o=off.getContext('2d'); o.setTransform(d,0,0,d,0,0);
+  const save=ctx; ctx=o; rich(segs,w/2,h*0.68,'center',size); ctx=save;
+  ctx.save();ctx.translate(cx,cy);ctx.rotate(-Math.PI/2);ctx.drawImage(off,-w/2,-h/2,w,h);ctx.restore();
+  return h;
+}
+function line(x1,y1,x2,y2){ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke()}
+function powLabel(e){return e===0?[['1','']]:e===1?[['10','']]:[['10',''],[String(e).replace('-','−'),'sup']]}
+function logAxes(xd,yd,xlab,ylab,xTick,yTick){
+  const TF=18, LF=19;
+  let tw=0; for(let e=Math.floor(yd[0]);e<=Math.ceil(yd[1]);e++){const lv=e; if(lv<yd[0]-1e-9||lv>yd[1]+1e-9)continue; tw=Math.max(tw,richW(yTick(e),TF))}
+  const labH=Math.ceil(LF*1.6), L=Math.round(4+labH+2+tw+8),R=W-16,T=18,B=H-68;
+  const X=v=>L+(Math.log10(v)-xd[0])/(xd[1]-xd[0])*(R-L), Y=v=>B-(Math.log10(v)-yd[0])/(yd[1]-yd[0])*(B-T);
+  ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle='#000';ctx.lineWidth=1;
+  for(let e=Math.floor(xd[0]);e<=Math.ceil(xd[1]);e++)for(let m=1;m<10;m++){
+    const lv=Math.log10(m*10**e); if(lv<xd[0]-1e-9||lv>xd[1]+1e-9)continue;
+    const x=X(m*10**e),len=m===1?8:4; line(x,B,x,B-len); line(x,T,x,T+len);
+    if(m===1) rich(xTick(e),x,B+24,'center',TF);
+  }
+  for(let e=Math.floor(yd[0]);e<=Math.ceil(yd[1]);e++)for(let m=1;m<10;m++){
+    const lv=Math.log10(m*10**e); if(lv<yd[0]-1e-9||lv>yd[1]+1e-9)continue;
+    const y=Y(m*10**e),len=m===1?8:4; line(L,y,L+len,y); line(R,y,R-len,y);
+    if(m===1) rich(yTick(e),L-8,y+6,'right',TF);
+  }
+  ctx.strokeRect(L,T,R-L,B-T);
+  rich(xlab,(L+R)/2,B+56,'center',LF);
+  yLabel(ylab,4+labH/2,(T+B)/2,LF);
+  return {X,Y,L,R,T,B};
+}
+function dot(x,y,c,fill=true){ctx.beginPath();ctx.arc(x,y,6,0,2*Math.PI);ctx.fillStyle=c;ctx.strokeStyle=c;ctx.lineWidth=2;fill?ctx.fill():ctx.stroke()}
+function draw(){
+  if($('modelView').hidden||!W) return;
+  if(caseSel==='sphere') drawSphere(); else drawShip();
+}
+function drawSphere(){
+  const s=sphereState();
+  const xd=[-1,7], yd=[Math.log10(0.05),Math.log10(100)];
+  const ax=logAxes(xd,yd,[['Reynolds number, Re','']],[['drag coefficient, C',''],['D','sub']],
+    e=>powLabel(e), e=>[[e<0?(10**e).toFixed(-e):String(10**e),'']]);
+  ctx.save();ctx.beginPath();ctx.rect(ax.L,ax.T,ax.R-ax.L,ax.B-ax.T);ctx.clip();
+  ctx.strokeStyle='#000';ctx.lineWidth=2;ctx.beginPath();
+  for(let lr=xd[0];lr<=6+1e-9;lr+=0.01){const Re=10**lr,x=ax.X(Re),y=ax.Y(cdSphere(Re));lr===xd[0]?ctx.moveTo(x,y):ctx.lineTo(x,y)}
+  ctx.stroke();
+  // beyond Re = 1e6 the correlation is extrapolated: dashed grey
+  ctx.strokeStyle='#888';ctx.setLineDash([5,4]);ctx.beginPath();
+  for(let lr=6;lr<=xd[1]+1e-9;lr+=0.01){const x=ax.X(10**lr),y=ax.Y(cdSphere(10**lr));lr===6?ctx.moveTo(x,y):ctx.lineTo(x,y)}
+  ctx.stroke();ctx.setLineDash([]);
+  // shade outside correlation range
+  ctx.fillStyle='rgba(0,0,0,0.08)';ctx.fillRect(ax.X(1e6),ax.T,ax.R-ax.X(1e6),ax.B-ax.T);
+  ctx.restore();
+  const inR=Re=>Re>=10**xd[0]&&Re<=10**xd[1];
+  const pts=[{Re:s.Rep,Cd:s.Cdp,c:'#c00000',lab:'prototype'},{Re:s.Rem,Cd:s.Cdm,c:'#0b4fb3',lab:'model'}];
+  const pos=pts.map(p=>({x:ax.X(Math.min(Math.max(p.Re,10**xd[0]),10**xd[1])),y:ax.Y(Math.min(Math.max(p.Cd,0.05),100))}));
+  pts.forEach((p,i)=>dot(pos[i].x,pos[i].y,p.c,inR(p.Re)));
+  // place each label where it does not touch the curve, the dots, or the other label
+  const curveY=px=>{const lr=xd[0]+(px-ax.L)/(ax.R-ax.L)*(xd[1]-xd[0]);return ax.Y(cdSphere(10**lr))};
+  const cnvW=richW([['correlation not valid','']],18), bandX=(ax.X(1e6)+ax.R)/2;
+  const placed=[{x0:bandX-14,x1:bandX+14,y0:ax.T+8,y1:ax.T+12+cnvW}];
+  const score=(b)=>{
+    if(b.x0<ax.L+2||b.x1>ax.R-2||b.y0<ax.T+2||b.y1>ax.B-2) return 1e6;
+    let n=0;
+    for(let px=b.x0-2;px<=b.x1+2;px+=2){const y=curveY(px);if(y>=b.y0-4&&y<=b.y1+4) n+=10}
+    for(const d of pos){const cx=Math.max(b.x0,Math.min(d.x,b.x1)),cy=Math.max(b.y0,Math.min(d.y,b.y1));if(Math.hypot(cx-d.x,cy-d.y)<9) n+=50}
+    for(const o of placed){if(b.x0<o.x1+4&&b.x1>o.x0-4&&b.y0<o.y1+2&&b.y1>o.y0-2) n+=100}
+    return n;
+  };
+  pts.forEach((p,i)=>{
+    const txt=p.lab+(inR(p.Re)?'':' (off scale)'), w=richW([[txt,'']],18), x=pos[i].x, y=pos[i].y;
+    let best=null, k=0;
+    for(const dy of [-14,24,-34,44,-54,64,-74,84,-94,104]) for(const side of [1,-1,0]){
+      const lx=side>0?x+10:side<0?x-10-w:x-w/2, base=y+dy;
+      const b={x0:lx,x1:lx+w,y0:base-14,y1:base+4};
+      const sc=score(b)+(k++)*0.01;   // prefer earlier (closer) candidates on ties
+      if(!best||sc<best.sc) best={lx,base,b,sc};
+      if(sc<1) break;
+    }
+    placed.push(best.b);
+    // leader line when the label had to move away from its point
+    const bx=Math.max(best.b.x0,Math.min(x,best.b.x1)), by=Math.max(best.b.y0,Math.min(y,best.b.y1));
+    const dist=Math.hypot(bx-x,by-y);
+    if(dist>30){ctx.strokeStyle=p.c;ctx.lineWidth=1;const ux=(bx-x)/dist,uy=(by-y)/dist;line(x+ux*8,y+uy*8,bx-ux*3,by-uy*3)}
+    rich([[txt,'']],best.lx,best.base,'left',18,p.c);
+  });
+  { const d=window.devicePixelRatio||1, w=Math.ceil(cnvW)+4, h=28, off=document.createElement('canvas'); off.width=w*d; off.height=h*d;
+    const o=off.getContext('2d'); o.setTransform(d,0,0,d,0,0); const sv=ctx; ctx=o; rich([['correlation not valid','']],w/2,19,'center',18,'#555'); ctx=sv;
+    ctx.save();ctx.translate(bandX,ax.T+10+w/2);ctx.rotate(-Math.PI/2);ctx.drawImage(off,-w/2,-h/2,w,h);ctx.restore(); }
+}
+function drawShip(){
+  const s=shipState();
+  const xd=[0,2], yd=[-9,-5];
+  const ax=logAxes(xd,yd,[['length scale ratio, L',''],['p','sub'],['/L',''],['m','sub']],
+    [['kinematic viscosity, ',''],['ν','g'],['m','sub'],[' (m',''],['2','sup'],['/s)','']],
+    e=>[[String(10**e),'']], e=>powLabel(e));
+  ctx.save();ctx.beginPath();ctx.rect(ax.L,ax.T,ax.R-ax.L,ax.B-ax.T);ctx.clip();
+  // fluid lines
+  ctx.lineWidth=2;
+  ctx.strokeStyle='#0b4fb3';line(ax.L,ax.Y(NU_W),ax.R,ax.Y(NU_W));
+  ctx.strokeStyle='#7a5a00';line(ax.L,ax.Y(NU_HG),ax.R,ax.Y(NU_HG));
+  // required curve
+  ctx.strokeStyle='#000';ctx.beginPath();
+  for(let lx=0;lx<=2.0001;lx+=0.01){const N=10**lx,x=ax.X(N),y=ax.Y(NU_W*N**-1.5);lx===0?ctx.moveTo(x,y):ctx.lineTo(x,y)}
+  ctx.stroke();ctx.restore();
+  rich([['water','']],ax.R-8,ax.Y(NU_W)-8,'right',18,'#0b4fb3');
+  rich([['mercury','']],ax.R-8,ax.Y(NU_HG)-8,'right',18,'#7a5a00');
+  const lab=W<480?[['needed for both Fr and Re','']]:[['needed to match both Fr and Re','']];
+  rich(lab,ax.X(W<480?5:8),ax.Y(6e-8),'left',18,'#000');
+  const nHg=(NU_W/NU_HG)**(2/3);
+  ctx.strokeStyle='#7a5a00';ctx.lineWidth=2;ctx.beginPath();ctx.arc(ax.X(nHg),ax.Y(NU_HG),5,0,2*Math.PI);ctx.stroke();
+  const x=ax.X(s.N), y=ax.Y(s.nuReq);
+  ctx.setLineDash([4,4]);ctx.strokeStyle='#c00000';ctx.lineWidth=1;line(x,y,x,ax.B);ctx.setLineDash([]);
+  dot(x,y,'#c00000');
+  const right=x<ax.R-90;
+  rich([['1 : '+s.N,'']],right?x+10:x-10,y-12,right?'left':'right',18,'#c00000');
+}
+
+/* ---------- start ---------- */
+buildTable(); updatePi(); updateSphere(); updateShip();
+</script>
+</body>
+</html>

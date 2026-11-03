@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSTRs in Series versus Plug Flow Reactor</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(', '\\)']], displayMath: [['$$', '$$']] },
+  chtml: { displayAlign: 'left', displayIndent: '0' },
+  options: { renderActions: { addMenu: [] } }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+<style>
+  :root{
+    --lce-red:#98000D;
+    --pfr:#1f5fbf;      /* plug flow reactor curve (blue) */
+    --cstr:#d40000;     /* CSTRs staircase (red) */
+    --panel-border:#c9c9c9;
+    --btn-bg:#f4f4f4;
+    --btn-bg-hover:#e9e9e9;
+    --btn-border:#b8b8b8;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;
+    color:#222;
+    background:#ffffff;
+    -webkit-font-smoothing:antialiased;
+  }
+  #app{
+    max-width:660px;
+    margin:14px auto;
+    padding:0 14px 20px;
+  }
+  .title{
+    font-size:19px;
+    font-weight:700;
+    text-align:center;
+    color:#111;
+    line-height:1.3;
+    margin:4px 0 10px;
+  }
+  #plotWrap{
+    display:flex;
+    justify-content:center;
+  }
+  canvas#plot{
+    width:560px;
+    height:400px;
+    max-width:100%;
+    display:block;
+  }
+
+  /* ---------- Controls ---------- */
+  #controls{
+    position:relative;
+    display:flex;
+    align-items:flex-start;
+    gap:18px;
+    margin:8px auto 0;
+    max-width:560px;
+  }
+  .sliders{
+    flex:1 1 auto;
+    min-width:0;
+  }
+  .sliderRow{
+    margin:10px 0 14px;
+  }
+  .sliderLabel{
+    font-size:16px;        /* slider text +15% */
+    color:#222;
+    margin-bottom:2px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .sliderLabel .name{ flex:0 0 auto; min-width:122px; }
+  .sliderLabel .val{
+    font-weight:400;
+    color:#000;
+    min-width:34px;
+    display:inline-block;
+  }
+  input[type="range"]{
+    --accent:#98000D; --grey:#999; --fill:50%;
+    -webkit-appearance:none; appearance:none;
+    flex:0 1 263px; min-width:0; height:5px; border-radius:3px;
+    outline:none; opacity:.95; margin:0;
+    -webkit-transition:.2s; transition:opacity .2s;
+    background:var(--grey);
+  }
+  input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none; appearance:none;
+    width:15px; height:15px; border:2px solid #fff; border-radius:50%;
+    background:var(--accent); cursor:pointer;
+    box-shadow:0 1px 2px rgba(0,0,0,.35);
+  }
+  input[type="range"]::-moz-range-thumb{
+    width:15px; height:15px; border:2px solid #fff; border-radius:50%;
+    background:var(--accent); cursor:pointer;
+    box-shadow:0 1px 2px rgba(0,0,0,.35);
+  }
+
+  /* ---------- Buttons (vertical, right of sliders) ---------- */
+  .btnCol{
+    flex:0 0 auto;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    padding-top:2px;
+  }
+  .infoBtn{
+    font-family:inherit;
+    font-size:14px;
+    width:104px;
+    padding:6px 8px;
+    background:var(--lce-red);
+    border:1px solid var(--lce-red);
+    border-radius:5px;
+    color:#fff;
+    cursor:pointer;
+    text-align:center;
+    transition:background .12s;
+  }
+  .infoBtn:hover{ background:#7a000a; border-color:#7a000a; }
+  .infoBtn.active{
+    background:#640008;
+    border-color:#640008;
+    color:#fff;
+  }
+
+  /* ---------- Flyout panel (opens below buttons, spanning to the left) ---------- */
+  #panel{
+    display:none;
+    position:absolute;
+    bottom:calc(100% + 6px);   /* open upward, overlapping the figure above */
+    left:0;
+    right:0;
+    background:#fbfbfb;
+    border:1px solid var(--panel-border);
+    border-radius:6px;
+    box-shadow:0 4px 16px rgba(0,0,0,0.22);
+    padding:14px 40px 16px 16px;
+    z-index:20;
+    font-size:15px;
+    line-height:1.5;
+    color:#222;
+  }
+  #panel.open{ display:block; }
+  #panel h4{
+    margin:0 0 2px;
+    font-size:15px;
+    color:var(--lce-red);
+  }
+  #panel h4 + p{ margin-top:0; }
+  #panel p{ margin:8px 0; }
+  #panel a{ color:var(--lce-red); text-decoration:none; }
+  #panel a:hover{ text-decoration:underline; }
+  #panelClose{
+    position:absolute;
+    top:6px;
+    right:10px;
+    width:24px;height:24px;
+    border:none;
+    background:transparent;
+    font-size:20px;
+    line-height:20px;
+    color:#666;
+    cursor:pointer;
+    padding:0;
+  }
+  #panelClose:hover{ color:#000; }
+  .eq{ margin:6px 0 6px 6px; font-size:16px; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="title">CSTRs in Series versus Plug Flow Reactor</div>
+
+  <div id="plotWrap">
+    <canvas id="plot" width="560" height="400"></canvas>
+  </div>
+
+  <div id="controls">
+    <div class="sliders">
+      <div class="sliderRow">
+        <div class="sliderLabel">
+          <span class="name">residence time</span>
+          <input type="range" id="tau" min="1" max="5" step="0.1" value="2">
+          <span class="val" id="tauVal">2.0</span>
+        </div>
+      </div>
+      <div class="sliderRow">
+        <div class="sliderLabel">
+          <span class="name">number of CSTRs</span>
+          <input type="range" id="nreac" min="1" max="30" step="1" value="10">
+          <span class="val" id="nVal">10</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="btnCol">
+      <button class="infoBtn" data-panel="directions">Directions</button>
+      <button class="infoBtn" data-panel="details">Details</button>
+      <button class="infoBtn" data-panel="about">About</button>
+    </div>
+
+    <div id="panel">
+      <button id="panelClose" aria-label="Close">&times;</button>
+      <div id="panelContent"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- Model constants ----------
+  var C0 = 1.0;   // inlet concentration
+  var k  = 1.0;   // first-order rate constant
+
+  // ---------- DOM ----------
+  var canvas  = document.getElementById('plot');
+  var ctx     = canvas.getContext('2d');
+  var tauEl   = document.getElementById('tau');
+  var nEl     = document.getElementById('nreac');
+  var tauVal  = document.getElementById('tauVal');
+  var nVal    = document.getElementById('nVal');
+
+  // ---------- Plot geometry (CSS pixels) ----------
+  var CSSW = 560, CSSH = 400;
+  var M = { l:78, r:20, t:18, b:56 };   // margins
+  var X0 = 0, X1 = 5;                    // x-range: volume
+  var Y0 = 0, Y1 = 1;                    // y-range: concentration
+
+  function setupHiDPI(){
+    // Supersample (extra 2x) so rotated axis text renders as crisply as
+    // horizontal text, giving both axis labels a matched weight and size.
+    var dpr = (window.devicePixelRatio || 1) * 2;
+    canvas.width  = Math.round(CSSW * dpr);
+    canvas.height = Math.round(CSSH * dpr);
+    canvas.style.width  = CSSW + 'px';
+    canvas.style.height = CSSH + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function px(x){ return M.l + (x - X0)/(X1 - X0) * (CSSW - M.l - M.r); }
+  function py(y){ return M.t + (Y1 - y)/(Y1 - Y0) * (CSSH - M.t - M.b); }
+
+  // ---------- Drawing ----------
+  function draw(){
+    var tau = parseFloat(tauEl.value);
+    var N   = parseInt(nEl.value, 10);
+
+    ctx.clearRect(0, 0, CSSW, CSSH);
+
+    var plotL = px(X0), plotR = px(X1), plotT = py(Y1), plotB = py(Y0);
+
+    // ----- grid -----
+    ctx.strokeStyle = '#eaeaea';
+    ctx.lineWidth = 1;
+    var xi, yi;
+    for(xi = X0; xi <= X1 + 1e-9; xi += 1){
+      ctx.beginPath();
+      ctx.moveTo(px(xi), plotT); ctx.lineTo(px(xi), plotB); ctx.stroke();
+    }
+    for(yi = Y0; yi <= Y1 + 1e-9; yi += 0.2){
+      ctx.beginPath();
+      ctx.moveTo(plotL, py(yi)); ctx.lineTo(plotR, py(yi)); ctx.stroke();
+    }
+
+    // ----- CSTR staircase (red) -----
+    var tauI = tau / N;                       // residence time of one CSTR
+    var Cj = function(j){ return C0 / Math.pow(1 + k*tauI, j); };
+    ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--cstr').trim();
+    ctx.lineWidth = 2.2;
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    ctx.moveTo(px(0), py(C0));
+    for(var j = 1; j <= N; j++){
+      var xL = (j - 1) * tauI, xR = j * tauI, c = Cj(j);
+      ctx.lineTo(px(xL), py(c));   // vertical drop into reactor j
+      ctx.lineTo(px(xR), py(c));   // horizontal hold across reactor j
+    }
+    ctx.stroke();
+
+    // ----- PFR curve (blue) -----
+    ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--pfr').trim();
+    ctx.lineWidth = 2.2;
+    ctx.beginPath();
+    var steps = 400;
+    for(var s = 0; s <= steps; s++){
+      var t = (s / steps) * tau;
+      var y = C0 * Math.exp(-k * t);
+      if(s === 0) ctx.moveTo(px(t), py(y)); else ctx.lineTo(px(t), py(y));
+    }
+    ctx.stroke();
+
+    drawFrameAndLabels();
+    drawLegend(plotR);
+  }
+
+  function drawFrameAndLabels(){
+    var plotL = px(X0), plotR = px(X1), plotT = py(Y1), plotB = py(Y0);
+
+    // frame box
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 1.2;
+    ctx.strokeRect(plotL, plotT, plotR - plotL, plotB - plotT);
+
+    // axis numbers (+15%)
+    ctx.fillStyle = '#000';
+    ctx.font = '15px "Helvetica Neue", Helvetica, Arial, sans-serif';
+    var tl = 6;
+    // x ticks
+    ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    for(var xi = X0; xi <= X1 + 1e-9; xi += 1){
+      var xx = px(xi);
+      ctx.beginPath(); ctx.moveTo(xx, plotB); ctx.lineTo(xx, plotB - tl); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(xx, plotT); ctx.lineTo(xx, plotT + tl); ctx.stroke();
+      ctx.fillText(String(xi), xx, plotB + 6);
+    }
+    // y ticks
+    ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+    for(var yi = Y0; yi <= Y1 + 1e-9; yi += 0.2){
+      var yy = py(yi);
+      ctx.beginPath(); ctx.moveTo(plotL, yy); ctx.lineTo(plotL + tl, yy); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(plotR, yy); ctx.lineTo(plotR - tl, yy); ctx.stroke();
+      ctx.fillText(yi.toFixed(1), plotL - 8, yy);
+    }
+
+    // axis titles (+15%)
+    ctx.font = '17px "Helvetica Neue", Helvetica, Arial, sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+    ctx.fillText('volume', (plotL + plotR) / 2, CSSH - 16);
+
+    ctx.save();
+    ctx.translate(34, (plotT + plotB) / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('concentration of reactant A', 0, 0);
+    ctx.restore();
+  }
+
+  function drawLegend(plotR){
+    var x = plotR - 92, y = py(1) + 12;
+    ctx.font = '14px "Helvetica Neue", Helvetica, Arial, sans-serif';
+    ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+
+    ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--pfr').trim();
+    ctx.lineWidth = 2.4;
+    ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + 26, y); ctx.stroke();
+    ctx.fillStyle = '#000';
+    ctx.fillText('PFR', x + 32, y);
+
+    y += 20;
+    ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--cstr').trim();
+    ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + 26, y); ctx.stroke();
+    ctx.fillStyle = '#000';
+    ctx.fillText('CSTRs', x + 32, y);
+  }
+
+  // ---------- Slider handlers ----------
+  function update(){
+    tauVal.textContent = parseFloat(tauEl.value).toFixed(1);
+    nVal.textContent = nEl.value;
+    draw();
+  }
+  tauEl.addEventListener('input', update);
+  nEl.addEventListener('input', update);
+
+  // ---------- Info panels ----------
+  var panel = document.getElementById('panel');
+  var panelContent = document.getElementById('panelContent');
+  var panelClose = document.getElementById('panelClose');
+  var buttons = Array.prototype.slice.call(document.querySelectorAll('.infoBtn'));
+  var currentPanel = null;
+
+  var content = {
+    directions:
+      '<h4>Directions</h4>' +
+      '<p>This simulation shows the concentration profile of reactant A subject to a ' +
+      'first-order irreversible reaction for a plug flow reactor (PFR) and a series of ' +
+      'equally-sized CSTRs. Both configurations have the same residence time. When the ' +
+      'number of CSTRs in series increases, the behavior of a PFR is approached.</p>',
+    details:
+      '<h4>Details</h4>' +
+      '<p>Exit concentration after \\(N\\) equal-size CSTRs is given by:</p>' +
+      '<div class="eq">$$C_N=\\dfrac{C_0}{\\left(1+k\\,\\tau_i\\right)^{N}}$$</div>' +
+      '<p>where \\(\\tau_i\\) is the residence time of a single CSTR.</p>' +
+      '<p>Exit concentration of a plug flow reactor is given by:</p>' +
+      '<div class="eq">$$C=C_0\\,\\exp(-k\\,\\tau).$$</div>',
+    about:
+      '<h4>About</h4>' +
+      '<p>This simulation was created in the ' +
+      '<a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> ' +
+      'at University of Colorado Boulder for ' +
+      '<a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> ' +
+      'by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a ' +
+      '<a href="https://demonstrations.wolfram.com/EquallySizedMixedFlowReactorsInSeriesVersusPlugFlowReactor/" target="_blank" rel="noopener">Mathematica simulation</a> ' +
+      'by Housam Binous. It was prepared with financial support from the National Science ' +
+      'Foundation (DUE 2336987 and 2336988). Address any questions or comments to ' +
+      '<a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.</p>'
+  };
+
+  function openPanel(name){
+    panelContent.innerHTML = content[name];
+    panel.classList.add('open');
+    buttons.forEach(function(b){
+      b.classList.toggle('active', b.getAttribute('data-panel') === name);
+    });
+    currentPanel = name;
+    if(window.MathJax && window.MathJax.typesetPromise){
+      window.MathJax.typesetPromise([panelContent]);
+    }
+  }
+  function closePanel(){
+    panel.classList.remove('open');
+    buttons.forEach(function(b){ b.classList.remove('active'); });
+    currentPanel = null;
+  }
+  buttons.forEach(function(b){
+    b.addEventListener('click', function(){
+      var name = b.getAttribute('data-panel');
+      if(currentPanel === name) closePanel(); else openPanel(name);
+    });
+  });
+  panelClose.addEventListener('click', closePanel);
+
+  // ---------- init ----------
+  setupHiDPI();
+  window.addEventListener('resize', function(){ setupHiDPI(); draw(); });
+  update();
+})();
+</script>
+</body>
+</html>

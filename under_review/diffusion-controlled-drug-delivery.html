@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Diffusion-Controlled Drug Delivery</title>
+<style>
+  html, body {
+    margin: 0; padding: 0;
+    background: #ffffff;
+    font-family: Helvetica, Arial, sans-serif;
+    color: #000;
+  }
+  #app {
+    width: 890px;
+    margin: 12px auto;
+    padding: 0 4px;
+  }
+  .panel {
+    border: 1px solid #a6a6a6;
+    background: #f4f4f4;
+    border-radius: 3px;
+    padding: 10px 12px;
+    font-size: 15px;
+  }
+  .row { display: flex; align-items: center; flex-wrap: wrap; margin: 4px 0; }
+  .toprow {
+    display: flex; align-items: center; flex-wrap: wrap;
+    gap: 14px; margin-bottom: 6px;
+  }
+  .setter-group { display: inline-flex; }
+  .setter {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    border: 1px solid #8a8a8a;
+    background: #eaeaea;
+    color: #000;
+    padding: 4px 12px;
+    cursor: pointer;
+    outline: none;
+  }
+  .setter:first-child { border-radius: 3px 0 0 3px; }
+  .setter:last-child { border-radius: 0 3px 3px 0; border-left: none; }
+  .setter.active {
+    background: #8b1a1a;
+    color: #fff;
+    border-color: #8b1a1a;
+  }
+  .lbl { font-size: 15px; }
+  .radio-set { display: inline-flex; align-items: center; gap: 12px; margin-left: 6px; }
+  .radio-set label { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; }
+  #pillBdiff.disabled { color: #a0a0a0; }
+  #pillBdiff.disabled .radio-set label { cursor: default; }
+  input[type="radio"] { cursor: pointer; }
+  .sub { vertical-align: sub; font-size: 0.75em; }
+  .sup { vertical-align: super; font-size: 0.75em; }
+  .ital { font-style: italic; }
+  .slider-block { display: inline-flex; align-items: center; gap: 8px; margin-right: 18px; }
+  input[type="range"] {
+    -webkit-appearance: none; appearance: none;
+    width: 150px; height: 4px; background: #c9c9c9; border-radius: 2px;
+    outline: none; cursor: pointer;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: #5a5a5a; cursor: pointer; border: none;
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 14px; height: 14px; border-radius: 50%;
+    background: #5a5a5a; cursor: pointer; border: none;
+  }
+  .val { display: inline-block; min-width: 42px; font-size: 15px; }
+  .slider-font { font-size: 19px; }
+  .slider-font .lbl { font-size: 19px; }
+  .slider-font .val { font-size: 19px; min-width: 52px; }
+  .playbtn {
+    width: 26px; height: 24px;
+    border: 1px solid #8a8a8a; background: #eaeaea; border-radius: 3px;
+    cursor: pointer; font-size: 12px; line-height: 1; margin-right: 6px;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  #figrow { position: relative; display: flex; align-items: flex-start; gap: 12px; margin-top: 8px; }
+  .btncol { display: flex; flex-direction: column; gap: 8px; flex: 0 0 auto; padding-top: 2px; }
+  #plotWrap { flex: 0 0 auto; }
+  canvas { display: block; }
+  .infobtn {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 17.25px;
+    border: 1px solid #8a8a8a;
+    background: #8b1a1a; color: #fff;
+    padding: 6px 8px; border-radius: 3px; cursor: pointer;
+    width: 118px; text-align: center;
+  }
+  .infobtn.active { background: #5f1010; }
+  .info-panel {
+    display: none;
+    position: absolute;
+    right: 4px;
+    border: 1px solid #a6a6a6;
+    background: #fbfbfb;
+    border-radius: 3px;
+    padding: 12px 16px;
+    font-size: 15px;
+    line-height: 1.5;
+    overflow-y: auto;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.20);
+    z-index: 5;
+    box-sizing: border-box;
+  }
+  .info-panel.show { display: block; }
+  .info-panel a { color: #8b1a1a; }
+  .eqline { margin: 12px 0; }
+  math { font-size: 118%; }
+  .symdefs { margin: 4px 0 0 0; }
+  .symdefs div { margin: 3px 0; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="panel">
+    <div class="toprow">
+      <div class="setter-group">
+        <button class="setter active" id="tabA" onclick="setTab(1)">varying <span class="ital">r</span>, <span class="ital">D</span></button>
+        <button class="setter" id="tabB" onclick="setTab(2)"><span class="ital">C</span><span class="sub">API</span> versus <span class="ital">r</span></button>
+      </div>
+      <div class="lbl" id="pillBdiff">
+        diffusivity in pill B (10<span class="sup">&minus;5</span>&nbsp;mm<span class="sup">2</span>/h):
+        <span class="radio-set">
+          <label><input type="radio" name="poly2" value="1" onchange="setPoly(1)">0.5</label>
+          <label><input type="radio" name="poly2" value="2" checked onchange="setPoly(2)">4</label>
+          <label><input type="radio" name="poly2" value="3" onchange="setPoly(3)">25</label>
+        </span>
+      </div>
+    </div>
+
+    <!-- tab 1 controls -->
+    <div id="ctrl1">
+      <div class="row lbl slider-font" style="margin-top:2px;">radii of beads within capsule:</div>
+      <div class="row slider-font">
+        <span class="slider-block">
+          <span class="lbl">pill A (mm)</span>
+          <input type="range" id="R1" min="0.025" max="0.25" step="0.005" value="0.075" oninput="onR1()">
+          <span class="val" id="R1v">0.075</span>
+        </span>
+        <span class="slider-block">
+          <span class="lbl">pill B (mm)</span>
+          <input type="range" id="R2" min="0.025" max="0.25" step="0.005" value="0.05" oninput="onR2()">
+          <span class="val" id="R2v">0.050</span>
+        </span>
+      </div>
+    </div>
+
+    <!-- tab 2 controls -->
+    <div id="ctrl2" style="display:none;">
+      <div class="row lbl">
+        sphere radius:&nbsp;<span class="ital">R</span>&nbsp;=&nbsp;0.075 mm
+      </div>
+      <div class="row">
+        <span class="lbl" style="margin-right:8px;">elapsed time (h)</span>
+        <button class="playbtn" id="play" onclick="togglePlay()">&#9654;</button>
+        <input type="range" id="tsoln" min="0" max="20" step="0.1" value="0" oninput="onTsoln()" style="width:280px;">
+        <span class="val" id="tsolnv" style="margin-left:8px;">0.0</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="figrow">
+    <div class="btncol">
+      <button class="infobtn" id="btnDir" onclick="toggleInfo('dir')">Directions</button>
+      <button class="infobtn" id="btnDet" onclick="toggleInfo('det')">Details</button>
+      <button class="infobtn" id="btnAbt" onclick="toggleInfo('abt')">About</button>
+    </div>
+
+    <div id="plotWrap">
+      <canvas id="plot" width="750" height="450"></canvas>
+    </div>
+
+  <div class="info-panel" id="dir">
+    This Demonstration models a diffusion-controlled drug delivery system to determine the amount of an
+    active pharmaceutical ingredient (API) released from a polymer sphere as a function of time. The elapsed
+    time is limited to 20 hours to correspond to the digestive cycle of humans. Drugs are often delivered as
+    a capsule that contains many spherical beads, and the API is uniformly distributed throughout each polymer
+    bead. The API is assumed to be immediately swept away once it diffuses to the surface of the bead. Select
+    "varying <span class="ital">r</span>, <span class="ital">D</span>" to compare two pills. The diffusivity
+    of pill A is fixed at 10<span class="sup">&minus;5</span> mm<span class="sup">2</span>/h; click on a button
+    to select the diffusivity of pill B. The radius of each pill can be selected with a slider. Select
+    "<span class="ital">C</span><span class="sub">API</span> versus <span class="ital">r</span>" to plot the
+    normalized concentration of the API as a function of radial position for one diffusivity and one spherical
+    radius. Use the slider to change the time at which the concentration profile is calculated or use the play
+    button to observe the concentration change continuously with time.
+  </div>
+
+  <div class="info-panel" id="det">
+    <div>The fractional amount of API released from a spherical bead is obtained from the solution of Fick's
+    second law for a sphere with a uniform initial concentration and zero concentration at the surface:</div>
+    <div class="eqline">
+      <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+        <mtext>drug&#160;released&#160;(%)</mtext><mo>=</mo><mn>100</mn>
+        <mrow><mo>[</mo>
+          <mn>1</mn><mo>&#8722;</mo>
+          <mfrac><mn>6</mn><msup><mi>&#960;</mi><mn>2</mn></msup></mfrac>
+          <munderover><mo>&#8721;</mo><mrow><mi>n</mi><mo>=</mo><mn>1</mn></mrow><mi>&#8734;</mi></munderover>
+          <mfrac><mn>1</mn><msup><mi>n</mi><mn>2</mn></msup></mfrac>
+          <mspace width="2px"/><mi>exp</mi>
+          <mrow><mo>(</mo><mo>&#8722;</mo>
+            <mfrac>
+              <mrow><mi>D</mi><mspace width="1px"/><msup><mi>n</mi><mn>2</mn></msup><msup><mi>&#960;</mi><mn>2</mn></msup><mi>t</mi></mrow>
+              <msup><mi>R</mi><mn>2</mn></msup>
+            </mfrac>
+          <mo>)</mo></mrow>
+        <mo>]</mo></mrow>
+      </math>
+    </div>
+    <div>The normalized concentration of API within the bead as a function of radial position is:</div>
+    <div class="eqline">
+      <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+        <mfrac>
+          <msub><mi>C</mi><mtext>API</mtext></msub>
+          <msubsup><mi>C</mi><mtext>API</mtext><mi>o</mi></msubsup>
+        </mfrac>
+        <mspace width="2px"/><mtext>(%)</mtext><mo>=</mo><mn>100</mn>
+        <mrow><mo>[</mo>
+          <mfrac><mrow><mn>2</mn><mi>R</mi></mrow><mrow><mi>&#960;</mi><mi>r</mi></mrow></mfrac>
+          <munderover><mo>&#8721;</mo><mrow><mi>n</mi><mo>=</mo><mn>1</mn></mrow><mi>&#8734;</mi></munderover>
+          <mfrac>
+            <msup><mrow><mo>(</mo><mo>&#8722;</mo><mn>1</mn><mo>)</mo></mrow><mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow></msup>
+            <mi>n</mi>
+          </mfrac>
+          <mi>sin</mi><mrow><mo>(</mo><mfrac><mrow><mi>n</mi><mi>&#960;</mi><mi>r</mi></mrow><mi>R</mi></mfrac><mo>)</mo></mrow>
+          <mspace width="2px"/><mi>exp</mi>
+          <mrow><mo>(</mo><mo>&#8722;</mo>
+            <mfrac>
+              <mrow><mi>D</mi><mspace width="1px"/><msup><mi>n</mi><mn>2</mn></msup><msup><mi>&#960;</mi><mn>2</mn></msup><mi>t</mi></mrow>
+              <msup><mi>R</mi><mn>2</mn></msup>
+            </mfrac>
+          <mo>)</mo></mrow>
+        <mo>]</mo></mrow>
+      </math>
+    </div>
+    <div class="symdefs">
+      <div>where:</div>
+      <div><span class="ital">C</span><span class="sub">API</span> = concentration of API at radial position <span class="ital">r</span></div>
+      <div><span class="ital">C</span><span class="sub">API</span><span class="sup">o</span> = initial (uniform) concentration of API in the bead</div>
+      <div><span class="ital">D</span> = diffusivity of the API in the polymer (mm<span class="sup">2</span>/h)</div>
+      <div><span class="ital">R</span> = radius of the spherical bead (mm)</div>
+      <div><span class="ital">r</span> = radial position within the bead (mm)</div>
+      <div><span class="ital">t</span> = elapsed time (h)</div>
+      <div><span class="ital">n</span> = summation index</div>
+    </div>
+    <div style="margin-top:8px;">Each series is evaluated with the first 100 terms.</div>
+  </div>
+
+  <div class="info-panel" id="abt">
+    This simulation was created in the
+    <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a>
+    at University of Colorado Boulder for
+    <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a>
+    by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a
+    <a href="https://demonstrations.wolfram.com/DiffusionControlledDrugDelivery/" target="_blank">Mathematica simulation</a>
+    by Rachel Saker and Rachael L. Baumann. It was prepared with financial support from the National Science
+    Foundation (DUE 2336987 and 2336988) in collaboration with Washington State University. Address any
+    questions or comments to LearnChemE@gmail.com.
+  </div>
+  </div>
+</div>
+
+<script>
+// ---------------- state ----------------
+var state = {
+  tab: 1,
+  poly2: 2,       // 1,2,3
+  R1: 0.075,
+  R2: 0.05,
+  tsoln: 0
+};
+var Da = 4e-5;    // pill A diffusivity (fixed)
+
+function D2val(){
+  if (state.poly2 === 1) return 5e-6;
+  if (state.poly2 === 2) return 4e-5;
+  return 2.5e-4; // poly2 === 3
+}
+
+// ---------------- physics ----------------
+function release(R, D, t){       // % released, sphere
+  var s = 0;
+  for (var n = 1; n <= 100; n++){
+    s += Math.exp(-D * t * Math.pow(Math.PI * n / R, 2)) / (n * n);
+  }
+  return 100 * (1 - (6 / (Math.PI * Math.PI)) * s);
+}
+function conc(R, r, D, t){       // normalized concentration %
+  if (t < 0.01) return 100;
+  if (r <= 1e-9){                // limit r -> 0
+    var s0 = 0;
+    for (var m = 1; m <= 100; m++){
+      s0 += 2 * Math.pow(-1, m + 1) * Math.exp(-D * t * Math.pow(Math.PI * m / R, 2));
+    }
+    return 100 * s0;
+  }
+  var s = 0;
+  for (var n = 1; n <= 100; n++){
+    s += (Math.pow(-1, n + 1) / n) * Math.sin(n * Math.PI * r / R) *
+         Math.exp(-D * t * Math.pow(Math.PI * n / R, 2));
+  }
+  return 100 * (2 * R / (Math.PI * r)) * s;
+}
+
+// ---------------- canvas / drawing ----------------
+var canvas = document.getElementById('plot');
+var ctx = canvas.getContext('2d');
+var CW = 750, CH = 450;
+(function setupHiDPI(){
+  var dpr = window.devicePixelRatio || 1;
+  canvas.style.width = CW + 'px';
+  canvas.style.height = CH + 'px';
+  canvas.width = Math.round(CW * dpr);
+  canvas.height = Math.round(CH * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+})();
+
+var M = { l: 98, r: 28, t: 25, b: 70 };  // plot margins
+var PW = CW - M.l - M.r;
+var PH = CH - M.t - M.b;
+
+function fmt(x, d){ return x.toFixed(d); }
+
+function drawFrame(xmin, xmax, ymin, ymax, xticks, yticks, xlabel, ylabelDraw, xtickfmt, ytickfmt){
+  ctx.clearRect(0, 0, CW, CH);
+  // frame box
+  ctx.strokeStyle = '#000';
+  ctx.lineWidth = 1.2;
+  ctx.strokeRect(M.l, M.t, PW, PH);
+
+  ctx.fillStyle = '#000';
+  ctx.font = '19px Helvetica, Arial, sans-serif';
+
+  // x ticks
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  for (var i = 0; i < xticks.length; i++){
+    var xv = xticks[i];
+    var px = M.l + (xv - xmin) / (xmax - xmin) * PW;
+    ctx.beginPath(); ctx.moveTo(px, M.t + PH); ctx.lineTo(px, M.t + PH - 6); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(px, M.t); ctx.lineTo(px, M.t + 6); ctx.stroke();
+    ctx.fillText(xtickfmt(xv), px, M.t + PH + 8);
+  }
+  // y ticks
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'middle';
+  for (var j = 0; j < yticks.length; j++){
+    var yv = yticks[j];
+    var py = M.t + PH - (yv - ymin) / (ymax - ymin) * PH;
+    ctx.beginPath(); ctx.moveTo(M.l, py); ctx.lineTo(M.l + 6, py); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(M.l + PW, py); ctx.lineTo(M.l + PW - 6, py); ctx.stroke();
+    ctx.fillText(ytickfmt(yv), M.l - 9, py);
+  }
+
+  // x axis label
+  ctx.font = '22px Helvetica, Arial, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'bottom';
+  ctx.fillText(xlabel, M.l + PW / 2, CH - 6);
+
+  // y axis label (custom draw callback so we can render subscripts)
+  ylabelDraw();
+}
+
+function mapX(xv, xmin, xmax){ return M.l + (xv - xmin) / (xmax - xmin) * PW; }
+function mapY(yv, ymin, ymax){ return M.t + PH - (yv - ymin) / (ymax - ymin) * PH; }
+
+// ---- plot 1: drug released vs time ----
+function drawPlot1(){
+  var xmin = 0, xmax = 20, ymin = 0, ymax = 105;
+  var D2 = D2val();
+
+  drawFrame(
+    xmin, xmax, ymin, ymax,
+    [0, 5, 10, 15, 20],
+    [0, 20, 40, 60, 80, 100],
+    'elapsed time (h)',
+    function(){
+      // y label: drug released (%)
+      ctx.save();
+      ctx.translate(26, M.t + PH / 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.font = '22px Helvetica, Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('drug released (%)', 0, 0);
+      ctx.restore();
+    },
+    function(v){ return String(v); },
+    function(v){ return String(v); }
+  );
+
+  var N = 400;
+  // pill A curve (gray solid)
+  ctx.strokeStyle = '#808080';
+  ctx.lineWidth = 2.4;
+  ctx.setLineDash([]);
+  ctx.beginPath();
+  for (var i = 0; i <= N; i++){
+    var t = xmin + (xmax - xmin) * i / N;
+    var y = release(state.R1, Da, t);
+    var px = mapX(t, xmin, xmax), py = mapY(Math.min(y, ymax), ymin, ymax);
+    if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+  }
+  ctx.stroke();
+
+  // pill B curve (orange dashed)
+  ctx.strokeStyle = '#ff9900';
+  ctx.lineWidth = 2.4;
+  ctx.setLineDash([9, 6]);
+  ctx.beginPath();
+  for (var k = 0; k <= N; k++){
+    var t2 = xmin + (xmax - xmin) * k / N;
+    var y2 = release(state.R2, D2, t2);
+    var px2 = mapX(t2, xmin, xmax), py2 = mapY(Math.min(y2, ymax), ymin, ymax);
+    if (k === 0) ctx.moveTo(px2, py2); else ctx.lineTo(px2, py2);
+  }
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // curve labels
+  function label(text, x, y, color){
+    var px = mapX(x, xmin, xmax), py = mapY(y, ymin, ymax);
+    ctx.font = '20px Helvetica, Arial, sans-serif';
+    var w = ctx.measureText(text).width + 10;
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(px - w / 2, py - 14, w, 28);
+    ctx.fillStyle = color;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text, px, py);
+  }
+  var ta = 0.33 * xmax, tb = 0.66 * xmax;
+  label('pill A', ta, Math.min(release(state.R1, Da, ta), ymax), '#000');
+  label('pill B', tb, Math.min(release(state.R2, D2, tb), ymax), '#ff9900');
+}
+
+// ---- plot 2: concentration profile vs r ----
+function drawPlot2(){
+  var R = 0.075;
+  var xmin = 0, xmax = 0.075, ymin = 0, ymax = 110;
+
+  drawFrame(
+    xmin, xmax, ymin, ymax,
+    [0, 0.025, 0.05, 0.075],
+    [0, 20, 40, 60, 80, 100],
+    '',   // custom x label drawn below (has italic r)
+    function(){
+      // y label: C_API/C_API^o (%)
+      ctx.save();
+      ctx.translate(26, M.t + PH / 2);
+      ctx.rotate(-Math.PI / 2);
+      drawConcYLabel();
+      ctx.restore();
+    },
+    function(v){ return v.toFixed(3); },
+    function(v){ return String(v); }
+  );
+
+  // custom x label with italic r
+  (function(){
+    var cx = M.l + PW / 2, cy = CH - 6;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'bottom';
+    var f1 = '22px Helvetica, Arial, sans-serif';
+    var f2 = 'italic 22px Helvetica, Arial, sans-serif';
+    ctx.font = f1; var w1 = ctx.measureText('position ').width;
+    ctx.font = f2; var w2 = ctx.measureText('r').width;
+    ctx.font = f1; var w3 = ctx.measureText(' (mm)').width;
+    var total = w1 + w2 + w3;
+    var sx = cx - total / 2;
+    ctx.fillStyle = '#000';
+    ctx.font = f1; ctx.fillText('position ', sx, cy);
+    ctx.font = f2; ctx.fillText('r', sx + w1, cy);
+    ctx.font = f1; ctx.fillText(' (mm)', sx + w1 + w2, cy);
+  })();
+
+  var D = Da, t = state.tsoln;
+  var N = 300;
+  // build path points
+  var pts = [];
+  for (var i = 0; i <= N; i++){
+    var r = xmin + (xmax - xmin) * i / N;
+    var y = conc(R, r, D, t);
+    if (y < 0) y = 0;
+    pts.push([r, Math.min(y, ymax)]);
+  }
+  // fill to axis
+  ctx.beginPath();
+  ctx.moveTo(mapX(pts[0][0], xmin, xmax), mapY(0, ymin, ymax));
+  for (var p = 0; p < pts.length; p++){
+    ctx.lineTo(mapX(pts[p][0], xmin, xmax), mapY(pts[p][1], ymin, ymax));
+  }
+  ctx.lineTo(mapX(pts[pts.length - 1][0], xmin, xmax), mapY(0, ymin, ymax));
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(128,128,128,0.25)';
+  ctx.fill();
+  // curve line
+  ctx.beginPath();
+  for (var q = 0; q < pts.length; q++){
+    var pxq = mapX(pts[q][0], xmin, xmax), pyq = mapY(pts[q][1], ymin, ymax);
+    if (q === 0) ctx.moveTo(pxq, pyq); else ctx.lineTo(pxq, pyq);
+  }
+  ctx.strokeStyle = '#808080';
+  ctx.lineWidth = 2.4;
+  ctx.setLineDash([]);
+  ctx.stroke();
+}
+
+function drawConcYLabel(){
+  // draws "C_API/C_API^o (%)" centered at (0,0) with current rotated ctx
+  var base = 22, subF = 15;
+  var fI = 'italic ' + base + 'px Helvetica, Arial, sans-serif';
+  var fN = base + 'px Helvetica, Arial, sans-serif';
+  var fSub = subF + 'px Helvetica, Arial, sans-serif';
+  // segments: [text, font, dy]
+  var segs = [
+    ['C', fI, 0],
+    ['API', fSub, 5],
+    ['/C', fI, 0],
+    ['API', fSub, 5],
+    ['o', fSub, -10],
+    [' (%)', fN, 0]
+  ];
+  ctx.textBaseline = 'middle';
+  ctx.textAlign = 'left';
+  var totalW = 0;
+  for (var s = 0; s < segs.length; s++){ ctx.font = segs[s][1]; totalW += ctx.measureText(segs[s][0]).width; }
+  var x = -totalW / 2;
+  ctx.fillStyle = '#000';
+  for (var s2 = 0; s2 < segs.length; s2++){
+    ctx.font = segs[s2][1];
+    ctx.fillText(segs[s2][0], x, segs[s2][2]);
+    x += ctx.measureText(segs[s2][0]).width;
+  }
+}
+
+function render(){
+  if (state.tab === 1) drawPlot1(); else drawPlot2();
+}
+
+// ---------------- UI handlers ----------------
+function setTab(t){
+  state.tab = t;
+  document.getElementById('tabA').classList.toggle('active', t === 1);
+  document.getElementById('tabB').classList.toggle('active', t === 2);
+  document.getElementById('ctrl1').style.display = (t === 1) ? 'block' : 'none';
+  document.getElementById('ctrl2').style.display = (t === 2) ? 'block' : 'none';
+  // pill B diffusivity is unused in the "C_API versus r" view: deactivate its radio buttons
+  var disable = (t === 2);
+  document.getElementById('pillBdiff').classList.toggle('disabled', disable);
+  var radios = document.querySelectorAll('input[name="poly2"]');
+  for (var i = 0; i < radios.length; i++){ radios[i].disabled = disable; }
+  if (t !== 2) stopPlay();
+  render();
+}
+function setPoly(v){ state.poly2 = v; render(); }
+function onR1(){
+  state.R1 = parseFloat(document.getElementById('R1').value);
+  document.getElementById('R1v').textContent = fmt(state.R1, 3);
+  render();
+}
+function onR2(){
+  state.R2 = parseFloat(document.getElementById('R2').value);
+  document.getElementById('R2v').textContent = fmt(state.R2, 3);
+  render();
+}
+function onTsoln(){
+  state.tsoln = parseFloat(document.getElementById('tsoln').value);
+  document.getElementById('tsolnv').textContent = fmt(state.tsoln, 1);
+  render();
+}
+
+// animation (play once, 0 -> 20)
+var playing = false, rafId = null, lastTime = 0;
+var rate = 5; // "hours" per second (AnimationRate 5)
+function togglePlay(){ if (playing) stopPlay(); else startPlay(); }
+function startPlay(){
+  if (state.tsoln >= 20) { state.tsoln = 0; }
+  playing = true;
+  document.getElementById('play').innerHTML = '&#10074;&#10074;';
+  lastTime = performance.now();
+  rafId = requestAnimationFrame(step);
+}
+function stopPlay(){
+  playing = false;
+  document.getElementById('play').innerHTML = '&#9654;';
+  if (rafId) cancelAnimationFrame(rafId);
+  rafId = null;
+}
+function step(now){
+  if (!playing) return;
+  var dt = (now - lastTime) / 1000;
+  lastTime = now;
+  state.tsoln += rate * dt;
+  if (state.tsoln >= 20){ state.tsoln = 20; }
+  document.getElementById('tsoln').value = state.tsoln;
+  document.getElementById('tsolnv').textContent = fmt(state.tsoln, 1);
+  render();
+  if (state.tsoln >= 20){ stopPlay(); return; }
+  rafId = requestAnimationFrame(step);
+}
+
+// info panels
+function toggleInfo(id){
+  var map = { dir: 'btnDir', det: 'btnDet', abt: 'btnAbt' };
+  var panel = document.getElementById(id);
+  var isOpen = panel.classList.contains('show');
+  ['dir', 'det', 'abt'].forEach(function(k){
+    document.getElementById(k).classList.remove('show');
+    document.getElementById(map[k]).classList.remove('active');
+  });
+  if (!isOpen){
+    positionPanel(id, document.getElementById(map[id]));
+    panel.classList.add('show');
+    document.getElementById(map[id]).classList.add('active');
+  }
+}
+
+function positionPanel(id, btn){
+  var fig = document.getElementById('figrow');
+  var wrap = document.getElementById('plotWrap');
+  var fr = fig.getBoundingClientRect();
+  var br = btn.getBoundingClientRect();
+  var wr = wrap.getBoundingClientRect();
+  var panel = document.getElementById(id);
+  // start a few pixels below the top of its own button
+  var top = (br.top - fr.top) + 6;
+  // just to the right of the button column, over the left edge of the figure
+  var left = (br.right - fr.left) + 12;
+  panel.style.top = top + 'px';
+  panel.style.left = left + 'px';
+  // align right edge just inside the figure's right edge
+  panel.style.right = ((fr.right - wr.right) + 4) + 'px';
+  // cover the figure: extend down to the bottom of the plot, scroll if taller
+  var figBottom = (wr.bottom - fr.top);
+  panel.style.maxHeight = (figBottom - top - 2) + 'px';
+}
+
+// init
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Heat Transfer between Flowing Liquids in Cylindrical Tubes</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(','\\)']], displayMath: [['$$','$$']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    font-family: Helvetica, Arial, sans-serif;
+    background: #ffffff;
+    color: #000;
+  }
+  #app {
+    position: relative;
+    width: 760px;
+    margin: 0 auto;
+    padding: 8px 10px 20px 10px;
+    box-sizing: border-box;
+  }
+  h1.simTitle {
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    margin: 6px 0 10px 0;
+  }
+  /* top row: dropdown + panel buttons */
+  .topRow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+  select#viewSelect {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    padding: 3px 4px;
+  }
+  .panelBtn {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    font-weight: normal;
+    color: #ffffff;
+    background-color: #98000D;
+    border: 1px solid #98000D;
+    border-radius: 4px;
+    padding: 5px 14px;
+    cursor: pointer;
+  }
+  .panelBtn:hover { background-color: #b21120; border-color: #b21120; }
+  /* control rows */
+  .ctrlRow {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 6px 0;
+    flex-wrap: nowrap;
+  }
+  .ctrl {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .ctrl.disabled { opacity: 0.35; pointer-events: none; }
+  .ctrl label {
+    font-size: 15px;      /* 15% larger than 13px base */
+    white-space: nowrap;
+  }
+  .ctrl input[type=range] {
+    width: 100px;
+    margin: 0;
+  }
+  .ctrlRow.tight { gap: 10px; }
+  .ctrlRow.tight .ctrl { gap: 5px; }
+  .ctrlRow.tight .ctrl input[type=range] { width: 80px; }
+  .ctrlRow.tight .ctrl .val { min-width: 28px; }
+  .ctrl .val {
+    font-size: 15px;
+    min-width: 34px;
+    text-align: left;
+  }
+  .ratioLabel {
+    font-size: 15px;
+    white-space: nowrap;
+  }
+  sub { font-size: 11px; }
+  em.v { font-style: italic; font-family: Georgia, 'Times New Roman', serif; }
+  /* canvas */
+  #plotWrap { position: relative; margin-top: 6px; }
+  canvas#plot {
+    display: block;
+    width: 720px;
+    height: 470px;
+  }
+  /* flyout panels */
+  .flyout {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 20;
+    background: #ffffff;
+    border: 2px solid #98000D;
+    border-radius: 6px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.35);
+    padding: 14px 40px 14px 18px;
+    font-size: 14px;
+    line-height: 1.45;
+    max-height: 520px;
+    overflow-y: auto;
+    box-sizing: border-box;
+  }
+  .flyout.open { display: block; }
+  .flyout .closeX {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    border: none;
+    background: none;
+    color: #98000D;
+    font-size: 22px;
+    font-weight: bold;
+    line-height: 1;
+    cursor: pointer;
+    padding: 2px 6px;
+  }
+  .flyout .closeX:hover { color: #b21120; }
+  .flyout p { margin: 8px 0; }
+  .flyout h2.panelHead {
+    font-size: 14px;
+    font-weight: bold;
+    color: #000;
+    margin: 0 0 2px 0;
+  }
+  .flyout h2.panelHead + p { margin-top: 0; }
+  .flyout table.symbols { border-collapse: collapse; margin: 4px 0 8px 0; }
+  .flyout table.symbols td { padding: 2px 12px 2px 0; vertical-align: top; }
+  /* range sliders */
+  input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+  input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  .flyout a { color: #98000D; }
+  /* left-justify display equations rather than centering them */
+  .flyout mjx-container[display="true"] {
+    text-align: left !important;
+    margin: 10px 0 !important;
+  }
+  .flyout mjx-container[display="true"] > svg {
+    margin-left: 0 !important;
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <h1 class="simTitle">Heat Transfer between Flowing Liquids in Cylindrical Tubes</h1>
+
+  <div class="topRow">
+    <select id="viewSelect">
+      <option value="1">average temperature</option>
+      <option value="2">radial temperature</option>
+      <option value="3">fluid velocity</option>
+      <option value="4" selected>temperature contours</option>
+    </select>
+    <button class="panelBtn" id="btnDirections" type="button">Directions</button>
+    <button class="panelBtn" id="btnDetails" type="button">Details</button>
+    <button class="panelBtn" id="btnAbout" type="button">About</button>
+  </div>
+
+  <div class="ctrlRow">
+    <div class="ctrl" id="ctrl-dPa">
+      <label>(&Delta;<em class="v">P</em>/<em class="v">L</em>)<sub>annulus</sub></label>
+      <input type="range" id="dPa" min="5" max="15" step="0.1" value="10">
+      <span class="val" id="dPa-val">10.0</span>
+    </div>
+    <div class="ctrl" id="ctrl-dPt">
+      <label>(&Delta;<em class="v">P</em>/<em class="v">L</em>)<sub>tube</sub></label>
+      <input type="range" id="dPt" min="5" max="15" step="0.1" value="10">
+      <span class="val" id="dPt-val">10.0</span>
+    </div>
+  </div>
+
+  <div class="ctrlRow">
+    <div class="ctrl" id="ctrl-Pea">
+      <label>Pe<sub>annulus</sub></label>
+      <input type="range" id="Pea" min="1" max="50" step="1" value="20">
+      <span class="val" id="Pea-val">20</span>
+    </div>
+    <div class="ctrl" id="ctrl-Pet">
+      <label>Pe<sub>tube</sub></label>
+      <input type="range" id="Pet" min="1" max="50" step="1" value="20">
+      <span class="val" id="Pet-val">20</span>
+    </div>
+    <div class="ctrl" id="ctrl-Z">
+      <label>axial distance <em class="v">z</em>/<em class="v">L</em></label>
+      <input type="range" id="Z" min="0.2" max="0.8" step="0.2" value="0.6">
+      <span class="val" id="Z-val">0.6</span>
+    </div>
+  </div>
+
+  <div class="ctrlRow tight">
+    <span class="ratioLabel">ratio of tube to annulus:</span>
+    <div class="ctrl" id="ctrl-alpha">
+      <label>conductivity</label>
+      <input type="range" id="alpha" min="0.5" max="2" step="0.1" value="1">
+      <span class="val" id="alpha-val">1.0</span>
+    </div>
+    <div class="ctrl" id="ctrl-mu">
+      <label>viscosity</label>
+      <input type="range" id="mu" min="1" max="10" step="0.1" value="5">
+      <span class="val" id="mu-val">5.0</span>
+    </div>
+    <div class="ctrl" id="ctrl-kappa">
+      <label>radii</label>
+      <input type="range" id="kappa" min="0.2" max="0.8" step="0.1" value="0.5">
+      <span class="val" id="kappa-val">0.5</span>
+    </div>
+  </div>
+
+  <div id="plotWrap">
+    <canvas id="plot" width="720" height="470"></canvas>
+
+    <div class="flyout" id="panelDirections">
+      <button class="closeX" data-close="panelDirections" type="button">&times;</button>
+      <h2 class="panelHead">Directions</h2>
+      <p>This simulation shows the velocity and temperature profiles of two liquids
+      at different initial temperatures flowing concurrently in laminar flow in a
+      cylindrical tube and the surrounding cylindrical annulus.</p>
+      <p>The properties of the two liquids are assumed to be constant, and their
+      velocity profiles are assumed to be independent of axial location. In the
+      inlet region \(z &lt; 0\), the liquids in the annular and the tube regions have
+      different uniform temperatures \(T_{\text{annulus}}\) and \(T_{\text{tube}}\),
+      respectively; in the region \(z &gt; 0\), the external annulus wall is thermally
+      insulated and the wall of the circular tube is assumed to be thermally thin.</p>
+      <p>Similar arrangements occur in various industrial applications, including
+      heat exchangers and tubular reactors. You can vary the ratio of the properties
+      of the fluid in the cylinder to the fluid in the annulus, the relative
+      dimension of the tubular to axial radii and the pressure gradient in the two
+      flow regions to see the temperature and velocities in the two flow regions.</p>
+      <p>Use the drop-down menu to select the plot to display: the average (cup)
+      temperature of each fluid along the tube, the radial temperature profile at a
+      selected axial distance, the fluid velocity profiles, or the temperature
+      contours.</p>
+    </div>
+
+    <div class="flyout" id="panelDetails">
+      <button class="closeX" data-close="panelDetails" type="button">&times;</button>
+      <h2 class="panelHead">Details</h2>
+      <p>The dimensionless horizontal distance is</p>
+      $$z = \frac{z^{*}}{L},$$
+      <p>where \(L\) is the length of the tube. The dimensionless radial distance is</p>
+      $$r = \frac{r^{*}}{R},$$
+      <p>where \(R\) is the external annular radius, and the dimensionless temperature is</p>
+      $$\frac{T(z,r) - T_{\text{tube}}(0,r)}{T_{\text{annulus}}(0,r) - T_{\text{tube}}(0,r)}.$$
+      <p>The temperature profile of the two liquids is obtained by solving a partial
+      differential equation with two different sets of parameters and velocity
+      profiles, one for each flow region:</p>
+      $$u\,\frac{\partial T}{\partial z} \;=\; \alpha\,\frac{1}{r}\,
+        \frac{\partial}{\partial r}\!\left(r\,\frac{\partial T}{\partial r}\right)
+        \;+\; \frac{1}{\mathrm{Pe}}\,\frac{\partial^{2} T}{\partial z^{2}},$$
+      <p>here:</p>
+      $$T=\begin{cases} T_{\text{tube}} & r\le \kappa R\\[2pt]
+          T_{\text{annulus}} & \kappa R &lt; r &lt; R \end{cases}
+        \qquad
+        u=\begin{cases} u_{\text{tube}} & r\le \kappa R\\[2pt]
+          u_{\text{annulus}} & \kappa R &lt; r &lt; R \end{cases}$$
+      $$\alpha=\begin{cases} \alpha_{\text{tube}} & r\le \kappa R\\[2pt]
+          \alpha_{\text{annulus}} & \kappa R &lt; r &lt; R \end{cases}
+        \qquad
+        \mathrm{Pe}=\begin{cases} \mathrm{Pe}_{\text{tube}} & r\le \kappa R\\[2pt]
+          \mathrm{Pe}_{\text{annulus}} & \kappa R &lt; r &lt; R \end{cases}$$
+      <p>where \(\kappa\) is the ratio of the radii of the tube to the annulus,
+      \(T\) is the dimensionless temperature, \(u\) is the velocity,
+      \(\mathrm{Pe}\) is the P&eacute;clet number \(u L/\alpha\), \(\alpha\) is the
+      thermal diffusivity \(k/(\rho\,C_p)\), and \(k\), \(\rho\) and \(C_p\) are the
+      fluid thermal conductivity, density and heat capacity, respectively. The
+      initial conditions are:</p>
+      $$T_{\text{tube}}(0,r)=0, \qquad T_{\text{annulus}}(0,r)=1,$$
+      <p>with boundary conditions</p>
+      $$\frac{\partial T}{\partial r}(R,z)=\frac{\partial T}{\partial r}(-R,z)=0.$$
+      <p>Here \(\kappa R\) and \(R\) are the radii of the tube and the annulus
+      respectively.</p>
+      <p>Analytic solutions for fully developed laminar flow in the tube and the
+      cylinder are shown in [1]:</p>
+      $$u_{\text{tube}}=\frac{\Delta P_{\text{tube}}\,(\kappa R)^{2}}
+        {4\,\mu_{\text{tube}}\,L}\left(1-\left(\frac{r}{\kappa R}\right)^{\!2}\right),$$
+      $$u_{\text{annulus}}=\frac{\Delta P_{\text{annulus}}\,R^{2}}
+        {4\,\mu_{\text{annulus}}\,L}\left[\left(1-\left(\frac{r}{R}\right)^{\!2}\right)
+        -\frac{1-\kappa^{2}}{\ln(1/\kappa)}\,\ln\!\left(\frac{R}{r}\right)\right],$$
+      <p>and the maximum velocity is</p>
+      $$U_{\max}=\begin{cases}
+        U_{\text{tube}}=\dfrac{\Delta P_{\text{tube}}\,(\kappa R)^{2}}
+          {4\,\mu_{\text{tube}}\,L} & r\le \kappa R\\[14pt]
+        U_{\text{annulus}}=\dfrac{\Delta P_{\text{annulus}}\,R^{2}}
+          {4\,\mu_{\text{annulus}}\,L}\left(1-\lambda^{2}
+          \left(1-\ln \lambda^{2}\right)\right) & \kappa R \le r &lt; R
+        \end{cases}$$
+      <p>Here \(\Delta P\) is the horizontal pressure and</p>
+      $$\lambda=\sqrt{\frac{1-\kappa^{2}}{2\,\ln(1/\kappa)}}.$$
+      <p>The average (cup) temperatures of the two fluids are:</p>
+      $$\tilde{T}_{\text{tube}}=\frac{\displaystyle\int_{0}^{\kappa R} T\,u_{\text{tube}}\,dr}
+        {\displaystyle\int_{0}^{\kappa R} u_{\text{tube}}\,dr},
+        \qquad
+        \tilde{T}_{\text{annular}}=\frac{\displaystyle\int_{\kappa R}^{R} T\,u_{\text{annulus}}\,dr}
+        {\displaystyle\int_{\kappa R}^{R} u_{\text{annulus}}\,dr}.$$
+      <p>These equations are solved numerically. Plots of the temperature and
+      velocity contours, as well as the average temperatures, are shown.</p>
+      <p><b>Reference</b></p>
+      <p>[1] R. B. Bird, W. E. Stewart and E. N. Lightfoot, <i>Transport
+      Phenomena</i>, 2nd ed., New York: John Wiley and Sons, 2002.</p>
+      <p><b>Symbols</b></p>
+      <table class="symbols">
+        <tr><td>\(C_p\)</td><td>fluid heat capacity</td></tr>
+        <tr><td>\(k\)</td><td>fluid thermal conductivity</td></tr>
+        <tr><td>\(L\)</td><td>tube length</td></tr>
+        <tr><td>\(\mathrm{Pe}\)</td><td>P&eacute;clet number, \(uL/\alpha\)</td></tr>
+        <tr><td>\(\Delta P\)</td><td>pressure drop over length \(L\)</td></tr>
+        <tr><td>\(r^{*}\)</td><td>radial position</td></tr>
+        <tr><td>\(r\)</td><td>dimensionless radial position, \(r^{*}/R\)</td></tr>
+        <tr><td>\(R\)</td><td>external (annulus) radius</td></tr>
+        <tr><td>\(T\)</td><td>dimensionless temperature</td></tr>
+        <tr><td>\(T_{\text{tube}},\ T_{\text{annulus}}\)</td><td>inlet temperatures of the tube and annulus fluids</td></tr>
+        <tr><td>\(\tilde{T}\)</td><td>average (cup) temperature</td></tr>
+        <tr><td>\(u\)</td><td>fluid axial velocity</td></tr>
+        <tr><td>\(U_{\max}\)</td><td>maximum fluid velocity</td></tr>
+        <tr><td>\(z^{*}\)</td><td>axial position</td></tr>
+        <tr><td>\(z\)</td><td>dimensionless axial position, \(z^{*}/L\)</td></tr>
+        <tr><td>\(\alpha\)</td><td>thermal diffusivity, \(k/(\rho C_p)\)</td></tr>
+        <tr><td>\(\kappa\)</td><td>ratio of tube radius to annulus radius</td></tr>
+        <tr><td>\(\lambda\)</td><td>dimensionless radius of maximum annulus velocity</td></tr>
+        <tr><td>\(\mu\)</td><td>fluid viscosity</td></tr>
+        <tr><td>\(\rho\)</td><td>fluid density</td></tr>
+      </table>
+    </div>
+
+    <div class="flyout" id="panelAbout">
+      <button class="closeX" data-close="panelAbout" type="button">&times;</button>
+      <h2 class="panelHead">About</h2>
+      <p>This simulation was created in the
+      <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department
+      of Chemical and Biological Engineering</a> at University of Colorado Boulder for
+      <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a>
+      by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a
+      <a href="https://demonstrations.wolfram.com/HeatTransferBetweenFlowingLiquidsInCylindricalTubes/"
+      target="_blank" rel="noopener">Mathematica simulation</a> by Clay Gruesbeck. It was
+      prepared with financial support from the National Science Foundation
+      (DUE&nbsp;2336987 and 2336988). Address any questions or comments to
+      LearnChemE@gmail.com.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ------------------------------------------------------------------ */
+/*  Constants (from the Mathematica Manipulate body)                   */
+/* ------------------------------------------------------------------ */
+const L = 1.0;          // tube length
+const R = 0.1;          // external annular radius
+const MU_A = 1e-2;      // annulus viscosity
+const ALPHA_A = 1e-4;   // annulus thermal diffusivity
+
+/* Numerical grid */
+const NR = 60;          // radial cells on half domain (0, R), cell-centered
+const NZ = 100;         // axial intervals
+const H  = R / NR;
+const DZ = L / NZ;
+
+/* ------------------------------------------------------------------ */
+/*  State                                                              */
+/* ------------------------------------------------------------------ */
+const state = {
+  g: 4,          // 1 avg T, 2 radial T, 3 velocity, 4 contours
+  dPa: 10, dPt: 10,
+  Pea: 20, Pet: 20,
+  Z: 0.6,
+  alpha: 1.0, mu: 5.0, kappa: 0.5
+};
+
+/* Cached PDE solution */
+let sol = null;        // { T: Float64Array[(NZ+1)*NR], Ft: [], Fa: [], key: "" }
+
+/* ------------------------------------------------------------------ */
+/*  Physics helpers                                                    */
+/* ------------------------------------------------------------------ */
+function lambdaOf(kappa){
+  return Math.sqrt((1 - kappa*kappa) / (2 * Math.log(1/kappa)));
+}
+function vtOf(r, dPt, kappa, mut){
+  const kR = kappa * R;
+  return dPt * kR*kR / (4 * mut * L) * (1 - (r/kR)*(r/kR));
+}
+function vaOf(r, dPa, kappa){
+  const rr = Math.abs(r);
+  return dPa * R*R / (4 * MU_A * L) *
+    (1 - (rr/R)*(rr/R) - ((1 - kappa*kappa)/Math.log(1/kappa)) * Math.log(R/rr));
+}
+
+/* ------------------------------------------------------------------ */
+/*  PDE solver: v T_z = a (1/r)(r T_r)_r + (1/Pe^2) T_zz               */
+/*  Symmetric half domain r in (0,R); Dirichlet step at z=0;           */
+/*  zero radial flux at r=0 (automatic) and r=R; dT/dz=0 at z=L.       */
+/*  Scharfetter-Gummel (exponentially fitted) fluxes in z; block       */
+/*  tridiagonal direct solve (planes coupled by diagonal blocks).      */
+/* ------------------------------------------------------------------ */
+function bernoulli(q){
+  if (q > 500) return 0;
+  if (Math.abs(q) < 1e-10) return 1 - q/2;
+  return q / (Math.expm1(q));
+}
+
+function solvePDE(p){
+  const key = [p.dPa,p.dPt,p.Pea,p.Pet,p.alpha,p.mu,p.kappa].join("|");
+  if (sol && sol.key === key) return sol;
+
+  const mut = p.mu * MU_A;
+  const alphat = p.alpha * ALPHA_A;
+  const kR = p.kappa * R;
+
+  /* per-cell data */
+  const rC = new Float64Array(NR);
+  const vC = new Float64Array(NR);
+  const DC = new Float64Array(NR);   // 1/Pe^2
+  const aC = new Float64Array(NR);   // thermal diffusivity
+  const T0 = new Float64Array(NR);   // inlet condition
+  for (let j = 0; j < NR; j++){
+    const r = (j + 0.5) * H;
+    rC[j] = r;
+    const inTube = r <= kR;
+    vC[j] = inTube ? vtOf(r, p.dPt, p.kappa, mut) : vaOf(r, p.dPa, p.kappa);
+    if (vC[j] < 0) vC[j] = 0;
+    DC[j] = inTube ? 1/(p.Pet*p.Pet) : 1/(p.Pea*p.Pea);
+    aC[j] = inTube ? alphat : ALPHA_A;
+    T0[j] = inTube ? 0 : 1;
+  }
+
+  /* radial face conductances: face f at r = f*H between cells f-1, f  */
+  const condFace = new Float64Array(NR + 1);      // r_f * a_f / H^2
+  for (let f = 1; f < NR; f++){
+    const rf = f * H;
+    const am = 2 * aC[f-1] * aC[f] / (aC[f-1] + aC[f]);   // harmonic mean
+    condFace[f] = rf * am / (H * H);
+  }
+  condFace[0] = 0;    // r=0: flux vanishes (r weight)
+  condFace[NR] = 0;   // r=R: insulated
+
+  const Ecoef = new Float64Array(NR), Wcoef = new Float64Array(NR);
+  for (let j = 0; j < NR; j++){
+    Ecoef[j] = condFace[j+1] / rC[j];
+    Wcoef[j] = condFace[j]   / rC[j];
+  }
+
+  /* axial coupling coefficients (Scharfetter-Gummel) */
+  const cup = new Float64Array(NR), cdn = new Float64Array(NR);
+  for (let j = 0; j < NR; j++){
+    const q = vC[j] * DZ / DC[j];
+    const Bq = bernoulli(q);        // B(q)
+    const Bmq = q + Bq;             // B(-q) = q + B(q)
+    cdn[j] = DC[j] / (DZ*DZ) * Bq;    // couples T(k+1)
+    cup[j] = DC[j] / (DZ*DZ) * Bmq;   // couples T(k-1)
+  }
+
+  /* Block-tridiagonal Thomas.  Plane k (k=1..NZ) unknowns T[k][*].
+     B_k tridiagonal (radial), A_k = diag(cup), C_k = diag(cdn);
+     last plane: diagonal z-part is -cup, no cdn coupling.           */
+  const n = NR;
+  const Xs = [];                       // stored U^{-1} C per plane
+  const Ys = [];                       // stored partial rhs solutions
+  let Xprev = null, Yprev = null;
+
+  const U = new Float64Array(n*n);
+  const piv = new Int32Array(n);
+
+  function luFactor(){
+    for (let c = 0; c < n; c++){
+      let pmax = Math.abs(U[c*n + c]), prow = c;
+      for (let rI = c+1; rI < n; rI++){
+        const a = Math.abs(U[rI*n + c]);
+        if (a > pmax){ pmax = a; prow = rI; }
+      }
+      piv[c] = prow;
+      if (prow !== c){
+        for (let cc = 0; cc < n; cc++){
+          const t = U[c*n + cc]; U[c*n + cc] = U[prow*n + cc]; U[prow*n + cc] = t;
+        }
+      }
+      const d = U[c*n + c];
+      for (let rI = c+1; rI < n; rI++){
+        const m = U[rI*n + c] / d;
+        U[rI*n + c] = m;
+        if (m !== 0){
+          for (let cc = c+1; cc < n; cc++) U[rI*n + cc] -= m * U[c*n + cc];
+        }
+      }
+    }
+  }
+  function luSolve(b){   // in place
+    for (let c = 0; c < n; c++){
+      const pr = piv[c];
+      if (pr !== c){ const t = b[c]; b[c] = b[pr]; b[pr] = t; }
+      const bc = b[c];
+      if (bc !== 0){
+        for (let rI = c+1; rI < n; rI++) b[rI] -= U[rI*n + c] * bc;
+      }
+    }
+    for (let c = n-1; c >= 0; c--){
+      let s = b[c];
+      for (let cc = c+1; cc < n; cc++) s -= U[c*n + cc] * b[cc];
+      b[c] = s / U[c*n + c];
+    }
+  }
+
+  const colBuf = new Float64Array(n);
+  for (let k = 1; k <= NZ; k++){
+    const last = (k === NZ);
+    /* build U = B_k - A X_{k-1} */
+    U.fill(0);
+    for (let j = 0; j < n; j++){
+      const zDiag = last ? -cup[j] : -(cup[j] + cdn[j]);
+      U[j*n + j] = zDiag - (Ecoef[j] + Wcoef[j]);
+      if (j+1 < n) U[j*n + (j+1)] = Ecoef[j];
+      if (j-1 >= 0) U[j*n + (j-1)] = Wcoef[j];
+    }
+    if (Xprev){
+      for (let j = 0; j < n; j++){
+        const cj = cup[j];
+        const off = j*n;
+        for (let c = 0; c < n; c++) U[off + c] -= cj * Xprev[j*n + c];
+      }
+    }
+    /* rhs */
+    const y = new Float64Array(n);
+    if (k === 1){
+      for (let j = 0; j < n; j++) y[j] = -cup[j] * T0[j];
+    }
+    if (Yprev){
+      for (let j = 0; j < n; j++) y[j] -= cup[j] * Yprev[j];
+    }
+    luFactor();
+    luSolve(y);
+    let X = null;
+    if (!last){
+      X = new Float64Array(n*n);
+      for (let c = 0; c < n; c++){
+        colBuf.fill(0);
+        colBuf[c] = cdn[c];
+        luSolve(colBuf);
+        for (let j = 0; j < n; j++) X[j*n + c] = colBuf[j];
+      }
+    }
+    Xs.push(X); Ys.push(y);
+    Xprev = X; Yprev = y;
+  }
+
+  /* back substitution */
+  const T = new Float64Array((NZ+1) * NR);
+  for (let j = 0; j < NR; j++) T[j] = T0[j];
+  let Tnext = Ys[NZ-1];
+  for (let j = 0; j < NR; j++) T[NZ*NR + j] = Tnext[j];
+  for (let k = NZ-1; k >= 1; k--){
+    const X = Xs[k-1], y = Ys[k-1];
+    const Tk = new Float64Array(n);
+    for (let j = 0; j < n; j++){
+      let s = y[j];
+      const off = j*n;
+      for (let c = 0; c < n; c++) s -= X[off + c] * Tnext[c];
+      Tk[j] = s;
+    }
+    for (let j = 0; j < n; j++) T[k*NR + j] = Tk[j];
+    Tnext = Tk;
+  }
+
+  /* average (cup) temperatures: Ft = int v T dr / int v dr  (dr weight,
+     as in the Mathematica code) */
+  let denomT = 0, denomA = 0;
+  for (let j = 0; j < NR; j++){
+    if (rC[j] <= kR) denomT += vC[j] * H; else denomA += vC[j] * H;
+  }
+  const Ft = new Float64Array(NZ+1), Fa = new Float64Array(NZ+1);
+  for (let k = 0; k <= NZ; k++){
+    let st = 0, sa = 0;
+    for (let j = 0; j < NR; j++){
+      const w = vC[j] * T[k*NR + j] * H;
+      if (rC[j] <= kR) st += w; else sa += w;
+    }
+    Ft[k] = denomT > 0 ? st / denomT : 0;
+    Fa[k] = denomA > 0 ? sa / denomA : 0;
+  }
+
+  sol = { T, Ft, Fa, key };
+  return sol;
+}
+
+/* bilinear sample of T at (z, r), r may be negative (symmetric) */
+function sampleT(S, z, r){
+  const zz = Math.min(Math.max(z, 0), L);
+  const rr = Math.min(Math.abs(r), R);
+  let kf = zz / DZ;
+  let k0 = Math.floor(kf); if (k0 > NZ-1) k0 = NZ-1;
+  const wk = kf - k0;
+  let jf = rr / H - 0.5;
+  let j0 = Math.floor(jf);
+  let wj = jf - j0;
+  if (j0 < 0){ j0 = 0; wj = 0; }
+  if (j0 > NR-2){ j0 = NR-2; wj = 1; }
+  const a = S.T[k0*NR + j0], b = S.T[k0*NR + j0+1];
+  const c = S.T[(k0+1)*NR + j0], d = S.T[(k0+1)*NR + j0+1];
+  return (a*(1-wj) + b*wj)*(1-wk) + (c*(1-wj) + d*wj)*wk;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Canvas setup (hi-DPI)                                              */
+/* ------------------------------------------------------------------ */
+const canvas = document.getElementById('plot');
+const ctx = canvas.getContext('2d');
+const CW = 720, CH = 470;
+const dpr = Math.max(1, window.devicePixelRatio || 1);
+canvas.width = CW * dpr;
+canvas.height = CH * dpr;
+canvas.style.width = CW + 'px';
+canvas.style.height = CH + 'px';
+
+/* plot margins */
+const ML = 102, MR = 34, MT = 16, MB = 78;
+const PW = CW - ML - MR;     // plot width
+const PH = CH - MT - MB;     // plot height
+
+let yTickW = 30;   // widest y tick label, set in drawFrame
+function xPix(x, xmin, xmax){ return ML + (x - xmin) / (xmax - xmin) * PW; }
+function yPix(y, ymin, ymax){ return MT + (ymax - y) / (ymax - ymin) * PH; }
+
+/* draw rotated y-axis label using an offscreen canvas (avoids glyph
+   overlap issues with directly rotated fillText) */
+function drawYLabel(parts){
+  const off = document.createElement('canvas');
+  const octx = off.getContext('2d');
+  octx.font = '18px Helvetica, Arial, sans-serif';
+  let w = 0;
+  for (const p of parts){
+    octx.font = fontFor(p);
+    w += octx.measureText(p.t).width;
+  }
+  off.width = Math.ceil((w + 10) * dpr);
+  off.height = Math.ceil(30 * dpr);
+  octx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  octx.textBaseline = 'middle';
+  octx.fillStyle = '#000';
+  let x = 5;
+  for (const p of parts){
+    octx.font = fontFor(p);
+    const dy = p.sub ? 5 : 0;
+    octx.fillText(p.t, x, 15 + dy);
+    x += octx.measureText(p.t).width;
+  }
+  ctx.save();
+  ctx.translate(ML - 6 - yTickW - 14, MT + PH/2);
+  ctx.rotate(-Math.PI/2);
+  ctx.drawImage(off, -(w+10)/2, -15, w+10, 30);
+  ctx.restore();
+}
+function fontFor(p){
+  const size = p.sub ? 13 : 18;
+  const style = p.i ? 'italic ' : '';
+  const fam = p.i ? "Georgia, 'Times New Roman', serif" : 'Helvetica, Arial, sans-serif';
+  return style + size + 'px ' + fam;
+}
+function drawXLabel(parts){
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillStyle = '#000';
+  let w = 0;
+  for (const p of parts){ ctx.font = fontFor(p); w += ctx.measureText(p.t).width; }
+  let x = ML + PW/2 - w/2;
+  const y = MT + PH + 42;
+  for (const p of parts){
+    ctx.font = fontFor(p);
+    ctx.fillText(p.t, x, y + (p.sub ? 5 : 0));
+    x += ctx.measureText(p.t).width;
+  }
+}
+
+function drawFrame(xmin, xmax, ymin, ymax, xticks, yticks, xfmt, yfmt, grid){
+  ctx.strokeStyle = '#000';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(ML, MT, PW, PH);
+  ctx.fillStyle = '#000';
+  ctx.font = '18px Helvetica, Arial, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  for (const t of xticks){
+    const px = xPix(t, xmin, xmax);
+    if (grid){
+      ctx.strokeStyle = '#d9d9d9';
+      ctx.beginPath(); ctx.moveTo(px, MT); ctx.lineTo(px, MT+PH); ctx.stroke();
+    }
+    ctx.strokeStyle = '#000';
+    ctx.beginPath(); ctx.moveTo(px, MT+PH); ctx.lineTo(px, MT+PH-6); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(px, MT); ctx.lineTo(px, MT+6); ctx.stroke();
+    ctx.fillText(xfmt(t), px, MT + PH + 5);
+  }
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'middle';
+  yTickW = 0;
+  for (const t of yticks){
+    yTickW = Math.max(yTickW, ctx.measureText(yfmt(t)).width);
+  }
+  for (const t of yticks){
+    const py = yPix(t, ymin, ymax);
+    if (grid){
+      ctx.strokeStyle = '#d9d9d9';
+      ctx.beginPath(); ctx.moveTo(ML, py); ctx.lineTo(ML+PW, py); ctx.stroke();
+    }
+    ctx.strokeStyle = '#000';
+    ctx.beginPath(); ctx.moveTo(ML, py); ctx.lineTo(ML+6, py); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(ML+PW, py); ctx.lineTo(ML+PW-6, py); ctx.stroke();
+    ctx.fillText(yfmt(t), ML - 6, py);
+  }
+  ctx.textAlign = 'left';
+}
+
+function labelBox(text, px, py, color, font, bg){
+  ctx.font = font || '18px Helvetica, Arial, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  if (bg){
+    const w = ctx.measureText(text).width;
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(px - w/2 - 4, py - 11, w + 8, 22);
+  }
+  ctx.fillStyle = color;
+  ctx.fillText(text, px, py);
+  ctx.textAlign = 'left';
+}
+
+/* TemperatureMap approximation */
+const TMAP = [
+  [0.00,  40,  54, 241],
+  [0.25, 130, 181, 246],
+  [0.50, 249, 250, 181],
+  [0.75, 245, 153,  90],
+  [1.00, 221,  22,  25]
+];
+function tmap(t){
+  const x = Math.min(Math.max(t, 0), 1);
+  for (let i = 1; i < TMAP.length; i++){
+    if (x <= TMAP[i][0]){
+      const a = TMAP[i-1], b = TMAP[i];
+      const f = (x - a[0]) / (b[0] - a[0]);
+      return [a[1] + f*(b[1]-a[1]), a[2] + f*(b[2]-a[2]), a[3] + f*(b[3]-a[3])];
+    }
+  }
+  const e = TMAP[TMAP.length-1];
+  return [e[1], e[2], e[3]];
+}
+
+/* ------------------------------------------------------------------ */
+/*  Plot views                                                         */
+/* ------------------------------------------------------------------ */
+function clearCanvas(){
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, CW, CH);
+}
+
+function fmt1(v){ return v.toFixed(1); }
+function fmt2(v){ return v.toFixed(2); }
+
+function drawVelocity(){
+  const p = state;
+  const mut = p.mu * MU_A;
+  const kR = p.kappa * R;
+  const lam = lambdaOf(p.kappa);
+  const vtMax = p.dPt * kR*kR / (4 * mut * L);
+  const vaMax = vaOf(lam * R, p.dPa, p.kappa);
+  const VMax = Math.max(vtMax, vaMax);
+
+  const xmin = 0, xmax = 1.2, ymin = -R, ymax = R;
+  drawFrame(xmin, xmax, ymin, ymax,
+    [0, 0.2, 0.4, 0.6, 0.8, 1.0, 1.2],
+    [-0.10, -0.05, 0.00, 0.05, 0.10],
+    fmt1, fmt2, false);
+
+  ctx.save();
+  ctx.beginPath(); ctx.rect(ML, MT, PW, PH); ctx.clip();
+
+  /* annulus (red): kR < |r| < R */
+  ctx.strokeStyle = '#cc0000';
+  ctx.lineWidth = 2.4;
+  for (const sgn of [1, -1]){
+    ctx.beginPath();
+    let first = true;
+    for (let i = 0; i <= 240; i++){
+      const r = sgn * (kR + (R - kR) * i / 240);
+      const rr = Math.abs(r);
+      const v = (rr <= kR + 1e-12) ? 0 : vaOf(r, p.dPa, p.kappa);
+      const px = xPix(Math.max(v,0)/VMax, xmin, xmax), py = yPix(r, ymin, ymax);
+      if (first){ ctx.moveTo(px, py); first = false; } else ctx.lineTo(px, py);
+    }
+    ctx.stroke();
+  }
+  /* tube (blue): |r| <= kR */
+  ctx.strokeStyle = '#0000cc';
+  ctx.beginPath();
+  for (let i = 0; i <= 240; i++){
+    const r = -kR + 2*kR * i / 240;
+    const v = vtOf(r, p.dPt, p.kappa, mut);
+    const px = xPix(v/VMax, xmin, xmax), py = yPix(r, ymin, ymax);
+    if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+  }
+  ctx.stroke();
+
+  /* black interface lines at +-kappa R */
+  ctx.strokeStyle = '#000';
+  ctx.lineWidth = 2;
+  for (const sgn of [1, -1]){
+    const py = yPix(sgn * kR, ymin, ymax);
+    ctx.beginPath(); ctx.moveTo(xPix(0,xmin,xmax), py); ctx.lineTo(xPix(1.2,xmin,xmax), py); ctx.stroke();
+  }
+  /* region labels */
+  labelBox(' tube ', xPix(0.6,xmin,xmax), yPix(0,ymin,ymax), '#0000cc');
+  labelBox(' annulus ', xPix(0.6,xmin,xmax), yPix(lam*R,ymin,ymax), '#cc0000');
+  labelBox(' annulus ', xPix(0.6,xmin,xmax), yPix(-lam*R,ymin,ymax), '#cc0000');
+  ctx.restore();
+
+  drawXLabel([{t:'velocity = '},{t:'v',i:1},{t:'/'},{t:'v',i:1},{t:'maximum',sub:1}]);
+  drawYLabel([{t:'radius = '},{t:'r',i:1},{t:'/'},{t:'R',i:1},{t:'annular',sub:1}]);
+}
+
+function drawRadialTemperature(){
+  const p = state;
+  const S = solvePDE(p);
+  const kR = p.kappa * R;
+  const xmin = -R, xmax = R, ymin = 0, ymax = 1.1;
+  drawFrame(xmin, xmax, ymin, ymax,
+    [-0.10, -0.05, 0.00, 0.05, 0.10],
+    [0, 0.2, 0.4, 0.6, 0.8, 1.0],
+    fmt2, fmt1, false);
+
+  ctx.save();
+  ctx.beginPath(); ctx.rect(ML, MT, PW, PH); ctx.clip();
+
+  const Zz = p.Z;
+  function plotSeg(r0, r1, color){
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2.4;
+    ctx.beginPath();
+    for (let i = 0; i <= 200; i++){
+      const r = r0 + (r1 - r0) * i / 200;
+      const T = sampleT(S, Zz, r);
+      const px = xPix(r, xmin, xmax), py = yPix(T, ymin, ymax);
+      if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    ctx.stroke();
+  }
+  plotSeg(-R, -kR, '#cc0000');   /* annulus */
+  plotSeg(-kR, kR, '#0000cc');   /* tube */
+  plotSeg(kR, R, '#cc0000');     /* annulus */
+
+  /* black interface lines at +-kappa R */
+  ctx.strokeStyle = '#000';
+  ctx.lineWidth = 2;
+  for (const sgn of [1, -1]){
+    const px = xPix(sgn * kR, xmin, xmax);
+    ctx.beginPath(); ctx.moveTo(px, yPix(0,ymin,ymax)); ctx.lineTo(px, yPix(1.1,ymin,ymax)); ctx.stroke();
+  }
+  /* labels: tube horizontal, annulus rotated */
+  labelBox(' tube ', xPix(0,xmin,xmax), yPix(0.5,ymin,ymax), '#0000cc');
+  for (const sgn of [1, -1]){
+    const rx = sgn * (kR + (1 - p.kappa) * R / 2);
+    ctx.save();
+    ctx.translate(xPix(rx, xmin, xmax), yPix(0.5, ymin, ymax));
+    ctx.rotate(-Math.PI/2);
+    ctx.font = '18px Helvetica, Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#cc0000';
+    ctx.fillText(' annulus ', 0, 0);
+    ctx.restore();
+  }
+  ctx.restore();
+
+  drawXLabel([{t:'radius = '},{t:'r',i:1},{t:'/'},{t:'R',i:1},{t:'annular',sub:1}]);
+  drawYLabel([{t:'temperature = '},{t:'T',i:1},{t:'/'},{t:'T',i:1},{t:'0',sub:1}]);
+}
+
+function drawAverageTemperature(){
+  const p = state;
+  const S = solvePDE(p);
+  const xmin = 0, xmax = L, ymin = 0, ymax = 1.1;
+  drawFrame(xmin, xmax, ymin, ymax,
+    [0, 0.2, 0.4, 0.6, 0.8, 1.0],
+    [0, 0.2, 0.4, 0.6, 0.8, 1.0],
+    fmt1, fmt1, true);
+
+  ctx.save();
+  ctx.beginPath(); ctx.rect(ML, MT, PW, PH); ctx.clip();
+
+  function curve(F, color){
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2.4;
+    ctx.beginPath();
+    for (let k = 0; k <= NZ; k++){
+      const px = xPix(k*DZ, xmin, xmax), py = yPix(F[k], ymin, ymax);
+      if (k === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    ctx.stroke();
+  }
+  curve(S.Ft, '#cc0000');   /* tube: red (as in the original) */
+  curve(S.Fa, '#0000cc');   /* annulus: blue */
+
+  const kMid = Math.round(0.5 * NZ);
+  const k03  = Math.round(0.3 * NZ);
+  labelBox(' tube ', xPix(0.5,xmin,xmax), yPix(S.Ft[kMid],ymin,ymax), '#cc0000',
+    '18px Helvetica, Arial, sans-serif', true);
+  labelBox(' annulus ', xPix(0.3,xmin,xmax), yPix(S.Fa[k03],ymin,ymax), '#0000cc',
+    '18px Helvetica, Arial, sans-serif', true);
+  ctx.restore();
+
+  drawXLabel([{t:'length = '},{t:'z',i:1},{t:'/'},{t:'L',i:1}]);
+  drawYLabel([{t:'average temperature'}]);
+}
+
+function drawContours(){
+  const p = state;
+  const S = solvePDE(p);
+  const kR = p.kappa * R;
+  const lam = lambdaOf(p.kappa);
+  const xmin = 0, xmax = L, ymin = -R, ymax = R;
+  drawFrame(xmin, xmax, ymin, ymax,
+    [0, 0.2, 0.4, 0.6, 0.8, 1.0],
+    [-0.10, -0.05, 0.00, 0.05, 0.10],
+    fmt1, fmt2, false);
+
+  /* filled color field */
+  const iw = Math.round(PW), ih = Math.round(PH);
+  const offc = document.createElement('canvas');
+  offc.width = iw; offc.height = ih;
+  const octx = offc.getContext('2d');
+  const img = octx.createImageData(iw, ih);
+  const data = img.data;
+  for (let py = 0; py < ih; py++){
+    const r = ymax - (py + 0.5) / ih * (ymax - ymin);
+    for (let px = 0; px < iw; px++){
+      const z = xmin + (px + 0.5) / iw * (xmax - xmin);
+      const t = sampleT(S, z, r);
+      const c = tmap(t);
+      const idx = (py * iw + px) * 4;
+      data[idx] = c[0]; data[idx+1] = c[1]; data[idx+2] = c[2]; data[idx+3] = 255;
+    }
+  }
+  octx.putImageData(img, 0, 0);
+  ctx.drawImage(offc, ML, MT, PW, PH);
+
+  /* contour lines (marching squares) with labels */
+  const GX = 181, GY = 145;
+  const F = new Float64Array(GX * GY);
+  for (let j = 0; j < GY; j++){
+    const r = ymin + (ymax - ymin) * j / (GY - 1);
+    for (let i = 0; i < GX; i++){
+      const z = xmin + (xmax - xmin) * i / (GX - 1);
+      F[j*GX + i] = sampleT(S, z, r);
+    }
+  }
+  const levels = [];
+  for (let v = 0.05; v < 0.999; v += 0.05) levels.push(Math.round(v*100)/100);
+
+  ctx.save();
+  ctx.beginPath(); ctx.rect(ML, MT, PW, PH); ctx.clip();
+  ctx.lineWidth = 0.8;
+  ctx.strokeStyle = 'rgba(60,60,60,0.85)';
+
+  const labelSpots = [];
+  levels.forEach(function(lv, li){
+    const segs = [];
+    for (let j = 0; j < GY-1; j++){
+      for (let i = 0; i < GX-1; i++){
+        const f00 = F[j*GX+i], f10 = F[j*GX+i+1];
+        const f01 = F[(j+1)*GX+i], f11 = F[(j+1)*GX+i+1];
+        let idxms = 0;
+        if (f00 > lv) idxms |= 1;
+        if (f10 > lv) idxms |= 2;
+        if (f11 > lv) idxms |= 4;
+        if (f01 > lv) idxms |= 8;
+        if (idxms === 0 || idxms === 15) continue;
+        const x0 = i/(GX-1), x1 = (i+1)/(GX-1);
+        const y0 = j/(GY-1), y1 = (j+1)/(GY-1);
+        function interp(fa, fb, a, b){ return a + (lv - fa)/(fb - fa) * (b - a); }
+        const pts = {};
+        if ((idxms & 1) !== (idxms & 2) >> 1) pts.b = [interp(f00,f10,x0,x1), y0];
+        if (((idxms>>1)&1) !== ((idxms>>2)&1)) pts.r = [x1, interp(f10,f11,y0,y1)];
+        if (((idxms>>3)&1) !== ((idxms>>2)&1)) pts.t = [interp(f01,f11,x0,x1), y1];
+        if ((idxms&1) !== ((idxms>>3)&1)) pts.l = [x0, interp(f00,f01,y0,y1)];
+        const arr = Object.values(pts);
+        if (arr.length >= 2) segs.push([arr[0], arr[1]]);
+        if (arr.length === 4) segs.push([arr[2], arr[3]]);
+      }
+    }
+    function toPix(pt){
+      return [ML + pt[0]*PW, MT + PH - pt[1]*PH];
+    }
+    ctx.beginPath();
+    for (const s of segs){
+      const a = toPix(s[0]), b = toPix(s[1]);
+      ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]);
+    }
+    ctx.stroke();
+    /* choose a label position: spread targets across x */
+    if (segs.length){
+      const targX = 0.12 + 0.76 * ((li * 7) % 19) / 18;
+      let best = null, bestD = 1e9;
+      for (const s of segs){
+        const mx = (s[0][0] + s[1][0]) / 2, my = (s[0][1] + s[1][1]) / 2;
+        const d = Math.abs(mx - targX);
+        if (d < bestD){ bestD = d; best = [mx, my]; }
+      }
+      if (best) labelSpots.push({ lv, px: toPix(best) });
+    }
+  });
+
+  /* contour labels */
+  ctx.font = '10px Helvetica, Arial, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  for (const s of labelSpots){
+    const txt = (Math.round(s.lv*100)/100).toString();
+    const w = ctx.measureText(txt).width;
+    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    ctx.fillRect(s.px[0]-w/2-2, s.px[1]-7, w+4, 14);
+    ctx.fillStyle = '#000';
+    ctx.fillText(txt, s.px[0], s.px[1]);
+  }
+  ctx.textAlign = 'left';
+
+  /* black interface lines */
+  ctx.strokeStyle = '#000';
+  ctx.lineWidth = 2;
+  for (const sgn of [1, -1]){
+    const py = yPix(sgn * kR, ymin, ymax);
+    ctx.beginPath(); ctx.moveTo(ML, py); ctx.lineTo(ML+PW, py); ctx.stroke();
+  }
+  /* region labels with white background */
+  labelBox(' tube ', xPix(0.5,xmin,xmax), yPix(0,ymin,ymax), '#0000cc',
+    '18px Helvetica, Arial, sans-serif', true);
+  labelBox(' annulus ', xPix(0.5,xmin,xmax), yPix(lam*R,ymin,ymax), '#cc0000',
+    '18px Helvetica, Arial, sans-serif', true);
+  labelBox(' annulus ', xPix(0.5,xmin,xmax), yPix(-lam*R,ymin,ymax), '#cc0000',
+    '18px Helvetica, Arial, sans-serif', true);
+  ctx.restore();
+
+  drawXLabel([{t:'length = '},{t:'z',i:1},{t:'/'},{t:'L',i:1}]);
+  drawYLabel([{t:'radius = '},{t:'r',i:1},{t:'/'},{t:'R',i:1},{t:'annular',sub:1}]);
+}
+
+/* ------------------------------------------------------------------ */
+/*  Redraw pipeline                                                    */
+/* ------------------------------------------------------------------ */
+let pending = false;
+function requestRedraw(){
+  if (pending) return;
+  pending = true;
+  requestAnimationFrame(function(){
+    pending = false;
+    redraw();
+  });
+}
+function redraw(){
+  clearCanvas();
+  switch (state.g){
+    case 1: drawAverageTemperature(); break;
+    case 2: drawRadialTemperature(); break;
+    case 3: drawVelocity(); break;
+    case 4: drawContours(); break;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/*  Controls                                                           */
+/* ------------------------------------------------------------------ */
+const sliders = [
+  { id:'dPa',   key:'dPa',   dec:1 },
+  { id:'dPt',   key:'dPt',   dec:1 },
+  { id:'Pea',   key:'Pea',   dec:0 },
+  { id:'Pet',   key:'Pet',   dec:0 },
+  { id:'Z',     key:'Z',     dec:1 },
+  { id:'alpha', key:'alpha', dec:1 },
+  { id:'mu',    key:'mu',    dec:1 },
+  { id:'kappa', key:'kappa', dec:1 }
+];
+sliders.forEach(function(s){
+  const el = document.getElementById(s.id);
+  const val = document.getElementById(s.id + '-val');
+  el.addEventListener('input', function(){
+    state[s.key] = parseFloat(el.value);
+    val.textContent = s.dec === 0 ? String(Math.round(state[s.key]))
+                                  : state[s.key].toFixed(s.dec);
+    requestRedraw();
+  });
+});
+
+function updateEnabled(){
+  const g = state.g;
+  setEnabled('ctrl-Pea',   g !== 3);
+  setEnabled('ctrl-Pet',   g !== 3);
+  setEnabled('ctrl-Z',     g === 2);
+  setEnabled('ctrl-alpha', g !== 3);
+  setEnabled('ctrl-mu',    g !== 2);
+}
+function setEnabled(id, on){
+  const el = document.getElementById(id);
+  if (on) el.classList.remove('disabled'); else el.classList.add('disabled');
+  el.querySelector('input').disabled = !on;
+}
+
+document.getElementById('viewSelect').addEventListener('change', function(e){
+  state.g = parseInt(e.target.value, 10);
+  updateEnabled();
+  requestRedraw();
+});
+
+/* ------------------------------------------------------------------ */
+/*  Flyout panels                                                      */
+/* ------------------------------------------------------------------ */
+const typeset = { panelDirections:false, panelDetails:false, panelAbout:true };
+function openPanel(id){
+  ['panelDirections','panelDetails','panelAbout'].forEach(function(pid){
+    document.getElementById(pid).classList.toggle('open', pid === id);
+  });
+  if (!typeset[id] && window.MathJax && MathJax.typesetPromise){
+    MathJax.typesetPromise([document.getElementById(id)]).then(function(){
+      typeset[id] = true;
+    }).catch(function(){});
+  }
+}
+function closePanel(id){
+  document.getElementById(id).classList.remove('open');
+}
+document.getElementById('btnDirections').addEventListener('click', function(){
+  const p = document.getElementById('panelDirections');
+  p.classList.contains('open') ? closePanel('panelDirections') : openPanel('panelDirections');
+});
+document.getElementById('btnDetails').addEventListener('click', function(){
+  const p = document.getElementById('panelDetails');
+  p.classList.contains('open') ? closePanel('panelDetails') : openPanel('panelDetails');
+});
+document.getElementById('btnAbout').addEventListener('click', function(){
+  const p = document.getElementById('panelAbout');
+  p.classList.contains('open') ? closePanel('panelAbout') : openPanel('panelAbout');
+});
+document.querySelectorAll('.closeX').forEach(function(b){
+  b.addEventListener('click', function(){ closePanel(b.dataset.close); });
+});
+
+/* ------------------------------------------------------------------ */
+updateEnabled();
+redraw();
+})();
+</script>
+</body>
+</html>

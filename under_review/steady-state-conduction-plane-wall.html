@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Steady-State Conduction in a Plane Wall</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="mathjax-script" async></script>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    font-family: Helvetica, Arial, sans-serif;
+    background: #ffffff;
+  }
+  #app {
+    position: relative;
+    width: 960px;
+    margin: 0 auto;
+  }
+  #simTitle {
+    height: 44px;
+    line-height: 44px;
+    padding-top: 6px;
+    text-align: center;
+    font-size: 26px;
+    font-weight: bold;
+  }
+  #figure {
+    position: relative;
+    width: 960px;
+    height: 720px;
+  }
+  #simCanvas {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 960px;
+    height: 720px;
+  }
+  /* ---- sliders ---- */
+  input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+  input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  /* position the sliders; track center sits where the old 16px slider's center was */
+  input.sl[type="range"] {
+    position: absolute;
+    margin: 6px 0 0 0;
+    cursor: pointer;
+  }
+  .slrange {
+    position: absolute;
+    font-size: 18px;
+    color: #000;
+    white-space: nowrap;
+  }
+  .sllabel {
+    position: absolute;
+    font-size: 18px;
+    color: #000;
+    white-space: nowrap;
+  }
+  .diaglabel {
+    position: absolute;
+    font-size: 18px;
+    color: #000;
+    white-space: nowrap;
+  }
+  sub { font-size: 70%; }
+  sup { font-size: 70%; }
+  /* ---- radio group ---- */
+  #radioBox {
+    position: absolute;
+    left: 30px;
+    top: 56px;
+    width: 310px;
+    height: 110px;
+    border: 1px solid #000;
+    background: transparent;
+  }
+  #radioTitle {
+    position: absolute;
+    left: 32px;
+    top: 26px;
+    font-size: 19px;
+  }
+  .radioRow {
+    position: absolute;
+    left: 42px;
+    font-size: 16px;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+  }
+  .radioRow input {
+    margin: 0 6px 0 0;
+    transform: translateY(2px);
+  }
+  /* ---- buttons and panels ---- */
+  #buttonRow {
+    position: absolute;
+    top: 68px;               /* 50px title + 18px */
+    right: 40px;
+    z-index: 40;
+    white-space: nowrap;
+  }
+  .panelBtn {
+    background-color: #98000D;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 17px;
+    font-weight: normal;
+    padding: 9px 22px;
+    margin-left: 14px;
+    cursor: pointer;
+  }
+  .panelBtn:hover { background-color: #7a000a; }
+  .panel {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: calc(100% + 6px);   /* drops down from just below the buttons */
+    white-space: normal;
+    width: 780px;
+    max-height: 640px;       /* never reaches past the top of the figure */
+    background: #fdfdfd;
+    border: 1px solid #888;
+    border-radius: 6px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+    padding: 0;
+    box-sizing: border-box;
+    font-size: 16px;
+    line-height: 1.5;
+    z-index: 50;
+    display: none;
+  }
+  .panel.open {
+    display: flex;
+    flex-direction: column;
+  }
+  .panelHead {
+    position: relative;
+    flex: 0 0 auto;
+    padding: 14px 44px 8px 22px;
+  }
+  .panelBody {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    overflow-x: auto;
+    padding: 0 22px 18px 22px;
+  }
+  .panel h3 {
+    margin: 0;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    font-weight: bold;
+  }
+  .symList { margin: 0 0 12px 0; }
+  .symList div { margin: 0 0 2px 0; }
+  .panel p { margin: 0 0 12px 0; }
+  .panel .closeX {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    font-size: 22px;
+    line-height: 1;
+    color: #444;
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-family: Helvetica, Arial, sans-serif;
+    padding: 2px 4px;
+  }
+  .panel .closeX:hover { color: #98000D; }
+  .panel a { color: #98000D; }
+  /* left-justify displayed equations instead of MathJax's centered default */
+  .panelBody mjx-container[display="true"] {
+    text-align: left !important;
+    margin: 0 !important;
+    display: block;
+  }
+  .panelBody mjx-container[display="true"] > svg {
+    margin: 0 !important;
+  }
+  .panelBody .eq {
+    text-align: left;
+    margin: -6px 0 6px 0;     /* tighter spacing above and below equations */
+    overflow-x: auto;
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="simTitle">Steady-State Conduction in a Plane Wall</div>
+  <div id="figure">
+    <canvas id="simCanvas"></canvas>
+
+    <!-- Left side boundary condition radio buttons -->
+    <div id="radioTitle">Left side boundary condition</div>
+    <div id="radioBox"></div>
+    <label class="radioRow" style="top:70px;">
+      <input type="radio" name="bc" value="1" checked>
+      1.&nbsp;&nbsp;constant surface temperature, <i>T</i><sub>s,L</sub>
+    </label>
+    <label class="radioRow" style="top:100px;">
+      <input type="radio" name="bc" value="2">
+      2.&nbsp;&nbsp;constant surface heat flux, <i>q</i><sub>s</sub>&Prime;
+    </label>
+    <label class="radioRow" style="top:130px;">
+      <input type="radio" name="bc" value="3">
+      3.&nbsp;&nbsp;convection with <i>h</i><sub>L</sub> and <i>T</i><sub>&infin;,L</sub>
+    </label>
+
+    <!-- Left BC sliders (only one set visible at a time) -->
+    <!-- 1: constant surface temperature -->
+    <span class="slrange" id="TLmin" style="left:52px; top:194px;">273</span>
+    <input class="sl" id="slTL" type="range" min="273" max="373" step="1" value="373"
+           style="left:88px; top:196px; width:200px;">
+    <span class="slrange" id="TLmax" style="left:296px; top:194px;">373</span>
+    <span class="sllabel" id="labTL" style="left:120px; top:220px;"><i>T</i><sub>s,L</sub> = 373 [K]</span>
+
+    <!-- 2: constant surface heat flux -->
+    <span class="slrange" id="fluxmin" style="left:64px; top:194px;">0</span>
+    <input class="sl" id="slflux" type="range" min="0" max="150" step="1" value="100"
+           style="left:88px; top:196px; width:200px;">
+    <span class="slrange" id="fluxmax" style="left:296px; top:194px;">150</span>
+    <span class="sllabel" id="labflux" style="left:110px; top:220px;"><i>q</i><sub>s</sub>&Prime; = 100 [W/m<sup>2</sup>]</span>
+
+    <!-- 3: convection -->
+    <span class="slrange" id="convhmin" style="left:64px; top:194px;">0</span>
+    <input class="sl" id="slconvh" type="range" min="0" max="10000" step="1" value="10"
+           style="left:88px; top:196px; width:200px;">
+    <span class="slrange" id="convhmax" style="left:296px; top:194px;">10,000</span>
+    <span class="sllabel" id="labconvh" style="left:110px; top:218px;"><i>h</i><sub>L</sub> = 10 [W/m<sup>2</sup>-K]</span>
+    <span class="slrange" id="convTmin" style="left:52px; top:250px;">273</span>
+    <input class="sl" id="slconvT" type="range" min="273" max="373" step="1" value="300"
+           style="left:88px; top:252px; width:200px;">
+    <span class="slrange" id="convTmax" style="left:296px; top:250px;">373</span>
+    <span class="sllabel" id="labconvT" style="left:120px; top:276px;"><i>T</i><sub>&infin;,L</sub> = 300 [K]</span>
+
+    <!-- k slider (inside wall) -->
+    <span class="slrange" style="left:468px; top:96px;">1</span>
+    <input class="sl" id="slk" type="range" min="1" max="301" step="1" value="10"
+           style="left:486px; top:98px; width:96px;">
+    <span class="slrange" style="left:588px; top:96px;">301</span>
+    <span class="sllabel" id="labk" style="left:482px; top:122px;"><i>k</i> = 10 [W/m-K]</span>
+
+    <!-- qdot slider (inside wall) -->
+    <span class="slrange" style="left:472px; top:176px;">0</span>
+    <input class="sl" id="slqdot" type="range" min="0" max="10000" step="100" value="0"
+           style="left:486px; top:178px; width:96px;">
+    <span class="slrange" style="left:588px; top:176px;">10,000</span>
+    <span class="sllabel" id="labqdot" style="left:482px; top:202px;"><i>q&#775;</i> = 0 [W/m<sup>3</sup>]</span>
+
+    <!-- Right side sliders -->
+    <span class="slrange" style="left:694px; top:182px;">0</span>
+    <input class="sl" id="slhR" type="range" min="0" max="10000" step="1" value="10"
+           style="left:720px; top:184px; width:160px;">
+    <span class="slrange" style="left:886px; top:182px;">10,000</span>
+    <span class="sllabel" id="labhR" style="left:732px; top:208px;"><i>h</i><sub>R</sub> = 10 [W/m<sup>2</sup>-K]</span>
+
+    <span class="slrange" style="left:680px; top:238px;">273</span>
+    <input class="sl" id="slTinfR" type="range" min="273" max="373" step="1" value="275"
+           style="left:720px; top:240px; width:160px;">
+    <span class="slrange" style="left:886px; top:238px;">373</span>
+    <span class="sllabel" id="labTinfR" style="left:744px; top:264px;"><i>T</i><sub>&infin;,R</sub> = 275 [K]</span>
+
+    <!-- diagram labels (HTML for easy italics/subscripts) -->
+    <span class="diaglabel" id="dlTsL" style="left:358px; top:78px;"><i>T</i><sub>s,L</sub></span>
+    <span class="diaglabel" id="dlqs" style="left:356px; top:172px; display:none;"><i>q</i><sub>s</sub>&Prime;</span>
+    <span class="diaglabel" id="dlconv" style="left:352px; top:280px; display:none;"><i>T</i><sub>&infin;,L</sub>, <i>h</i><sub>L</sub></span>
+    <span class="diaglabel" style="left:702px; top:62px;"><i>T</i><sub>&infin;,R</sub>, <i>h</i><sub>R</sub></span>
+    <span class="diaglabel" style="left:466px; top:312px;"><i>x</i></span>
+  </div>
+
+  <!-- Buttons: top right, on the same line as "Left Side BC" -->
+  <div id="buttonRow">
+    <button class="panelBtn" id="btnDirections">Directions</button>
+    <button class="panelBtn" id="btnDetails">Details</button>
+    <button class="panelBtn" id="btnAbout">About</button>
+
+    <div class="panel" id="panelDirections">
+      <div class="panelHead">
+        <h3>Directions</h3>
+        <button class="closeX" data-close="panelDirections">&times;</button>
+      </div>
+      <div class="panelBody">
+      <p>This simulation solves the heat equation in a 1-D, plane wall in the steady state. The boundary condition on the right side of the wall is convection with ambient fluid temperature <i>T</i><sub>&infin;,R</sub> and convection coefficient <i>h</i><sub>R</sub>. The boundary condition on the left side of the wall can be chosen with the radio buttons. Options include constant surface temperature at <i>T</i><sub>s,L</sub>, constant surface heat flux at <i>q</i><sub>s</sub>&Prime;, and convection with ambient fluid temperature <i>T</i><sub>&infin;,L</sub> and convection coefficient <i>h</i><sub>L</sub>. Adjust all parameters with the respective slider bar and observe the change in the spatial temperature (left plot) and heat flux (right plot) profiles. Note that the uniform volumetric heat generation <i>q&#775;</i> and the thermal conductivity of the wall <i>k</i> can also be adjusted. To simulate a constant surface temperature on the right hand boundary, increase <i>h</i><sub>R</sub> to infinity (&gt;10,000 W/m<sup>2</sup>K).</p>
+      </div>
+    </div>
+
+    <div class="panel" id="panelDetails">
+      <div class="panelHead">
+        <h3>Details</h3>
+        <button class="closeX" data-close="panelDetails">&times;</button>
+      </div>
+      <div class="panelBody">
+      <p>The steady-state heat equation for a plane wall of thickness \(L\) with uniform volumetric heat generation \(\dot{q}\) and constant thermal conductivity \(k\) is:</p>
+      <div class="eq">\[ \frac{d^{2}T}{dx^{2}} + \frac{\dot{q}}{k} = 0 \]</div>
+      <p>Integrating twice yields the general solution for the temperature profile:</p>
+      <div class="eq">\[ T(x) = -\frac{\dot{q}\,x^{2}}{2k} + C_{1}x + C_{2} \]</div>
+      <p>and the heat flux is obtained from Fourier's law:</p>
+      <div class="eq">\[ q''(x) = -k\frac{dT}{dx} = \dot{q}\,x - C_{1}k \]</div>
+      <p>The right-side boundary condition is convection for all cases:</p>
+      <div class="eq">\[ -k\left.\frac{dT}{dx}\right|_{x=L} = h_{R}\left[T(L) - T_{\infty,R}\right] \]</div>
+      <p><b>1. Constant surface temperature</b> &nbsp; \(T(0) = T_{s,L}\):</p>
+      <div class="eq">\[ C_{2} = T_{s,L}, \qquad C_{1} = \frac{\dot{q}L + \dfrac{\dot{q}L^{2}h_{R}}{2k} + h_{R}\left(T_{\infty,R} - C_{2}\right)}{h_{R}L + k} \]</div>
+      <p><b>2. Constant surface heat flux</b> &nbsp; \(q''(0) = q_{s}''\):</p>
+      <div class="eq">\[ C_{1} = -\frac{q_{s}''}{k}, \qquad C_{2} = \frac{\dot{q}L + \dfrac{\dot{q}L^{2}h_{R}}{2k} + h_{R}T_{\infty,R} - C_{1}\left(h_{R}L + k\right)}{h_{R}} \]</div>
+      <p><b>3. Convection</b> &nbsp; \(-k\left.\dfrac{dT}{dx}\right|_{x=0} = h_{L}\left[T_{\infty,L} - T(0)\right]\):</p>
+      <div class="eq">\[ C_{2} = \frac{\dot{q}L + \dfrac{\dot{q}L^{2}h_{R}}{2k} + h_{R}T_{\infty,R} + \dfrac{h_{L}\left(h_{R}L + k\right)T_{\infty,L}}{k}}{h_{R} + \dfrac{h_{L}\left(h_{R}L + k\right)}{k}}, \qquad C_{1} = -\frac{h_{L}\left(T_{\infty,L} - C_{2}\right)}{k} \]</div>
+      <p><b>Symbols:</b></p>
+      <div class="symList">
+        <div>\(T\) = temperature [K]</div>
+        <div>\(x\) = position [m]</div>
+        <div>\(L\) = wall thickness (0.075 m)</div>
+        <div>\(k\) = thermal conductivity [W/m-K]</div>
+        <div>\(\dot{q}\) = uniform volumetric heat generation [W/m<sup>3</sup>]</div>
+        <div>\(q''\) = heat flux [W/m<sup>2</sup>]</div>
+        <div>\(q_{s}''\) = surface heat flux [W/m<sup>2</sup>]</div>
+        <div>\(h_{L},\,h_{R}\) = convection coefficients on the left and right surfaces [W/m<sup>2</sup>-K]</div>
+        <div>\(T_{\infty,L},\,T_{\infty,R}\) = ambient fluid temperatures on the left and right sides [K]</div>
+        <div>\(T_{s,L}\) = left surface temperature [K]</div>
+        <div>\(C_{1},\,C_{2}\) = integration constants</div>
+      </div>
+      </div>
+    </div>
+
+    <div class="panel" id="panelAbout">
+      <div class="panelHead">
+        <h3>About</h3>
+        <button class="closeX" data-close="panelAbout">&times;</button>
+      </div>
+      <div class="panelBody">
+      <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a MATLAB simulation by Keith Regner. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+/* ================= physics ================= */
+const L = 0.075;
+const N = 101;
+const xArr = Array.from({length: N}, (_, i) => i * L / (N - 1));
+
+function solve(k, qdot, TinfR, hR, radio, TsL, qs, hL, TinfL) {
+  let C1, C2;
+  if (radio === 1) {                       // constant surface temperature
+    C2 = TsL;
+    C1 = (qdot * L + (qdot * L * L * hR) / (2 * k) + TinfR * hR - C2 * hR) /
+         (L * hR + k);
+  } else if (radio === 2) {                // constant surface heat flux
+    C1 = -qs / k;
+    C2 = (qdot * L + (qdot * L * L * hR) / (2 * k) + TinfR * hR -
+          C1 * (L * hR + k)) / hR;
+  } else {                                 // convection
+    C2 = (qdot * L + (qdot * L * L * hR) / (2 * k) + TinfR * hR +
+          (hL * (L * hR + k) * TinfL) / k) /
+         (hR + (hL * (L * hR + k)) / k);
+    C1 = -hL * (TinfL - C2) / k;
+  }
+  const T = xArr.map(x => (-qdot * x * x) / (2 * k) + C1 * x + C2);
+  const q = xArr.map(x => qdot * x - C1 * k);
+  return { T, q };
+}
+
+/* ================= state ================= */
+const state = {
+  k: 10, qdot: 0, TinfR: 275, hR: 10,
+  radio: 1, TsL: 373, qs: 100, hL: 10, TinfL: 300
+};
+
+/* ================= canvas setup ================= */
+const canvas = document.getElementById("simCanvas");
+const ctx = canvas.getContext("2d");
+const W = 960, H = 720;
+const dpr = window.devicePixelRatio || 1;
+canvas.width = W * dpr;
+canvas.height = H * dpr;
+ctx.scale(dpr, dpr);
+
+const MBLUE = "rgb(0,112,189)";
+
+/* plot boxes: MATLAB ax1 [1.1 .6 4.5 4] in, ax2 [6.7 .6 4.5 4] in, 80 px/in */
+const ax1 = { left: 88,  top: 352, w: 360, h: 320 };
+const ax2 = { left: 536, top: 352, w: 360, h: 320 };
+
+/* ---------- axis helpers ---------- */
+function niceStep(range, target) {
+  const raw = range / target;
+  const mag = Math.pow(10, Math.floor(Math.log10(raw)));
+  const norm = raw / mag;
+  let s;
+  if (norm <= 1) s = 1;
+  else if (norm <= 2) s = 2;
+  else if (norm <= 2.5) s = 2.5;
+  else if (norm <= 5) s = 5;
+  else s = 10;
+  return s * mag;
+}
+
+function dataRange(data) {
+  let mn = Infinity, mx = -Infinity;
+  for (const v of data) {
+    if (!isFinite(v)) continue;
+    if (v < mn) mn = v;
+    if (v > mx) mx = v;
+  }
+  return (isFinite(mn) && isFinite(mx)) ? { mn, mx } : null;
+}
+
+/* Temperature axis: coarse, stable limits.  Span is at least 100 K, limits
+   snap to multiples of 50 K (or the tick step if larger), and tick steps are
+   restricted to 25, 50, 100, 250, 500, ... so labels never need decimals. */
+function tempLimits(data) {
+  const r = dataRange(data);
+  if (!r) return null;
+  let { mn, mx } = r;
+  if (mx - mn < 100) {
+    const c = 0.5 * (mn + mx);
+    mn = c - 50; mx = c + 50;
+  }
+  const steps = [25, 50, 100, 250, 500, 1000, 2500, 5000, 10000, 25000, 50000, 100000];
+  let step = steps[steps.length - 1], lo, hi;
+  for (const s of steps) {
+    const snap = Math.max(50, s);
+    const l = Math.floor(mn / snap) * snap;
+    const h = Math.ceil(mx / snap) * snap;
+    if ((h - l) / s <= 7) { step = s; lo = l; hi = h; break; }
+  }
+  if (lo === undefined) {
+    lo = Math.floor(mn / step) * step;
+    hi = Math.ceil(mx / step) * step;
+  }
+  return { lo, hi, step, scale: 1 };
+}
+
+/* Heat-flux axis: always includes zero and rounds the far end up to a
+   coarse "nice" value (1, 1.5, 2, 2.5, 3, 4, 5, 6, 8 x 10^n), so the scale
+   only changes when the flux crosses one of those values.  Axes reaching
+   10,000 W/m2 or more are shown in kW/m2. */
+function niceCeil(v) {
+  if (v <= 0) return 0;
+  const mag = Math.pow(10, Math.floor(Math.log10(v)));
+  for (const m of [1, 2, 5, 10]) {
+    if (v <= m * mag * (1 + 1e-9)) return m * mag;
+  }
+  return 10 * mag;
+}
+
+let lastFlux = null;    /* previous heat-flux axis, kept while it still fits */
+
+function fluxLimits(data) {
+  const r = dataRange(data);
+  if (!r) return null;
+  /* keep the current axis as long as the curve fits inside it and still
+     reaches at least 20% of the axis' largest magnitude */
+  if (lastFlux) {
+    const big = Math.max(Math.abs(lastFlux.loW), Math.abs(lastFlux.hiW));
+    const reach = Math.max(Math.abs(r.mn), Math.abs(r.mx));
+    const fits = r.mn >= lastFlux.loW - 1e-9 && r.mx <= lastFlux.hiW + 1e-9;
+    const signOK = (r.mn < 0) === (lastFlux.loW < 0) && (r.mx > 0) === (lastFlux.hiW > 0);
+    if (fits && signOK && reach >= 0.2 * big) return lastFlux;
+  }
+  let hi = niceCeil(Math.max(0, r.mx));
+  let lo = -niceCeil(Math.max(0, -r.mn));
+  if (hi - lo === 0) hi = 10;
+  const span = hi - lo;
+  const mag = Math.pow(10, Math.floor(Math.log10(span)) - 1);
+  let step = span;
+  outer:
+  for (let e = mag; e <= span; e *= 10) {
+    for (const m of [1, 2, 5, 2.5]) {
+      const st = m * e;
+      const ok = (x) => Math.abs(x / st - Math.round(x / st)) < 1e-6;
+      if (span / st <= 8 && ok(lo) && ok(hi)) { step = st; break outer; }
+    }
+  }
+  const scale = Math.max(Math.abs(lo), Math.abs(hi)) >= 10000 ? 1000 : 1;
+  lastFlux = { lo: lo / scale, hi: hi / scale, step: step / scale, scale, loW: lo, hiW: hi };
+  return lastFlux;
+}
+
+function fmtTick(v, step) {
+  if (Math.abs(v) < 1e-12) return "0";
+  let dec = 0;                       /* decimals needed to show the step exactly */
+  while (dec < 6 && Math.abs(step * Math.pow(10, dec) - Math.round(step * Math.pow(10, dec))) > 1e-9) dec++;
+  return v.toFixed(dec);
+}
+
+function drawAxes(ax, ylim, xlabel, ylabel) {
+  ctx.save();
+  ctx.strokeStyle = "#000";
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(ax.left, ax.top, ax.w, ax.h);
+
+  ctx.fillStyle = "#000";
+  ctx.font = "16px Helvetica, Arial, sans-serif";
+
+  /* x ticks: 0 to L with step 0.02 (MATLAB auto for [0 0.075]) */
+  const xstep = 0.02;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "top";
+  for (let xv = 0; xv <= L + 1e-9; xv += xstep) {
+    const px = ax.left + (xv / L) * ax.w;
+    ctx.beginPath();
+    ctx.moveTo(px, ax.top + ax.h);
+    ctx.lineTo(px, ax.top + ax.h - 6);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(px, ax.top);
+    ctx.lineTo(px, ax.top + 6);
+    ctx.stroke();
+    ctx.fillText(fmtTick(xv, xstep), px, ax.top + ax.h + 6);
+  }
+
+  /* y ticks */
+  ctx.textAlign = "right";
+  ctx.textBaseline = "middle";
+  for (let yv = ylim.lo; yv <= ylim.hi + ylim.step * 1e-6; yv += ylim.step) {
+    const py = ax.top + ax.h - ((yv - ylim.lo) / (ylim.hi - ylim.lo)) * ax.h;
+    ctx.beginPath();
+    ctx.moveTo(ax.left, py);
+    ctx.lineTo(ax.left + 6, py);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(ax.left + ax.w, py);
+    ctx.lineTo(ax.left + ax.w - 6, py);
+    ctx.stroke();
+    ctx.fillText(fmtTick(yv, ylim.step), ax.left - 7, py);
+  }
+
+  /* x label */
+  ctx.textAlign = "center";
+  ctx.textBaseline = "top";
+  ctx.font = "19px Helvetica, Arial, sans-serif";
+  ctx.fillText(xlabel, ax.left + ax.w / 2, ax.top + ax.h + 26);
+
+  /* y label: rendered on an offscreen canvas, then rotated, to avoid
+     rotated-glyph artifacts */
+  const off = document.createElement("canvas");
+  const ow = 300, oh = 30;
+  off.width = ow * dpr; off.height = oh * dpr;
+  const octx = off.getContext("2d");
+  octx.scale(dpr, dpr);
+  octx.font = "19px Helvetica, Arial, sans-serif";
+  octx.fillStyle = "#000";
+  octx.textAlign = "center";
+  octx.textBaseline = "middle";
+  if (ylabel.sup) {
+    const base = ylabel.base, supTxt = ylabel.sup, sufTxt = ylabel.suffix || "";
+    octx.save();
+    octx.font = "19px Helvetica, Arial, sans-serif";
+    const bw = octx.measureText(base).width;
+    const sfw = octx.measureText(sufTxt).width;
+    octx.font = "13px Helvetica, Arial, sans-serif";
+    const spw = octx.measureText(supTxt).width;
+    const totW = bw + spw + 1 + sfw;
+    let sx = ow / 2 - totW / 2;
+    octx.textAlign = "left";
+    octx.font = "19px Helvetica, Arial, sans-serif";
+    octx.fillText(base, sx, oh / 2 + 1);
+    octx.font = "13px Helvetica, Arial, sans-serif";
+    octx.fillText(supTxt, sx + bw + 1, oh / 2 - 7);
+    octx.font = "19px Helvetica, Arial, sans-serif";
+    octx.fillText(sufTxt, sx + bw + 1 + spw, oh / 2 + 1);
+    octx.restore();
+  } else {
+    octx.fillText(ylabel.base, ow / 2, oh / 2 + 1);
+  }
+  ctx.save();
+  ctx.translate(ax.left - 60, ax.top + ax.h / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.drawImage(off, -ow / 2, -oh / 2, ow, oh);
+  ctx.restore();
+
+  ctx.restore();
+}
+
+function drawCurve(ax, ylim, data) {
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(ax.left, ax.top, ax.w, ax.h);
+  ctx.clip();
+  ctx.strokeStyle = MBLUE;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  let started = false;
+  for (let i = 0; i < N; i++) {
+    const v = data[i];
+    if (!isFinite(v)) { started = false; continue; }
+    const px = ax.left + (xArr[i] / L) * ax.w;
+    const py = ax.top + ax.h - ((v - ylim.lo) / (ylim.hi - ylim.lo)) * ax.h;
+    if (!started) { ctx.moveTo(px, py); started = true; }
+    else ctx.lineTo(px, py);
+  }
+  ctx.stroke();
+  ctx.restore();
+}
+
+/* ---------- diagram (wall + arrows) ---------- */
+function arrow(x1, y1, x2, y2, headLen) {
+  const ang = Math.atan2(y2 - y1, x2 - x1);
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(x2, y2);
+  ctx.lineTo(x2 - headLen * Math.cos(ang - 0.42), y2 - headLen * Math.sin(ang - 0.42));
+  ctx.lineTo(x2 - headLen * Math.cos(ang + 0.42), y2 - headLen * Math.sin(ang + 0.42));
+  ctx.closePath();
+  ctx.fill();
+}
+
+function drawDiagram() {
+  /* gray wall: MATLAB [5.6 5.2 2.5 3] in -> x 448..648, y(top) 64..304 */
+  ctx.save();
+  ctx.fillStyle = "#dedede";
+  ctx.fillRect(448, 64, 200, 240);
+  ctx.strokeStyle = "#000";
+  ctx.lineWidth = 1;
+  ctx.strokeRect(448, 64, 200, 240);
+
+  ctx.fillStyle = "#000";
+
+  /* x-direction arrow at lower-left corner of wall */
+  arrow(448, 304, 448 + 26, 304, 8);
+
+  /* right-side convection arrow (points up), right of the wall */
+  arrow(696, 160, 696, 84, 9);
+
+  /* left-side BC illustration */
+  if (state.radio === 1) {
+    /* line with filled circle head at the wall face */
+    ctx.beginPath();
+    ctx.moveTo(400, 88);
+    ctx.lineTo(444, 88);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(444, 88, 4.5, 0, 2 * Math.PI);
+    ctx.fill();
+  } else if (state.radio === 2) {
+    for (const y of [88, 136, 184, 232, 280]) {
+      arrow(398, y, 446, y, 9);
+    }
+  } else {
+    /* vertical arrow near left face */
+    arrow(400, 272, 400, 152, 9);
+  }
+  ctx.restore();
+}
+
+/* ---------- master redraw ---------- */
+function redraw() {
+  ctx.clearRect(0, 0, W, H);
+  drawDiagram();
+
+  const sol = solve(state.k, state.qdot, state.TinfR, state.hR, state.radio,
+                    state.TsL, state.qs, state.hL, state.TinfL);
+
+  const yT = tempLimits(sol.T);
+  const yq = fluxLimits(sol.q);
+
+  if (yT) {
+    drawAxes(ax1, yT, "position [m]", { base: "temperature [K]" });
+    drawCurve(ax1, yT, sol.T);
+  }
+  if (yq) {
+    const unit = yq.scale === 1000 ? "kW/m" : "W/m";
+    drawAxes(ax2, yq, "position [m]", { base: "heat flux [" + unit, sup: "2", suffix: "]" });
+    drawCurve(ax2, yq, sol.q.map(v => v / yq.scale));
+  }
+}
+
+/* ================= slider wiring ================= */
+function num(v) { return Number(v).toLocaleString("en-US"); }   /* 1000 -> "1,000" */
+
+function bind(id, key, labelId, labelFn) {
+  const el = document.getElementById(id);
+  el.addEventListener("input", () => {
+    state[key] = Number(el.value);
+    document.getElementById(labelId).innerHTML = labelFn(state[key]);
+    redraw();
+  });
+}
+
+bind("slk",     "k",     "labk",
+  v => "<i>k</i> = " + num(v) + " [W/m-K]");
+bind("slqdot",  "qdot",  "labqdot",
+  v => "<i>q&#775;</i> = " + num(v) + " [W/m<sup>3</sup>]");
+bind("slhR",    "hR",    "labhR",
+  v => "<i>h</i><sub>R</sub> = " + num(v) + " [W/m<sup>2</sup>-K]");
+bind("slTinfR", "TinfR", "labTinfR",
+  v => "<i>T</i><sub>&infin;,R</sub> = " + num(v) + " [K]");
+bind("slTL",    "TsL",   "labTL",
+  v => "<i>T</i><sub>s,L</sub> = " + num(v) + " [K]");
+bind("slflux",  "qs",    "labflux",
+  v => "<i>q</i><sub>s</sub>&Prime; = " + num(v) + " [W/m<sup>2</sup>]");
+bind("slconvh", "hL",    "labconvh",
+  v => "<i>h</i><sub>L</sub> = " + num(v) + " [W/m<sup>2</sup>-K]");
+bind("slconvT", "TinfL", "labconvT",
+  v => "<i>T</i><sub>&infin;,L</sub> = " + num(v) + " [K]");
+
+/* ================= radio buttons ================= */
+const groups = {
+  1: ["TLmin", "slTL", "TLmax", "labTL", "dlTsL"],
+  2: ["fluxmin", "slflux", "fluxmax", "labflux", "dlqs"],
+  3: ["convhmin", "slconvh", "convhmax", "labconvh",
+      "convTmin", "slconvT", "convTmax", "labconvT", "dlconv"]
+};
+
+function setBC(sel) {
+  state.radio = sel;
+  for (const g of [1, 2, 3]) {
+    const show = (g === sel);
+    for (const id of groups[g]) {
+      document.getElementById(id).style.display = show ? "" : "none";
+    }
+  }
+  redraw();
+}
+
+for (const r of document.querySelectorAll('input[name="bc"]')) {
+  r.addEventListener("change", () => setBC(Number(r.value)));
+}
+
+/* ================= panels ================= */
+const panelIds = ["panelDirections", "panelDetails", "panelAbout"];
+
+function openPanel(id) {
+  for (const p of panelIds) {
+    document.getElementById(p).classList.toggle("open", p === id);
+  }
+  const body = document.querySelector("#" + id + " .panelBody");
+  if (body) body.scrollTop = 0;
+  if (id === "panelDetails" && window.MathJax && MathJax.typesetPromise) {
+    MathJax.typesetPromise([document.getElementById("panelDetails")]);
+  }
+}
+function closePanel(id) {
+  document.getElementById(id).classList.remove("open");
+}
+function togglePanel(id) {
+  document.getElementById(id).classList.contains("open")
+    ? closePanel(id) : openPanel(id);
+}
+
+document.getElementById("btnDirections")
+  .addEventListener("click", () => togglePanel("panelDirections"));
+document.getElementById("btnDetails")
+  .addEventListener("click", () => togglePanel("panelDetails"));
+document.getElementById("btnAbout")
+  .addEventListener("click", () => togglePanel("panelAbout"));
+for (const x of document.querySelectorAll(".closeX")) {
+  x.addEventListener("click", () => closePanel(x.dataset.close));
+}
+
+/* ================= init ================= */
+setBC(1);
+</script>
+</body>
+</html>

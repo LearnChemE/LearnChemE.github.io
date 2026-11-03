@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>First-Order Transfer Functions in Process Control</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(', '\\)']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js"></script>
+<style>
+  body {
+    font-family: Helvetica, Arial, sans-serif;
+    margin: 12px;
+    background-color: #ffffff;
+  }
+  #container {
+    position: relative;
+    width: 700px;
+  }
+  #topRow {
+    display: flex;
+    align-items: flex-start;
+  }
+  /* controls */
+  #controls {
+    flex: 0 0 auto;
+  }
+  .setter-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .setter-label {
+    font-size: 16.8px;   /* 14px + 20% */
+    margin-right: 10px;
+  }
+  .setter-btn {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 16.8px;   /* 14px + 20% */
+    padding: 6px 14px;
+    margin-right: 4px;
+    border: 1px solid #999;
+    background-color: #f5f5f5;
+    cursor: pointer;
+    border-radius: 3px;
+  }
+  .setter-btn.selected {
+    background-color: #c9c9c9;
+    border-color: #666;
+  }
+  .slider-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    font-size: 16.8px;   /* 14px + 20% */
+  }
+  .slider-label {
+    width: 215px;
+    text-align: right;
+    padding-right: 10px;
+  }
+  /* slider style */
+  input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+  input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  .slider-row input[type=range] {
+    width: 170px;
+  }
+  .slider-value {
+    width: 46px;
+    text-align: left;
+    padding-left: 10px;
+  }
+  .slider-row.disabled {
+    opacity: 0.4;
+  }
+  /* Directions / Details / About buttons: vertical column right of the sliders */
+  #buttonCol {
+    display: flex;
+    flex-direction: column;
+    margin-left: 24px;
+  }
+  .panel-btn {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 16.8px;   /* 14px + 20% */
+    background-color: #98000D;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 0;
+    width: 132px;
+    margin-bottom: 8px;
+    cursor: pointer;
+  }
+  .panel-btn:hover {
+    background-color: #b30010;
+  }
+  /* flyout panels */
+  .panel {
+    box-sizing: border-box;
+    display: none;
+    position: absolute;
+    background-color: #ffffff;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    box-shadow: 2px 3px 8px rgba(0,0,0,0.30);
+    padding: 12px 16px;
+    font-size: 14px;
+    line-height: 1.45;
+    z-index: 20;
+    overflow-y: auto;
+  }
+  .panel .close-x {
+    position: absolute;
+    top: 4px;
+    right: 8px;
+    font-size: 20px;
+    line-height: 20px;
+    color: #555;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  .panel .close-x:hover { color: #98000D; }
+  .panel h3 {
+    margin: 2px 0 8px 0;
+    font-size: 15px;
+  }
+  .panel p { margin: 6px 0; }
+  .eq { margin: 4px 0 4px 14px; }
+  #plotTitle {
+    width: 640px;
+    text-align: center;
+    min-height: 30px;
+    margin-top: 4px;
+    font-size: 17px;
+  }
+  #plotArea { position: relative; }
+  canvas { display: block; }
+</style>
+</head>
+<body>
+<div id="container">
+  <div id="topRow">
+    <div id="controls">
+      <div class="setter-row">
+        <span class="setter-label">choose input</span>
+        <button class="setter-btn" id="btnStep" onclick="setInput(1)">step</button>
+        <button class="setter-btn" id="btnRamp" onclick="setInput(2)">ramp</button>
+        <button class="setter-btn" id="btnSin" onclick="setInput(3)">sinusoidal</button>
+      </div>
+      <div class="slider-row">
+        <span class="slider-label">time constant, <i style="font-family: 'Times New Roman', Times, serif;">&tau;</i></span>
+        <input type="range" id="sT" min="1" max="10" step="1" value="5" oninput="update()">
+        <span class="slider-value" id="vT">5</span>
+      </div>
+      <div class="slider-row">
+        <span class="slider-label">input step size, <i>a</i></span>
+        <input type="range" id="sA" min="1" max="5" step="0.5" value="3" oninput="update()">
+        <span class="slider-value" id="vA">3</span>
+      </div>
+      <div class="slider-row" id="rowW">
+        <span class="slider-label">angular frequency <i>&omega;</i></span>
+        <input type="range" id="sW" min="0.5" max="5" step="0.5" value="1" oninput="update()">
+        <span class="slider-value" id="vW">1</span>
+      </div>
+    </div>
+    <div id="buttonCol">
+      <button class="panel-btn" id="btnDirections" onclick="togglePanel('directions')">Directions</button>
+      <button class="panel-btn" id="btnDetails" onclick="togglePanel('details')">Details</button>
+      <button class="panel-btn" id="btnAbout" onclick="togglePanel('about')">About</button>
+    </div>
+  </div>
+
+  <div id="plotTitle"></div>
+  <div id="plotArea">
+    <canvas id="plot" width="640" height="430"></canvas>
+  </div>
+
+  <!-- Directions panel -->
+  <div class="panel" id="panel-directions">
+    <span class="close-x" onclick="closePanels()">&times;</span>
+    <h3>Directions</h3>
+    <p>Select the type of input (step, ramp or sinusoidal) with the "choose input" buttons, and use the sliders to change the time constant \(\tau\) and the input magnitude \(a\). For a sinusoidal input, the angular frequency \(\omega\) can also be varied.</p>
+    <p>A transfer function is the ratio of the output to the input of a system. The system response is determined from the transfer function and the system input. A Laplace transform converts the input from the time domain to the spatial domain by using Laplace transform relations. The transformed spatial input is multiplied by the transfer function to get the output in the spatial domain. It is then converted back to the time domain using an inverse Laplace transform.</p>
+    <p>This Demonstration shows the responses to a first-order transfer function. You can vary the magnitude of the input and the time constant \(\tau\). The time constant is related to how long a system takes to reach the new steady state. The input can be a step function, a ramp, or a sinusoidal input.</p>
+  </div>
+
+  <!-- Details panel -->
+  <div class="panel" id="panel-details">
+    <span class="close-x" onclick="closePanels()">&times;</span>
+    <h3>Details</h3>
+    <p><b>Step Input and Response</b></p>
+    <p>For a step input of magnitude \(a\),</p>
+    <div class="eq">\(s =\) space domain</div>
+    <div class="eq">\(t =\) time domain</div>
+    <div class="eq">\(x(t) = a\)</div>
+    <div class="eq">\(x(s) = \dfrac{a}{s}\)</div>
+    <div class="eq">\(y(s) = \dfrac{K\,a}{s(\tau s + 1)}\)</div>
+    <div class="eq">\(y(t) = K\,a\left(1 - e^{-t/\tau}\right)\)</div>
+    <div class="eq">\(\tau = 0.632\,\Delta SS\)&nbsp; time constant</div>
+    <div class="eq">\(\Delta SS =\) change in steady states</div>
+    <p><b>Ramp Input and Response</b></p>
+    <p>For a ramp input of magnitude \(a\),</p>
+    <div class="eq">\(x(t) = a\,t\)</div>
+    <div class="eq">\(x(s) = \dfrac{a}{s^2}\)</div>
+    <div class="eq">\(y(s) = \dfrac{K\,a}{(\tau s + 1)\,s^2}\)</div>
+    <div class="eq">\(y(t) = K\,a\,\tau\left(e^{-t/\tau} - 1\right) + K\,a\,t\)</div>
+    <p><b>Sinusoidal Input and Response</b></p>
+    <div class="eq">\(\omega = 2\pi f\)&nbsp; angular frequency, rate of change of the function</div>
+    <div class="eq">\(x(t) = a\sin(\omega t)\)</div>
+    <div class="eq">\(x(s) = \dfrac{a\,\omega}{s^2 + \omega^2}\)</div>
+    <div class="eq">\(y(s) = \dfrac{K\,a\,\omega}{(\tau s + 1)(s^2 + \omega^2)}\)</div>
+    <div class="eq">\(y(t) = \dfrac{K\,a\,\omega\,\tau}{\omega^2\tau^2 + 1}\,e^{-t/\tau} + \dfrac{K\,a}{\sqrt{\omega^2\tau^2 + 1}}\sin(\omega t + \phi)\)</div>
+    <div class="eq">\(\phi = -\tan^{-1}(\omega \tau)\)&nbsp; phase shift, negative value represents a delay</div>
+    <div class="eq">time shift \(= -\dfrac{360}{\phi}\,p\)</div>
+    <div class="eq">amplitude ratio \(= \dfrac{B}{A}\)</div>
+    <p><b>Symbols</b></p>
+    <div class="eq">\(a\) = input magnitude</div>
+    <div class="eq">\(A\) = amplitude of the input</div>
+    <div class="eq">\(B\) = amplitude of the output (response)</div>
+    <div class="eq">\(f\) = frequency (1/min)</div>
+    <div class="eq">\(K\) = process gain</div>
+    <div class="eq">\(p\) = period of the sinusoidal input (min)</div>
+    <div class="eq">\(s\) = Laplace transform variable</div>
+    <div class="eq">\(t\) = time (min)</div>
+    <div class="eq">\(x\) = input</div>
+    <div class="eq">\(y\) = output (response)</div>
+    <div class="eq">\(\Delta SS\) = change in steady state</div>
+    <div class="eq">\(\tau\) = time constant (min)</div>
+    <div class="eq">\(\phi\) = phase shift (rad)</div>
+    <div class="eq">\(\omega\) = angular frequency (rad/min)</div>
+  </div>
+
+  <!-- About panel -->
+  <div class="panel" id="panel-about">
+    <span class="close-x" onclick="closePanels()">&times;</span>
+    <h3>About</h3>
+    <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a Mathematica simulation by Simon M. Lane. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.</p>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+// ---------- state ----------
+let W = 3;   // 1 = step, 2 = ramp, 3 = sinusoidal (default from CDF)
+
+const canvas = document.getElementById('plot');
+const ctx = canvas.getContext('2d');
+const CW = 640, CH = 430;
+
+// hi-DPI setup
+const dpr = window.devicePixelRatio || 1;
+canvas.width = CW * dpr;
+canvas.height = CH * dpr;
+canvas.style.width = CW + 'px';
+canvas.style.height = CH + 'px';
+ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+// plot margins
+const ML = 70, MR = 22, MT = 12, MB = 60;
+const PW = CW - ML - MR;   // plot width
+const PH = CH - MT - MB;   // plot height
+
+// ---------- helpers ----------
+function toPrec2(x) {
+  return String(Number(Number(x).toPrecision(2)));
+}
+
+function niceTicks(min, max, step) {
+  const t = [];
+  for (let v = min; v <= max + 1e-9; v += step) t.push(Number(v.toFixed(6)));
+  return t;
+}
+
+function makeScale(xmin, xmax, ymin, ymax) {
+  return {
+    xmin, xmax, ymin, ymax,
+    px: t => ML + (t - xmin) / (xmax - xmin) * PW,
+    py: y => MT + (1 - (y - ymin) / (ymax - ymin)) * PH
+  };
+}
+
+function drawFrame(sc, xticks, yticks) {
+  ctx.strokeStyle = '#000';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(ML, MT, PW, PH);
+  ctx.fillStyle = '#000';
+  ctx.font = '16.25px Helvetica, Arial, sans-serif';
+  // x ticks
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  xticks.forEach(t => {
+    const x = sc.px(t);
+    ctx.beginPath(); ctx.moveTo(x, MT + PH); ctx.lineTo(x, MT + PH - 6); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x, MT); ctx.lineTo(x, MT + 6); ctx.stroke();
+    ctx.fillText(String(t), x, MT + PH + 5);
+  });
+  // y ticks
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'middle';
+  yticks.forEach(t => {
+    const y = sc.py(t);
+    ctx.beginPath(); ctx.moveTo(ML, y); ctx.lineTo(ML + 6, y); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(ML + PW, y); ctx.lineTo(ML + PW - 6, y); ctx.stroke();
+    ctx.fillText(String(t), ML - 7, y);
+  });
+  // axis labels
+  ctx.font = '17.5px Helvetica, Arial, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillText('time (min)', ML + PW / 2, CH - 10);
+  ctx.save();
+  ctx.translate(36, MT + PH / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.fillText('response', 0, 0);
+  ctx.restore();
+}
+
+function clipPlot() {
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(ML, MT, PW, PH);
+  ctx.clip();
+}
+
+function drawCurve(sc, fn, t0, t1, color, width) {
+  clipPlot();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = width;
+  ctx.beginPath();
+  const n = 600;
+  for (let i = 0; i <= n; i++) {
+    const t = t0 + (t1 - t0) * i / n;
+    const x = sc.px(t), y = sc.py(fn(t));
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawLine(sc, x1, y1, x2, y2) {
+  ctx.strokeStyle = '#000';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(sc.px(x1), sc.py(y1));
+  ctx.lineTo(sc.px(x2), sc.py(y2));
+  ctx.stroke();
+}
+
+function labelWhiteBg(sc, text, x, y, fontPx, style) {
+  if (style === 'greek') {
+    ctx.font = 'italic ' + fontPx + 'px "Times New Roman", Times, serif';
+  } else {
+    ctx.font = (style === true ? 'italic ' : '') + fontPx + 'px Helvetica, Arial, sans-serif';
+  }
+  const w = ctx.measureText(text).width;
+  const px = sc.px(x), py = sc.py(y);
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(px - w / 2 - 3, py - fontPx / 2 - 2, w + 6, fontPx + 4);
+  ctx.fillStyle = '#000';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, px, py);
+}
+
+// parameter-value box: rows = [[label, value], ...], centered at (fx, fy) scaled coords
+// A label may be a string or an array of [text, kind] segments; kind 'g' = italic serif Greek
+function segFont(kind, fontPx) {
+  return kind === 'g'
+    ? 'italic ' + fontPx + 'px "Times New Roman", Times, serif'
+    : fontPx + 'px Helvetica, Arial, sans-serif';
+}
+function segsOf(label) {
+  return Array.isArray(label) ? label : [[label, 'n']];
+}
+function segWidth(label, fontPx) {
+  return segsOf(label).reduce((w, seg) => {
+    ctx.font = segFont(seg[1], fontPx);
+    return w + ctx.measureText(seg[0]).width;
+  }, 0);
+}
+function drawParamBox(rows, fx, fy, fontPx) {
+  ctx.font = fontPx + 'px Helvetica, Arial, sans-serif';
+  const rowH = fontPx + 10;
+  let wLab = 0, wVal = 0;
+  rows.forEach(r => {
+    wLab = Math.max(wLab, segWidth(r[0], fontPx));
+    wVal = Math.max(wVal, ctx.measureText(r[1]).width);
+  });
+  const pad = 8, gap = 10;
+  const bw = wLab + gap + wVal + 2 * pad;
+  const bh = rows.length * rowH + 2;
+  const cx = ML + fx * PW, cy = MT + (1 - fy) * PH;
+  const bx = cx - bw / 2, by = cy - bh / 2;
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(bx, by, bw, bh);
+  ctx.strokeStyle = '#999';
+  ctx.lineWidth = 0.8;
+  // inner horizontal dividers
+  for (let i = 1; i < rows.length; i++) {
+    const y = by + 1 + i * rowH;
+    ctx.beginPath(); ctx.moveTo(bx, y); ctx.lineTo(bx + bw, y); ctx.stroke();
+  }
+  ctx.fillStyle = '#000';
+  ctx.textBaseline = 'middle';
+  rows.forEach((r, i) => {
+    const y = by + 1 + (i + 0.5) * rowH;
+    // right-aligned label drawn segment by segment (mixed fonts)
+    ctx.textAlign = 'left';
+    let x = bx + pad + wLab - segWidth(r[0], fontPx);
+    segsOf(r[0]).forEach(seg => {
+      ctx.font = segFont(seg[1], fontPx);
+      ctx.fillText(seg[0], x, y);
+      x += ctx.measureText(seg[0]).width;
+    });
+    ctx.font = fontPx + 'px Helvetica, Arial, sans-serif';
+    ctx.fillText(r[1], bx + pad + wLab + gap, y);
+  });
+}
+
+// small inset input plot for step case, centered at scaled (fx, fy)
+function drawInputInset(alpha, fx, fy) {
+  const iw = 165, ih = 125;
+  const cx = ML + fx * PW, cy = MT + (1 - fy) * PH;
+  const x0 = cx - iw / 2, y0 = cy - ih / 2;
+  const iml = 34, imr = 8, imt = 26, imb = 22;
+  const ipw = iw - iml - imr, iph = ih - imt - imb;
+  // background
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(x0 - 4, y0 - 4, iw + 8, ih + 8);
+  // frame
+  ctx.strokeStyle = '#000';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(x0 + iml, y0 + imt, ipw, iph);
+  // title
+  ctx.fillStyle = '#000';
+  ctx.font = '19px Helvetica, Arial, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillText('input', x0 + iml + ipw / 2, y0 + imt - 8);
+  // scales: x in [-5,5], y in [-1,6]
+  const sx = t => x0 + iml + (t + 5) / 10 * ipw;
+  const sy = v => y0 + imt + (1 - (v + 1) / 7) * iph;
+  // step curve (green)
+  ctx.strokeStyle = '#00a000';
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ctx.moveTo(sx(-5), sy(0));
+  ctx.lineTo(sx(0), sy(0));
+  ctx.lineTo(sx(0), sy(alpha));
+  ctx.lineTo(sx(5), sy(alpha));
+  ctx.stroke();
+  // axis labels
+  ctx.fillStyle = '#000';
+  ctx.font = '14px Helvetica, Arial, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('time (min)', x0 + iml + ipw / 2, y0 + imt + iph + 14);
+  ctx.save();
+  ctx.translate(x0 + iml - 20, y0 + imt + iph / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.font = 'italic 15.4px Helvetica, Arial, sans-serif';
+  ctx.fillText('x(t)', 0, 0);
+  ctx.restore();
+}
+
+// ---------- physics + plots ----------
+function currentParams() {
+  return {
+    T: parseFloat(document.getElementById('sT').value),
+    alpha: parseFloat(document.getElementById('sA').value),
+    w: parseFloat(document.getElementById('sW').value)
+  };
+}
+
+function drawStep(p) {
+  const { T, alpha } = p;
+  const sc = makeScale(0, 25, 0, 10);
+  const Ytau = alpha * 0.632;
+  const Xtau = -T * Math.log(1 - Ytau / alpha);          // = -T ln(0.368)
+  const line = alpha * (1 - Math.exp(-Xtau / T));        // = 0.632 a
+  const YdSS = alpha * (1 - Math.exp(-24 / T));
+  const timeconstant = Xtau;
+
+  const resp = t => alpha * (1 - Math.exp(-t / T));
+  drawCurve(sc, resp, 0, 25, '#1f4e9c', 2.6);
+  drawLine(sc, Xtau, 0, Xtau, line);
+  drawLine(sc, 24, 0, 24, YdSS);
+  drawFrame(sc, niceTicks(0, 25, 5), niceTicks(0, 10, 2));
+  drawInputInset(alpha, 0.22, 0.70);
+  labelWhiteBg(sc, '0.632 \u00D7 \u0394SS', Xtau, line / 2, 15, false);
+  labelWhiteBg(sc, '\u0394SS', 24, alpha / 2, 15, false);
+  drawParamBox([
+    ['gain K =', toPrec2(1)],
+    [[['time constant ', 'n'], ['\u03C4', 'g'], [' =', 'n']], toPrec2(timeconstant)]
+  ], 0.72, 0.80, 19);
+}
+
+function drawRamp(p) {
+  const { T, alpha } = p;
+  const sc = makeScale(0, 20, 0, 20);
+  const theta = 0;
+  const yline = alpha * T * (Math.exp(-(10 / alpha - theta) / T) - 1) + alpha * (10 / alpha - theta);
+  const tauRamp = 10 - yline;
+
+  const input = t => alpha * t;
+  const resp = t => alpha * T * (Math.exp(-(t - theta) / T) - 1) + alpha * (t - theta);
+  // curves drawn over t in [0, 10] as in the original
+  drawCurve(sc, input, 0, 10, '#00a000', 2.6);
+  drawCurve(sc, resp, 0, 10, '#0000ff', 2.6);
+  drawLine(sc, 10 / alpha, 10, 10 / alpha, yline);
+  drawFrame(sc, niceTicks(0, 20, 5), niceTicks(0, 20, 5));
+  labelWhiteBg(sc, 'input', 3, 3 * alpha, 15, false);
+  labelWhiteBg(sc, 'response', 6, resp(6), 15, false);
+  labelWhiteBg(sc, '\u03C4', 10 / alpha, (10 - yline) / 2 + yline, 18, 'greek');
+  drawParamBox([
+    ['gain K =', toPrec2(1)],
+    [[['time constant ', 'n'], ['\u03C4', 'g'], [' =', 'n']], toPrec2(tauRamp) + ' min']
+  ], 0.77, 0.81, 19);
+}
+
+// first response maximum for sinusoidal input, from t = 0.05 (mimics FindMaximum)
+function firstMax(fn) {
+  const t0 = 0.05, t1 = 10, n = 4000;
+  let prev = fn(t0);
+  let rising = false;
+  for (let i = 1; i <= n; i++) {
+    const t = t0 + (t1 - t0) * i / n;
+    const v = fn(t);
+    if (v > prev) rising = true;
+    else if (rising && v < prev) {
+      // refine around previous point with a fine parabolic step
+      const tm = t0 + (t1 - t0) * (i - 1) / n;
+      const h = (t1 - t0) / n;
+      const ym = fn(tm), yl = fn(tm - h), yr = fn(tm + h);
+      const denom = (yl - 2 * ym + yr);
+      const dt = denom !== 0 ? 0.5 * h * (yl - yr) / denom : 0;
+      const tstar = tm + dt;
+      return { t: tstar, y: fn(tstar) };
+    }
+    prev = v;
+  }
+  // no interior max found -> boundary
+  const yEnd = fn(t1), yStart = fn(t0);
+  return yEnd > yStart ? { t: t1, y: yEnd } : { t: t0, y: yStart };
+}
+
+function drawSin(p) {
+  const { T, alpha, w } = p;
+  const sc = makeScale(0, 10, -6, 10);
+  const Phi = -Math.atan(w * T);
+  const resp = t => (alpha * w * T / (w * w * T * T + 1)) * Math.exp(-t / T)
+                  + (alpha / Math.sqrt(w * w * T * T + 1)) * Math.sin(w * t + Phi);
+  const input = t => alpha * Math.sin(w * t);
+  const x = 1.5 / w;
+  const m = firstMax(resp);
+  const time1 = m.t, time2 = m.y;
+
+  drawCurve(sc, resp, 0, 10, '#0000ff', 2.6);
+  drawCurve(sc, input, 0, 10, '#00a000', 2.6);
+  drawLine(sc, x, 0, x, alpha);
+  drawLine(sc, time1, 0, time1, time2);
+  // phase-shift indicator: thicker horizontal line, raised slightly,
+  // with a vertical line at its right end
+  const yPhi = sc.py(time2) - 9;
+  ctx.strokeStyle = '#000';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(sc.px(x), yPhi);
+  ctx.lineTo(sc.px(time1), yPhi);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(sc.px(time1), yPhi - 8);
+  ctx.lineTo(sc.px(time1), yPhi + 8);
+  ctx.stroke();
+  drawFrame(sc, niceTicks(0, 10, 2), niceTicks(-6, 10, 2));
+  const dyPhi = 9 * (sc.ymax - sc.ymin) / PH;
+  labelWhiteBg(sc, '\u03C6', (time1 - x) / 2 + x, time2 + dyPhi, 15, false);
+  labelWhiteBg(sc, 'A', x, alpha / 2, 15, true);
+  labelWhiteBg(sc, 'B', time1, time2 / 2, 15, true);
+  labelWhiteBg(sc, 'input', 8, input(8), 15, false);
+  labelWhiteBg(sc, 'response', 6, resp(6), 15, false);
+  drawParamBox([
+    ['amplitude output B =', toPrec2(time2)],
+    ['amplitude ratio B/A =', toPrec2(time2 / alpha)],
+    ['phase shift \u03C6 =', toPrec2(-Phi) + ' min']
+  ], 0.75, 0.85, 16.5);
+}
+
+// ---------- plot titles ----------
+const titles = {
+  1: 'response = \\(K a\\left(1 - e^{-t/\\tau}\\right)\\)',
+  2: 'response = \\(K a \\tau\\left(e^{-t/\\tau} - 1\\right) + K a\\, t\\)',
+  3: 'response = \\(\\dfrac{K a \\omega \\tau}{\\omega^2\\tau^2 + 1}\\, e^{-t/\\tau} + \\dfrac{K a}{\\sqrt{\\omega^2\\tau^2 + 1}}\\sin(\\omega t + \\phi)\\)'
+};
+
+let lastTitleW = 0;
+function updateTitle() {
+  if (W !== lastTitleW) {
+    const el = document.getElementById('plotTitle');
+    el.style.fontSize = (W === 3) ? '14px' : '17px';
+    el.innerHTML = titles[W];
+    lastTitleW = W;
+    if (window.MathJax && MathJax.typesetPromise) {
+      MathJax.typesetPromise([el]).catch(() => {});
+    }
+  }
+}
+
+// ---------- UI ----------
+function setInput(which) {
+  W = which;
+  document.getElementById('btnStep').classList.toggle('selected', W === 1);
+  document.getElementById('btnRamp').classList.toggle('selected', W === 2);
+  document.getElementById('btnSin').classList.toggle('selected', W === 3);
+  const rowW = document.getElementById('rowW');
+  const sW = document.getElementById('sW');
+  if (W === 3) { rowW.classList.remove('disabled'); sW.disabled = false; }
+  else { rowW.classList.add('disabled'); sW.disabled = true; }
+  update();
+}
+
+function update() {
+  const p = currentParams();
+  document.getElementById('vT').textContent = String(p.T);
+  document.getElementById('vA').textContent = String(p.alpha);
+  document.getElementById('vW').textContent = String(p.w);
+  ctx.clearRect(0, 0, CW, CH);
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(0, 0, CW, CH);
+  if (W === 1) drawStep(p);
+  else if (W === 2) drawRamp(p);
+  else drawSin(p);
+  updateTitle();
+}
+
+// ---------- panels ----------
+// Each panel is placed just to the left of its button, starting a few
+// pixels below it, so it covers the figure rather than the other buttons.
+function positionPanel(panelId, btnId) {
+  const panel = document.getElementById(panelId);
+  const btn = document.getElementById(btnId);
+  const container = document.getElementById('container');
+  const bRect = btn.getBoundingClientRect();
+  const cRect = container.getBoundingClientRect();
+  const btnBottom = bRect.bottom - cRect.top;
+  const left = 12;
+  panel.style.left = left + 'px';
+  panel.style.width = (cRect.width - left) + 'px';  // right end at the right edge
+  panel.style.top = (btnBottom + 5) + 'px';         // a few pixels below the button
+  panel.style.maxHeight = '470px';
+}
+
+let openPanel = null;
+function togglePanel(name) {
+  const id = 'panel-' + name;
+  if (openPanel === id) { closePanels(); return; }
+  closePanels();
+  const btnId = 'btn' + name.charAt(0).toUpperCase() + name.slice(1);
+  positionPanel(id, btnId);
+  const panel = document.getElementById(id);
+  panel.style.display = 'block';
+  openPanel = id;
+  if (window.MathJax && MathJax.typesetPromise) {
+    MathJax.typesetPromise([panel]).catch(() => {});
+  }
+}
+
+function closePanels() {
+  document.querySelectorAll('.panel').forEach(p => p.style.display = 'none');
+  openPanel = null;
+}
+
+// ---------- init ----------
+setInput(3);
+</script>
+</body>
+</html>

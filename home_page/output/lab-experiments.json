@@ -1,0 +1,317 @@
+[
+  {
+    "title": "absorption-column",
+    "href": "https://learncheme.github.io/lab-experiments/absorption-column/dist/index.html",
+    "image": "/home_page/media/lab-experiments-absorption-column.png",
+    "tooltip": "absorption-column",
+    "description": "",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/lab-experiments/absorption-column/",
+    "simulation_type": "lab-experiment"
+  },
+  {
+    "title": "Antoine Equation Digital Experiment",
+    "href": "https://learncheme.github.io/lab-experiments/antoine-constants/dist/index.html",
+    "image": "/home_page/media/lab-experiments-antoine-constants.png",
+    "tooltip": "Antoine Equation Digital Experiment",
+    "description": "",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/lab-experiments/antoine-constants/",
+    "simulation_type": "lab-experiment"
+  },
+  {
+    "title": "Blood Cell Separations",
+    "href": "https://learncheme.github.io/lab-experiments/cell-sedimentation/dist/index.html",
+    "image": "/home_page/media/lab-experiments-cell-sedimentation.png",
+    "tooltip": "Blood Cell Separations",
+    "description": "",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/lab-experiments/cell-sedimentation/",
+    "simulation_type": "lab-experiment"
+  },
+  {
+    "title": "Chemical equilibrium for N2O4 dissociation",
+    "href": "https://learncheme.github.io/lab-experiments/chemical_equilbrium_for_N2O4_dissociation/dist/index.html",
+    "image": "/home_page/media/lab-experiments-chemical-equilbrium-for-n2o4-dissociation.png",
+    "tooltip": "Chemical equilibrium for N2O4 dissociation",
+    "description": "",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/lab-experiments/chemical_equilbrium_for_N2O4_dissociation/",
+    "simulation_type": "lab-experiment"
+  },
+  {
+    "title": "Adsorption Process Simulation",
+    "href": "https://learncheme.github.io/lab-experiments/co2_adsorption/index.html",
+    "image": "/home_page/media/lab-experiments-co2-adsorption.png",
+    "tooltip": "Adsorption Process Simulation",
+    "description": "",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/lab-experiments/co2_adsorption/",
+    "simulation_type": "lab-experiment"
+  },
+  {
+    "title": "co2-adsorption",
+    "href": "https://learncheme.github.io/lab-experiments/co2-adsorption/dist/index.html",
+    "image": "/home_page/media/lab-experiments-co2-adsorption.png",
+    "tooltip": "co2-adsorption",
+    "description": "",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/lab-experiments/co2-adsorption/",
+    "simulation_type": "lab-experiment"
+  },
+  {
+    "title": "co2-desorption",
+    "href": "https://learncheme.github.io/lab-experiments/co2-desorption/dist/index.html",
+    "image": "/home_page/media/lab-experiments-co2-desorption.png",
+    "tooltip": "co2-desorption",
+    "description": "",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/lab-experiments/co2-desorption/",
+    "simulation_type": "lab-experiment"
+  },
+  {
+    "title": "Coin Rise in Viscous Fluid",
+    "href": "https://learncheme.github.io/lab-experiments/coin_rise_in_viscous_fluid/dist/index.html",
+    "image": "/home_page/media/lab-experiments-coin-rise-in-viscous-fluid.png",
+    "tooltip": "Coin Rise in Viscous Fluid",
+    "description": "",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/lab-experiments/coin_rise_in_viscous_fluid/",
+    "simulation_type": "lab-experiment"
+  },
+  {
+    "title": "Extended Area Heat Exchanger",
+    "href": "https://learncheme.github.io/lab-experiments/cross-exchanger/dist/index.html",
+    "image": "/home_page/media/lab-experiments-cross-exchanger.png",
+    "tooltip": "Extended Area Heat Exchanger",
+    "description": "",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/lab-experiments/cross-exchanger/",
+    "simulation_type": "lab-experiment"
+  },
+  {
+    "title": "Unsteady state material balances on a CVD reactor",
+    "href": "https://learncheme.github.io/lab-experiments/cvd_reactor/dist/index.html",
+    "image": "/home_page/media/lab-experiments-cvd-reactor.png",
+    "tooltip": "Unsteady state material balances on a CVD reactor",
+    "description": "",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/lab-experiments/cvd_reactor/",
+    "simulation_type": "lab-experiment"
+  },
+  {
+    "title": "Head Loss Virtual Lab",
+    "href": "https://learncheme.github.io/lab-experiments/example/dist/index.html",
+    "image": "/home_page/media/lab-experiments-example.png",
+    "tooltip": "Head Loss Virtual Lab",
+    "description": "Head Loss Virtual Lab",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/lab-experiments/example/",
+    "simulation_type": "lab-experiment"
+  },
+  {
+    "title": "Flow In Inclined Tube",
+    "href": "https://learncheme.github.io/lab-experiments/flow_in_inclined_tube/dist/index.html",
+    "image": "/home_page/media/lab-experiments-flow-in-inclined-tube.png",
+    "tooltip": "Flow In Inclined Tube",
+    "description": "",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/lab-experiments/flow_in_inclined_tube/",
+    "simulation_type": "lab-experiment"
+  },
+  {
+    "title": "Fluidized Bed Virtual Lab",
+    "href": "https://learncheme.github.io/lab-experiments/fluidized-bed/dist/index.html",
+    "image": "/home_page/media/lab-experiments-fluidized-bed.png",
+    "tooltip": "Head Loss Virtual Lab",
+    "description": "Head Loss Virtual Lab",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/lab-experiments/fluidized-bed/",
+    "simulation_type": "lab-experiment"
+  },
+  {
+    "title": "Garage Door Ladder Logic",
+    "href": "https://learncheme.github.io/lab-experiments/garage_door/src/html/index.html",
+    "image": "/home_page/media/lab-experiments-garage-door-src-html.png",
+    "tooltip": "Garage Door Ladder Logic",
+    "description": "",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/lab-experiments/garage_door/src/html/",
+    "simulation_type": "lab-experiment"
+  },
+  {
+    "title": "gas-chromatography",
+    "href": "https://learncheme.github.io/lab-experiments/gas-chromatography/index.html",
+    "image": "/home_page/media/lab-experiments-gas-chromatography.png",
+    "tooltip": "gas-chromatography",
+    "description": "",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/lab-experiments/gas-chromatography/",
+    "simulation_type": "lab-experiment"
+  },
+  {
+    "title": "glucose-analyzer",
+    "href": "https://learncheme.github.io/lab-experiments/glucose-analyzer/dist/index.html",
+    "image": "/home_page/media/lab-experiments-glucose-analyzer.png",
+    "tooltip": "glucose-analyzer",
+    "description": "",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/lab-experiments/glucose-analyzer/",
+    "simulation_type": "lab-experiment"
+  },
+  {
+    "title": "Haber Process Digital Experiment",
+    "href": "https://learncheme.github.io/lab-experiments/haber_process/dist/index.html",
+    "image": "/home_page/media/lab-experiments-haber-process.png",
+    "tooltip": "A digital experiment to explore the Haber Process.",
+    "description": "A digital experiment to explore the Haber Process.",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/lab-experiments/haber_process/",
+    "simulation_type": "lab-experiment"
+  },
+  {
+    "title": "Injecting Liquid Into an Evacuated Tank",
+    "href": "https://learncheme.github.io/lab-experiments/InjectingLiquidIntoAnEvacuatedTank/dist/index.html",
+    "image": "/home_page/media/lab-experiments-injectingliquidintoanevacuatedtank.png",
+    "tooltip": "An interactive simulation designed to teach engineering students about vapor-liquid equilibrium and basic concepts of thermodynamics.",
+    "description": "An interactive simulation designed to teach engineering students about vapor-liquid equilibrium and basic concepts of thermodynamics.",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/lab-experiments/InjectingLiquidIntoAnEvacuatedTank/",
+    "simulation_type": "lab-experiment"
+  },
+  {
+    "title": "Kettle Boiler",
+    "href": "https://learncheme.github.io/lab-experiments/kettle-boiler/dist/index.html",
+    "image": "/home_page/media/lab-experiments-kettle-boiler.png",
+    "tooltip": "Kettle Boiler",
+    "description": "",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/lab-experiments/kettle-boiler/",
+    "simulation_type": "lab-experiment"
+  },
+  {
+    "title": "Kettle Boiler Project",
+    "href": "https://learncheme.github.io/lab-experiments/KettleBoiler/dist/index.html",
+    "image": "/home_page/media/lab-experiments-kettleboiler.png",
+    "tooltip": "Kettle Boiler Project",
+    "description": "",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/lab-experiments/KettleBoiler/",
+    "simulation_type": "lab-experiment"
+  },
+  {
+    "title": "liquid-liquid-extraction",
+    "href": "https://learncheme.github.io/lab-experiments/liquid-liquid-extraction/dist/index.html",
+    "image": "/home_page/media/lab-experiments-liquid-liquid-extraction.png",
+    "tooltip": "liquid-liquid-extraction",
+    "description": "",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/lab-experiments/liquid-liquid-extraction/",
+    "simulation_type": "lab-experiment"
+  },
+  {
+    "title": "lle-for-meb",
+    "href": "https://learncheme.github.io/lab-experiments/lle-for-meb/dist/index.html",
+    "image": "/home_page/media/lab-experiments-lle-for-meb.png",
+    "tooltip": "lle-for-meb",
+    "description": "",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/lab-experiments/lle-for-meb/",
+    "simulation_type": "lab-experiment"
+  },
+  {
+    "title": "Mass and Mole Balances",
+    "href": "https://learncheme.github.io/lab-experiments/Mass-and-mole-balances-on-a-reactor/dist/index.html",
+    "image": "/home_page/media/lab-experiments-mass-and-mole-balances-on-a-reactor.png",
+    "tooltip": "Mass and Mole Balances",
+    "description": "",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/lab-experiments/Mass-and-mole-balances-on-a-reactor/",
+    "simulation_type": "lab-experiment"
+  },
+  {
+    "title": "Head Loss Virtual Lab",
+    "href": "https://learncheme.github.io/lab-experiments/non-newtonian-headloss/dist/index.html",
+    "image": "/home_page/media/lab-experiments-non-newtonian-headloss.png",
+    "tooltip": "Head Loss Virtual Lab",
+    "description": "Head Loss Virtual Lab",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/lab-experiments/non-newtonian-headloss/",
+    "simulation_type": "lab-experiment"
+  },
+  {
+    "title": "non-newtonian-rheology",
+    "href": "https://learncheme.github.io/lab-experiments/non-newtonian-rheology/dist/index.html",
+    "image": "/home_page/media/lab-experiments-non-newtonian-rheology.png",
+    "tooltip": "non-newtonian-rheology",
+    "description": "",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/lab-experiments/non-newtonian-rheology/",
+    "simulation_type": "lab-experiment"
+  },
+  {
+    "title": "React App",
+    "href": "https://learncheme.github.io/lab-experiments/react_ladder_logic/ladder-logic/public/index.html",
+    "image": "/home_page/media/lab-experiments-react-ladder-logic-ladder-logic-public.png",
+    "tooltip": "Web site created using create-react-app",
+    "description": "Web site created using create-react-app",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/lab-experiments/react_ladder_logic/ladder-logic/public/",
+    "simulation_type": "lab-experiment"
+  },
+  {
+    "title": "Reverse Osmosis Simulation",
+    "href": "https://learncheme.github.io/lab-experiments/reverse_osmosis_membrane/index.html",
+    "image": "/home_page/media/lab-experiments-reverse-osmosis-membrane.png",
+    "tooltip": "A digital laboratory experiment demonstrating reverse osmosis principles.",
+    "description": "A digital laboratory experiment demonstrating reverse osmosis principles.",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/lab-experiments/reverse_osmosis_membrane/",
+    "simulation_type": "lab-experiment"
+  },
+  {
+    "title": "single_effect_evaporator",
+    "href": "https://learncheme.github.io/lab-experiments/single_effect_evaporator/index.html",
+    "image": "/home_page/media/lab-experiments-single-effect-evaporator.png",
+    "tooltip": "single_effect_evaporator",
+    "description": "",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/lab-experiments/single_effect_evaporator/",
+    "simulation_type": "lab-experiment"
+  },
+  {
+    "title": "single_stage_distillation",
+    "href": "https://learncheme.github.io/lab-experiments/single_stage_distillation/dist/index.html",
+    "image": "/home_page/media/lab-experiments-single-stage-distillation.png",
+    "tooltip": "An Online Lab Experiment for Chemical Engineering undergraduate students",
+    "description": "An Online Lab Experiment for Chemical Engineering undergraduate students",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/lab-experiments/single_stage_distillation/",
+    "simulation_type": "lab-experiment"
+  },
+  {
+    "title": "single_stage_manualonly",
+    "href": "https://learncheme.github.io/lab-experiments/single_stage_manualonly/dist/index.html",
+    "image": "/home_page/media/lab-experiments-single-stage-manualonly.png",
+    "tooltip": "An Online Lab Experiment for Chemical Engineering undergraduate students",
+    "description": "An Online Lab Experiment for Chemical Engineering undergraduate students",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/lab-experiments/single_stage_manualonly/",
+    "simulation_type": "lab-experiment"
+  },
+  {
+    "title": "Single-Effect Evaporator",
+    "href": "https://learncheme.github.io/lab-experiments/single-effect-evaporator/dist/index.html",
+    "image": "/home_page/media/lab-experiments-single-effect-evaporator.png",
+    "tooltip": "Single-Effect Evaporator",
+    "description": "",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/lab-experiments/single-effect-evaporator/",
+    "simulation_type": "lab-experiment"
+  },
+  {
+    "title": "stripping-absorption-meb",
+    "href": "https://learncheme.github.io/lab-experiments/stripping-absorption-meb/dist/index.html",
+    "image": "/home_page/media/lab-experiments-stripping-absorption-meb.png",
+    "tooltip": "stripping-absorption-meb",
+    "description": "",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/lab-experiments/stripping-absorption-meb/",
+    "simulation_type": "lab-experiment"
+  },
+  {
+    "title": "stripping-column",
+    "href": "https://learncheme.github.io/lab-experiments/stripping-column/dist/index.html",
+    "image": "/home_page/media/lab-experiments-stripping-column.png",
+    "tooltip": "stripping-column",
+    "description": "",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/lab-experiments/stripping-column/",
+    "simulation_type": "lab-experiment"
+  },
+  {
+    "title": "Unsteady state material balances for a two-phase, multicomponent system",
+    "href": "https://learncheme.github.io/lab-experiments/unsteady_state_material_balances/dist/index.html",
+    "image": "/home_page/media/lab-experiments-unsteady-state-material-balances.png",
+    "tooltip": "Unsteady state material balances for a two-phase, multicomponent system",
+    "description": "",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/lab-experiments/unsteady_state_material_balances/",
+    "simulation_type": "lab-experiment"
+  },
+  {
+    "title": "unsteady-state-material-balances",
+    "href": "https://learncheme.github.io/lab-experiments/unsteady-state-material-balances/dist/index.html",
+    "image": "/home_page/media/lab-experiments-unsteady-state-material-balances.png",
+    "tooltip": "unsteady-state-material-balances",
+    "description": "",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/lab-experiments/unsteady-state-material-balances/",
+    "simulation_type": "lab-experiment"
+  }
+]

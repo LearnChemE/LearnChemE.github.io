@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Estimating Kinetic Parameters from a Batch Reactor Experiment</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.min.js"></script>
+<style>
+  body {
+    font-family: Helvetica, Arial, sans-serif;
+    background-color: #ffffff;
+    margin: 0;
+    padding: 12px;
+  }
+  #app {
+    position: relative;
+    width: 758px;
+    margin: 0 auto;
+  }
+  #titleBar {
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    margin: 4px 0 10px 0;
+  }
+  #mainRow {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+  }
+  #controls {
+    width: 308px;
+    padding: 8px 6px 8px 0;
+    box-sizing: border-box;
+  }
+  .sectionHeading {
+    font-weight: bold;
+    font-size: 16.94px;
+    margin: 4px 0 6px 2px;
+  }
+  .controlRow {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .controlLabel {
+    font-size: 16.94px;
+    text-align: right;
+    width: 122px;
+    padding-right: 6px;
+    flex-shrink: 0;
+  }
+  input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+  input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  .controlRow input[type=range] {
+    width: 118px;
+    flex-shrink: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+  .controlValue {
+    font-size: 16.94px;
+    width: 48px;
+    text-align: left;
+    padding-left: 6px;
+  }
+  .spacerRow { height: 22px; }
+  #plotArea {
+    position: relative;
+  }
+  canvas { display: block; }
+  #buttonBar {
+    position: relative;
+    margin: 22px 0 0 24px;
+    width: 132px;
+  }
+  .panelButton {
+    display: block;
+    width: 132px;
+    background-color: #98000D;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    padding: 7px 0;
+    margin: 0 0 10px 0;
+    cursor: pointer;
+  }
+  .panelButton:hover { background-color: #b31220; }
+  #panelAnchor {
+    position: absolute;
+    top: 0;
+    left: 170px;
+    width: 0;
+    height: 0;
+  }
+  .infoPanel {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    width: 552px;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    background-color: #fafafa;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.18);
+    padding: 12px 18px;
+    font-size: 15px;
+    line-height: 1.45;
+    box-sizing: border-box;
+    max-height: 552px;
+    overflow-y: auto;
+  }
+  .infoPanel h3 { margin: 4px 0 4px 0; font-size: 15px; font-weight: bold; }
+  .infoPanel h3 + p { margin-top: 0; }
+  .infoPanel a { color: #98000D; }
+  .infoPanel .eqn { text-align: left; }
+  .infoPanel .eqn mjx-container[display="true"] {
+    text-align: left !important;
+    margin-left: 0 !important;
+  }
+  .infoPanel .eqn mjx-container[display="true"] > svg { margin-left: 0 !important; }
+  .symbolTable { border-collapse: collapse; margin: 0 0 6px 0; }
+  .symbolTable td { padding: 2px 0; vertical-align: top; }
+  .symbolTable td:first-child { width: 44px; }
+  .panelClose {
+    position: sticky;
+    top: 0;
+    float: right;
+    margin: -4px -6px 0 10px;
+    font-size: 22px;
+    line-height: 1;
+    color: #555555;
+    cursor: pointer;
+    user-select: none;
+    z-index: 11;
+  }
+  .panelClose:hover { color: #98000D; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="titleBar">Estimating Kinetic Parameters from a Batch Reactor Experiment</div>
+  <div id="mainRow">
+    <div id="controls">
+      <div class="sectionHeading">theoretical</div>
+      <div class="controlRow">
+        <div class="controlLabel">reaction order n</div>
+        <input type="range" id="nSlider" min="1" max="2.5" step="0.01" value="1.5">
+        <div class="controlValue" id="nValue">1.5</div>
+      </div>
+      <div class="controlRow">
+        <div class="controlLabel">rate constant k</div>
+        <input type="range" id="kSlider" min="1" max="5" step="0.01" value="1">
+        <div class="controlValue" id="kValue">1</div>
+      </div>
+      <div class="spacerRow"></div>
+      <div class="controlRow">
+        <div class="controlLabel">seed</div>
+        <input type="range" id="seedSlider" min="1" max="1000" step="1" value="1">
+        <div class="controlValue" id="seedValue">1</div>
+      </div>
+      <div class="controlRow">
+        <div class="controlLabel">noise amplitude</div>
+        <input type="range" id="noiseSlider" min="0.01" max="0.2" step="0.01" value="0.05">
+        <div class="controlValue" id="noiseValue">0.05</div>
+      </div>
+
+      <div id="buttonBar">
+        <button class="panelButton" id="directionsBtn">Directions</button>
+        <button class="panelButton" id="detailsBtn">Details</button>
+        <button class="panelButton" id="aboutBtn">About</button>
+      </div>
+    </div>
+    <div id="plotArea">
+      <canvas id="plotCanvas"></canvas>
+    </div>
+  </div>
+
+
+
+  <div id="panelAnchor">
+    <div class="infoPanel" id="directionsPanel">
+      <span class="panelClose" data-panel="directionsPanel">&times;</span>
+      <h3>Directions</h3>
+      <p>Consider an irreversible homogeneous liquid-phase reaction \(n\,\mathrm{A} \rightarrow \mathrm{B}\) taking place in a batch reactor. Assume that the experimental data (i.e. the concentration of species \(\mathrm{A}\) versus time data indicated by the blue dots in the figure) comes from, for example, the on-line measurement of electrical conductivity of the mixture in the reactor. The governing equation of the batch reactor is given by \(\frac{dc}{dt} = -k c^n\) with \(c(t=0)=1\).</p>
+      <p>This Demonstration uses the experimentally obtained data in order to estimate the theoretical reaction order \(n\) and rate constant \(k\) (shown in the figure in red and blue, respectively). You can vary the theoretical values of \(n\) and \(k\) using the sliders. The seed slider selects which random number sequence is used to generate the simulated data. The noise amplitude slider increases the noise in the concentration data but does not change the time of the individual data point.</p>
+    </div>
+
+    <div class="infoPanel" id="detailsPanel">
+      <span class="panelClose" data-panel="detailsPanel">&times;</span>
+      <h3>Details</h3>
+      <p>The concentration \(c\) of species \(\mathrm{A}\) in the batch reactor is governed by:</p>
+      <p class="eqn">\[\frac{dc}{dt} = -k c^n, \qquad c(0) = 1,\]</p>
+      <p>where \(k\) is the rate constant and \(n\) is the reaction order. This equation is solved numerically for the theoretical values of \(k\) and \(n\) set by the sliders.</p>
+      <p>Simulated experimental data (blue dots) are generated by adding uniformly distributed random noise to the theoretical solution at times \(t_i = 0, 0.05, 0.10, \ldots, 4\):</p>
+      <p class="eqn">\[c_i = \max\!\left[0,\; c(t_i) + a\,\frac{2 r_i - 1}{2}\right],\]</p>
+      <p>where \(a\) is the noise amplitude and \(r_i\) is a random number uniformly distributed on \([0,1]\); the random sequence is set by the seed.</p>
+      <p>The experimental reaction order \(n_1\) and rate constant \(k_1\) are then estimated by a nonlinear least-squares fit of the solution of the governing equation to the noisy data; that is, \(k_1\) and \(n_1\) are chosen to minimize:</p>
+      <p class="eqn">\[\sum_i \left[ c(t_i;\, k_1, n_1) - c_i \right]^2,\]</p>
+      <p>where \(c(t;\, k_1, n_1)\) is the solution of \(\frac{dc}{dt} = -k_1 c^{n_1}\) with \(c(0)=1\). The fitted curve is shown in red, and the estimated values of \(n_1\) and \(k_1\) are displayed above the figure.</p>
+      <h3>Reference</h3>
+      <p>[1] L. D. Schmidt, <i>The Engineering of Chemical Reactions</i>, New York: Oxford University Press, 1998.</p>
+      <h3>Symbols</h3>
+      <table class="symbolTable">
+        <tr><td>\(a\)</td><td>noise amplitude</td></tr>
+        <tr><td>\(c\)</td><td>concentration of species \(\mathrm{A}\) (normalized so that \(c(0)=1\))</td></tr>
+        <tr><td>\(c_i\)</td><td>simulated experimental concentration at time \(t_i\)</td></tr>
+        <tr><td>\(k\)</td><td>theoretical rate constant</td></tr>
+        <tr><td>\(k_1\)</td><td>rate constant estimated from the data (experimental)</td></tr>
+        <tr><td>\(n\)</td><td>theoretical reaction order</td></tr>
+        <tr><td>\(n_1\)</td><td>reaction order estimated from the data (experimental)</td></tr>
+        <tr><td>\(r_i\)</td><td>random number uniformly distributed on \([0,1]\)</td></tr>
+        <tr><td>\(t\)</td><td>time</td></tr>
+        <tr><td>\(t_i\)</td><td>time of the \(i\)th data point</td></tr>
+      </table>
+    </div>
+
+    <div class="infoPanel" id="aboutPanel">
+      <span class="panelClose" data-panel="aboutPanel">&times;</span>
+      <h3>About</h3>
+      <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/EstimatingKineticParametersFromABatchReactorExperiment/" target="_blank" rel="noopener">Mathematica simulation</a> by Housam Binous, Ahmed Bellagi, and Brian G. Higgins. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  "use strict";
+
+  // ---------- state ----------
+  var state = {
+    n: 1.5,
+    k: 1,
+    seed: 1,
+    noise: 0.05
+  };
+
+  // ---------- seeded RNG (mulberry32) ----------
+  function makeRng(seed) {
+    var a = seed >>> 0;
+    return function() {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      var t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  // ---------- analytic solution of dc/dt = -k c^n, c(0)=1 ----------
+  function conc(t, k, n) {
+    if (Math.abs(n - 1) < 1e-9) {
+      return Math.exp(-k * t);
+    }
+    var base = 1 + (n - 1) * k * t;
+    if (base <= 0) return 0;
+    return Math.pow(base, 1 / (1 - n));
+  }
+
+  // ---------- data generation ----------
+  var tData = [];
+  (function() {
+    for (var i = 0; i <= 80; i++) tData.push(i * 0.05);
+  })();
+
+  function generateData() {
+    var rng = makeRng(state.seed);
+    var data = [];
+    for (var i = 0; i < tData.length; i++) {
+      var c = conc(tData[i], state.k, state.n);
+      var v = c + state.noise * (2 * rng() - 1) / 2;
+      data.push(Math.max(0, v));
+    }
+    return data;
+  }
+
+  // ---------- least-squares fit (Nelder-Mead over k1, n1) ----------
+  function sse(k1, n1, data) {
+    if (k1 <= 0 || n1 < 0.2 || n1 > 6 || k1 > 50) return 1e12;
+    var s = 0;
+    for (var i = 0; i < tData.length; i++) {
+      var d = conc(tData[i], k1, n1) - data[i];
+      s += d * d;
+    }
+    return s;
+  }
+
+  function nelderMead(f, x0) {
+    var alpha = 1, gamma = 2, rho = 0.5, sigma = 0.5;
+    var simplex = [
+      { x: x0.slice() },
+      { x: [x0[0] + 0.25, x0[1]] },
+      { x: [x0[0], x0[1] + 0.25] }
+    ];
+    simplex.forEach(function(p) { p.f = f(p.x); });
+
+    for (var iter = 0; iter < 300; iter++) {
+      simplex.sort(function(a, b) { return a.f - b.f; });
+      if (Math.abs(simplex[2].f - simplex[0].f) < 1e-14) break;
+
+      var cx = [(simplex[0].x[0] + simplex[1].x[0]) / 2,
+                (simplex[0].x[1] + simplex[1].x[1]) / 2];
+      var worst = simplex[2];
+      var xr = [cx[0] + alpha * (cx[0] - worst.x[0]),
+                cx[1] + alpha * (cx[1] - worst.x[1])];
+      var fr = f(xr);
+
+      if (fr < simplex[0].f) {
+        var xe = [cx[0] + gamma * (xr[0] - cx[0]),
+                  cx[1] + gamma * (xr[1] - cx[1])];
+        var fe = f(xe);
+        if (fe < fr) { worst.x = xe; worst.f = fe; }
+        else { worst.x = xr; worst.f = fr; }
+      } else if (fr < simplex[1].f) {
+        worst.x = xr; worst.f = fr;
+      } else {
+        var xc = [cx[0] + rho * (worst.x[0] - cx[0]),
+                  cx[1] + rho * (worst.x[1] - cx[1])];
+        var fc = f(xc);
+        if (fc < worst.f) { worst.x = xc; worst.f = fc; }
+        else {
+          for (var j = 1; j < 3; j++) {
+            simplex[j].x = [simplex[0].x[0] + sigma * (simplex[j].x[0] - simplex[0].x[0]),
+                            simplex[0].x[1] + sigma * (simplex[j].x[1] - simplex[0].x[1])];
+            simplex[j].f = f(simplex[j].x);
+          }
+        }
+      }
+    }
+    simplex.sort(function(a, b) { return a.f - b.f; });
+    return simplex[0].x;
+  }
+
+  function fitData(data) {
+    var f = function(x) { return sse(x[0], x[1], data); };
+    // multi-start for robustness, mirroring FindFit starting near (1, 1.5)
+    var starts = [[1, 1.5], [state.k, state.n], [2.5, 2]];
+    var best = null, bestF = Infinity;
+    for (var i = 0; i < starts.length; i++) {
+      var x = nelderMead(f, starts[i]);
+      var fx = f(x);
+      if (fx < bestF) { bestF = fx; best = x; }
+    }
+    return { k1: best[0], n1: best[1] };
+  }
+
+  // ---------- canvas / plot ----------
+  var canvas = document.getElementById("plotCanvas");
+  var ctx = canvas.getContext("2d");
+  var CW = 440, CH = 500;  // css size
+  var dpr = window.devicePixelRatio || 1;
+  canvas.width = CW * dpr;
+  canvas.height = CH * dpr;
+  canvas.style.width = CW + "px";
+  canvas.style.height = CH + "px";
+
+  // plot frame region (square, aspect ratio 1)
+  var frame = { left: 58, top: 98, size: 350 };
+
+  function tx(t) { return frame.left + (t / 4) * frame.size; }
+  function ty(c) { return frame.top + (1 - c) * frame.size; }
+
+  function drawTick(x1, y1, x2, y2) {
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+  }
+
+  function draw() {
+    var data = generateData();
+    var fit = fitData(data);
+
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, CW, CH);
+
+    var L = frame.left, T = frame.top, S = frame.size;
+    var R = L + S, B = T + S;
+
+    // gridlines
+    ctx.strokeStyle = "#d9d9d9";
+    ctx.lineWidth = 1;
+    var i, x, y;
+    for (i = 0; i <= 8; i++) {          // every 0.5 in t
+      x = tx(i * 0.5);
+      drawTick(x, T, x, B);
+    }
+    for (i = 0; i <= 5; i++) {          // every 0.2 in c
+      y = ty(i * 0.2);
+      drawTick(L, y, R, y);
+    }
+
+    // fitted curve (thick red)
+    ctx.strokeStyle = "#cc0000";
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    for (i = 0; i <= 400; i++) {
+      var t = 4 * i / 400;
+      var c = conc(t, fit.k1, fit.n1);
+      c = Math.min(1, Math.max(0, c));
+      if (i === 0) ctx.moveTo(tx(t), ty(c));
+      else ctx.lineTo(tx(t), ty(c));
+    }
+    ctx.stroke();
+
+    // data points (blue filled circles)
+    ctx.fillStyle = "#1b45c8";
+    for (i = 0; i < tData.length; i++) {
+      if (data[i] > 1) continue;
+      ctx.beginPath();
+      ctx.arc(tx(tData[i]), ty(data[i]), 3.4, 0, 2 * Math.PI);
+      ctx.fill();
+    }
+
+    // frame
+    ctx.strokeStyle = "#000000";
+    ctx.lineWidth = 1;
+    ctx.strokeRect(L, T, S, S);
+
+    // ticks and tick labels
+    ctx.fillStyle = "#000000";
+    ctx.font = "15px Helvetica, Arial, sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "top";
+    for (i = 0; i <= 4; i++) {
+      x = tx(i);
+      drawTick(x, B, x, B - 6);
+      drawTick(x, T, x, T + 6);
+      ctx.fillText(String(i), x, B + 5);
+    }
+    // minor x ticks
+    for (i = 0; i <= 8; i++) {
+      x = tx(i * 0.5);
+      drawTick(x, B, x, B - 3.5);
+      drawTick(x, T, x, T + 3.5);
+    }
+    ctx.textAlign = "right";
+    ctx.textBaseline = "middle";
+    for (i = 0; i <= 5; i++) {
+      y = ty(i * 0.2);
+      drawTick(L, y, L + 6, y);
+      drawTick(R, y, R - 6, y);
+      ctx.fillText((i * 0.2).toFixed(1), L - 7, y);
+    }
+    // minor y ticks
+    for (i = 0; i <= 10; i++) {
+      y = ty(i * 0.1);
+      drawTick(L, y, L + 3.5, y);
+      drawTick(R, y, R - 3.5, y);
+    }
+
+    // axis labels
+    ctx.font = "17px Helvetica, Arial, sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "top";
+    ctx.fillText("time", L + S / 2, B + 26);
+    // y-axis label: render horizontally to an offscreen canvas (same
+    // rasterization as the x-axis label), then draw it rotated, so
+    // glyph spacing is identical to unrotated text.
+    var yl = document.createElement("canvas");
+    var ylw = 130, ylh = 24;
+    yl.width = ylw * dpr;
+    yl.height = ylh * dpr;
+    var yctx = yl.getContext("2d");
+    yctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    yctx.font = "17px Helvetica, Arial, sans-serif";
+    yctx.fillStyle = "#000000";
+    yctx.textAlign = "center";
+    yctx.textBaseline = "middle";
+    yctx.fillText("concentration", ylw / 2, ylh / 2);
+    ctx.save();
+    ctx.translate(16, T + S / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.drawImage(yl, -ylw / 2, -ylh / 2, ylw, ylh);
+    ctx.restore();
+
+    // plot label: fitted values (NumberForm {4,2} -> 2 decimal places)
+    ctx.font = "16.5px Helvetica, Arial, sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "alphabetic";
+    ctx.fillStyle = "#000000";
+    var cx1 = L + S * 0.27;
+    var cx2 = L + S * 0.75;
+    ctx.fillText("experimental", L + S / 2, 24);
+    ctx.fillText("reaction order", cx1, 48);
+    ctx.fillText("rate constant", cx2, 48);
+    ctx.fillText(fit.n1.toFixed(2), cx1, 72);
+    ctx.fillText(fit.k1.toFixed(2), cx2, 72);
+  }
+
+  // ---------- controls ----------
+  function fmt(v, dec) {
+    var s = Number(v).toFixed(dec);
+    // trim trailing zeros the way Mathematica labeled sliders do (1. -> 1, 1.50 -> 1.5)
+    if (dec > 0) s = s.replace(/0+$/, "").replace(/\.$/, "");
+    return s;
+  }
+
+  function bindSlider(id, valId, key, dec) {
+    var slider = document.getElementById(id);
+    var valEl = document.getElementById(valId);
+    slider.addEventListener("input", function() {
+      state[key] = parseFloat(slider.value);
+      valEl.textContent = fmt(slider.value, dec);
+      draw();
+    });
+    valEl.textContent = fmt(slider.value, dec);
+  }
+
+  bindSlider("nSlider", "nValue", "n", 2);
+  bindSlider("kSlider", "kValue", "k", 2);
+  bindSlider("seedSlider", "seedValue", "seed", 0);
+  bindSlider("noiseSlider", "noiseValue", "noise", 2);
+
+  // ---------- panels ----------
+  var panels = {
+    directionsBtn: "directionsPanel",
+    detailsBtn: "detailsPanel",
+    aboutBtn: "aboutPanel"
+  };
+  Object.keys(panels).forEach(function(btnId) {
+    document.getElementById(btnId).addEventListener("click", function() {
+      var target = document.getElementById(panels[btnId]);
+      var isOpen = target.style.display === "block";
+      Object.keys(panels).forEach(function(b) {
+        document.getElementById(panels[b]).style.display = "none";
+      });
+      if (!isOpen) {
+        target.style.display = "block";
+        if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([target]);
+      }
+    });
+  });
+
+  Array.prototype.forEach.call(document.querySelectorAll(".panelClose"), function(x) {
+    x.addEventListener("click", function() {
+      document.getElementById(x.getAttribute("data-panel")).style.display = "none";
+    });
+  });
+
+  draw();
+})();
+</script>
+</body>
+</html>

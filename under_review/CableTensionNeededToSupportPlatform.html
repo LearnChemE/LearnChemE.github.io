@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cable Tension Needed to Support Platform</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(', '\\)']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.min.js"></script>
+<style>
+  body {
+    font-family: Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 10px;
+    background-color: #ffffff;
+  }
+  #container {
+    position: relative;
+    width: 640px;
+    margin: 0 auto;
+  }
+  #title {
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    margin: 5px 0 10px 0;
+  }
+  #controls {
+    margin: 0 10px 8px 8px;
+    font-size: 15px;
+  }
+  .control-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 6px;
+    flex-wrap: nowrap;
+  }
+  .control-row label {
+    margin-right: 8px;
+    white-space: nowrap;
+  }
+  .slider-group {
+    display: flex;
+    align-items: center;
+    margin-right: 14px;
+    white-space: nowrap;
+  }
+  .slider-group .slider-name {
+    margin-right: 6px;
+  }
+
+  /* ---- slider styling ---- */
+  input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+  input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  /* keep fixed widths and vertical centering in the control rows */
+  input[type="range"].short-slider { width: 110px; margin: 0 6px 0 0; }
+  input[type="range"].long-slider  { width: 150px; margin: 0 6px 0 0; }
+
+  .slider-value {
+    display: inline-block;
+    min-width: 34px;
+    text-align: left;
+  }
+
+  /* Buttons on the same row as the mass slider, pushed right */
+  #button-row {
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
+  }
+  .panel-btn {
+    background-color: #98000D;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    cursor: pointer;
+  }
+  .panel-btn:hover { background-color: #7a000a; }
+
+  #bottom-area {
+    position: relative;
+    width: 620px;
+  }
+  #figure-wrap {
+    position: relative;
+    width: 620px;
+  }
+  #simCanvas {
+    width: 600px;
+    height: 400px;
+    display: block;
+    margin: 0 auto;
+    border: 1px solid #ccc;
+  }
+  /* Panels open just below the buttons, overlaying the figure */
+  .panel {
+    display: none;
+    position: absolute;
+    left: 10px;
+    top: 0;
+    width: 578px;
+    max-height: 400px;
+    overflow-y: auto;
+    background-color: #f7f7f7;
+    border: 2px solid #98000D;
+    border-radius: 6px;
+    padding: 12px 34px 12px 14px;
+    font-size: 15px;
+    line-height: 1.45;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    z-index: 10;
+    box-sizing: border-box;
+  }
+  .panel.open { display: block; }
+  .panel-close {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    font-weight: bold;
+    color: #98000D;
+    cursor: pointer;
+    line-height: 1;
+    padding: 2px 6px;
+  }
+  .panel-close:hover { color: #000; }
+  .panel a { color: #98000D; }
+</style>
+</head>
+<body>
+<div id="container">
+  <div id="title">Cable Tension Needed to Support Platform</div>
+
+  <div id="controls">
+    <div class="control-row">
+      <label>distance of object from left (m):</label>
+      <div class="slider-group">
+        <span class="slider-name">cable</span>
+        <input type="range" id="z1" class="short-slider" min="0.5" max="10" step="0.1" value="6.5">
+        <span class="slider-value" id="z1val">6.5</span>
+      </div>
+      <div class="slider-group">
+        <span class="slider-name">person</span>
+        <input type="range" id="z2" class="short-slider" min="1" max="9.9" step="0.1" value="4">
+        <span class="slider-value" id="z2val">4.0</span>
+      </div>
+    </div>
+    <div class="control-row">
+      <div class="slider-group">
+        <span class="slider-name">mass of person (kg)</span>
+        <input type="range" id="m" class="long-slider" min="50" max="100" step="1" value="62">
+        <span class="slider-value" id="mval">62</span>
+      </div>
+      <div id="button-row">
+        <button class="panel-btn" data-panel="panel-directions">Directions</button>
+        <button class="panel-btn" data-panel="panel-details">Details</button>
+        <button class="panel-btn" data-panel="panel-about">About</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="bottom-area">
+    <div id="figure-wrap">
+      <canvas id="simCanvas"></canvas>
+    </div>
+
+    <div class="panel" id="panel-directions">
+      <button class="panel-close" data-panel="panel-directions">&times;</button>
+      <b>Directions</b>
+      <p>A woman is standing on a platform attached on the left and supported by
+      a cable on the right. Use sliders to change the distances from the left of
+      the woman and the cable. Set the mass of the woman with a slider. A moment
+      balance is done to determine the tension force in the cable that keeps the
+      platform from rotating.</p>
+    </div>
+
+    <div class="panel" id="panel-details">
+      <button class="panel-close" data-panel="panel-details">&times;</button>
+      <b>Details</b>
+      <p>A moment balance is done about the left point of the platform:</p>
+      <p style="text-align:center;">\( \displaystyle \sum M_{\mathrm{L}} = 0 = z_{\mathrm{c}}\, F_{\mathrm{T}} - z_{\mathrm{w}}\, m\, g , \)</p>
+      <p>where \( F_{\mathrm{T}} \) is the tension force in the cable (N),
+      \( z_{\mathrm{c}} \) and \( z_{\mathrm{w}} \) are the distances of the
+      cable and the woman from the left of the platform (m), \( m \) is the mass
+      of the woman (kg), and \( g \) is the acceleration due to gravity
+      (\( \mathrm{m}/\mathrm{s}^2 \)).</p>
+    </div>
+
+    <div class="panel" id="panel-about">
+      <button class="panel-close" data-panel="panel-about">&times;</button>
+      <b>About</b>
+      <p>This simulation was created in the
+      <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a>
+      at University of Colorado Boulder for
+      <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a>
+      by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a
+      <a href="https://demonstrations.wolfram.com/CableTensionNeededToSupportPlatform/" target="_blank" rel="noopener">Mathematica simulation</a>
+      by Rachael L. Baumann. It was prepared with financial support from the
+      National Science Foundation (DUE 2336987 and 2336988). Address any
+      questions or comments to LearnChemE@gmail.com.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ---- geometry constants (from the Mathematica source) ----
+  var W = 10;          // platform length (m)
+  var T_thick = 0.5;   // platform thickness (m)
+  var H = 5;           // ceiling height (m)
+  var DH = T_thick + 0.3;  // 0.8, dimension-line offset
+  var G = 9.8;
+
+  // plot range: x in [-2t, 11] = [-1, 11], y in [-3, 5.6]
+  var XMIN = -1, XMAX = 11, YMIN = -3, YMAX = 5.6;
+  var CW = 600, CH = 400;   // design size in CSS pixels
+
+  var canvas = document.getElementById('simCanvas');
+  var ctx = canvas.getContext('2d');
+
+  function setupCanvas() {
+    var dpr = window.devicePixelRatio || 1;
+    canvas.width = CW * dpr;
+    canvas.height = CH * dpr;
+    canvas.style.width = CW + 'px';
+    canvas.style.height = CH + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function mx(x) { return (x - XMIN) / (XMAX - XMIN) * CW; }
+  function my(y) { return CH - (y - YMIN) / (YMAX - YMIN) * CH; }
+
+  // formatting helpers matching NumberForm significant figures
+  function fmt1(v) { return v.toFixed(1); }           // {3,1}: one decimal
+  function fmtInt(v) { return String(Math.round(v)); } // {5,0}/{4,0}: integer
+
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+
+  function drawArrowhead(x, y, angle, len, halfWidth) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(angle);
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(-len, -halfWidth);
+    ctx.lineTo(-len, halfWidth);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawWoman(z2) {
+    // local coords: r=0.1, h0=1, w0=0.5 ; feet at plot y = 0
+    var k = 130;           // px per local unit (design scale)
+    var x0 = mx(z2);       // horizontal center
+    var y0 = my(0);        // feet on platform top
+    function lx(x) { return x0 + x * k; }
+    function ly(y) { return y0 - y * k; }
+
+    ctx.save();
+    ctx.fillStyle = '#000';
+    ctx.strokeStyle = '#000';
+
+    // head: disk at (0, h0), r = 0.1
+    ctx.beginPath();
+    ctx.arc(lx(0), ly(1.0), 0.1 * k, 0, 2 * Math.PI);
+    ctx.fill();
+
+    // arms: thick round-capped polyline
+    ctx.lineWidth = 0.075 * k;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    ctx.moveTo(lx(-0.6 * 0.5), ly(0.5));
+    ctx.lineTo(lx(-0.2 * 0.5), ly(0.85));
+    ctx.lineTo(lx( 0.2 * 0.5), ly(0.85));
+    ctx.lineTo(lx( 0.6 * 0.5), ly(0.5));
+    ctx.stroke();
+
+    // legs
+    [-1, 1].forEach(function (s) {
+      ctx.beginPath();
+      ctx.moveTo(lx(s * 0.15 * 0.5), ly(0.3));
+      ctx.lineTo(lx(s * 0.15 * 0.5), ly(0));
+      ctx.stroke();
+    });
+
+    // body / dress polygon
+    ctx.beginPath();
+    ctx.moveTo(lx(-0.15 * 0.5), ly(0.85));
+    ctx.lineTo(lx( 0.15 * 0.5), ly(0.85));
+    ctx.lineTo(lx( 0.45 * 0.5), ly(0.3));
+    ctx.lineTo(lx(-0.45 * 0.5), ly(0.3));
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawLabelWithBg(text, x, y, align, baseline, framed) {
+    ctx.save();
+    ctx.font = '18px Helvetica, Arial, sans-serif';
+    ctx.textAlign = align;
+    ctx.textBaseline = baseline;
+    var w = ctx.measureText(text).width;
+    var h = 20;
+    var bx = x, by = y;
+    if (align === 'center') bx = x - w / 2 - 3;
+    else if (align === 'left') bx = x - 3;
+    if (baseline === 'middle') by = y - h / 2 - 1;
+    else if (baseline === 'top') by = y - 1;
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(bx, by, w + 6, h + 2);
+    ctx.fillStyle = '#000000';
+    ctx.fillText(text, x, y);
+    ctx.restore();
+  }
+
+  function draw() {
+    var z1 = parseFloat(document.getElementById('z1').value);
+    var z2 = parseFloat(document.getElementById('z2').value);
+    var m  = parseFloat(document.getElementById('m').value);
+
+    document.getElementById('z1val').textContent = fmt1(z1);
+    document.getElementById('z2val').textContent = fmt1(z2);
+    document.getElementById('mval').textContent  = fmtInt(m);
+
+    var Tension = z2 * m * G / z1;   // moment balance about left point
+    var weight = m * G;
+
+    ctx.clearRect(0, 0, CW, CH);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, CW, CH);
+
+    // --- ceiling (gray) ---
+    ctx.fillStyle = '#808080';
+    ctx.fillRect(mx(-0.1), my(H + T_thick), mx(W + 0.1) - mx(-0.1), my(H) - my(H + T_thick));
+    // --- left wall (gray) ---
+    ctx.fillRect(mx(-2 * T_thick), my(H + T_thick), mx(-0.2 * T_thick) - mx(-2 * T_thick), my(-2 * T_thick) - my(H + T_thick));
+
+    // hatch marks on ceiling: from (x, h) to (x+0.5, h+t), x = 0..9
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    for (var xh = 0; xh <= W - 0.1; xh += 1) {
+      ctx.moveTo(mx(xh), my(H));
+      ctx.lineTo(mx(xh + 0.5), my(H + T_thick));
+    }
+    ctx.stroke();
+    // line along ceiling bottom
+    ctx.beginPath();
+    ctx.moveTo(mx(-0.1), my(H));
+    ctx.lineTo(mx(W + 0.1), my(H));
+    ctx.stroke();
+    // hatch marks on wall: from (-2t, y) to (-0.2t, y+t), y = 0..5
+    ctx.beginPath();
+    for (var yh = 0; yh <= H; yh += 1) {
+      ctx.moveTo(mx(-2 * T_thick), my(yh));
+      ctx.lineTo(mx(-0.2 * T_thick), my(yh + T_thick));
+    }
+    ctx.stroke();
+    // line along wall right edge
+    ctx.beginPath();
+    ctx.moveTo(mx(-0.2 * T_thick), my(-2 * T_thick));
+    ctx.lineTo(mx(-0.2 * T_thick), my(H + T_thick));
+    ctx.stroke();
+
+    // --- platform (brown with thick black edge) ---
+    ctx.fillStyle = '#8B4513';
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.rect(mx(-0.1), my(0), mx(W + 0.1) - mx(-0.1), my(-T_thick) - my(0));
+    ctx.fill();
+    ctx.stroke();
+
+    // --- woman ---
+    drawWoman(z2);
+
+    // --- cable: double-headed arrow (heads point inward toward tension label) ---
+    var thickFrac = 0.0035 + 0.005 * clamp((Tension - 5) / (19404 - 5), 0, 1);
+    var cableW = thickFrac * CW;
+    var cx = mx(z1);
+    ctx.strokeStyle = '#000';
+    ctx.fillStyle = '#000';
+    ctx.lineWidth = cableW;
+    ctx.beginPath();
+    ctx.moveTo(cx, my(0));
+    ctx.lineTo(cx, my(H));
+    ctx.stroke();
+    var headLen = 0.05 * CW * 0.6;   // ~18 px
+    var headHalf = headLen * 0.42;
+    // head at 30% up, pointing up (angle -90deg)
+    var y30 = my(0) + (my(H) - my(0)) * 0.3;
+    drawArrowhead(cx, y30, -Math.PI / 2, headLen, headHalf);
+    // head at 70% up, pointing down
+    var y70 = my(0) + (my(H) - my(0)) * 0.7;
+    drawArrowhead(cx, y70, Math.PI / 2, headLen, headHalf);
+
+    // tension label, framed on white at cable midpoint
+    drawLabelWithBg(fmtInt(Tension) + ' N', cx, my(H / 2), 'center', 'middle', true);
+
+    // --- weight arrow ---
+    var wLen = 2 * (weight / (100 * G));   // plot units, 1..2
+    var wx = mx(z2);
+    var wy0 = my(-T_thick);
+    var wy1 = my(-T_thick - wLen);
+    ctx.lineWidth = 0.01 * CW;   // 6 px
+    ctx.beginPath();
+    ctx.moveTo(wx, wy0);
+    ctx.lineTo(wx, wy1 - 14);
+    ctx.stroke();
+    drawArrowhead(wx, wy1, Math.PI / 2, 16, 8);   // head tip exactly at arrow end
+    // weight label anchored with its top at the arrow tip (as in Mathematica)
+    ctx.save();
+    ctx.font = '18px Helvetica, Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillStyle = '#000';
+    ctx.fillText(fmtInt(weight) + ' N', wx, wy1 + 2);
+    ctx.restore();
+
+    // --- dimension line for cable distance z1 at y = -1.5*dh ---
+    var yd1 = -1.5 * DH;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(mx(0), my(yd1));
+    ctx.lineTo(mx(z1), my(yd1));
+    // ticks at 0 and z1
+    [0, z1].forEach(function (xt) {
+      ctx.moveTo(mx(xt), my(-0.5 * DH - 0.8 * DH));
+      ctx.lineTo(mx(xt), my(-0.5 * DH - 1.2 * DH));
+    });
+    ctx.stroke();
+    drawLabelWithBg(' ' + fmt1(z1) + ' m ', mx(z1 / 2), my(yd1), 'center', 'middle', false);
+
+    // --- dimension line for person distance z2 at y = -dh ---
+    ctx.beginPath();
+    ctx.moveTo(mx(0), my(-DH));
+    ctx.lineTo(mx(z2), my(-DH));
+    [0, z2].forEach(function (xt) {
+      ctx.moveTo(mx(xt), my(-0.8 * DH));
+      ctx.lineTo(mx(xt), my(-1.2 * DH));
+    });
+    ctx.stroke();
+    drawLabelWithBg(' ' + fmt1(z2) + ' m ', mx(z2 / 2), my(-DH), 'center', 'middle', false);
+  }
+
+  // ---- panel logic: buttons on the control row, panels open over the figure ----
+  var panelIds = ['panel-directions', 'panel-details', 'panel-about'];
+  function closeAll() {
+    panelIds.forEach(function (id) {
+      document.getElementById(id).classList.remove('open');
+    });
+  }
+  document.querySelectorAll('.panel-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var id = btn.getAttribute('data-panel');
+      var p = document.getElementById(id);
+      var wasOpen = p.classList.contains('open');
+      closeAll();
+      if (!wasOpen) {
+        p.classList.add('open');
+        if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([p]);
+      }
+    });
+  });
+  document.querySelectorAll('.panel-close').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.getElementById(btn.getAttribute('data-panel')).classList.remove('open');
+    });
+  });
+
+  ['z1', 'z2', 'm'].forEach(function (id) {
+    document.getElementById(id).addEventListener('input', draw);
+  });
+
+  setupCanvas();
+  draw();
+  window.addEventListener('resize', function () { setupCanvas(); draw(); });
+})();
+</script>
+</body>
+</html>

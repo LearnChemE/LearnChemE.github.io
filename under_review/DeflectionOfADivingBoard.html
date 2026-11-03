@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deflection of a Diving Board</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(', '\\)']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.min.js"></script>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    font-family: Helvetica, Arial, sans-serif;
+    background: #ffffff;
+  }
+  #app {
+    position: relative;
+    width: 740px;
+    margin: 10px auto 30px auto;
+  }
+  #title {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    margin: 8px 0 10px 0;
+  }
+  /* ---------- controls ---------- */
+  #controls {
+    display: grid;
+    grid-template-columns: max-content max-content;
+    grid-column-gap: 18px;
+    grid-row-gap: 8px;
+    width: max-content;
+    margin: 0 auto 6px auto;
+  }
+  .ctrl {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    font-size: 16.1px;
+  }
+  .ctrl label {
+    text-align: right;
+    margin-right: 6px;
+    flex: 1 0 auto;
+  }
+  input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  .ctrl input[type=range] {
+    width: 105px;
+    flex: 0 0 auto;
+    margin: 0 6px 0 0;
+  }
+  .ctrl .val {
+    min-width: 38px;
+    text-align: left;
+  }
+  /* ---------- canvas ---------- */
+  #simCanvas {
+    display: block;
+    margin: 4px auto 0 auto;
+    width: 600px;
+    height: 400px;
+  }
+  /* ---------- bottom buttons ---------- */
+  #buttonRow {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 12px;
+  }
+  .panelBtn {
+    background: #98000D;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 18px;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 16.5px;
+    cursor: pointer;
+  }
+  .panelBtn:hover { background: #b00010; }
+  /* ---------- panels ---------- */
+  .panel {
+    display: none;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 48px;            /* opens above the button row */
+    width: 560px;
+    max-height: 430px;
+    overflow-y: auto;
+    background: #ffffff;
+    border: 2px solid #98000D;
+    border-radius: 6px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.30);
+    padding: 14px 18px 14px 18px;
+    font-size: 15px;
+    line-height: 1.45;
+    z-index: 20;
+    box-sizing: border-box;
+  }
+  .panel.open { display: block; }
+  .panel .closeX {
+    position: absolute;
+    top: 6px;
+    right: 10px;
+    border: none;
+    background: none;
+    font-size: 20px;
+    font-weight: bold;
+    color: #98000D;
+    cursor: pointer;
+    line-height: 1;
+    padding: 2px 4px;
+  }
+  .panel .closeX:hover { color: #000000; }
+  .panel h3 {
+    margin: 0 0 8px 0;
+    font-size: 17px;
+  }
+  .panel p { margin: 0 0 10px 0; }
+  .panel a { color: #98000D; }
+  .eq { text-align: left; margin: 10px 0; }
+  .symTable { border-collapse: collapse; margin: 0 0 6px 0; }
+  .symTable td { padding: 2px 10px 2px 0; vertical-align: top; }
+  .symTable td:first-child { min-width: 48px; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="title">Deflection of a Diving Board</div>
+
+  <div id="controls">
+    <div class="ctrl">
+      <label for="mSlider">mass of woman (kg)</label>
+      <input type="range" id="mSlider" min="52" max="75" step="1" value="60">
+      <span class="val" id="mVal">60</span>
+    </div>
+    <div class="ctrl">
+      <label for="LSlider">distance of woman from wall (m)</label>
+      <input type="range" id="LSlider" min="0.5" max="3.5" step="0.1" value="3">
+      <span class="val" id="LVal">3.0</span>
+    </div>
+    <div class="ctrl">
+      <label for="bSlider">board width (m)</label>
+      <input type="range" id="bSlider" min="0.4" max="1.5" step="0.1" value="0.5">
+      <span class="val" id="bVal">0.5</span>
+    </div>
+    <div class="ctrl">
+      <label for="hSlider">board thickness (m)</label>
+      <input type="range" id="hSlider" min="0.04" max="0.1" step="0.01" value="0.05">
+      <span class="val" id="hVal">0.05</span>
+    </div>
+  </div>
+
+  <canvas id="simCanvas"></canvas>
+
+  <div id="buttonRow">
+    <button class="panelBtn" data-panel="directionsPanel">Directions</button>
+    <button class="panelBtn" data-panel="detailsPanel">Details</button>
+    <button class="panelBtn" data-panel="aboutPanel">About</button>
+  </div>
+
+  <!-- Directions panel -->
+  <div class="panel" id="directionsPanel">
+    <button class="closeX" aria-label="close">&times;</button>
+    <h3>Directions</h3>
+    <p>In this Demonstration, a woman stands on a diving board that is anchored
+    to the wall on the left. Use the sliders to set the mass of the woman, her
+    distance from the left wall, the board width and the board thickness. The
+    deflection from horizontal is shown on the diagram at the location where
+    the woman is standing. Assume that the diving board is weightless, so the
+    length of the board does not affect deflection.</p>
+  </div>
+
+  <!-- Details panel -->
+  <div class="panel" id="detailsPanel">
+    <button class="closeX" aria-label="close">&times;</button>
+    <h3>Details</h3>
+    <p>A woman stands on a diving board that is attached to a wall on the left.
+    The diving board has width \(b\) and thickness \(h\). Deflection \(\nu\) of
+    the board from the horizontal position for \(0 \le x \le L\) is:</p>
+    <p class="eq">\(\nu(x) = -\dfrac{m \, g \, x^2}{6 \, E \, I}\,(3 L - x)\),</p>
+    <p>where \(m\) is the mass of the woman (kg),
+    \(g = 9.8~\mathrm{m}/\mathrm{s}^2\) is acceleration due to gravity,
+    \(x\) is distance from the wall (m), \(L\) is the distance from the wall
+    where the woman is standing (m), \(E\) is the modulus of elasticity for
+    plastic (Pa), and \(I = \frac{1}{12} b h^3\) is the moment of inertia
+    (\(\mathrm{m}^4\)).</p>
+    <p>For \(x > L\), the deflection of the board is:</p>
+    <p class="eq">\(\nu(x) = \nu_{max} - \dfrac{m \, g \, L^2}{2 \, E \, I}\,(x - L)\),</p>
+    <p>where \(\nu_{max} = -\dfrac{m \, g \, L^3}{3 \, E \, I}\) is maximum
+    deflection.</p>
+    <h3 style="margin-top:14px;">Symbols</h3>
+    <table class="symTable">
+      <tr><td>\(b\)</td><td>board width (m)</td></tr>
+      <tr><td>\(E\)</td><td>modulus of elasticity of plastic, \(3 \times 10^9\) Pa</td></tr>
+      <tr><td>\(g\)</td><td>acceleration due to gravity, \(9.8~\mathrm{m}/\mathrm{s}^2\)</td></tr>
+      <tr><td>\(h\)</td><td>board thickness (m)</td></tr>
+      <tr><td>\(I\)</td><td>moment of inertia of the board cross section (\(\mathrm{m}^4\))</td></tr>
+      <tr><td>\(L\)</td><td>distance from the wall where the woman stands (m)</td></tr>
+      <tr><td>\(m\)</td><td>mass of the woman (kg)</td></tr>
+      <tr><td>\(x\)</td><td>distance from the wall along the board (m)</td></tr>
+      <tr><td>\(\nu\)</td><td>deflection of the board from horizontal (m)</td></tr>
+      <tr><td>\(\nu_{max}\)</td><td>maximum deflection, at \(x = L\) (m)</td></tr>
+    </table>
+  </div>
+
+  <!-- About panel -->
+  <div class="panel" id="aboutPanel">
+    <button class="closeX" aria-label="close">&times;</button>
+    <h3>About</h3>
+    <p>This simulation was created in the
+    <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department
+    of Chemical and Biological Engineering</a> at University of Colorado
+    Boulder for <a href="http://www.learncheme.com" target="_blank"
+    rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It
+    is a JavaScript/HTML5 implementation of a
+    <a href="https://demonstrations.wolfram.com/DeflectionOfADivingBoard/"
+    target="_blank" rel="noopener">Mathematica simulation</a> by Rachael L.
+    Baumann. It was prepared with financial support from the National Science
+    Foundation (DUE 2336987 and 2336988). Address any questions or comments to
+    <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.</p>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ----------------------------------------------------------------
+     Physics (identical to the Mathematica Manipulate)
+     ---------------------------------------------------------------- */
+  var L0 = 3.5;        // board length, m
+  var g  = 9.8;        // m/s^2
+  var E  = 3e9;        // Pa, plastic
+
+  // state (slider variables)
+  var m = 60, L = 3, b = 0.5, h = 0.05;
+
+  function Ix()      { return (1 / 12) * b * h * h * h; }
+  function nuMax()   { return -(m * g * Math.pow(L, 3)) / (3 * E * Ix()); }
+  function nu(x) {
+    if (x >= 0 && x <= L) {
+      return -(m * g * x * x) / (6 * E * Ix()) * (3 * L - x);
+    }
+    return nuMax() - (m * g * L * L) / (2 * E * Ix()) * (x - L);
+  }
+
+  /* ----------------------------------------------------------------
+     Number formatting (matches Mathematica NumberForm usage)
+     ---------------------------------------------------------------- */
+  // NumberForm[x, 2]  ->  2 significant figures
+  function sig2(x) {
+    if (x === 0) { return "0.0"; }
+    var s = Math.abs(x).toPrecision(2);
+    if (s.indexOf("e") !== -1) { s = Number(s).toString(); }
+    return s;
+  }
+  // NumberForm[x, {2, 1}]  ->  1 digit after the decimal point
+  function fix1(x) { return x.toFixed(1); }
+
+  /* ----------------------------------------------------------------
+     Canvas set-up (hi-DPI)
+     ---------------------------------------------------------------- */
+  var CW = 600, CH = 400;
+  var canvas = document.getElementById("simCanvas");
+  var ctx = canvas.getContext("2d");
+  var dpr = window.devicePixelRatio || 1;
+  canvas.width  = CW * dpr;
+  canvas.height = CH * dpr;
+  canvas.style.width  = CW + "px";
+  canvas.style.height = CH + "px";
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  // PlotRange -> {{-0.3, 4.6}, {-1.8, 1.3}}, AspectRatio -> Full
+  var XMIN = -0.3, XMAX = 4.6, YMIN = -1.8, YMAX = 1.3;
+  function px(x) { return (x - XMIN) / (XMAX - XMIN) * CW; }
+  function py(y) { return (YMAX - y) / (YMAX - YMIN) * CH; }
+
+  // Thickness[0.007*(1+Rescale[h,{0.04,0.1}])] -> fraction of plot width
+  function boardLineWidth() {
+    var resc = (h - 0.04) / (0.1 - 0.04);
+    return 0.007 * (1 + resc) * CW;
+  }
+
+  /* ----------------------------------------------------------------
+     Woman graphic (purple stick figure from the initialization code)
+     Drawn in her own coordinate system, y up, then rotated about the
+     anchor point (feet at the board).
+     ---------------------------------------------------------------- */
+  function drawWoman(ax, ay, angle) {
+    // ax, ay: canvas px of the anchor (board point {L, nu(L)})
+    // anchor is at {0, -0.05} in woman coordinates
+    var S = 130;                       // px per woman-unit (ImageSize ~100)
+    var lw = 0.1 * 0.75 * S;           // Thickness[0.1] of ~0.75-unit-wide graphic
+
+    ctx.save();
+    ctx.translate(ax, ay);
+    ctx.rotate(-angle);                // canvas y is down; positive Mma angle -> CCW
+    // move so that woman-coordinate (0, -0.05) sits at the origin
+    function wx(x) { return x * S; }
+    function wy(y) { return -(y - (-0.05)) * S; }
+
+    ctx.fillStyle = "rgb(128,0,128)";
+    ctx.strokeStyle = "rgb(128,0,128)";
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.lineWidth = lw;
+
+    // head: Disk[{0,1}, 0.1]
+    ctx.beginPath();
+    ctx.arc(wx(0), wy(1), 0.1 * S, 0, 2 * Math.PI);
+    ctx.fill();
+
+    // arms: Line[{{-0.3,0.5},{-0.1,0.85},{0.1,0.85},{0.3,0.5}}]
+    ctx.beginPath();
+    ctx.moveTo(wx(-0.3), wy(0.5));
+    ctx.lineTo(wx(-0.1), wy(0.85));
+    ctx.lineTo(wx(0.1),  wy(0.85));
+    ctx.lineTo(wx(0.3),  wy(0.5));
+    ctx.stroke();
+
+    // legs: Line[{{±0.075,0.3},{±0.075,0}}]
+    [-1, 1].forEach(function (s) {
+      ctx.beginPath();
+      ctx.moveTo(wx(s * 0.075), wy(0.3));
+      ctx.lineTo(wx(s * 0.075), wy(0));
+      ctx.stroke();
+    });
+
+    // body: Polygon[{{-0.075,0.85},{0.075,0.85},{0.225,0.3},{-0.225,0.3}}]
+    ctx.beginPath();
+    ctx.moveTo(wx(-0.075), wy(0.85));
+    ctx.lineTo(wx(0.075),  wy(0.85));
+    ctx.lineTo(wx(0.225),  wy(0.3));
+    ctx.lineTo(wx(-0.225), wy(0.3));
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+  /* ----------------------------------------------------------------
+     Text helpers
+     ---------------------------------------------------------------- */
+  function textWhiteBG(str, cx, cy, fontPx) {
+    ctx.font = fontPx + "px Helvetica, Arial, sans-serif";
+    var w = ctx.measureText(str).width;
+    var hgt = fontPx;
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(cx - w / 2 - 3, cy - hgt / 2 - 2, w + 6, hgt + 4);
+    ctx.fillStyle = "#000000";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(str, cx, cy);
+  }
+
+  /* ----------------------------------------------------------------
+     Main drawing routine
+     ---------------------------------------------------------------- */
+  function draw() {
+    ctx.clearRect(0, 0, CW, CH);
+
+    var lwBoard = boardLineWidth();
+    var nuL  = nu(L);
+    var nuL0 = nu(L0);
+
+    /* dashed horizontal reference line from wall to woman */
+    ctx.save();
+    ctx.strokeStyle = "rgb(102,102,102)";        // GrayLevel[0.4]
+    ctx.lineWidth = lwBoard;
+    ctx.setLineDash([10, 10]);
+    ctx.lineCap = "butt";
+    ctx.beginPath();
+    ctx.moveTo(px(0), py(0));
+    ctx.lineTo(px(L), py(0));
+    ctx.stroke();
+    ctx.restore();
+
+    /* wall: gray rectangle */
+    ctx.fillStyle = "rgb(179,179,179)";          // GrayLevel[0.7]
+    ctx.fillRect(px(-0.25), py(1.5), px(0) - px(-0.25), py(-1.8) - py(1.5));
+
+    /* wall edge + hatching */
+    ctx.strokeStyle = "#000000";
+    ctx.lineWidth = 2.5;                          // Thick
+    ctx.lineCap = "butt";
+    ctx.beginPath();
+    ctx.moveTo(px(0), py(-1.8));
+    ctx.lineTo(px(0), py(1.5));
+    ctx.stroke();
+    for (var y = -1.8; y <= 1.25 + 1e-9; y += 0.25) {
+      ctx.beginPath();
+      ctx.moveTo(px(0),     py(y + 0.25));
+      ctx.lineTo(px(-0.25), py(y));
+      ctx.stroke();
+    }
+
+    /* deflected board: plot of nu(x), 0 <= x <= L0 */
+    ctx.strokeStyle = "rgb(102,102,102)";
+    ctx.lineWidth = lwBoard;
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    var N = 200;
+    for (var i = 0; i <= N; i++) {
+      var x = (L0 * i) / N;
+      var X = px(x), Y = py(nu(x));
+      if (i === 0) { ctx.moveTo(X, Y); } else { ctx.lineTo(X, Y); }
+    }
+    ctx.stroke();
+
+    /* woman, rotated by ArcSin[nu(L)/L] about her feet */
+    drawWoman(px(L), py(nuL), Math.asin(nuL / L));
+
+    /* ---- purple dimension line: distance of woman from wall ---- */
+    ctx.strokeStyle = "rgb(128,0,128)";
+    ctx.fillStyle = "rgb(128,0,128)";
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.moveTo(px(0), py(nuL0));
+    ctx.lineTo(px(L), py(nuL0));
+    ctx.stroke();
+    [0, L].forEach(function (xx) {
+      ctx.beginPath();
+      ctx.moveTo(px(xx), py(nuL0 - 0.05));
+      ctx.lineTo(px(xx), py(nuL0 + 0.05));
+      ctx.stroke();
+    });
+    ctx.save();
+    ctx.fillStyle = "#000000";
+    (function () {
+      var str = " " + fix1(L) + " m ";
+      ctx.font = "18px Helvetica, Arial, sans-serif";
+      var w = ctx.measureText(str).width;
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(px(0.5 * L) - w / 2 - 2, py(nuL0) - 11, w + 4, 22);
+      ctx.fillStyle = "rgb(128,0,128)";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(str, px(0.5 * L), py(nuL0));
+    })();
+    ctx.restore();
+
+    /* ---- black dimension line: full board length (3.5 m) ---- */
+    ctx.strokeStyle = "#000000";
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.moveTo(px(0),  py(nuL0 - 0.25));
+    ctx.lineTo(px(L0), py(nuL0 - 0.25));
+    ctx.stroke();
+    [0, L0].forEach(function (xx) {
+      ctx.beginPath();
+      ctx.moveTo(px(xx), py(nuL0 - 0.25 + 0.05));
+      ctx.lineTo(px(xx), py(nuL0 - 0.25 - 0.05));
+      ctx.stroke();
+    });
+    textWhiteBG(" 3.5 m ", px(L0 / 2), py(nuL0 - 0.25), 18);
+
+    /* ---- deflection indicator at x = 1.1 L ---- */
+    ctx.strokeStyle = "#000000";
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.moveTo(px(1.1 * L), py(0));
+    ctx.lineTo(px(1.1 * L), py(nuL));
+    ctx.stroke();
+    [0, nuL].forEach(function (yy) {
+      ctx.beginPath();
+      ctx.moveTo(px(1.1 * L) - 0.05 * (CW / (XMAX - XMIN)) / 1, py(yy));
+      ctx.lineTo(px(1.1 * L) + 0.05 * (CW / (XMAX - XMIN)) / 1, py(yy));
+      ctx.stroke();
+    });
+
+    /* deflection label, two centered lines placed right of the line,
+       above the lower end (Text offset {-1.5, -1}) */
+    ctx.font = "18px Helvetica, Arial, sans-serif";
+    var l1 = "deflection:";
+    var l2 = sig2(Math.abs(nuL)) + " m";
+    var blockW = Math.max(ctx.measureText(l1).width, ctx.measureText(l2).width);
+    var lineH = 21;
+    var blockH = 2 * lineH;
+    var leftX  = px(1.1 * L) + 0.25 * blockW;
+    var botY   = py(nuL);
+    ctx.fillStyle = "#000000";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "alphabetic";
+    ctx.fillText(l1, leftX + blockW / 2, botY - blockH + lineH - 5);
+    ctx.fillText(l2, leftX + blockW / 2, botY - 5);
+  }
+
+  /* ----------------------------------------------------------------
+     Sliders
+     ---------------------------------------------------------------- */
+  var mS = document.getElementById("mSlider");
+  var LS = document.getElementById("LSlider");
+  var bS = document.getElementById("bSlider");
+  var hS = document.getElementById("hSlider");
+  var mV = document.getElementById("mVal");
+  var LV = document.getElementById("LVal");
+  var bV = document.getElementById("bVal");
+  var hV = document.getElementById("hVal");
+
+  function update() {
+    m = parseFloat(mS.value);
+    L = parseFloat(LS.value);
+    b = parseFloat(bS.value);
+    h = parseFloat(hS.value);
+    mV.textContent = m.toFixed(0);
+    LV.textContent = L.toFixed(1);
+    bV.textContent = b.toFixed(1);
+    hV.textContent = h.toFixed(2);
+    draw();
+  }
+  [mS, LS, bS, hS].forEach(function (s) {
+    s.addEventListener("input", update);
+  });
+
+  /* ----------------------------------------------------------------
+     Panels (open above the buttons, close with the x)
+     ---------------------------------------------------------------- */
+  var buttons = document.querySelectorAll(".panelBtn");
+  var panels  = document.querySelectorAll(".panel");
+
+  function closeAll() {
+    panels.forEach(function (p) { p.classList.remove("open"); });
+  }
+  buttons.forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var target = document.getElementById(btn.dataset.panel);
+      var wasOpen = target.classList.contains("open");
+      closeAll();
+      if (!wasOpen) {
+        target.classList.add("open");
+        if (window.MathJax && MathJax.typesetPromise) {
+          MathJax.typesetPromise([target]);
+        }
+      }
+    });
+  });
+  panels.forEach(function (p) {
+    p.querySelector(".closeX").addEventListener("click", closeAll);
+  });
+
+  update();
+})();
+</script>
+</body>
+</html>

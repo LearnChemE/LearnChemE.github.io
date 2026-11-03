@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Visualizing R-Squared in Statistics</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(', '\\)']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.min.js"></script>
+<style>
+  body {
+    font-family: Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 12px;
+    background-color: #ffffff;
+  }
+  #container {
+    position: relative;
+    width: 640px;
+  }
+  #controlsRow {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+  }
+  #sliderBlock {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .controlRow {
+    display: flex;
+    align-items: center;
+    height: 26px;
+  }
+  .controlLabel {
+    width: 110px;
+    text-align: right;
+    padding-right: 8px;
+    font-size: 17px;   /* increased 20% */
+  }
+  .graphLabel {
+    font-size: 17px;   /* increased 20% */
+  }
+  #simTitle {
+    font-size: 22px;
+    font-weight: normal;
+    color: #000000;
+    text-align: center;
+    width: 640px;
+    margin: 6px 0 14px 0;
+  }
+  input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+  input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  #sliderBlock input[type="range"] {
+    width: 180px;      /* shorter sliders */
+    margin-bottom: 0;  /* keep slider centered on its label */
+  }
+  .sliderValue {
+    font-size: 17px;   /* increased 20% */
+    padding-left: 8px;
+    min-width: 50px;
+  }
+  .graphBtn {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 17px;   /* increased 20% */
+    width: 34px;
+    height: 26px;
+    margin-right: 4px;
+    border: 1px solid #999;
+    border-radius: 4px;
+    background-color: #f0f0f0;
+    cursor: pointer;
+  }
+  .graphBtn.selected {
+    background-color: #98000D;
+    color: #ffffff;
+    border-color: #98000D;
+  }
+  #panelButtons {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-left: 24px;
+  }
+  .panelBtn {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    background-color: #98000D;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    padding: 7px 0;
+    width: 100px;
+    cursor: pointer;
+  }
+  .panelBtn:hover {
+    background-color: #7a000a;
+  }
+  .panel {
+    display: none;
+    position: absolute;
+    width: 480px;
+    background-color: #fdfdfd;
+    border: 1px solid #888;
+    border-radius: 6px;
+    box-shadow: 3px 3px 8px rgba(0,0,0,0.35);
+    padding: 12px 16px;
+    font-size: 14px;
+    line-height: 1.45;
+    z-index: 20;
+    box-sizing: border-box;
+    max-height: 460px;
+    overflow-y: auto;
+  }
+  .panelClose {
+    position: absolute;
+    top: 6px;
+    right: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #555;
+    cursor: pointer;
+    line-height: 1;
+  }
+  .panelClose:hover { color: #98000D; }
+  .panel h3 {
+    margin: 0 24px 8px 0;
+    font-size: 15px;
+    color: #98000D;
+  }
+  .panel p { margin: 0 0 9px 0; }
+  #plotLabel {
+    text-align: center;
+    font-size: 16px;
+    margin: 10px 0 2px 0;
+    width: 470px;
+  }
+  #plotCanvas {
+    display: block;
+  }
+  a { color: #98000D; }
+</style>
+</head>
+<body>
+<div id="container">
+
+  <div id="simTitle">Visualizing R-Squared in Statistics</div>
+
+  <div id="controlsRow">
+    <div id="sliderBlock">
+      <div class="controlRow">
+        <span class="controlLabel graphLabel"><i>graph</i></span>
+        <button class="graphBtn selected" id="g1">1</button>
+        <button class="graphBtn" id="g2">2</button>
+        <button class="graphBtn" id="g3">3</button>
+      </div>
+      <div class="controlRow">
+        <span class="controlLabel"><i>n</i></span>
+        <input type="range" id="nSlider" min="10" max="100" step="10" value="20">
+        <span class="sliderValue" id="nValue">20</span>
+      </div>
+      <div class="controlRow">
+        <span class="controlLabel"><i>&rho;</i></span>
+        <input type="range" id="rhoSlider" min="-0.99" max="0.99" step="0.01" value="0.85">
+        <span class="sliderValue" id="rhoValue">0.85</span>
+      </div>
+      <div class="controlRow">
+        <span class="controlLabel">random seed</span>
+        <input type="range" id="seedSlider" min="1" max="12345" step="1" value="212">
+        <span class="sliderValue" id="seedValue">212</span>
+      </div>
+    </div>
+
+    <div id="panelButtons">
+      <button class="panelBtn" id="btnDirections">Directions</button>
+      <button class="panelBtn" id="btnDetails">Details</button>
+      <button class="panelBtn" id="btnAbout">About</button>
+    </div>
+  </div>
+
+  <div id="plotLabel"></div>
+  <canvas id="plotCanvas"></canvas>
+
+  <div class="panel" id="panelDirections">
+    <span class="panelClose" data-close="panelDirections">&times;</span>
+    <h3>Directions</h3>
+    <p>Select graph <b>1</b>, <b>2</b>, or <b>3</b> to change the display. Graph 1 shows the
+    data (blue points) and the fitted least-squares regression line (red). Graph 2 shows the
+    data and the fitted points (red). Graph 3 adds a rug on each of the \(y\) axes: the blue
+    rug on the left axis shows the \(y\) values, and the red rug on the right axis shows the
+    fitted \(\hat{y}\) values.</p>
+    <p>Use the <i>n</i> slider to change the sample size, the \(\rho\) slider to change the
+    correlation parameter of the bivariate normal distribution from which the sample is drawn,
+    and the random seed slider to generate a different random sample.</p>
+    <p>Notice how the plot changes dramatically as the parameter \(\rho\) is changed. You may
+    also wish to experiment with different sample sizes by changing \(n\) or different random
+    samples by changing the seed.</p>
+  </div>
+
+  <div class="panel" id="panelDetails">
+    <span class="panelClose" data-close="panelDetails">&times;</span>
+    <h3>Details</h3>
+    <p>In general, \(R^2\) is often referred to as the coefficient of determination and its
+    verbal interpretation is that it is the fraction of variation explained by the model. This
+    in fact is illustrated in our Demonstration in the case of simple linear regression.</p>
+    <p>A random sample of size \(n\) is generated from a bivariate normal distribution with
+    correlation parameter \(\rho\), means 0, and variances 1. The first plot, graph 1, shows
+    the data and the fitted regression line. Next, graph 2 shows the data and the fitted
+    points. In graph 3, a rug is added on each of the \(y\) axes. The axes on the left with the
+    blue rug show the \(y\) values; the axes on the right with the red rug show the fitted
+    \(y\) values.</p>
+    <p>The plot label shows \(R^2 = r^2 = S_{reg}/S_y\), where \(r\) is the correlation
+    coefficient, \(S_y\) is the sum of the squared deviations of the \(y\)'s from their mean,
+    and \(S_{reg}\) is the sum of the squared deviations of the \(\hat{y}\)'s from their mean.
+    In graph 3, the rugs provide a visualization of the spread of the \(y\)'s and
+    \(\hat{y}\)'s.</p>
+    <p>In statistics courses not based on calculus, it is often mentioned when discussing
+    simple linear regression that \(R^2 = r^2\) and that \(r^2\) is the fraction of variation
+    explained by the model. This Demonstration is especially useful for explaining the concept
+    to these students.</p>
+  </div>
+
+  <div class="panel" id="panelAbout">
+    <span class="panelClose" data-close="panelAbout">&times;</span>
+    <h3>About</h3>
+    <p>This simulation was made at the University of Colorado Boulder, Department of Chemical
+    and Biological Engineering. It is a browser-based version of the Wolfram
+    Demonstration
+    <a href="http://demonstrations.wolfram.com/VisualizingRSquaredInStatistics/" target="_blank"
+    rel="noopener">"Visualizing R-Squared in Statistics"</a>, contributed by Ian McLeod.</p>
+  </div>
+
+</div>
+
+<script>
+(function() {
+  // ---------- state ----------
+  var state = {
+    g: 1,        // graph selector
+    n: 20,       // sample size
+    rho: 0.85,   // correlation parameter
+    seed: 212    // random seed
+  };
+  var rugTick = 0.2;
+  var adj = 0.1;
+
+  // ---------- seeded RNG (mulberry32) + Box-Muller normals ----------
+  function mulberry32(a) {
+    return function() {
+      a |= 0; a = a + 0x6D2B79F5 | 0;
+      var t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+  function makeNormals(rand) {
+    var spare = null;
+    return function() {
+      if (spare !== null) { var s = spare; spare = null; return s; }
+      var u = 0, v = 0;
+      do { u = rand(); } while (u === 0);
+      v = rand();
+      var m = Math.sqrt(-2.0 * Math.log(u));
+      spare = m * Math.sin(2.0 * Math.PI * v);
+      return m * Math.cos(2.0 * Math.PI * v);
+    };
+  }
+
+  // ---------- model ----------
+  var model = {};
+  function computeModel() {
+    var rand = mulberry32(state.seed);
+    var nrm = makeNormals(rand);
+    var n = state.n, rho = state.rho;
+    var x = [], y = [];
+    for (var i = 0; i < n; i++) {
+      var z1 = nrm(), z2 = nrm();
+      x.push(z1);
+      y.push(rho * z1 + Math.sqrt(1 - rho * rho) * z2);
+    }
+    // sample means
+    var xbar = 0, ybar = 0;
+    for (i = 0; i < n; i++) { xbar += x[i]; ybar += y[i]; }
+    xbar /= n; ybar /= n;
+    // least squares fit y = a x + b
+    var sxx = 0, sxy = 0, syy = 0;
+    for (i = 0; i < n; i++) {
+      sxx += (x[i] - xbar) * (x[i] - xbar);
+      sxy += (x[i] - xbar) * (y[i] - ybar);
+      syy += (y[i] - ybar) * (y[i] - ybar);
+    }
+    var a = sxy / sxx;
+    var b = ybar - a * xbar;
+    var r = sxy / Math.sqrt(sxx * syy);
+    var yfit = [], res = [], Se = 0;
+    for (i = 0; i < n; i++) {
+      yfit.push(a * x[i] + b);
+      res.push(y[i] - yfit[i]);
+      Se += res[i] * res[i];
+    }
+    var Sy = syy;            // (n-1) * variance of y
+    var Sr = Sy - Se;        // regression sum of squares
+    // plot range
+    var xmin = Math.min.apply(null, x) - adj;
+    var xmax = Math.max.apply(null, x) + adj;
+    var ymin = Math.min(Math.min.apply(null, y), Math.min.apply(null, yfit)) - adj;
+    var ymax = Math.max(Math.max.apply(null, y), Math.max.apply(null, yfit)) + adj;
+    model = { x: x, y: y, yfit: yfit, a: a, b: b, r: r, Se: Se, Sy: Sy, Sr: Sr,
+              xmin: xmin, xmax: xmax, ymin: ymin, ymax: ymax };
+  }
+
+  // ---------- canvas set-up (hi-DPI) ----------
+  var canvas = document.getElementById('plotCanvas');
+  var ctx = canvas.getContext('2d');
+  var cssW = 470, cssH = 440;
+  var dpr = window.devicePixelRatio || 1;
+  canvas.width = cssW * dpr;
+  canvas.height = cssH * dpr;
+  canvas.style.width = cssW + 'px';
+  canvas.style.height = cssH + 'px';
+
+  // plot area (square)
+  var margin = { left: 55, right: 25, top: 12, bottom: 45 };
+  var pw = cssW - margin.left - margin.right;   // 390
+  var ph = pw;                                   // square
+  var TICK_FONT = '15px Helvetica, Arial, sans-serif';  // axis numbers, increased 20%
+
+  function xPix(v) { return margin.left + (v - model.xmin) / (model.xmax - model.xmin) * pw; }
+  function yPix(v) { return margin.top + ph - (v - model.ymin) / (model.ymax - model.ymin) * ph; }
+
+  function niceTicks(lo, hi, target) {
+    var span = hi - lo;
+    var step = Math.pow(10, Math.floor(Math.log(span / target) / Math.LN10));
+    var err = target / span * step;
+    if (err <= 0.15) step *= 10;
+    else if (err <= 0.35) step *= 5;
+    else if (err <= 0.75) step *= 2;
+    var ticks = [];
+    var t0 = Math.ceil(lo / step) * step;
+    for (var t = t0; t <= hi + 1e-9; t += step) ticks.push(Math.abs(t) < 1e-9 ? 0 : t);
+    return { ticks: ticks, step: step };
+  }
+  function fmtTick(v, step) {
+    var d = Math.max(0, -Math.floor(Math.log(step) / Math.LN10 + 1e-9));
+    return v.toFixed(d);
+  }
+
+  function draw() {
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, cssW, cssH);
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = '#000000';
+
+    // frame
+    ctx.strokeRect(margin.left, margin.top, pw, ph);
+
+    // clip region for data
+    var xt = niceTicks(model.xmin, model.xmax, 6);
+    var yt = niceTicks(model.ymin, model.ymax, 6);
+
+    // ticks + labels
+    ctx.fillStyle = '#000000';
+    ctx.font = TICK_FONT;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    var i, px, py;
+    for (i = 0; i < xt.ticks.length; i++) {
+      px = xPix(xt.ticks[i]);
+      ctx.beginPath();
+      ctx.moveTo(px, margin.top + ph); ctx.lineTo(px, margin.top + ph - 6);
+      ctx.moveTo(px, margin.top); ctx.lineTo(px, margin.top + 6);
+      ctx.stroke();
+      ctx.fillText(fmtTick(xt.ticks[i], xt.step), px, margin.top + ph + 7);
+    }
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    for (i = 0; i < yt.ticks.length; i++) {
+      py = yPix(yt.ticks[i]);
+      ctx.beginPath();
+      ctx.moveTo(margin.left, py); ctx.lineTo(margin.left + 6, py);
+      ctx.moveTo(margin.left + pw, py); ctx.lineTo(margin.left + pw - 6, py);
+      ctx.stroke();
+      ctx.fillText(fmtTick(yt.ticks[i], yt.step), margin.left - 8, py);
+    }
+
+    // clip to plot area for data elements
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(margin.left, margin.top, pw, ph);
+    ctx.clip();
+
+    var n = state.n;
+
+    if (state.g === 1) {
+      // thick red least-squares line
+      ctx.strokeStyle = '#DD0000';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(xPix(model.xmin), yPix(model.a * model.xmin + model.b));
+      ctx.lineTo(xPix(model.xmax), yPix(model.a * model.xmax + model.b));
+      ctx.stroke();
+    }
+
+    if (state.g === 3) {
+      // blue rug on left axis at y values
+      ctx.strokeStyle = '#0000CC';
+      ctx.lineWidth = 1;
+      for (i = 0; i < n; i++) {
+        py = yPix(model.y[i]);
+        ctx.beginPath();
+        ctx.moveTo(xPix(model.xmin), py);
+        ctx.lineTo(xPix(model.xmin + rugTick), py);
+        ctx.stroke();
+      }
+      // red rug on right axis at fitted y values
+      ctx.strokeStyle = '#DD0000';
+      for (i = 0; i < n; i++) {
+        py = yPix(model.yfit[i]);
+        ctx.beginPath();
+        ctx.moveTo(xPix(model.xmax), py);
+        ctx.lineTo(xPix(model.xmax - rugTick), py);
+        ctx.stroke();
+      }
+    }
+
+    if (state.g === 2 || state.g === 3) {
+      // fitted points (red)
+      ctx.fillStyle = '#DD0000';
+      for (i = 0; i < n; i++) {
+        ctx.beginPath();
+        ctx.arc(xPix(model.x[i]), yPix(model.yfit[i]), 3.5, 0, 2 * Math.PI);
+        ctx.fill();
+      }
+    }
+
+    // data points (blue)
+    ctx.fillStyle = '#0000CC';
+    for (i = 0; i < n; i++) {
+      ctx.beginPath();
+      ctx.arc(xPix(model.x[i]), yPix(model.y[i]), 3.5, 0, 2 * Math.PI);
+      ctx.fill();
+    }
+
+    ctx.restore();
+
+    // plot label (HTML, above canvas)
+    var lbl = document.getElementById('plotLabel');
+    lbl.innerHTML =
+      '<i>r</i> = ' + model.r.toFixed(3) +
+      ', <i>R</i><sup>2</sup> = ' + (100 * model.r * model.r).toFixed(1) + '%' +
+      ', <i>S</i><sub>reg</sub> = ' + model.Sr.toFixed(2) +
+      ', <i>S</i><sub>y</sub> = ' + model.Sy.toFixed(2);
+  }
+
+  function update() {
+    computeModel();
+    draw();
+  }
+
+  // ---------- controls ----------
+  function selectGraph(g) {
+    state.g = g;
+    document.getElementById('g1').classList.toggle('selected', g === 1);
+    document.getElementById('g2').classList.toggle('selected', g === 2);
+    document.getElementById('g3').classList.toggle('selected', g === 3);
+    draw();
+  }
+  document.getElementById('g1').addEventListener('click', function() { selectGraph(1); });
+  document.getElementById('g2').addEventListener('click', function() { selectGraph(2); });
+  document.getElementById('g3').addEventListener('click', function() { selectGraph(3); });
+
+  document.getElementById('nSlider').addEventListener('input', function() {
+    state.n = parseInt(this.value, 10);
+    document.getElementById('nValue').textContent = state.n;
+    update();
+  });
+  document.getElementById('rhoSlider').addEventListener('input', function() {
+    state.rho = parseFloat(this.value);
+    document.getElementById('rhoValue').textContent = state.rho.toFixed(2);
+    update();
+  });
+  document.getElementById('seedSlider').addEventListener('input', function() {
+    state.seed = parseInt(this.value, 10);
+    document.getElementById('seedValue').textContent = state.seed;
+    update();
+  });
+
+  // ---------- panels ----------
+  var panelForButton = {
+    btnDirections: 'panelDirections',
+    btnDetails: 'panelDetails',
+    btnAbout: 'panelAbout'
+  };
+  var container = document.getElementById('container');
+  var buttonCol = document.getElementById('panelButtons');
+
+  function positionPanel(panel, btn) {
+    // panel's right edge aligns with the right edge of the buttons,
+    // starting a few pixels below its button
+    var colRight = buttonCol.offsetLeft + buttonCol.offsetWidth;
+    var btnTop = buttonCol.offsetTop + btn.offsetTop;
+    panel.style.left = (colRight - panel.offsetWidth) + 'px';
+    panel.style.top = (btnTop + 8) + 'px';
+  }
+  function closeAllPanels() {
+    Object.keys(panelForButton).forEach(function(id) {
+      document.getElementById(panelForButton[id]).style.display = 'none';
+    });
+  }
+  Object.keys(panelForButton).forEach(function(btnId) {
+    var btn = document.getElementById(btnId);
+    var panel = document.getElementById(panelForButton[btnId]);
+    btn.addEventListener('click', function() {
+      var isOpen = panel.style.display === 'block';
+      closeAllPanels();
+      if (!isOpen) {
+        panel.style.display = 'block';
+        positionPanel(panel, btn);
+        if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([panel]);
+      }
+    });
+  });
+  document.querySelectorAll('.panelClose').forEach(function(x) {
+    x.addEventListener('click', function() {
+      document.getElementById(this.getAttribute('data-close')).style.display = 'none';
+    });
+  });
+
+  // ---------- initial ----------
+  update();
+})();
+</script>
+</body>
+</html>

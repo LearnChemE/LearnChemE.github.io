@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Transformations for Linear Regression</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-chtml.min.js"></script>
+<style>
+  body {
+    font-family: Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 10px 0 40px 0;
+    background-color: #ffffff;
+    color: #000000;
+  }
+  h1.simTitle {
+    text-align: center;
+    font-size: 24px;
+    font-weight: normal;
+    margin: 8px 0 4px 0;
+  }
+  #simWrap {
+    position: relative;
+    width: 1260px;
+    margin: 0 auto;
+  }
+  #simCanvas {
+    display: block;
+    width: 1260px;
+    height: 720px;
+  }
+  .mjLabel {
+    position: absolute;
+    font-size: 17px;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+  .mjRot {
+    transform: translate(-50%, -50%) rotate(-90deg);
+  }
+  .mjCtr {
+    transform: translate(-50%, -50%);
+  }
+  .mjLeft {
+    transform: translate(0, -50%);
+  }
+  .radioRow {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    height: 30px;
+  }
+  .radioRow input[type="radio"] {
+    width: 15px;
+    height: 15px;
+    margin: 0 6px 0 0;
+    cursor: pointer;
+  }
+  .radioRow label.num {
+    font-size: 16px;
+    margin-right: 8px;
+    cursor: pointer;
+  }
+  .radioRow .eq {
+    font-size: 17px;
+    white-space: nowrap;
+  }
+  #panelArea {
+    position: relative;
+    width: 1260px;
+    margin: 18px auto 0 auto;
+    text-align: center;
+  }
+  #panelButtons button {
+    background-color: #98000D;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 17px;
+    font-weight: normal;
+    padding: 9px 22px;
+    margin: 0 8px;
+    cursor: pointer;
+  }
+  #panelButtons button:hover {
+    background-color: #b30010;
+  }
+  .panel {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%);
+    width: 850px;
+    background-color: #ffffff;
+    border: 1px solid #bbbbbb;
+    border-radius: 4px;
+    padding: 14px 20px 14px 20px;
+    font-size: 16px;
+    line-height: 1.5;
+    text-align: left;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+    z-index: 10;
+  }
+  .panelBody {
+    max-height: 620px;
+    overflow-y: auto;
+    padding-right: 40px;
+  }
+  .panelClose {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+    background-color: #98000D;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 18px;
+    line-height: 30px;
+    text-align: center;
+    padding: 0;
+    cursor: pointer;
+    z-index: 11;
+  }
+  .panelClose:hover { background-color: #b30010; }
+  .panelTitle {
+    font-size: 16px;
+    font-weight: bold;
+    margin: 0 50px 0 0;
+    line-height: 30px;
+  }
+  .panelBody > p:first-child { margin-top: 2px; }
+  /* left-justify MathJax display equations in the panels */
+  .panel mjx-container[display="true"] {
+    text-align: left !important;
+    margin: 10px 0 !important;
+  }
+  .panel mjx-container[display="true"] > mjx-math {
+    margin: 0 !important;
+    text-align: left !important;
+  }
+  .panel a { color: #98000D; }
+  .panel table {
+    border-collapse: collapse;
+    margin: 8px 0;
+  }
+  .panel table td, .panel table th {
+    border: 1px solid #bbbbbb;
+    padding: 5px 12px;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<h1 class="simTitle">Transformations for Linear Regression</h1>
+
+<div id="simWrap">
+  <canvas id="simCanvas" width="1260" height="720"></canvas>
+
+  <!-- axis labels (MathJax) -->
+  <span class="mjLabel mjCtr" style="left:270px; top:355px;">\(x\)</span>
+  <span class="mjLabel mjRot" style="left:52px; top:180px;">\(y\)</span>
+  <span class="mjLabel mjCtr" style="left:270px; top:690px;">\(\hat{y}_{i}\)</span>
+  <span class="mjLabel mjRot" style="left:42px; top:513px;">\(y_{i} - \hat{y}_{i}\)</span>
+  <span class="mjLabel mjCtr" style="left:720px; top:355px;">\(\chi\)</span>
+  <span class="mjLabel mjRot" style="left:496px; top:180px;">\(\Psi\)</span>
+  <span class="mjLabel mjCtr" style="left:720px; top:690px;">\(\hat{\Psi}_{i}\)</span>
+  <span class="mjLabel mjRot" style="left:486px; top:513px;">\(\Psi_{i} - \hat{\Psi}_{i}\)</span>
+
+  <!-- in-plot legend equations, left plot -->
+  <span class="mjLabel mjLeft" id="actEqL" style="left:196px; top:92px;">\(y = 5e^{x} + 2\)</span>
+  <span class="mjLabel mjLeft" id="fitEqL" style="left:168px; top:116px;"></span>
+  <span class="mjLabel mjLeft" id="r2L"    style="left:168px; top:140px;"></span>
+
+  <!-- in-plot legend equations, right plot -->
+  <span class="mjLabel mjLeft" id="actEqR" style="left:646px; top:92px;">\(\Psi = 5\chi + 2\)</span>
+  <span class="mjLabel mjLeft" id="fitEqR" style="left:618px; top:116px;"></span>
+  <span class="mjLabel mjLeft" id="r2R"    style="left:618px; top:140px;"></span>
+
+  <!-- radio buttons with equation labels -->
+  <div class="radioRow" style="left:918px; top:39px;">
+    <input type="radio" name="eqSel" id="r1" value="0" checked>
+    <label class="num" for="r1">1.</label>
+    <span class="eq">\(y = 5e^{x} + 2,\; \Psi = y,\; \chi = e^{x}\)</span>
+  </div>
+  <div class="radioRow" style="left:918px; top:84px;">
+    <input type="radio" name="eqSel" id="r2" value="1">
+    <label class="num" for="r2">2.</label>
+    <span class="eq">\(y = 5x^{-1} + 2,\; \Psi = y,\; \chi = x^{-1}\)</span>
+  </div>
+  <div class="radioRow" style="left:918px; top:129px;">
+    <input type="radio" name="eqSel" id="r3" value="2">
+    <label class="num" for="r3">3.</label>
+    <span class="eq">\(y = 5\ln(x) + 2,\; \Psi = y,\; \chi = \ln(x)\)</span>
+  </div>
+  <div class="radioRow" style="left:918px; top:174px;">
+    <input type="radio" name="eqSel" id="r4" value="3">
+    <label class="num" for="r4">4.</label>
+    <span class="eq">\(y^{2} = 5x^{5} + 2,\; \Psi = y^{2},\; \chi = x^{5}\)</span>
+  </div>
+</div>
+
+<div id="panelArea">
+<div id="panelButtons">
+  <button id="btnDirections">Directions</button>
+  <button id="btnDetails">Details</button>
+  <button id="btnAbout">About</button>
+</div>
+
+<div class="panel" id="panelDirections">
+  <button class="panelClose" title="Close">&#10005;</button>
+  <h2 class="panelTitle">Directions</h2>
+  <p>This simulation shows how transformations can be used to manipulate nonlinear
+  equations into a form for linear regression analysis. Four different equations are
+  shown on the right-hand side of the window and can be selected with the radio buttons.
+  The selected nonlinear equation is plotted in the upper left plot (dashed black line).
+  Experimental data are generated from this equation by adding white Gaussian noise and
+  are shown on the same plot (blue circles). These nonlinear experimental data are fit
+  with a linear model (solid green line). The residuals of that fitting are shown in the
+  lower left plot and exhibit a clear trend, indicating the linear approximation is
+  violated.</p>
+  <p>The nonlinear equation and experimental data are transformed accordingly and shown
+  in the upper right plot. The transformed data are fit with a linear model. The
+  residuals for the resulting fit are shown in the lower right plot. New experimental
+  data are generated each time an equation is selected.</p>
+</div>
+
+<div class="panel" id="panelDetails">
+  <button class="panelClose" title="Close">&#10005;</button>
+  <h2 class="panelTitle">Details</h2>
+  <p>Each nonlinear equation \(y = f(x)\) is transformed into a linear form
+  \(\Psi = \beta_{1}\chi + \beta_{0}\) using the transformed variables \(\Psi\) and
+  \(\chi\):</p>
+  <table>
+    <tr><th>Nonlinear equation</th><th>Transformation</th><th>Linear form</th></tr>
+    <tr><td>\(y = 5e^{x} + 2\)</td><td>\(\Psi = y,\; \chi = e^{x}\)</td><td>\(\Psi = 5\chi + 2\)</td></tr>
+    <tr><td>\(y = 5x^{-1} + 2\)</td><td>\(\Psi = y,\; \chi = x^{-1}\)</td><td>\(\Psi = 5\chi + 2\)</td></tr>
+    <tr><td>\(y = 5\ln(x) + 2\)</td><td>\(\Psi = y,\; \chi = \ln(x)\)</td><td>\(\Psi = 5\chi + 2\)</td></tr>
+    <tr><td>\(y^{2} = 5x^{5} + 2\)</td><td>\(\Psi = y^{2},\; \chi = x^{5}\)</td><td>\(\Psi = 5\chi + 2\)</td></tr>
+  </table>
+  <p>Experimental data are simulated by evaluating the equation at \(x = 0.05, 0.10,
+  \ldots, 3.00\) and adding white Gaussian noise with a signal-to-noise ratio of
+  1&nbsp;dB relative to a 1&nbsp;W reference (noise standard deviation
+  \(\sigma = \sqrt{10^{-\mathrm{SNR}/10}} \approx 0.89\)). Independent noise is added to
+  the untransformed data \(y\) and to the transformed data \(\Psi\).</p>
+  <p>Simple linear regression is used to fit the data. The least-squares estimates of
+  the slope \(\hat{\beta}_{1}\) and intercept \(\hat{\beta}_{0}\) are:</p>
+  \[\hat{\beta}_{1} = \frac{\displaystyle\sum_{i=1}^{n}\left(\chi_{i} -
+  \bar{\chi}\right)\left(\Psi_{i} - \bar{\Psi}\right)}
+  {\displaystyle\sum_{i=1}^{n}\left(\chi_{i} - \bar{\chi}\right)^{2}}\]
+  \[\hat{\beta}_{0} = \bar{\Psi} - \hat{\beta}_{1}\,\bar{\chi}\]
+  <p>where \(\bar{\chi}\) and \(\bar{\Psi}\) are the sample means and \(n = 60\) is the
+  number of data points. The fitted values and residuals are:</p>
+  \[\hat{\Psi}_{i} = \hat{\beta}_{0} + \hat{\beta}_{1}\,\chi_{i}, \qquad
+  e_{i} = \Psi_{i} - \hat{\Psi}_{i}\]
+  <p>The correlation coefficient \(r\) is:</p>
+  \[r = \frac{\displaystyle\sum_{i=1}^{n}\left(\chi_{i} - \bar{\chi}\right)
+  \left(\Psi_{i} - \bar{\Psi}\right)}
+  {\sqrt{\displaystyle\sum_{i=1}^{n}\left(\chi_{i} - \bar{\chi}\right)^{2}}\,
+  \sqrt{\displaystyle\sum_{i=1}^{n}\left(\Psi_{i} - \bar{\Psi}\right)^{2}}}\]
+  <p>and \(r^{2}\) is the coefficient of determination. The same regression formulas are
+  applied to the untransformed data \((x_{i},\, y_{i})\) for the plots on the left. When
+  the linear model is appropriate, the residuals scatter randomly about zero; a clear
+  trend in the residuals indicates that the linear model is violated.</p>
+  <p>Symbols:<br>
+  \(x,\, y\) = independent and dependent variables<br>
+  \(\chi,\, \Psi\) = transformed independent and dependent variables<br>
+  \(\hat{y},\, \hat{\Psi}\) = values predicted by the linear fit<br>
+  \(\hat{\beta}_{0},\, \hat{\beta}_{1}\) = least-squares intercept and slope<br>
+  \(e_{i}\) = residual of data point \(i\)<br>
+  \(r^{2}\) = coefficient of determination</p>
+</div>
+
+<div class="panel" id="panelAbout">
+  <button class="panelClose" title="Close">&#10005;</button>
+  <h2 class="panelTitle">About</h2>
+  <p>This simulation was created in the
+  <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of
+  Chemical and Biological Engineering</a> at University of Colorado Boulder for
+  <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a>
+  by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a
+  MATLAB simulation by Keith Regner. It was prepared with financial support from the
+  National Science Foundation (DUE 2336987 and 2336988). Address any questions or
+  comments to
+  <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.</p>
+</div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ------------------------------------------------------------------
+  // geometry (canvas logical coordinates, 90 px per MATLAB inch)
+  // ------------------------------------------------------------------
+  var W = 1260, H = 720;
+  var AX1 = { x0: 90,  x1: 450, y0: 45,  y1: 315 };  // upper left  (data & fit)
+  var AX2 = { x0: 90,  x1: 450, y0: 378, y1: 648 };  // lower left  (residuals)
+  var AX3 = { x0: 540, x1: 900, y0: 45,  y1: 315 };  // upper right (transformed)
+  var AX4 = { x0: 540, x1: 900, y0: 378, y1: 648 };  // lower right (residuals)
+
+  var canvas = document.getElementById('simCanvas');
+  var ctx = canvas.getContext('2d');
+  var dpr = window.devicePixelRatio || 1;
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  var BLUE = 'rgb(0,112,189)';
+  var GREEN = 'rgb(0,255,0)';
+
+  // ------------------------------------------------------------------
+  // model
+  // ------------------------------------------------------------------
+  var N = 60;
+  var xData = [];
+  for (var i = 1; i <= N; i++) { xData.push(0.05 * i); }
+
+  var SNR_DB = 1;
+  var NOISE_SIGMA = Math.sqrt(Math.pow(10, -SNR_DB / 10)); // awgn, 0 dBW reference
+
+  // the four equations: y(x), chi(x); Psi_true = 5*chi + 2
+  var EQS = [
+    { y: function (x) { return 5 * Math.exp(x) + 2; },
+      chi: function (x) { return Math.exp(x); },
+      actual: '\\(y = 5e^{x} + 2\\)',
+      ylim1: [-20, 120], ylim2: [-20, 30] },
+    { y: function (x) { return 5 / x + 2; },
+      chi: function (x) { return 1 / x; },
+      actual: '\\(y = 5x^{-1} + 2\\)',
+      ylim1: [-20, 110], ylim2: [-15, 80] },
+    { y: function (x) { return 5 * Math.log(x) + 2; },
+      chi: function (x) { return Math.log(x); },
+      actual: '\\(y = 5\\ln(x) + 2\\)',
+      ylim1: [-20, 30], ylim2: [-10, 5] },
+    { y: function (x) { return Math.sqrt(5 * Math.pow(x, 5) + 2); },
+      chi: function (x) { return Math.pow(x, 5); },
+      actual: '\\(y = \\sqrt{5x^{5} + 2}\\)',
+      ylim1: [-20, 30], ylim2: [-10, 10] }
+  ];
+
+  // Box-Muller standard normal
+  var spare = null;
+  function randn() {
+    if (spare !== null) { var s = spare; spare = null; return s; }
+    var u = 0, v = 0;
+    while (u === 0) { u = Math.random(); }
+    while (v === 0) { v = Math.random(); }
+    var m = Math.sqrt(-2 * Math.log(u));
+    spare = m * Math.sin(2 * Math.PI * v);
+    return m * Math.cos(2 * Math.PI * v);
+  }
+
+  // simple linear regression (same as MATLAB simp_lin_reg)
+  function linReg(xs, ys) {
+    var n = xs.length, xbar = 0, ybar = 0, k;
+    for (k = 0; k < n; k++) { xbar += xs[k]; ybar += ys[k]; }
+    xbar /= n; ybar /= n;
+    var sxy = 0, sxx = 0, syy = 0;
+    for (k = 0; k < n; k++) {
+      var dx = xs[k] - xbar, dy = ys[k] - ybar;
+      sxy += dx * dy; sxx += dx * dx; syy += dy * dy;
+    }
+    var b1 = sxy / sxx;
+    var b0 = ybar - b1 * xbar;
+    var r = sxy / (Math.sqrt(sxx) * Math.sqrt(syy));
+    var res = [];
+    for (k = 0; k < n; k++) { res.push(ys[k] - (b0 + b1 * xs[k])); }
+    return { b1: b1, b0: b0, r: r, res: res };
+  }
+
+  // state for current selection
+  var state = null;
+
+  function generate(idx) {
+    var eq = EQS[idx];
+    var yRef = xData.map(eq.y);
+    var chi = xData.map(eq.chi);
+    var psiRef = chi.map(function (c) { return 5 * c + 2; });
+    var yNoisy = yRef.map(function (v) { return v + NOISE_SIGMA * randn(); });
+    var psiNoisy = psiRef.map(function (v) { return v + NOISE_SIGMA * randn(); });
+    var fit = linReg(xData, yNoisy);
+    var fitT = linReg(chi, psiNoisy);
+    state = {
+      idx: idx, eq: eq,
+      yRef: yRef, yNoisy: yNoisy,
+      chi: chi, psiRef: psiRef, psiNoisy: psiNoisy,
+      fit: fit, fitT: fitT
+    };
+  }
+
+  // ------------------------------------------------------------------
+  // number formatting (match MATLAB num2str behavior)
+  // ------------------------------------------------------------------
+  function fmt2(v) {           // round to 2 decimals, trim trailing zeros
+    return String(parseFloat(v.toFixed(2)));
+  }
+  function fmt3sig(v) {        // 3 significant figures
+    return v.toPrecision(3);
+  }
+  function fmtTick(v) {
+    if (Math.abs(v) < 1e-12) { return '0'; }
+    return String(Number(v.toPrecision(10)));
+  }
+
+  // ------------------------------------------------------------------
+  // axis helpers
+  // ------------------------------------------------------------------
+  function niceTicks(lo, hi, target) {
+    target = target || 6;
+    var range = hi - lo;
+    if (range <= 0) { return [lo]; }
+    var raw = range / target;
+    var mag = Math.pow(10, Math.floor(Math.log10(raw)));
+    var norm = raw / mag;
+    var step;
+    if (norm < 1.5) { step = 1; }
+    else if (norm < 3.5) { step = 2; }
+    else if (norm < 7.5) { step = 5; }
+    else { step = 10; }
+    step *= mag;
+    var ticks = [];
+    var t = Math.ceil(lo / step - 1e-9) * step;
+    while (t <= hi + 1e-9) {
+      ticks.push(Math.abs(t) < step * 1e-8 ? 0 : t);
+      t += step;
+    }
+    return ticks;
+  }
+
+  function tightLims(arrs, pad) {
+    var lo = Infinity, hi = -Infinity;
+    arrs.forEach(function (a) {
+      a.forEach(function (v) {
+        if (isFinite(v)) { if (v < lo) { lo = v; } if (v > hi) { hi = v; } }
+      });
+    });
+    if (pad) {
+      var p = (hi - lo) * pad;
+      lo -= p; hi += p;
+    }
+    if (lo === hi) { lo -= 1; hi += 1; }
+    return [lo, hi];
+  }
+
+  function makeScale(ax, xlim, ylim) {
+    return {
+      x: function (v) { return ax.x0 + (v - xlim[0]) / (xlim[1] - xlim[0]) * (ax.x1 - ax.x0); },
+      y: function (v) { return ax.y1 - (v - ylim[0]) / (ylim[1] - ylim[0]) * (ax.y1 - ax.y0); }
+    };
+  }
+
+  function drawAxes(ax, xlim, ylim) {
+    var sc = makeScale(ax, xlim, ylim);
+    ctx.save();
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(ax.x0, ax.y0, ax.x1 - ax.x0, ax.y1 - ax.y0);
+
+    ctx.lineWidth = 1.5;
+    ctx.font = '15px Helvetica, Arial, sans-serif';
+    ctx.fillStyle = '#000';
+
+    var tickLen = 6;
+    // x ticks
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    niceTicks(xlim[0], xlim[1]).forEach(function (t) {
+      var px = sc.x(t);
+      ctx.beginPath();
+      ctx.moveTo(px, ax.y1); ctx.lineTo(px, ax.y1 - tickLen);
+      ctx.moveTo(px, ax.y0); ctx.lineTo(px, ax.y0 + tickLen);
+      ctx.stroke();
+      ctx.fillText(fmtTick(t), px, ax.y1 + 6);
+    });
+    // y ticks
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    niceTicks(ylim[0], ylim[1]).forEach(function (t) {
+      var py = sc.y(t);
+      ctx.beginPath();
+      ctx.moveTo(ax.x0, py); ctx.lineTo(ax.x0 + tickLen, py);
+      ctx.moveTo(ax.x1, py); ctx.lineTo(ax.x1 - tickLen, py);
+      ctx.stroke();
+      ctx.fillText(fmtTick(t), ax.x0 - 7, py);
+    });
+    ctx.restore();
+    return sc;
+  }
+
+  function clipTo(ax) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(ax.x0, ax.y0, ax.x1 - ax.x0, ax.y1 - ax.y0);
+    ctx.clip();
+  }
+
+  function drawLine(sc, xs, ys, color, width, dash) {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    ctx.setLineDash(dash || []);
+    ctx.beginPath();
+    for (var k = 0; k < xs.length; k++) {
+      var px = sc.x(xs[k]), py = sc.y(ys[k]);
+      if (k === 0) { ctx.moveTo(px, py); } else { ctx.lineTo(px, py); }
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  function drawMarkers(sc, xs, ys) {
+    for (var k = 0; k < xs.length; k++) {
+      ctx.beginPath();
+      ctx.arc(sc.x(xs[k]), sc.y(ys[k]), 4, 0, 2 * Math.PI);
+      ctx.fillStyle = BLUE;
+      ctx.fill();
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = '#000';
+      ctx.stroke();
+    }
+  }
+
+  // ------------------------------------------------------------------
+  // drawing
+  // ------------------------------------------------------------------
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    var s = state;
+    var xlim1 = [0.05, 3];
+
+    // ---- upper left: nonlinear data, linear fit, actual curve ----
+    var sc1 = drawAxes(AX1, xlim1, s.eq.ylim1);
+    clipTo(AX1);
+    var yHat1 = xData.map(function (x) { return s.fit.b0 + s.fit.b1 * x; });
+    drawMarkers(sc1, xData, s.yNoisy);
+    drawLine(sc1, xData, yHat1, GREEN, 2);
+    drawLine(sc1, xData, s.yRef, '#000', 1, [6, 4]);
+    ctx.restore();
+
+    // ---- lower left: residuals of untransformed fit ----
+    var x2lim = tightLims([s.yNoisy], 0.02);
+    var sc2 = drawAxes(AX2, x2lim, s.eq.ylim2);
+    clipTo(AX2);
+    drawMarkers(sc2, s.yNoisy, s.fit.res);
+    drawLine(sc2, [x2lim[0], x2lim[1]], [0, 0], '#000', 2);
+    ctx.restore();
+
+    // ---- upper right: transformed data, linear fit, actual line ----
+    var psiHat = s.chi.map(function (c) { return s.fitT.b0 + s.fitT.b1 * c; });
+    var x3lim = tightLims([s.chi], 0);
+    var y3lim = tightLims([s.psiNoisy, psiHat, s.psiRef], 0.03);
+    var sc3 = drawAxes(AX3, x3lim, y3lim);
+    clipTo(AX3);
+    drawMarkers(sc3, s.chi, s.psiNoisy);
+    drawLine(sc3, s.chi, psiHat, GREEN, 2);
+    drawLine(sc3, s.chi, s.psiRef, '#000', 1, [6, 4]);
+    ctx.restore();
+
+    // ---- lower right: residuals of transformed fit ----
+    var x4lim = tightLims([s.psiNoisy], 0.02);
+    var sc4 = drawAxes(AX4, x4lim, [-3.5, 3.5]);
+    clipTo(AX4);
+    drawMarkers(sc4, s.psiNoisy, s.fitT.res);
+    drawLine(sc4, [x4lim[0], x4lim[1]], [0, 0], '#000', 2);
+    ctx.restore();
+
+    // ---- in-plot legends (line/marker samples and plain words) ----
+    ctx.font = '15px Helvetica, Arial, sans-serif';
+    ctx.fillStyle = '#000';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    [0, 450].forEach(function (dx) {
+      // data marker
+      ctx.beginPath();
+      ctx.arc(114 + dx, 68, 4, 0, 2 * Math.PI);
+      ctx.fillStyle = BLUE;
+      ctx.fill();
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = '#000';
+      ctx.stroke();
+      ctx.fillStyle = '#000';
+      ctx.fillText('data', 128 + dx, 69);
+      // actual: dashed sample
+      ctx.strokeStyle = '#000';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([6, 4]);
+      ctx.beginPath();
+      ctx.moveTo(106 + dx, 92); ctx.lineTo(144 + dx, 92);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillText('actual,', 149 + dx, 93);
+      // fit: green sample
+      ctx.strokeStyle = GREEN;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(106 + dx, 116); ctx.lineTo(144 + dx, 116);
+      ctx.stroke();
+      ctx.fillText('fit,', 149 + dx, 117);
+    });
+  }
+
+  // ------------------------------------------------------------------
+  // dynamic MathJax legend text
+  // ------------------------------------------------------------------
+  function fitString(b1, b0, xSym, ySym) {
+    var sign = b0 < 0 ? ' - ' : ' + ';
+    return '\\(\\hat{' + ySym + '} = ' + fmt2(b1) + xSym + sign +
+           fmt2(Math.abs(b0)) + ',\\)';
+  }
+
+  function updateLabels() {
+    var s = state;
+    var actL = document.getElementById('actEqL');
+    var fitL = document.getElementById('fitEqL');
+    var r2L = document.getElementById('r2L');
+    var fitR = document.getElementById('fitEqR');
+    var r2R = document.getElementById('r2R');
+
+    actL.innerHTML = s.eq.actual;
+    fitL.innerHTML = fitString(s.fit.b1, s.fit.b0, 'x', 'y');
+    r2L.innerHTML = '\\(r^{2} = ' + fmt3sig(s.fit.r * s.fit.r) + '\\)';
+    fitR.innerHTML = fitString(s.fitT.b1, s.fitT.b0, '\\chi', '\\Psi');
+    r2R.innerHTML = '\\(r^{2} = ' + fmt3sig(s.fitT.r * s.fitT.r) + '\\)';
+
+    if (window.MathJax && MathJax.typesetPromise) {
+      MathJax.typesetPromise([actL, fitL, r2L, fitR, r2R]);
+    }
+  }
+
+  function update(idx) {
+    generate(idx);
+    draw();
+    updateLabels();
+  }
+
+  // ------------------------------------------------------------------
+  // controls
+  // ------------------------------------------------------------------
+  document.querySelectorAll('input[name="eqSel"]').forEach(function (rb) {
+    rb.addEventListener('change', function () {
+      update(parseInt(this.value, 10));
+    });
+  });
+
+  // collapsible panels
+  function wirePanel(btnId, panelId) {
+    var btn = document.getElementById(btnId);
+    var panel = document.getElementById(panelId);
+    btn.addEventListener('click', function () {
+      var open = panel.style.display === 'block';
+      document.querySelectorAll('.panel').forEach(function (p) {
+        p.style.display = 'none';
+      });
+      if (!open) {
+        panel.style.display = 'block';
+        if (window.MathJax && MathJax.typesetPromise) {
+          MathJax.typesetPromise([panel]);
+        }
+      }
+    });
+  }
+  wirePanel('btnDirections', 'panelDirections');
+  wirePanel('btnDetails', 'panelDetails');
+  wirePanel('btnAbout', 'panelAbout');
+
+  // wrap each panel's content in a scrolling body so the close button
+  // stays pinned to the panel's upper-right corner
+  document.querySelectorAll('.panel').forEach(function (panel) {
+    var body = document.createElement('div');
+    body.className = 'panelBody';
+    var nodes = [];
+    panel.childNodes.forEach(function (n) {
+      if (!(n.nodeType === 1 && (n.classList.contains('panelClose') ||
+                                 n.classList.contains('panelTitle')))) {
+        nodes.push(n);
+      }
+    });
+    nodes.forEach(function (n) { body.appendChild(n); });
+    panel.appendChild(body);
+  });
+
+  document.querySelectorAll('.panelClose').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      this.closest('.panel').style.display = 'none';
+    });
+  });
+
+  // ------------------------------------------------------------------
+  // start
+  // ------------------------------------------------------------------
+  update(0);
+})();
+</script>
+</body>
+</html>

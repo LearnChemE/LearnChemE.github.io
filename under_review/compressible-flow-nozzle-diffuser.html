@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Compressible Flow through a Nozzle/Diffuser</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    font-family: Helvetica, Arial, sans-serif;
+    background: #ffffff;
+    color: #222222;
+  }
+  #app {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 14px 16px 24px 16px;
+    position: relative;
+  }
+  h1.title {
+    font-size: 17px;
+    font-weight: bold;
+    text-align: center;
+    margin: 4px 0 14px 0;
+    color: #111111;
+  }
+  .top-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+  }
+  .setterbar {
+    display: flex;
+    gap: 0;
+  }
+  .setterbar button {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 15.6px;
+    padding: 6px 22px;
+    border: 1px solid #98000D;
+    background: #ffffff;
+    color: #98000D;
+    cursor: pointer;
+    outline: none;
+  }
+  .setterbar button.left { border-radius: 4px 0 0 4px; border-right: none; }
+  .setterbar button.right { border-radius: 0 4px 4px 0; }
+  .setterbar button.active {
+    background: #98000D;
+    color: #ffffff;
+  }
+  .canvas-wrap {
+    border: 1px solid #cccccc;
+    border-radius: 3px;
+    background: #ffffff;
+    margin-bottom: 10px;
+  }
+  canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .controls-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    justify-content: center;
+    align-items: center;
+    margin: 10px 0 4px 0;
+  }
+  .slider-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .slider-group label {
+    font-size: 15.6px;
+    color: #222222;
+    white-space: nowrap;
+  }
+  input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+  input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  .slider-group input[type="range"] {
+    width: 150px;
+    margin-bottom: 0;
+  }
+  .slider-group .val {
+    font-size: 15.6px;
+    color: #000000;
+    font-weight: normal;
+    min-width: 46px;
+    display: inline-block;
+    text-align: left;
+    margin-left: -4px;
+  }
+  .plot-label {
+    font-size: 15.6px;
+    font-weight: bold;
+  }
+  .panel-buttons {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .panel-header {
+    background: #98000D;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 26px;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    font-weight: normal;
+    color: #ffffff;
+    cursor: pointer;
+    text-align: center;
+  }
+  .panel-header:hover { background: #7d000b; }
+  .panel-header.open { background: #7d000b; }
+  .panel-body {
+    display: none;
+    position: absolute;
+    z-index: 30;
+    width: 562px;
+    max-width: calc(100vw - 32px);
+    background: #ffffff;
+    border: 1px solid #cccccc;
+    border-radius: 6px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+    padding: 32px 16px 14px 16px;
+    font-size: 14.3px;
+    line-height: 1.55;
+    color: #333333;
+  }
+  .panel-body.open { display: block; }
+  .panel-body.wide { width: 552px; }
+  #panel-details { width: 635px; }
+  .panel-body h2 {
+    font-size: 17px;
+    font-weight: bold;
+    color: #000000;
+    margin: 0 0 10px 0;
+  }
+  .symbols { margin: 4px 0 0 0; padding: 0; list-style: none; }
+  .symbols li { margin: 0 0 4px 0; }
+  .panel-body p { margin: 0 0 10px 0; }
+  .panel-body a { color: #98000D; text-decoration: none; }
+  .panel-body a:hover { text-decoration: underline; }
+  .panel-close {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    line-height: 1;
+    color: #888888;
+    cursor: pointer;
+    padding: 4px 8px;
+  }
+  .panel-close:hover { color: #98000D; }
+  .eq {
+    font-style: italic;
+    display: block;
+    margin: 6px 0 10px 18px;
+    color: #111111;
+  }
+  .sub { vertical-align: sub; font-size: 0.75em; }
+  .sup { vertical-align: super; font-size: 0.75em; }
+</style>
+</head>
+<body>
+<div id="app">
+  <h1 class="title">Compressible Flow through a Nozzle/Diffuser</h1>
+
+  <div class="top-toolbar">
+    <div class="setterbar">
+      <button id="btnDiagram" class="left active">diagram</button>
+      <button id="btnPlots" class="right">plots</button>
+    </div>
+    <div class="panel-buttons">
+      <button class="panel-header" data-panel="directions" data-placement="below">Directions</button>
+      <button class="panel-header" data-panel="details" data-placement="below" data-offset="-60">Details</button>
+      <button class="panel-header" data-panel="about">About</button>
+    </div>
+  </div>
+
+  <div class="canvas-wrap">
+    <canvas id="cv"></canvas>
+  </div>
+
+  <div class="controls-row" id="mainControls">
+    <div class="slider-group">
+      <label for="u1">inlet velocity u<span class="sub">1</span> (m/s)</label>
+      <input type="range" id="u1" min="10" max="100" step="1" value="100">
+      <span class="val" id="u1val">100</span>
+    </div>
+    <div class="slider-group">
+      <label for="d2">outlet diameter d<span class="sub">2</span> (m)</label>
+      <input type="range" id="d2" min="0.040" max="0.100" step="0.001" value="0.040">
+      <span class="val" id="d2val">0.040</span>
+    </div>
+  </div>
+
+  <div class="controls-row" id="plotControls" style="display:none;">
+    <div class="slider-group">
+      <label class="plot-label">plot:</label>
+    </div>
+    <div class="setterbar" style="margin-bottom:0;">
+      <button id="btnVel" class="left active">outlet velocity</button>
+      <button id="btnTemp" class="right">outlet temp</button>
+    </div>
+  </div>
+
+  <div id="panels">
+    <div class="panel-body wide" id="panel-directions">
+      <button class="panel-close" data-panel="directions" aria-label="Close">&times;</button>
+      <h2>Directions</h2>
+      <p>This Demonstration models compressible flow through a reversible nozzle/diffuser. The inlet pressure P<span class="sub">1</span>, the exit velocity u<span class="sub">2</span>, and the exit temperature T<span class="sub">2</span> are calculated from mass and energy balances during air flow. Because it is reversible, the entropy change is zero. The air exits as a free jet at atmospheric pressure (P<span class="sub">2</span> = 101.3&nbsp;kPa).</p>
+      <p>Set the outlet diameter d<span class="sub">2</span> and inlet velocity u<span class="sub">1</span> with the sliders. When d<span class="sub">2</span> &lt; d<span class="sub">1</span>, the device acts as a nozzle, with the inlet pressure higher than the exit pressure (P<span class="sub">1</span> &gt; P<span class="sub">2</span>) in order to provide the energy needed to accelerate the air through the nozzle. When d<span class="sub">2</span> &gt; d<span class="sub">1</span>, the device operates as a diffuser, and the exit pressure is higher than the inlet pressure (P<span class="sub">1</span> &lt; P<span class="sub">2</span>).</p>
+      <p>Select "plots" to plot the outlet velocity or outlet temperature as a function of outlet diameter for compressible air flow (blue) and incompressible air flow (green). Air is assumed to behave as an ideal gas and all flow is subsonic.</p>
+    </div>
+
+    <div class="panel-body wide" id="panel-details">
+      <button class="panel-close" data-panel="details" aria-label="Close">&times;</button>
+      <h2>Details</h2>
+      <p>The mass balance around a nozzle/diffuser for compressible flow, where i = 1 for the inlet and i = 2 for the outlet, is given by:</p>
+      <span class="eq">u<span class="sub">1</span> A<span class="sub">1</span> &rho;<span class="sub">1</span> = u<span class="sub">2</span> A<span class="sub">2</span> &rho;<span class="sub">2</span>,</span>
+      <p>where A<span class="sub">i</span> = (&pi;/4) d<span class="sub">i</span><span class="sup">2</span> is the area, u<span class="sub">i</span> is the velocity (m/s), &rho;<span class="sub">i</span> = P<span class="sub">i</span> / (R T<span class="sub">i</span>) is the density calculated from the ideal gas law, d<span class="sub">i</span> is diameter (m), P<span class="sub">i</span> is pressure (kPa), R is the ideal gas constant, and T<span class="sub">i</span> is temperature (K).</p>
+      <p>The mass balance simplifies to:</p>
+      <span class="eq">u<span class="sub">1</span> d<span class="sub">1</span><span class="sup">2</span> (P<span class="sub">1</span>/T<span class="sub">1</span>) = u<span class="sub">2</span> d<span class="sub">2</span><span class="sup">2</span> (P<span class="sub">2</span>/T<span class="sub">2</span>),</span>
+      <p>for incompressible flow &rho;<span class="sub">1</span> = &rho;<span class="sub">2</span>, and thus u<span class="sub">1</span> A<span class="sub">1</span> = u<span class="sub">2</span> A<span class="sub">2</span>.</p>
+      <p>The energy balance for an adiabatic nozzle/diffuser is:</p>
+      <span class="eq">m<span class="sub">1</span> (H<span class="sub">1</span> + u<span class="sub">1</span><span class="sup">2</span>/2) &minus; m<span class="sub">2</span> (H<span class="sub">2</span> + u<span class="sub">2</span><span class="sup">2</span>/2) = 0,</span>
+      <p>where H<span class="sub">i</span> is enthalpy (J/kg), and conservation of mass means that m<span class="sub">1</span> = m<span class="sub">2</span>, so the energy balance simplifies to:</p>
+      <span class="eq">H<span class="sub">2</span> &minus; H<span class="sub">1</span> = Cp (T<span class="sub">2</span> &minus; T<span class="sub">1</span>) = &frac12; (u<span class="sub">1</span><span class="sup">2</span> &minus; u<span class="sub">2</span><span class="sup">2</span>),</span>
+      <p>where Cp = 7/2 R is the ideal gas heat capacity of air (J/[kg&middot;K]).</p>
+      <p>For compressible flow, the inlet pressure P<span class="sub">1</span> is calculated from an entropy balance on an adiabatic reversible system:</p>
+      <span class="eq">Cp ln(T<span class="sub">2</span>/T<span class="sub">1</span>) &minus; R ln(P<span class="sub">2</span>/P<span class="sub">1</span>) = 0,</span>
+      <p>which simplifies to</p>
+      <span class="eq">T<span class="sub">2</span>/T<span class="sub">1</span> = (P<span class="sub">2</span>/P<span class="sub">1</span>)<span class="sup">R/Cp</span>.</span>
+      <p><b>Symbols</b></p>
+      <ul class="symbols">
+        <li>A<span class="sub">i</span> = cross-sectional area (m<span class="sup">2</span>)</li>
+        <li>Cp = ideal-gas heat capacity of air (J/[kg&middot;K])</li>
+        <li>d<span class="sub">i</span> = diameter (m); d<span class="sub">1</span> = 0.06 m is fixed</li>
+        <li>H<span class="sub">i</span> = enthalpy (J/kg)</li>
+        <li>m<span class="sub">i</span> = mass flow rate (kg/s)</li>
+        <li>P<span class="sub">i</span> = pressure (kPa); P<span class="sub">2</span> = 101.3 kPa</li>
+        <li>R = gas constant for air (J/[kg&middot;K])</li>
+        <li>T<span class="sub">i</span> = temperature (K); T<span class="sub">1</span> = 400 K</li>
+        <li>u<span class="sub">i</span> = velocity (m/s)</li>
+        <li>&rho;<span class="sub">i</span> = density (kg/m<span class="sup">3</span>)</li>
+        <li>subscripts 1, 2 = inlet, outlet</li>
+      </ul>
+    </div>
+
+    <div class="panel-body" id="panel-about">
+      <button class="panel-close" data-panel="about" aria-label="Close">&times;</button>
+      <h2>About</h2>
+      <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/CompressibleFlowThroughANozzleDiffuser/" target="_blank" rel="noopener">Mathematica simulation</a> by Rachael L. Baumann. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  "use strict";
+
+  // ---------- Physical constants ----------
+  var R  = 287.0;       // specific gas constant for air, J/(kg K)
+  var Cp = 3.5 * R;     // ideal gas heat capacity of air, J/(kg K)  == 1004.5
+  var P2 = 101.3;       // kPa, fixed atmospheric exit pressure
+  var T1 = 400.0;       // K, fixed inlet temperature (confirmed against original demo output)
+  var d1 = 0.06;        // m, fixed inlet diameter (confirmed against original demo output)
+
+  // ---------- State ----------
+  var state = {
+    view: "diagram",     // "diagram" | "plots"
+    plotVar: "velocity", // "velocity" | "temperature"
+    u1: 100,              // m/s
+    d2: 0.040             // m
+  };
+
+  // ---------- Solve the physics: given u1, d1, d2, T1, P2, R, Cp ----------
+  // Combining the mass balance, the isentropic (entropy) relation, and the
+  // energy balance yields a single equation in T2:
+  //   u2(T2) = u1 * (d1/d2)^2 * (T1/T2)^(Cp/R - 1)
+  //   T2 = T1 + (u1^2 - u2^2) / (2 Cp)
+  // The physical (subsonic) root sits close to T1, so Newton's method
+  // started at T2 = T1 converges reliably within the slider ranges used here.
+  // Returns { u2, T2, P1 }
+  function solve(u1, d1, d2, T1, P2, R, Cp) {
+    var ratio = Math.pow(d1 / d2, 2);
+    var expo = Cp / R - 1; // = 2.5 for air (Cp/R = 7/2)
+
+    function u2ofT2(T2) {
+      return u1 * ratio * Math.pow(T1 / T2, expo);
+    }
+    function f(T2) {
+      var u2 = u2ofT2(T2);
+      return T1 + (u1 * u1 - u2 * u2) / (2 * Cp) - T2;
+    }
+
+    var T2 = T1;
+    for (var i = 0; i < 100; i++) {
+      var h = Math.max(1e-4, T2 * 1e-6);
+      var f0 = f(T2);
+      var f1 = f(T2 + h);
+      var deriv = (f1 - f0) / h;
+      if (Math.abs(deriv) < 1e-12) break;
+      var step = f0 / deriv;
+      var T2new = T2 - step;
+      if (T2new <= 1) T2new = T2 / 2;
+      if (Math.abs(T2new - T2) < 1e-9) { T2 = T2new; break; }
+      T2 = T2new;
+    }
+
+    var u2 = u2ofT2(T2);
+    var P1 = P2 * Math.pow(T1 / T2, Cp / R);
+    return { u2: u2, T2: T2, P1: P1 };
+  }
+
+  function incompressibleU2(u1, d1, d2) {
+    return u1 * Math.pow(d1 / d2, 2);
+  }
+
+  // ---------- Canvas setup (hi-DPI) ----------
+  var canvas = document.getElementById("cv");
+  var ctx = canvas.getContext("2d");
+  var CSS_W = 720, CSS_H = 430;
+
+  function fitCanvas() {
+    var dpr = window.devicePixelRatio || 1;
+    canvas.width = CSS_W * dpr;
+    canvas.height = CSS_H * dpr;
+    canvas.style.width = CSS_W + "px";
+    canvas.style.height = CSS_H + "px";
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  fitCanvas();
+  window.addEventListener("resize", function() { fitCanvas(); draw(); });
+
+  // ---------- Formatting helpers (3 significant figures, like the original) ----------
+  function sigfig(x, n) {
+    if (x === 0) return "0";
+    var d = Math.ceil(Math.log10(Math.abs(x)));
+    var power = n - d;
+    var factor = Math.pow(10, power);
+    var val = Math.round(x * factor) / factor;
+    // Fix floating artifacts and choose sensible decimal display
+    if (power > 0) {
+      return val.toFixed(Math.max(power, 0));
+    } else {
+      return String(Math.round(val));
+    }
+  }
+
+  // ---------- Drawing: diagram ----------
+  // Draw text made of normal-size and subscript tokens, e.g.
+  // [{t:"u"},{t:"1",sub:true},{t:" = 100 m/s"}]
+  // align: "left" | "center" | "right", anchored at (x, y) (y = baseline of normal text)
+  function drawMixedText(tokens, x, y, align, fontPx, color) {
+    var subFontPx = Math.round(fontPx * 0.72);
+    var widths = tokens.map(function(tok) {
+      ctx.font = (tok.sub ? subFontPx : fontPx) + "px Helvetica, Arial, sans-serif";
+      return ctx.measureText(tok.t).width;
+    });
+    var total = widths.reduce(function(a, b) { return a + b; }, 0);
+    var startX = align === "left" ? x : (align === "right" ? x - total : x - total / 2);
+    var cursor = startX;
+    ctx.textAlign = "left";
+    ctx.fillStyle = color;
+    for (var i = 0; i < tokens.length; i++) {
+      var tok = tokens[i];
+      ctx.font = (tok.sub ? subFontPx : fontPx) + "px Helvetica, Arial, sans-serif";
+      var yOff = tok.sub ? y + Math.round(fontPx * 0.28) : y;
+      ctx.fillText(tok.t, cursor, yOff);
+      cursor += widths[i];
+    }
+  }
+
+  // Mathematica-style real-number formatting: whole numbers get a trailing
+  // decimal point (e.g. "100."), matching the original demo's display.
+  function machReal(x) {
+    return Math.round(x) + ".";
+  }
+  // Trim trailing zeros from a fixed-precision meter value (0.060 -> "0.06").
+  function fmtMeters(x) {
+    var s = x.toFixed(3);
+    s = s.replace(/0+$/, "");
+    if (s.endsWith(".")) s = s.slice(0, -1);
+    return s + " m";
+  }
+
+  function drawDiagram(u1, d2, result) {
+    ctx.clearRect(0, 0, CSS_W, CSS_H);
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, CSS_W, CSS_H);
+
+    // Geometry layout
+    var cx = CSS_W / 2;
+    var cy = 225;
+    var pipeLen = 320;
+    var xStart = cx - pipeLen / 2;
+    var xEnd = cx + pipeLen / 2;
+    var xThroatL = xStart + 40; // short straight inlet section, like the Mathematica version
+    var xThroatR = xEnd - 40;   // short straight outlet section
+    var xD1Ring = xStart + 34;  // ring/measurement position near the inlet
+    var xD2Ring = xEnd - 34;    // ring/measurement position near the outlet
+
+    // Inlet (d1) is fixed and always drawn at the same size; only the outlet
+    // half-height scales with d2 relative to that fixed inlet, so changing
+    // the outlet-diameter slider never changes how big the inlet looks.
+    var maxHalf = 70; // px half-height representing the fixed inlet diameter d1
+    var h1 = maxHalf;
+    var h2 = maxHalf * (d2 / d1);
+    var ringRx = 13; // horizontal "width" of the perspective rings/end caps
+
+    // --- Pipe outline (converging or diverging duct), 3D-style shading ---
+    ctx.beginPath();
+    ctx.moveTo(xStart, cy - h1);
+    ctx.lineTo(xThroatL, cy - h1);
+    ctx.lineTo(xThroatR, cy - h2);
+    ctx.lineTo(xEnd, cy - h2);
+    ctx.lineTo(xEnd, cy + h2);
+    ctx.lineTo(xThroatR, cy + h2);
+    ctx.lineTo(xThroatL, cy + h1);
+    ctx.lineTo(xStart, cy + h1);
+    ctx.closePath();
+
+    var maxHalfOverall = Math.max(h1, h2);
+    var grad = ctx.createLinearGradient(0, cy - maxHalfOverall, 0, cy + maxHalfOverall);
+    grad.addColorStop(0, "#f0a355");
+    grad.addColorStop(0.5, "#d998a8");
+    grad.addColorStop(1, "#6f63a8");
+    ctx.fillStyle = grad;
+    ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = "#6b6b7a";
+    ctx.stroke();
+
+    // Ring ellipses at the d1/d2 measurement points, suggesting the tube's
+    // circular cross-section there, like the original Mathematica version.
+    function ring(x, halfH) {
+      ctx.beginPath();
+      ctx.ellipse(x, cy, ringRx, halfH, 0, 0, 2 * Math.PI);
+      ctx.strokeStyle = "#6b6b7a";
+      ctx.lineWidth = 1.4;
+      ctx.stroke();
+    }
+    ring(xD1Ring, h1);
+    ring(xD2Ring, h2);
+
+    // Support legs (decorative), matching the physical-apparatus look
+    ctx.strokeStyle = "#888888";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(xThroatL + 10, cy + h1 * 0.55);
+    ctx.lineTo(xThroatL - 4, cy + h1 + 34);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(xThroatR - 10, cy + h2 * 0.55 + (h1 - h2));
+    ctx.lineTo(xThroatR + 4, cy + h1 + 34);
+    ctx.stroke();
+
+    // Flow-direction arrows at the inlet and outlet (simple, matching the
+    // original Mathematica version's plain black arrows).
+    function flowArrow(xTail, xTip, y) {
+      ctx.strokeStyle = "#000000";
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      ctx.moveTo(xTail, y);
+      ctx.lineTo(xTip - 9, y);
+      ctx.stroke();
+      ctx.fillStyle = "#000000";
+      ctx.beginPath();
+      ctx.moveTo(xTip, y);
+      ctx.lineTo(xTip - 9, y - 5);
+      ctx.lineTo(xTip - 9, y + 5);
+      ctx.closePath();
+      ctx.fill();
+    }
+    flowArrow(xStart - 40, xStart - 16, cy);
+    flowArrow(xEnd + 16, xEnd + 40, cy);
+
+    // Device-type label above the figure
+    var deviceLabel = d2 < d1 ? "nozzle" : (d2 > d1 ? "diffuser" : "");
+    if (deviceLabel) {
+      ctx.font = "bold 19px Helvetica, Arial, sans-serif";
+      ctx.fillStyle = "#333333";
+      ctx.textAlign = "center";
+      ctx.fillText(deviceLabel, cx, 45);
+    }
+
+    // --- d1, d2 measurement arrows, shown directly on the rings ---
+    function vDimArrow(x, yTop, yBot) {
+      ctx.strokeStyle = "#000000";
+      ctx.fillStyle = "#000000";
+      ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.moveTo(x, yTop);
+      ctx.lineTo(x, yBot);
+      ctx.stroke();
+      function head(y, dir) {
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x - 4, y + dir * 8);
+        ctx.lineTo(x + 4, y + dir * 8);
+        ctx.closePath();
+        ctx.fill();
+      }
+      head(yTop, 1);
+      head(yBot, -1);
+    }
+    vDimArrow(xD1Ring, cy - h1, cy + h1);
+    vDimArrow(xD2Ring, cy - h2, cy + h2);
+
+    function ringLabel(text, x, y) {
+      ctx.font = "17px Helvetica, Arial, sans-serif";
+      var w = ctx.measureText(text).width;
+      ctx.fillStyle = "rgba(255,255,255,0.92)";
+      ctx.fillRect(x - w / 2 - 5, y - 13, w + 10, 22);
+      ctx.fillStyle = "#111111";
+      ctx.textAlign = "center";
+      ctx.fillText(text, x, y + 6);
+    }
+    ringLabel(fmtMeters(d1), xD1Ring, cy);
+    ringLabel(fmtMeters(d2), xD2Ring, cy);
+
+    // --- State values, placed in front of (left) and at the exit (right) ---
+    var rowY = [cy - 28, cy, cy + 28];
+    var leftX = xStart - 42;
+
+    drawMixedText(
+      [{ t: "u" }, { t: "1", sub: true }, { t: " = " + machReal(u1) + " m/s" }],
+      leftX, rowY[0], "right", 18, "#111111"
+    );
+    drawMixedText(
+      [{ t: "T" }, { t: "1", sub: true }, { t: " = " + machReal(T1) + " K" }],
+      leftX, rowY[1], "right", 18, "#111111"
+    );
+    drawMixedText(
+      [{ t: "P" }, { t: "1", sub: true }, { t: " = " + result.P1.toFixed(1) + " kPa" }],
+      leftX, rowY[2], "right", 18, "#111111"
+    );
+
+    var rightX = xEnd + 42;
+    drawMixedText(
+      [{ t: "u" }, { t: "2", sub: true }, { t: " = " + machReal(result.u2) + " m/s" }],
+      rightX, rowY[0], "left", 18, "#111111"
+    );
+    drawMixedText(
+      [{ t: "T" }, { t: "2", sub: true }, { t: " = " + machReal(result.T2) + " K" }],
+      rightX, rowY[1], "left", 18, "#111111"
+    );
+    drawMixedText(
+      [{ t: "P" }, { t: "2", sub: true }, { t: " = " + P2.toFixed(1) + " kPa" }],
+      rightX, rowY[2], "left", 18, "#111111"
+    );
+  }
+
+  // ---------- Drawing: plots ----------
+  function drawPlots(u1, d2Current, plotVar) {
+    ctx.clearRect(0, 0, CSS_W, CSS_H);
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, CSS_W, CSS_H);
+
+    var marginL = 105, marginR = 30, marginT = 30, marginB = 68;
+    var plotW = CSS_W - marginL - marginR;
+    var plotH = CSS_H - marginT - marginB;
+
+    var dMin = 0.040, dMax = 0.100;
+    var N = 140;
+
+    var compVals = [];
+    var incompVals = [];
+    var dArr = [];
+
+    var yMin = Infinity, yMax = -Infinity;
+
+    for (var i = 0; i <= N; i++) {
+      var d2 = dMin + (dMax - dMin) * i / N;
+      var res = solve(u1, d1, d2, T1, P2, R, Cp);
+      var uInc = incompressibleU2(u1, d1, d2);
+      var yComp, yInc;
+      if (plotVar === "velocity") {
+        yComp = res.u2;
+        yInc = uInc;
+      } else {
+        // incompressible temperature = T1 (no temperature change, since energy
+        // balance with rho1=rho2 model still conserves KE<->enthalpy the same way;
+        // to be faithful to the demonstration, show T1-based incompressible energy balance:
+        // Cp(T2-T1) = 1/2 (u1^2 - uInc^2)
+        yComp = res.T2;
+        yInc = T1 + (u1 * u1 - uInc * uInc) / (2 * Cp);
+      }
+      dArr.push(d2);
+      compVals.push(yComp);
+      incompVals.push(yInc);
+      yMin = Math.min(yMin, yComp, yInc);
+      yMax = Math.max(yMax, yComp, yInc);
+    }
+
+    if (plotVar === "temperature") {
+      yMin = 360;
+      yMax = 410;
+    } else {
+      yMin = 0;
+      yMax = 300;
+    }
+
+    function X(d) { return marginL + (d - dMin) / (dMax - dMin) * plotW; }
+    function Y(v) { return marginT + (1 - (v - yMin) / (yMax - yMin)) * plotH; }
+
+    // Axes
+    ctx.strokeStyle = "#333333";
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.moveTo(marginL, marginT);
+    ctx.lineTo(marginL, marginT + plotH);
+    ctx.lineTo(marginL + plotW, marginT + plotH);
+    ctx.stroke();
+
+    // Ticks + gridlines (x) -- fonts 50% larger (12px -> 18px)
+    ctx.font = "18px Helvetica, Arial, sans-serif";
+    ctx.fillStyle = "#333333";
+    ctx.textAlign = "center";
+    var xTicks = 6;
+    for (var t = 0; t <= xTicks; t++) {
+      var dv = dMin + (dMax - dMin) * t / xTicks;
+      var xx = X(dv);
+      ctx.beginPath();
+      ctx.moveTo(xx, marginT + plotH);
+      ctx.lineTo(xx, marginT + plotH + 5);
+      ctx.stroke();
+      ctx.fillText(dv.toFixed(3), xx, marginT + plotH + 24);
+    }
+    drawMixedText(
+      [{ t: "outlet diameter d" }, { t: "2", sub: true }, { t: " (m)" }],
+      marginL + plotW / 2, marginT + plotH + 52, "center", 18, "#333333"
+    );
+
+    // Ticks (y)
+    ctx.textAlign = "right";
+    var yTicks = plotVar === "velocity" ? 6 : 5;
+    for (var ty = 0; ty <= yTicks; ty++) {
+      var yv = yMin + (yMax - yMin) * ty / yTicks;
+      var yy = Y(yv);
+      ctx.beginPath();
+      ctx.moveTo(marginL - 5, yy);
+      ctx.lineTo(marginL, yy);
+      ctx.stroke();
+      ctx.fillText(yv.toFixed(0), marginL - 10, yy + 6);
+    }
+    ctx.save();
+    ctx.translate(46, marginT + plotH / 2);
+    ctx.rotate(-Math.PI / 2);
+    if (plotVar === "velocity") {
+      drawMixedText(
+        [{ t: "outlet velocity u" }, { t: "2", sub: true }, { t: " (m/s)" }],
+        0, 0, "center", 18, "#333333"
+      );
+    } else {
+      drawMixedText(
+        [{ t: "outlet temperature T" }, { t: "2", sub: true }, { t: " (K)" }],
+        0, 0, "center", 18, "#333333"
+      );
+    }
+    ctx.restore();
+
+    // --- Reference lines: horizontal at the inlet value (u1 or T1) ---
+    var refVal = plotVar === "velocity" ? u1 : T1;
+    var yRef = Y(refVal);
+    ctx.save();
+    ctx.setLineDash([2, 4]);
+    ctx.strokeStyle = "#666666";
+    ctx.lineWidth = 1.3;
+    ctx.beginPath();
+    ctx.moveTo(marginL, yRef);
+    ctx.lineTo(marginL + plotW, yRef);
+    ctx.stroke();
+    ctx.restore();
+    drawMixedText(
+      plotVar === "velocity" ? [{ t: "u" }, { t: "1", sub: true }] : [{ t: "T" }, { t: "1", sub: true }],
+      marginL + plotW - 6, yRef - 8, "right", 14, "#555555"
+    );
+
+    // --- Reference line: vertical dashed at the inlet diameter d1 ---
+    var xD1 = X(d1);
+    ctx.save();
+    ctx.setLineDash([6, 4]);
+    ctx.strokeStyle = "#666666";
+    ctx.lineWidth = 1.3;
+    ctx.beginPath();
+    ctx.moveTo(xD1, marginT);
+    ctx.lineTo(xD1, marginT + plotH);
+    ctx.stroke();
+    ctx.restore();
+
+    // "nozzle |<--- d1 --->| diffuser" indicator row, matching the original
+    // Mathematica version: arrows point outward from the d1 label toward
+    // the nozzle/diffuser region words. Placed on whichever side (top or
+    // bottom) is opposite the u1/T1 reference line, keeping it clear.
+    var rowNearTop = refVal < (yMin + yMax) / 2;
+    var indicatorRowY = rowNearTop ? (marginT + 20) : (marginT + plotH - 20);
+    function outwardArrow(xInner, xOuter, y) {
+      ctx.save();
+      ctx.setLineDash([2, 3]);
+      ctx.strokeStyle = "#777777";
+      ctx.lineWidth = 1.3;
+      ctx.beginPath();
+      ctx.moveTo(xInner, y);
+      ctx.lineTo(xOuter, y);
+      ctx.stroke();
+      ctx.restore();
+      var dir = xOuter > xInner ? 1 : -1;
+      ctx.fillStyle = "#777777";
+      ctx.beginPath();
+      ctx.moveTo(xOuter, y);
+      ctx.lineTo(xOuter - dir * 8, y - 4);
+      ctx.lineTo(xOuter - dir * 8, y + 4);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    ctx.font = "italic 17px Helvetica, Arial, sans-serif";
+    ctx.fillStyle = "#777777";
+
+    ctx.textAlign = "left";
+    var nozzleTextX = X(dMin) + 6;
+    ctx.fillText("nozzle", nozzleTextX, indicatorRowY - 4);
+    var nozzleTextW = ctx.measureText("nozzle").width;
+    outwardArrow(xD1 - 10, nozzleTextX + nozzleTextW + 10, indicatorRowY);
+
+    var diffuserOuterX = xD1 + (X(dMax) - xD1) * 0.5;
+    outwardArrow(xD1 + 10, diffuserOuterX, indicatorRowY);
+    ctx.textAlign = "left";
+    ctx.fillText("diffuser", diffuserOuterX + 10, indicatorRowY - 4);
+
+    drawMixedText(
+      [{ t: "d" }, { t: "1", sub: true }],
+      xD1, indicatorRowY - 4, "center", 14, "#555555"
+    );
+
+    // Curves
+    function drawCurve(vals, color) {
+      ctx.beginPath();
+      for (var i = 0; i < vals.length; i++) {
+        var xx = X(dArr[i]);
+        var yy = Y(vals[i]);
+        if (i === 0) ctx.moveTo(xx, yy); else ctx.lineTo(xx, yy);
+      }
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2.4;
+      ctx.stroke();
+    }
+    drawCurve(incompVals, "#2e8b3d");
+    drawCurve(compVals, "#1f5fa8");
+
+    // Marker at current d2
+    var curRes = solve(u1, d1, d2Current, T1, P2, R, Cp);
+    var curInc = incompressibleU2(u1, d1, d2Current);
+    var curCompY = plotVar === "velocity" ? curRes.u2 : curRes.T2;
+    var curIncY = plotVar === "velocity" ? curInc : (T1 + (u1 * u1 - curInc * curInc) / (2 * Cp));
+
+    function marker(d, v, color) {
+      ctx.beginPath();
+      ctx.arc(X(d), Y(v), 4.5, 0, 2 * Math.PI);
+      ctx.fillStyle = color;
+      ctx.fill();
+      ctx.strokeStyle = "#000000";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+    marker(d2Current, curCompY, "#1f5fa8");
+    marker(d2Current, curIncY, "#2e8b3d");
+
+    // Live value readout for the current slider position, shown at a fixed
+    // spot (matches both confirmed screenshots: roughly 65% across, 40% down).
+    var unit = plotVar === "velocity" ? " m/s" : " K";
+    var readoutX = marginL + plotW * 0.65;
+    var readoutY1 = marginT + plotH * 0.40;
+    var readoutY2 = readoutY1 + 24;
+    ctx.font = "16px Helvetica, Arial, sans-serif";
+    ctx.textAlign = "left";
+    ctx.fillStyle = "#1f5fa8";
+    ctx.fillText("compressible = " + curCompY.toFixed(1) + unit, readoutX, readoutY1);
+    ctx.fillStyle = "#2e8b3d";
+    ctx.fillText("incompressible = " + curIncY.toFixed(1) + unit, readoutX, readoutY2);
+  }
+
+  // ---------- Master draw ----------
+  function draw() {
+    var u1 = state.u1;
+    var d2 = state.d2;
+    if (state.view === "diagram") {
+      var result = solve(u1, d1, d2, T1, P2, R, Cp);
+      drawDiagram(u1, d2, result);
+    } else {
+      drawPlots(u1, d2, state.plotVar);
+    }
+  }
+
+  // ---------- UI wiring ----------
+  var u1Slider = document.getElementById("u1");
+  var d2Slider = document.getElementById("d2");
+  var u1val = document.getElementById("u1val");
+  var d2val = document.getElementById("d2val");
+
+  u1Slider.addEventListener("input", function() {
+    state.u1 = parseFloat(u1Slider.value);
+    u1val.textContent = state.u1.toFixed(0);
+    draw();
+  });
+  d2Slider.addEventListener("input", function() {
+    state.d2 = parseFloat(d2Slider.value);
+    d2val.textContent = state.d2.toFixed(3);
+    draw();
+  });
+
+  var btnDiagram = document.getElementById("btnDiagram");
+  var btnPlots = document.getElementById("btnPlots");
+  var mainControls = document.getElementById("mainControls");
+  var plotControls = document.getElementById("plotControls");
+
+  btnDiagram.addEventListener("click", function() {
+    state.view = "diagram";
+    btnDiagram.classList.add("active");
+    btnPlots.classList.remove("active");
+    plotControls.style.display = "none";
+    draw();
+  });
+  btnPlots.addEventListener("click", function() {
+    state.view = "plots";
+    btnPlots.classList.add("active");
+    btnDiagram.classList.remove("active");
+    plotControls.style.display = "flex";
+    draw();
+  });
+
+  var btnVel = document.getElementById("btnVel");
+  var btnTemp = document.getElementById("btnTemp");
+  btnVel.addEventListener("click", function() {
+    state.plotVar = "velocity";
+    btnVel.classList.add("active");
+    btnTemp.classList.remove("active");
+    draw();
+  });
+  btnTemp.addEventListener("click", function() {
+    state.plotVar = "temperature";
+    btnTemp.classList.add("active");
+    btnVel.classList.remove("active");
+    draw();
+  });
+
+  // Floating panels: each opens just to the left of, and a few px below,
+  // its trigger button. Opening one closes any other that's open.
+  var appEl = document.getElementById("app");
+  var headers = document.querySelectorAll(".panel-header");
+
+  function positionPanel(button, body) {
+    var appRect = appEl.getBoundingClientRect();
+    var btnRect = button.getBoundingClientRect();
+    var panelWidth = body.offsetWidth || 340;
+    var placement = button.getAttribute("data-placement");
+    var left, top;
+    if (placement === "below") {
+      left = btnRect.left - appRect.left;
+      var maxLeft = appRect.width - panelWidth - 4;
+      if (left > maxLeft) left = maxLeft;
+      left += (parseFloat(button.getAttribute("data-offset")) || 0);
+      if (left < 4) left = 4;
+      top = (btnRect.bottom - appRect.top) + 6;
+    } else {
+      left = (btnRect.left - appRect.left) - panelWidth;
+      if (left < 4) left = 4;
+      top = (btnRect.bottom - appRect.top) + 6;
+    }
+    body.style.left = left + "px";
+    body.style.top = top + "px";
+  }
+
+  function closeAllPanels() {
+    headers.forEach(function(h) {
+      var body = document.getElementById("panel-" + h.getAttribute("data-panel"));
+      body.classList.remove("open");
+      h.classList.remove("open");
+    });
+  }
+
+  document.querySelectorAll(".panel-close").forEach(function(btn) {
+    btn.addEventListener("click", function(e) {
+      e.stopPropagation();
+      var panelId = "panel-" + btn.getAttribute("data-panel");
+      var body = document.getElementById(panelId);
+      var header = document.querySelector('.panel-header[data-panel="' + btn.getAttribute("data-panel") + '"]');
+      body.classList.remove("open");
+      if (header) header.classList.remove("open");
+    });
+  });
+
+  headers.forEach(function(h) {
+    h.addEventListener("click", function() {
+      var panelId = "panel-" + h.getAttribute("data-panel");
+      var body = document.getElementById(panelId);
+      var wasOpen = body.classList.contains("open");
+      closeAllPanels();
+      if (!wasOpen) {
+        body.classList.add("open");
+        h.classList.add("open");
+        positionPanel(h, body);
+      }
+    });
+  });
+
+  window.addEventListener("resize", function() {
+    headers.forEach(function(h) {
+      var body = document.getElementById("panel-" + h.getAttribute("data-panel"));
+      if (body.classList.contains("open")) positionPanel(h, body);
+    });
+  });
+
+  // Initial paint
+  draw();
+})();
+</script>
+</body>
+</html>

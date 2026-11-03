@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Construct a Conversion-Temperature Diagram for a Reversible Adiabatic Reaction</title>
+<script>
+window.MathJax = {
+  tex: {inlineMath: [['\\(', '\\)']], displayMath: [['$$','$$']]},
+  svg: {fontCache: 'global'},
+  startup: {typeset: false}
+};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+  html, body {
+    margin: 0; padding: 0;
+    background: #ffffff;
+    font-family: Helvetica, Arial, sans-serif;
+    color: #000;
+  }
+  #app {
+    width: 700px;
+    margin: 12px auto 30px auto;
+    padding: 0 10px;
+  }
+  h1.title {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 6px 0 12px 0;
+    line-height: 1.25;
+  }
+  /* ---------- controls ---------- */
+  #controls {
+    border: 1px solid #cfcfcf;
+    background: #f7f7f7;
+    padding: 8px 10px 9px 10px;
+    border-radius: 3px;
+  }
+  .ctrlrow {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    min-height: 30px;
+  }
+  .ctrlrow + .ctrlrow { margin-top: 8px; }
+  .steplabel {
+    font-size: 16px;
+    font-weight: normal;
+    flex: 1 1 auto;
+  }
+  button.mbtn {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    font-weight: normal;
+    color: #fff;
+    background: #98000D;
+    border: none;
+    border-radius: 3px;
+    padding: 5px 12px;
+    cursor: pointer;
+  }
+  button.mbtn:hover { background: #b3101d; }
+  button.mbtn:active { background: #7a000a; }
+  button.mbtn:disabled { background: #b9a5a7; cursor: default; }
+  label.chk {
+    font-size: 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    user-select: none;
+  }
+  label.chk input { width: 15px; height: 15px; cursor: pointer; }
+  label.chk.disabled { color: #999; cursor: default; }
+  .sliderbox {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+  }
+  .sliderbox .slab { white-space: nowrap; }
+  .sliderbox .sval {
+    font-size: 16px;
+    min-width: 44px;
+    text-align: left;
+    font-variant-numeric: tabular-nums;
+  }
+  input[type=range] {
+    -webkit-appearance: none; appearance: none;
+    height: 4px; background: #b8b8b8; border-radius: 2px;
+    outline: none; cursor: pointer; margin: 0;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 15px; height: 15px; border-radius: 50%;
+    background: #6a6a6a; border: 1px solid #4a4a4a; cursor: pointer;
+  }
+  input[type=range]::-moz-range-thumb {
+    width: 15px; height: 15px; border-radius: 50%;
+    background: #6a6a6a; border: 1px solid #4a4a4a; cursor: pointer; border-style: solid;
+  }
+  input[type=range]:disabled { opacity: .45; cursor: default; }
+  input[type=range]:disabled::-webkit-slider-thumb { cursor: default; }
+  /* ---------- figure panel ---------- */
+  #figpanel {
+    position: relative;
+    border: 1px solid #cfcfcf;
+    border-top: none;
+    background: #fff;
+    padding: 8px 10px 6px 10px;
+  }
+  #panelbar { display: flex; gap: 8px; }
+  #cv { display: block; width: 700px; height: 570px; touch-action: none; }
+  .flyout {
+    display: none;
+    position: absolute;
+    top: 42px;
+    left: 10px;
+    width: 660px;
+    max-height: 500px;
+    overflow-y: auto;
+    background: #fff;
+    border: 1px solid #98000D;
+    border-radius: 3px;
+    box-shadow: 0 3px 10px rgba(0,0,0,.25);
+    padding: 12px 34px 14px 14px;
+    font-size: 15.5px;
+    line-height: 1.45;
+    z-index: 20;
+  }
+  .flyout.open { display: block; }
+  .flyout h2 {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 17px;
+    font-weight: bold;
+    line-height: 1.3;
+    margin: 0 0 8px 0;
+    color: #000;
+  }
+  .flyout p { margin: 0 0 9px 0; }
+  .flyout p:last-child { margin-bottom: 0; }
+  .flyout a { color: #98000D; }
+  .closebtn {
+    position: absolute;
+    top: 4px; right: 6px;
+    border: none; background: none;
+    font-size: 21px; line-height: 1;
+    color: #98000D; cursor: pointer;
+    padding: 2px 4px;
+    font-family: Helvetica, Arial, sans-serif;
+  }
+  .closebtn:hover { color: #000; }
+  .eqline { text-align: left; margin: 10px 0; }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <h1 class="title">Construct a Conversion-Temperature Diagram for a Reversible Adiabatic Reaction</h1>
+
+  <div id="controls">
+    <div class="ctrlrow">
+      <button class="mbtn" id="newprob">new problem</button>
+      <span class="steplabel" id="steptitle">1. Draw the energy balance line.</span>
+      <button class="mbtn" id="nextbtn">next</button>
+      <label class="chk" id="sollab"><input type="checkbox" id="solchk"> solution</label>
+      <label class="chk" id="hintlab"><input type="checkbox" id="hintchk"> hint</label>
+    </div>
+    <div class="ctrlrow" id="row2">
+      <div class="sliderbox" id="box-T">
+        <span class="slab">Use temperature to calculate equilibrium conversion.</span>
+        <input type="range" id="sT" min="275" max="550" step="5" value="275" style="width:150px">
+        <span class="sval" id="vT">275</span>
+      </div>
+      <div class="sliderbox" id="box-eq">
+        <span class="slab">adiabatic equilibrium:</span>
+        <span class="slab">conversion</span>
+        <input type="range" id="sxe" min="0.1" max="1" step="0.01" value="0.5" style="width:110px">
+        <span class="sval" id="vxe">0.50</span>
+        <span class="slab">temperature (K)</span>
+        <input type="range" id="sTe" min="275" max="550" step="1" value="325" style="width:110px">
+        <span class="sval" id="vTe">325</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="figpanel">
+    <div id="panelbar">
+      <button class="mbtn" data-panel="dir">Directions</button>
+      <button class="mbtn" data-panel="det">Details</button>
+      <button class="mbtn" data-panel="abt">About</button>
+    </div>
+
+    <div class="flyout" id="p-dir">
+      <button class="closebtn" data-close="dir" aria-label="close">&times;</button>
+      <h2>Directions</h2>
+      <p>A reversible reaction, A &#8652; B, takes place in an adiabatic plug-flow reactor (PFR).
+      Construct a conversion-versus-temperature diagram by plotting the energy balance and
+      equilibrium lines. The energy balance line is plotted first for a feed that contains only
+      reactant A, and then it is plotted for a feed that also contains an inert component. Click
+      the "new problem" button for a new set of conditions. Before moving on to the next step,
+      check "solution" to see the answer. Once you check "solution", you cannot change your
+      answer.</p>
+    </div>
+
+    <div class="flyout" id="p-det">
+      <button class="closebtn" data-close="det" aria-label="close">&times;</button>
+      <h2>Details</h2>
+      <p>For the reversible reaction \(\mathrm{A} \rightleftharpoons \mathrm{B}\) with both
+      reactant \(\mathrm{A}\) and inert component \(\mathrm{I}\) in the adiabatic PFR feed, the
+      equilibrium constant is:</p>
+      <div class="eqline">\( K_e = K_m\, e^{\frac{\Delta H}{R}\left(\frac{1}{T_m}-\frac{1}{T}\right)} \),</div>
+      <p>where \(K_m\) is the equilibrium constant at temperature \(T_m\) (K), \(\Delta H\) is the
+      heat of reaction (J/mol), \(R\) is the ideal gas constant (J/mol K) and \(T\) is the
+      temperature of the reaction (K).</p>
+      <p>The equilibrium conversion is obtained from the equilibrium constant, assuming ideal
+      gases:</p>
+      <div class="eqline">\( X_e = \dfrac{K_e}{1+K_e} \),</div>
+      <div class="eqline">\( X_{EB} = \dfrac{\sum \alpha\, C_p\,(T-T_f)}{-\Delta H} = \dfrac{(1+\alpha)\,C_p\,(T-T_f)}{-\Delta H} \),</div>
+      <p>where \(X_e\) is the equilibrium conversion, \(X_{EB}\) is the conversion calculated from
+      the energy balance, \(\alpha\) is the ratio in the molar flow rate of inert to reactant,
+      \(C_p\) is the heat capacity (J/mol K) and \(T_f\) is the feed temperature (K).</p>
+    </div>
+
+    <div class="flyout" id="p-abt">
+      <button class="closebtn" data-close="abt" aria-label="close">&times;</button>
+      <h2>About</h2>
+      <p>This simulation was created in the
+      <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a>
+      at University of Colorado Boulder for
+      <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a>
+      by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a
+      <a href="https://demonstrations.wolfram.com/ConstructAConversionTemperatureDiagramForAReversibleAdiabati/" target="_blank" rel="noopener">Mathematica simulation</a>
+      by Rachael L. Baumann. It was prepared with financial support from the National Science
+      Foundation (DUE 2336987 and 2336988).
+      Address any questions or comments to
+      <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.</p>
+    </div>
+
+    <canvas id="cv" width="700" height="570"></canvas>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+/* ============================ state ============================ */
+var seed = 1, MB = 1, solutionOn = false, hintOn = false;
+var Tsl = 275, xeSl = 0.5, TeSl = 325;
+
+var DEF = {
+  EBx: [[325,0.50],[525,0.50]],
+  EBd: [[300,0.50],[475,0.50]],
+  Ex : [[325,0.10],[400,0.10],[475,0.10],[525,0.10]],
+  Ed : [[300,0.10],[400,0.10],[450,0.10],[475,0.10]],
+  ebx: [[325,0.50],[525,0.50]],
+  ebd: [[300,0.50],[475,0.50]]
+};
+var L = {};
+function resetLocators(){
+  L = JSON.parse(JSON.stringify(DEF));
+}
+resetLocators();
+
+/* ============================ problem generation ============================ */
+function mulberry32(a){
+  return function(){
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    var t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+var P = {};
+function newProblem(s){
+  /* a handful of random draws put the adiabatic equilibrium beyond the fixed
+     plot range, which would make step 3 unanswerable; skip those            */
+  for (var k = 0; k < 25; k++){
+    buildProblem(s + 7919*k);
+    var t0 = Teq(0), ta = Teq(P.alphaVal);
+    if (t0 >= P.Tmin && t0 <= P.Tmax && ta >= P.Tmin && ta <= P.Tmax) return;
+  }
+}
+function buildProblem(s){
+  var r = mulberry32((s * 2654435761) >>> 0);
+  function ri(a,b){ return a + Math.floor(r()*(b-a+1)); }
+  var Tf1 = ri(300,400), Tf2 = ri(400,500), part = ri(1,16), rxn = ri(1,2);
+  var p = { rxn: rxn, part: part, alphaVal: Math.round((0.5 + 0.1*(part-1))*10)/10 };
+  if (rxn === 1){
+    p.dH = ri(-83680,-60000); p.Cp = ri(209,220);
+    p.Km = 100000; p.Tm = 298; p.Tf = Tf1; p.Tmin = 300; p.Tmax = 550;
+  } else {
+    p.dH = ri(65000,80000); p.Cp = ri(175,200);
+    p.Km = 10; p.Tm = 398; p.Tf = Tf2; p.Tmin = 275; p.Tmax = 500;
+  }
+  P = p;
+}
+function alpha(){ return MB >= 4 ? P.alphaVal : 0; }
+
+/* ============================ physics ============================ */
+function Ke(T){ return P.Km * Math.exp((P.dH/8.314)*(1/P.Tm - 1/T)); }
+function xE(T){ var k = Ke(T); return k/(1+k); }
+function xEB(T,a){ return (1+a)*P.Cp*(T-P.Tf)/(-P.dH); }
+function Ttest(a){ return P.Tf + (-P.dH)/((1+a)*P.Cp); }
+
+function Teq(a){                       /* intersection of equilibrium and energy balance */
+  var t1 = P.Tf, t2 = Ttest(a);
+  var lo = Math.max(1, Math.min(t1,t2)), hi = Math.max(t1,t2);
+  var f = function(T){ return xE(T) - xEB(T,a); };
+  /* scan inward from the feed-temperature end so the physically meaningful
+     branch is found (avoids the spurious low-temperature root)              */
+  var N = 3000, prevT = hi, prevF = f(hi), i, k;
+  for (i=1;i<=N;i++){
+    var T = hi - (hi-lo)*i/N, fv = f(T);
+    if (!isFinite(fv)) continue;
+    if (isFinite(prevF) && (fv < 0) !== (prevF < 0)){
+      var A = T, B = prevT, fA = fv;
+      for (k=0;k<80;k++){
+        var m = 0.5*(A+B), fm = f(m);
+        if ((fm < 0) === (fA < 0)) { A = m; fA = fm; } else { B = m; }
+      }
+      return 0.5*(A+B);
+    }
+    prevT = T; prevF = fv;
+  }
+  return hi;
+}
+function xeq(a){ return xE(Teq(a)); }
+
+function tempAt(x){                    /* temperature where xE(T) = x, clamped to plot range */
+  var lo = P.Tmin, hi = P.Tmax;
+  var f = function(T){ return xE(T) - x; };
+  var flo = f(lo), fhi = f(hi);
+  if (flo === 0) return lo;
+  if (fhi === 0) return hi;
+  if ((flo < 0) === (fhi < 0)) return (Math.abs(flo) < Math.abs(fhi)) ? lo : hi;
+  for (var i=0;i<120;i++){
+    var m = 0.5*(lo+hi), fm = f(m);
+    if ((fm < 0) === (flo < 0)) { lo = m; flo = fm; } else { hi = m; }
+  }
+  return 0.5*(lo+hi);
+}
+function T2of(a){                      /* end of the plotted energy balance segment */
+  var tt = Ttest(alpha());
+  if (P.dH > 0){
+    if (a === 0) return P.Tmin;
+    return tt > P.Tmin ? tt : P.Tmin;
+  } else {
+    if (a === 0) return P.Tmax;
+    return tt > P.Tmax ? P.Tmax : tt;
+  }
+}
+
+/* ============================ number formats ============================ */
+function f2(x){ return x.toFixed(2); }                       /* conversions: 2 decimals   */
+function f0(x){ return String(Math.round(x)); }              /* temperatures: integer     */
+function sci3(x){                                            /* 3 significant figures     */
+  if (x === 0) return [{s:"0.00"}];
+  var e = Math.floor(Math.log10(Math.abs(x)));
+  var m = x / Math.pow(10,e);
+  if (Math.abs(Number(m.toFixed(2))) >= 10){ m /= 10; e += 1; }
+  return [{s: m.toFixed(2)}, {s: "\u00D710"}, {s: String(e), sup:true}];
+}
+
+/* ============================ canvas / rich text ============================ */
+var cv = document.getElementById("cv");
+var ctx = cv.getContext("2d");
+var CW = 700, CH = 570;
+var PLx0 = 70, PLx1 = 670, PLy0 = 105, PLy1 = 505;   /* plot rectangle (600 x 400)       */
+var FONT = "Helvetica, Arial, sans-serif";
+
+function setupHiDPI(){
+  var dpr = window.devicePixelRatio || 1;
+  cv.width  = CW * dpr;
+  cv.height = CH * dpr;
+  cv.style.width  = CW + "px";
+  cv.style.height = CH + "px";
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+
+function fnt(size, italic){ return (italic ? "italic " : "") + size + "px " + FONT; }
+
+/* parts: {s:text, it:italic, sub:true, sup:true} | {sp:px} | {frac:{n:[],d:[]}} */
+function measureRich(parts, size){
+  var w = 0;
+  for (var i=0;i<parts.length;i++){
+    var p = parts[i];
+    if (p.sp){ w += p.sp; continue; }
+    if (p.frac){
+      var nw = measureRich(p.frac.n, size*0.92), dw = measureRich(p.frac.d, size*0.92);
+      w += Math.max(nw,dw) + 8; continue;
+    }
+    var sz = (p.sub||p.sup) ? size*0.72 : size;
+    ctx.font = fnt(sz, p.it);
+    w += ctx.measureText(p.s).width;
+  }
+  return w;
+}
+function drawRich(parts, x, y, size, color){
+  ctx.fillStyle = color || "#000";
+  ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
+  for (var i=0;i<parts.length;i++){
+    var p = parts[i];
+    if (p.sp){ x += p.sp; continue; }
+    if (p.frac){
+      var s2 = size*0.92;
+      var nw = measureRich(p.frac.n, s2), dw = measureRich(p.frac.d, s2);
+      var fw = Math.max(nw,dw), bar = y - 0.33*size;
+      drawRich(p.frac.n, x + 4 + (fw-nw)/2, bar - 0.22*size, s2, color);
+      drawRich(p.frac.d, x + 4 + (fw-dw)/2, bar + 0.90*size, s2, color);
+      ctx.strokeStyle = color || "#000"; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(x+2, bar+0.5); ctx.lineTo(x+fw+6, bar+0.5); ctx.stroke();
+      x += fw + 8; continue;
+    }
+    var sz = (p.sub||p.sup) ? size*0.72 : size;
+    var dy = p.sub ? size*0.26 : (p.sup ? -size*0.42 : 0);
+    ctx.font = fnt(sz, p.it);
+    ctx.fillText(p.s, x, y + dy);
+    x += ctx.measureText(p.s).width;
+  }
+}
+function drawRichCentered(parts, cx, y, size, color){
+  drawRich(parts, cx - measureRich(parts,size)/2, y, size, color);
+}
+
+/* white-backed text box, offset given in Mathematica Text[] convention */
+function boxedText(parts, px, py, size, color, offx, offy, pad){
+  pad = (pad === undefined) ? 3 : pad;
+  var w = measureRich(parts,size), h = size*1.18;
+  var cx = px - offx*(w/2), cy = py + offy*(h/2);
+  ctx.fillStyle = "#fff";
+  ctx.fillRect(cx - w/2 - pad, cy - h/2 - pad, w + 2*pad, h + 2*pad);
+  drawRich(parts, cx - w/2, cy + size*0.36, size, color);
+}
+/* two-line white-backed label (column) */
+function boxedColumn(lines, px, py, size, color, offx, offy){
+  var w = 0, i;
+  for (i=0;i<lines.length;i++) w = Math.max(w, measureRich(lines[i],size));
+  var lh = size*1.25, h = lh*lines.length;
+  var cx = px - offx*(w/2), cy = py + offy*(h/2);
+  ctx.fillStyle = "#fff";
+  ctx.fillRect(cx - w/2 - 2, cy - h/2 - 2, w + 4, h + 4);
+  for (i=0;i<lines.length;i++){
+    drawRich(lines[i], cx - w/2, cy - h/2 + lh*(i+1) - lh*0.28, size, color);
+  }
+}
+
+/* ============================ coordinates ============================ */
+function X(T){ return PLx0 + (T - P.Tmin)/(P.Tmax - P.Tmin) * (PLx1 - PLx0); }
+function Y(x){ return PLy1 - x * (PLy1 - PLy0); }
+function invX(px){ return P.Tmin + (px - PLx0)/(PLx1 - PLx0) * (P.Tmax - P.Tmin); }
+function invY(py){ return (PLy1 - py)/(PLy1 - PLy0); }
+
+/* ============================ frame ============================ */
+var COL_EB = "#0000ff", COL_E = "#000000", COL_S = "#009900", COL_EBL = "#8080ff";
+
+function drawFrame(){
+  var t, x;
+  ctx.save();
+  ctx.beginPath(); ctx.rect(PLx0,PLy0,PLx1-PLx0,PLy1-PLy0); ctx.clip();
+  ctx.strokeStyle = "#cccccc"; ctx.lineWidth = 1;
+  var t0 = Math.ceil(P.Tmin/10)*10;
+  for (t = t0; t <= P.Tmax; t += 10){
+    x = Math.round(X(t)) + 0.5;
+    ctx.beginPath(); ctx.moveTo(x,PLy0); ctx.lineTo(x,PLy1); ctx.stroke();
+  }
+  for (var k = 0; k <= 20; k++){
+    var y = Math.round(Y(k*0.05)) + 0.5;
+    ctx.beginPath(); ctx.moveTo(PLx0,y); ctx.lineTo(PLx1,y); ctx.stroke();
+  }
+  ctx.restore();
+
+  ctx.strokeStyle = "#000"; ctx.lineWidth = 1;
+  ctx.strokeRect(PLx0+0.5, PLy0+0.5, PLx1-PLx0, PLy1-PLy0);
+
+  /* ticks + labels */
+  ctx.fillStyle = "#000";
+  ctx.font = fnt(16,false);
+  ctx.textAlign = "center"; ctx.textBaseline = "top";
+  var tmaj0 = Math.ceil(P.Tmin/50)*50;
+  for (t = tmaj0; t <= P.Tmax; t += 50){
+    x = Math.round(X(t)) + 0.5;
+    ctx.beginPath(); ctx.moveTo(x,PLy1); ctx.lineTo(x,PLy1-9); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x,PLy0); ctx.lineTo(x,PLy0+9); ctx.stroke();
+    ctx.fillText(String(t), x, PLy1 + 7);
+  }
+  for (t = Math.ceil(P.Tmin/10)*10; t <= P.Tmax; t += 10){
+    if (t % 50 === 0) continue;
+    x = Math.round(X(t)) + 0.5;
+    ctx.beginPath(); ctx.moveTo(x,PLy1); ctx.lineTo(x,PLy1-5); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x,PLy0); ctx.lineTo(x,PLy0+5); ctx.stroke();
+  }
+  ctx.textAlign = "right"; ctx.textBaseline = "middle";
+  for (var j = 0; j <= 10; j++){
+    var v = j/10, yy = Math.round(Y(v)) + 0.5;
+    var maj = (j % 2 === 0);
+    ctx.beginPath(); ctx.moveTo(PLx0,yy); ctx.lineTo(PLx0 + (maj?9:5), yy); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(PLx1,yy); ctx.lineTo(PLx1 - (maj?9:5), yy); ctx.stroke();
+    if (maj) ctx.fillText(v.toFixed(1), PLx0 - 8, yy);
+  }
+
+  /* axis labels */
+  ctx.font = fnt(18,false);
+  ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
+  ctx.fillText("temperature (K)", (PLx0+PLx1)/2, PLy1 + 52);
+  ctx.save();
+  ctx.translate(22, (PLy0+PLy1)/2);
+  ctx.rotate(-Math.PI/2);
+  ctx.fillText("conversion", 0, 0);
+  ctx.restore();
+}
+
+/* ============================ curve helpers ============================ */
+function clipPlot(fn){
+  ctx.save();
+  ctx.beginPath(); ctx.rect(PLx0,PLy0,PLx1-PLx0,PLy1-PLy0); ctx.clip();
+  fn();
+  ctx.restore();
+}
+function polyline(pts, color, width, dash){
+  ctx.strokeStyle = color; ctx.lineWidth = width;
+  ctx.setLineDash(dash || []);
+  ctx.lineJoin = "round"; ctx.lineCap = "round";
+  ctx.beginPath();
+  for (var i=0;i<pts.length;i++){
+    var px = X(pts[i][0]), py = Y(pts[i][1]);
+    if (i === 0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+  }
+  ctx.stroke();
+  ctx.setLineDash([]);
+}
+function eqCurve(){
+  var pts = [];
+  for (var T = P.Tmin; T <= P.Tmax + 1e-9; T += 1) pts.push([T, xE(T)]);
+  return pts;
+}
+function ebCurve(a){
+  var pts = [];
+  for (var T = P.Tmin; T <= P.Tmax + 1e-9; T += 5) pts.push([T, xEB(T,a)]);
+  return pts;
+}
+function ring(pt, color){            /* draggable locator: colored disk with white center */
+  var px = X(pt[0]), py = Y(pt[1]);
+  ctx.fillStyle = color;
+  ctx.beginPath(); ctx.arc(px,py,6.6,0,2*Math.PI); ctx.fill();
+  ctx.fillStyle = "#fff";
+  ctx.beginPath(); ctx.arc(px,py,3.6,0,2*Math.PI); ctx.fill();
+}
+
+/* ============================ plot label ============================ */
+function dHkJ(){ return String(Math.round(P.dH/1000)); }
+
+function labelLines(){
+  var a = alpha();
+  if (MB === 1 || MB === 4){
+    if (hintOn) return [[{s:"The energy balance is linear."}]];
+    var lines = [[{s:"Drag the blue circles so the dashed line is the adiabatic energy balance line."}]];
+    if (MB === 4){
+      lines.push([{s:"for a feed with inert, ratio of inert/reactant feed flow rates = "+P.alphaVal.toFixed(1)}]);
+    }
+    var cond = [
+      {s:"T",it:true},{s:"feed",sub:true},{s:" = "+P.Tf+" K"},{sp:22},
+      {s:"C",it:true},{s:"p, reactant",sub:true}
+    ];
+    if (MB === 4){
+      cond.push({s:" = "},{s:"C",it:true},{s:"p, inert",sub:true});
+      cond.push({s:" = "+P.Cp+" J/(mol K)"});
+    } else {
+      cond.push({s:" = "+P.Cp+" J/mol K"});
+    }
+    cond.push({sp:22},{s:"\u0394"},{s:"H",it:true},{s:"rxn",sub:true},{s:" = "+dHkJ()+" kJ/mol"});
+    lines.push(cond);
+    return lines;
+  }
+  if (MB === 2){
+    if (hintOn) return [[
+      {s:"x",it:true},{s:"E",sub:true},{s:" = "},
+      {frac:{n:[{s:"K",it:true},{s:"e",sub:true}],
+             d:[{s:"1 + "},{s:"K",it:true},{s:"e",sub:true}]}}
+    ]];
+    var l2 = [{s:"equilibrium constant = "}].concat(sci3(Ke(Tsl)), [{s:" at slider temperature"}]);
+    return [
+      [{s:"Drag the circles to move the dashed line to plot the equilibrium conversion."}],
+      l2
+    ];
+  }
+  if (MB === 3){
+    if (hintOn) return [[{s:"intersection of energy balance and equilibrium curves"}]];
+    if (solutionOn) return [[
+      {s:"equilibrium conversion = "+f2(xeq(a))},{sp:22},
+      {s:"equilibrium temperature = "+f0(Teq(a))+" K"}
+    ]];
+    return [[{s:"Use sliders to indicate adiabatic equilibrium conversion and temperature."}]];
+  }
+  return [];
+}
+function drawPlotLabel(){
+  var lines = labelLines();
+  var size = 17, lh = 25;
+  var yBottom = PLy0 - 16;
+  for (var i=0;i<lines.length;i++){
+    var y = yBottom - lh*(lines.length-1-i);
+    drawRichCentered(lines[i], (PLx0+PLx1)/2, y, size, "#000");
+  }
+}
+
+/* ============================ main draw ============================ */
+function locSet(){
+  if (MB === 1) return P.rxn === 1 ? L.EBx : L.EBd;
+  if (MB === 2) return P.rxn === 1 ? L.Ex  : L.Ed;
+  if (MB === 4) return P.rxn === 1 ? L.ebx : L.ebd;
+  return null;
+}
+function fixedT(i){                   /* step 2 locators have fixed temperatures */
+  return P.rxn === 1 ? [325,400,475,525][i] : [300,400,450,475][i];
+}
+
+function draw(){
+  ctx.clearRect(0,0,CW,CH);
+  ctx.fillStyle = "#fff"; ctx.fillRect(0,0,CW,CH);
+  drawFrame();
+  drawPlotLabel();
+
+  var a = alpha(), i, pts;
+
+  clipPlot(function(){
+
+    /* ---- energy balance ---- */
+    if (MB === 1){
+      pts = L2();
+      polyline(pts, COL_EB, 2.5, [9,7]);
+      if (solutionOn) polyline(ebCurve(a), COL_EB, 2.5);
+    }
+    if (MB > 1 && MB < 4){
+      polyline(ebCurve(a), COL_EB, 2.5);
+    }
+
+    /* ---- equilibrium curve ---- */
+    if (MB === 2){
+      var E = locSet(), ep = [];
+      for (i=0;i<4;i++) ep.push([fixedT(i), E[i][1]]);
+      polyline(ep, COL_E, 2.5, [9,7]);
+      if (solutionOn) polyline(eqCurve(), COL_E, 2.5);
+    }
+    if (MB > 2){
+      polyline(eqCurve(), COL_E, 2.5);
+    }
+
+    /* ---- step 4 / 5: inert vs no inert ---- */
+    if (MB === 4){
+      polyline(ebCurve(0), COL_EBL, 2.5);
+      polyline(L2(), COL_EB, 2.5, [9,7]);
+      if (solutionOn) polyline(ebCurve(a), COL_EB, 2.5);
+    }
+    if (MB === 5){
+      polyline(ebCurve(a), COL_EB, 2.5);
+      polyline(ebCurve(0), COL_EBL, 2.5);
+      ctx.setLineDash([6,5]);
+      guides(Teq(a), xeq(a), "#000", 1);
+      guides(Teq(0), xeq(0), "#000", 1);
+      ctx.setLineDash([]);
+    }
+
+    /* ---- step 3 guide lines ---- */
+    if (MB === 3){
+      ctx.setLineDash([6,5]);
+      ctx.strokeStyle = "#000"; ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(X(TeSl), Y(xE(TeSl))); ctx.lineTo(X(TeSl), Y(0)); ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(X(P.Tmin), Y(xeSl)); ctx.lineTo(X(tempAt(xeSl)), Y(xeSl)); ctx.stroke();
+      ctx.setLineDash([]);
+      if (solutionOn){
+        ctx.setLineDash([6,5]);
+        guides(Teq(a), xeq(a), COL_S, 1.6);
+        ctx.setLineDash([]);
+      }
+    }
+  });
+
+  /* ---- locators + text (drawn unclipped) ---- */
+  if (MB === 1 || MB === 4){
+    var S = locSet();
+    ring(S[0], COL_EB); ring(S[1], COL_EB);
+    boxedColumn(
+      [[{s:"T",it:true},{s:" = "+f0(S[0][0])+" K"}],[{s:"x",it:true},{s:" = "+f2(S[0][1])}]],
+      X(S[0][0]), Y(S[0][1]), 17, COL_EB, -1, -1.5);
+    boxedColumn(
+      [[{s:"T",it:true},{s:" = "+f0(S[1][0])+" K"}],[{s:"x",it:true},{s:" = "+f2(S[1][1])}]],
+      X(S[1][0]), Y(S[1][1]), 17, COL_EB, 0.8, -1.5);
+  }
+  if (MB === 2){
+    var E2 = locSet();
+    for (i=0;i<4;i++){
+      var pt = [fixedT(i), E2[i][1]];
+      ring(pt, COL_E);
+      boxedText([{s:f2(pt[1])}], X(pt[0]), Y(pt[1]), 17, COL_E, 0, 1.5);
+    }
+  }
+  if (MB === 4 || MB === 5){
+    var tn = P.Tf + 0.25*(T2of(0) - P.Tf);
+    boxedText([{s:"no inert"}], X(tn), Y(xEB(tn,0)), 17, "#000", 0, 0, 2);
+    if (MB === 5 || solutionOn){
+      var ti = P.Tf + 0.75*(T2of(a) - P.Tf);
+      boxedText([{s:"inert"}], X(ti), Y(xEB(ti,a)), 17, COL_EB, 0, 0, 2);
+    }
+  }
+  if (MB === 3){
+    boxedText([{s:"x",it:true},{s:"eq",sub:true},{s:" = "+f2(xeSl)}],
+      (X(P.Tmin)+X(tempAt(xeSl)))/2, Y(xeSl), 17, "#000", 0, 0, 0);
+    boxedText([{s:"T",it:true},{s:"eq",sub:true},{s:" = "+f0(TeSl)+" K"}],
+      X(TeSl), Y(0.2*xE(TeSl)), 17, "#000", 0, 0, 3);
+    if (solutionOn){
+      boxedText([{s:"correct "},{s:"x",it:true},{s:"eq",sub:true},{s:" = "+f2(xeq(a))}],
+        X(Teq(a)), Y(xeq(a)), 17, "#000", -1, 0, 3);
+      boxedText([{s:"correct "},{s:"T",it:true},{s:"eq",sub:true},{s:" = "+f0(Teq(a))+" K"}],
+        X(Teq(a)), Y(xeq(a)/2), 17, "#000", 0, 0, 3);
+    }
+  }
+  if (MB === 5){
+    boxedText([{s:"x",it:true},{s:"eq",sub:true},{s:" = "+f2(xeq(a))}],
+      (X(P.Tmin)+X(Teq(a)))/2, Y(xeq(a)), 17, "#000", 0, 0, 0);
+    boxedText([{s:"T",it:true},{s:"eq",sub:true},{s:" = "+f0(Teq(a))+" K"}],
+      X(Teq(a)), Y(0.1*xeq(a)), 17, "#000", 0, 0, 3);
+    boxedText([{s:"x",it:true},{s:"eq",sub:true},{s:" = "+f2(xeq(0))}],
+      (X(P.Tmin)+X(Teq(0)))/2, Y(xeq(0)), 17, "#000", 0, 0, 0);
+    boxedText([{s:"T",it:true},{s:"eq",sub:true},{s:" = "+f0(Teq(0))+" K"}],
+      X(Teq(0)), Y(0.5*xeq(0)), 17, "#000", 0, 0, 3);
+  }
+}
+function L2(){                       /* the two-point dashed line the student drags */
+  var S = locSet();
+  return [[S[0][0],S[0][1]],[S[1][0],S[1][1]]];
+}
+function guides(T,x,color,w){
+  ctx.strokeStyle = color; ctx.lineWidth = w;
+  ctx.beginPath(); ctx.moveTo(X(P.Tmin),Y(x)); ctx.lineTo(X(T),Y(x)); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(X(T),Y(x)); ctx.lineTo(X(T),Y(0)); ctx.stroke();
+}
+
+/* ============================ dragging ============================ */
+var dragIdx = -1;
+function evtPos(e){
+  var r = cv.getBoundingClientRect();
+  var cx = (e.touches && e.touches[0]) ? e.touches[0].clientX : e.clientX;
+  var cy = (e.touches && e.touches[0]) ? e.touches[0].clientY : e.clientY;
+  return {x:(cx - r.left)*(CW/r.width), y:(cy - r.top)*(CH/r.height)};
+}
+function pickLocator(pos){
+  var S = locSet();
+  if (!S || solutionOn) return -1;
+  var best = -1, bd = 16*16;
+  for (var i=0;i<S.length;i++){
+    var T = (MB === 2) ? fixedT(i) : S[i][0];
+    var dx = pos.x - X(T), dy = pos.y - Y(S[i][1]);
+    var d = dx*dx + dy*dy;
+    if (d < bd){ bd = d; best = i; }
+  }
+  return best;
+}
+function moveLocator(i, pos){
+  var S = locSet();
+  var x = Math.max(0, Math.min(1, invY(pos.y)));
+  if (MB === 2){
+    S[i][1] = x;
+  } else {
+    var T = Math.max(P.Tmin, Math.min(P.Tmax, invX(pos.x)));
+    S[i][0] = T; S[i][1] = x;
+  }
+}
+cv.addEventListener("mousedown", function(e){
+  var pos = evtPos(e); dragIdx = pickLocator(pos);
+  if (dragIdx >= 0){ moveLocator(dragIdx,pos); draw(); e.preventDefault(); }
+});
+window.addEventListener("mousemove", function(e){
+  if (dragIdx >= 0){ moveLocator(dragIdx, evtPos(e)); draw(); }
+});
+window.addEventListener("mouseup", function(){ dragIdx = -1; });
+cv.addEventListener("mousemove", function(e){
+  if (dragIdx < 0) cv.style.cursor = (pickLocator(evtPos(e)) >= 0) ? "pointer" : "default";
+});
+cv.addEventListener("touchstart", function(e){
+  var pos = evtPos(e); dragIdx = pickLocator(pos);
+  if (dragIdx >= 0){ moveLocator(dragIdx,pos); draw(); e.preventDefault(); }
+}, {passive:false});
+cv.addEventListener("touchmove", function(e){
+  if (dragIdx >= 0){ moveLocator(dragIdx, evtPos(e)); draw(); e.preventDefault(); }
+}, {passive:false});
+cv.addEventListener("touchend", function(){ dragIdx = -1; });
+
+/* ============================ UI wiring ============================ */
+var STEPS = [
+  "1. Draw the energy balance line.",
+  "2. Draw the equilibrium conversion curve.",
+  "3. Determine the adiabatic equilibrium conversion.",
+  "4. Draw the energy balance line when inert is in the feed.",
+  "5. Solution."
+];
+var el = function(id){ return document.getElementById(id); };
+
+function syncUI(){
+  el("steptitle").textContent = STEPS[MB-1];
+  el("nextbtn").style.visibility = (MB < 5) ? "visible" : "hidden";
+  var showCk = (MB < 5);
+  el("sollab").style.visibility = showCk ? "visible" : "hidden";
+  el("hintlab").style.visibility = showCk ? "visible" : "hidden";
+
+  el("solchk").checked = solutionOn;
+  el("hintchk").checked = hintOn;
+  el("solchk").disabled = solutionOn;
+  el("hintchk").disabled = solutionOn;
+  el("sollab").className = "chk" + (solutionOn ? " disabled" : "");
+  el("hintlab").className = "chk" + (solutionOn ? " disabled" : "");
+
+  el("box-T").style.display  = (MB === 2) ? "inline-flex" : "none";
+  el("box-eq").style.display = (MB === 3) ? "inline-flex" : "none";
+  el("row2").style.display   = (MB === 2 || MB === 3) ? "flex" : "none";
+
+  el("sxe").disabled = solutionOn;
+  el("sTe").disabled = solutionOn;
+
+  el("vT").textContent  = String(Tsl);
+  el("vxe").textContent = xeSl.toFixed(2);
+  el("vTe").textContent = String(TeSl);
+}
+function refresh(){ syncUI(); draw(); }
+
+el("newprob").addEventListener("click", function(){
+  seed = (seed < 1000) ? seed + 1 : seed - 1;
+  MB = 1; solutionOn = false; hintOn = false;
+  newProblem(seed);
+  resetLocators();
+  Tsl = 275; xeSl = 0.5; TeSl = 325;
+  el("sT").value = 275; el("sxe").value = 0.5; el("sTe").value = 325;
+  refresh();
+});
+el("nextbtn").addEventListener("click", function(){
+  MB = (MB >= 1 && MB < 5) ? MB + 1 : 5;
+  solutionOn = false;
+  refresh();
+});
+el("solchk").addEventListener("change", function(){ solutionOn = this.checked; refresh(); });
+el("hintchk").addEventListener("change", function(){ hintOn = this.checked; refresh(); });
+el("sT").addEventListener("input",  function(){ Tsl  = Number(this.value); refresh(); });
+el("sxe").addEventListener("input", function(){ xeSl = Number(this.value); refresh(); });
+el("sTe").addEventListener("input", function(){ TeSl = Number(this.value); refresh(); });
+
+/* ---- Directions / Details / About flyouts ---- */
+var panelIds = {dir:"p-dir", det:"p-det", abt:"p-abt"};
+function closeAll(){
+  for (var k in panelIds) el(panelIds[k]).classList.remove("open");
+}
+var btns = document.querySelectorAll("#panelbar button");
+for (var b=0;b<btns.length;b++){
+  btns[b].addEventListener("click", function(){
+    var key = this.getAttribute("data-panel");
+    var node = el(panelIds[key]);
+    var wasOpen = node.classList.contains("open");
+    closeAll();
+    if (!wasOpen){
+      node.classList.add("open");
+      if (key === "det" && window.MathJax && MathJax.typesetPromise){
+        MathJax.typesetPromise([node]);
+      }
+    }
+  });
+}
+var cbs = document.querySelectorAll(".closebtn");
+for (var c=0;c<cbs.length;c++){
+  cbs[c].addEventListener("click", closeAll);
+}
+
+/* ============================ init ============================ */
+setupHiDPI();
+newProblem(seed);
+refresh();
+window.addEventListener("resize", function(){ setupHiDPI(); draw(); });
+</script>
+</body>
+</html>

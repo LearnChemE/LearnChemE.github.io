@@ -37,6 +37,28 @@ header a {
   font-weight: bold;
 }
 
+/* Simulation filters */
+
+.simulation-filters {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  max-width: 1200px;
+  margin: 20px auto 0;
+  padding: 10px 20px;
+  border: 1px solid #444;
+  border-radius: 8px;
+  background-color: #232323;
+}
+
+.simulation-filters label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
 h1 {
   margin: 0;
   font-size: 2rem;

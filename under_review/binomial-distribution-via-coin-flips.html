@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Binomial Distribution via Coin Flips</title>
+<style>
+  body {
+    font-family: Helvetica, Arial, sans-serif;
+    background-color: #ffffff;
+    margin: 0;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+  }
+  #container {
+    width: 780px;
+    max-width: 100%;
+  }
+  #title {
+    text-align: center;
+    font-size: 24px;
+    margin: 8px 0 14px 0;
+    font-weight: normal;
+  }
+  .controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px 10px;
+    margin-bottom: 8px;
+  }
+  .ctl-label {
+    font-size: 16px;
+  }
+  .setter-group {
+    display: inline-flex;
+  }
+  .setter-group button {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    padding: 4px 10px;
+    border: 1px solid #a0a0a0;
+    background-color: #fdfdfd;
+    cursor: pointer;
+    margin: 0;
+  }
+  .setter-group button + button { border-left: none; }
+  .setter-group button:first-child { border-radius: 4px 0 0 4px; }
+  .setter-group button:last-child { border-radius: 0 4px 4px 0; }
+  .setter-group button.selected {
+    background-color: #c8c8c8;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.35);
+  }
+  .setter-group button:hover:not(.selected) { background-color: #ececec; }
+  #flipBtn {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    padding: 5px 16px;
+    border: 1px solid #a0a0a0;
+    border-radius: 4px;
+    background-color: #fdfdfd;
+    cursor: pointer;
+  }
+  #flipBtn:hover { background-color: #ececec; }
+  #flipBtn:active { background-color: #d8d8d8; }
+  input[type="range"] {
+    --accent: #98000D;
+    --grey: #999;
+    --fill: 50%;
+    -webkit-appearance: none;
+    appearance: none;
+    width: 150px;
+    height: 5px;
+    border-radius: 3px;
+    outline: none;
+    opacity: .95;
+    margin: 0;
+    vertical-align: middle;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+    background: var(--grey);
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(0,0,0,.35);
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 15px;
+    height: 15px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(0,0,0,.35);
+  }
+  #phVal {
+    font-size: 16px;
+    display: inline-block;
+    min-width: 34px;
+  }
+  #plotCanvas {
+    display: block;
+    margin: 4px auto 10px auto;
+    background: #ffffff;
+  }
+  #panelButtons {
+    text-align: center;
+    margin: 12px 0 8px 0;
+  }
+  #panelButtons button {
+    font-family: Helvetica, Arial, sans-serif;
+    background-color: #98000D;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    padding: 9px 22px;
+    font-size: 17px;
+    margin: 0 8px;
+    cursor: pointer;
+  }
+  #panelButtons button:hover { background-color: #7a000a; }
+  #panelWrap {
+    position: relative;
+  }
+  .panel {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 4px);
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    box-sizing: border-box;
+    border: 1px solid #b0b0b0;
+    border-radius: 6px;
+    background-color: #fafafa;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.25);
+    padding: 12px 34px 12px 18px;
+    font-size: 16px;
+    line-height: 1.45;
+    text-align: left;
+    z-index: 10;
+  }
+  .panel-close {
+    position: absolute;
+    top: 6px;
+    right: 10px;
+    font-size: 22px;
+    line-height: 1;
+    color: #555555;
+    cursor: pointer;
+    user-select: none;
+  }
+  .panel-close:hover { color: #98000D; }
+  .panel a { color: #98000D; }
+  .panel-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 6px;
+  }
+</style>
+</head>
+<body>
+<div id="container">
+  <h1 id="title">Binomial Distribution via Coin Flips</h1>
+
+  <div class="controls">
+    <span class="setter-group" id="tabGroup">
+      <button data-val="1" class="selected">coin flips</button>
+      <button data-val="2">probability mass function</button>
+      <button data-val="3">binomial distribution</button>
+    </span>
+    <span style="display:inline-flex; align-items:center; gap:8px; white-space:nowrap;">
+      <span class="ctl-label">probability of heads (%)</span>
+      <input type="range" id="phSlider" min="0" max="100" step="1" value="50">
+      <span id="phVal">50</span>
+    </span>
+  </div>
+
+  <div class="controls">
+    <span class="ctl-label">coin flips per trial</span>
+    <span class="setter-group" id="flipsGroup">
+      <button data-val="5">5</button>
+      <button data-val="10">10</button>
+      <button data-val="20" class="selected">20</button>
+    </span>
+    <span class="ctl-label" style="margin-left:8px;">number of trials</span>
+    <span class="setter-group" id="trialsGroup">
+      <button data-val="1">1</button>
+      <button data-val="10">10</button>
+      <button data-val="100" class="selected">100</button>
+      <button data-val="1000">1,000</button>
+      <button data-val="10000">10,000</button>
+    </span>
+    <button id="flipBtn" style="margin-left:12px;">flip coins</button>
+  </div>
+
+  <canvas id="plotCanvas" width="600" height="400"></canvas>
+
+  <div id="panelWrap">
+  <div id="panelButtons">
+    <button onclick="togglePanel('directions')">Directions</button>
+    <button onclick="togglePanel('details')">Details</button>
+    <button onclick="togglePanel('about')">About</button>
+  </div>
+
+  <div id="directions" class="panel">
+    <span class="panel-close" onclick="togglePanel('directions')">&#215;</span>
+    <div class="panel-title">Directions</div>
+    In this Demonstration, you can set the number of coin flips per trial to 5,
+    10 or 20, and the number of heads is recorded. Set the total number of
+    trials (from 1 to 10,000) with a button. When the probability of heads is
+    50%, the distribution closely resembles a normal distribution as the number
+    of trials and the number of coin flips per trial increase. As the sample
+    size increases, the distribution more closely resembles a true binomial
+    distribution. Make a weighted coin by changing the probability of landing
+    on heads using the slider; 0% means the coin always lands on tails and 100%
+    means the coin always lands on heads. Click "flip coins" to generate a new
+    set of coin flips. Use buttons to view a bar chart of the coin flips, the
+    probability distribution (also known as the probability mass function), or
+    the binomial distribution. The probability mass function is the number of
+    flips in a trial that resulted in <i>x</i> heads divided by the number of
+    flips.
+  </div>
+
+  <div id="details" class="panel">
+    <span class="panel-close" onclick="togglePanel('details')">&#215;</span>
+    <div class="panel-title">Details</div>
+    To generate the bar graph, first a list is made of 100 possible outcomes. A
+    "1" in the list means heads and a "0" means tails. If the probability of
+    flipping heads is 50%, then the list contains 50 ones and 50 zeros. If the
+    probability of flipping heads is 70%, then the list contains 70 ones and 30
+    zeros. Numbers are then randomly selected from the list. If 5 is selected
+    for "coin flips per trial," then a number is selected from the list five
+    times, and these numbers are summed. For example, for five flips in a
+    trial, if the random numbers selected from the list are 1, 0, 0, 1, 1, then
+    the number of heads in that trial is three. This process is repeated for
+    each trial.
+  </div>
+
+  <div id="about" class="panel">
+    <span class="panel-close" onclick="togglePanel('about')">&#215;</span>
+    <div class="panel-title">About</div>
+    This simulation was created in the
+    <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department
+    of Chemical and Biological Engineering</a> at University of Colorado
+    Boulder for <a href="http://www.learncheme.com" target="_blank"
+    rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It
+    is a JavaScript/HTML5 implementation of a
+    <a href="https://demonstrations.wolfram.com/BinomialDistributionViaCoinFlips/"
+    target="_blank" rel="noopener">Mathematica simulation</a> by Adam J.
+    Johnston, Rachael L. Baumann, and John L. Falconer. It was prepared with
+    financial support from the National Science Foundation (DUE 2336987 and
+    2336988). Address any
+    questions or comments to LearnChemE@gmail.com.
+  </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+/* ---------------- state ---------------- */
+const state = {
+  tab: 1,        // 1 = coin flips, 2 = pmf, 3 = binomial distribution
+  pheads: 50,    // probability of heads (%)
+  flips: 20,     // coin flips per trial
+  trials: 100,   // number of trials
+  seed: 1        // random seed; "flip coins" changes it
+};
+
+/* ---------------- seeded RNG (mulberry32) ---------------- */
+function mulberry32(a) {
+  return function () {
+    a |= 0; a = (a + 0x6D2B79F5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/* ---------------- simulation (mirrors the Mathematica code) ------------
+   selection: list of 100 outcomes, 1 (heads) for the first pheads entries,
+   0 (tails) for the rest. Each flip randomly chooses one entry from the
+   list; the heads in each trial are summed, and the counts of trials with
+   x heads (x = 0..flips) are tabulated.                                    */
+let data1 = [];   // number of heads in each trial
+let data2 = [];   // data2[x] = number of trials with x heads
+
+function runSimulation() {
+  const rng = mulberry32(state.seed);
+  const selection = new Array(100);
+  for (let x = 1; x <= 100; x++) selection[x - 1] = (x <= state.pheads) ? 1 : 0;
+
+  data1 = new Array(state.trials);
+  for (let t = 0; t < state.trials; t++) {
+    let sum = 0;
+    for (let f = 0; f < state.flips; f++) {
+      sum += selection[Math.floor(rng() * 100)];
+    }
+    data1[t] = sum;
+  }
+  data2 = new Array(state.flips + 1).fill(0);
+  for (let t = 0; t < state.trials; t++) data2[data1[t]]++;
+}
+
+/* ---------------- math helpers ---------------- */
+// log-gamma (Lanczos approximation), for binomial coefficients at large n
+function lgamma(z) {
+  const g = [676.5203681218851, -1259.1392167224028, 771.32342877765313,
+    -176.61502916214059, 12.507343278686905, -0.13857109526572012,
+    9.9843695780195716e-6, 1.5056327351493116e-7];
+  if (z < 0.5) {
+    return Math.log(Math.PI / Math.sin(Math.PI * z)) - lgamma(1 - z);
+  }
+  z -= 1;
+  let x = 0.99999999999980993;
+  for (let i = 0; i < 8; i++) x += g[i] / (z + i + 1);
+  const t = z + 7.5;
+  return 0.5 * Math.log(2 * Math.PI) + (z + 0.5) * Math.log(t) - t + Math.log(x);
+}
+
+// 10 * Binomial[n, x] p^x (1-p)^(n-x), evaluated for continuous x (as in the CDF)
+function binomialCurve(x, n, p) {
+  if (x < 0 || x > n) return 0;
+  if (p <= 0) return (x < 1e-9) ? 10 : 0;
+  if (p >= 1) return (Math.abs(x - n) < 1e-9) ? 10 : 0;
+  const lnY = Math.log(10) + lgamma(n + 1) - lgamma(x + 1) - lgamma(n - x + 1)
+            + x * Math.log(p) + (n - x) * Math.log(1 - p);
+  return Math.exp(lnY);
+}
+
+// nice tick step for an axis
+function niceStep(range, targetTicks) {
+  const raw = range / targetTicks;
+  const mag = Math.pow(10, Math.floor(Math.log10(raw)));
+  const norm = raw / mag;
+  let step;
+  if (norm <= 1) step = 1;
+  else if (norm <= 2) step = 2;
+  else if (norm <= 5) step = 5;
+  else step = 10;
+  return step * mag;
+}
+
+function formatTick(v, step) {
+  if (step >= 1) {
+    return v.toLocaleString('en-US');
+  }
+  const dec = Math.max(0, -Math.floor(Math.log10(step)) );
+  return v.toFixed(dec);
+}
+
+/* ---------------- canvas setup (hi-DPI) ---------------- */
+const canvas = document.getElementById('plotCanvas');
+const ctx = canvas.getContext('2d');
+const W = 600, H = 400;
+function setupHiDPI() {
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.width = W + 'px';
+  canvas.style.height = H + 'px';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+/* ---------------- drawing ---------------- */
+// plot area padding: {{left, right}, {bottom, top}} = {{65,15},{50,15}}
+const PAD = { left: 80, right: 15, bottom: 55, top: 15 };
+const LABEL_FONT = 20;   // axis labels (17 * 1.2)
+const TICK_FONT = 17;    // tick numbers (14 * 1.2)
+const YLABEL_X = 13;     // x position of rotated y-axis labels
+
+function drawFrame() {
+  ctx.strokeStyle = '#000000';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(PAD.left + 0.5, PAD.top + 0.5,
+                 W - PAD.left - PAD.right - 1, H - PAD.top - PAD.bottom - 1);
+}
+
+function xPix(x, xmin, xmax) {
+  return PAD.left + (x - xmin) / (xmax - xmin) * (W - PAD.left - PAD.right);
+}
+function yPix(y, ymin, ymax) {
+  return H - PAD.bottom - (y - ymin) / (ymax - ymin) * (H - PAD.top - PAD.bottom);
+}
+
+// draw text with an italic first character (e.g. "x number of heads per trial")
+function drawMixedLabel(italicPart, normalPart, cx, cy, size, rotate) {
+  ctx.save();
+  ctx.translate(cx, cy);
+  if (rotate) ctx.rotate(-Math.PI / 2);
+  ctx.font = 'italic ' + size + 'px Helvetica, Arial, sans-serif';
+  const wI = ctx.measureText(italicPart).width;
+  ctx.font = size + 'px Helvetica, Arial, sans-serif';
+  const wN = ctx.measureText(normalPart).width;
+  const total = wI + wN;
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#000000';
+  ctx.font = 'italic ' + size + 'px Helvetica, Arial, sans-serif';
+  ctx.fillText(italicPart, -total / 2, 0);
+  ctx.font = size + 'px Helvetica, Arial, sans-serif';
+  ctx.fillText(normalPart, -total / 2 + wI, 0);
+  ctx.restore();
+}
+
+function drawYTicks(ymin, ymax, step, xLeft, xRight) {
+  let maxW = 0;
+  ctx.font = TICK_FONT + 'px Helvetica, Arial, sans-serif';
+  ctx.fillStyle = '#000000';
+  ctx.strokeStyle = '#000000';
+  ctx.lineWidth = 1;
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'middle';
+  const start = Math.ceil(ymin / step) * step;
+  for (let v = start; v <= ymax + 1e-9; v += step) {
+    const py = yPix(v, ymin, ymax);
+    ctx.beginPath();
+    ctx.moveTo(xLeft, py); ctx.lineTo(xLeft + 6, py);   // left tick (inward)
+    ctx.moveTo(xRight, py); ctx.lineTo(xRight - 6, py); // right tick (inward)
+    ctx.stroke();
+    const lbl = formatTick(v, step);
+    maxW = Math.max(maxW, ctx.measureText(lbl).width);
+    ctx.fillText(lbl, xLeft - 6, py);
+  }
+  return maxW;
+}
+
+/* ---- view 1: bar chart of coin flips ---- */
+function drawBarChart() {
+  const n = state.flips;
+  const xmin = 0, xmax = n + 2;               // bar for x heads centered at x+1
+  const maxCount = Math.max(1, Math.max(...data2));
+  const ymin = 0, ymax = maxCount * 1.08;     // 8% headroom (Scaled[0.08])
+
+  // bars
+  ctx.fillStyle = 'rgb(0, 153, 217)';         // RGBColor[0, 0.6, 0.85]
+  const barW = 0.8;
+  for (let x = 0; x <= n; x++) {
+    if (data2[x] === 0) continue;
+    const x0 = xPix(x + 1 - barW / 2, xmin, xmax);
+    const x1 = xPix(x + 1 + barW / 2, xmin, xmax);
+    const y0 = yPix(0, ymin, ymax);
+    const y1 = yPix(data2[x], ymin, ymax);
+    ctx.fillRect(x0, y1, x1 - x0, y0 - y1);
+    ctx.strokeStyle = 'rgb(0, 110, 160)';
+    ctx.lineWidth = 0.5;
+    ctx.strokeRect(x0, y1, x1 - x0, y0 - y1);
+  }
+
+  // bar value labels (only nonzero counts), white background, size 16
+  ctx.font = '16px Helvetica, Arial, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'bottom';
+  for (let x = 0; x <= n; x++) {
+    if (data2[x] === 0) continue;
+    const px = xPix(x + 1, xmin, xmax);
+    const py = yPix(data2[x], ymin, ymax) - 2;
+    const label = data2[x].toLocaleString('en-US');
+    const w = ctx.measureText(label).width;
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(px - w / 2 - 2, py - 16, w + 4, 17);
+    ctx.fillStyle = '#000000';
+    ctx.fillText(label, px, py);
+  }
+
+  drawFrame();
+
+  // y ticks (left labels, ticks both sides)
+  const step = niceStep(ymax, 6);
+  const tickW = drawYTicks(ymin, ymax, step, PAD.left, W - PAD.right);
+  const yLabelX = PAD.left - 6 - tickW - LABEL_FONT / 2 - 6;
+
+  // x tick numbers and small marks along the bottom (Epilog in the CDF)
+  const tickStep = (n === 5) ? 1 : (n === 10) ? 2 : 5;
+  ctx.font = TICK_FONT + 'px Helvetica, Arial, sans-serif';
+  ctx.fillStyle = '#000000';
+  ctx.strokeStyle = '#000000';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  for (let x = 0; x <= n; x += tickStep) {
+    const px = xPix(x + 1, xmin, xmax);
+    const py0 = yPix(0, ymin, ymax);
+    ctx.beginPath();
+    ctx.moveTo(px, py0);
+    ctx.lineTo(px, py0 - 6);
+    ctx.stroke();
+    ctx.fillText(String(x), px, py0 + 6);
+  }
+
+  // axis labels (size 17)
+  drawMixedLabel('x', ' number of heads per trial', PAD.left + (W - PAD.left - PAD.right) / 2, H - 13, LABEL_FONT, false);
+  drawYLabelTrials(yLabelX);
+}
+
+function drawYLabelTrials(cx) {
+  // "number of trials with x heads" rotated, with italic x
+  const size = LABEL_FONT;
+  const cy = PAD.top + (H - PAD.top - PAD.bottom) / 2;
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(-Math.PI / 2);
+  const p1 = 'number of trials with ', p2 = 'x', p3 = ' heads';
+  ctx.font = size + 'px Helvetica, Arial, sans-serif';
+  const w1 = ctx.measureText(p1).width;
+  const w3 = ctx.measureText(p3).width;
+  ctx.font = 'italic ' + size + 'px Helvetica, Arial, sans-serif';
+  const w2 = ctx.measureText(p2).width;
+  const total = w1 + w2 + w3;
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#000000';
+  ctx.font = size + 'px Helvetica, Arial, sans-serif';
+  ctx.fillText(p1, -total / 2, 0);
+  ctx.font = 'italic ' + size + 'px Helvetica, Arial, sans-serif';
+  ctx.fillText(p2, -total / 2 + w1, 0);
+  ctx.font = size + 'px Helvetica, Arial, sans-serif';
+  ctx.fillText(p3, -total / 2 + w1 + w2, 0);
+  ctx.restore();
+}
+
+/* ---- view 2: probability mass function ---- */
+function drawPMF() {
+  const n = state.flips;
+  const xmin = -0.02 * n - 0.5, xmax = n + 0.02 * n + 0.5;
+  let maxP = 0;
+  for (let x = 0; x <= n; x++) maxP = Math.max(maxP, data2[x] / state.trials);
+  if (maxP === 0) maxP = 1;
+  const ymin = 0, ymax = maxP * 1.05;
+
+  // green filling lines from axis to point, then points
+  for (let x = 0; x <= n; x++) {
+    const p = data2[x] / state.trials;
+    const px = xPix(x, xmin, xmax);
+    ctx.strokeStyle = 'rgb(0, 200, 0)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(px, yPix(0, ymin, ymax));
+    ctx.lineTo(px, yPix(p, ymin, ymax));
+    ctx.stroke();
+  }
+  for (let x = 0; x <= n; x++) {
+    const p = data2[x] / state.trials;
+    const px = xPix(x, xmin, xmax);
+    ctx.fillStyle = 'rgb(0, 178, 0)';   // RGBColor[0, 0.7, 0]
+    ctx.beginPath();
+    ctx.arc(px, yPix(p, ymin, ymax), 5.4, 0, 2 * Math.PI);  // PointSize[0.018]*600/2
+    ctx.fill();
+  }
+
+  drawFrame();
+
+  const stepY = niceStep(ymax, 6);
+  drawYTicks(ymin, ymax, stepY, PAD.left, W - PAD.right);
+
+  // x ticks
+  const tickStep = (n === 5) ? 1 : (n === 10) ? 2 : 5;
+  ctx.font = TICK_FONT + 'px Helvetica, Arial, sans-serif';
+  ctx.fillStyle = '#000000';
+  ctx.strokeStyle = '#000000';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  for (let x = 0; x <= n; x += tickStep) {
+    const px = xPix(x, xmin, xmax);
+    const py0 = H - PAD.bottom;
+    ctx.beginPath();
+    ctx.moveTo(px, py0); ctx.lineTo(px, py0 - 6);
+    ctx.moveTo(px, PAD.top); ctx.lineTo(px, PAD.top + 6);
+    ctx.stroke();
+    ctx.fillText(String(x), px, py0 + 6);
+  }
+
+  drawMixedLabel('x', ' number of heads per trial', PAD.left + (W - PAD.left - PAD.right) / 2, H - 13, LABEL_FONT, false);
+  // y label: "probability of x heads per trial"
+  const size = LABEL_FONT;
+  ctx.save();
+  ctx.translate(YLABEL_X, PAD.top + (H - PAD.top - PAD.bottom) / 2);
+  ctx.rotate(-Math.PI / 2);
+  const p1 = 'probability of ', p2 = 'x', p3 = ' heads per trial';
+  ctx.font = size + 'px Helvetica, Arial, sans-serif';
+  const w1 = ctx.measureText(p1).width, w3 = ctx.measureText(p3).width;
+  ctx.font = 'italic ' + size + 'px Helvetica, Arial, sans-serif';
+  const w2 = ctx.measureText(p2).width;
+  const total = w1 + w2 + w3;
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#000000';
+  ctx.font = size + 'px Helvetica, Arial, sans-serif';
+  ctx.fillText(p1, -total / 2, 0);
+  ctx.font = 'italic ' + size + 'px Helvetica, Arial, sans-serif';
+  ctx.fillText(p2, -total / 2 + w1, 0);
+  ctx.font = size + 'px Helvetica, Arial, sans-serif';
+  ctx.fillText(p3, -total / 2 + w1 + w2, 0);
+  ctx.restore();
+}
+
+/* ---- view 3: binomial distribution ---- */
+function drawBinomial() {
+  const n = state.trials;
+  const p = state.pheads / 100;
+  const xmin = 0, xmax = n;
+
+  // sample the curve
+  const N = 600;
+  const ys = new Array(N + 1);
+  let maxY = 0;
+  for (let i = 0; i <= N; i++) {
+    const x = xmin + (xmax - xmin) * i / N;
+    ys[i] = binomialCurve(x, n, p);
+    if (isFinite(ys[i])) maxY = Math.max(maxY, ys[i]);
+  }
+  if (maxY === 0) maxY = 1;
+  const ymin = 0, ymax = maxY * 1.05;
+
+  // curve (thick, black)
+  ctx.strokeStyle = '#000000';
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  let started = false;
+  for (let i = 0; i <= N; i++) {
+    const x = xmin + (xmax - xmin) * i / N;
+    const y = ys[i];
+    if (!isFinite(y)) { started = false; continue; }
+    const px = xPix(x, xmin, xmax), py = yPix(Math.min(y, ymax), ymin, ymax);
+    if (!started) { ctx.moveTo(px, py); started = true; }
+    else ctx.lineTo(px, py);
+  }
+  ctx.stroke();
+
+  drawFrame();
+
+  const stepY = niceStep(ymax, 6);
+  const tickW = drawYTicks(ymin, ymax, stepY, PAD.left, W - PAD.right);
+  const yLabelX = PAD.left - 6 - tickW - LABEL_FONT / 2 - 6;
+
+  // x ticks
+  const stepX = niceStep(xmax - xmin, 6);
+  ctx.font = TICK_FONT + 'px Helvetica, Arial, sans-serif';
+  ctx.fillStyle = '#000000';
+  ctx.strokeStyle = '#000000';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  for (let x = 0; x <= xmax + 1e-9; x += stepX) {
+    const px = xPix(x, xmin, xmax);
+    const py0 = H - PAD.bottom;
+    ctx.beginPath();
+    ctx.moveTo(px, py0); ctx.lineTo(px, py0 - 6);
+    ctx.moveTo(px, PAD.top); ctx.lineTo(px, PAD.top + 6);
+    ctx.stroke();
+    const lbl = formatTick(x, stepX);
+    const halfW = ctx.measureText(lbl).width / 2;
+    let lx = px;
+    if (px + halfW > W - 2) lx = W - 2 - halfW;
+    if (px - halfW < 2) lx = 2 + halfW;
+    ctx.fillText(lbl, lx, py0 + 6);
+  }
+
+  // axis labels
+  ctx.font = LABEL_FONT + 'px Helvetica, Arial, sans-serif';
+  ctx.fillStyle = '#000000';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('number of trials', PAD.left + (W - PAD.left - PAD.right) / 2, H - 13);
+  ctx.save();
+  ctx.translate(yLabelX, PAD.top + (H - PAD.top - PAD.bottom) / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.fillText('binomial distribution', 0, 0);
+  ctx.restore();
+}
+
+function redraw() {
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, W, H);
+  if (state.tab === 1) drawBarChart();
+  else if (state.tab === 2) drawPMF();
+  else drawBinomial();
+}
+
+function update() {
+  runSimulation();
+  redraw();
+}
+
+/* ---------------- controls wiring ---------------- */
+function wireSetter(groupId, key, cb) {
+  const group = document.getElementById(groupId);
+  group.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      group.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      state[key] = parseInt(btn.dataset.val, 10);
+      cb();
+    });
+  });
+}
+wireSetter('tabGroup', 'tab', redraw);
+wireSetter('flipsGroup', 'flips', update);
+wireSetter('trialsGroup', 'trials', update);
+
+const phSlider = document.getElementById('phSlider');
+phSlider.addEventListener('input', () => {
+  state.pheads = parseInt(phSlider.value, 10);
+  document.getElementById('phVal').textContent = state.pheads;
+  update();
+});
+
+document.getElementById('flipBtn').addEventListener('click', () => {
+  state.seed = (state.seed < 1000) ? state.seed + 1 : state.seed - 1;
+  update();
+});
+
+/* ---------------- panels ---------------- */
+function togglePanel(id) {
+  ['directions', 'details', 'about'].forEach(pid => {
+    const el = document.getElementById(pid);
+    if (pid === id) {
+      el.style.display = (el.style.display !== 'block') ? 'block' : 'none';
+    } else {
+      el.style.display = 'none';
+    }
+  });
+}
+
+/* ---------------- init ---------------- */
+setupHiDPI();
+update();
+</script>
+</body>
+</html>

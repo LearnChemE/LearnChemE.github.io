@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blending Process: Dynamic Simulation and Linearization</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.min.js"></script>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    font-family: Helvetica, Arial, sans-serif;
+    background: #ffffff;
+    color: #000000;
+  }
+  #app {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 12px 10px 30px 10px;
+    position: relative;
+  }
+  h1.simTitle {
+    font-size: 22px;
+    font-weight: normal;
+    text-align: center;
+    margin: 6px 0 10px 0;
+  }
+  /* view-selection buttons */
+  .viewRow {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+  }
+  .viewBtn {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    font-weight: normal;
+    padding: 7px 16px;
+    border: 1px solid #888;
+    border-radius: 5px;
+    background: #f2f2f2;
+    color: #000;
+    cursor: pointer;
+  }
+  .viewBtn.active {
+    background: #98000D;
+    color: #ffffff;
+    border-color: #98000D;
+  }
+  /* layout: controls left, plot right on wide screens */
+  .mainArea {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    justify-content: center;
+    align-items: flex-start;
+  }
+  .controls {
+    flex: 0 0 250px;
+    min-width: 230px;
+    padding-top: 8px;
+  }
+  .sliderBlock {
+    margin-bottom: 14px;
+  }
+  .sliderLabel {
+    font-size: 16px;
+    font-weight: normal;
+    margin-bottom: 2px;
+  }
+  .sliderLabel .val {
+    font-weight: normal;
+  }
+  input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+  input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  .plotWrap {
+    flex: 1 1 560px;
+    min-width: 320px;
+  }
+  canvas#plot {
+    width: 100%;
+    display: block;
+  }
+  /* Directions / Details / About */
+  .panelBtnCol {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  .panelBtn {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 17px;
+    font-weight: normal;
+    width: 120px;
+    padding: 8px 0;
+    text-align: center;
+    border: none;
+    border-radius: 5px;
+    background: #98000D;
+    color: #ffffff;
+    cursor: pointer;
+  }
+  .panelBtn:hover { background: #7a000a; }
+  .panel {
+    display: none;
+    position: absolute;
+    z-index: 20;
+    border: 1px solid #aaaaaa;
+    border-radius: 5px;
+    padding: 12px 16px;
+    font-size: 16px;
+    line-height: 1.45;
+    background: #fdfdfd;
+    box-shadow: 3px 4px 10px rgba(0,0,0,0.25);
+    box-sizing: border-box;
+  }
+  .panel p { margin: 8px 0; }
+  .panel ul { margin: 6px 0 6px 22px; padding: 0; }
+  /* left-justify displayed equations */
+  .panel mjx-container[display="true"],
+  .panel mjx-container[jax="SVG"][display="true"] {
+    text-align: left !important;
+    margin: 10px 0 10px 0 !important;
+    display: block !important;
+  }
+  .panel mjx-container[display="true"] > svg { margin-left: 0 !important; }
+  .panelClose {
+    position: absolute;
+    top: 6px;
+    right: 9px;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 19px;
+    line-height: 1;
+    padding: 2px 6px;
+    border: none;
+    background: transparent;
+    color: #98000D;
+    cursor: pointer;
+  }
+  .panelClose:hover { color: #000000; }
+  .panelBody { padding-right: 18px; }
+</style>
+</head>
+<body>
+<div id="app">
+  <h1 class="simTitle">Blending Process: Dynamic Simulation and Linearization</h1>
+
+  <div class="viewRow">
+    <button class="viewBtn active" id="btnView0">constant inputs</button>
+    <button class="viewBtn" id="btnView1">step change in w&#8321;</button>
+    <button class="viewBtn" id="btnView2">nonlinear versus linear</button>
+  </div>
+
+  <div class="mainArea">
+    <div class="controls">
+      <div class="sliderBlock">
+        <div class="sliderLabel" id="lab_w1"></div>
+        <input type="range" id="sl_w1" min="0.5" max="2.0" step="0.1" value="1.0">
+      </div>
+      <div class="sliderBlock">
+        <div class="sliderLabel" id="lab_w2"></div>
+        <input type="range" id="sl_w2" min="1.0" max="5.0" step="0.1" value="3.0">
+      </div>
+      <div class="sliderBlock" id="blk_dw1">
+        <div class="sliderLabel" id="lab_dw1"></div>
+        <input type="range" id="sl_dw1" min="0.00" max="0.50" step="0.01" value="0.10">
+      </div>
+      <div class="sliderBlock">
+        <div class="sliderLabel" id="lab_x1"></div>
+        <input type="range" id="sl_x1" min="0.05" max="0.20" step="0.01" value="0.10">
+      </div>
+      <div class="sliderBlock">
+        <div class="sliderLabel" id="lab_x0"></div>
+        <input type="range" id="sl_x0" min="0.000" max="0.100" step="0.005" value="0.025">
+      </div>
+      <div class="panelBtnCol">
+        <button class="panelBtn" id="btnDirections">Directions</button>
+        <button class="panelBtn" id="btnDetails">Details</button>
+        <button class="panelBtn" id="btnAbout">About</button>
+      </div>
+    </div>
+    <div class="plotWrap">
+      <canvas id="plot"></canvas>
+    </div>
+  </div>
+
+  <div class="panel" id="panelDirections">
+    <p>This simulation models a stirred-tank blending process in which two inlet streams
+    (stream 1 with mass fraction \(x_1\) of species A and stream 2 with \(x_2 = 0\)) mix in a tank,
+    and a single outlet stream leaves the tank. Select a view with the buttons at the top:</p>
+    <ul>
+      <li><b>constant inputs:</b> the tank volume \(V\) and the mass fraction \(x\) of species A
+      in the tank are plotted versus time when the inlet mass flow rates \(w_1\) and \(w_2\) are constant
+      and the outlet flow rate equals the total inlet flow rate, so the volume is constant.
+      The mass fraction approaches its steady-state value \(\bar{x}\) (dashed line) at long times.</li>
+      <li><b>step change in w&#8321;:</b> at time zero, the flow rate of stream 1 increases by
+      \(\Delta w_1\) while the outlet flow rate is held at its original value, so the volume
+      increases without bound; the volume is an integrating process with no unique steady state.</li>
+      <li><b>nonlinear versus linear:</b> the response of the nonlinear model to the step change
+      in \(w_1\) (solid curves) is compared to the response of the model linearized around the
+      steady state (dashed curves), written in deviation variables.</li>
+    </ul>
+    <p>Use the sliders to set the nominal flow rates \(w_1\) and \(w_2\), the size of the step change
+    \(\Delta w_1\), the inlet mass fraction \(x_1\), and the initial mass fraction \(x_0\) in the tank.
+    Setting \(x_0\) different from \(\bar{x}\) starts the system away from steady state.</p>
+  </div>
+
+  <div class="panel" id="panelDetails">
+    <p>A total mass balance and a species-A mass balance on the well-mixed tank, with constant
+    density \(\rho\), yield the nonlinear model:</p>
+    \[ \frac{dV}{dt} = \frac{1}{\rho}\left(w_1 + w_2 - w\right) \]
+    \[ \frac{dx}{dt} = \frac{1}{\rho V}\left[\,w_1\,(x_1 - x) + w_2\,(x_2 - x)\,\right] \]
+    <p>where \(V\) is the tank volume (m\(^3\)), \(x\) is the mass fraction of species A in the tank
+    and in the outlet stream, \(w_1\) and \(w_2\) are the inlet mass flow rates (kg/s), \(w\) is the
+    outlet mass flow rate (kg/s), and \(x_1\) and \(x_2\) are the inlet mass fractions.
+    At steady state, the mass fraction in the tank is:</p>
+    \[ \bar{x} = \frac{w_1 x_1 + w_2 x_2}{w_1 + w_2} \]
+    <p>The volume does not have a unique steady state; because filling a tank is an integrating
+    process, \(V\) increases or decreases without bound whenever the inlet and outlet flow rates
+    differ. A desired operating volume \(\bar{V}\) (here the initial volume) is therefore specified.</p>
+    <p>Linearizing around \((\bar{V}, \bar{x})\) with the nominal inputs
+    \(\bar{u} = (\bar{w}_1, \bar{w}_2, \bar{w})\) and defining the deviation variables
+    \(V' = V - \bar{V}\), \(x' = x - \bar{x}\), \(w_1' = w_1 - \bar{w}_1\),
+    \(w_2' = w_2 - \bar{w}_2\), and \(w' = w - \bar{w}\) gives the state-space model
+    \(\dot{\mathbf{x}} = A\mathbf{x} + B\mathbf{u}\) with state
+    \(\mathbf{x} = (V',\,x')\) and input \(\mathbf{u} = (w_1',\,w_2',\,w')\):</p>
+    \[ A = \begin{bmatrix} 0 & 0 \\[4pt] 0 & \dfrac{-(\bar{w}_1 + \bar{w}_2)}{\rho \bar{V}} \end{bmatrix}
+       \qquad
+       B = \begin{bmatrix} \dfrac{1}{\rho} & \dfrac{1}{\rho} & -\dfrac{1}{\rho} \\[8pt]
+       \dfrac{x_1 - \bar{x}}{\rho \bar{V}} & \dfrac{x_2 - \bar{x}}{\rho \bar{V}} & 0 \end{bmatrix} \]
+    <p>The volume equation is linear and independent of \(x\), so the linear model reproduces it
+    exactly. The mass-fraction response of the linear model is approximate, but for a small step
+    change the agreement with the nonlinear model is good. The steady-state gain matrix
+    \(K = C(-A)^{-1}B + D\) cannot be evaluated because \(A\) is singular, which reflects the
+    absence of a unique steady-state volume. Parameter values: \(\rho = 1000\) kg/m\(^3\),
+    \(x_2 = 0\), \(\bar{V} = V_0 = 10\) m\(^3\), and a simulation time of 3600 s. The equations
+    are integrated with a fourth-order Runge&ndash;Kutta method.</p>
+  </div>
+
+  <div class="panel" id="panelAbout">
+    <p>This browser-based simulation was created by John L. Falconer using Claude AI. It is based
+    on a MATLAB simulation by Martha Grover (Georgia Institute of Technology, 2017) and its Python
+    translation by John Hedengren (Brigham Young University, 2017) for a blending-process
+    screencast series on dynamic simulation, steady states, deviation variables, and linearization.</p>
+    <p>It was prepared with support from the National Science Foundation (grants DUE 2336987 and
+    DUE 2336988) as part of the LearnChemE project at the Department of Chemical and Biological
+    Engineering, University of Colorado Boulder.</p>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+/* ---------------- parameters and state ---------------- */
+const rho = 1000;      // density [kg/m^3]
+const x2  = 0;         // mass fraction of A in stream 2
+const V0  = 10;        // initial volume [m^3]
+const tf  = 3600;      // final time [s]
+const N   = 400;       // integration steps
+
+let view = 0;          // 0: constant inputs, 1: step in w1, 2: nonlinear vs linear
+const state = { w1: 1.0, w2: 3.0, dw1: 0.10, x1: 0.10, x0: 0.025 };
+
+/* ---------------- helpers ---------------- */
+function fmt(v, d) { return v.toFixed(d); }
+
+/* rich-text canvas label: segments {t: text, sub: bool} */
+function drawRich(ctx, segs, x, y, px, color, italicMain) {
+  ctx.save();
+  ctx.fillStyle = color || "#000";
+  ctx.textAlign = "left";
+  ctx.textBaseline = "alphabetic";
+  let cx = x;
+  for (const s of segs) {
+    if (s.gap !== undefined) { cx += s.gap * px / 16; continue; }
+    const size = s.sub ? Math.round(px * 0.72) : px;
+    const style = (s.italic === false) ? "" : (italicMain === false ? "" : "italic ");
+    ctx.font = style + size + "px Helvetica, Arial, sans-serif";
+    const dy = s.sub ? px * 0.28 : 0;
+    ctx.fillText(s.t, cx, y + dy);
+    cx += ctx.measureText(s.t).width;
+  }
+  ctx.restore();
+  return cx - x;
+}
+function richWidth(ctx, segs, px, italicMain) {
+  let w = 0;
+  ctx.save();
+  for (const s of segs) {
+    if (s.gap !== undefined) { w += s.gap * px / 16; continue; }
+    const size = s.sub ? Math.round(px * 0.72) : px;
+    const style = (s.italic === false) ? "" : (italicMain === false ? "" : "italic ");
+    ctx.font = style + size + "px Helvetica, Arial, sans-serif";
+    w += ctx.measureText(s.t).width;
+  }
+  ctx.restore();
+  return w;
+}
+
+/* ---------------- physics ---------------- */
+function derivNonlinear(z, u, x1v) {
+  const V = z[0], x = z[1];
+  const w1 = u[0], w2 = u[1], w = u[2];
+  return [ (w1 + w2 - w) / rho,
+           (w1 * (x1v - x) + w2 * (x2 - x)) / (rho * V) ];
+}
+function derivLinear(z, u, A, B) {
+  return [ A[0][0]*z[0] + A[0][1]*z[1] + B[0][0]*u[0] + B[0][1]*u[1] + B[0][2]*u[2],
+           A[1][0]*z[0] + A[1][1]*z[1] + B[1][0]*u[0] + B[1][1]*u[1] + B[1][2]*u[2] ];
+}
+function rk4(derivFn, z0, tArr, ...args) {
+  const n = tArr.length;
+  const out = [z0.slice()];
+  let z = z0.slice();
+  for (let i = 1; i < n; i++) {
+    const h = tArr[i] - tArr[i-1];
+    const k1 = derivFn(z, ...args);
+    const k2 = derivFn([z[0]+0.5*h*k1[0], z[1]+0.5*h*k1[1]], ...args);
+    const k3 = derivFn([z[0]+0.5*h*k2[0], z[1]+0.5*h*k2[1]], ...args);
+    const k4 = derivFn([z[0]+h*k3[0], z[1]+h*k3[1]], ...args);
+    z = [ z[0] + h/6*(k1[0]+2*k2[0]+2*k3[0]+k4[0]),
+          z[1] + h/6*(k1[1]+2*k2[1]+2*k3[1]+k4[1]) ];
+    out.push(z.slice());
+  }
+  return out;
+}
+
+function simulate() {
+  const { w1, w2, dw1, x1, x0 } = state;
+  const tArr = [];
+  for (let i = 0; i <= N; i++) tArr.push(tf * i / N);
+
+  const wOut = w1 + w2;                       // outlet flow fixed at nominal total inlet
+  const xbar = (w1 * x1 + w2 * x2) / (w1 + w2);
+  const Vbar = V0;
+  const z0 = [V0, x0];
+
+  // figure 1: constant inputs
+  const zConst = rk4(derivNonlinear, z0, tArr, [w1, w2, wOut], x1);
+  // figure 2: step change in w1 (outlet unchanged)
+  const zStep = rk4(derivNonlinear, z0, tArr, [w1 + dw1, w2, wOut], x1);
+  // figure 3: linearized model in deviation variables
+  const A = [[0, 0], [0, -(w1 + w2) / (rho * Vbar)]];
+  const B = [[1/rho, 1/rho, -1/rho],
+             [(x1 - xbar) / (rho * Vbar), (x2 - xbar) / (rho * Vbar), 0]];
+  const up = [dw1, 0, 0];
+  const zp0 = [z0[0] - Vbar, z0[1] - xbar];
+  const zpArr = rk4(derivLinear, zp0, tArr, up, A, B);
+  const zLin = zpArr.map(z => [z[0] + Vbar, z[1] + xbar]);
+
+  return { tArr, zConst, zStep, zLin, xbar };
+}
+
+/* ---------------- plotting ---------------- */
+const canvas = document.getElementById("plot");
+const ctx = canvas.getContext("2d");
+
+function niceTicks(lo, hi, target) {
+  if (hi - lo < 1e-12) { hi = lo + 1; }
+  const span = hi - lo;
+  const raw = span / target;
+  const mag = Math.pow(10, Math.floor(Math.log10(raw)));
+  let step = mag;
+  for (const m of [1, 2, 2.5, 5, 10]) {
+    if (raw / mag <= m) { step = m * mag; break; }
+  }
+  const t0 = Math.ceil(lo / step) * step;
+  const ticks = [];
+  for (let v = t0; v <= hi + 1e-9 * span; v += step) ticks.push(v);
+  return ticks;
+}
+function tickLabel(v, ticks) {
+  const step = ticks.length > 1 ? ticks[1] - ticks[0] : 1;
+  const dec = Math.max(0, -Math.floor(Math.log10(step) + 1e-9));
+  return v.toFixed(Math.min(dec, 4));
+}
+
+function drawSubplot(px, box, tArr, series, opts) {
+  // series: [{y:[...], color, dash, width, label:[segs]}]
+  const { title, yLabelSegs, xLabel, hline } = opts;
+  let yMin = Infinity, yMax = -Infinity;
+  if (opts.yRange) {
+    yMin = opts.yRange[0]; yMax = opts.yRange[1];      // fixed axis scale
+  } else {
+    for (const s of series) for (const v of s.y) { if (v < yMin) yMin = v; if (v > yMax) yMax = v; }
+    if (hline !== undefined) { yMin = Math.min(yMin, hline); yMax = Math.max(yMax, hline); }
+    let pad = (yMax - yMin) * 0.12;
+    if (pad < 1e-12) pad = Math.abs(yMax) * 0.1 + 0.01;
+    yMin -= pad; yMax += pad;
+  }
+
+  const xMin = 0, xMax = tf;
+  const X = t => box.x + (t - xMin) / (xMax - xMin) * box.w;
+  const Y = v => box.y + box.h - (v - yMin) / (yMax - yMin) * box.h;
+
+  // frame
+  ctx.strokeStyle = "#000";
+  ctx.lineWidth = 1;
+  ctx.strokeRect(box.x, box.y, box.w, box.h);
+
+  // ticks
+  ctx.fillStyle = "#000";
+  const xTicks = niceTicks(xMin, xMax, 7);
+  ctx.font = px.tick + "px Helvetica, Arial, sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "top";
+  for (const tv of xTicks) {
+    const xx = X(tv);
+    ctx.beginPath(); ctx.moveTo(xx, box.y + box.h); ctx.lineTo(xx, box.y + box.h - 5); ctx.stroke();
+    ctx.fillText(tickLabel(tv, xTicks), xx, box.y + box.h + 5);
+  }
+  const yTicks = opts.yTicks || niceTicks(yMin, yMax, 5);
+  ctx.textAlign = "right";
+  ctx.textBaseline = "middle";
+  let maxTickW = 0;
+  const yTickText = tv => (opts.yTickDec !== undefined ? tv.toFixed(opts.yTickDec) : tickLabel(tv, yTicks));
+  for (const tv of yTicks) maxTickW = Math.max(maxTickW, ctx.measureText(yTickText(tv)).width);
+  for (const tv of yTicks) {
+    const yy = Y(tv);
+    ctx.beginPath(); ctx.moveTo(box.x, yy); ctx.lineTo(box.x + 5, yy); ctx.stroke();
+    ctx.fillText(yTickText(tv), box.x - 7, yy);
+  }
+
+  // axis labels
+  ctx.textAlign = "center";
+  ctx.textBaseline = "alphabetic";
+  if (xLabel) {
+    ctx.font = px.axis + "px Helvetica, Arial, sans-serif";
+    const seg = [{t:"time", italic:false},{gap:5},{t:"(s)", italic:false}];
+    const w = richWidth(ctx, seg, px.axis);
+    drawRich(ctx, seg, box.x + box.w/2 - w/2, box.y + box.h + px.tick + 22, px.axis, "#000");
+  }
+  if (yLabelSegs) {
+    ctx.save();
+    // baseline of the rotated label sits just left of the widest tick number
+    ctx.translate(box.x - 7 - maxTickW - 8, box.y + box.h/2);
+    ctx.rotate(-Math.PI/2);
+    const w = richWidth(ctx, yLabelSegs, px.axis);
+    drawRich(ctx, yLabelSegs, -w/2, 0, px.axis, "#000");
+    ctx.restore();
+  }
+  if (title) {
+    ctx.font = px.title + "px Helvetica, Arial, sans-serif";
+    ctx.fillStyle = "#000";
+    ctx.textAlign = "center";
+    ctx.fillText(title, box.x + box.w/2, box.y - 10);
+  }
+
+  // horizontal steady-state line (only when it lies within the axis range)
+  const hlineOn = hline !== undefined && hline >= yMin && hline <= yMax;
+  if (hlineOn) {
+    ctx.save();
+    ctx.strokeStyle = "#777";
+    ctx.setLineDash([6, 5]);
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.moveTo(box.x, Y(hline));
+    ctx.lineTo(box.x + box.w, Y(hline));
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // clip and draw curves
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(box.x, box.y, box.w, box.h);
+  ctx.clip();
+  for (const s of series) {
+    ctx.strokeStyle = s.color;
+    ctx.lineWidth = s.width || 2.5;
+    ctx.setLineDash(s.dash || []);
+    ctx.beginPath();
+    for (let i = 0; i < tArr.length; i++) {
+      const xx = X(tArr[i]), yy = Y(s.y[i]);
+      if (i === 0) ctx.moveTo(xx, yy); else ctx.lineTo(xx, yy);
+    }
+    ctx.stroke();
+  }
+  ctx.setLineDash([]);
+  ctx.restore();
+
+  // curve labels: placed beside their curve, clear of every curve drawn
+  // over the label's full width (side: "above" or "below" the curves)
+  const clearance = 6;                   // px between curve and text
+  const placed = [];                     // boxes of labels already drawn
+  const n = tArr.length;
+  for (const s of series) {
+    if (!s.label) continue;
+    const w = richWidth(ctx, s.label, px.curve);
+    const asc = px.curve * 0.78, desc = px.curve * 0.22;
+    const xc = X(tArr[Math.min(Math.round(n * (s.labelPos ?? 0.5)), n - 1)]);
+    let x0 = Math.min(Math.max(xc - w / 2, box.x + 4), box.x + box.w - w - 4);
+    // highest and lowest curve pixels under the label span
+    let top = Infinity, bot = -Infinity;
+    for (const c of series) {
+      for (let i = 0; i < n; i++) {
+        const xx = X(tArr[i]);
+        if (xx < x0 - 4 || xx > x0 + w + 4) continue;
+        const yy = Y(c.y[i]);
+        if (yy < top) top = yy;
+        if (yy > bot) bot = yy;
+      }
+    }
+    const halfLine = 2;
+    const yAbove = top - halfLine - clearance - desc;     // baseline above all curves
+    const yBelow = bot + halfLine + clearance + asc;      // baseline below all curves
+    const fitsAbove = yAbove - asc >= box.y + 2;
+    const fitsBelow = yBelow + desc <= box.y + box.h - 2;
+    let y = (s.labelSide === "below")
+      ? (fitsBelow || !fitsAbove ? yBelow : yAbove)
+      : (fitsAbove || !fitsBelow ? yAbove : yBelow);
+    // avoid overlapping another label
+    for (const b of placed) {
+      const overlapX = x0 < b.x1 + 6 && x0 + w > b.x0 - 6;
+      const overlapY = y - asc < b.y1 + 2 && y + desc > b.y0 - 2;
+      if (overlapX && overlapY) {
+        x0 = (b.x1 + 12 + w <= box.x + box.w - 4) ? b.x1 + 12 : b.x0 - 12 - w;
+      }
+    }
+    drawRich(ctx, s.label, x0, y, px.curve, s.color);
+    placed.push({ x0: x0, x1: x0 + w, y0: y - asc, y1: y + desc });
+  }
+  // hline label: try spots along the line, above then below, keeping clear of curves and labels
+  if (hlineOn && opts.hlineLabel) {
+    const w = richWidth(ctx, opts.hlineLabel, px.curve);
+    const asc = px.curve * 0.78, desc = px.curve * 0.22;
+    const yl = Y(hline);
+    const clearOf = (x0, y0, x1, y1) => {
+      if (y0 < box.y + 2 || y1 > box.y + box.h - 2) return false;
+      for (const b of placed) if (x0 < b.x1 + 4 && x1 > b.x0 - 4 && y0 < b.y1 + 2 && y1 > b.y0 - 2) return false;
+      for (const c of series) for (let i = 0; i < n; i++) {
+        const xx = X(tArr[i]), yy = Y(c.y[i]);
+        if (xx > x0 - 5 && xx < x1 + 5 && yy > y0 - 5 && yy < y1 + 5) return false;
+      }
+      return true;
+    };
+    const fracs = [0.97, 0.80, 0.62, 0.45, 0.28, 0.10];
+    let spot = null;
+    outer: for (const off of [5, 16, 28, 42]) {
+      for (const side of ["above", "below"]) {
+        for (const f of fracs) {
+          const x0 = Math.min(box.x + box.w * f - w, box.x + box.w - w - 6);
+          if (x0 < box.x + 6) continue;
+          const yb = side === "above" ? yl - off - desc : yl + off + asc;
+          if (clearOf(x0, yb - asc, x0 + w, yb + desc)) { spot = [x0, yb]; break outer; }
+        }
+      }
+    }
+    if (!spot) spot = [box.x + box.w - w - 6, yl - 5 - desc];
+    drawRich(ctx, opts.hlineLabel, spot[0], spot[1], px.curve, "#555");
+  }
+  return { X, Y };
+}
+
+function render() {
+  const cssW = Math.min(canvas.parentElement.clientWidth, 620);
+  const cssH = 575;
+  const dpr = window.devicePixelRatio || 1;
+  canvas.style.width = cssW + "px";
+  canvas.style.height = cssH + "px";
+  canvas.width = Math.round(cssW * dpr);
+  canvas.height = Math.round(cssH * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, cssW, cssH);
+
+  const px = { tick: 15.6, axis: 16, title: 16, curve: 15, yoff: 70 };
+  const left = 90, right = 20;
+  const boxW = cssW - left - right;
+  const boxTop = { x: left, y: 40, w: boxW, h: 190 };
+  // bottom plot 20% taller (190 -> 228) and placed closer to the top plot
+  const boxBot = { x: left, y: 295, w: boxW, h: 228 };
+
+  const sim = simulate();
+  const { tArr, zConst, zStep, zLin, xbar } = sim;
+  const VsegsU = [{t:"volume", italic:false}, {gap:5}, {t:"(m\u00B3)", italic:false}];
+  const xsegs = [{t:"mass fraction", italic:false}, {gap:5}, {t:"x"}];
+  const xbarLabel = [{t:"x\u0304 = " + xbar.toFixed(4), italic:false}];
+
+  let title1 = "", series1 = [], series2 = [], hline;
+  if (view === 0) {
+    title1 = "blending process with constant inputs";
+    series1 = [{ y: zConst.map(z => z[0]), color: "#1f4fa0" }];
+    series2 = [{ y: zConst.map(z => z[1]), color: "#1f4fa0" }];
+    hline = xbar;
+  } else if (view === 1) {
+    title1 = "blending process with a step change in w\u2081";
+    series1 = [{ y: zStep.map(z => z[0]), color: "#1f4fa0" }];
+    series2 = [{ y: zStep.map(z => z[1]), color: "#1f4fa0" }];
+    hline = xbar;
+  } else {
+    title1 = "nonlinear versus linear model for a step change in w\u2081";
+    series1 = [
+      { y: zStep.map(z => z[0]), color: "#c00000", width: 3,
+        label: [{t:"nonlinear", italic:false}], labelPos: 0.40, labelSide: "above" },
+      { y: zLin.map(z => z[0]), color: "#1f4fa0", dash: [8, 6], width: 2.5,
+        label: [{t:"linearized", italic:false}], labelPos: 0.65, labelSide: "below" }
+    ];
+    series2 = [
+      { y: zStep.map(z => z[1]), color: "#c00000", width: 3,
+        label: [{t:"nonlinear", italic:false}], labelPos: 0.30, labelSide: "above" },
+      { y: zLin.map(z => z[1]), color: "#1f4fa0", dash: [8, 6], width: 2.5,
+        label: [{t:"linearized", italic:false}], labelPos: 0.62, labelSide: "below" }
+    ];
+    hline = xbar;
+  }
+
+  drawSubplot(px, boxTop, tArr, series1, {
+    title: title1, yLabelSegs: VsegsU, xLabel: true,
+    yRange: [9.8, 12.0], yTicks: [10.0, 10.5, 11.0, 11.5, 12.0], yTickDec: 1
+  });
+  const botOpts = { yLabelSegs: xsegs, xLabel: true, hline: hline, hlineLabel: xbarLabel };
+  // fixed mass-fraction scale in all views
+  botOpts.yRange = [0, 0.10];
+  botOpts.yTicks = [0, 0.02, 0.04, 0.06, 0.08, 0.10];
+  botOpts.yTickDec = 2;
+  drawSubplot(px, boxBot, tArr, series2, botOpts);
+}
+
+/* ---------------- controls ---------------- */
+function subSeg(base, sub, restPlain) {
+  return [{t: base}, {t: sub, sub: true}];
+}
+function updateLabels() {
+  const html = (main, sub, val, unit) =>
+    "<i>" + main + "</i><sub>" + sub + "</sub> = " + val + (unit ? " " + unit : "");
+  document.getElementById("lab_w1").innerHTML =
+    html("w", "1", fmt(state.w1, 1), "kg/s") + " &nbsp;(stream 1 flow rate)";
+  document.getElementById("lab_w2").innerHTML =
+    html("w", "2", fmt(state.w2, 1), "kg/s") + " &nbsp;(stream 2 flow rate)";
+  document.getElementById("lab_dw1").innerHTML =
+    "&Delta;<i>w</i><sub>1</sub> = " + fmt(state.dw1, 2) + " kg/s &nbsp;(step change)";
+  document.getElementById("lab_x1").innerHTML =
+    html("x", "1", fmt(state.x1, 2), "") + " &nbsp;(stream 1 mass fraction)";
+  document.getElementById("lab_x0").innerHTML =
+    html("x", "0", fmt(state.x0, 3), "") + " &nbsp;(initial mass fraction)";
+}
+function bindSlider(id, key, dec) {
+  const el = document.getElementById(id);
+  el.addEventListener("input", () => {
+    state[key] = parseFloat(el.value);
+    updateLabels();
+    render();
+  });
+}
+bindSlider("sl_w1", "w1");
+bindSlider("sl_w2", "w2");
+bindSlider("sl_dw1", "dw1");
+bindSlider("sl_x1", "x1");
+bindSlider("sl_x0", "x0");
+
+const viewBtns = [document.getElementById("btnView0"),
+                  document.getElementById("btnView1"),
+                  document.getElementById("btnView2")];
+viewBtns.forEach((b, i) => b.addEventListener("click", () => {
+  view = i;
+  viewBtns.forEach((bb, j) => bb.classList.toggle("active", j === i));
+  document.getElementById("blk_dw1").style.opacity = (i === 0) ? 0.4 : 1.0;
+  document.getElementById("sl_dw1").disabled = (i === 0);
+  render();
+}));
+document.getElementById("blk_dw1").style.opacity = 0.4;
+document.getElementById("sl_dw1").disabled = true;
+
+/* ---------------- panels ---------------- */
+const panels = {
+  btnDirections: "panelDirections",
+  btnDetails: "panelDetails",
+  btnAbout: "panelAbout"
+};
+let openPanelId = null;
+
+function closeAllPanels() {
+  for (const pid of Object.values(panels)) {
+    document.getElementById(pid).style.display = "none";
+  }
+  openPanelId = null;
+}
+
+// add a close X in the upper right corner of each panel
+for (const panelId of Object.values(panels)) {
+  const panel = document.getElementById(panelId);
+  const wrap = document.createElement("div");
+  wrap.className = "panelBody";
+  while (panel.firstChild) wrap.appendChild(panel.firstChild);
+  panel.appendChild(wrap);
+  const x = document.createElement("button");
+  x.className = "panelClose";
+  x.setAttribute("aria-label", "Close");
+  x.innerHTML = "&#10005;";
+  x.addEventListener("click", closeAllPanels);
+  panel.appendChild(x);
+}
+
+function positionPanel(btnId, panelId) {
+  const app = document.getElementById("app");
+  const btn = document.getElementById(btnId);
+  const panel = document.getElementById(panelId);
+  const viewRow = document.querySelector(".viewRow");
+  const appRect = app.getBoundingClientRect();
+  const btnRect = btn.getBoundingClientRect();
+  const rowRect = viewRow.getBoundingClientRect();
+  const gap = 12;                                   // gap right of the button
+  const left = btnRect.right - appRect.left + gap;
+  // top is anchored just below the three view-selection buttons at the top
+  const top = rowRect.bottom - appRect.top + 8;
+  panel.style.left = left + "px";
+  panel.style.top = top + "px";
+  panel.style.width = Math.max(300, appRect.width - left - 10) + "px";
+}
+
+for (const [btnId, panelId] of Object.entries(panels)) {
+  document.getElementById(btnId).addEventListener("click", () => {
+    const panel = document.getElementById(panelId);
+    const opening = (openPanelId !== panelId);
+    closeAllPanels();
+    if (opening) {
+      positionPanel(btnId, panelId);
+      panel.style.display = "block";
+      openPanelId = panelId;
+      if (window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise([panel]);
+      }
+    }
+  });
+}
+
+window.addEventListener("resize", () => {
+  if (openPanelId) {
+    const btnId = Object.keys(panels).find(k => panels[k] === openPanelId);
+    positionPanel(btnId, openPanelId);
+  }
+});
+
+/* ---------------- init ---------------- */
+window.addEventListener("resize", render);
+updateLabels();
+render();
+</script>
+</body>
+</html>

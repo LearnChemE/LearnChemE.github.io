@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ion exchange column</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] },
+  chtml: { displayAlign: 'left' }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js" defer></script>
+<style>
+  :root{
+    --red:#98000D;
+    --red-dark:#7a0009;
+    --ink:#000;
+    --panel-bg:#fdfdfb;
+    --border:#ccc;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0; padding:0;
+    font-family: Helvetica, Arial, sans-serif;
+    color:var(--ink);
+    background:#ffffff;
+  }
+  #app{
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 14px 16px 20px 16px;
+    position: relative;
+  }
+  h1{
+    font-size: 20px;
+    font-weight: 700;
+    margin: 2px 0 10px 0;
+    text-align:center;
+  }
+  .btnrow{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:12px;
+    flex-wrap: wrap;
+  }
+  .btnrow .spacer{flex:1;}
+  button.house{
+    background: var(--red);
+    color:#fff;
+    border:none;
+    border-radius:4px;
+    padding:7px 14px;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size:14px;
+    cursor:pointer;
+    transition: background 0.15s ease;
+  }
+  button.house:hover{ background: var(--red-dark); }
+  button.house:active{ transform: translateY(1px); }
+  button.house.wide{ min-width: 92px; }
+
+  .stage{
+    display:flex;
+    gap:18px;
+    flex-wrap: wrap;
+    justify-content:center;
+    position:relative;
+  }
+  .col-wrap, .chart-wrap{
+    background:#fff;
+    border:1px solid #ddd;
+    border-radius:6px;
+    padding:8px;
+  }
+  .col-wrap{ width:236px; }
+  .chart-wrap{ width:508px; }
+  canvas{ display:block; }
+
+  .feedlabel, .efflabel{
+    text-align:center;
+    font-size:16px;
+    color:#000;
+  }
+
+  .sliders{
+    margin-top:16px;
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 26px;
+    background:#faf9f7;
+    border:1px solid #e3e1dd;
+    border-radius:6px;
+    padding:14px 18px;
+  }
+  .slider-row{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+  }
+  .slider-row .toprow{
+    display:flex;
+    justify-content:space-between;
+    font-size:17px;
+  }
+  .slider-row .toprow .val{
+    font-weight:400;
+    color: #000;
+    min-width: 110px;
+    text-align:right;
+  }
+  input[type=range]{
+    -webkit-appearance:none;
+    width:100%;
+    height: 18px;
+    background:transparent;
+  }
+  input[type=range]::-webkit-slider-runnable-track{
+    height:4px;
+    background:#c9c5bf;
+    border-radius:2px;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    margin-top:-6px;
+    width:16px; height:16px;
+    border-radius:50%;
+    background: var(--red);
+    border:none;
+    cursor:pointer;
+  }
+  input[type=range]::-moz-range-track{
+    height:4px;
+    background:#c9c5bf;
+    border-radius:2px;
+  }
+  input[type=range]::-moz-range-thumb{
+    width:16px; height:16px;
+    border-radius:50%;
+    background: var(--red);
+    border:none;
+    cursor:pointer;
+  }
+
+  /* flyout panels */
+  .panel{
+    position:absolute;
+    top:44px;
+    left:50%;
+    transform: translateX(-50%);
+    width: min(640px, 92%);
+    max-height: 70vh;
+    overflow-y:auto;
+    background: var(--panel-bg);
+    border:1px solid #ccc;
+    border-radius:8px;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.18);
+    padding: 18px 22px 20px 22px;
+    z-index: 50;
+    display:none;
+  }
+  .panel.open{ display:block; }
+  .panel h2{
+    font-size:16px;
+    margin: 0 0 10px 0;
+    padding-right: 26px;
+  }
+  .panel p, .panel li{ font-size: 13.5px; line-height:1.4; margin: 6px 0; }
+  .panel .closeX{
+    position:absolute;
+    top:10px; right:14px;
+    font-size:18px;
+    font-weight:700;
+    color:#888;
+    cursor:pointer;
+    background:none;
+    border:none;
+    line-height:1;
+  }
+  .panel .closeX:hover{ color: var(--red); }
+  .panel table{ border-collapse: collapse; margin: 6px 0; font-size: 13px; }
+  .panel td{ padding: 2px 10px 2px 0; vertical-align: top; }
+  .mjx-container{ font-size: 100% !important; }
+  mjx-container[display="true"]{ margin: 0.35em 0 !important; }
+</style>
+</head>
+<body>
+<div id="app">
+  <h1>Ion exchange column</h1>
+
+  <div class="btnrow">
+    <button class="house" id="btnDirections">Directions</button>
+    <button class="house" id="btnDetails">Details</button>
+    <button class="house" id="btnAbout">About</button>
+    <div class="spacer"></div>
+    <button class="house wide" id="btnPlay">Play</button>
+    <button class="house wide" id="btnReset">Reset</button>
+  </div>
+
+  <!-- Directions panel -->
+  <div class="panel" id="panelDirections">
+    <button class="closeX" data-close="panelDirections">&times;</button>
+    <h2>Directions</h2>
+    <p>This simulation models a fixed-bed ion-exchange column softening hard water: influent
+    Ca<sup>2+</sup>/Mg<sup>2+</sup> ions exchange for Na<sup>+</sup> on the resin as the feed flows downward
+    through the bed. Use the five sliders to set the feed concentration of Ca<sup>2+</sup> plus
+    Mg<sup>2+</sup> (C&#8320;), volumetric
+    flow rate (Q), resin capacity (q&#8320;), resin mass (m), and the Thomas rate constant (k<sub>Th</sub>);
+    each change recomputes the breakthrough time and resets the clock to t&nbsp;=&nbsp;0. Press
+    <b>Play</b> to advance time and watch the exhausted (orange) zone move down through the column
+    while the breakthrough curve on the right traces out C/C&#8320; (outlet concentration of
+    Ca<sup>2+</sup> + Mg<sup>2+</sup> ions divided by their inlet concentration) at the column outlet,
+    drag the <b>time</b> slider to move to any instant directly, or press <b>Reset</b> to return to
+    t&nbsp;=&nbsp;0.</p>
+  </div>
+
+  <!-- Details panel -->
+  <div class="panel" id="panelDetails">
+    <button class="closeX" data-close="panelDetails">&times;</button>
+    <h2>Details</h2>
+    <p>The effluent concentration of Ca<sup>2+</sup> plus Mg<sup>2+</sup> ions (C) divided by the
+    feed concentration of these ions (C&#8320;) is modeled with the <b>Thomas equation</b>, the standard
+    analytical model for a favorable, second-order-reversible ion-exchange (or adsorption)
+    equilibrium in a fixed bed:</p>
+    \[ \frac{C}{C_0} \;=\; \frac{1}{1+\exp\!\Big[\dfrac{k_{Th}}{Q}\big(q_0 m - C_0 Q t\big)\Big]} \]
+    <p>This can be rewritten using the stoichiometric (ideal) breakthrough time \(t_b\) and a
+    dimensionless sharpness factor \(s\):</p>
+    \[ t_b=\frac{q_0\,m}{C_0\,Q}, \qquad s=\frac{k_{Th}\,q_0\,m}{Q}=k_{Th}C_0t_b, \qquad
+       \frac{C}{C_0}=\frac{1}{1+\exp\!\big[s\,(1-t/t_b)\big]} \]
+    <p>\(t_b\) is the time at which C/C&#8320;&nbsp;=&nbsp;0.5 (the midpoint of the S-shaped curve);
+    it is also the time an infinitely sharp front would take to exhaust the whole bed. Larger
+    \(s\) (faster mass transfer, i.e. larger \(k_{Th}\)) gives a narrower mass-transfer zone and a
+    steeper breakthrough curve; smaller \(s\) spreads the curve out.</p>
+    <p>The column diagram extends the same equation along the bed length assuming the
+    mass-transfer zone travels as a self-sharpening ("constant pattern") wave. With \(z\)
+    the fractional bed depth (0 = inlet, 1 = outlet), the local resin saturation is</p>
+    \[ \theta(z,t)=\frac{1}{1+\exp\!\big[s\,(z-t/t_b)\big]} \]
+    <p>which reduces to the effluent equation above at \(z=1\).</p>
+    <table>
+      <tr><td>\(C_0\)</td><td>feed (influent) hardness concentration of Ca<sup>2+</sup> plus Mg<sup>2+</sup> ions, meq/L</td></tr>
+      <tr><td>\(C\)</td><td>effluent (outlet) concentration of Ca<sup>2+</sup> plus Mg<sup>2+</sup> ions at time t, meq/L</td></tr>
+      <tr><td>\(Q\)</td><td>volumetric flow rate through the bed, L/min</td></tr>
+      <tr><td>\(q_0\)</td><td>resin exchange capacity, meq/g resin</td></tr>
+      <tr><td>\(m\)</td><td>mass of resin in the bed, g</td></tr>
+      <tr><td>\(k_{Th}\)</td><td>Thomas rate constant, L/(meq&middot;min)</td></tr>
+      <tr><td>\(t_b\)</td><td>stoichiometric (ideal) breakthrough time, the time at which C/C&#8320;&nbsp;=&nbsp;0.5, min</td></tr>
+      <tr><td>\(s\)</td><td>dimensionless sharpness factor; larger \(s\) gives a narrower mass-transfer zone and a steeper breakthrough curve</td></tr>
+      <tr><td>\(z\)</td><td>fractional bed depth (0 = inlet, 1 = outlet), dimensionless</td></tr>
+    </table>
+  </div>
+
+  <!-- About panel -->
+  <div class="panel" id="panelAbout">
+    <button class="closeX" data-close="panelAbout">&times;</button>
+    <h2>About</h2>
+    <p>This simulation was created in the
+    <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a>
+    at University of Colorado Boulder for
+    <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a>
+    by John L. Falconer using Claude AI. It was prepared with financial support from the
+    National Science Foundation (DUE&nbsp;2336987 and 2336988). Address any questions or
+    comments to LearnChemE@gmail.com.</p>
+  </div>
+
+  <div class="stage">
+    <div class="col-wrap">
+      <div class="feedlabel">feed: C&#8320; (Ca<sup>2+</sup>, Mg<sup>2+</sup>)</div>
+      <canvas id="colCanvas" width="220" height="380" style="width:220px;height:380px;"></canvas>
+      <div class="efflabel" id="effLabel">effluent: C/C&#8320; = 0.000</div>
+    </div>
+    <div class="chart-wrap">
+      <canvas id="chartCanvas" width="488" height="420" style="width:488px;height:420px;"></canvas>
+    </div>
+  </div>
+
+  <div class="sliders">
+    <div class="slider-row">
+      <div class="toprow"><span>feed concentration, C&#8320;</span><span class="val" id="C0val"></span></div>
+      <input type="range" id="C0" min="0.5" max="5" step="0.1" value="2">
+    </div>
+    <div class="slider-row">
+      <div class="toprow"><span>flow rate, Q</span><span class="val" id="Qval"></span></div>
+      <input type="range" id="Q" min="0.05" max="1" step="0.01" value="0.2">
+    </div>
+    <div class="slider-row">
+      <div class="toprow"><span>resin capacity, q&#8320;</span><span class="val" id="q0val"></span></div>
+      <input type="range" id="q0" min="0.5" max="4" step="0.1" value="2">
+    </div>
+    <div class="slider-row">
+      <div class="toprow"><span>resin mass, m</span><span class="val" id="mval"></span></div>
+      <input type="range" id="m" min="20" max="300" step="5" value="100">
+    </div>
+    <div class="slider-row">
+      <div class="toprow"><span>Thomas rate constant, k<sub>Th</sub></span><span class="val" id="kThval"></span></div>
+      <input type="range" id="kTh" min="0.001" max="0.05" step="0.001" value="0.01">
+    </div>
+    <div class="slider-row">
+      <div class="toprow"><span>time</span><span class="val" id="timeSliderVal"></span></div>
+      <input type="range" id="timeSlider" min="0" max="1000" step="1" value="0">
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- state ----------
+  var P = { C0:2, Q:0.2, q0:2, m:100, kTh:0.01 };
+  var tBreak = 0, sFactor = 0, tMax = 1000;
+  var tCur = 0;
+  var playing = false;
+  var lastFrameTime = null;
+  var ANIM_SECONDS = 16; // real seconds for a full 0..tMax sweep
+
+  // colors
+  var FRESH = [151,197,235];   // light blue -- Na-form, fresh resin
+  var EXHAUST = [217,119,6];   // amber -- Ca-loaded, exhausted resin
+
+  function lerp(a,b,f){ return a+(b-a)*f; }
+  function lerpColor(c1,c2,f){
+    f = Math.max(0,Math.min(1,f));
+    return 'rgb(' + Math.round(lerp(c1[0],c2[0],f)) + ',' +
+                     Math.round(lerp(c1[1],c2[1],f)) + ',' +
+                     Math.round(lerp(c1[2],c2[2],f)) + ')';
+  }
+
+  function recompute(){
+    tBreak = (P.q0*P.m)/(P.C0*P.Q);
+    sFactor = (P.kTh*P.q0*P.m)/P.Q;
+    tMax = 2*tBreak;
+    var ts = document.getElementById('timeSlider');
+    ts.max = tMax.toFixed(2);
+  }
+
+  function theta(z,t){
+    // local saturation fraction, 0=fresh,1=exhausted (constant-pattern wave)
+    var e = sFactor*(z - t/tBreak);
+    // guard overflow
+    if (e > 60) return 0;
+    if (e < -60) return 1;
+    return 1/(1+Math.exp(e));
+  }
+  function effluent(t){ return theta(1,t); }
+
+  // The constant-pattern wave formula above is only valid once the front has
+  // developed. Taken literally it gives a non-zero value everywhere (including
+  // z=0 and t=0) because the logistic curve never truly reaches 0 or 1 - the
+  // deviation is negligible when s is large (sharp front) but becomes visible
+  // when s is small (e.g. a large flow rate Q), showing a non-zero outlet
+  // concentration at t=0. A short startup ramp forces the whole bed, and the
+  // displayed effluent curve, to start from exactly zero.
+  function startupRamp(t){
+    return 1 - Math.exp(-3*sFactor*t/tBreak);
+  }
+  function thetaVis(z,t){
+    return startupRamp(t) * theta(z,t);
+  }
+  function displayEffluent(t){ return thetaVis(1,t); }
+
+  // ---------- canvas setup (hi-DPI) ----------
+  function hiDPICanvas(canvas){
+    var dpr = window.devicePixelRatio || 1;
+    var cssW = parseFloat(canvas.style.width);
+    var cssH = parseFloat(canvas.style.height);
+    canvas.width = cssW*dpr;
+    canvas.height = cssH*dpr;
+    var ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    return { ctx: ctx, w: cssW, h: cssH };
+  }
+
+  var colC = document.getElementById('colCanvas');
+  var chartC = document.getElementById('chartCanvas');
+  var colCtxObj = hiDPICanvas(colC);
+  var chartCtxObj = hiDPICanvas(chartC);
+
+  // ---------- drawing: column ----------
+  function drawColumn(){
+    var ctx = colCtxObj.ctx, W = colCtxObj.w, H = colCtxObj.h;
+    ctx.clearRect(0,0,W,H);
+    ctx.font = '12px Helvetica, Arial, sans-serif';
+    ctx.textAlign = 'center';
+
+    var bedX = 34, bedW = W-90;
+    var bedTop = 34, bedBot = H-46;
+    var bedH = bedBot-bedTop;
+
+    // feed arrow
+    ctx.strokeStyle = '#000'; ctx.fillStyle = '#000'; ctx.lineWidth = 3.25;
+    ctx.beginPath();
+    ctx.moveTo(W/2, 6); ctx.lineTo(W/2, bedTop-4);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(W/2-5, bedTop-9); ctx.lineTo(W/2, bedTop-2); ctx.lineTo(W/2+5, bedTop-9);
+    ctx.fill();
+
+    // bed outline (rounded rect)
+    var r=8;
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(bedX+r, bedTop);
+    ctx.arcTo(bedX+bedW, bedTop, bedX+bedW, bedTop+r, r);
+    ctx.arcTo(bedX+bedW, bedBot, bedX+bedW-r, bedBot, r);
+    ctx.arcTo(bedX, bedBot, bedX, bedBot-r, r);
+    ctx.arcTo(bedX, bedTop, bedX+r, bedTop, r);
+    ctx.closePath();
+    ctx.clip();
+
+    // draw N horizontal bands representing local saturation theta(z,t)
+    var N = 90;
+    for (var i=0;i<N;i++){
+      var z0 = i/N, z1=(i+1)/N;
+      var zc = (z0+z1)/2;
+      var th = thetaVis(zc, tCur);
+      ctx.fillStyle = lerpColor(FRESH, EXHAUST, th);
+      var y0 = bedTop + z0*bedH;
+      var y1 = bedTop + z1*bedH;
+      ctx.fillRect(bedX, y0, bedW, (y1-y0)+0.6);
+    }
+
+    ctx.restore();
+
+    // bed border
+    ctx.strokeStyle = '#555'; ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(bedX+r, bedTop);
+    ctx.arcTo(bedX+bedW, bedTop, bedX+bedW, bedTop+r, r);
+    ctx.arcTo(bedX+bedW, bedBot, bedX+bedW-r, bedBot, r);
+    ctx.arcTo(bedX, bedBot, bedX, bedBot-r, r);
+    ctx.arcTo(bedX, bedTop, bedX+r, bedTop, r);
+    ctx.closePath();
+    ctx.stroke();
+
+    // z labels
+    ctx.fillStyle = '#000';
+    ctx.font = '16px Helvetica, Arial, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText('z=0', bedX+bedW+4, bedTop+11);
+    ctx.fillText('z=1', bedX+bedW+4, bedBot+6);
+
+    // effluent arrow
+    var effVal = displayEffluent(tCur);
+    ctx.strokeStyle = '#000'; ctx.fillStyle = '#000'; ctx.lineWidth = 3.25;
+    ctx.beginPath();
+    ctx.moveTo(W/2, bedBot+4); ctx.lineTo(W/2, H-16);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(W/2-5, H-21); ctx.lineTo(W/2, H-14); ctx.lineTo(W/2+5, H-21);
+    ctx.fill();
+
+    document.getElementById('effLabel').innerHTML =
+      'effluent: C/C₀ = ' + effVal.toFixed(3);
+  }
+
+  // ---------- drawing: breakthrough chart ----------
+  function drawChart(){
+    var ctx = chartCtxObj.ctx, W = chartCtxObj.w, H = chartCtxObj.h;
+    ctx.clearRect(0,0,W,H);
+
+    var padL=56, padR=24, padT=14, padB=48;
+    var plotW = W-padL-padR, plotH = H-padT-padB;
+
+    function xPix(t){ return padL + (t/tMax)*plotW; }
+    function yPix(c){ return padT + (1-c)*plotH; }
+
+    // nice round step for the x-axis (time) ticks, e.g. 1/2/5 x 10^n
+    function niceStep(range, targetTicks){
+      var rawStep = range/targetTicks;
+      var mag = Math.pow(10, Math.floor(Math.log10(rawStep)));
+      var norm = rawStep/mag;
+      var niceNorm = (norm<1.5)?1:(norm<3)?2:(norm<7)?5:10;
+      return niceNorm*mag;
+    }
+
+    // axis ticks (numbers + short tick marks, no gridlines)
+    ctx.font = '17px Helvetica, Arial, sans-serif';
+    ctx.fillStyle = '#000';
+    ctx.strokeStyle = '#000'; ctx.lineWidth = 1;
+    var nY = 5;
+    for (var i=0;i<=nY;i++){
+      var cv = i/nY;
+      var y = yPix(cv);
+      ctx.beginPath(); ctx.moveTo(padL-5,y); ctx.lineTo(padL,y); ctx.stroke();
+      ctx.textAlign = 'right';
+      ctx.fillText(cv.toFixed(1), padL-8, y+6);
+    }
+    var xStep = niceStep(tMax, 6);
+    for (var tv=0; tv<=tMax+1e-9; tv+=xStep){
+      var x = xPix(tv);
+      ctx.beginPath(); ctx.moveTo(x,padT+plotH); ctx.lineTo(x,padT+plotH+5); ctx.stroke();
+      ctx.textAlign = 'center';
+      ctx.fillText(Math.round(tv), x, padT+plotH+20);
+    }
+
+    // axis lines (full box: left, bottom, top, right)
+    ctx.strokeStyle = '#000'; ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.moveTo(padL,padT); ctx.lineTo(padL,padT+plotH); ctx.lineTo(padL+plotW,padT+plotH);
+    ctx.lineTo(padL+plotW,padT); ctx.lineTo(padL,padT);
+    ctx.stroke();
+
+    // axis labels
+    ctx.fillStyle = '#000';
+    ctx.font = '17px Helvetica, Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('time (min)', padL+plotW/2, H-8);
+    ctx.save();
+    ctx.translate(16, padT+plotH/2);
+    ctx.rotate(-Math.PI/2);
+    ctx.font = '17px Helvetica, Arial, sans-serif';
+    ctx.fillText('C / C₀', 0, 0);
+    ctx.restore();
+
+    // 0.5 breakthrough reference lines
+    ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+    ctx.setLineDash([4,3]);
+    ctx.beginPath(); ctx.moveTo(padL, yPix(0.5)); ctx.lineTo(padL+plotW, yPix(0.5)); ctx.stroke();
+    var xb = xPix(tBreak);
+    ctx.beginPath(); ctx.moveTo(xb, padT); ctx.lineTo(xb, padT+plotH); ctx.stroke();
+    ctx.setLineDash([]);
+    (function drawTbLabel(){
+      var mainFont = '17px Helvetica, Arial, sans-serif';
+      var subFont = '12px Helvetica, Arial, sans-serif';
+      var rest = ' = '+Math.round(tBreak)+' min';
+      var y = padT+16;
+      ctx.fillStyle = '#000';
+      ctx.textAlign = 'left';
+      ctx.font = mainFont;
+      var tW = ctx.measureText('t').width;
+      ctx.font = subFont;
+      var bW = ctx.measureText('b').width;
+      ctx.font = mainFont;
+      var restW = ctx.measureText(rest).width;
+      var x = xb - 4 - (tW+bW+restW);
+      ctx.font = mainFont;
+      ctx.fillText('t', x, y);
+      ctx.font = subFont;
+      ctx.fillText('b', x+tW, y+5);
+      ctx.font = mainFont;
+      ctx.fillText(rest, x+tW+bW, y);
+    })();
+
+    // full future curve (dashed light)
+    ctx.beginPath();
+    var steps=200;
+    for (var k=0;k<=steps;k++){
+      var t = tMax*k/steps;
+      var c = displayEffluent(t);
+      var xx = xPix(t), yy = yPix(c);
+      if (k===0) ctx.moveTo(xx,yy); else ctx.lineTo(xx,yy);
+    }
+    ctx.strokeStyle = '#ddb9bd';
+    ctx.setLineDash([2,3]);
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // realized curve up to tCur (solid house red)
+    ctx.beginPath();
+    var steps2 = Math.max(2, Math.round(steps*(tCur/tMax)));
+    for (k=0;k<=steps2;k++){
+      t = tMax*k/steps;
+      if (t>tCur) t=tCur;
+      c = displayEffluent(t);
+      xx = xPix(t); yy = yPix(c);
+      if (k===0) ctx.moveTo(xx,yy); else ctx.lineTo(xx,yy);
+    }
+    ctx.strokeStyle = '#98000D';
+    ctx.lineWidth = 2.4;
+    ctx.stroke();
+
+    // current point marker
+    var cx = xPix(tCur), cy = yPix(displayEffluent(tCur));
+    ctx.beginPath();
+    ctx.arc(cx,cy,4.5,0,Math.PI*2);
+    ctx.fillStyle = '#98000D';
+    ctx.fill();
+    ctx.strokeStyle = '#fff'; ctx.lineWidth=1; ctx.stroke();
+
+    // sharpness factor, bottom-right of plot area (inset from axes)
+    ctx.fillStyle = '#000';
+    ctx.font = '17px Helvetica, Arial, sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText('s = '+Number(sFactor).toPrecision(3), padL+plotW-10, padT+plotH-12);
+  }
+
+  function fmt(n, d){ return Number(n).toFixed(d); }
+
+  function updateReadouts(){
+    document.getElementById('C0val').textContent = fmt(P.C0,1)+' meq/L';
+    document.getElementById('Qval').textContent = fmt(P.Q,2)+' L/min';
+    document.getElementById('q0val').textContent = fmt(P.q0,1)+' meq/g';
+    document.getElementById('mval').textContent = fmt(P.m,0)+' g';
+    document.getElementById('kThval').textContent = fmt(P.kTh,3)+' L/(meq·min)';
+    document.getElementById('timeSliderVal').textContent = fmt(tCur,0)+' min';
+  }
+
+  function redraw(){
+    updateReadouts();
+    drawColumn();
+    drawChart();
+  }
+
+  // ---------- slider wiring ----------
+  function bindParamSlider(id, key){
+    var el = document.getElementById(id);
+    el.addEventListener('input', function(){
+      P[key] = parseFloat(el.value);
+      recompute();
+      tCur = 0;
+      document.getElementById('timeSlider').value = 0;
+      playing = false;
+      document.getElementById('btnPlay').textContent = 'Play';
+      redraw();
+    });
+  }
+  bindParamSlider('C0','C0');
+  bindParamSlider('Q','Q');
+  bindParamSlider('q0','q0');
+  bindParamSlider('m','m');
+  bindParamSlider('kTh','kTh');
+
+  var timeSlider = document.getElementById('timeSlider');
+  timeSlider.addEventListener('input', function(){
+    tCur = parseFloat(timeSlider.value);
+    playing = false;
+    document.getElementById('btnPlay').textContent = 'Play';
+    redraw();
+  });
+
+  // ---------- play/pause/reset ----------
+  var btnPlay = document.getElementById('btnPlay');
+  btnPlay.addEventListener('click', function(){
+    if (tCur >= tMax) { tCur = 0; }
+    playing = !playing;
+    btnPlay.textContent = playing ? 'Pause' : 'Play';
+    lastFrameTime = null;
+    if (playing) requestAnimationFrame(tick);
+  });
+  document.getElementById('btnReset').addEventListener('click', function(){
+    tCur = 0;
+    playing = false;
+    btnPlay.textContent = 'Play';
+    timeSlider.value = 0;
+    redraw();
+  });
+
+  function tick(now){
+    if (!playing) return;
+    if (lastFrameTime===null) lastFrameTime = now;
+    var dtSec = (now-lastFrameTime)/1000;
+    lastFrameTime = now;
+    var simSpeed = tMax/ANIM_SECONDS;
+    tCur += dtSec*simSpeed;
+    if (tCur >= tMax){
+      tCur = tMax;
+      playing = false;
+      btnPlay.textContent = 'Play';
+    }
+    timeSlider.value = tCur;
+    redraw();
+    if (playing) requestAnimationFrame(tick);
+  }
+
+  // ---------- flyout panels ----------
+  var panels = ['panelDirections','panelDetails','panelAbout'];
+  function closeAll(){
+    panels.forEach(function(id){ document.getElementById(id).classList.remove('open'); });
+  }
+  function togglePanel(id){
+    var isOpen = document.getElementById(id).classList.contains('open');
+    closeAll();
+    if (!isOpen) document.getElementById(id).classList.add('open');
+  }
+  document.getElementById('btnDirections').addEventListener('click', function(){ togglePanel('panelDirections'); });
+  document.getElementById('btnDetails').addEventListener('click', function(){ togglePanel('panelDetails'); });
+  document.getElementById('btnAbout').addEventListener('click', function(){ togglePanel('panelAbout'); });
+  document.querySelectorAll('.closeX').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.getElementById(btn.getAttribute('data-close')).classList.remove('open');
+    });
+  });
+  document.addEventListener('click', function(e){
+    panels.forEach(function(id){
+      var p = document.getElementById(id);
+      if (!p.classList.contains('open')) return;
+      var btnIds = {panelDirections:'btnDirections', panelDetails:'btnDetails', panelAbout:'btnAbout'};
+      var trigger = document.getElementById(btnIds[id]);
+      if (!p.contains(e.target) && e.target!==trigger){
+        p.classList.remove('open');
+      }
+    });
+  });
+
+  // ---------- init ----------
+  recompute();
+  redraw();
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PFR Start-Up Dynamics</title>
+<style>
+/* Layout: LearnChemE sim frame — title, button row with overlay flyouts, controls column beside a stack of plots */
+:root {
+  --bg: #ffffff;
+  --panel: #f6f4f4;
+  --ink: #000000;
+  --muted: #000000;
+  --rule: #d9d3d3;
+  --brand: #98000D;
+  --brand-hover: #7a000a;
+  --font: Helvetica, "Helvetica Neue", Arial, sans-serif;
+  color-scheme: light;
+}
+[hidden] { display: none !important; }
+html, body { background: var(--bg); color: var(--ink); }
+body { margin: 0; font-family: var(--font); font-size: 17px; padding-inline: 16px; padding-block: 12px 24px; }
+#app { max-width: 1280px; margin: 0 auto; position: relative; }
+h1 { font-size: 17px; font-weight: 700; margin: 4px 0 10px; text-wrap: balance; }
+.btnrow { display: flex; flex-wrap: wrap; gap: 8px; }
+button.lce {
+  font-family: var(--font); font-size: 17px; font-weight: normal; color: #fff; background: var(--brand);
+  border: none; border-radius: 4px; padding: 7px 14px; cursor: pointer;
+}
+button.lce:hover { background: var(--brand-hover); }
+button.lce:focus-visible, input:focus-visible { outline: 2px solid #2a6fd6; outline-offset: 2px; }
+button.lce[aria-pressed="true"] { box-shadow: inset 0 0 0 2px rgba(255,255,255,0.55); }
+.flyout {
+  position: absolute; z-index: 30; top: calc(100% + 6px); left: 0;
+  width: min(620px, calc(100vw - 32px)); max-height: 72vh; font-size: 17px;
+  display: flex; flex-direction: column;
+  background: var(--bg); color: var(--ink); border: 1px solid var(--rule); border-radius: 6px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.18);
+}
+.flyout .fhead { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px 6px; border-bottom: 1px solid var(--rule); }
+.flyout .fhead h2 { font-size: 17px; margin: 0; }
+#detPanel { width: min(713px, calc(100vw - 32px)); }
+.symtab { border-collapse: collapse; margin: 6px 0 4px; }
+.symtab td { padding: 3px 14px 3px 0; vertical-align: top; }
+.symtab td:first-child { white-space: nowrap; }
+.flyout .close { background: none; border: none; font-size: 1.5rem; line-height: 1; cursor: pointer; color: var(--muted); padding: 0 4px; }
+.flyout .close:hover { color: var(--brand); }
+.flyout .fbody { overflow-y: auto; padding: 8px 16px 14px; line-height: 1.5; }
+.flyout .fbody p { margin: 8px 0; max-width: 72ch; }
+.flyout .fbody h3 { font-size: 17px; margin: 14px 0 4px; }
+.flyout a { color: var(--brand); }
+mjx-container[display="true"] { text-align: left !important; margin: 6px 0 6px 12px !important; }
+
+.main { display: grid; grid-template-columns: 318px minmax(0, 1fr); gap: 18px; margin-top: 14px; }
+@media (max-width: 820px) { .main { grid-template-columns: minmax(0, 1fr); } }
+.leftcol { display: flex; flex-direction: column; gap: 12px; align-self: start; min-width: 0; }
+.runbtns { margin-top: -26px;   /* rises beside the conversion text so the buttons stay put */ position: relative; align-items: center; }
+#panelBtns { margin-left: 88px; }   /* with the 8px row gap: one inch (96px) to the right of Reset */
+@media (max-width: 640px) { #panelBtns { margin-left: 0; } }
+.controls { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 12px 12px; display: flex; flex-direction: column; gap: 10px; align-self: start; }
+.ctlgroup { display: flex; flex-direction: column; gap: 10px; }
+.ctlgroup h3 { font-size: 17px; color: var(--ink); margin: 4px 0 0; font-weight: 700; }
+.slider { padding-left: 1.1em; }   /* indent sliders and labels about 4 spaces */
+.slider label { display: block; font-size: 17px; }
+.srow { display: flex; align-items: center; gap: 10px; }
+.slider span.v { font-size: 17px; font-variant-numeric: tabular-nums; font-weight: normal; white-space: nowrap; }
+input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+.slider input[type=range] { width: 205px; flex: none; margin: 4px 0; }
+.runrow { display: flex; gap: 8px; flex-wrap: wrap; }
+.runrow button { flex: 1 1 auto; }
+.check { display: flex; align-items: center; gap: 8px; font-size: 17px; }
+.check input { accent-color: var(--brand); }
+.note { font-size: 17px; color: var(--ink); margin: 0; }
+
+.plots { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.readouts { display: flex; flex-wrap: wrap; gap: 6px 26px; font-size: 17px; font-variant-numeric: tabular-nums; }
+.readouts b { font-weight: normal; }
+.tau { font-family: "Times New Roman", Times, serif; font-style: italic; font-size: 1.08em; }
+canvas { display: block; width: 100%; }
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 640px) { .pair { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <h1>Transient Start-Up of a Non-Isothermal Plug Flow Reactor</h1>
+
+  <div class="main">
+    <div class="leftcol">
+    <div class="controls">
+      <div class="ctlgroup">
+        <h3>Temperatures</h3>
+        <div class="slider"><label for="sT0">inlet temperature T<sub>0</sub> (K)</label><div class="srow"><input type="range" id="sT0" min="300" max="400" step="1" value="350"><span class="v" id="vT0"></span></div></div>
+        <div class="slider"><label for="sTi">initial reactor temperature T<sub>i</sub> (K)</label><div class="srow"><input type="range" id="sTi" min="280" max="400" step="1" value="300"><span class="v" id="vTi"></span></div><p class="note" id="tiNote">T<sub>i</sub> takes effect at Reset.</p></div>
+        <div class="slider"><label for="sTa">jacket temperature T<sub>a</sub> (K)</label><div class="srow"><input type="range" id="sTa" min="280" max="400" step="1" value="350"><span class="v" id="vTa"></span></div></div>
+      </div>
+      <div class="ctlgroup">
+        <h3>Reaction</h3>
+        <div class="slider"><label for="sDa">Da = k(350 K)&middot;<span class="tau">&tau;</span></label><div class="srow"><input type="range" id="sDa" min="0.02" max="2" step="0.01" value="0.3"><span class="v" id="vDa"></span></div></div>
+        <div class="slider"><label for="sE">activation energy E<sub>a</sub> (kJ/mol)</label><div class="srow"><input type="range" id="sE" min="40" max="140" step="1" value="80"><span class="v" id="vE"></span></div></div>
+        <div class="slider"><label for="sdT">adiabatic temperature rise (K)</label><div class="srow"><input type="range" id="sdT" min="0" max="200" step="1" value="100"><span class="v" id="vdT"></span></div></div>
+      </div>
+      <div class="ctlgroup">
+        <h3>Heat transfer</h3>
+        <div class="slider"><label for="sB">&beta; = Ua<span class="tau">&tau;</span>/(&rho;c<sub>p</sub>)</label><div class="srow"><input type="range" id="sB" min="0" max="10" step="0.1" value="2"><span class="v" id="vB"></span></div></div>
+        <div class="slider"><label for="sS">thermal capacitance ratio &sigma;</label><div class="srow"><input type="range" id="sS" min="1" max="20" step="0.5" value="5"><span class="v" id="vS"></span></div></div>
+      </div>
+      <div class="ctlgroup">
+        <h3>Display</h3>
+        <div class="slider"><label for="sSp">animation speed (time/<span class="tau">&tau;</span> per s)</label><div class="srow"><input type="range" id="sSp" min="0.02" max="1" step="0.02" value="0.8"><span class="v" id="vSp"></span></div></div>
+        <label class="check" for="cSS"><input type="checkbox" id="cSS" checked> show steady-state profiles</label>
+      </div>
+    </div>
+
+    </div>
+    <div class="plots">
+      <div class="readouts" id="readouts" hidden></div>
+      <canvas id="cvTube"></canvas>
+      <div class="btnrow runbtns">
+        <button class="lce" id="playBtn">Play</button>
+        <button class="lce" id="resetBtn">Reset</button>
+        <div class="btnrow" id="panelBtns">
+          <button class="lce" data-panel="dirPanel" aria-pressed="false">Directions</button>
+          <button class="lce" data-panel="detPanel" aria-pressed="false">Details</button>
+          <button class="lce" data-panel="aboutPanel" aria-pressed="false">About</button>
+        </div>
+
+        <div class="flyout" id="dirPanel" hidden>
+          <div class="fhead"><h2>Directions</h2><button class="close" aria-label="Close">&times;</button></div>
+          <div class="fbody">
+            <p>This simulation shows how temperature and concentration profiles develop when a jacketed plug flow reactor is started up. The exothermic, liquid-phase, first-order reaction A &rarr; B takes place. At time zero the reactor is full of solvent (no A) at the initial temperature T<sub>i</sub>, and feed containing A starts to enter at the inlet temperature T<sub>0</sub>.</p>
+        <p>Sliders are used to set the inlet temperature, the initial reactor temperature, and the jacket temperature. There are no radial temperature gradients in the reactor. The rate constant and residence time together are set with the Damköhler number (Da) slider. The activation energy for the reaction is also set with a slider. The adiabatic temperature rise, which is set with a slider, is related to the heat of reaction and heat capacities. It is the temperature rise for complete conversion in an adiabatic reactor. The dimensionless heat transfer coefficient (&beta;) is set with a slider, as is the thermal capacitance ratio, which is defined in the Details.</p>
+            <p>Press <b>Play</b> to run the start-up and <b>Reset</b> to return to the initial state. The simulation stops automatically after the reactor has been at steady state for 3 dimensionless times (time/<span class="tau">&tau;</span>); press <b>Play</b> to continue, or change a slider and press <b>Play</b> to follow the response to that step change. The tube at the top is colored by temperature. The two profile plots show C<sub>A</sub>/C<sub>A0</sub> and temperature versus axial position; dashed curves are the steady-state profiles for the current slider values. The bottom plot tracks outlet conversion, outlet temperature, and the maximum (hot-spot) temperature in the reactor versus dimensionless time t/<span class="tau">&tau;</span>.</p>
+            <p>Every slider except the initial reactor temperature can be changed while the simulation runs; the change acts as a step change in that variable. For example, let the reactor reach steady state, then lower the inlet temperature. When the thermal capacitance ratio &sigma; is greater than 1, the hot spot temporarily rises well above both the old and new steady states (wrong-way behavior). Set &sigma; = 1 to see this effect disappear.</p>
+          </div>
+        </div>
+
+        <div class="flyout" id="detPanel" hidden>
+          <div class="fhead"><h2>Details</h2><button class="close" aria-label="Close">&times;</button></div>
+          <div class="fbody">
+            <p>The liquid-phase reaction A &rarr; B is first order and exothermic. Mass and energy balances for a plug flow reactor with a cooling (or heating) jacket, including the heat capacity of the reactor wall or packing, are:</p>
+            \[ \frac{\partial C_A}{\partial t} + u\,\frac{\partial C_A}{\partial z} = -k(T)\,C_A \]
+            \[ \sigma\,\frac{\partial T}{\partial t} + u\,\frac{\partial T}{\partial z} = \frac{(-\Delta H_R)\,k(T)\,C_A}{\rho c_p} - \frac{U a}{\rho c_p}\,(T - T_a) \]
+            \[ k(T) = k_{\mathrm{ref}}\exp\!\left[\frac{E_a}{R}\left(\frac{1}{T_{\mathrm{ref}}} - \frac{1}{T}\right)\right], \qquad T_{\mathrm{ref}} = 350\ \mathrm{K} \]
+            <p>where u is the fluid velocity, z is axial position, a is the heat-transfer area per reactor volume, and T<sub>a</sub> is the jacket temperature. The thermal capacitance ratio is</p>
+            \[ \sigma = \frac{\rho c_p + \rho_w c_{p,w}\,(V_w/V)}{\rho c_p} \ge 1 \]
+            <p>Because the wall must also be heated, a temperature change travels down the reactor at speed u/&sigma;, while concentration changes travel at u. With &sigma; = 1, every fluid element behaves like a batch reactor moving down the tube.</p>
+            <p>With dimensionless position &zeta; = z/L, time &theta; = t/&tau; (space time &tau; = L/u), and f = C<sub>A</sub>/C<sub>A0</sub>:</p>
+            \[ \frac{\partial f}{\partial \theta} + \frac{\partial f}{\partial \zeta} = -\mathrm{Da}\,e^{\gamma}\,f \]
+            \[ \sigma\,\frac{\partial T}{\partial \theta} + \frac{\partial T}{\partial \zeta} = \Delta T_{\mathrm{ad}}\,\mathrm{Da}\,e^{\gamma}\,f - \beta\,(T - T_a) \]
+            \[ \mathrm{Da} = k_{\mathrm{ref}}\,\tau, \quad \gamma = \frac{E_a}{R}\left(\frac{1}{T_{\mathrm{ref}}} - \frac{1}{T}\right), \quad \Delta T_{\mathrm{ad}} = \frac{(-\Delta H_R)\,C_{A0}}{\rho c_p}, \quad \beta = \frac{U a\,\tau}{\rho c_p} \]
+            <p>Initial conditions: f(&zeta;, 0) = 0 and T(&zeta;, 0) = T<sub>i</sub>. Boundary conditions: f(0, &theta;) = 1 and T(0, &theta;) = T<sub>0</sub>. Conversion is X = 1 &minus; f.</p>
+            <p>The steady-state profiles (dashed) are found by setting the time derivatives to zero and integrating the resulting ordinary differential equations from &zeta; = 0 to 1 with a fourth-order Runge&ndash;Kutta method:</p>
+            \[ \frac{df}{d\zeta} = -\mathrm{Da}\,e^{\gamma} f, \qquad \frac{dT}{d\zeta} = \Delta T_{\mathrm{ad}}\,\mathrm{Da}\,e^{\gamma} f - \beta\,(T - T_a) \]
+            <p>The steady state does not depend on &sigma;; only the approach to it does.</p>
+            <p>The transient equations are solved by the method of lines on 400 axial grid points with operator splitting. Each time step (&Delta;&theta; = &Delta;&zeta;) first shifts the concentration profile exactly one grid point (first-order upwind with Courant number 1) and advances temperature with first-order upwind differencing (Courant number 1/&sigma;). Reaction and heat exchange are then integrated at each grid point with adaptive substeps. The small numerical dispersion in the temperature equation makes the final transient profiles differ slightly from the steady-state curves.</p>
+            <h3>Symbols</h3>
+            <table class="symtab">
+              <tr><td>\(a\)</td><td>heat-transfer area per reactor volume (m<sup>2</sup>/m<sup>3</sup>)</td></tr>
+              <tr><td>\(C_A,\ C_B\)</td><td>concentrations of A and B (mol/m<sup>3</sup>)</td></tr>
+              <tr><td>\(C_{A0}\)</td><td>concentration of A in the feed (mol/m<sup>3</sup>)</td></tr>
+              <tr><td>\(c_p\)</td><td>heat capacity of the reacting fluid (J/(kg K))</td></tr>
+              <tr><td>\(c_{p,w}\)</td><td>heat capacity of the reactor wall or packing (J/(kg K))</td></tr>
+              <tr><td>\(\mathrm{Da}\)</td><td>Damköhler number, k<sub>ref</sub>&tau; (dimensionless)</td></tr>
+              <tr><td>\(E_a\)</td><td>activation energy (kJ/mol)</td></tr>
+              <tr><td>\(f\)</td><td>dimensionless concentration of A, C<sub>A</sub>/C<sub>A0</sub></td></tr>
+              <tr><td>\(k,\ k_{\mathrm{ref}}\)</td><td>rate constant at T and at T<sub>ref</sub> (1/s)</td></tr>
+              <tr><td>\(L\)</td><td>reactor length (m)</td></tr>
+              <tr><td>\(R\)</td><td>ideal gas constant, 8.314 J/(mol K)</td></tr>
+              <tr><td>\(t\)</td><td>time (s)</td></tr>
+              <tr><td>\(T\)</td><td>fluid temperature (K)</td></tr>
+              <tr><td>\(T_0\)</td><td>feed (inlet) temperature (K)</td></tr>
+              <tr><td>\(T_a\)</td><td>jacket temperature (K)</td></tr>
+              <tr><td>\(T_i\)</td><td>initial reactor temperature (K)</td></tr>
+              <tr><td>\(T_{\mathrm{ref}}\)</td><td>reference temperature for k, 350 K</td></tr>
+              <tr><td>\(u\)</td><td>fluid velocity (m/s)</td></tr>
+              <tr><td>\(U\)</td><td>overall heat-transfer coefficient (W/(m<sup>2</sup> K))</td></tr>
+              <tr><td>\(V,\ V_w\)</td><td>reactor volume and wall (or packing) volume (m<sup>3</sup>)</td></tr>
+              <tr><td>\(X\)</td><td>conversion of A, 1 &minus; f</td></tr>
+              <tr><td>\(z\)</td><td>axial position (m)</td></tr>
+              <tr><td>\(\beta\)</td><td>dimensionless heat-transfer coefficient, Ua&tau;/(&rho;c<sub>p</sub>)</td></tr>
+              <tr><td>\(\gamma\)</td><td>dimensionless Arrhenius exponent</td></tr>
+              <tr><td>\(\Delta H_R\)</td><td>heat of reaction (J/mol)</td></tr>
+              <tr><td>\(\Delta T_{\mathrm{ad}}\)</td><td>adiabatic temperature rise (K)</td></tr>
+              <tr><td>\(\zeta\)</td><td>dimensionless axial position, z/L</td></tr>
+              <tr><td>\(\theta\)</td><td>dimensionless time, t/&tau;</td></tr>
+              <tr><td>\(\rho,\ \rho_w\)</td><td>densities of the fluid and the wall or packing (kg/m<sup>3</sup>)</td></tr>
+              <tr><td>\(\sigma\)</td><td>thermal capacitance ratio (dimensionless)</td></tr>
+              <tr><td>\(\tau\)</td><td>space time, L/u (s)</td></tr>
+            </table>
+          </div>
+        </div>
+
+        <div class="flyout" id="aboutPanel" hidden>
+          <div class="fhead"><h2>About</h2><button class="close" aria-label="Close">&times;</button></div>
+          <div class="fbody">
+            <p>This simulation was created in the <a href="https://www.colorado.edu/chbe/" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="https://learncheme.com/" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.</p>
+          </div>
+        </div>
+      </div>
+      <div class="pair">
+        <canvas id="cvC"></canvas>
+        <canvas id="cvT"></canvas>
+      </div>
+      <canvas id="cvHist"></canvas>
+    </div>
+  </div>
+</div>
+
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+  svg: { displayAlign: 'left', displayIndent: '0em', fontCache: 'global' },
+  startup: { typeset: true }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js" async></script>
+
+<script>
+(function () {
+  "use strict";
+  // ---------------- model ----------------
+  const TREF = 350, RG = 8.314, N = 400;
+  const P = {};
+  const sliders = {
+    T0: ['sT0', 'vT0', v => v.toFixed(0)],
+    Ti: ['sTi', 'vTi', v => v.toFixed(0)],
+    Ta: ['sTa', 'vTa', v => v.toFixed(0)],
+    Da: ['sDa', 'vDa', v => v.toFixed(2)],
+    E: ['sE', 'vE', v => v.toFixed(0)],
+    dTad: ['sdT', 'vdT', v => v.toFixed(0)],
+    beta: ['sB', 'vB', v => v.toFixed(1)],
+    sig: ['sS', 'vS', v => v.toFixed(1)],
+    speed: ['sSp', 'vSp', v => v.toFixed(2)]
+  };
+  function readSliders() {
+    for (const k in sliders) {
+      const [id, vid, fmt] = sliders[k];
+      P[k] = parseFloat(document.getElementById(id).value);
+      document.getElementById(vid).innerHTML = fmt(P[k]);
+    }
+  }
+  function kt(T) { return P.Da * Math.exp((P.E * 1000 / RG) * (1 / TREF - 1 / T)); }
+
+  const S = { f: new Float64Array(N + 1), T: new Float64Array(N + 1), theta: 0, hist: [], nStep: 0, done: false, ssStart: null, pf: null, pT: null, labH: {}, labT: {} };
+  const SS_HOLD = 3;
+  const LABEL_FREEZE = 3;   // time/tau after which the max T and outlet T labels stop following the curves   // run this many dimensionless times at steady state, then stop
+  let steadyProf = [];
+  let running = false;
+  let tLo = 280, tHi = 400, tAxis = 10;
+
+  function resetSim(deferPredict) {
+    S.f.fill(0); S.T.fill(P.Ti);
+    S.f[0] = 1; S.T[0] = P.T0;
+    S.theta = 0; S.nStep = 0; S.hist = []; S.done = false; S.ssStart = null; S.pf = null; S.pT = null; S.labH = {}; S.labT = {};
+    record(S);
+    computeSteady();
+    if (deferPredict) schedulePredict(); else predictAxis();
+    recalcRange(true);
+  }
+
+  // all state-advancing functions take a state object so the run can also be simulated ahead
+  function step(st) {
+    st = st || S;
+    const f = st.f, T = st.T, a = 1 / P.sig, dth = 1 / N;
+    for (let i = N; i >= 1; i--) { f[i] = f[i - 1]; T[i] = T[i] - a * (T[i] - T[i - 1]); }
+    f[0] = 1; T[0] = P.T0;
+    for (let i = 1; i <= N; i++) {
+      let rem = dth, fi = f[i], Ti = T[i], guard = 0;
+      while (rem > 1e-14 && guard++ < 5000) {
+        const k = kt(Ti);
+        let h = rem;
+        const hk = 0.05 / Math.max(k, 1e-12); if (hk < h) h = hk;
+        const hq = 1.0 * P.sig / Math.max(P.dTad * k * fi, 1e-12); if (hq < h) h = hq;
+        const df = fi * (1 - Math.exp(-k * h));
+        fi -= df;
+        Ti += (P.dTad * df - P.beta * (Ti - P.Ta) * h) / P.sig;
+        rem -= h;
+      }
+      f[i] = fi; T[i] = Ti;
+    }
+    st.theta += dth; st.nStep++;
+    if (st.nStep % 20 === 0) record(st);
+  }
+
+  function hotSpot(st) {
+    st = st || S;
+    let m = -Infinity, im = 0;
+    for (let i = 0; i <= N; i++) if (st.T[i] > m) { m = st.T[i]; im = i; }
+    return [m, im / N];
+  }
+  function record(st) {
+    if (st.hist) { const [tm] = hotSpot(st); st.hist.push([st.theta, st.f[N], st.T[N], tm]); }
+    // steady-state test: profiles essentially unchanged since the last record (0.05 time/tau ago)
+    if (st.pT) {
+      let dT = 0, df = 0;
+      for (let i = 0; i <= N; i++) { dT = Math.max(dT, Math.abs(st.T[i] - st.pT[i])); df = Math.max(df, Math.abs(st.f[i] - st.pf[i])); }
+      if (st.nStep > N && dT < 0.005 && df < 2e-5) {
+        if (st.ssStart === null) st.ssStart = st.theta;
+        else if (st.theta - st.ssStart >= SS_HOLD - 1e-9) st.done = true;
+      } else st.ssStart = null;
+    }
+    st.pT = Float64Array.from(st.T); st.pf = Float64Array.from(st.f);
+  }
+
+  // Run a copy of the current state ahead to find where the run will stop,
+  // and end the time axis there so the bottom graph fills its width.
+  function predictAxis() {
+    const c = { f: Float64Array.from(S.f), T: Float64Array.from(S.T), theta: S.theta, nStep: S.nStep,
+                hist: null, done: S.done, ssStart: S.ssStart,
+                pf: S.pf && Float64Array.from(S.pf), pT: S.pT && Float64Array.from(S.pT) };
+    const cap = S.theta + 200;
+    while (!c.done && c.theta < cap) step(c);
+    tAxis = Math.max(1, Math.ceil(c.theta - 1e-9));
+  }
+  let predictTimer = null;
+  function schedulePredict() {
+    clearTimeout(predictTimer);
+    predictTimer = setTimeout(() => { predictAxis(); if (!running) drawAll(); }, 150);
+  }
+
+  function computeSteady() {
+    const M = 400, out = [];
+    let f = 1, T = P.T0; out.push([0, f, T]);
+    const rhs = (f, T) => { const r = kt(T) * f; return [-r, P.dTad * r - P.beta * (T - P.Ta)]; };
+    for (let j = 1; j <= M; j++) {
+      let rem = 1 / M, guard = 0;
+      while (rem > 1e-14 && guard++ < 20000) {
+        const k = kt(T);
+        const h = Math.min(rem, 0.05 / Math.max(k, 1e-12), 0.5 / Math.max(P.dTad * k * f, 1e-12));
+        const a = rhs(f, T), b = rhs(f + h / 2 * a[0], T + h / 2 * a[1]),
+              c = rhs(f + h / 2 * b[0], T + h / 2 * b[1]), d = rhs(f + h * c[0], T + h * c[1]);
+        f += h / 6 * (a[0] + 2 * b[0] + 2 * c[0] + d[0]);
+        T += h / 6 * (a[1] + 2 * b[1] + 2 * c[1] + d[1]);
+        if (f < 0) f = 0;
+        rem -= h;
+      }
+      out.push([j / M, f, T]);
+    }
+    steadyProf = out;
+  }
+
+  function recalcRange(fresh) {
+    let lo = Math.min(P.T0, P.Ti, P.Ta), hi = Math.max(P.T0, P.Ti, P.Ta);
+    for (const r of steadyProf) { if (r[2] < lo) lo = r[2]; if (r[2] > hi) hi = r[2]; }
+    for (let i = 0; i <= N; i++) { if (S.T[i] < lo) lo = S.T[i]; if (S.T[i] > hi) hi = S.T[i]; }
+    lo = Math.floor((lo - 5) / 10) * 10; hi = Math.ceil((hi + 5) / 10) * 10;
+    if (fresh) { tLo = lo; tHi = hi; }
+    else { tLo = Math.min(tLo, lo); tHi = Math.max(tHi, hi); }
+  }
+
+  // ---------------- drawing helpers ----------------
+  const FONT = 'Helvetica, "Helvetica Neue", Arial, sans-serif';
+  const SERIF = '"Times New Roman", Times, serif';
+  const FS = 17, LFS = 16;   // text size, curve-label size
+  const AFS = 18.7;          // axis numbers and axis labels (10% larger than other text)
+  const COL = { ink: '#000', grid: '#ebe6e6', axis: '#333', C: '#1f5fa8', B: '#2e8540', T: '#b0001a', Tmax: '#d97a00', ss: '#6d6d6d', jacket: '#1a6fd8' };
+
+  function setup(cv, aspect, minH) {
+    const dpr = window.devicePixelRatio || 1;
+    const w = cv.clientWidth || cv.parentElement.clientWidth;
+    const h = Math.max(minH || 0, Math.round(w * aspect));
+    cv.style.height = h + 'px';
+    cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+    const ctx = cv.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+    return { ctx, w, h };
+  }
+
+  // rich text: _x or _{..} subscript, ^x or ^{..} superscript, Greek drawn in serif italic
+  function parseRich(s) {
+    const out = []; let i = 0;
+    while (i < s.length) {
+      const c = s[i];
+      if ((c === '_' || c === '^') && i + 1 < s.length) {
+        let t;
+        if (s[i + 1] === '{') { const j = s.indexOf('}', i); t = s.slice(i + 2, j); i = j + 1; }
+        else { t = s[i + 1]; i += 2; }
+        out.push({ t, mode: c === '_' ? 'sub' : 'sup' });
+      } else { out.push({ t: c, mode: 'n' }); i++; }
+    }
+    return out;
+  }
+  function richPieces(ctx, s, size) {
+    return parseRich(s).map(p => {
+      const sz = p.mode === 'n' ? size : size * 0.72;
+      const serif = /[τθσζ]/.test(p.t);
+      const font = (serif ? 'italic ' : '') + sz + 'px ' + (serif ? SERIF : FONT);
+      ctx.font = font;
+      return { t: p.t, font, w: ctx.measureText(p.t).width, dy: p.mode === 'sub' ? size * 0.28 : p.mode === 'sup' ? -size * 0.38 : 0 };
+    });
+  }
+  function richWidth(ctx, s, size) { return richPieces(ctx, s, size).reduce((a, p) => a + p.w, 0); }
+  function drawRich(ctx, s, x, y, size, align, color, halo) {
+    const pcs = richPieces(ctx, s, size);
+    const W = pcs.reduce((a, p) => a + p.w, 0);
+    let cx = align === 'center' ? x - W / 2 : align === 'right' ? x - W : x;
+    ctx.textBaseline = 'alphabetic'; ctx.textAlign = 'left';
+    if (halo) {
+      let hx = cx;
+      ctx.save(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 4; ctx.lineJoin = 'round';
+      for (const p of pcs) { ctx.font = p.font; ctx.strokeText(p.t, hx, y + p.dy); hx += p.w; }
+      ctx.restore();
+    }
+    ctx.fillStyle = color || COL.ink;
+    for (const p of pcs) { ctx.font = p.font; ctx.fillText(p.t, cx, y + p.dy); cx += p.w; }
+    return W;
+  }
+
+  function niceStep(range, n) {
+    const raw = range / n, mag = Math.pow(10, Math.floor(Math.log10(raw))), r = raw / mag;
+    return (r < 1.5 ? 1 : r < 3 ? 2 : r < 7 ? 5 : 10) * mag;
+  }
+  function niceUp(v) {
+    const mag = Math.pow(10, Math.floor(Math.log10(v)));
+    for (const m of [1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10]) if (m * mag >= v - 1e-9) return m * mag;
+    return 10 * mag;
+  }
+  function fmtTick(v, st) {
+    const d = Math.max(0, -Math.floor(Math.log10(st) + 1e-9));
+    return v.toFixed(d);
+  }
+  // Rotated axis label drawn so it looks exactly like the horizontal x-axis text: the label is
+  // rendered upright on an offscreen canvas at device resolution, then that image is turned 90°
+  // on whole pixels (rotating text directly in canvas loses font hinting and looks thinner).
+  // (x, y): baseline position and center of the label; dir -1 reads bottom-to-top, +1 top-to-bottom.
+  function drawRotated(ctx, text, x, y, dir) {
+    const dpr = window.devicePixelRatio || 1;
+    const w = Math.ceil(richWidth(ctx, text, AFS)) + 4, h = Math.ceil(AFS * 1.7), base = Math.round(AFS * 1.1);
+    const off = document.createElement('canvas');
+    off.width = Math.ceil(w * dpr); off.height = Math.ceil(h * dpr);
+    const oc = off.getContext('2d');
+    oc.setTransform(dpr, 0, 0, dpr, 0, 0);
+    drawRich(oc, text, w / 2, base, AFS, 'center');
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.translate(Math.round(x * dpr), Math.round(y * dpr));
+    ctx.rotate(dir * Math.PI / 2);
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(off, -Math.round(off.width / 2), -Math.round(base * dpr));
+    ctx.restore();
+  }
+  // widest tick label on a y axis
+  function tickW(ctx, yr) {
+    const ys = niceStep(yr[1] - yr[0], 5);
+    ctx.font = AFS + 'px ' + FONT;
+    let m = 0;
+    for (let v = Math.ceil(yr[0] / ys - 1e-9) * ys; v <= yr[1] + 1e-9; v += ys) m = Math.max(m, ctx.measureText(fmtTick(v, ys)).width);
+    return m;
+  }
+  const YLAB_GAP = 9;                       // gap between tick numbers and rotated y label
+  const yMargin = tw => 6 + tw + YLAB_GAP + 16;   // room for ticks + label
+
+  // axes box; returns mapping functions
+  function axes(ctx, box, xr, yr, xlab, ylab, opts) {
+    opts = opts || {};
+    const { l, t, r, b } = box;
+    const X = x => l + (x - xr[0]) / (xr[1] - xr[0]) * (r - l);
+    const Y = y => b - (y - yr[0]) / (yr[1] - yr[0]) * (b - t);
+    const xs = niceStep(xr[1] - xr[0], opts.nx || 5), ys = niceStep(yr[1] - yr[0], opts.ny || 5);
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = COL.grid;
+    ctx.beginPath();
+    for (let v = Math.ceil(xr[0] / xs - 1e-9) * xs; v <= xr[1] + 1e-9; v += xs) { ctx.moveTo(X(v), t); ctx.lineTo(X(v), b); }
+    for (let v = Math.ceil(yr[0] / ys - 1e-9) * ys; v <= yr[1] + 1e-9; v += ys) { ctx.moveTo(l, Y(v)); ctx.lineTo(r, Y(v)); }
+    ctx.stroke();
+    ctx.strokeStyle = COL.axis; ctx.strokeRect(l, t, r - l, b - t);
+    ctx.fillStyle = COL.ink; ctx.font = AFS + 'px ' + FONT;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    for (let v = Math.ceil(xr[0] / xs - 1e-9) * xs; v <= xr[1] + 1e-9; v += xs) {
+      ctx.beginPath(); ctx.moveTo(X(v), b); ctx.lineTo(X(v), b - 5); ctx.stroke();
+      ctx.fillText(fmtTick(v, xs), X(v), b + 5);
+    }
+    ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+    for (let v = Math.ceil(yr[0] / ys - 1e-9) * ys; v <= yr[1] + 1e-9; v += ys) {
+      ctx.beginPath(); ctx.moveTo(l, Y(v)); ctx.lineTo(l + 5, Y(v)); ctx.stroke();
+      ctx.fillText(fmtTick(v, ys), l - 6, Y(v));
+    }
+    if (xlab) drawRich(ctx, xlab, (l + r) / 2, b + 47, AFS, 'center');
+    if (ylab) {
+      const lx = l - 6 - tickW(ctx, yr) - YLAB_GAP;
+      drawRotated(ctx, ylab, lx, (t + b) / 2, -1);
+    }
+    return { X, Y };
+  }
+  function rightAxis(ctx, box, yr, ylab) {
+    const { t, r, b } = box;
+    const Y = y => b - (y - yr[0]) / (yr[1] - yr[0]) * (b - t);
+    const ys = niceStep(yr[1] - yr[0], 5);
+    ctx.strokeStyle = COL.axis; ctx.fillStyle = COL.ink; ctx.font = AFS + 'px ' + FONT;
+    ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    for (let v = Math.ceil(yr[0] / ys - 1e-9) * ys; v <= yr[1] + 1e-9; v += ys) {
+      ctx.beginPath(); ctx.moveTo(r, Y(v)); ctx.lineTo(r - 5, Y(v)); ctx.stroke();
+      ctx.fillText(fmtTick(v, ys), r + 6, Y(v));
+    }
+    const lx = r + 6 + tickW(ctx, yr) + YLAB_GAP;
+    drawRotated(ctx, ylab, lx, (t + b) / 2, 1);
+    return Y;
+  }
+  function polyline(ctx, pts, X, Y, color, width, dash) {
+    ctx.save();
+    ctx.beginPath(); ctx.rect(ctx._clip.l, ctx._clip.t, ctx._clip.r - ctx._clip.l, ctx._clip.b - ctx._clip.t); ctx.clip();
+    ctx.strokeStyle = color; ctx.lineWidth = width; ctx.setLineDash(dash || []); ctx.lineJoin = 'round';
+    ctx.beginPath();
+    pts.forEach((p, i) => { const x = X(p[0]), y = Y(p[1]); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
+    ctx.stroke(); ctx.restore();
+  }
+
+  // curve labels: each {text, x, y (anchor in px), side: 'above' | 'below' | 'end', color}
+  // labels are kept inside the plot box and pushed apart vertically if they collide
+  function curveLabels(ctx, box, labels) {
+    const H = 19;
+    for (const L of labels) {
+      L.w = richWidth(ctx, L.text, LFS);
+      if (L.side === 'end') {
+        L.lx = L.x + 8; if (L.lx + L.w > box.r - 4) L.lx = L.x - 8 - L.w;
+        L.ly = L.y - 7;
+      } else {
+        L.lx = Math.min(Math.max(L.x - L.w / 2, box.l + 4), box.r - 4 - L.w);
+        L.ly = L.side === 'below' ? L.y + 21 : L.y - 8;
+      }
+      L.ly = Math.min(Math.max(L.ly, box.t + 17), box.b - 6);
+    }
+    const sorted = labels.slice().sort((a, b) => a.ly - b.ly);
+    const overlapX = (a, b) => a.lx < b.lx + b.w && b.lx < a.lx + a.w;
+    for (let pass = 0; pass < 3; pass++) {
+      for (let i = 0; i < sorted.length; i++) for (let j = i + 1; j < sorted.length; j++) {
+        const a = sorted[i], b = sorted[j];
+        if (overlapX(a, b) && b.ly - a.ly < H) b.ly = a.ly + H;
+      }
+      for (let i = sorted.length - 1; i >= 0; i--) {
+        if (sorted[i].ly > box.b - 6) {
+          const d = sorted[i].ly - (box.b - 6);
+          for (let k = 0; k <= i; k++) if (k === i || overlapX(sorted[k], sorted[i])) sorted[k].ly -= d;
+        }
+      }
+    }
+    for (const L of labels) drawRich(ctx, L.text, L.lx, L.ly, LFS, 'left', L.color, true);
+  }
+
+
+  // Persistent curve labels. Each label is tied to a point on its own curve plus a pixel offset.
+  // It stays where it is until a curve or another label runs into it; only then is a new
+  // spot found, choosing the clear position farthest from the other curves.
+  function segHitsRect(r, x1, y1, x2, y2) {
+    if (Math.max(x1, x2) < r.x0 || Math.min(x1, x2) > r.x1 || Math.max(y1, y2) < r.y0 || Math.min(y1, y2) > r.y1) return false;
+    const n = Math.ceil(Math.hypot(x2 - x1, y2 - y1) / 2) + 1;
+    for (let k = 0; k <= n; k++) {
+      const x = x1 + (x2 - x1) * k / n, y = y1 + (y2 - y1) * k / n;
+      if (x >= r.x0 && x <= r.x1 && y >= r.y0 && y <= r.y1) return true;
+    }
+    return false;
+  }
+  function curveHitsRect(r, pts) {
+    for (let i = 1; i < pts.length; i++) if (segHitsRect(r, pts[i - 1][0], pts[i - 1][1], pts[i][0], pts[i][1])) return true;
+    return pts.length === 1 && pts[0][0] >= r.x0 && pts[0][0] <= r.x1 && pts[0][1] >= r.y0 && pts[0][1] <= r.y1;
+  }
+  function rectDist(r, pts) {
+    let m = Infinity;
+    for (const [x, y] of pts) {
+      const dx = Math.max(r.x0 - x, 0, x - r.x1), dy = Math.max(r.y0 - y, 0, y - r.y1);
+      m = Math.min(m, Math.hypot(dx, dy));
+    }
+    return m;
+  }
+  const rectsOverlap = (a, b) => a.x0 < b.x1 && b.x0 < a.x1 && a.y0 < b.y1 && b.y0 < a.y1;
+  // labels: [{key, text, color, pts (own curve, px)}]; obstacles: every curve on the plot (px)
+  function stickyLabels(ctx, box, store, labels, obstacles, growing, reserved) {
+    const placed = (reserved || []).slice();
+    const rectAt = (L, ax, ay, ox, oy) => ({ x0: ax + ox - 3, x1: ax + ox + L.w + 3, y0: ay + oy - 14, y1: ay + oy + 6 });
+    const valid = r => r.x0 >= box.l + 2 && r.x1 <= box.r - 2 && r.y0 >= box.t + 2 && r.y1 <= box.b - 2 &&
+      !placed.some(q => rectsOverlap(q, r)) && !obstacles.some(c => curveHitsRect(r, c));
+    // pass 1: keep every label whose stored spot is still clear
+    for (const L of labels) {
+      L.w = richWidth(ctx, L.text, LFS);
+      const st = store[L.key];
+      L.r = null;
+      if (st && st.i < L.pts.length) {
+        const r = rectAt(L, L.pts[st.i][0], L.pts[st.i][1], st.ox, st.oy);
+        if (valid(r)) { L.r = r; placed.push(r); }
+      }
+    }
+    // pass 2: find a new spot only for labels that lost theirs
+    for (const L of labels) {
+      if (L.r) continue;
+      const n = L.pts.length;
+      const endX = n ? L.pts[n - 1][0] : box.l;
+      const othersC = [].concat(...obstacles.filter(c => c !== L.pts && !(L.ignore && L.ignore.includes(c))));
+      const stepI = Math.max(1, Math.floor(n / 80));
+      let best = null;
+      for (let i = L.minI || 0; i < n; i += stepI) {
+        const [ax, ay] = L.pts[i];
+        for (const oy of (L.sides || [-10, 23])) {
+          for (const ox of [-L.w / 2, -L.w - 4, 4]) {   // centered, or ending/starting at the anchor point
+            const rr = rectAt(L, ax, ay, ox, oy);
+            if (growing && rr.x1 > endX - 6) continue;   // only beside curve already drawn, so new data never runs into it
+            if (!valid(rr)) continue;
+            const score = Math.min(rectDist(rr, othersC), 24) + (L.bonus ? L.bonus(i) : 0) - Math.abs(ax - (box.l + box.r) / 2) * 0.002 + (ox === -L.w / 2 ? 0.5 : 0);
+            if (!best || score > best.score) best = { score, i, ox, oy, r: rr };
+          }
+        }
+      }
+      if (best) { store[L.key] = { i: best.i, ox: best.ox, oy: best.oy }; L.r = best.r; placed.push(best.r); }
+      else delete store[L.key];
+    }
+    for (const L of labels) if (L.r) drawRich(ctx, L.text, L.r.x0 + 3, L.r.y1 - 6, LFS, 'left', L.color, true);
+  }
+
+  // temperature color map
+  const STOPS = [[0, [44, 90, 160]], [0.3, [120, 175, 215]], [0.5, [240, 232, 205]], [0.72, [240, 160, 75]], [1, [165, 20, 35]]];
+  function tColor(T) {
+    let u = (T - tLo) / (tHi - tLo); u = Math.max(0, Math.min(1, u));
+    for (let k = 1; k < STOPS.length; k++) {
+      if (u <= STOPS[k][0]) {
+        const [u0, c0] = STOPS[k - 1], [u1, c1] = STOPS[k], s = (u - u0) / (u1 - u0);
+        return 'rgb(' + c0.map((c, j) => Math.round(c + s * (c1[j] - c))).join(',') + ')';
+      }
+    }
+    return 'rgb(165,20,35)';
+  }
+
+  // ---------------- views ----------------
+  const cvTube = document.getElementById('cvTube'), cvC = document.getElementById('cvC'),
+        cvT = document.getElementById('cvT'), cvH = document.getElementById('cvHist');
+
+  function drawTube() {
+    const { ctx, w, h } = setup(cvTube, 0, 146);
+    const l = 66, r = w - 128, cy = 62, th = 32;
+    // jacket
+    ctx.fillStyle = '#e4ecf3'; ctx.strokeStyle = '#8aa1b5'; ctx.lineWidth = 1;
+    ctx.fillRect(l, cy - th / 2 - 12, r - l, th + 24); ctx.strokeRect(l, cy - th / 2 - 12, r - l, th + 24);
+    drawRich(ctx, 'jacket at T_a', (l + r) / 2, cy - th / 2 - 18, FS, 'center');
+    // tube colored by T
+    const n = Math.max(2, Math.round(r - l));
+    for (let k = 0; k < n; k++) {
+      const z = k / n, i = Math.round(z * N);
+      ctx.fillStyle = tColor(S.T[i]);
+      ctx.fillRect(l + k * (r - l) / n, cy - th / 2, (r - l) / n + 0.7, th);
+    }
+    ctx.strokeStyle = COL.axis; ctx.lineWidth = 1.5; ctx.strokeRect(l, cy - th / 2, r - l, th);
+    // arrows
+    ctx.strokeStyle = COL.ink; ctx.fillStyle = COL.ink; ctx.lineWidth = 2;
+    const arrow = (x0, x1) => { ctx.beginPath(); ctx.moveTo(x0, cy); ctx.lineTo(x1 - 7, cy); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x1, cy); ctx.lineTo(x1 - 9, cy - 5); ctx.lineTo(x1 - 9, cy + 5); ctx.fill(); };
+    arrow(l - 56, l - 2);
+    arrow(r + 2, r + 52);
+    ctx.font = FS + 'px ' + FONT; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    ctx.fillText('feed', l - 30, cy + 8);
+    ctx.fillText('product', r + 32, cy + 8);
+    // inlet and outlet conditions
+    drawRich(ctx, 'T_0 = ' + P.T0.toFixed(0) + ' K', 2, 26, FS, 'left');
+    drawRich(ctx, 'T = ' + S.T[N].toFixed(0) + ' K', r + 58, 26, FS, 'right');
+    ctx.font = FS + 'px ' + FONT; ctx.fillStyle = COL.ink; ctx.textAlign = 'right'; ctx.textBaseline = 'top';
+    const convTxt = 'conversion = ' + (S.nStep >= N ? (1 - S.f[N]).toFixed(3) : '—');
+    const convLeft = r + 58 - ctx.measureText(convTxt).width;
+    ctx.fillText(convTxt, r + 58, cy + th / 2 + 46);   // one row below max T, beside the buttons
+    // hot spot marker (shown only once the run has started)
+    if (S.nStep > 0) {
+      const [tm, zm] = hotSpot();
+      const xm = l + zm * (r - l);
+      ctx.fillStyle = COL.ink; ctx.beginPath();
+      ctx.moveTo(xm, cy + th / 2 + 14); ctx.lineTo(xm - 6, cy + th / 2 + 24); ctx.lineTo(xm + 6, cy + th / 2 + 24); ctx.fill();
+      ctx.font = FS + 'px ' + FONT; ctx.textBaseline = 'top';
+      const lab = 'max T = ' + tm.toFixed(0) + ' K', lw = ctx.measureText(lab).width;
+      ctx.textAlign = 'left';
+      ctx.fillText(lab, Math.min(Math.max(xm - lw / 2, l - 50), r + 40 - lw), cy + th / 2 + 27);
+    }
+    // color bar
+    const bw = 14, bx = w - bw - 36, bt = 10, bb = h - 12;
+    for (let y = bt; y < bb; y++) { ctx.fillStyle = tColor(tHi - (y - bt) / (bb - bt) * (tHi - tLo)); ctx.fillRect(bx, y, bw, 1.2); }
+    ctx.strokeStyle = COL.axis; ctx.lineWidth = 1; ctx.strokeRect(bx, bt, bw, bb - bt);
+    ctx.fillStyle = COL.ink; ctx.font = FS + 'px ' + FONT; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    ctx.fillText(tHi.toFixed(0), bx + bw + 4, bt + 6); ctx.fillText(tLo.toFixed(0), bx + bw + 4, bb - 6);
+    ctx.fillText('K', bx + bw + 4, (bt + bb) / 2);
+  }
+
+  function profilePlot(cv, which) {
+    const { ctx, w, h } = setup(cv, 0.74, 270);
+    const isC = which === 'C';
+    const yr = isC ? [0, 1] : [tLo, tHi];
+    const box = { l: yMargin(tickW(ctx, yr)), t: 32, r: w - 16, b: h - 58 };
+    ctx._clip = box;
+    const { X, Y } = axes(ctx, box, [0, 1], yr, 'axial position z/L', isC ? 'concentration/C_{A0}' : 'temperature (K)');
+    drawRich(ctx, isC ? 'concentration profiles' : 'temperature profile', box.l, 20, FS, 'left');
+    if (document.getElementById('cSS').checked) {
+      polyline(ctx, steadyProf.map(r => [r[0], isC ? r[1] : r[2]]), X, Y, COL.ss, 1.6, [6, 5]);
+      if (isC) polyline(ctx, steadyProf.map(r => [r[0], 1 - r[1]]), X, Y, COL.ss, 1.6, [6, 5]);
+    }
+    if (isC) {
+      const fb = i => (i <= S.nStep ? 1 : 0) - S.f[i];
+      const pb = []; for (let i = 0; i <= N; i++) pb.push([i / N, fb(i)]);
+      polyline(ctx, pb, X, Y, COL.B, 2.6);
+      const pa = []; for (let i = 0; i <= N; i++) pa.push([i / N, S.f[i]]);
+      polyline(ctx, pa, X, Y, COL.C, 2.6);
+      const iz = Math.round(0.14 * N), fa = S.f[iz], fbv = fb(iz);
+      if (S.nStep > 0) curveLabels(ctx, box, [   // both curves sit at zero until the run starts
+        { text: 'C_A/C_{A0}', x: X(0.14), y: Y(fa), side: fa > 0.5 ? 'below' : 'above', color: COL.C },
+        { text: 'C_B/C_{A0}', x: X(0.14), y: Y(fbv), side: fbv > 0.5 ? 'below' : 'above', color: COL.B }
+      ]);
+    } else {
+      const ya = Y(P.Ta), showTa = P.Ta >= tLo && P.Ta <= tHi;
+      if (showTa) {
+        ctx.save(); ctx.strokeStyle = COL.jacket; ctx.lineWidth = 2; ctx.setLineDash([8, 5]); ctx.beginPath(); ctx.moveTo(box.l, ya); ctx.lineTo(box.r, ya); ctx.stroke(); ctx.restore();
+      }
+      const pts = []; for (let i = 0; i <= N; i++) pts.push([i / N, S.T[i]]);
+      polyline(ctx, pts, X, Y, COL.T, 2.6);
+      const pxT = pts.map(p => [X(p[0]), Y(p[1])]);
+      const pxTa = []; for (let k = 0; k <= 50; k++) pxTa.push([box.l + k / 50 * (box.r - box.l), ya]);
+      const pxSS = steadyProf.map(r => [X(r[0]), Y(r[2])]);
+      const showSS = document.getElementById('cSS').checked;
+      const labs = [], obs = [pxT];
+      if (showSS) { labs.push({ key: 'ss', text: 'steady state', color: '#444', pts: pxSS, ignore: [pxT], sides: [-10], minI: Math.round(0.25 * pxSS.length), bonus: i => Math.min(Math.abs(pxSS[i][1] - pxT[i][1]), 20) }); obs.push(pxSS); }
+      if (showTa) { labs.push({ key: 'Ta', text: 'jacket temperature', color: COL.jacket, pts: pxTa }); obs.push(pxTa); }
+      // the red (transient) curve's label rides just above the curve at z/L = 0.2, so it moves smoothly with it
+      const trW = richWidth(ctx, 'transient', LFS);
+      const trX = Math.min(Math.max(X(0.2) - trW / 2, box.l + 4), box.r - 4 - trW);
+      let trTop = Infinity;
+      for (const [x, y] of pxT) if (x >= trX - 4 && x <= trX + trW + 4) trTop = Math.min(trTop, y);
+      const trY = Math.min(Math.max(trTop - 8, box.t + 16), box.b - 6);
+      // once steady state is reached the red curve lies on the steady-state curve, so drop its label
+      const atSS = S.done || S.ssStart !== null;
+      if (!atSS) drawRich(ctx, 'transient', trX, trY, LFS, 'left', COL.T, true);
+      stickyLabels(ctx, box, S.labT, labs, obs, false, atSS ? [] : [{ x0: trX - 3, x1: trX + trW + 3, y0: trY - 14, y1: trY + 6 }]);
+    }
+  }
+
+  function histPlot() {
+    const { ctx, w, h } = setup(cvH, 0.36, 270);
+    const narrow = w < 520;
+    const yrT = [tLo, tHi];
+    const box = { l: yMargin(tickW(ctx, [0, 1])), t: 14, r: w - yMargin(tickW(ctx, yrT)), b: h - 58 };
+    ctx._clip = box;
+    if (S.theta > tAxis) tAxis = Math.ceil(S.theta + 1);
+    const { X, Y } = axes(ctx, box, [0, tAxis], [0, 1], 'dimensionless time t/τ', 'outlet C_A/C_{A0}', { nx: narrow ? 4 : 8 });
+    const YT = rightAxis(ctx, box, yrT, 'temperature (K)');
+    polyline(ctx, S.hist.map(r => [r[0], r[1]]), X, Y, COL.C, 2.4);
+    polyline(ctx, S.hist.map(r => [r[0], r[3]]), X, YT, COL.Tmax, 2, [7, 4]);
+    polyline(ctx, S.hist.map(r => [r[0], r[2]]), X, YT, COL.T, 2.4);
+    const pC = S.hist.map(r => [X(r[0]), Y(r[1])]),
+          pM = S.hist.map(r => [X(r[0]), YT(r[3])]),
+          pO = S.hist.map(r => [X(r[0]), YT(r[2])]);
+    // max T and outlet T labels ride at the ends of their curves until time/tau = 3, then stay there.
+    // Each sits just behind the end point (max T above its curve, outlet T below) so later data never reaches it.
+    let ia = S.hist.length - 1;
+    while (ia > 0 && S.hist[ia][0] > LABEL_FREEZE + 1e-9) ia--;
+    const reserved = [];
+    for (const [text, color, pts, oy] of [['max T', COL.Tmax, pM, -9], ['outlet T', COL.T, pO, 22]]) {
+      if (text === 'max T' && S.nStep === 0) continue;   // max T appears once the run starts
+      const w = richWidth(ctx, text, LFS), ax = pts[ia][0];
+      const lx = Math.min(Math.max(ax - w - 4, box.l + 4), box.r - 4 - w);
+      // clear the curve over the whole width of the label, not just at the end point
+      let yRef = oy < 0 ? Infinity : -Infinity;
+      for (let k = 0; k <= ia; k++) {
+        const [x, y] = pts[k];
+        if (x >= lx - 4 && x <= lx + w + 4) yRef = oy < 0 ? Math.min(yRef, y) : Math.max(yRef, y);
+      }
+      if (!isFinite(yRef)) yRef = pts[ia][1];
+      const ly = Math.min(Math.max(yRef + (oy < 0 ? -8 : 21), box.t + 16), box.b - 6);
+      drawRich(ctx, text, lx, ly, LFS, 'left', color, true);
+      reserved.push({ x0: lx - 3, x1: lx + w + 3, y0: ly - 14, y1: ly + 6 });
+    }
+    stickyLabels(ctx, box, S.labH, [
+      { key: 'C', text: 'C_A/C_{A0}', color: COL.C, pts: pC }
+    ], [pC, pM, pO], true, reserved);
+  }
+
+  const readoutEl = document.getElementById('readouts');
+  const fmt3 = v => (v === 0 ? '0.00' : v.toPrecision(3));
+  function drawReadouts() {
+    readoutEl.innerHTML =
+      '';   // time/tau readout removed; time is shown on the bottom graph's axis
+  }
+
+  function drawAll() { drawReadouts(); drawTube(); profilePlot(cvC, 'C'); profilePlot(cvT, 'T'); histPlot(); }
+
+  // ---------------- interaction ----------------
+  const playBtn = document.getElementById('playBtn');
+  let last = null, acc = 0;
+  function loop(ts) {
+    if (!running) { last = null; return; }
+    if (last === null) last = ts;
+    const dt = Math.min(0.1, (ts - last) / 1000); last = ts;
+    acc += dt * P.speed * N;
+    let n = Math.floor(acc); acc -= n; n = Math.min(n, 1500);
+    for (let k = 0; k < n && !S.done; k++) step(S);
+    recalcRange(false);
+    if (S.done) {
+      running = false; playBtn.textContent = 'Play'; last = null;
+      tAxis = Math.ceil(S.theta - 1e-9);   // end the time axis where the run stopped
+      drawAll();
+      return;
+    }
+    drawAll();
+    requestAnimationFrame(loop);
+  }
+  playBtn.addEventListener('click', () => {
+    if (!running && S.done) { S.done = false; S.ssStart = null; predictAxis(); }
+    running = !running;
+    playBtn.textContent = running ? 'Pause' : 'Play';
+    if (running) requestAnimationFrame(loop);
+  });
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    running = false; playBtn.textContent = 'Play'; acc = 0;
+    readSliders(); resetSim(); drawAll();
+  });
+  for (const k in sliders) {
+    document.getElementById(sliders[k][0]).addEventListener('input', () => {
+      readSliders();
+      if (k === 'speed') return;
+      if (S.theta === 0) { resetSim(true); }
+      else {
+        if (k !== 'Ti') { S.T[0] = P.T0; computeSteady(); recalcRange(false); S.done = false; S.ssStart = null; schedulePredict(); }
+      }
+      if (!running) drawAll();
+    });
+  }
+  document.getElementById('cSS').addEventListener('change', () => { if (!running) drawAll(); });
+
+  // flyout panels: overlay below the button row, one open at a time
+  const panelBtns = document.querySelectorAll('#panelBtns button');
+  function closeAll() { panelBtns.forEach(b => { b.setAttribute('aria-pressed', 'false'); document.getElementById(b.dataset.panel).hidden = true; }); }
+  panelBtns.forEach(b => b.addEventListener('click', e => {
+    e.stopPropagation();
+    const p = document.getElementById(b.dataset.panel), open = !p.hidden;
+    closeAll();
+    if (!open) {
+      p.hidden = false; b.setAttribute('aria-pressed', 'true');
+      // keep the panel inside the window; its body scrolls with the × pinned
+      p.style.maxHeight = Math.max(240, window.innerHeight - p.getBoundingClientRect().top - 12) + 'px';
+    }
+  }));
+  document.querySelectorAll('.flyout .close').forEach(c => c.addEventListener('click', closeAll));
+  document.querySelectorAll('.flyout').forEach(f => f.addEventListener('click', e => e.stopPropagation()));
+  document.addEventListener('click', closeAll);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAll(); });
+
+  let rz; window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(drawAll, 60); });
+
+  readSliders(); resetSim(); drawAll();
+  window.__pfr = { S, P, step, drawAll, steadyProf: () => steadyProf };
+})();
+</script>
+
+</body>
+</html>

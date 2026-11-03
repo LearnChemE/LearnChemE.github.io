@@ -1,0 +1,704 @@
+<title>Tubular Polymerization Reactor</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, chtml: { displayAlign: 'left', displayIndent: '1em' }, startup: { typeset: false } };
+</script>
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-chtml.js"></script>
+<style>
+/* Layout: LearnChemE house style — controls band (flow model + panel buttons on one row), readouts, two rows of three plots */
+:root {
+  --bg: #ffffff; --ink: #000000; --muted: #5c5c5c; --rule: #d9d6d6; --panel: #f6f4f4;
+  --brand: #98000D; --brand-hover: #7a000a; --warn: #b3261e; --warn-bg: #fdecea;
+  --font: Helvetica, Arial, sans-serif; --serif: "Times New Roman", Times, serif;
+  color-scheme: light;
+}
+[hidden] { display: none !important; }
+html, body { background: var(--bg); color: var(--ink); }
+body { font-family: var(--font); font-size: 17px; }
+#app { max-width: 1320px; margin: 0 auto; padding-inline: 16px; padding-block: 12px 24px; }
+h1 { font-size: 22px; font-weight: bold; margin: 0; text-wrap: balance; }
+
+.controls { margin-top: 10px; padding: 12px 16px; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; display: grid; gap: 12px 34px; grid-template-columns: repeat(3, auto); width: fit-content; max-width: 100%; box-sizing: border-box; }
+@media (max-width: 1040px) { .controls { grid-template-columns: repeat(2, auto); } }
+@media (max-width: 700px) { .controls { grid-template-columns: auto; } }
+.toprow { grid-column: 1 / -1; position: relative; display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: center; }
+.seglab { margin-right: 10px; }
+.seg { display: inline-flex; border: 1px solid var(--brand); border-radius: 4px; overflow: hidden; flex-wrap: wrap; vertical-align: middle; }
+.seg button { background: var(--bg); color: var(--brand); border: 0; padding: 6px 12px; font: 17px var(--font); cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--brand); }
+.seg button[aria-pressed=true] { background: var(--brand); color: #fff; }
+.btns { display: flex; gap: 8px; margin-left: auto; }
+button.lc { background: var(--brand); color: #fff; border: 0; border-radius: 4px; padding: 7px 14px; font: 17px var(--font); cursor: pointer; }
+button.lc:hover { background: var(--brand-hover); }
+button.lc:focus-visible, .seg button:focus-visible, input[type=range]:focus-visible { outline: 2px solid #1f63c6; outline-offset: 2px; }
+
+.flyout { position: absolute; top: calc(100% + 6px); right: 0; z-index: 20; width: min(640px, calc(100vw - 32px)); background: var(--bg); border: 1px solid var(--rule); border-radius: 6px; box-shadow: 0 8px 28px rgba(0,0,0,.18); display: flex; flex-direction: column; max-height: 76vh; }
+#pDet { width: min(846px, calc(100vw - 32px)); }
+.flyout .close { position: absolute; top: 4px; right: 8px; background: none; border: 0; font-size: 26px; line-height: 1; color: var(--muted); cursor: pointer; z-index: 1; }
+.flyout .close:hover { color: var(--ink); }
+.flyout .body { overflow-y: auto; padding: 16px 24px 18px 18px; line-height: 1.5; font-size: 17px; }
+.flyout h3 { margin: 16px 0 4px; font-size: 17px; }
+.flyout h3:first-child { margin-top: 0; }
+.flyout p { margin: 6px 0; }
+.flyout a { color: var(--brand); }
+.flyout table { border-collapse: collapse; font-size: 17px; margin: 6px 0; }
+.flyout td { padding: 3px 12px 3px 0; vertical-align: top; }
+.flyout table.sym td:first-child { white-space: nowrap; }
+.tau { font-family: var(--serif); font-style: italic; font-size: 1.1em; }
+
+.row { display: grid; grid-template-columns: 1fr; gap: 6px; min-width: 0; }
+.row label { font-size: 17px; }
+.sl { display: flex; align-items: center; gap: 12px; }
+.sl input[type="range"] { flex: 0 0 auto; width: 190px; max-width: 65%; margin-bottom: 0; }
+.sl output { font-variant-numeric: tabular-nums; font-weight: normal; white-space: nowrap; }
+
+input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+
+.readouts { display: flex; flex-wrap: wrap; gap: 6px 24px; margin: 14px 2px 4px; align-items: baseline; font-variant-numeric: tabular-nums; }
+.readouts b { font-weight: bold; }
+.warn { color: var(--warn); background: var(--warn-bg); border-radius: 4px; padding: 2px 8px; font-weight: bold; }
+
+.card { min-width: 0; }
+.card h2 { font-size: 17px; font-weight: bold; margin: 14px 0 4px; }
+canvas { display: block; width: 100%; }
+.grid3 { display: grid; gap: 4px 6px; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); }
+.grid3 canvas { height: 290px; }
+</style>
+<div id="app">
+<h1>Tubular Polymerization Reactor</h1>
+
+<section class="controls" aria-label="Reactor settings">
+  <div class="toprow">
+    <div><span class="seglab">flow model</span><div class="seg" id="modeSeg" role="group" aria-label="flow model">
+        <button type="button" data-v="0" aria-pressed="false">plug flow</button>
+        <button type="button" data-v="1" aria-pressed="false">laminar, Newtonian</button>
+        <button type="button" data-v="2" aria-pressed="true">laminar, viscosity rise</button>
+      </div></div>
+    <div class="btns">
+      <button class="lc" data-panel="pDir" type="button">Directions</button>
+      <button class="lc" data-panel="pDet" type="button">Details</button>
+      <button class="lc" data-panel="pAbout" type="button">About</button>
+    </div>
+  <div class="flyout" id="pDir" hidden>
+    <button class="close" type="button" aria-label="Close">&times;</button>
+    <div class="body">
+      <p>This simulation models bulk free-radical polymerization of styrene in a 20 m jacketed tube. Monomer with dissolved initiator enters at the feed temperature, and the tube wall is held at the wall temperature. The temperature changes with radial and axial locations so the conversion and viscosity also depend on both radial and axial locations. The profiles also depend on whether plug flow, laminar flow, or laminar with viscosity rise is selected.</p>
+      <p>Select a flow model. <b>Plug flow</b> gives every fluid element the same residence time. <b>Laminar, Newtonian</b> keeps the parabolic velocity profile. <b>Laminar, viscosity rise</b> recalculates the velocity profile at each axial position from the local viscosity, so slow, viscous fluid near the wall pushes more of the flow into the center.</p>
+      <p>The plots show axial profiles of conversion, temperature and viscosity along the centerline, along the outer stream (the stream tube that enters at 90% of the radius), and for the mixing-cup average. The bottom row shows radial velocity profiles, the cumulative residence-time distribution, and the molecular-weight distribution of the polymer leaving the tube.</p>
+      <p>Increase the tube diameter or the wall temperature to see the hot spot grow into a thermal runaway. Increase the viscosity-rise parameter to see channeling in the core.</p>
+    </div>
+  </div>
+
+  <div class="flyout" id="pDet" hidden>
+    <button class="close" type="button" aria-label="Close">&times;</button>
+    <div class="body" id="detBody">
+      <h3>Kinetics (bulk styrene, initiated plus thermal)</h3>
+      \[R_i = 2 f k_d[\mathrm{I}] + 2k_{th}[\mathrm{M}]^3 \qquad [\mathrm{P}^\bullet]=\sqrt{\frac{R_i}{2k_t}} \qquad R_p = k_p[\mathrm{M}][\mathrm{P}^\bullet]\]
+      <p>The gel effect lowers the termination rate constant as conversion \(X\) increases (Hui and Hamielec):</p>
+      \[k_t = k_{t0}\exp\!\left[-2\left(A_1X+A_2X^2+A_3X^3\right)\right]\]
+      \[A_1 = 2.57-5.05\times10^{-3}T,\quad A_2=9.56-1.76\times10^{-2}T,\quad A_3=-3.03+7.85\times10^{-3}T\]
+      <table>
+        <tr><td>\(k_d = 6.38\times10^{13}\,e^{-14842/T}\ \mathrm{s^{-1}}\)</td><td>initiator (benzoyl-peroxide-like), \(f=0.6\)</td></tr>
+        <tr><td>\(k_p = 1.051\times10^{7}\,e^{-3557/T}\ \mathrm{L/(mol\,s)}\)</td><td>propagation</td></tr>
+        <tr><td>\(k_{t0} = 1.255\times10^{9}\,e^{-844/T}\ \mathrm{L/(mol\,s)}\)</td><td>termination by combination</td></tr>
+        <tr><td>\(k_{th} = 2.19\times10^{5}\,e^{-13810/T}\ \mathrm{L^2/(mol^2 s)}\)</td><td>thermal initiation</td></tr>
+        <tr><td>\(C_M = 0.2198\,e^{-2820/T}\)</td><td>chain transfer to monomer</td></tr>
+      </table>
+      <h3>Stream tubes</h3>
+      <p>Radial diffusion of polymer is negligible, so the tube is divided into 40 annular stream tubes. Each tube \(i\) carries a fixed volumetric flow \(q_i\) set by the inlet velocity profile. Along each tube, with \(dt = dz/\bar u_i\):</p>
+      \[\frac{dX}{dt} = k_p[\mathrm{P}^\bullet](1-X) \qquad \frac{d[\mathrm{I}]}{dt} = -k_d[\mathrm{I}]\]
+      <h3>Energy balance</h3>
+      <p>Heat moves between tubes by radial conduction, and the wall is held at \(T_w\):</p>
+      \[\rho c_p u\frac{\partial T}{\partial z} = \frac{k}{r}\frac{\partial}{\partial r}\!\left(r\frac{\partial T}{\partial r}\right) + (-\Delta H_p)R_p \qquad T(R,z)=T_w\]
+      <p>Conduction is solved implicitly at each axial step. The adiabatic temperature rise for full conversion is \(\Delta T_{ad} = (-\Delta H_p)[\mathrm{M}]_0/(\rho c_p) \approx 356\ \mathrm{K}\), which is why hot spots grow quickly in wide tubes.</p>
+      <h3>Velocity profile</h3>
+      <p>For slowly varying viscosity (lubrication approximation), with \(G=-dp/dz\):</p>
+      \[u(r) = \frac{G}{2}\int_r^R \frac{r'}{\mu(r')}\,dr' \qquad Q = \int_0^R 2\pi r\,u\,dr\]
+      <p>In the viscosity-rise model, \(G\) and the tube boundaries are found at each \(z\) so every stream tube still carries its own \(q_i\). Viscous wall tubes widen and slow down, and the core speeds up. The pressure drop is \(\Delta p = \int_0^L G\,dz\).</p>
+      <h3>Viscosity</h3>
+      \[\mu = \mu_m \exp\!\left[\frac{B X}{1+0.5X} + (1800+7000X)\left(\frac{1}{T}-\frac{1}{373\ \mathrm{K}}\right)\right] \qquad \mu_m = 0.35\ \mathrm{mPa\,s}\]
+      <p>\(B\) lumps the effect of polymer concentration and chain length on viscosity. This is an illustrative correlation for teaching.</p>
+      <h3>Residence-time distribution</h3>
+      \[F(t) = \sum_{t_i\le t}\frac{q_i}{Q} \qquad \text{laminar, Newtonian: } F(\theta) = 1-\frac{1}{4\theta^2},\ \theta=\frac{t}{\tau}\ge\frac12\]
+      <h3>Molecular-weight distribution</h3>
+      <p>Polymer made at each instant follows a Schulz distribution with number-average degree of polymerization</p>
+      \[\overline{DP}_{n,\mathrm{inst}} = \frac{R_p}{R_i/2 + C_M R_p}\]
+      <p>and shape parameter between 1 (all transfer) and 2 (all combination). The outlet distribution, plotted as weight fraction per decade \(W(\log M)\), is the sum over every axial step and stream tube, weighted by the polymer flow in each tube.</p>
+      <h3>Physical properties</h3>
+      <p>\(\rho = 900\ \mathrm{kg/m^3}\), \(c_p = 1.9\ \mathrm{kJ/(kg\,K)}\), \(k = 0.13\ \mathrm{W/(m\,K)}\), \(\Delta H_p = -69.9\ \mathrm{kJ/mol}\), \([\mathrm{M}]_0 = 8.7\ \mathrm{mol/L}\), \(M_{\mathrm{styrene}} = 104.15\ \mathrm{g/mol}\), \(L = 20\ \mathrm m\).</p>
+      <h3>Symbols</h3>
+      <table class="sym">
+        <tr><td>\(A_1, A_2, A_3\)</td><td>gel-effect coefficients (dimensionless)</td></tr>
+        <tr><td>\(B\)</td><td>viscosity-rise parameter (dimensionless)</td></tr>
+        <tr><td>\(C_M\)</td><td>chain-transfer constant to monomer (dimensionless)</td></tr>
+        <tr><td>\(c_p\)</td><td>heat capacity (J/(kg K))</td></tr>
+        <tr><td>\(D\)</td><td>tube diameter (cm)</td></tr>
+        <tr><td>\(\overline{DP}_{n,\mathrm{inst}}\)</td><td>instantaneous number-average degree of polymerization</td></tr>
+        <tr><td>\(f\)</td><td>initiator efficiency</td></tr>
+        <tr><td>\(F(t)\)</td><td>cumulative residence-time distribution</td></tr>
+        <tr><td>\(G\)</td><td>axial pressure gradient, \(-dp/dz\) (Pa/m)</td></tr>
+        <tr><td>\(\Delta H_p\)</td><td>heat of polymerization (kJ/mol)</td></tr>
+        <tr><td>\([\mathrm{I}],\ [\mathrm{I}]_0\)</td><td>initiator concentration, in feed (mol/L)</td></tr>
+        <tr><td>\(k\)</td><td>thermal conductivity (W/(m K))</td></tr>
+        <tr><td>\(k_d\)</td><td>initiator decomposition rate constant (s<sup>−1</sup>)</td></tr>
+        <tr><td>\(k_p\)</td><td>propagation rate constant (L/(mol s))</td></tr>
+        <tr><td>\(k_t,\ k_{t0}\)</td><td>termination rate constant, at zero conversion (L/(mol s))</td></tr>
+        <tr><td>\(k_{th}\)</td><td>thermal initiation rate constant (L<sup>2</sup>/(mol<sup>2</sup> s))</td></tr>
+        <tr><td>\(L\)</td><td>tube length (m)</td></tr>
+        <tr><td>\(M\)</td><td>polymer molecular weight (g/mol)</td></tr>
+        <tr><td>\(M_n,\ M_w\)</td><td>number- and weight-average molecular weight (g/mol)</td></tr>
+        <tr><td>\([\mathrm{M}],\ [\mathrm{M}]_0\)</td><td>monomer concentration, in feed (mol/L)</td></tr>
+        <tr><td>\([\mathrm{P}^\bullet]\)</td><td>total radical concentration (mol/L)</td></tr>
+        <tr><td>\(\Delta p\)</td><td>pressure drop (Pa)</td></tr>
+        <tr><td>PDI</td><td>polydispersity index, \(M_w/M_n\)</td></tr>
+        <tr><td>\(q_i\)</td><td>volumetric flow rate in stream tube \(i\) (m<sup>3</sup>/s)</td></tr>
+        <tr><td>\(Q\)</td><td>total volumetric flow rate (m<sup>3</sup>/s)</td></tr>
+        <tr><td>\(r\)</td><td>radial position (m)</td></tr>
+        <tr><td>\(R\)</td><td>tube radius (m)</td></tr>
+        <tr><td>\(R_i\)</td><td>rate of radical initiation (mol/(L s))</td></tr>
+        <tr><td>\(R_p\)</td><td>rate of polymerization (mol/(L s))</td></tr>
+        <tr><td>\(t\)</td><td>time; residence time (s)</td></tr>
+        <tr><td>\(T\)</td><td>temperature (K in rate equations, °C on plots)</td></tr>
+        <tr><td>\(T_0,\ T_w\)</td><td>feed temperature, wall temperature (°C)</td></tr>
+        <tr><td>\(\Delta T_{ad}\)</td><td>adiabatic temperature rise at complete conversion (K)</td></tr>
+        <tr><td>\(u,\ \bar u\)</td><td>axial velocity, mean axial velocity (m/s)</td></tr>
+        <tr><td>\(W(\log M)\)</td><td>weight fraction of polymer per decade of molecular weight</td></tr>
+        <tr><td>\(X\)</td><td>monomer conversion</td></tr>
+        <tr><td>\(z\)</td><td>axial position (m)</td></tr>
+        <tr><td>\(\theta\)</td><td>dimensionless time, \(t/\tau\)</td></tr>
+        <tr><td>\(\mu,\ \mu_m\)</td><td>viscosity, viscosity of pure monomer at 100 °C (Pa s)</td></tr>
+        <tr><td>\(\rho\)</td><td>density (kg/m<sup>3</sup>)</td></tr>
+        <tr><td>\(\tau\)</td><td>mean residence time, \(L/\bar u\) (h)</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="flyout" id="pAbout" hidden>
+    <button class="close" type="button" aria-label="Close">&times;</button>
+    <div class="body">
+      <p>This simulation was created in the <a href="https://www.colorado.edu/chbe/" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="https://learncheme.com/" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.</p>
+    </div>
+  </div>
+  </div>
+  <div class="row"><label for="sTf">feed temperature, T<sub>0</sub></label><div class="sl"><input type="range" id="sTf" min="60" max="160" step="1" value="120"><output id="oTf" for="sTf"></output></div></div>
+  <div class="row"><label for="sTw">wall temperature, T<sub>w</sub></label><div class="sl"><input type="range" id="sTw" min="60" max="160" step="1" value="120"><output id="oTw" for="sTw"></output></div></div>
+  <div class="row"><label for="sD">tube diameter, D</label><div class="sl"><input type="range" id="sD" min="1" max="5" step="0.1" value="2.5"><output id="oD" for="sD"></output></div></div>
+  <div class="row"><label for="sTau">mean residence time, <span class="tau">τ</span></label><div class="sl"><input type="range" id="sTau" min="0.25" max="4" step="0.05" value="1"><output id="oTau" for="sTau"></output></div></div>
+  <div class="row"><label for="sI0">initiator, [I]<sub>0</sub></label><div class="sl"><input type="range" id="sI0" min="0.0005" max="0.02" step="0.0005" value="0.005"><output id="oI0" for="sI0"></output></div></div>
+  <div class="row"><label for="sB">viscosity-rise parameter, B</label><div class="sl"><input type="range" id="sB" min="4" max="16" step="0.5" value="10"><output id="oB" for="sB"></output></div></div>
+</section>
+
+<div class="readouts" id="readouts" aria-live="polite"></div>
+
+<div class="grid3">
+  <div class="card"><h2>Conversion</h2><canvas id="cX"></canvas></div>
+  <div class="card"><h2>Temperature</h2><canvas id="cT"></canvas></div>
+  <div class="card"><h2>Viscosity</h2><canvas id="cMu"></canvas></div>
+</div>
+<div class="grid3">
+  <div class="card"><h2>Velocity profiles</h2><canvas id="cU"></canvas></div>
+  <div class="card"><h2>Cumulative residence-time distribution</h2><canvas id="cRTD"></canvas></div>
+  <div class="card"><h2>Molecular-weight distribution at outlet</h2><canvas id="cMWD"></canvas></div>
+</div>
+</div>
+<script>
+// ===== Tubular polymerization reactor solver (bulk styrene, initiated, 2-D r-z) =====
+const C = { rho: 900, cp: 1900, k: 0.13, dH: 6.99e4, M0: 8.7, Mm: 104.15, f: 0.6, L: 20 };
+const DTAD = C.dH * C.M0 * 1000 / (C.rho * C.cp);   // adiabatic temperature rise at X = 1 (K)
+const NR = 40, NZ = 300, NB = 150, LOGM_LO = 2.5, LOGM_HI = 7.5;
+
+function kin(T) {
+  return {
+    kd: 6.38e13 * Math.exp(-14842 / T),     // initiator decomposition, 1/s
+    kp: 1.051e7 * Math.exp(-3557 / T),      // propagation, L/(mol s)
+    kt0: 1.255e9 * Math.exp(-844 / T),      // termination (zero conversion), L/(mol s)
+    cm: 0.2198 * Math.exp(-2820 / T),       // transfer-to-monomer constant ktrM/kp
+    kth: 2.19e5 * Math.exp(-13810 / T),     // thermal self-initiation, L2/(mol2 s)
+    A1: 2.57 - 5.05e-3 * T, A2: 9.56 - 1.76e-2 * T, A3: -3.03 + 7.85e-3 * T
+  };
+}
+function viscosity(X, T, B) {   // Pa s, illustrative correlation for styrene/polystyrene solution
+  return 0.35e-3 * Math.exp(B * X / (1 + 0.5 * X) + (1800 + 7000 * X) * (1 / T - 1 / 373.15));
+}
+function lgamma(x) { // x >= 2
+  return (x - 0.5) * Math.log(x) - x + 0.5 * Math.log(2 * Math.PI) + 1 / (12 * x) - 1 / (360 * x * x * x);
+}
+
+function solve(s) {
+  // Stream-tube formulation. s: {mode 0 plug /1 laminar Newtonian /2 laminar viscosity-coupled, Tw, Tf (degC), D (cm), tau (h), I0 (mol/L)}
+  const R = s.D / 200, L = C.L, tau = s.tau * 3600, ubar = L / tau, Q = ubar * Math.PI * R * R;
+  const dz = L / NZ, Tw = s.Tw + 273.15, PI = Math.PI;
+  const rb = new Float64Array(NR + 1);                 // tube boundaries (m)
+  for (let k = 0; k <= NR; k++) rb[k] = R * k / NR;
+  const q = new Float64Array(NR);                       // volumetric flow carried by each tube (m3/s)
+  for (let i = 0; i < NR; i++) {
+    const a2 = rb[i] ** 2, b2 = rb[i + 1] ** 2;
+    q[i] = s.mode === 0 ? ubar * PI * (b2 - a2) : 2 * PI * 2 * ubar * ((b2 - a2) / 2 - (b2 * b2 - a2 * a2) / (4 * R * R));
+  }
+  const X = new Float64Array(NR), I = new Float64Array(NR).fill(s.I0), T = new Float64Array(NR).fill(s.Tf + 273.15);
+  const age = new Float64Array(NR), mu = new Float64Array(NR), uc = new Float64Array(NR), rc = new Float64Array(NR);
+  const phiB = new Float64Array(NR + 1);
+  const m0 = new Float64Array(NR), m2 = new Float64Array(NR);
+  const hist = new Float64Array(NR * NB);
+  const logM = new Float64Array(NB), lnN = new Float64Array(NB), nArr = new Float64Array(NB);
+  const dlog = (LOGM_HI - LOGM_LO) / (NB - 1);
+  for (let b = 0; b < NB; b++) { logM[b] = LOGM_LO + b * dlog; nArr[b] = Math.pow(10, logM[b]) / C.Mm; lnN[b] = Math.log(nArr[b]); }
+  const NN = (NZ + 1) * NR;
+  const F = { X: new Float32Array(NN), T: new Float32Array(NN), mu: new Float32Array(NN), u: new Float32Array(NN), rb: new Float32Array((NZ + 1) * (NR + 1)) };
+  const cup = { X: [], T: [], mu: [] }, uProf = {};
+  let dp = 0;
+  const a = new Float64Array(NR), b = new Float64Array(NR), c = new Float64Array(NR), d = new Float64Array(NR), cpv = new Float64Array(NR), dpv = new Float64Array(NR);
+  const dX = new Float64Array(NR);
+  const LN10 = Math.log(10);
+
+  // march inward from the wall for a given G; tube thicknesses set by fixed q (mode 2). returns inner radius^2 of tube 0
+  function shoot(G, write) {
+    let a2 = R * R, ph = 0;
+    for (let i = NR - 1; i >= 0; i--) {
+      const s2 = q[i] / (2 * PI * mu[i] * G);
+      const y = 2 * q[i] / (PI * G) / (ph + Math.sqrt(ph * ph + s2));
+      if (write) { rb[i + 1] = Math.sqrt(a2); phiB[i + 1] = ph; }
+      ph += y / (4 * mu[i]); a2 -= y;
+    }
+    if (write) { rb[0] = 0; phiB[0] = ph; }
+    return a2;
+  }
+  // fixed boundaries: flow per unit G and phi at boundaries
+  function fixedFlow() {
+    let ph = 0, S = 0; phiB[NR] = 0;
+    for (let i = NR - 1; i >= 0; i--) {
+      const y = rb[i + 1] ** 2 - rb[i] ** 2;
+      S += PI * (ph * y + y * y / (8 * mu[i]));
+      ph += y / (4 * mu[i]); phiB[i] = ph;
+    }
+    return S;
+  }
+
+  for (let j = 0; j <= NZ; j++) {
+    for (let i = 0; i < NR; i++) mu[i] = viscosity(X[i], T[i], s.B);
+    let G;
+    if (s.mode === 2) {
+      let lo = Math.log(1e-12), hi = Math.log(1e12);
+      for (let it = 0; it < 80; it++) { const mid = 0.5 * (lo + hi); if (shoot(Math.exp(mid), false) > 0) hi = mid; else lo = mid; }
+      G = Math.exp(0.5 * (lo + hi)); shoot(G, true);
+    } else G = Q / fixedFlow();
+    for (let i = 0; i < NR; i++) {
+      const Ai = PI * (rb[i + 1] ** 2 - rb[i] ** 2);
+      uc[i] = Math.max(q[i] / Ai, 1e-7 * ubar);
+      rc[i] = Math.sqrt(0.5 * (rb[i] ** 2 + rb[i + 1] ** 2));
+    }
+    let qx = 0, qt = 0;
+    for (let i = 0; i < NR; i++) {
+      const k = j * NR + i; F.X[k] = X[i]; F.T[k] = T[i] - 273.15; F.mu[k] = mu[i]; F.u[k] = uc[i] / ubar;
+      qx += q[i] * X[i]; qt += q[i] * T[i];
+    }
+    for (let k = 0; k <= NR; k++) F.rb[j * (NR + 1) + k] = rb[k] / R;
+    cup.X.push(qx / Q); cup.T.push(qt / Q - 273.15); cup.mu.push(viscosity(qx / Q, qt / Q, s.B));
+    if (j === 0 || j === NZ / 2 || j === NZ) {
+      const pr = [];
+      if (s.mode === 0) { pr.push([0, 1], [1, 1]); }
+      else {
+        for (let i = 0; i < NR; i++) {
+          // sample u = G*phi(r) at inner boundary and midpoint of each tube
+          for (const fr of [0, 0.5]) {
+            const r = rb[i] + fr * (rb[i + 1] - rb[i]);
+            pr.push([r / R, G * (phiB[i + 1] + (rb[i + 1] ** 2 - r * r) / (4 * mu[i])) / ubar]);
+          }
+        }
+        pr.push([1, 0]);
+      }
+      uProf[j] = pr;
+    }
+    if (j === NZ) break;
+    dp += G * dz;
+
+    // ---- species + chain length along each stream tube (segregated, no radial mass transfer)
+    for (let i = 0; i < NR; i++) {
+      const dt = dz / uc[i]; age[i] += dt;
+      const K = kin(T[i]);
+      const n = Math.min(150, Math.max(1, Math.ceil(dt / 60)));
+      const h = dt / n;
+      let x = X[i], ii = I[i], sumdx = 0, sumInv = 0, sumW = 0, sumK = 0;
+      for (let m = 0; m < n; m++) {
+        const gt = Math.exp(-2 * (K.A1 * x + K.A2 * x * x + K.A3 * x * x * x));
+        const M = C.M0 * (1 - x);
+        const Ri = 2 * C.f * K.kd * ii + 2 * K.kth * M * M * M;
+        const P = Math.sqrt(Ri / (2 * K.kt0 * gt));
+        const xn = 1 - (1 - x) * Math.exp(-K.kp * P * h);
+        const dxs = xn - x;
+        if (dxs > 1e-14) {
+          const Rp = K.kp * M * P;
+          const comb = Ri / 2, trans = K.cm * Rp;
+          const DPn = Rp / (comb + trans), kk = 1 + comb / (comb + trans);
+          sumdx += dxs; sumInv += dxs / DPn; sumW += dxs * DPn * (kk + 1) / kk; sumK += dxs * kk;
+        }
+        ii *= Math.exp(-K.kd * h); x = xn;
+      }
+      dX[i] = x - X[i]; X[i] = x; I[i] = ii;
+      if (sumdx > 1e-12) {
+        m0[i] += sumInv; m2[i] += sumW;
+        const DPn = sumdx / sumInv, kk = sumK / sumdx, p = kk / DPn;
+        const c0 = Math.log(LN10) + (kk + 1) * Math.log(p) - lgamma(kk + 1) + Math.log(sumdx);
+        const off = i * NB;
+        for (let bb = 0; bb < NB; bb++) {
+          const e = c0 + (kk + 1) * lnN[bb] - p * nArr[bb];
+          if (e > -40) hist[off + bb] += Math.exp(e);
+        }
+      }
+    }
+    // ---- energy per tube: implicit radial conduction, explicit reaction heat
+    for (let i = 0; i < NR; i++) {
+      const ci = C.rho * C.cp * q[i] / dz;
+      const kw = i > 0 ? C.k * 2 * PI * rb[i] / (rc[i] - rc[i - 1]) : 0;
+      let ke, rhs = ci * (T[i] + DTAD * dX[i]);
+      if (i < NR - 1) ke = C.k * 2 * PI * rb[i + 1] / (rc[i + 1] - rc[i]);
+      else { ke = C.k * 2 * PI * R / (R - rc[i]); rhs += ke * Tw; }
+      a[i] = -kw; b[i] = ci + kw + ke; c[i] = i < NR - 1 ? -ke : 0; d[i] = rhs;
+    }
+    cpv[0] = c[0] / b[0]; dpv[0] = d[0] / b[0];
+    for (let i = 1; i < NR; i++) { const m = b[i] - a[i] * cpv[i - 1]; cpv[i] = c[i] / m; dpv[i] = (d[i] - a[i] * dpv[i - 1]) / m; }
+    T[NR - 1] = dpv[NR - 1];
+    for (let i = NR - 2; i >= 0; i--) T[i] = dpv[i] - cpv[i] * T[i + 1];
+  }
+
+  // ---- outlet MWD and averages weighted by polymer mass flow of each tube
+  const tot = new Float64Array(NB), core = new Float64Array(NB), outer = new Float64Array(NB);
+  let qX = 0, qm0 = 0, qm2 = 0;
+  for (let i = 0; i < NR; i++) {
+    qX += q[i] * X[i]; qm0 += q[i] * m0[i]; qm2 += q[i] * m2[i];
+    const inCore = rc[i] < 0.5 * R;
+    for (let bb = 0; bb < NB; bb++) {
+      const v = q[i] * hist[i * NB + bb]; tot[bb] += v;
+      if (inCore) core[bb] += v; else outer[bb] += v;
+    }
+  }
+  let area = 0; for (let bb = 0; bb < NB; bb++) area += tot[bb] * dlog;
+  if (area > 0) for (let bb = 0; bb < NB; bb++) { tot[bb] /= area; core[bb] /= area; outer[bb] /= area; }
+  const Mn = qX / qm0 * C.Mm, Mw = qm2 / qX * C.Mm;
+  let coreFlow = 0; for (let i = 0; i < NR; i++) if (rc[i] < 0.5 * R) coreFlow += q[i] / Q;
+
+  // ---- RTD: each stream tube carries flow fraction q_i/Q with residence time age_i
+  const idx = [...Array(NR).keys()].sort((p, r) => age[p] - age[r]);
+  const rtd = []; let Fc = 0;
+  for (const i of idx) { Fc += q[i] / Q; rtd.push([age[i] / tau, Fc]); }
+  let tmean = 0; for (let i = 0; i < NR; i++) tmean += q[i] / Q * age[i];
+
+  let Tmax = -1e9, jmax = 0, imax = 0;
+  for (let j = 0; j <= NZ; j++) for (let i = 0; i < NR; i++) { const t = F.T[j * NR + i]; if (t > Tmax) { Tmax = t; jmax = j; imax = i; } }
+
+  return { NR, NZ, L, R, F, cup, uProf, dp, Mn, Mw, logM: Array.from(logM), tot, core, outer, rtd, tmean: tmean / tau,
+    Tmax, zmax: jmax * dz, rmax: F.rb[jmax * (NR + 1) + imax], imax, Xout: cup.X[NZ], Tw: s.Tw, coreFlow };
+}
+
+// ===== UI and plotting =====
+const SANS = 'Helvetica, Arial, sans-serif', SERIF = '"Times New Roman", Times, serif';
+const INK = '#000000';
+const COL = { cup: '#000000', center: '#d62728', outer: '#1f63c6', wall: '#7a7a7a', mid: '#2c8f3a' };
+const OUTER_TUBE = 36;   // stream tube that enters at r/R = 0.9
+const AX = 16;           // axis labels, tick numbers and curve labels (px)
+
+const $ = id => document.getElementById(id);
+const state = { mode: 2 };
+let res = null;
+
+function prep(cv) {
+  const dpr = Math.max(1, window.devicePixelRatio || 1);
+  const w = cv.clientWidth, h = cv.clientHeight;
+  const W = Math.round(w * dpr), H = Math.round(h * dpr);
+  if (cv.width !== W || cv.height !== H) { cv.width = W; cv.height = H; }
+  const ctx = cv.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, w, h);
+  return { ctx, w, h };
+}
+function niceStep(range, n) {
+  const raw = range / n, p = Math.pow(10, Math.floor(Math.log10(raw))), f = raw / p;
+  return (f < 1.5 ? 1 : f < 3 ? 2 : f < 7 ? 5 : 10) * p;
+}
+function ticks(a, b, n) {
+  const st = niceStep(b - a, n), t = [];
+  for (let v = Math.ceil(a / st - 1e-9) * st; v <= b + st * 1e-9; v += st) t.push(+v.toFixed(10));
+  return { t, st };
+}
+function fmt(v, st) { const d = Math.max(0, -Math.floor(Math.log10(st) + 1e-9)); return v.toFixed(d); }
+function niceMax(v) { const st = niceStep(v, 5); return Math.ceil(v / st - 1e-9) * st; }
+
+// text made of parts [[text, font, dy]] (dy for superscripts)
+function textParts(ctx, parts, x, y, align) {
+  let w = 0;
+  for (const [t, f] of parts) { ctx.font = f; w += ctx.measureText(t).width; }
+  let x0 = align === 'center' ? x - w / 2 : align === 'right' ? x - w : x;
+  ctx.textAlign = 'left';
+  for (const [t, f, dy] of parts) { ctx.font = f; ctx.fillText(t, x0, y + (dy || 0)); x0 += ctx.measureText(t).width; }
+  return w;
+}
+const sans = sz => sz + 'px ' + SANS;
+const serifI = sz => 'italic ' + (sz + 1) + 'px ' + SERIF;
+const powLabel = n => [['10', sans(AX)], [String(n), sans(12), -7]];
+
+// ---- curve labels: try candidate spots along each curve, keep the one that is inside the
+// plot, clear of other labels, and covers the fewest curve pixels
+function densify(pts) {
+  const out = [];
+  for (let k = 0; k < pts.length; k++) {
+    if (k === 0) { out.push(pts[0]); continue; }
+    const [x0, y0] = pts[k - 1], [x1, y1] = pts[k];
+    const n = Math.max(1, Math.ceil(Math.hypot(x1 - x0, y1 - y0) / 3));
+    for (let s = 1; s <= n; s++) out.push([x0 + (x1 - x0) * s / n, y0 + (y1 - y0) * s / n]);
+  }
+  return out;
+}
+function yAtX(pts, px) {
+  for (let k = 1; k < pts.length; k++) {
+    const [x0, y0] = pts[k - 1], [x1, y1] = pts[k];
+    if ((px - x0) * (px - x1) <= 0) return x1 === x0 ? (y0 + y1) / 2 : y0 + (y1 - y0) * (px - x0) / (x1 - x0);
+  }
+  return null;
+}
+function overlap(a, b) { return a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h; }
+function placeLabels(ctx, items, allPts, box, placed) {
+  ctx.font = sans(AX);
+  const H = AX + 4;
+  for (const it of items) {
+    const w = ctx.measureText(it.label).width + 4;
+    const fracs = it.at || [0.5, 0.35, 0.65, 0.2, 0.8, 0.42, 0.58, 0.27, 0.73, 0.12, 0.88];
+    let best = null;
+    fracs.forEach((f, rank) => {
+      const px = box.x + f * box.w, py = yAtX(it.pts, px);
+      if (py === null) return;
+      const cands = [
+        { x: px - w / 2, y: py - 7 - H }, { x: px - w / 2, y: py + 7 },
+        { x: px + 9, y: py - H / 2 }, { x: px - 9 - w, y: py - H / 2 },
+        { x: px + 6, y: py - 6 - H }, { x: px - 6 - w, y: py + 6 }, { x: px + 6, y: py + 6 }, { x: px - 6 - w, y: py - 6 - H }];
+      cands.forEach((c, ci) => {
+        const b = { x: c.x, y: c.y, w, h: H };
+        let s = rank * 0.6 + ci * 0.3;
+        if (b.x < box.x + 2 || b.y < box.y + 2 || b.x + b.w > box.x + box.w - 2 || b.y + b.h > box.y + box.h - 2) s += 1e5;
+        for (const p of placed) if (overlap(b, p)) s += 1e4;
+        for (const p of allPts) if (p[0] > b.x && p[0] < b.x + b.w && p[1] > b.y && p[1] < b.y + b.h) s += 6;
+        if (!best || s < best.s) best = { s, b };
+      });
+    });
+    if (!best) continue;
+    placed.push(best.b);
+    ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    ctx.lineJoin = 'round'; ctx.lineWidth = 4; ctx.strokeStyle = '#ffffff';
+    ctx.strokeText(it.label, best.b.x + 2, best.b.y + H / 2);
+    ctx.fillStyle = it.textColor || it.color; ctx.fillText(it.label, best.b.x + 2, best.b.y + H / 2);
+  }
+}
+
+// y-axis label: draw horizontally on an offscreen canvas, then rotate the bitmap by 90 degrees,
+// so it renders with the same glyph hinting and weight as the horizontal x-axis label
+function rotLabel(ctx, parts, cx, cy) {
+  const dpr = Math.max(1, window.devicePixelRatio || 1);
+  let w = 0; for (const [t, f] of parts) { ctx.font = f; w += ctx.measureText(t).width; }
+  w = Math.ceil(w) + 4; const h = Math.ceil(AX * 1.7);
+  const off = document.createElement('canvas'); off.width = w * dpr; off.height = h * dpr;
+  const o = off.getContext('2d'); o.setTransform(dpr, 0, 0, dpr, 0, 0);
+  o.fillStyle = INK; o.textBaseline = 'alphabetic';
+  textParts(o, parts, w / 2, h / 2 + AX * 0.36, 'center');
+  ctx.save(); ctx.translate(Math.round(cx), Math.round(cy)); ctx.rotate(-Math.PI / 2);
+  ctx.drawImage(off, -w / 2, -h / 2, w, h); ctx.restore();
+}
+
+function plot(cv, o) {
+  const { ctx, w, h } = prep(cv);
+  const m = { l: 74, r: 14, t: 12, b: 54 };
+  const ph = h - m.t - m.b;
+  const [x0, x1] = o.x, [y0, y1] = o.y;
+  const ly = o.logY;
+  // measure the y tick numbers first so the y-axis label can sit at the left edge (in line with the heading)
+  const yt = ly ? null : ticks(y0, y1, Math.max(3, Math.floor(ph / 45)));
+  let tickW = 0;
+  if (ly) for (let d = Math.ceil(y0); d <= Math.floor(y1); d++) { let s = 0; for (const [t, f] of powLabel(d)) { ctx.font = f; s += ctx.measureText(t).width; } tickW = Math.max(tickW, s); }
+  else { ctx.font = sans(AX); for (const v of yt.t) tickW = Math.max(tickW, ctx.measureText(fmt(v, yt.st)).width); }
+  const ylabX = Math.round(AX * 0.36) + 1;
+  m.l = Math.ceil(ylabX + AX * 0.5 + 7 + tickW + 7);
+  const pw = w - m.l - m.r;
+  const head = cv.previousElementSibling;           // align the graph heading with the y axis
+  if (head && head.tagName === 'H2') head.style.paddingLeft = m.l + 'px';
+  const Y = v => { const t = ly ? (Math.log10(v) - y0) / (y1 - y0) : (v - y0) / (y1 - y0); return m.t + ph * (1 - t); };
+  const X = v => m.l + pw * (v - x0) / (x1 - x0);
+  ctx.lineWidth = 1; ctx.strokeStyle = '#e3e0e0';
+  const xt = ticks(x0, x1, Math.max(3, Math.floor(pw / 80)));
+  ctx.fillStyle = INK; ctx.font = sans(AX);
+  for (const v of xt.t) {
+    const px = X(v); ctx.beginPath(); ctx.moveTo(px, m.t); ctx.lineTo(px, m.t + ph); ctx.stroke();
+    ctx.textBaseline = 'top';
+    if (o.xPow) textParts(ctx, powLabel(v), px, m.t + ph + 7, 'center');
+    else { ctx.font = sans(AX); ctx.textAlign = 'center'; ctx.fillText(fmt(v, xt.st), px, m.t + ph + 6); }
+  }
+  if (ly) {
+    for (let d = Math.ceil(y0); d <= Math.floor(y1); d++) {
+      const py = Y(Math.pow(10, d)); ctx.beginPath(); ctx.moveTo(m.l, py); ctx.lineTo(m.l + pw, py); ctx.stroke();
+      ctx.textBaseline = 'middle'; textParts(ctx, powLabel(d), m.l - 7, py + 2, 'right');
+    }
+  } else {
+    for (const v of yt.t) {
+      const py = Y(v); ctx.beginPath(); ctx.moveTo(m.l, py); ctx.lineTo(m.l + pw, py); ctx.stroke();
+      ctx.textAlign = 'right'; ctx.textBaseline = 'middle'; ctx.font = sans(AX); ctx.fillText(fmt(v, yt.st), m.l - 7, py);
+    }
+  }
+  ctx.strokeStyle = INK; ctx.strokeRect(m.l, m.t, pw, ph);
+  ctx.fillStyle = INK; ctx.textBaseline = 'alphabetic';
+  textParts(ctx, o.xlabel, m.l + pw / 2, h - 6, 'center');
+  rotLabel(ctx, o.ylabel, ylabX, m.t + ph / 2);
+
+  // series
+  const allPts = [], items = [];
+  ctx.save(); ctx.beginPath(); ctx.rect(m.l, m.t, pw, ph); ctx.clip();
+  for (const s of o.series) {
+    const pts = s.x.map((xv, k) => [X(xv), Y(ly ? Math.max(s.y[k], 1e-30) : s.y[k])]);
+    ctx.strokeStyle = s.color; ctx.lineWidth = s.w || 2.2; ctx.setLineDash(s.dash || []);
+    ctx.beginPath(); pts.forEach((p, k) => k ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])); ctx.stroke();
+    const dp = densify(pts); allPts.push(...dp);
+    if (s.label) items.push({ label: s.label, color: s.color, textColor: s.textColor, pts: dp, at: s.at });
+  }
+  ctx.setLineDash([]);
+  const placed = o.annot ? (o.annot(ctx, X, Y) || []) : [];
+  placeLabels(ctx, items, allPts, { x: m.l, y: m.t, w: pw, h: ph }, placed);
+  ctx.restore();
+}
+
+function drawAll() {
+  const r = res, NR = r.NR, NZ = r.NZ;
+  const z = [], Xc = [], Xo = [], Tc = [], To = [], muC = [], muO = [];
+  for (let j = 0; j <= NZ; j++) {
+    z.push(j * r.L / NZ);
+    Xc.push(r.F.X[j * NR]); Xo.push(r.F.X[j * NR + OUTER_TUBE]);
+    Tc.push(r.F.T[j * NR]); To.push(r.F.T[j * NR + OUTER_TUBE]);
+    muC.push(r.F.mu[j * NR]); muO.push(r.F.mu[j * NR + OUTER_TUBE]);
+  }
+  const zl = [['axial position, z (m)', sans(AX)]];
+  const plug = state.mode === 0;
+
+  const xmax = Math.max(...Xc, ...Xo, ...r.cup.X);
+  plot($('cX'), { x: [0, r.L], y: [0, Math.min(1, niceMax(Math.max(0.05, xmax * 1.08)))], xlabel: zl, ylabel: [['conversion, X', sans(AX)]],
+    series: [{ x: z, y: Xo, color: COL.outer, label: 'outer stream' }, { x: z, y: r.cup.X, color: COL.cup, label: 'mixing cup' }, { x: z, y: Xc, color: COL.center, label: 'centerline' }] });
+
+  let tlo = Math.min(...Tc, ...To, ...r.cup.T, r.Tw), thi = Math.max(...Tc, ...To, ...r.cup.T, r.Tw);
+  const tt = niceStep(Math.max(thi - tlo, 5), 5); tlo = Math.floor(tlo / tt - 0.15) * tt; thi = Math.ceil(thi / tt + 0.2) * tt;
+  let jh = 0; for (let j = 1; j <= NZ; j++) if (Tc[j] > Tc[jh]) jh = j;
+  plot($('cT'), { x: [0, r.L], y: [tlo, thi], xlabel: zl, ylabel: [['temperature (°C)', sans(AX)]],
+    series: [{ x: [0, r.L], y: [r.Tw, r.Tw], color: COL.wall, textColor: '#555555', dash: [6, 4], w: 1.6, label: 'wall', at: [0.8, 0.65, 0.9, 0.5] },
+      { x: z, y: To, color: COL.outer, label: 'outer stream' }, { x: z, y: r.cup.T, color: COL.cup, label: 'mixing cup' }, { x: z, y: Tc, color: COL.center, label: 'centerline' }],
+    annot: (ctx, X, Y) => {
+      if (Tc[jh] - Math.max(Tc[0], r.Tw) < 1) return [];
+      const px = X(z[jh]), py = Y(Tc[jh]);
+      ctx.fillStyle = COL.center; ctx.beginPath(); ctx.arc(px, py, 5, 0, 2 * Math.PI); ctx.fill();
+      const txt = `hot spot ${Tc[jh].toFixed(0)} °C`;
+      ctx.font = sans(AX); const w = ctx.measureText(txt).width;
+      const right = px > X(0) + (X(r.L) - X(0)) * 0.5;
+      const bx = right ? px - 10 - w : px + 10, by = Math.max(Y(thi) + 3, py - 8 - (AX + 4));
+      ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+      ctx.lineJoin = 'round'; ctx.lineWidth = 4; ctx.strokeStyle = '#ffffff'; ctx.strokeText(txt, bx, by + 2);
+      ctx.fillStyle = INK; ctx.fillText(txt, bx, by + 2);
+      return [{ x: bx - 2, y: by, w: w + 4, h: AX + 4 }];
+    } });
+
+  const all = [...muC, ...muO, ...r.cup.mu];
+  const mlo = Math.floor(Math.log10(Math.min(...all)) - 0.05), mhi = Math.ceil(Math.log10(Math.max(...all)) + 0.05);
+  plot($('cMu'), { x: [0, r.L], y: [mlo, Math.max(mhi, mlo + 2)], logY: true, xlabel: zl, ylabel: [['viscosity (Pa·s)', sans(AX)]],
+    series: [{ x: z, y: muO, color: COL.outer, label: 'outer stream' }, { x: z, y: r.cup.mu, color: COL.cup, label: 'mixing cup' }, { x: z, y: muC, color: COL.center, label: 'centerline' }] });
+
+  // velocity profiles; one label when the three profiles coincide
+  const pr = [r.uProf[0], r.uProf[NZ / 2], r.uProf[NZ]];
+  const peak = p => Math.max(...p.map(q => q[1]));
+  const same = Math.abs(peak(pr[0]) - peak(pr[2])) < 0.02 && Math.abs(peak(pr[0]) - peak(pr[1])) < 0.02;
+  const umax = Math.max(2.2, ...pr.flat().map(p => p[1]));
+  const ser = p => ({ x: p.map(q => q[0]), y: p.map(q => q[1]) });
+  plot($('cU'), { x: [0, 1], y: [0, niceMax(umax * 1.08)], xlabel: [['radial position, r/R', sans(AX)]], ylabel: [['velocity / mean velocity', sans(AX)]],
+    series: same
+      ? [{ ...ser(pr[0]), color: COL.cup, label: plug ? 'flat at all z' : 'same at all z' }]
+      : [{ ...ser(pr[0]), color: COL.cup, dash: [6, 4], label: 'inlet' }, { ...ser(pr[1]), color: COL.mid, label: 'z = L/2' }, { ...ser(pr[2]), color: COL.center, label: 'outlet' }] });
+
+  // RTD (cumulative)
+  const sx = [0], sy = [0];
+  let prevF = 0;
+  for (const [th, Fv] of r.rtd) { sx.push(th, th); sy.push(prevF, Fv); prevF = Fv; }
+  sx.push(10); sy.push(1);
+  const lx = [], lyv = []; for (let k = 0; k <= 200; k++) { const th = 0.5 + 3.5 * k / 200; lx.push(th); lyv.push(1 - 1 / (4 * th * th)); }
+  const rtdSeries = [
+    { x: [0, 1, 1, 4], y: [0, 0, 1, 1], color: COL.wall, textColor: '#555555', dash: [6, 4], w: 1.6, label: 'ideal PFR', at: [0.25, 0.35, 0.15, 0.6] },
+    { x: [0, 0.5, ...lx], y: [0, 0, ...lyv], color: COL.outer, dash: [3, 3], w: 1.6, label: 'laminar, Newtonian', at: [0.45, 0.55, 0.65, 0.35, 0.75] },
+    { x: sx, y: sy, color: COL.cup, w: 2.4, label: 'this reactor', at: [0.12, 0.18, 0.08, 0.3, 0.6, 0.8] }];
+  if (state.mode === 1) rtdSeries[1].label = null;   // identical to this reactor
+  if (plug) rtdSeries[0].label = null;
+  plot($('cRTD'), { x: [0, 4], y: [0, 1.05], xlabel: [['time / ', sans(AX)], ['τ', serifI(AX + 1)]], ylabel: [['F(t)', sans(AX)]], series: rtdSeries });
+
+  // MWD
+  const lm = r.logM;
+  let wmax = 0; for (let b = 0; b < lm.length; b++) wmax = Math.max(wmax, r.tot[b]);
+  plot($('cMWD'), { x: [3, 7], xPow: true, y: [0, niceMax(Math.max(wmax, 1e-3) * 1.15)], xlabel: [['molecular weight, M (g/mol)', sans(AX)]], ylabel: [['W(log M)', sans(AX)]],
+    series: plug ? [{ x: lm, y: Array.from(r.tot), color: COL.cup, w: 2.4, label: 'outlet' }] : [
+      { x: lm, y: Array.from(r.core), color: COL.center, dash: [6, 4], label: 'core, r < R/2' },
+      { x: lm, y: Array.from(r.outer), color: COL.outer, dash: [6, 4], label: 'outer, r > R/2' },
+      { x: lm, y: Array.from(r.tot), color: COL.cup, w: 2.4, label: 'total' }] });
+}
+
+function fmtM(v) { return v >= 1e6 ? (v / 1e6).toFixed(2) + '×10⁶' : Math.round(v / 1000) + ',000'; }
+function fmtP(pa) { return pa >= 1e5 ? (pa / 1e5).toFixed(2) + ' bar' : pa >= 1000 ? (pa / 1000).toFixed(1) + ' kPa' : pa.toFixed(0) + ' Pa'; }
+function readouts() {
+  const r = res;
+  let within = 0; for (const [th, Fv] of r.rtd) if (th <= 4) within = Fv;
+  const late = 1 - within;
+  let html = `<span>outlet conversion = ${r.Xout.toFixed(3)}</span>` +
+    `<span>hot spot = ${r.Tmax.toFixed(0)} °C at z = ${r.zmax.toFixed(1)} m</span>` +
+    `<span>pressure drop = ${fmtP(r.dp)}</span>` +
+    `<span>M<sub>n</sub> = ${fmtM(r.Mn)}</span><span>M<sub>w</sub> = ${fmtM(r.Mw)}</span>` +
+    `<span>PDI = ${(r.Mw / r.Mn).toFixed(2)}</span>`;
+  if (late >= 0.001) html += `<span>flow with t &gt; 4<span class="tau">τ</span> = ${(late * 100).toFixed(1)}%</span>`;
+  if (r.Tmax > 200) html += `<span class="warn">thermal runaway: centerline exceeds 200 °C</span>`;
+  $('readouts').innerHTML = html;
+}
+
+const sliders = {
+  sTf: v => `${v} °C`, sTw: v => `${v} °C`, sD: v => `${(+v).toFixed(1)} cm`,
+  sTau: v => `${(+v).toFixed(2)} h`, sI0: v => `${(+v).toFixed(4)} mol/L`, sB: v => (+v).toFixed(1)
+};
+function params() {
+  return { mode: state.mode, Tf: +$('sTf').value, Tw: +$('sTw').value, D: +$('sD').value, tau: +$('sTau').value, I0: +$('sI0').value, B: +$('sB').value };
+}
+let pending = false;
+function update() {
+  if (pending) return; pending = true;
+  requestAnimationFrame(() => {
+    pending = false;
+    for (const id in sliders) $(id.replace('s', 'o')).textContent = sliders[id]($(id).value);
+    res = solve(params()); readouts(); drawAll();
+  });
+}
+for (const id in sliders) $(id).addEventListener('input', update);
+$('modeSeg').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  for (const x of $('modeSeg').querySelectorAll('button')) x.setAttribute('aria-pressed', x === b ? 'true' : 'false');
+  state.mode = Number(b.dataset.v); update();
+});
+
+// flyout panels: overlays below the button row that never move the buttons
+let typeset = false;
+// keep an open panel inside the window even when the controls panel is narrower than it
+function clampPanel(p) {
+  p.style.right = '0px';
+  const r = p.getBoundingClientRect(), pad = 16;
+  if (r.left < pad) p.style.right = (r.left - pad) + 'px';
+  else if (r.right > window.innerWidth - pad) p.style.right = (r.right - window.innerWidth + pad) + 'px';
+}
+window.addEventListener('resize', () => document.querySelectorAll('.flyout').forEach(f => { if (!f.hidden) clampPanel(f); }));
+function tryTypeset() {
+  if (window.MathJax && MathJax.startup && MathJax.startup.promise) MathJax.startup.promise.then(() => MathJax.typesetPromise([$('detBody')]));
+  else setTimeout(tryTypeset, 300);
+}
+document.querySelectorAll('button[data-panel]').forEach(b => b.addEventListener('click', () => {
+  const p = $(b.dataset.panel), open = p.hidden;
+  document.querySelectorAll('.flyout').forEach(f => f.hidden = true);
+  p.hidden = !open;
+  if (open) clampPanel(p);
+  if (open && p.id === 'pDet' && !typeset) { typeset = true; tryTypeset(); }
+}));
+document.querySelectorAll('.flyout .close').forEach(b => b.addEventListener('click', () => b.closest('.flyout').hidden = true));
+document.addEventListener('keydown', e => { if (e.key === 'Escape') document.querySelectorAll('.flyout').forEach(f => f.hidden = true); });
+
+let rz; window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => res && drawAll(), 80); });
+update();
+</script>

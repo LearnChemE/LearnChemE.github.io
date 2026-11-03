@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Equilibrium-Limited Polycondensation</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+  chtml: { displayAlign: 'left', displayIndent: '0em' },
+  svg: { displayAlign: 'left', displayIndent: '0em' },
+  startup: { typeset: false }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 16px 16px 20px 16px;
+    font-family: Helvetica, Arial, sans-serif; font-size: 17px; color: #000;
+    font-weight: normal; background: #fff;
+  }
+  #app { width: max-content; margin: 0 auto; }
+  #title { font-size: 22px; font-weight: bold; text-align: center; margin: 0 0 16px 0; }
+  #sim { position: relative; }
+  #btnRow { display: flex; gap: 8px; margin-bottom: 12px; }
+  .topBtn {
+    background: #98000D; color: #fff; border: none; border-radius: 4px;
+    font-family: inherit; font-size: 17px; font-weight: normal;
+    padding: 6px 14px; cursor: pointer;
+  }
+  .topBtn:hover { background: #7a000a; }
+
+  .panel {
+    display: none; position: absolute; top: 44px; left: 0; z-index: 20;
+    background: #fff; border: 1px solid #888; border-radius: 6px;
+    box-shadow: 0 4px 14px rgba(0,0,0,.25);
+    padding: 0 20px 14px 20px; width: max-content; max-width: 760px;
+    max-height: 80vh; overflow-y: auto; font-size: 17px; line-height: 1.45;
+  }
+  .panelHead {
+    position: sticky; top: 0; background: #fff; display: flex; justify-content: space-between;
+    align-items: center; padding: 8px 0 6px 0; margin: 0 -8px 4px 0; z-index: 2;
+  }
+  .panelTitle { font-size: 20px; font-weight: bold; color: #000; }
+  .closeX {
+    border: none; background: none; font-size: 24px; line-height: 1; cursor: pointer;
+    color: #000; padding: 0 4px; font-family: inherit;
+  }
+  .panel p { margin: 0 0 10px 0; }
+  .panel a { color: #98000D; }
+  .symTable td { padding: 1px 12px 1px 0; vertical-align: top; }
+  mjx-container[display="true"] { text-align: left !important; margin: 6px 0 !important; }
+
+  #topArea { display: flex; gap: 40px; align-items: flex-end; margin-bottom: 10px; }
+  #ctrls { display: grid; grid-template-columns: auto 200px 80px; column-gap: 10px; row-gap: 8px; align-items: center; }
+  #ctrls label { text-align: right; }
+  #ctrls input[type="range"] { width: 200px; margin-bottom: 0; }
+  #ctrls select { font-family: inherit; font-size: 17px; color: #000; width: max-content; padding: 1px 2px; justify-self: start; }
+
+  table.res { border-collapse: collapse; }
+  table.res td { padding: 2px 10px; font-weight: normal; border-bottom: 1px solid #ddd; text-align: right; vertical-align: top; }
+  table.res td.num { text-align: left; white-space: nowrap; }
+
+  #plots { display: flex; gap: 14px; }
+  canvas { display: block; }
+
+  input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="title">Equilibrium-Limited Polycondensation</div>
+  <div id="sim">
+
+  <!-- Directions -->
+  <div class="panel" id="dirPanel">
+    <div class="panelHead"><span class="panelTitle">Directions</span><button class="closeX" aria-label="close">&times;</button></div>
+    <p>This simulation shows why step-growth polycondensation is limited by chemical equilibrium and why the small-molecule by-product (water) must be removed under vacuum, with devolatilization, to make high-molecular-weight polymer. A diacid and a diol react reversibly to form ester links and water. The equilibrium conversion of functional groups, the number-average degree of polymerization, and the number-average molecular weight are calculated for the selected equilibrium constant, water partial pressure above the melt, and stoichiometric ratio.</p>
+    <p>Use the sliders to set the equilibrium constant K (typically 1&ndash;10 for polyesters and 100&ndash;1000 for polyamides), the partial pressure of water in the reactor (the water concentration in the melt is taken to be proportional to this pressure, with no water removed at 1000 mbar), and the stoichiometric ratio r of the two monomers. Choose the polymer to convert the degree of polymerization into a molecular weight, and choose the target degree of polymerization for the dashed line in the plots.</p>
+    <p>The left plot shows the degree of polymerization at equilibrium versus the water partial pressure; the blue curve is for the selected K, and the grey curves are for other values of K. The black dot is the current condition. The shaded region corresponds to the low pressures that require high vacuum and devolatilization (large melt surface area, thin films, or finishing reactors). When r &lt; 1, the stoichiometric imbalance caps the degree of polymerization regardless of K or pressure, and this cap is shown as a dashed line.</p>
+    <p>The right plot shows the Carothers equation, which relates degree of polymerization to conversion; the blue dot is the equilibrium conversion for the current conditions. Move the mouse over either plot to read values along the curve.</p>
+  </div>
+
+  <!-- Details -->
+  <div class="panel" id="detPanel">
+    <div class="panelHead"><span class="panelTitle">Details</span><button class="closeX" aria-label="close">&times;</button></div>
+    <p>A diacid (A&ndash;A) and a diol (B&ndash;B) undergo reversible esterification; every ester link formed releases one water molecule:</p>
+    \[ \text{–COOH} + \text{HO–} \;\rightleftharpoons\; \text{–COO–} + \text{H}_2\text{O} \]
+    <p>The stoichiometric ratio \(r \le 1\) is the ratio of the initial concentrations of the two types of functional groups, with A the deficient group. If the initial concentration of B groups is \(M_0\), then the initial concentration of A groups is \(r M_0\). After a fraction \(p\) of the A groups has reacted,</p>
+    \[ [\text{A}] = r M_0 (1-p) \qquad [\text{B}] = M_0 (1 - r p) \qquad [\text{ester}] = r M_0\, p \]
+    <p>The amount of water formed equals \(r M_0 p\), but only a fraction \(f\) remains in the melt. The water concentration in the melt is assumed proportional to the partial pressure of water above it (Henry's law), with no water removed at a reference pressure of \(P^\circ = 1000\) mbar:</p>
+    \[ [\text{H}_2\text{O}] = f\, r M_0\, p \qquad f = \frac{P}{P^\circ} \]
+    <p>The equilibrium constant, assuming equal reactivity of all functional groups (independent of chain length) and ideal solution behavior, is</p>
+    \[ K = \frac{[\text{ester}][\text{H}_2\text{O}]}{[\text{A}][\text{B}]} = \frac{f\, r\, p^2}{(1-p)(1-rp)} \]
+    <p>This is a quadratic equation in \(p\); the root between 0 and 1 is</p>
+    \[ r(K - f)\, p^2 - K(1+r)\, p + K = 0 \qquad p = \frac{2K}{K(1+r) + \sqrt{K^2(1+r)^2 - 4rK(K-f)}} \]
+    <p>For \(r = 1\) this reduces to</p>
+    \[ \frac{p}{1-p} = \sqrt{\frac{K}{f}} \]
+    <p>The Carothers equation gives the number-average degree of polymerization (number of structural units per chain):</p>
+    \[ X_n = \frac{1+r}{1+r-2rp} \]
+    <p>For \(r = 1\), \(X_n = 1/(1-p)\), and combining with the equilibrium expression gives \(X_n = 1 + \sqrt{K/f}\). In a closed reactor with no water removal (\(f = 1\)) and \(K = 4\), \(X_n = 3\), which is only an oligomer. For \(r < 1\), even complete conversion (\(p = 1\)) gives a finite degree of polymerization, the stoichiometric limit:</p>
+    \[ X_{n,\max} = \frac{1+r}{1-r} \]
+    <p>The number-average molecular weight is</p>
+    \[ M_n = X_n\, M_u \]
+    <p>where \(M_u\) is the mean molar mass of a structural unit (half the repeat unit for an A&ndash;A/B&ndash;B polymer): 96 g/mol for PET, 110 g/mol for PBT, 113 g/mol for nylon 6,6, and 100 g/mol for the generic polymer.</p>
+    <p>To reach a target degree of polymerization \(X_t\), the required conversion and the largest fraction of water that can remain are</p>
+    \[ p_t = \frac{(1+r)(1 - 1/X_t)}{2r} \qquad f_t = \frac{K(1-p_t)(1-rp_t)}{r\, p_t^2} \qquad P_t = f_t\, P^\circ \]
+    <p>If \(p_t \ge 1\), the target is above the stoichiometric limit and cannot be reached at any pressure. For \(X_t = 100\), \(r = 1\), and \(K = 4\), \(f_t = 4.1\times10^{-4}\), so more than 99.96% of the water must be removed and the water partial pressure must be below about 0.4 mbar. The last stages of polycondensation are therefore run at high vacuum in devolatilizing reactors that continually renew a thin melt surface so water can diffuse out of the viscous polymer.</p>
+    <p>This simulation considers equilibrium only; reaction kinetics and mass-transfer rates determine how long it takes to approach these values.</p>
+    <p>Symbols:</p>
+    <table class="symTable">
+      <tr><td>\(f\)</td><td>fraction of the water formed that remains in the melt</td></tr>
+      <tr><td>\(f_t\)</td><td>largest fraction of water that can remain to reach \(X_t\)</td></tr>
+      <tr><td>\(K\)</td><td>equilibrium constant for esterification (dimensionless)</td></tr>
+      <tr><td>\(M_0\)</td><td>initial concentration of B functional groups (mol/L)</td></tr>
+      <tr><td>\(M_n\)</td><td>number-average molecular weight (g/mol)</td></tr>
+      <tr><td>\(M_u\)</td><td>mean molar mass of a structural unit (g/mol)</td></tr>
+      <tr><td>\(p\)</td><td>conversion of the deficient (A) functional groups</td></tr>
+      <tr><td>\(p_t\)</td><td>conversion needed to reach \(X_t\)</td></tr>
+      <tr><td>\(P\)</td><td>partial pressure of water above the melt (mbar)</td></tr>
+      <tr><td>\(P^\circ\)</td><td>reference pressure at which no water is removed, 1000 mbar</td></tr>
+      <tr><td>\(P_t\)</td><td>largest water partial pressure that reaches \(X_t\) (mbar)</td></tr>
+      <tr><td>\(r\)</td><td>stoichiometric ratio of A to B functional groups (\(r \le 1\))</td></tr>
+      <tr><td>\(X_n\)</td><td>number-average degree of polymerization (structural units per chain)</td></tr>
+      <tr><td>\(X_{n,\max}\)</td><td>stoichiometric limit on \(X_n\)</td></tr>
+      <tr><td>\(X_t\)</td><td>target degree of polymerization</td></tr>
+      <tr><td>\([\;]\)</td><td>concentration (mol/L)</td></tr>
+    </table>
+  </div>
+
+  <!-- About -->
+  <div class="panel" id="aboutPanel" style="max-width:672px">
+    <div class="panelHead"><span class="panelTitle">About</span><button class="closeX" aria-label="close">&times;</button></div>
+    <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by John L. Falconer using Claude AI. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.</p>
+  </div>
+
+  <div id="topArea">
+    <div>
+      <div id="btnRow">
+        <button class="topBtn" data-panel="dirPanel">Directions</button>
+        <button class="topBtn" data-panel="detPanel">Details</button>
+        <button class="topBtn" data-panel="aboutPanel">About</button>
+      </div>
+      <div id="ctrls">
+        <label for="kSl">equilibrium constant, K</label>
+        <input type="range" id="kSl" min="-1" max="3" step="0.01" value="0.60206">
+        <span id="kVal"></span>
+        <label for="pSl">water partial pressure (mbar)</label>
+        <input type="range" id="pSl" min="-1" max="3" step="0.01" value="3">
+        <span id="pVal"></span>
+        <label for="rSl">stoichiometric ratio, r</label>
+        <input type="range" id="rSl" min="0.9" max="1" step="0.001" value="1">
+        <span id="rVal"></span>
+        <label for="polySel">polymer</label>
+        <select id="polySel">
+          <option value="96">PET</option>
+          <option value="110">PBT</option>
+          <option value="113">nylon 6,6</option>
+          <option value="100">generic</option>
+        </select>
+        <span></span>
+        <label for="tSel">target degree of polymerization</label>
+        <select id="tSel">
+          <option value="50">50</option>
+          <option value="100" selected>100</option>
+          <option value="200">200</option>
+          <option value="500">500</option>
+        </select>
+        <span></span>
+      </div>
+    </div>
+    <table class="res">
+      <tr><td>fraction of water remaining, f</td><td class="num" id="rF"></td></tr>
+      <tr><td>equilibrium conversion, p</td><td class="num" id="rP"></td></tr>
+      <tr><td>degree of polymerization, X<sub>n</sub></td><td class="num" id="rX"></td></tr>
+      <tr><td>molecular weight, M<sub>n</sub> (g/mol)</td><td class="num" id="rM"></td></tr>
+      <tr><td id="rTlab">pressure needed for X<sub>n</sub> = 100</td><td class="num" id="rT"></td></tr>
+    </table>
+  </div>
+
+  <div id="plots">
+    <canvas id="c1"></canvas>
+    <canvas id="c2"></canvas>
+  </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  // ---------- panels ----------
+  const btns = document.querySelectorAll('.topBtn');
+  const panels = document.querySelectorAll('.panel');
+  let typeset = false;
+  function closeAll() { panels.forEach(p => p.style.display = 'none'); }
+  btns.forEach(b => b.addEventListener('click', () => {
+    const p = document.getElementById(b.dataset.panel);
+    const open = p.style.display === 'block';
+    closeAll();
+    if (!open) {
+      const br = document.getElementById('btnRow');
+      p.style.top = (br.offsetTop + br.offsetHeight + 6) + 'px';
+      p.style.display = 'block';
+      if (p.id === 'detPanel' && !typeset && window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise([p]).then(() => { typeset = true; });
+      }
+    }
+  }));
+  document.querySelectorAll('.closeX').forEach(x =>
+    x.addEventListener('click', () => { x.closest('.panel').style.display = 'none'; }));
+
+  // ---------- canvas setup ----------
+  const W = 500, W1 = 560, H = 440;
+  const dpr = window.devicePixelRatio || 1;
+  function setup(id, w) {
+    const c = document.getElementById(id);
+    c.width = w * dpr; c.height = H * dpr;
+    c.style.width = w + 'px'; c.style.height = H + 'px';
+    const ctx = c.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return ctx;
+  }
+  const cv1 = document.getElementById('c1'), cv2 = document.getElementById('c2');
+  const ctx1 = setup('c1', W1), ctx2 = setup('c2', W);
+  const M = { l: 86, r: 18, t: 18, b: 62 };
+  const PW = W - M.l - M.r, PH = H - M.t - M.b;
+  const PW1 = W1 - M.l - 78;   // plot 1 leaves room on the right for curve labels
+  const FONT = 'Helvetica, Arial, sans-serif';
+  const BLUE = '#0050c8', GREY = '#8a8a8a';
+
+  // rich text: segments [{t, sub, sup}]
+  function richWidth(ctx, segs, size) {
+    let w = 0;
+    segs.forEach(s => {
+      ctx.font = ((s.sub || s.sup) ? Math.round(size * 0.72) : size) + 'px ' + FONT;
+      w += ctx.measureText(s.t).width;
+    });
+    return w;
+  }
+  function richDraw(ctx, segs, x, y, size, color, align, halo) {
+    const w = richWidth(ctx, segs, size);
+    let cx = align === 'center' ? x - w / 2 : align === 'right' ? x - w : x;
+    ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    segs.forEach(s => {
+      const sz = (s.sub || s.sup) ? Math.round(size * 0.72) : size;
+      ctx.font = sz + 'px ' + FONT;
+      const dy = s.sub ? size * 0.3 : s.sup ? -size * 0.38 : 0;
+      if (halo) {
+        ctx.strokeStyle = '#fff'; ctx.lineWidth = 5; ctx.lineJoin = 'round';
+        ctx.strokeText(s.t, cx, y + dy);
+      }
+      ctx.fillStyle = color;
+      ctx.fillText(s.t, cx, y + dy);
+      cx += ctx.measureText(s.t).width;
+    });
+    return w;
+  }
+  // y-axis label: draw horizontally on offscreen canvas, then rotate
+  function yLabel(ctx, segs, x, yc) {
+    const size = 20;
+    const tmp = document.createElement('canvas').getContext('2d');
+    const w = Math.ceil(richWidth(tmp, segs, size)) + 4, h = 30;
+    const oc = document.createElement('canvas');
+    oc.width = w * dpr; oc.height = h * dpr;
+    const o = oc.getContext('2d');
+    o.setTransform(dpr, 0, 0, dpr, 0, 0);
+    richDraw(o, segs, 2, h / 2, size, '#000', 'left');
+    ctx.save();
+    ctx.translate(x, yc);
+    ctx.rotate(-Math.PI / 2);
+    ctx.drawImage(oc, -w / 2, -h / 2, w, h);
+    ctx.restore();
+  }
+  const DEC = (n) => [{ t: '10' }, { t: (n < 0 ? '−' : '') + Math.abs(n), sup: true }];
+  const XN = (rest) => [{ t: 'X' }, { t: 'n', sub: true }].concat(rest);
+
+  // ---------- model ----------
+  const P0 = 1000;                         // mbar, no water removed
+  function conv(K, f, r) {                 // equilibrium conversion of deficient groups
+    const b = K * (1 + r);
+    const disc = Math.max(0, b * b - 4 * r * K * (K - f));
+    return 2 * K / (b + Math.sqrt(disc));
+  }
+  const caro = (p, r) => (1 + r) / (1 + r - 2 * r * p);
+  const Xn = (K, f, r) => caro(conv(K, f, r), r);
+  const cap = r => (1 + r) / (1 - r);
+
+  // axes: plot 1 x = log10 P from 3 (left) to -1 (right); y = log10 Xn 0..4
+  const X1 = lP => M.l + (3 - lP) / 4 * PW1;
+  const Y = lx => M.t + PH - lx / 4 * PH;
+  const X2 = p => M.l + p * PW;
+
+  function frame(ctx, pw) {
+    ctx.clearRect(0, 0, W1, H);
+    ctx.strokeStyle = '#000'; ctx.lineWidth = 1;
+    ctx.strokeRect(M.l, M.t, pw, PH);
+  }
+  function yTicksLog(ctx) {
+    const labs = ['1', '10', '100', '1000', null];
+    for (let d = 0; d <= 4; d++) {
+      const y = Y(d);
+      ctx.strokeStyle = '#000'; ctx.lineWidth = 1; ctx.beginPath();
+      ctx.moveTo(M.l, y); ctx.lineTo(M.l + 7, y); ctx.stroke();
+      if (labs[d]) richDraw(ctx, [{ t: labs[d] }], M.l - 6, y, 16, '#000', 'right');
+      else richDraw(ctx, DEC(d), M.l - 6, y, 16, '#000', 'right');
+      if (d < 4) for (let m = 2; m <= 9; m++) {
+        const ym = Y(d + Math.log10(m));
+        ctx.beginPath(); ctx.moveTo(M.l, ym); ctx.lineTo(M.l + 4, ym); ctx.stroke();
+      }
+    }
+    yLabel(ctx, XN([]).slice(0, 0).concat([{ t: 'degree of polymerization, X' }, { t: 'n', sub: true }]), 27, M.t + PH / 2);
+  }
+  function dashedH(ctx, y, x0, x1, color) {
+    ctx.save(); ctx.setLineDash([6, 5]); ctx.strokeStyle = color || '#000'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(x0, y); ctx.lineTo(x1, y); ctx.stroke(); ctx.restore();
+  }
+  function hoverBox(ctx, lines, x, y, color, plotRight) {
+    // two-line readout beside an open circle; flips to the left near the right edge
+    const w = Math.max(...lines.map(l => richWidth(ctx, l, 16)));
+    const left = x + 12 + w > plotRight - 4;
+    const tx = left ? x - 12 : x + 12;
+    const ty = Math.max(M.t + 20, Math.min(y, M.t + PH - 20));
+    lines.forEach((l, i) => richDraw(ctx, l, tx, ty - 9 + 19 * i, 16, color, left ? 'right' : 'left', true));
+    ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(x, y, 5, 0, 2 * Math.PI); ctx.fill(); ctx.stroke();
+  }
+
+  // ---------- formatting ----------
+  function fmtK(K) { return K < 1 ? K.toFixed(2) : K < 10 ? K.toFixed(1) : String(Math.round(K)); }
+  function fmtP(P) { return P >= 100 ? String(Math.round(P)) : P >= 10 ? String(Math.round(P)) : P >= 1 ? P.toFixed(1) : P.toFixed(2); }
+  function fmtSci(v) {
+    const e = Math.floor(Math.log10(v)), m = v / Math.pow(10, e);
+    return m.toFixed(1) + ' &times; 10<sup>−' + (-e) + '</sup>';
+  }
+  function fmtF(v) { return v >= 0.995 ? '1.0' : v >= 0.01 ? Number(v.toPrecision(2)).toString() : fmtSci(v); }
+  function fmtX(x) { return x < 10 ? x.toFixed(2) : x < 100 ? x.toFixed(1) : String(Math.round(x)); }
+  function fmtM(m) { return (m < 1000 ? Math.round(m) : Math.round(m / 10) * 10).toLocaleString('en-US'); }
+  function fmtPct(f) {           // percent of water removed, enough decimals to be meaningful
+    const dec = f >= 0.01 ? 1 : Math.max(1, Math.floor(-Math.log10(f)) - 1);
+    return ((1 - f) * 100).toFixed(dec);
+  }
+
+  // ---------- state ----------
+  let S = {};                                // current K, P, f, r, p, x, Mu, Xt
+  let hov1 = null, hov2 = null;              // hover positions (log10 P, p)
+
+  // ---------- plot 1: Xn vs water partial pressure ----------
+  function drawPlot1() {
+    const ctx = ctx1, { K, r, Xt } = S;
+    frame(ctx, PW1);
+    const R = M.l + PW1;
+    // high-vacuum region P < ~3 mbar
+    ctx.fillStyle = '#eef2f8';
+    ctx.fillRect(X1(0.5), M.t + 1, X1(-1) - X1(0.5) - 1, PH - 2);
+    richDraw(ctx, [{ t: 'vacuum and' }], (X1(0.5) + X1(-1)) / 2, M.t + 18, 16, '#000', 'center');
+    richDraw(ctx, [{ t: 'devolatilization' }], (X1(0.5) + X1(-1)) / 2, M.t + 38, 16, '#000', 'center');
+
+    const refs = [1, 10, 100, 1000];
+    function curve(Kv, color, lw) {
+      ctx.strokeStyle = color; ctx.lineWidth = lw; ctx.beginPath();
+      for (let i = 0; i <= 240; i++) {
+        const lP = 3 - 4 * i / 240, x = X1(lP), y = Y(Math.log10(Xn(Kv, Math.pow(10, lP) / P0, r)));
+        i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+      }
+      ctx.stroke();
+    }
+    ctx.save();
+    ctx.beginPath(); ctx.rect(M.l, M.t, PW1, PH); ctx.clip();
+    dashedH(ctx, Y(Math.log10(Xt)), M.l, R);
+    const capped = r < 1 && cap(r) < 1e4;
+    if (capped) dashedH(ctx, Y(Math.log10(cap(r))), M.l, R, GREY);
+    refs.forEach(Kr => curve(Kr, GREY, 1.5));
+    curve(K, BLUE, 2.5);
+    ctx.restore();
+
+    // reference labels at the curves' right ends, fixed for the reference values; the blue label
+    // hides whichever grey label it would overlap
+    const endY = Kv => Y(Math.log10(Xn(Kv, 0.1 / P0, r)));
+    const labs = refs.map(Kr => ({ y: endY(Kr), t: 'K = ' + Kr, c: GREY }));
+    labs.sort((a, b) => b.y - a.y);
+    for (let i = 1; i < labs.length; i++) labs[i].y = Math.min(labs[i].y, labs[i - 1].y - 19);
+    const by = endY(K);
+    labs.filter(L => Math.abs(L.y - by) >= 17).forEach(L => richDraw(ctx, [{ t: L.t }], R + 11, L.y, 16, L.c, 'left'));
+    richDraw(ctx, [{ t: 'K = ' + fmtK(K) }], R + 11, by, 16, BLUE, 'left');
+
+    // target and stoichiometric-limit labels
+    richDraw(ctx, XN([{ t: ' = ' + Xt }]), M.l + 8, Y(Math.log10(Xt)) - 13, 16, '#000', 'left', true);
+    if (capped) {
+      const yc = Y(Math.log10(cap(r))), yT = Y(Math.log10(Xt));
+      // below the line unless the target label sits just there; then above
+      const below = !(yT > yc && yT - yc < 32);
+      richDraw(ctx, [{ t: 'stoichiometric limit = ' + Math.round(cap(r)) }],
+        M.l + 8, below ? yc + 14 : yc - 13, 16, GREY, 'left', true);
+    }
+
+    // current point
+    const xp = X1(Math.log10(S.P)), yp = Y(Math.log10(S.x));
+    ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(xp, yp, 6, 0, 2 * Math.PI); ctx.fill();
+
+    // hover readout along the blue curve
+    if (hov1 !== null) {
+      const P = Math.pow(10, hov1), xh = Xn(K, P / P0, r);
+      hoverBox(ctx, [[{ t: 'P = ' + fmtP(P) + ' mbar' }], XN([{ t: ' = ' + fmtX(xh) }])],
+        X1(hov1), Y(Math.log10(xh)), BLUE, R);
+    }
+
+    // x ticks
+    ctx.lineWidth = 1;
+    for (let d = 3; d >= -1; d--) {
+      const x = X1(d);
+      ctx.strokeStyle = '#000'; ctx.beginPath();
+      ctx.moveTo(x, M.t + PH); ctx.lineTo(x, M.t + PH - 7); ctx.stroke();
+      const lab = d >= 0 ? [{ t: String(Math.pow(10, d)) }] : [{ t: '0.1' }];
+      richDraw(ctx, lab, x, M.t + PH + 16, 16, '#000', 'center');
+      if (d > -1) for (let m = 2; m <= 9; m++) {
+        const xm = X1(d - 1 + Math.log10(m));
+        ctx.beginPath(); ctx.moveTo(xm, M.t + PH); ctx.lineTo(xm, M.t + PH - 4); ctx.stroke();
+      }
+    }
+    richDraw(ctx, [{ t: 'water partial pressure, P (mbar)' }], M.l + PW1 / 2, H - 18, 20, '#000', 'center');
+    yTicksLog(ctx);
+  }
+
+  // ---------- plot 2: Carothers ----------
+  function drawPlot2() {
+    const ctx = ctx2, { r, p, Xt } = S;
+    frame(ctx, PW);
+    function curve(rv, color, lw) {
+      ctx.strokeStyle = color; ctx.lineWidth = lw; ctx.beginPath();
+      let started = false;
+      for (let i = 0; i <= 600; i++) {
+        // sample densely near p = 1 by walking in log(1 - p)
+        const pp = i < 300 ? i / 300 * 0.9 : 1 - 0.1 * Math.pow(10, -5 * (i - 300) / 300);
+        const xn = caro(pp, rv); if (!(xn > 0)) break;
+        const x = X2(pp), y = Y(Math.log10(xn));
+        started ? ctx.lineTo(x, y) : ctx.moveTo(x, y); started = true;
+      }
+      ctx.stroke();
+    }
+    ctx.save();
+    ctx.beginPath(); ctx.rect(M.l, M.t, PW, PH); ctx.clip();
+    dashedH(ctx, Y(Math.log10(Xt)), M.l, M.l + PW);
+    if (r < 1) curve(1, GREY, 1.5);
+    curve(r, BLUE, 2.5);
+    // guide lines for current point
+    const xp = X2(p), yp = Y(Math.log10(S.x));
+    ctx.save(); ctx.setLineDash([3, 4]); ctx.strokeStyle = BLUE; ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.moveTo(xp, yp); ctx.lineTo(xp, M.t + PH);
+    ctx.moveTo(xp, yp); ctx.lineTo(M.l, yp); ctx.stroke(); ctx.restore();
+    ctx.restore();
+
+    // labels
+    const eq = XN([{ t: ' = (1 + r)/(1 + r − 2rp)' }]);
+    richDraw(ctx, eq, X2(0.08), Y(Math.log10(5)), 16, BLUE, 'left', true);
+    if (r < 1) {
+      richDraw(ctx, [{ t: 'r = ' + r.toFixed(3) }], X2(0.08), Y(Math.log10(5)) + 19, 16, BLUE, 'left', true);
+      richDraw(ctx, [{ t: 'r = 1' }], X2(0.999) - 9, Y(3), 16, GREY, 'right', true);
+    }
+    const pt = (1 + r) * (1 - 1 / Xt) / (2 * r);
+    const tl = pt < 1 ? XN([{ t: ' = ' + Xt + ' requires p = ' + pt.toFixed(3) }])
+                      : XN([{ t: ' = ' + Xt + ' not reachable at r = ' + r.toFixed(3) }]);
+    const yT = Y(Math.log10(Xt));
+    const tY = (yp > yT - 28 && yp < yT - 2) ? yT + 14 : yT - 13;
+    richDraw(ctx, tl, M.l + 8, tY, 16, '#000', 'left', true);
+
+    ctx.fillStyle = BLUE; ctx.beginPath(); ctx.arc(xp, yp, 6, 0, 2 * Math.PI); ctx.fill();
+
+    if (hov2 !== null) {
+      const xh = caro(hov2, r);
+      if (xh > 0 && xh <= 1e4)
+        hoverBox(ctx, [[{ t: 'p = ' + hov2.toFixed(3) }], XN([{ t: ' = ' + fmtX(xh) }])],
+          X2(hov2), Y(Math.log10(xh)), BLUE, M.l + PW);
+    }
+
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 5; i++) {
+      const v = i / 5, x = X2(v);
+      ctx.strokeStyle = '#000'; ctx.beginPath();
+      ctx.moveTo(x, M.t + PH); ctx.lineTo(x, M.t + PH - 7); ctx.stroke();
+      richDraw(ctx, [{ t: v.toFixed(1) }], x, M.t + PH + 16, 16, '#000', 'center');
+    }
+    richDraw(ctx, [{ t: 'conversion of functional groups, p' }], M.l + PW / 2, H - 18, 20, '#000', 'center');
+    yTicksLog(ctx);
+  }
+
+  // ---------- hover ----------
+  function pos(ev, cv) {
+    const b = cv.getBoundingClientRect();
+    return { x: (ev.clientX - b.left) * (cv.width / dpr) / b.width, y: (ev.clientY - b.top) * (cv.height / dpr) / b.height };
+  }
+  const NEAR = 8;   // px: the readout appears only when the pointer is this close to the blue curve
+  // nearest sampled point on the blue curve; returns its parameter or null
+  function nearest1(q) {
+    let best = null, bd = NEAR;
+    for (let i = 0; i <= 400; i++) {
+      const lP = 3 - 4 * i / 400, xn = Xn(S.K, Math.pow(10, lP) / P0, S.r);
+      const x = X1(lP), y = Y(Math.log10(xn));
+      if (y < M.t) continue;
+      const d = Math.hypot(q.x - x, q.y - y);
+      if (d < bd) { bd = d; best = lP; }
+    }
+    return best;
+  }
+  function nearest2(q) {
+    let best = null, bd = NEAR;
+    for (let i = 0; i <= 800; i++) {
+      const pp = i < 400 ? i / 400 * 0.9 : 1 - 0.1 * Math.pow(10, -5 * (i - 400) / 400);
+      const xn = caro(pp, S.r); if (!(xn > 0)) break;
+      const x = X2(pp), y = Y(Math.log10(xn));
+      if (y < M.t) continue;
+      const d = Math.hypot(q.x - x, q.y - y);
+      if (d < bd) { bd = d; best = pp; }
+    }
+    return best;
+  }
+  cv1.addEventListener('pointermove', ev => {
+    const h = nearest1(pos(ev, cv1));
+    if (h !== hov1) { hov1 = h; drawPlot1(); }
+    cv1.style.cursor = h === null ? 'default' : 'crosshair';
+  });
+  cv1.addEventListener('pointerleave', () => { hov1 = null; drawPlot1(); });
+  cv2.addEventListener('pointermove', ev => {
+    const h = nearest2(pos(ev, cv2));
+    if (h !== hov2) { hov2 = h; drawPlot2(); }
+    cv2.style.cursor = h === null ? 'default' : 'crosshair';
+  });
+  cv2.addEventListener('pointerleave', () => { hov2 = null; drawPlot2(); });
+
+  // ---------- update ----------
+  const kSl = document.getElementById('kSl'), pSl = document.getElementById('pSl'), rSl = document.getElementById('rSl');
+  const polySel = document.getElementById('polySel'), tSel = document.getElementById('tSel');
+  function fill(sl) {
+    const pct = (sl.value - sl.min) / (sl.max - sl.min) * 100;
+    sl.style.background = `linear-gradient(to right, #98000D 0%, #98000D ${pct}%, #999 ${pct}%, #999 100%)`;
+  }
+  function update() {
+    const K = Math.pow(10, +kSl.value), P = Math.pow(10, +pSl.value), r = +rSl.value;
+    const f = P / P0, p = conv(K, f, r), x = caro(p, r);
+    const Mu = +polySel.value, Xt = +tSel.value;
+    S = { K, P, f, r, p, x, Mu, Xt };
+
+    document.getElementById('kVal').textContent = fmtK(K);
+    document.getElementById('pVal').textContent = fmtP(P);
+    document.getElementById('rVal').textContent = r.toFixed(3);
+    document.getElementById('rF').innerHTML = fmtF(f);
+    document.getElementById('rP').textContent = p.toFixed(3);
+    document.getElementById('rX').textContent = fmtX(x);
+    document.getElementById('rM').textContent = fmtM(x * Mu);
+    document.getElementById('rTlab').innerHTML = 'pressure needed for X<sub>n</sub> = ' + Xt;
+
+    const pt = (1 + r) * (1 - 1 / Xt) / (2 * r);
+    let txt;
+    if (pt >= 1) {
+      txt = 'not reachable<br>(stoichiometric limit is ' + Math.round(cap(r)) + ')';
+    } else {
+      const ft = K * (1 - pt) * (1 - r * pt) / (r * pt * pt);
+      if (ft >= 1) txt = 'any pressure<br>(no water removal needed)';
+      else txt = '&le; ' + fmtP(ft * P0) + ' mbar<br>(remove more than ' + fmtPct(ft) + '% of the water)';
+    }
+    document.getElementById('rT').innerHTML = txt;
+
+    fill(kSl); fill(pSl); fill(rSl);
+    drawPlot1();
+    drawPlot2();
+  }
+  [kSl, pSl, rSl].forEach(s => s.addEventListener('input', update));
+  [polySel, tSel].forEach(s => s.addEventListener('change', update));
+  update();
+})();
+</script>
+</body>
+</html>

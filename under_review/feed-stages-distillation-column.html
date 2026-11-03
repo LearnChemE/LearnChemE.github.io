@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Feed Stages in a Distillation Column</title>
+<style>
+  html,body{margin:0;padding:0;background:#fff;}
+  #app{
+    font-family:Helvetica,Arial,sans-serif;
+    width:640px;margin:14px auto;color:#000;
+    -webkit-font-smoothing:antialiased;
+  }
+  #title{font-size:17px;font-weight:bold;margin:0 0 10px 2px;}
+  /* ---- control bar ---- */
+  #controls{
+    border:1px solid #c8c8c8;background:#fbfbfb;
+    padding:9px 12px;margin-bottom:8px;border-radius:2px;
+    display:flex;align-items:center;gap:10px;width:fit-content;
+  }
+  #controls .lbl{font-size:15.6px;white-space:nowrap;}
+  #q{width:221px;flex:none;height:18px;}
+  /* native-ish slider styling */
+  input[type=range]{-webkit-appearance:none;appearance:none;background:transparent;}
+  input[type=range]::-webkit-slider-runnable-track{height:4px;background:#b9b9b9;border-radius:2px;}
+  input[type=range]::-moz-range-track{height:4px;background:#b9b9b9;border-radius:2px;}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:14px;height:14px;margin-top:-5px;border-radius:50%;background:#5b6b8c;border:1px solid #3d4a63;cursor:pointer;}
+  input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:#5b6b8c;border:1px solid #3d4a63;cursor:pointer;}
+  #qval{font-size:15.6px;min-width:40px;text-align:left;font-variant-numeric:tabular-nums;}
+  /* ---- stage (holds buttons, canvas, and flyout panels) ---- */
+  #stage{position:relative;width:600px;margin:0 auto;}
+  /* ---- canvas ---- */
+  #plot{display:block;width:600px;height:400px;}
+  /* ---- buttons ---- */
+  #buttons{display:flex;gap:6px;justify-content:flex-start;margin:2px 0 6px;}
+  #buttons button{
+    font-family:Helvetica,Arial,sans-serif;font-size:18.7px;
+    color:#fff;background:#98000d;border:1px solid #98000d;
+    padding:6px 23px;border-radius:3px;cursor:pointer;
+  }
+  #buttons button:hover{background:#800009;border-color:#800009;}
+  #buttons button.on{background:#6d0009;border-color:#3f0005;}
+  /* ---- flyout info panel (positioned in JS just right of / below its button) ---- */
+  #panel{
+    display:none;position:absolute;z-index:10;width:540px;max-height:470px;overflow:auto;
+    border:1px solid #98000d;background:#fff;
+    padding:12px 16px;font-size:14px;line-height:1.5;border-radius:3px;
+    box-shadow:0 4px 14px rgba(0,0,0,.22);box-sizing:border-box;
+  }
+  #panel.show{display:block;}
+  #panelBody{padding-right:14px;}
+  #panelClose{
+    position:absolute;top:4px;right:8px;z-index:2;
+    border:none;background:none;color:#98000d;cursor:pointer;
+    font:bold 20px/1 Helvetica,Arial,sans-serif;padding:2px 4px;
+  }
+  #panelClose:hover{color:#6d0009;}
+  #panel h3{margin:0 0 6px;font-size:14px;color:#98000d;}
+  #panel a{color:#98000d;}
+  #panel i{font-style:italic;}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="title">Feed Stages in a Distillation Column</div>
+
+  <div id="controls">
+    <span class="lbl">feed quality</span>
+    <input type="range" id="q" min="-0.5" max="1.5" step="0.1" value="0.7">
+    <span id="qval">0.7</span>
+  </div>
+
+  <div id="stage">
+    <div id="buttons">
+      <button data-p="dir">Directions</button>
+      <button data-p="det">Details</button>
+      <button data-p="abt">About</button>
+    </div>
+
+    <canvas id="plot" width="1200" height="800"></canvas>
+
+    <div id="panel"><button id="panelClose" aria-label="Close panel" title="Close">&times;</button><div id="panelBody"></div></div>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+// ---------- geometry constants (from the Mathematica source) ----------
+const X = 1, Y = 0.4*1, W = 0.35*1, H = 0.65*Y;   // x,y,w,h
+const T1 = 0.035, T2 = T1/2;                       // arrow thicknesses
+const colL = "#0000ff";                            // liquid  = Blue
+const colV = "#00b300";                            // vapor   = RGBColor[0,0.7,0]
+const grayFill = "#e5e5e5";                        // GrayLevel[0.9]
+
+// plot range (matches PlotRange with padding)
+const xMin = -W - 0.01, xMax = X + 0.02;
+const yMin = -1.10*H - 0.12, yMax = Y + 1.10*H + 0.12;
+
+const cv = document.getElementById("plot");
+const ctx = cv.getContext("2d");
+const LW = 600, LH = 400;                          // logical size
+const DPR = cv.width / LW;                          // = 2
+
+const sx = LW/(xMax-xMin), sy = LH/(yMax-yMin);
+function PX(x){ return (x-xMin)*sx; }
+function PY(y){ return LH-(y-yMin)*sy; }
+function TPX(t){ return t*LW; }                     // thickness -> px (fraction of width)
+
+// ---------- bezier helpers ----------
+function bez(points, n){            // de Casteljau, return n+1 sampled pts
+  const out=[];
+  for(let i=0;i<=n;i++){
+    const t=i/n; let pts=points.map(p=>[p[0],p[1]]);
+    while(pts.length>1){
+      const np=[];
+      for(let k=0;k<pts.length-1;k++)
+        np.push([pts[k][0]+(pts[k+1][0]-pts[k][0])*t, pts[k][1]+(pts[k+1][1]-pts[k][1])*t]);
+      pts=np;
+    }
+    out.push(pts[0]);
+  }
+  return out;
+}
+
+// ---------- arrowhead: filled triangle that connects smoothly to the shaft ----------
+// point + tangent angle at fractional arc-length `pos` along a data-coord polyline
+function headGeom(pts, pos){
+  const px=pts.map(p=>[PX(p[0]),PY(p[1])]);
+  const seg=[]; let total=0;
+  for(let i=0;i<px.length-1;i++){ const d=Math.hypot(px[i+1][0]-px[i][0],px[i+1][1]-px[i][1]); seg.push(d); total+=d; }
+  let target=pos*total, acc=0, idx=0, f=0;
+  for(let i=0;i<seg.length;i++){ if(acc+seg[i]>=target){ idx=i; f=seg[i]? (target-acc)/seg[i]:0; break; } acc+=seg[i]; idx=i; f=1; }
+  const a=px[idx], b=px[idx+1]||px[idx];
+  return { x:a[0]+(b[0]-a[0])*f, y:a[1]+(b[1]-a[1])*f, ang:Math.atan2(b[1]-a[1], b[0]-a[0]) };
+}
+// Filled solid triangle head: apex at (vx,vy), base set back by `depth`, base half-width `halfW`
+// (always >= the shaft half-width so the shaft connects into the triangle with no gap).
+// Returns the base-center point where the shaft should end.
+function fillHead(vx,vy,ang,color,lw){
+  const halfW=Math.max(17, lw*0.6+4), depth=halfW*1.25;
+  const c=Math.cos(ang), s=Math.sin(ang);
+  const rot=(x,y)=>[vx+x*c-y*s, vy+x*s+y*c];
+  const apex=rot(0,0), b1=rot(-depth,halfW), b2=rot(-depth,-halfW), base=rot(-depth,0);
+  ctx.setLineDash([]);
+  ctx.beginPath(); ctx.moveTo(apex[0],apex[1]); ctx.lineTo(b1[0],b1[1]); ctx.lineTo(b2[0],b2[1]); ctx.closePath();
+  ctx.fillStyle=color; ctx.fill();
+  return { bx:base[0], by:base[1], depth };
+}
+function fillHeadOnPath(pts,pos,color,lw){ const g=headGeom(pts,pos); return fillHead(g.x,g.y,g.ang,color,lw); }
+
+// straight flow arrow. Solid: rectangle shaft + filled triangle head (connected).
+// Dashed: full-length dashed shaft with SHORT dashes (wide horizontal bars) + filled head marker.
+function arrow(x0,y0,x1,y1,thick,color,headPos,dashed){
+  const lw=TPX(thick);
+  if(dashed){
+    ctx.save();
+    ctx.beginPath(); ctx.moveTo(PX(x0),PY(y0)); ctx.lineTo(PX(x1),PY(y1));
+    ctx.strokeStyle=color; ctx.lineWidth=lw; ctx.lineCap="butt";
+    ctx.setLineDash([Math.max(6,lw*0.55), Math.max(6,lw*0.75)]);   // short dashes -> wide horizontal bars
+    ctx.stroke(); ctx.restore();
+    const g=headGeom([[x0,y0],[x1,y1]], headPos);
+    fillHead(g.x,g.y,g.ang,color,lw);
+  } else {
+    const g=headGeom([[x0,y0],[x1,y1]], 1.0);          // apex at the endpoint
+    const h=fillHead(g.x,g.y,g.ang,color,lw);
+    ctx.save();
+    ctx.beginPath(); ctx.moveTo(PX(x0),PY(y0)); ctx.lineTo(h.bx,h.by);   // shaft meets the triangle base
+    ctx.strokeStyle=color; ctx.lineWidth=lw; ctx.lineCap="butt"; ctx.setLineDash([]);
+    ctx.stroke(); ctx.restore();
+  }
+}
+
+// bezier ribbon (single color); shaft trimmed to the triangle base so the head connects smoothly
+function bezArrow(points, thick, color, headPos){
+  const s=bez(points,90);
+  const lw=TPX(thick);
+  const px=s.map(p=>[PX(p[0]),PY(p[1])]);
+  const cum=[0];
+  for(let i=1;i<px.length;i++) cum.push(cum[i-1]+Math.hypot(px[i][0]-px[i-1][0],px[i][1]-px[i-1][1]));
+  const total=cum[cum.length-1], headArc=headPos*total;
+  function at(arc){
+    let i=1; while(i<cum.length && cum[i]<arc) i++; i=Math.min(i,px.length-1);
+    const t=(arc-cum[i-1])/((cum[i]-cum[i-1])||1);
+    return { x:px[i-1][0]+(px[i][0]-px[i-1][0])*t, y:px[i-1][1]+(px[i][1]-px[i-1][1])*t,
+             ang:Math.atan2(px[i][1]-px[i-1][1], px[i][0]-px[i-1][0]) };
+  }
+  const head=at(headArc);
+  const h=fillHead(head.x,head.y,head.ang,color,lw);
+  const stopArc=Math.max(0, headArc-h.depth);          // stop the curve at the triangle base
+  ctx.setLineDash([]);
+  ctx.beginPath(); ctx.moveTo(px[0][0],px[0][1]);
+  for(let i=1;i<px.length;i++){
+    if(cum[i]<=stopArc){ ctx.lineTo(px[i][0],px[i][1]); }
+    else { const t=(stopArc-cum[i-1])/((cum[i]-cum[i-1])||1);
+           ctx.lineTo(px[i-1][0]+(px[i][0]-px[i-1][0])*t, px[i-1][1]+(px[i][1]-px[i-1][1])*t); break; }
+  }
+  ctx.strokeStyle=color; ctx.lineWidth=lw; ctx.lineCap="round"; ctx.lineJoin="round";
+  ctx.stroke();
+}
+
+// ---------- token text with overbar / subscript ----------
+function blend(c1,c2,t){
+  const a=hex(c1),b=hex(c2);
+  return `rgb(${Math.round(a[0]+(b[0]-a[0])*t)},${Math.round(a[1]+(b[1]-a[1])*t)},${Math.round(a[2]+(b[2]-a[2])*t)})`;
+}
+function hex(h){return [parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];}
+
+// tokens: {t:'V', bar:true, sub:'F', italic:true}
+// A white halo is drawn behind every glyph & overbar so thick flow arrows
+// underneath never obscure the label. Overbar sits well clear of the letter.
+function drawTokens(tokens, cx, cy, size, align){
+  ctx.textBaseline="middle";
+  const barY = cy - size*0.56;                 // clear gap above cap height
+  const barW = Math.max(1.4, size*0.06);
+  // measure
+  let widths=tokens.map(tk=>{
+    ctx.font=(tk.italic? "italic ":"")+size+"px Helvetica,Arial,sans-serif";
+    let w=ctx.measureText(tk.t).width;
+    if(tk.sub){ ctx.font="italic "+(size*0.62)+"px Helvetica,Arial,sans-serif"; w+=ctx.measureText(tk.sub).width; }
+    return w;
+  });
+  let total=widths.reduce((a,b)=>a+b,0);
+  let startX = align==="center"? cx-total/2 : (align==="right"? cx-total : cx);
+
+  // pass 1: white halo (strokes), pass 2: black fills
+  for(let pass=0;pass<2;pass++){
+    let x=startX;
+    ctx.textAlign="left"; ctx.lineJoin="round";
+    for(let i=0;i<tokens.length;i++){
+      const tk=tokens[i];
+      ctx.font=(tk.italic? "italic ":"")+size+"px Helvetica,Arial,sans-serif";
+      if(pass===0){ ctx.strokeStyle="#fff"; ctx.lineWidth=size*0.28; ctx.strokeText(tk.t, x, cy); }
+      else { ctx.fillStyle="#000"; ctx.fillText(tk.t, x, cy); }
+      const wMain=ctx.measureText(tk.t).width;
+      if(tk.bar){
+        ctx.beginPath();
+        ctx.moveTo(x+size*0.04, barY); ctx.lineTo(x+wMain-size*0.04, barY);
+        if(pass===0){ ctx.strokeStyle="#fff"; ctx.lineWidth=barW+size*0.22; }
+        else { ctx.strokeStyle="#000"; ctx.lineWidth=barW; }
+        ctx.lineCap="round"; ctx.stroke();
+      }
+      x+=wMain;
+      if(tk.sub){
+        ctx.font="italic "+(size*0.62)+"px Helvetica,Arial,sans-serif";
+        if(pass===0){ ctx.strokeStyle="#fff"; ctx.lineWidth=size*0.20; ctx.strokeText(tk.sub, x, cy+size*0.22); }
+        else { ctx.fillStyle="#000"; ctx.fillText(tk.sub, x, cy+size*0.22); }
+        x+=ctx.measureText(tk.sub).width;
+      }
+    }
+  }
+}
+function op(s){return {t:s, op:true};}      // operator token (= + < >)
+function V(){return {t:"V",italic:true};}
+function Vbar(){return {t:"V",italic:true,bar:true};}
+function Lt(){return {t:"L",italic:true};}
+function Lbar(){return {t:"L",italic:true,bar:true};}
+function F(){return {t:"F",italic:true};}
+function Vsub(){return {t:"V",italic:true,bar:false,sub:"F"};}
+function Lsub(){return {t:"L",italic:true,bar:false,sub:"F"};}
+
+// ---------- main draw ----------
+let q = 0.7;
+
+function feedType(q){
+  if(q<0)  return ["superheated","vapor"];
+  if(q===0)return ["dew point","vapor"];
+  if(q<1)  return ["partially","vaporized"];
+  if(q===1)return ["bubble point","liquid"];
+  return ["subcooled","liquid"];
+}
+
+function draw(){
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  ctx.clearRect(0,0,LW,LH);
+  ctx.lineJoin="round";
+
+  // ---- p1: feed stage box + column walls ----
+  // gray rectangle (0,0)-(X,Y)
+  ctx.fillStyle=grayFill;
+  ctx.fillRect(PX(0),PY(Y), PX(X)-PX(0), PY(0)-PY(Y));
+  ctx.strokeStyle="#000"; ctx.lineWidth=2.4;
+  ctx.strokeRect(PX(0),PY(Y), PX(X)-PX(0), PY(0)-PY(Y));
+  // column walls (vertical thick lines at x=0 and x=X)
+  ctx.lineWidth=2.4;
+  [0,X].forEach(xx=>{
+    ctx.beginPath();
+    ctx.moveTo(PX(xx),PY(-1.2*H)); ctx.lineTo(PX(xx),PY(Y+1.2*H)); ctx.stroke();
+  });
+
+  // ---- vaporize / condense secondary curves ----
+  if(q<0){ // superheated vapor: some liquid vaporizes (blue->green ribbon up)
+    const pts=bez([[0.26,0.75*Y],[0.5,0.5*Y],[0.7,Y]],40);
+    for(let i=0;i<pts.length-1;i++){
+      ctx.beginPath();
+      ctx.moveTo(PX(pts[i][0]),PY(pts[i][1]));
+      ctx.lineTo(PX(pts[i+1][0]),PY(pts[i+1][1]));
+      ctx.strokeStyle=blend(colL,colV,i/(pts.length-1));
+      ctx.lineWidth=TPX((-q)*T2); ctx.lineCap="round";
+      ctx.stroke();
+    }
+    fillHeadOnPath(pts,1,colV,TPX((-q)*T2));
+  }
+  if(q>1){ // subcooled liquid: some vapor condenses (green->blue ribbon down)
+    const pts=bez([[0.74,0.75*Y],[0.29,0.75*Y],[0.29,0]],40);
+    for(let i=0;i<pts.length-1;i++){
+      ctx.beginPath();
+      ctx.moveTo(PX(pts[i][0]),PY(pts[i][1]));
+      ctx.lineTo(PX(pts[i+1][0]),PY(pts[i+1][1]));
+      ctx.strokeStyle=blend(colV,colL,i/(pts.length-1));
+      ctx.lineWidth=TPX((q-1)*T2); ctx.lineCap="round";
+      ctx.stroke();
+    }
+    // filled arrow tip into the liquid stream (pointing down)
+    fillHead(PX(0.29), PY(0), Math.PI/2, colL, TPX((q-1)*T2));
+  }
+
+  // ---- feed arrow entering the stage (curved) ----
+  ctx.globalAlpha=0.78;
+  if(q<=0){
+    bezArrow([[0,Y/2],[0.42,Y/2],[0.75,0.35*Y],[0.75,0.75*Y],[0.75,0.9*Y]], T1, colV, 1);
+  } else if(q<1){
+    bezArrow([[0,Y/2],[0.42,Y/2],[0.75,0.35*Y],[0.75,0.75*Y],[0.75,0.9*Y]], (1-q)*T1, colV, 1);
+    ctx.globalAlpha=0.6;
+    bezArrow([[0,Y/2],[0.27,0.6*Y],[0.25,0.05*Y]], q*T1, colL, 0.95);
+  } else {
+    ctx.globalAlpha=0.6;
+    bezArrow([[0,Y/2],[0.27,0.6*Y],[0.25,0.05*Y]], (q===1? q*T1 : T1), colL, 0.95);
+  }
+  ctx.globalAlpha=1;
+
+  // ---- p2: column flow arrows ----
+  // feed stub (black)
+  arrow(-W, Y/2, -0.08*W, Y/2, T1, "#000", 0.93, false);
+
+  // liquid (blue), x=0.25
+  let lBottom = q<=0 ? T2*(1+q) : (q<=1 ? T2+q*T1 : T1+T2+(q-1)*T2);
+  let lMid    = q<=0 ? T2*(1+q) : T2;
+  arrow(0.25, 0, 0.25, -H, lBottom, colL, 0.93, false);   // L̄ leaving bottom
+  arrow(0.25, Y, 0.25, 0,  lMid,    colL, 0.93, true);    // through stage (dashed)
+  arrow(0.25, Y+H, 0.25, Y, T2,     colL, 0.87, false);   // L entering top
+
+  // vapor (green), x=0.75
+  let vTop = q<=0 ? T2+T1-q*T2 : (q<=1 ? T2+(1-q)*T1 : T2+(1-q)*T2);
+  arrow(0.75, Y, 0.75, Y+H, vTop, colV, 0.87, false);     // V leaving top (solid)
+  arrow(0.75, -H, 0.75, Y,  T2,   colV, 0.87, true);      // through stage (dashed)
+  arrow(0.75, -H, 0.75, Y,  T2,   colV, 0.30, true);      // V̄ entering bottom (dashed)
+
+  // ---- stream labels ----
+  drawTokens([Lt()], PX(0.25), PY(Y+H)-15, 22, "center");
+  drawTokens([Vbar()], PX(0.75), PY(-H)+18, 22, "center");
+
+  // ---- mass-balance equations ----
+  let topEq, botEq;
+  if(q<0){      topEq=[V(),op(" > "),Vbar(),op(" + "),F()]; botEq=[Lbar(),op(" < "),Lt()]; }
+  else if(q===0){topEq=[V(),op(" = "),Vbar(),op(" + "),F()]; botEq=[Lbar(),op(" = "),Lt()]; }
+  else if(q<1){ topEq=[V(),op(" = "),Vbar(),op(" + "),Vsub()]; botEq=[Lbar(),op(" = "),Lt(),op(" + "),Lsub()]; }
+  else if(q===1){topEq=[V(),op(" = "),Vbar()]; botEq=[Lbar(),op(" = "),Lt(),op(" + "),F()]; }
+  else {        topEq=[V(),op(" < "),Vbar()]; botEq=[Lbar(),op(" > "),Lt(),op(" + "),F()]; }
+  drawTokens(topEq, PX(0.75), PY(Y+H)-13, 21, "center");   // above the V arrow tip
+  drawTokens(botEq, PX(0.25), PY(-H)+17, 21, "center");    // below the L-bar arrow tip
+
+  // ---- feed label + state (stacked above the black feed arrow) ----
+  const ft=feedType(q);
+  const fx=PX(-W/2);
+  const arrowTop = PY(Y/2) - TPX(T1)/2;        // top edge of black feed arrow
+  ctx.fillStyle="#000"; ctx.textBaseline="middle";
+  // line 1: "feed F"  (F italic)
+  const fs=18, y1=arrowTop-58, y2=arrowTop-35, y3=arrowTop-13;
+  ctx.font=fs+"px Helvetica,Arial,sans-serif";
+  const wFeed=ctx.measureText("feed ").width;
+  ctx.font="italic "+fs+"px Helvetica,Arial,sans-serif";
+  const wF=ctx.measureText("F").width;
+  const startX=fx-(wFeed+wF)/2;
+  ctx.textAlign="left";
+  ctx.font=fs+"px Helvetica,Arial,sans-serif";
+  ctx.fillText("feed ", startX, y1);
+  ctx.font="italic "+fs+"px Helvetica,Arial,sans-serif";
+  ctx.fillText("F", startX+wFeed, y1);
+  // lines 2-3: feed state
+  ctx.font=fs+"px Helvetica,Arial,sans-serif"; ctx.textAlign="center";
+  ctx.fillText(ft[0], fx, y2);
+  ctx.fillText(ft[1], fx, y3);
+}
+
+// ---------- slider ----------
+const slider=document.getElementById("q"), qval=document.getElementById("qval");
+function fmt(v){ return (v<0?"":"")+v.toFixed(1); }
+slider.addEventListener("input",()=>{
+  q=parseFloat(slider.value);
+  if(Math.abs(q)<1e-9) q=0;
+  qval.textContent=fmt(q);
+  draw();
+});
+
+// ---------- info panels ----------
+const panel=document.getElementById("panel");
+const TEXT={
+ dir:`<h3>Directions</h3>In this simulation, the flow of liquid and vapor at the feed stage of a distillation column are simulated. The flow rates to and from a feed stage of a distillation column are proportional to the thickness of the arrows in the figure. Liquid (blue) flows down the column and vapor (green) flows up. Use the slider to change the quality of the feed stream. A quality of 0 corresponds to a vapor feed (<i>V</i><sub>F</sub>) at its dew point and a quality of 1 corresponds to a liquid feed (<i>L</i><sub>F</sub>) at its bubble point; the state of the feed is indicated just below the feed arrow. Depending on its quality, the feed can go into the liquid flow or vapor flow, or it can be distributed between the two. A superheated vapor goes into the vapor phase and also causes some of the liquid flow in the column to vaporize. A subcooled liquid feed goes into the liquid phase and also causes some of the vapor flow in the column to condense.`,
+ det:`<h3>Details</h3><b>Reference</b><br>[1] J. D. Seader, E. J. Henley and D. K. Roper, <i>Separation Process Principles: Chemical and Biochemical Operations</i>, 3rd ed., Hoboken, NJ: John Wiley &amp; Sons, 2011 p.&nbsp;265.`,
+ abt:`<h3>About</h3>This digital experiment was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by John L. Falconer. It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/FeedStagesInADistillationColumn/" target="_blank">Mathematica simulation</a> by Rachael L. Baumann and Adam J. Johnston. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.`
+};
+let openPanel=null;
+const stage=document.getElementById("stage");
+const panelBody=document.getElementById("panelBody");
+function placePanel(btn){
+  // anchor the panel just to the right of its button, a few px below the button
+  const left0 = btn.offsetLeft + Math.round(btn.offsetWidth*0.45);   // shifted rightward
+  const top0  = btn.offsetTop + btn.offsetHeight + 5;                 // a few px below
+  panel.style.top = top0 + "px";
+  // clamp horizontally so the panel stays within the figure
+  const maxLeft = Math.max(0, stage.clientWidth - panel.offsetWidth);
+  panel.style.left = Math.min(left0, maxLeft) + "px";
+}
+function closePanel(){
+  openPanel=null; panel.classList.remove("show");
+  document.querySelectorAll("#buttons button").forEach(x=>x.classList.remove("on"));
+}
+document.getElementById("panelClose").addEventListener("click", closePanel);
+document.querySelectorAll("#buttons button").forEach(b=>{
+  b.addEventListener("click",()=>{
+    const p=b.dataset.p;
+    if(openPanel===p){ closePanel(); return; }
+    document.querySelectorAll("#buttons button").forEach(x=>x.classList.remove("on"));
+    openPanel=p; b.classList.add("on");
+    panelBody.innerHTML=TEXT[p]; panel.classList.add("show");
+    placePanel(b);            // measure after it's visible so width/height are known
+  });
+});
+
+draw();
+})();
+</script>
+</body>
+</html>

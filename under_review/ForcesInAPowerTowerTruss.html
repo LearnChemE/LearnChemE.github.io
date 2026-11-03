@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Forces in a Power Tower Truss</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(', '\\)']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.min.js"></script>
+<style>
+  body {
+    font-family: Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 10px;
+    background-color: #ffffff;
+  }
+  .app {
+    width: 900px;
+    margin: 0 auto;
+  }
+  h1.title {
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    margin: 6px 0 10px 0;
+  }
+  /* ---- controls ---- */
+  .controls {
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 8px 14px;
+    margin-bottom: 8px;
+    background: #fafafa;
+    display: inline-block;
+  }
+  .ctl-grid {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    column-gap: 28px;
+    row-gap: 6px;
+    align-items: center;
+  }
+  .ctl-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+  }
+  .ctl-label {
+    font-size: 15px;
+  }
+  .ctl-value {
+    font-size: 15px;
+    min-width: 34px;
+    text-align: left;
+    padding: 1px 5px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    background: #fff;
+  }
+  input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey);cursor:pointer}
+  input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  input[type=range].small { width: 130px; }
+  input[type=range].med { width: 200px; }
+  .cbx-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 15px;
+  }
+  input[type=checkbox] { transform: scale(1.15); cursor: pointer; }
+  /* ---- figure + side buttons ---- */
+  .fig-wrap {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    width: fit-content;
+  }
+  #simCanvas {
+    width: 760px;
+    height: 675px;
+    display: block;
+  }
+  .btn-col {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-top: 4px;
+  }
+  .panel-btn {
+    background-color: #98000D;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    padding: 9px 12px;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 16.5px;
+    font-weight: normal;
+    cursor: pointer;
+    width: 110px;
+  }
+  .panel-btn:hover { background-color: #7a000a; }
+  /* ---- flyout panels (open to the LEFT of the buttons) ---- */
+  .flyout {
+    display: none;
+    position: absolute;
+    top: 4px;
+    right: 122px;             /* button width + gap: opens to the left of the buttons */
+    width: 560px;
+    max-height: 660px;
+    overflow-y: auto;
+    background: #ffffff;
+    border: 2px solid #98000D;
+    border-radius: 6px;
+    padding: 14px 18px 16px 18px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+    z-index: 20;
+    font-size: 15px;
+    line-height: 1.45;
+  }
+  .flyout.open { display: block; }
+  /* Details panel: widen so its left edge lines up with the left edge of
+     the controls panel above (both the controls box and #simCanvas start
+     at the left edge of .fig-wrap, so left:0 aligns them). */
+  #panelDetails {
+    left: 0;
+    width: auto;
+  }
+  .flyout .close-x {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    background: none;
+    border: none;
+    font-size: 22px;
+    font-weight: bold;
+    color: #98000D;
+    cursor: pointer;
+    line-height: 1;
+    padding: 2px 6px;
+  }
+  .flyout .close-x:hover { color: #000; }
+  .flyout h2 {
+    margin: 0 0 8px 0;
+    font-size: 18px;
+    color: #98000D;
+  }
+  .flyout p { margin: 7px 0; }
+  .flyout a { color: #98000D; }
+  .fig-caption {
+    font-size: 14px;
+    margin: 2px 0 12px 0;
+  }
+  #memberTip {
+    display: none;
+    position: absolute;
+    pointer-events: none;
+    background: #ffffff;
+    border: 1px solid #000;
+    border-radius: 4px;
+    padding: 2px 7px;
+    font-size: 16px;
+    color: #000;
+    white-space: nowrap;
+    z-index: 10;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  }
+  canvas.detailfig { display: block; margin: 8px auto 0 auto; }
+</style>
+</head>
+<body>
+<div class="app">
+  <h1 class="title">Forces in a Power Tower Truss</h1>
+
+  <!-- controls -->
+  <div class="controls">
+    <div class="ctl-grid">
+      <div class="ctl-label">forces at joint E (kN)</div>
+      <div class="ctl-row">
+        <span class="ctl-label">horizontal <em>F</em><sub>E,<em>x</em></sub></span>
+        <input type="range" id="FExSlider" class="small" min="0" max="4" step="0.1" value="4">
+        <span class="ctl-value" id="FExValue">4.0</span>
+      </div>
+      <div class="ctl-row">
+        <span class="ctl-label">vertical <em>F</em><sub>E,<em>y</em></sub></span>
+        <input type="range" id="FEySlider" class="small" min="4" max="10" step="0.1" value="8">
+        <span class="ctl-value" id="FEyValue">8.0</span>
+      </div>
+      <div class="ctl-row" style="grid-column: 1 / span 2;">
+        <span class="ctl-label">force at joint G (kN)</span>
+        <input type="range" id="FGSlider" class="med" min="4" max="10" step="0.1" value="5">
+        <span class="ctl-value" id="FGValue">5.0</span>
+      </div>
+      <div class="cbx-row">
+        <input type="checkbox" id="labelCheck">
+        <label for="labelCheck">show joint labels</label>
+      </div>
+    </div>
+  </div>
+
+  <!-- figure with side buttons and flyout panels -->
+  <div class="fig-wrap">
+    <canvas id="simCanvas"></canvas>
+    <div id="memberTip"></div>
+
+    <div class="btn-col">
+      <button class="panel-btn" id="btnDirections">Directions</button>
+      <button class="panel-btn" id="btnDetails">Details</button>
+      <button class="panel-btn" id="btnAbout">About</button>
+    </div>
+
+    <!-- Directions -->
+    <div class="flyout" id="panelDirections">
+      <button class="close-x" data-close="panelDirections">&times;</button>
+      <h2>Directions</h2>
+      <p>The method of joints is used to solve for the member forces and reaction forces on
+      a power tower truss. Use sliders to set the point load forces at joints G and E, and
+      check &ldquo;show joint labels&rdquo; to see the labeled joints. This truss rests on two pinned
+      supports, which resist both vertical and horizontal forces. Member forces are shown
+      in kN. Arrows that point outward (<span style="color: rgb(0,153,0);">green</span>) represent the member
+      response to compression forces, and arrows that point inward
+      (<span style="color: rgb(255,0,64);">red</span>) represent the member response to tension forces.
+      Compression acts to shorten the member and tension acts to lengthen it. Zero members
+      (black lines) are in neither tension nor compression, so their force is 0&nbsp;kN. Zero
+      members provide stability and extra support to the structure in case another member
+      fails.</p>
+    </div>
+
+    <!-- Details -->
+    <div class="flyout" id="panelDetails">
+      <button class="close-x" data-close="panelDetails">&times;</button>
+      <h2>Details</h2>
+      <p>The reaction forces are calculated first by summing the \(x\) forces, then
+      calculating moments about joint A, and then doing a force balance in the \(y\)
+      direction.</p>
+      <p>\(\Sigma\, F_x = 0 = -R_{\mathrm{A},\,x} - R_{\mathrm{B},\,x} + F_{\mathrm{E},x}\),</p>
+      <p>\(\Sigma\, M_{\mathrm{A}} = 0 = -2\, w_1\, R_{\mathrm{B},\,y} + (2\, w_1 + w_2)\, F_{\mathrm{E},\,y} + (2\, h_1 + h_2)\, F_{\mathrm{E},\,x} - w_2\, F_{\mathrm{G}}\),</p>
+      <p>\(\Sigma\, F_y = 0 = R_{\mathrm{A},\,y} + R_{\mathrm{B},\,y} - F_{\mathrm{G}} - F_{\mathrm{E},\,y}\),</p>
+      <p>where</p>
+      <p>\(R_{\mathrm{A},\,x}\) and \(R_{\mathrm{A},\,y}\) are the reaction forces in the \(x\) and \(y\) directions at joint A,</p>
+      <p>\(R_{\mathrm{B},\,x}\) and \(R_{\mathrm{B},\,y}\) are the reaction forces at joint B,</p>
+      <p>\(R_{\mathrm{A},\,x} = R_{\mathrm{B},\,x} = \frac{1}{2}\, F_{\mathrm{E},\,x}\),</p>
+      <p>\(F_{\mathrm{E},\,x}\) and \(F_{\mathrm{E},\,y}\) are the point load forces in the \(x\) and \(y\) directions at joint E,</p>
+      <p>\(F_{\mathrm{G}}\) is the point load force at joint G,</p>
+      <p>\(w_1\) and \(w_2\) are the shorter and longer widths,</p>
+      <p>and \(h_1\) and \(h_2\) are the shorter and longer heights.</p>
+      <p>The second and third terms (\((2\, w_1 + w_2)\, F_{\mathrm{E},\,y}\), \((2\, h_1 + h_2)\, F_{\mathrm{E},\,x}\))
+      are positive in the moment balance because they cause a clockwise rotation, and the
+      first and fourth terms (\(-2\, w_1\, R_{\mathrm{B},\,y}\), \(-w_2\, F_{\mathrm{G}}\)) are negative because they
+      cause a counterclockwise rotation.</p>
+      <p>The method of joints is used to calculate the member forces using the order of the
+      calculations below. Force balances are done assuming we can determine which forces
+      are under tension and which forces are under compression prior to solving the truss.
+      At joint A there is an upward force of \(R_{\mathrm{A},\,y}\), so we know that \(F_1\) must be a
+      compression force in order for the truss to remain stationary. Also, there is a force
+      of \(R_{\mathrm{A},\,x}\) in the negative \(x\) direction, so \(F_{10}\) must be a tension force. A
+      labeled truss is shown in Figure&nbsp;1. See the angles used in Figure&nbsp;2.</p>
+      <p>Joint G:</p>
+      <p>\(\theta_2 = \tan^{-1}(h_1 / w_2)\),</p>
+      <p>\(\Sigma\, F_y = 0 = F_3 \sin\theta_2 - F_{\mathrm{G}}\),</p>
+      <p>\(\Sigma\, F_x = 0 = -F_3 \cos\theta_2 + F_4\).</p>
+      <p>Joint E:</p>
+      <p>\(\Sigma\, F_y = 0 = F_6 \sin\theta_2 - F_{\mathrm{E},\,y}\),</p>
+      <p>\(\Sigma\, F_x = 0 = -F_5 + F_6 \cos\theta_2 + F_{\mathrm{E},\,x}\).</p>
+      <p>Joint F:</p>
+      <p>\(\theta_3 = \tan^{-1}(h_1 / w_1)\),</p>
+      <p>\(\Sigma\, F_y = 0 = -F_{14} \sin\theta_3 + F_{15} \sin\theta_3\),</p>
+      <p>\(\Sigma\, F_x = 0 = -F_4 + F_5 - F_{14} \cos\theta_3 - F_{15} \cos\theta_3\).</p>
+      <p>Joint H:</p>
+      <p>\(\Sigma\, F_x = 0 = F_3 \cos\theta_2 - F_{13} + F_{14} \cos\theta_3\),</p>
+      <p>\(\Sigma\, F_y = 0 = F_2 - F_3 \sin\theta_2 + F_{14} \sin\theta_3\).</p>
+      <p>Joint D:</p>
+      <p>\(\Sigma\, F_x = 0 = -F_6 \cos\theta_2 + F_{15} \cos\theta_3 + F_{16}\),</p>
+      <p>\(\Sigma\, F_y = 0 = -F_6 \sin\theta_2 + F_7 - F_{15} \sin\theta_3\).</p>
+      <p>Joint J:</p>
+      <p>\(\Sigma\, F_x = 0 = -F_{12} \cos\theta_3 + F_{13} - F_{16} - F_{17} \cos\theta_3\),</p>
+      <p>\(\Sigma\, F_y = 0 = -F_{12} \sin\theta_3 + F_{17} \sin\theta_3\).</p>
+      <p>Joint A:</p>
+      <p>\(\theta_1 = \tan^{-1}(h_2 / w_1)\),</p>
+      <p>\(\Sigma\, F_x = 0 = F_{10} \cos\theta_1 - R_{\mathrm{A},\,x}\),</p>
+      <p>\(\Sigma\, F_y = 0 = -F_1 + F_{10} \sin\theta_1 + R_{\mathrm{A},\,y}\).</p>
+      <p>Joint B:</p>
+      <p>\(\Sigma\, F_x = 0 = F_9 \cos\theta_1 - R_{\mathrm{B},\,x}\),</p>
+      <p>\(\Sigma\, F_y = 0 = -F_8 + F_9 \sin\theta_1 + R_{\mathrm{B},\,y}\).</p>
+      <p>Joint I:</p>
+      <p>\(\Sigma\, F_x = 0 = -F_{11} + F_{12} \cos\theta_3\).</p>
+      <p>Joint C:</p>
+      <p>\(\Sigma\, F_x = 0 = F_{17} \cos\theta_3 - F_{18}\).</p>
+      <canvas id="fig1Canvas" class="detailfig"></canvas>
+      <p class="fig-caption">Figure 1.</p>
+      <p>For some conditions, \(F_{14}\) is under compression and \(F_{15}\) is under
+      tension.</p>
+      <canvas id="fig2Canvas" class="detailfig"></canvas>
+      <p class="fig-caption">Figure 2.</p>
+      <p><strong>Symbols</strong></p>
+      <p>\(F_1, F_2, \ldots, F_{18}\) = forces in truss members 1&ndash;18 (kN)</p>
+      <p>\(F_{\mathrm{E},\,x}\) = horizontal point load at joint E (kN)</p>
+      <p>\(F_{\mathrm{E},\,y}\) = vertical point load at joint E (kN)</p>
+      <p>\(F_{\mathrm{G}}\) = vertical point load at joint G (kN)</p>
+      <p>\(R_{\mathrm{A},\,x}\), \(R_{\mathrm{A},\,y}\) = horizontal and vertical reaction forces at pinned support A (kN)</p>
+      <p>\(R_{\mathrm{B},\,x}\), \(R_{\mathrm{B},\,y}\) = horizontal and vertical reaction forces at pinned support B (kN)</p>
+      <p>\(M_{\mathrm{A}}\) = moment about joint A (kN&middot;length)</p>
+      <p>\(w_1\) = shorter width of the truss (length)</p>
+      <p>\(w_2\) = longer width of the truss (length)</p>
+      <p>\(h_1\) = shorter height of the truss (length)</p>
+      <p>\(h_2\) = longer height of the truss (length)</p>
+      <p>\(\theta_1\) = angle of members 9 and 10 from the horizontal, \(\tan^{-1}(h_2/w_1)\)</p>
+      <p>\(\theta_2\) = angle of members 3 and 6 from the horizontal, \(\tan^{-1}(h_1/w_2)\)</p>
+      <p>\(\theta_3\) = angle of the diagonal members 12, 14, 15 and 17 from the horizontal, \(\tan^{-1}(h_1/w_1)\)</p>
+    </div>
+
+    <!-- About -->
+    <div class="flyout" id="panelAbout">
+      <button class="close-x" data-close="panelAbout">&times;</button>
+      <h2>About</h2>
+      <p>This simulation was created in the
+      <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of
+      Chemical and Biological Engineering</a> at University of Colorado Boulder for
+      <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a>
+      by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a
+      <a href="https://demonstrations.wolfram.com/ForcesInAPowerTowerTruss/" target="_blank"
+      rel="noopener">Mathematica simulation</a> by Rachael L. Baumann. It was prepared with
+      financial support from the National Science Foundation (DUE 2336987 and 2336988).
+      Address any questions or comments to
+      <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+/* ================= geometry & constants ================= */
+const w1 = 7, w2 = 11, h1 = 7, h2 = 12;
+const th1 = Math.atan(h2 / w1);   // angle of members AK, BK
+const th2 = Math.atan(h1 / w2);   // angle of members GH, DE
+const th3 = Math.PI / 4;          // angle of 45-degree diagonals
+
+const colC = "rgb(0,153,0)";      // compression (green)
+const colT = "rgb(255,0,64)";     // tension (red)
+const colB = "rgb(0,0,255)";      // external force arrows (blue)
+
+/* plot range (world coordinates, y up) */
+const XMIN = -22, XMAX = 30, YMIN = -15, YMAX = 31.2;
+const CSSW = 760, CSSH = 675;
+
+/* joints */
+const J = {
+  A: [-w1, 0], B: [w1, 0], C: [w1, h2], D: [w1, h1 + h2],
+  E: [w1 + w2, 2 * h1 + h2], F: [0, 2 * h1 + h2], G: [-w1 - w2, 2 * h1 + h2],
+  H: [-w1, h1 + h2], I: [-w1, h2], Jt: [0, h1 + h2], K: [0, h2]
+};
+
+/* member endpoints, label text positions and rotations (from the Mathematica source) */
+const members = [
+  { k: "F1",  p: [[-w1, 0], [-w1, h2]],                       lp: [-w1, h2 / 2],            rot: Math.PI / 2 },
+  { k: "F2",  p: [[-w1, h2], [-w1, h1 + h2]],                 lp: [-w1, h2 + h1 / 2],       rot: Math.PI / 2 },
+  { k: "F3",  p: [[-w1, h1 + h2], [-w1 - w2, 2 * h1 + h2]],   lp: [-w1 - w2 / 2, 1.5 * h1 + h2], rot: -th2 },
+  { k: "F4",  p: [[-w1 - w2, 2 * h1 + h2], [0, 2 * h1 + h2]], lp: [-(w1 + w2) / 2, 2 * h1 + h2], rot: 0 },
+  { k: "F5",  p: [[0, 2 * h1 + h2], [w1 + w2, 2 * h1 + h2]],  lp: [(w1 + w2) / 2, 2 * h1 + h2],  rot: 0 },
+  { k: "F6",  p: [[w1, h1 + h2], [w1 + w2, 2 * h1 + h2]],     lp: [w1 + 0.5 * w2, 1.5 * h1 + h2], rot: th2 },
+  { k: "F7",  p: [[w1, h2], [w1, h1 + h2]],                   lp: [w1, 0.5 * h1 + h2],      rot: Math.PI / 2 },
+  { k: "F8",  p: [[w1, 0], [w1, h2]],                         lp: [w1, 0.5 * h2],           rot: Math.PI / 2 },
+  { k: "F9",  p: [[w1, 0], [0, h2]],                          lp: [0.5 * w1, h2 / 2],       rot: -th1 },
+  { k: "F10", p: [[-w1, 0], [0, h2]],                         lp: [-0.5 * w1, 0.5 * w2],    rot: th1 },
+  { k: "F11", p: [[-w1, h2], [0, h2]],                        lp: [-0.5 * w1, h2],          rot: 0 },
+  { k: "F12", p: [[-w1, h2], [0, h1 + h2]],                   lp: [-0.5 * w1, 0.5 * h1 + h2], rot: th3 },
+  { k: "F13", p: [[-w1, h1 + h2], [0, h1 + h2]],              lp: [-0.5 * w1, h1 + h2],     rot: 0 },
+  { k: "F14", p: [[-w1, h1 + h2], [0, 2 * h1 + h2]],          lp: [-0.5 * w1, 1.5 * h1 + h2], rot: th3 },
+  { k: "F15", p: [[w1, h1 + h2], [0, 2 * h1 + h2]],           lp: [0.5 * w1, 1.5 * h1 + h2], rot: -th3 },
+  { k: "F16", p: [[0, h1 + h2], [w1, h1 + h2]],               lp: [0.5 * w1, h1 + h2],      rot: 0 },
+  { k: "F17", p: [[w1, h2], [0, h1 + h2]],                    lp: [0.5 * w1, 0.5 * h1 + h2], rot: -th3 },
+  { k: "F18", p: [[w1, h2], [0, h2]],                         lp: [0.5 * w1, h2],           rot: 0 }
+];
+
+/* joint labels: [name, anchor, offset] (Mathematica Text offsets) */
+const jointLabels = [
+  ["A", [-w1, 0], [1.5, -1]],
+  ["B", [w1, 0], [-1.75, -1]],
+  ["C", [w1, h2], [-1.5, 0]],
+  ["D", [w1, h1 + h2], [-1.5, 1]],
+  ["E", [w1 + w2, 2 * h1 + h2], [-1, -1.2]],
+  ["F", [0, 2 * h1 + h2], [0, -1.2]],
+  ["G", [-w1 - w2, 2 * h1 + h2], [1, -1.2]],
+  ["H", [-w1, h1 + h2], [1.5, 1]],
+  ["I", [-w1, h2], [1.5, 0]],
+  ["J", [0, h1 + h2], [0, -1.2]],
+  ["K", [0, h2], [0, -1.2]]
+];
+
+/* joint dots in main figure */
+const jointDots = [
+  [-w1, -0.75], [-w1, h2], [-w1, h1 + h2], [-w1 - w2, 2 * h1 + h2],
+  [w1, -0.75], [w1, h2], [w1, h1 + h2], [w1 + w2, 2 * h1 + h2],
+  [0, h2], [0, h1 + h2], [0, 2 * h1 + h2]
+];
+
+/* ================= physics: method of joints ================= */
+function solveTruss(FEx, FEy, FG) {
+  const s1 = Math.sin(th1), c1 = Math.cos(th1);
+  const s2 = Math.sin(th2), c2 = Math.cos(th2);
+  const s3 = Math.sin(th3), c3 = Math.cos(th3);
+
+  const RAx = 0.5 * FEx;
+  const RBx = RAx;
+  const RBy = ((2 * w1 + w2) * FEy + (2 * h1 + h2) * FEx - w2 * FG) / (2 * w1);
+  const RAy = FEy + FG - RBy;
+
+  const F3 = -FG / s2;
+  const F4 = -F3 * c2;
+  const F6 = -FEy / s2;
+  const F5 = -F6 * c2 + FEx;
+  const F15 = (F4 - F5) / (2 * c3);
+  const F14 = -F15;
+  const F2 = F3 * s2 + F14 * s3;
+  const F13 = F3 * c2 - F14 * c3;
+  const F7 = F6 * s2 + F15 * s3;
+  const F16 = F6 * c2 - F15 * c3;
+  const F12 = (F16 - F13) / (2 * c3);
+  const F17 = -F12;
+  const F10 = RAx / c1;
+  const F1 = -(F10 * s1 + RAy);
+  const F9 = -RBx / c1;
+  const F8 = -(F9 * s1 + RBy);
+  const F11 = -F12 * c3;
+  const F18 = -F17 * c3;
+
+  return { RAx, RAy, RBx, RBy, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10,
+           F11, F12, F13, F14, F15, F16, F17, F18 };
+}
+
+function chop(v) { return Math.abs(v) < 1e-9 ? 0 : v; }
+
+/* NumberForm[Abs[F], {5, 2}] for |F| < 10, {5, 1} otherwise */
+function fmtMember(F) {
+  F = chop(F);
+  if (F === 0) return "0";
+  const a = Math.abs(F);
+  return a < 10 ? a.toFixed(2) : a.toFixed(1);
+}
+/* NumberForm[Abs[F], {5, 2}] */
+function fmtExt(F) { return Math.abs(F).toFixed(2); }
+
+/* arrow length scaling for external force arrows */
+function scaleF(F) { return 3 + 10 * Math.min(Math.abs(F) / 25.7, 1); }
+
+/* ================= canvas helpers ================= */
+function setupCanvas(canvas, cssW, cssH) {
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = Math.round(cssW * dpr);
+  canvas.height = Math.round(cssH * dpr);
+  canvas.style.width = cssW + "px";
+  canvas.style.height = cssH + "px";
+  const ctx = canvas.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return ctx;
+}
+
+function makeMapper(cssW, cssH, xmin, xmax, ymin, ymax) {
+  const sx = cssW / (xmax - xmin);
+  const sy = cssH / (ymax - ymin);
+  return {
+    x: (x) => (x - xmin) * sx,
+    y: (y) => cssH - (y - ymin) * sy,
+    s: sx
+  };
+}
+
+function arrowHead(ctx, x, y, ang, len, wid, color) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(ang);
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(-len, wid);
+  ctx.lineTo(-0.55 * len, 0);
+  ctx.lineTo(-len, -wid);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
+/* draw a straight arrow (screen coords) with head at the end */
+function drawArrow(ctx, x1, y1, x2, y2, color, lw, headLen, headWid) {
+  const ang = Math.atan2(y2 - y1, x2 - x1);
+  const bx = x2 - 0.55 * headLen * Math.cos(ang);
+  const by = y2 - 0.55 * headLen * Math.sin(ang);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = lw;
+  ctx.lineCap = "butt";
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(bx, by);
+  ctx.stroke();
+  arrowHead(ctx, x2, y2, ang, headLen, headWid, color);
+}
+
+/* rotated text with white background (screen coords, rotWorld is CCW math angle) */
+function rotatedLabel(ctx, text, x, y, rotWorld, fontPx, color) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(-rotWorld);
+  ctx.font = fontPx + "px Helvetica, Arial, sans-serif";
+  const m = ctx.measureText(text);
+  const w = m.width, h = fontPx;
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(-w / 2 - 2, -h / 2 - 1, w + 4, h + 2);
+  ctx.fillStyle = color;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(text, 0, 1);
+  ctx.restore();
+}
+
+/* Mathematica-style Text offset placement: offset in units of half box size */
+function offsetText(ctx, drawFn, boxW, boxH, ax, ay, off) {
+  const cx = ax - off[0] * boxW / 2;
+  const cy = ay + off[1] * boxH / 2;   // screen y down; +oy moves box below anchor... see note
+  drawFn(cx, cy);
+}
+
+/* pinned support drawing (world coords via mapper) */
+function drawPin(ctx, M, cx, r, groundY) {
+  const px = M.x(cx), py = M.y(-r), rr = r * M.s;
+  // gray disk
+  ctx.fillStyle = "rgb(179,179,179)";
+  ctx.beginPath();
+  ctx.arc(px, M.y(-r), rr, 0, 2 * Math.PI);
+  ctx.fill();
+  // gray trapezoid
+  ctx.beginPath();
+  ctx.moveTo(M.x(cx - r), M.y(-r / 2));
+  ctx.lineTo(M.x(cx + r), M.y(-r / 2));
+  ctx.lineTo(M.x(cx + 1), M.y(groundY));
+  ctx.lineTo(M.x(cx - 1), M.y(groundY));
+  ctx.closePath();
+  ctx.fill();
+  // black outline: sides + ground
+  ctx.strokeStyle = "#000000";
+  ctx.lineWidth = 2.4;
+  ctx.beginPath();
+  ctx.moveTo(M.x(cx - r), M.y(-r));
+  ctx.lineTo(M.x(cx - 1), M.y(groundY));
+  ctx.moveTo(M.x(cx + r), M.y(-r));
+  ctx.lineTo(M.x(cx + 1), M.y(groundY));
+  ctx.moveTo(M.x(cx - 1), M.y(groundY));
+  ctx.lineTo(M.x(cx + 1), M.y(groundY));
+  ctx.stroke();
+  // curved member seat over the pin
+  ctx.beginPath();
+  let first = true;
+  for (let i = 0; i <= 24; i++) {
+    const t = -r + (2 * r) * i / 24;         // x offset from center
+    const yv = -r + r * Math.sqrt(Math.max(0, 1 - (t / r) * (t / r)));  // arc over disk
+    const X = M.x(cx + t), Y = M.y(Math.min(yv, 0) - 0.0);
+    if (first) { ctx.moveTo(X, Y); first = false; } else { ctx.lineTo(X, Y); }
+  }
+  ctx.stroke();
+}
+
+/* ================= main drawing ================= */
+const canvas = document.getElementById("simCanvas");
+const ctx = setupCanvas(canvas, CSSW, CSSH);
+const M = makeMapper(CSSW, CSSH, XMIN, XMAX, YMIN, YMAX);
+
+function memberArrow(ctx, F, p1, p2) {
+  const x1 = M.x(p1[0]), y1 = M.y(p1[1]);
+  const x2 = M.x(p2[0]), y2 = M.y(p2[1]);
+  const ang = Math.atan2(y2 - y1, x2 - x1);
+  const hl = 20, hw = 7.5;
+  F = chop(F);
+  if (F === 0) {
+    ctx.strokeStyle = "#000000";
+    ctx.lineWidth = 5;
+    ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+    return;
+  }
+  const col = F < 0 ? colC : colT;
+  ctx.strokeStyle = col;
+  ctx.lineWidth = 5;
+  ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+  if (F < 0) {
+    /* compression: arrowheads at both ends pointing outward */
+    arrowHead(ctx, x2, y2, ang, hl, hw, col);
+    arrowHead(ctx, x1, y1, ang + Math.PI, hl, hw, col);
+  } else {
+    /* tension: arrowheads inside the member pointing toward each other */
+    const xa = x1 + 0.315 * (x2 - x1), ya = y1 + 0.315 * (y2 - y1);
+    const xb = x1 + 0.675 * (x2 - x1), yb = y1 + 0.675 * (y2 - y1);
+    arrowHead(ctx, xa, ya, ang, hl, hw, col);
+    arrowHead(ctx, xb, yb, ang + Math.PI, hl, hw, col);
+  }
+}
+
+/* draw italic-F / italic-R symbol with subscript, e.g. sym="F", sub=["G"] or ["E,","y"(italic)] */
+function drawSymbolLabel(ctx, x, y, sym, subPlain, subItal, fontPx, color, align) {
+  ctx.textBaseline = "middle";
+  ctx.fillStyle = color;
+  const f1 = "italic " + fontPx + "px Helvetica, Arial, sans-serif";
+  const fs = Math.round(fontPx * 0.72);
+  const f2p = fs + "px Helvetica, Arial, sans-serif";
+  const f2i = "italic " + fs + "px Helvetica, Arial, sans-serif";
+  ctx.font = f1;
+  const w0 = ctx.measureText(sym).width;
+  ctx.font = f2p;
+  const w1_ = ctx.measureText(subPlain).width;
+  ctx.font = f2i;
+  const w2_ = subItal ? ctx.measureText(subItal).width : 0;
+  const total = w0 + w1_ + w2_;
+  let x0 = x;
+  if (align === "center") x0 = x - total / 2;
+  else if (align === "right") x0 = x - total;
+  ctx.font = f1;
+  ctx.textAlign = "left";
+  ctx.fillText(sym, x0, y);
+  ctx.font = f2p;
+  ctx.fillText(subPlain, x0 + w0, y + fontPx * 0.28);
+  if (subItal) {
+    ctx.font = f2i;
+    ctx.fillText(subItal, x0 + w0 + w1_, y + fontPx * 0.28);
+  }
+}
+
+function draw() {
+  const FEx = parseFloat(document.getElementById("FExSlider").value);
+  const FEy = parseFloat(document.getElementById("FEySlider").value);
+  const FG = parseFloat(document.getElementById("FGSlider").value);
+  const showLabels = document.getElementById("labelCheck").checked;
+
+  document.getElementById("FExValue").textContent = FEx.toFixed(1);
+  document.getElementById("FEyValue").textContent = FEy.toFixed(1);
+  document.getElementById("FGValue").textContent = FG.toFixed(1);
+
+  const r = solveTruss(FEx, FEy, FG);
+
+  ctx.clearRect(0, 0, CSSW, CSSH);
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, CSSW, CSSH);
+
+  /* supports */
+  drawPin(ctx, M, -w1, 0.75, -2.5);
+  drawPin(ctx, M, w1, 0.7, -2.5);
+
+  /* truss frame (black, drawn under colored member arrows) */
+  ctx.strokeStyle = "#000000";
+  ctx.lineWidth = 2.6;
+  ctx.beginPath();
+  const seg = (a, b) => { ctx.moveTo(M.x(a[0]), M.y(a[1])); ctx.lineTo(M.x(b[0]), M.y(b[1])); };
+  seg([-18, 26], [18, 26]); seg([18, 26], [7, 19]); seg([7, 19], [-7, 19]); seg([-7, 19], [-18, 26]);
+  seg([-7, 19], [0, 26]); seg([-7, 12], [0, 19]); seg([-7, 0], [0, 12]);
+  seg([7, 19], [0, 26]); seg([7, 12], [0, 19]); seg([7, 0], [0, 12]);
+  seg([-7, 19], [-7, 0]); seg([7, 19], [7, 0]); seg([-7, 12], [7, 12]);
+  ctx.stroke();
+
+  /* member force arrows */
+  for (const mb of members) memberArrow(ctx, r[mb.k], mb.p[0], mb.p[1]);
+
+  /* external force arrows (blue) */
+  const lwB = 7, hlB = 22, hwB = 8.5;
+  const G = [-w1 - w2, 2 * h1 + h2], E = [w1 + w2, 2 * h1 + h2];
+  /* FG at joint G, downward */
+  drawArrow(ctx, M.x(G[0]), M.y(G[1]), M.x(G[0]), M.y(G[1] - scaleF(FG)), colB, lwB, hlB, hwB);
+  /* FEy at joint E, downward */
+  drawArrow(ctx, M.x(E[0]), M.y(E[1]), M.x(E[0]), M.y(E[1] - scaleF(FEy)), colB, lwB, hlB, hwB);
+  /* FEx at joint E, to the right */
+  if (FEx !== 0) {
+    drawArrow(ctx, M.x(E[0]), M.y(E[1]), M.x(E[0] + scaleF(FEx)), M.y(E[1]), colB, lwB, hlB, hwB);
+  }
+  /* RAy: from below up to the pin (reversed if negative) */
+  {
+    const yb = -0.75 - scaleF(r.RAy);
+    if (r.RAy >= 0) drawArrow(ctx, M.x(-w1), M.y(yb), M.x(-w1), M.y(-0.75), colB, lwB, hlB, hwB);
+    else drawArrow(ctx, M.x(-w1), M.y(-0.75), M.x(-w1), M.y(yb), colB, lwB, hlB, hwB);
+  }
+  /* RBy: upward to the pin */
+  drawArrow(ctx, M.x(w1), M.y(-0.75 - scaleF(r.RBy)), M.x(w1), M.y(-0.1 * h1), colB, lwB, hlB, hwB);
+  /* RAx, RBx: to the left */
+  if (r.RAx !== 0) drawArrow(ctx, M.x(-w1), M.y(-0.1 * h1), M.x(-w1 - scaleF(r.RAx)), M.y(-0.1 * h1), colB, lwB, hlB, hwB);
+  if (r.RBx !== 0) drawArrow(ctx, M.x(w1), M.y(-0.1 * h1), M.x(w1 - scaleF(r.RBx)), M.y(-0.1 * h1), colB, lwB, hlB, hwB);
+
+  /* external force labels (18 px): values, or symbols when labels shown */
+  const fpx = 18;
+  ctx.font = fpx + "px Helvetica, Arial, sans-serif";
+  function extLabel(valText, symFn, ax, ay, off) {
+    /* off in Mathematica Text offset units */
+    if (!showLabels) {
+      ctx.font = fpx + "px Helvetica, Arial, sans-serif";
+      const w = ctx.measureText(valText).width, h = fpx;
+      const cx = ax - off[0] * w / 2;
+      const cy = ay + off[1] * h / 2 + (off[1] !== 0 ? Math.sign(off[1]) * 2 : 0);
+      ctx.fillStyle = "#000000";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(valText, cx, cy);
+    } else {
+      symFn(ax, ay, off);
+    }
+  }
+  /* FG label */
+  extLabel(fmtExt(FG) + " kN",
+    (ax, ay) => drawSymbolLabel(ctx, ax, ay + 14, "F", "G", "", fpx, "#000", "center"),
+    M.x(G[0]), M.y(G[1] - scaleF(FG)), [0, 1.5]);
+  /* FEy label */
+  extLabel(fmtExt(FEy) + " kN",
+    (ax, ay) => drawSymbolLabel(ctx, ax, ay + 14, "F", "E, ", "y", fpx, "#000", "center"),
+    M.x(E[0]), M.y(E[1] - scaleF(FEy)), [0, 1.5]);
+  /* FEx label */
+  if (FEx !== 0) {
+    extLabel(fmtExt(FEx) + " kN",
+      (ax, ay) => drawSymbolLabel(ctx, ax + 8, ay, "F", "E,", "x", fpx, "#000", "left"),
+      M.x(E[0] + scaleF(FEx)), M.y(E[1]), [-1.2, 0]);
+  }
+  /* RAy label */
+  extLabel(fmtExt(r.RAy) + " kN",
+    (ax, ay) => drawSymbolLabel(ctx, ax, ay + 14, "R", "A, ", "y", fpx, "#000", "center"),
+    M.x(-w1), M.y(-0.75 - scaleF(r.RAy)), [0, 1.5]);
+  /* RAx label */
+  if (r.RAx !== 0) {
+    extLabel(fmtExt(r.RAx) + " kN",
+      (ax, ay) => drawSymbolLabel(ctx, ax - 8, ay, "R", "A, ", "x", fpx, "#000", "right"),
+      M.x(-w1 - scaleF(r.RAx)), M.y(-0.75), [1.2, 0]);
+  }
+  /* RBx label */
+  if (r.RBx !== 0) {
+    extLabel(fmtExt(r.RBx) + " kN",
+      (ax, ay) => drawSymbolLabel(ctx, ax - 8, ay, "R", "B, ", "x", fpx, "#000", "right"),
+      M.x(w1 - scaleF(r.RBx)), M.y(-0.1 * h1), [1.2, 0]);
+  }
+  /* RBy label */
+  extLabel(fmtExt(r.RBy) + " kN",
+    (ax, ay) => drawSymbolLabel(ctx, ax, ay + 14, "R", "B, ", "y", fpx, "#000", "center"),
+    M.x(w1), M.y(-0.75 - scaleF(r.RBy)), [0, 1.5]);
+
+  /* member force value labels (17 px, rotated along member, white background) */
+  for (const mb of members) {
+    const F = chop(r[mb.k]);
+    const col = F < 0 ? colC : (F > 0 ? colT : "#000000");
+    rotatedLabel(ctx, fmtMember(F), M.x(mb.lp[0]), M.y(mb.lp[1]), mb.rot, 17, col);
+  }
+
+  /* joint dots */
+  for (const p of jointDots) {
+    const x = M.x(p[0]), y = M.y(p[1]);
+    ctx.fillStyle = "#000000";
+    ctx.beginPath(); ctx.arc(x, y, 7.5, 0, 2 * Math.PI); ctx.fill();
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath(); ctx.arc(x, y, 4.5, 0, 2 * Math.PI); ctx.fill();
+  }
+
+  /* joint letter labels in rounded frames */
+  if (showLabels) {
+    ctx.font = "16px Helvetica, Arial, sans-serif";
+    for (const [name, p, off] of jointLabels) {
+      const tw = ctx.measureText(name).width;
+      const bw = tw + 16, bh = 24;
+      const ax = M.x(p[0]), ay = M.y(p[1]);
+      const cx = ax - off[0] * bw / 2;
+      const cy = ay + off[1] * bh / 2;
+      ctx.fillStyle = "#ffffff";
+      ctx.strokeStyle = "#000000";
+      ctx.lineWidth = 1.3;
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(cx - bw / 2, cy - bh / 2, bw, bh, 12);
+      else ctx.rect(cx - bw / 2, cy - bh / 2, bw, bh);
+      ctx.fill(); ctx.stroke();
+      ctx.fillStyle = "#000000";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(name, cx, cy + 1);
+    }
+  }
+
+  /* header text */
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.font = "17px Helvetica, Arial, sans-serif";
+  const parts = [
+    ["all ", "rgb(102,102,102)"],
+    ["compression", colC],
+    [" and ", "rgb(102,102,102)"],
+    ["tension", colT],
+    [" forces are in kN", "rgb(102,102,102)"]
+  ];
+  let total = 0;
+  for (const [t] of parts) total += ctx.measureText(t).width;
+  let xcur = M.x(0) - total / 2;
+  const yhdr = M.y(30.5);
+  ctx.textAlign = "left";
+  for (const [t, c] of parts) {
+    ctx.fillStyle = c;
+    ctx.fillText(t, xcur, yhdr);
+    xcur += ctx.measureText(t).width;
+  }
+}
+
+/* ================= Details figures ================= */
+function drawFig1() {
+  const W = 500, H = 420;
+  const c = document.getElementById("fig1Canvas");
+  const g = setupCanvas(c, W, H);
+  const m = makeMapper(W, H, -24, 24, -6, 33);
+  g.clearRect(0, 0, W, H);
+
+  drawPinSmall(g, m, -w1, 0.75);
+  drawPinSmall(g, m, w1, 0.7);
+
+  g.strokeStyle = "#000000";
+  g.lineWidth = 2.2;
+  g.beginPath();
+  const seg = (a, b) => { g.moveTo(m.x(a[0]), m.y(a[1])); g.lineTo(m.x(b[0]), m.y(b[1])); };
+  seg([-18, 26], [18, 26]); seg([18, 26], [7, 19]); seg([7, 19], [-7, 19]); seg([-7, 19], [-18, 26]);
+  seg([-7, 19], [0, 26]); seg([-7, 12], [0, 19]); seg([-7, 0], [0, 12]);
+  seg([7, 19], [0, 26]); seg([7, 12], [0, 19]); seg([7, 0], [0, 12]);
+  seg([-7, 19], [-7, 0]); seg([7, 19], [7, 0]); seg([-7, 12], [7, 12]);
+  g.stroke();
+
+  /* joint dots */
+  for (const p of [[-7, -0.56], [7, -0.56], [-7, 12], [7, 12], [-7, 19], [7, 19], [-18, 26], [18, 26], [0, 12], [0, 19], [0, 26]]) {
+    const x = m.x(p[0]), y = m.y(p[1]);
+    g.fillStyle = "#000"; g.beginPath(); g.arc(x, y, 5.5, 0, 2 * Math.PI); g.fill();
+    g.fillStyle = "#fff"; g.beginPath(); g.arc(x, y, 3, 0, 2 * Math.PI); g.fill();
+  }
+
+  /* dimension labels on the left with white background */
+  function dimLabel(txt, sub, x, y) {
+    g.textBaseline = "middle";
+    g.font = "italic 16px Helvetica, Arial, sans-serif";
+    const wA = g.measureText(txt).width;
+    g.font = "12px Helvetica, Arial, sans-serif";
+    const wB = g.measureText(sub).width;
+    const X = m.x(x), Y = m.y(y);
+    g.fillStyle = "#fff";
+    g.fillRect(X - 2, Y - 10, wA + wB + 5, 20);
+    g.fillStyle = "#000";
+    g.textAlign = "left";
+    g.font = "italic 16px Helvetica, Arial, sans-serif";
+    g.fillText(txt, X, Y);
+    g.font = "12px Helvetica, Arial, sans-serif";
+    g.fillText(sub, X + wA, Y + 5);
+  }
+  /* height dimension lines and labels */
+  g.strokeStyle = "#000"; g.lineWidth = 1;
+  g.setLineDash([4, 3]);
+  g.beginPath();
+  g.moveTo(m.x(-21), m.y(0)); g.lineTo(m.x(-21), m.y(26));
+  g.moveTo(m.x(-22), m.y(0)); g.lineTo(m.x(-7.8), m.y(0));
+  g.moveTo(m.x(-22), m.y(12)); g.lineTo(m.x(-7.8), m.y(12));
+  g.moveTo(m.x(-22), m.y(19)); g.lineTo(m.x(-7.8), m.y(19));
+  g.moveTo(m.x(-22), m.y(26)); g.lineTo(m.x(-18.6), m.y(26));
+  /* width dimension line along the top */
+  g.moveTo(m.x(-18), m.y(29)); g.lineTo(m.x(18), m.y(29));
+  g.moveTo(m.x(-18), m.y(26.6)); g.lineTo(m.x(-18), m.y(29.4));
+  g.moveTo(m.x(-7), m.y(19.6)); g.lineTo(m.x(-7), m.y(29.4));
+  g.moveTo(m.x(0), m.y(26.6)); g.lineTo(m.x(0), m.y(29.4));
+  g.moveTo(m.x(7), m.y(19.6)); g.lineTo(m.x(7), m.y(29.4));
+  g.moveTo(m.x(18), m.y(26.6)); g.lineTo(m.x(18), m.y(29.4));
+  g.stroke();
+  g.setLineDash([]);
+  dimLabel("h", "2", -23.4, 6);
+  dimLabel("h", "1", -23.4, 15.5);
+  dimLabel("h", "1", -23.4, 22.5);
+  dimLabel("w", "2", -13.2, 30.7);
+  dimLabel("w", "1", -4.2, 30.7);
+  dimLabel("w", "1", 2.8, 30.7);
+  dimLabel("w", "2", 11.8, 30.7);
+
+  /* member numbers at member midpoints, white background */
+  g.font = "14px Helvetica, Arial, sans-serif";
+  g.textAlign = "center"; g.textBaseline = "middle";
+  for (const mb of members) {
+    const a = mb.p[0], b = mb.p[1];
+    const X = m.x((a[0] + b[0]) / 2), Y = m.y((a[1] + b[1]) / 2);
+    const txt = mb.k.slice(1);
+    const tw = g.measureText(txt).width;
+    g.fillStyle = "#fff";
+    g.fillRect(X - tw / 2 - 3, Y - 9, tw + 6, 18);
+    g.fillStyle = "#000";
+    g.fillText(txt, X, Y + 1);
+  }
+
+  /* joint labels (drawn last so the white frames cover dimension lines) */
+  g.font = "15px Helvetica, Arial, sans-serif";
+  /* nudge a few labels in this figure so their frames clear the joint dots */
+  const fig1Off = { E: [-1.35, -1.4], F: [0, -1.7], G: [1.35, -1.4], J: [0, -1.7], K: [0, -1.7] };
+  for (const [name, p, off0] of jointLabels) {
+    const off = fig1Off[name] || off0;
+    const tw = g.measureText(name).width;
+    const bw = tw + 14, bh = 21;
+    const ax = m.x(p[0]), ay = m.y(p[1]);
+    const cx = ax - off[0] * bw / 2;
+    const cy = ay + off[1] * bh / 2;
+    g.fillStyle = "#fff";
+    g.strokeStyle = "#000";
+    g.lineWidth = 1.1;
+    g.beginPath();
+    if (g.roundRect) g.roundRect(cx - bw / 2, cy - bh / 2, bw, bh, 10);
+    else g.rect(cx - bw / 2, cy - bh / 2, bw, bh);
+    g.fill(); g.stroke();
+    g.fillStyle = "#000";
+    g.textAlign = "center"; g.textBaseline = "middle";
+    g.fillText(name, cx, cy + 1);
+  }
+
+}
+
+function drawPinSmall(g, m, cx, r) {
+  const rr = r * m.s;
+  g.fillStyle = "rgb(179,179,179)";
+  g.beginPath(); g.arc(m.x(cx), m.y(-r), rr, 0, 2 * Math.PI); g.fill();
+  g.beginPath();
+  g.moveTo(m.x(cx - r), m.y(-r / 2));
+  g.lineTo(m.x(cx + r), m.y(-r / 2));
+  g.lineTo(m.x(cx + 1), m.y(-1.75));
+  g.lineTo(m.x(cx - 1), m.y(-1.75));
+  g.closePath(); g.fill();
+  g.strokeStyle = "#000"; g.lineWidth = 1.8;
+  g.beginPath();
+  g.moveTo(m.x(cx - r), m.y(-r)); g.lineTo(m.x(cx - 1), m.y(-1.75));
+  g.moveTo(m.x(cx + r), m.y(-r)); g.lineTo(m.x(cx + 1), m.y(-1.75));
+  g.moveTo(m.x(cx - 1), m.y(-1.75)); g.lineTo(m.x(cx + 1), m.y(-1.75));
+  g.stroke();
+  g.beginPath();
+  let first = true;
+  for (let i = 0; i <= 24; i++) {
+    const t = -r + (2 * r) * i / 24;
+    const yv = -r + r * Math.sqrt(Math.max(0, 1 - (t / r) * (t / r)));
+    const X = m.x(cx + t), Y = m.y(Math.min(yv, 0));
+    if (first) { g.moveTo(X, Y); first = false; } else { g.lineTo(X, Y); }
+  }
+  g.stroke();
+}
+
+function drawFig2() {
+  const W = 470, H = 400;
+  const c = document.getElementById("fig2Canvas");
+  const g = setupCanvas(c, W, H);
+  const m = makeMapper(W, H, -22, 22, -5, 31);
+  g.clearRect(0, 0, W, H);
+
+  drawPinSmall(g, m, -w1, 0.75);
+  drawPinSmall(g, m, w1, 0.7);
+
+  const hl = 12, hw = 4.5;
+  function memArrow(a, b, style) {
+    const x1 = m.x(a[0]), y1 = m.y(a[1]);
+    const x2 = m.x(b[0]), y2 = m.y(b[1]);
+    const ang = Math.atan2(y2 - y1, x2 - x1);
+    g.strokeStyle = "#000"; g.lineWidth = 2.2;
+    g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke();
+    if (style === "out") {
+      arrowHead(g, x2, y2, ang, hl, hw, "#000");
+      arrowHead(g, x1, y1, ang + Math.PI, hl, hw, "#000");
+    } else if (style === "in") {
+      const xa = x1 + 0.315 * (x2 - x1), ya = y1 + 0.315 * (y2 - y1);
+      const xb = x1 + 0.675 * (x2 - x1), yb = y1 + 0.675 * (y2 - y1);
+      arrowHead(g, xa, ya, ang, hl, hw, "#000");
+      arrowHead(g, xb, yb, ang + Math.PI, hl, hw, "#000");
+    }
+  }
+  /* outward-arrowhead members */
+  memArrow([-7, 0], [-7, 12], "out"); memArrow([-7, 12], [-7, 19], "out");
+  memArrow([-7, 19], [-18, 26], "out"); memArrow([-7, 12], [0, 12], "out");
+  memArrow([-7, 19], [0, 19], "out"); memArrow([0, 19], [7, 19], "out");
+  memArrow([0, 19], [7, 12], "out"); memArrow([7, 12], [7, 19], "out");
+  memArrow([7, 19], [18, 26], "out"); memArrow([7, 19], [0, 26], "out");
+  memArrow([7, 0], [7, 12], "out");
+  /* inward-arrowhead members */
+  memArrow([-7, 0], [0, 12], "in"); memArrow([0, 12], [7, 12], "in");
+  memArrow([-7, 12], [0, 19], "in"); memArrow([-7, 19], [0, 26], "in");
+  memArrow([-18, 26], [0, 26], "in"); memArrow([0, 26], [18, 26], "in");
+  /* plain line */
+  memArrow([0, 12], [7, 0], "line");
+
+  /* angle arcs (Mathematica angles: CCW from +x axis; canvas y is flipped) */
+  function arc(cx, cy, rad, a1, a2) {
+    g.strokeStyle = "#000"; g.lineWidth = 1.4;
+    g.beginPath();
+    g.arc(m.x(cx), m.y(cy), rad * m.s, -a1, -a2, a2 > a1);
+    g.stroke();
+  }
+  function thetaLabel(sub, x, y, off) {
+    g.textBaseline = "middle";
+    g.font = "italic 16px Helvetica, Arial, sans-serif";
+    const wA = g.measureText("\u03B8").width;
+    g.font = "12px Helvetica, Arial, sans-serif";
+    const wB = g.measureText(sub).width;
+    const bw = wA + wB + 2, bh = 18;
+    const cx = m.x(x) - off[0] * bw / 2;
+    const cy = m.y(y) + off[1] * bh / 2;
+    g.fillStyle = "#000";
+    g.textAlign = "left";
+    g.font = "italic 16px Helvetica, Arial, sans-serif";
+    g.fillText("\u03B8", cx - bw / 2, cy);
+    g.font = "12px Helvetica, Arial, sans-serif";
+    g.fillText(sub, cx - bw / 2 + wA, cy + 5);
+  }
+  g.strokeStyle = "#000";
+  /* theta1 at A and B, with short horizontal helper lines */
+  arc(-7, 0, 2, 0, th1);
+  g.lineWidth = 1.6; g.beginPath(); g.moveTo(m.x(-7), m.y(0)); g.lineTo(m.x(-4.5), m.y(0)); g.stroke();
+  thetaLabel("1", -5, 0, [-1, -1]);
+  arc(7, 0, 2, Math.PI, Math.PI - th1);
+  g.beginPath(); g.moveTo(m.x(7), m.y(0)); g.lineTo(m.x(4.5), m.y(0)); g.stroke();
+  thetaLabel("1", 5, 0, [1, -1]);
+  /* theta3 arcs at K (0,12), J (0,19), F (0,26) */
+  arc(0, 12, 2, Math.PI, 4.123340357836604);  thetaLabel("3", -2, 12, [1, 1.5]);
+  arc(0, 12, 2, 0, -0.9817477042468103);      thetaLabel("3", 2, 12, [-1, 1.5]);
+  arc(0, 19, 2, Math.PI, 4.123340357836604);  thetaLabel("3", -2, 19, [1, 1.5]);
+  arc(0, 19, 2, 0, -Math.PI / 4);             thetaLabel("3", 2, 19, [-1, 1.5]);
+  arc(0, 26, 2, Math.PI, 4.123340357836604);  thetaLabel("3", -2, 26, [1, 1.5]);
+  arc(0, 26, 2, 0, -Math.PI / 4);             thetaLabel("3", 2, 26, [-1, 1.5]);
+  /* theta2 arcs at G and E */
+  arc(-18, 26, 2, -th2, 0);                   thetaLabel("2", -16, 26, [-1.2, 1]);
+  arc(18, 26, 2, Math.PI, Math.PI + th2);     thetaLabel("2", 16, 26, [1.2, 1]);
+
+  /* joint dots */
+  for (const p of [[-7, -0.56], [7, -0.56], [-7, 12], [7, 12], [-7, 19], [7, 19], [-18, 26], [18, 26], [0, 12], [0, 19], [0, 26]]) {
+    const x = m.x(p[0]), y = m.y(p[1]);
+    g.fillStyle = "#000"; g.beginPath(); g.arc(x, y, 5, 0, 2 * Math.PI); g.fill();
+    g.fillStyle = "#fff"; g.beginPath(); g.arc(x, y, 2.8, 0, 2 * Math.PI); g.fill();
+  }
+}
+
+/* ================= panel logic ================= */
+const panels = ["panelDirections", "panelDetails", "panelAbout"];
+let detailsDrawn = false;
+function openPanel(id) {
+  for (const p of panels) {
+    document.getElementById(p).classList.toggle("open", p === id);
+  }
+  if (id === "panelDetails") {
+    if (!detailsDrawn) {
+      drawFig1();
+      drawFig2();
+      detailsDrawn = true;
+    }
+    if (window.MathJax && MathJax.typesetPromise) {
+      MathJax.typesetPromise([document.getElementById("panelDetails")]);
+    }
+  }
+}
+function closePanel(id) { document.getElementById(id).classList.remove("open"); }
+
+document.getElementById("btnDirections").addEventListener("click", () => {
+  const p = document.getElementById("panelDirections");
+  p.classList.contains("open") ? closePanel("panelDirections") : openPanel("panelDirections");
+});
+document.getElementById("btnDetails").addEventListener("click", () => {
+  const p = document.getElementById("panelDetails");
+  p.classList.contains("open") ? closePanel("panelDetails") : openPanel("panelDetails");
+});
+document.getElementById("btnAbout").addEventListener("click", () => {
+  const p = document.getElementById("panelAbout");
+  p.classList.contains("open") ? closePanel("panelAbout") : openPanel("panelAbout");
+});
+document.querySelectorAll(".close-x").forEach(b => {
+  b.addEventListener("click", () => closePanel(b.dataset.close));
+});
+
+/* ================= hover: show member number ================= */
+const tip = document.getElementById("memberTip");
+function distToSeg(px, py, x1, y1, x2, y2) {
+  const dx = x2 - x1, dy = y2 - y1;
+  let t = ((px - x1) * dx + (py - y1) * dy) / (dx * dx + dy * dy);
+  t = Math.max(0, Math.min(1, t));
+  return Math.hypot(px - (x1 + t * dx), py - (y1 + t * dy));
+}
+canvas.addEventListener("mousemove", (e) => {
+  const rect = canvas.getBoundingClientRect();
+  const px = e.clientX - rect.left, py = e.clientY - rect.top;
+  let best = null, bestD = 8;   /* pick tolerance in px */
+  for (const mb of members) {
+    const d = distToSeg(px, py, M.x(mb.p[0][0]), M.y(mb.p[0][1]), M.x(mb.p[1][0]), M.y(mb.p[1][1]));
+    if (d < bestD) { bestD = d; best = mb; }
+  }
+  if (best) {
+    tip.textContent = "member " + best.k.slice(1);
+    tip.style.display = "block";
+    tip.style.left = (canvas.offsetLeft + px + 14) + "px";
+    tip.style.top = (canvas.offsetTop + py - 30) + "px";
+    canvas.style.cursor = "pointer";
+  } else {
+    tip.style.display = "none";
+    canvas.style.cursor = "default";
+  }
+});
+canvas.addEventListener("mouseleave", () => { tip.style.display = "none"; canvas.style.cursor = "default"; });
+
+/* ================= wire up controls ================= */
+for (const id of ["FExSlider", "FEySlider", "FGSlider"]) {
+  document.getElementById(id).addEventListener("input", draw);
+}
+document.getElementById("labelCheck").addEventListener("change", draw);
+
+draw();
+</script>
+</body>
+</html>

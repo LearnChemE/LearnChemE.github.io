@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Frictional Pressure Drop in a Pipe</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(','\\)']], displayMath: [['$$','$$']] },
+  chtml: { displayAlign: 'left', displayIndent: '0em' }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+<style>
+  :root{
+    --red:#98000D;
+    --red-dark:#7a000a;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family: Helvetica, Arial, sans-serif;
+    color:#000000;
+    background:#ffffff;
+    padding:22px 16px 40px;
+  }
+  h1{
+    font-size:22px;
+    text-align:center;
+    margin:0 0 18px;
+    font-weight:bold;
+  }
+  .sim-wrap{
+    max-width:780px;
+    margin:0 auto;
+  }
+  .top-bar{
+    position:relative;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:16px;
+    flex-wrap:wrap;
+    margin-bottom:18px;
+    padding-right:34px;
+  }
+  .btn-row-top{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .plot-type-row{
+    display:flex;
+    justify-content:flex-end;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  .btn-row-top button,
+  .plot-type-row button{
+    background:var(--red);
+    color:#ffffff;
+    border:none;
+    border-radius:5px;
+    padding:9px 16px;
+    font-size:15px;
+    font-weight:normal;
+    font-family:inherit;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .btn-row-top button:hover,
+  .plot-type-row button:hover{
+    background:var(--red-dark);
+  }
+  .btn-row-top button.active,
+  .plot-type-row button.active{
+    background:var(--red-dark);
+  }
+  .main-row{
+    display:flex;
+    gap:30px;
+    align-items:flex-start;
+    position:relative;
+    flex-wrap:wrap;
+  }
+  .left-col{
+    flex:0 0 290px;
+    position:relative;
+  }
+  .right-col{
+    flex:0 1 460px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    min-width:300px;
+  }
+  .slider-block{
+    margin-bottom:16px;
+  }
+  .slider-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    font-size:17px;
+    font-weight:normal;
+    margin-bottom:3px;
+  }
+  .slider-top .name{
+    color:#000000;
+  }
+  .slider-top .value{
+    font-variant-numeric:tabular-nums;
+    color:#000000;
+    white-space:nowrap;
+    margin-left:10px;
+  }
+  input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+  input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+
+  .panel{
+    position:absolute;
+    top:100%;
+    left:0;
+    margin-top:10px;
+    width:840px;
+    max-width:calc(100vw - 40px);
+    max-height:440px;
+    background:#ffffff;
+    border:1px solid #cccccc;
+    border-radius:7px;
+    box-shadow:0 8px 22px rgba(0,0,0,.22);
+    z-index:60;
+    display:none;
+    font-size:16px;
+    line-height:1.55;
+  }
+  .panel.open{ display:block; }
+  .panel .close-x{
+    position:absolute;
+    top:8px;
+    right:14px;
+    cursor:pointer;
+    font-size:22px;
+    color:#777;
+    font-weight:bold;
+    line-height:1;
+    user-select:none;
+    z-index:2;
+  }
+  .panel .close-x:hover{ color:#222; }
+  .panel-inner{
+    max-height:440px;
+    overflow-y:auto;
+    padding:20px 26px 22px;
+  }
+  .panel h3{
+    margin:0 0 10px;
+    color:var(--red);
+    font-size:19px;
+  }
+  .panel p{ margin:0 0 10px; }
+  .eq{
+    margin:14px 0;
+    text-align:left;
+  }
+  .symlist{
+    margin:14px 0 4px;
+    padding:0;
+    list-style:none;
+  }
+  .symlist li{
+    margin:4px 0;
+  }
+  .panel a{ color:var(--red); text-decoration:underline; }
+  .panel a:hover{ color:var(--red-dark); }
+
+  .result-box{
+    border:1px solid #999999;
+    border-radius:5px;
+    padding:12px 18px;
+    margin-bottom:12px;
+    font-size:17px;
+    font-weight:normal;
+    text-align:left;
+    background:#ffffff;
+    display:inline-block;
+    width:auto;
+    max-width:100%;
+    color:#000000;
+  }
+  .result-box div{ margin:3px 0; }
+
+  canvas{
+    max-width:100%;
+    display:block;
+  }
+
+  @media (max-width:760px){
+    .main-row{ flex-direction:column; }
+    .left-col{ flex:0 0 auto; width:100%; }
+    .panel{ width:100%; max-width:100%; }
+  }
+</style>
+</head>
+<body>
+<div class="sim-wrap">
+  <h1>Frictional Pressure Drop in a Pipe</h1>
+
+  <div class="top-bar" id="topBar">
+    <div class="btn-row-top">
+      <button id="btn-directions" type="button">Directions</button>
+      <button id="btn-details" type="button">Details</button>
+      <button id="btn-about" type="button">About</button>
+    </div>
+    <div class="plot-type-row" id="plotTypeRow">
+      <button type="button" class="plot-type-btn active" data-plot="1">f vs. <i>Re</i></button>
+      <button type="button" class="plot-type-btn" data-plot="2">&Delta;<i>P<sub>f</sub></i> vs. <i>Q</i></button>
+      <button type="button" class="plot-type-btn" data-plot="3">&Delta;<i>P<sub>f</sub></i> vs. <i>D</i></button>
+      <button type="button" class="plot-type-btn" data-plot="4">&Delta;<i>P<sub>f</sub></i> vs. <i>L</i></button>
+    </div>
+
+    <div class="panel" id="panel-directions">
+      <span class="close-x" data-close="panel-directions">&times;</span>
+      <div class="panel-inner">
+      <h3>Directions</h3>
+      <p>This simulation calculates and displays the pressure drop in a pipe due to friction as a function of the liquid&rsquo;s volumetric flow rate, the pipe&rsquo;s diameter, length, and degree of roughness, and the liquid&rsquo;s density and viscosity. It also calculates and displays the liquid&rsquo;s mass flow rate, the Reynolds number, and the corresponding friction factor. You can choose one of the following plots to display: the friction factor versus Reynolds number (Moody diagram) or the pressure drop versus the flow rate, the pipe&rsquo;s diameter, or its length.</p>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-details">
+      <span class="close-x" data-close="panel-details">&times;</span>
+      <div class="panel-inner">
+      <h3>Details</h3>
+      <p>The average velocity in the pipe is</p>
+      <div class="eq">$$u=\dfrac{4Q}{\pi D^{2}}$$</div>
+      <p>and the Reynolds number is</p>
+      <div class="eq">$$Re=\dfrac{\rho\,u\,D}{\mu}$$</div>
+      <p>The (Darcy) friction factor, used in the Moody diagram, is obtained from</p>
+      <div class="eq">$$f=\dfrac{64}{Re}\ \ \text{for } Re\le 3000 \text{ (laminar flow)}$$</div>
+      <div class="eq">$$\dfrac{1}{\sqrt{f}}=-2\log_{10}\!\left(\dfrac{\varepsilon/D}{3.7}+\dfrac{2.51}{Re\sqrt{f}}\right)\ \ \text{for } Re>3000 \text{ (turbulent flow, Colebrook equation)}$$</div>
+      <p>and the frictional pressure drop is given by the Darcy&ndash;Weisbach equation</p>
+      <div class="eq">$$\Delta P_{f}=f\,\dfrac{L}{D}\,\dfrac{\rho\,u^{2}}{2}$$</div>
+      <p>The mass flow rate is</p>
+      <div class="eq">$$\dot m=\rho\,Q$$</div>
+      <p><b>Definitions of symbols</b></p>
+      <ul class="symlist">
+        <li><i>Q</i> &ndash; volumetric flow rate (m<sup>3</sup>/min)</li>
+        <li><i>D</i> &ndash; pipe diameter (cm)</li>
+        <li><i>L</i> &ndash; pipe length (m)</li>
+        <li><i>&epsilon;/D</i> &ndash; relative pipe roughness (dimensionless)</li>
+        <li><i>&rho;</i> &ndash; liquid density (kg/m<sup>3</sup>)</li>
+        <li><i>&mu;</i> &ndash; liquid viscosity (Pa&middot;s)</li>
+        <li><i>u</i> &ndash; average liquid velocity in the pipe (m/s)</li>
+        <li><i>Re</i> &ndash; Reynolds number (dimensionless)</li>
+        <li><i>f</i> &ndash; Darcy (Moody) friction factor (dimensionless); note this is four times the Fanning friction factor</li>
+        <li>&Delta;<i>P<sub>f</sub></i> &ndash; frictional pressure drop (kPa)</li>
+        <li><i>&#7745;</i> &ndash; mass flow rate (kg/min)</li>
+      </ul>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-about">
+      <span class="close-x" data-close="panel-about">&times;</span>
+      <div class="panel-inner">
+      <h3>About</h3>
+      <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/FrictionalPressureDropInAPipe/" target="_blank" rel="noopener">Mathematica simulation</a> by Mark D. Normand and Micha Peleg. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-row" id="mainRow">
+    <div class="left-col" id="leftCol">
+      <div class="slider-block">
+        <div class="slider-top"><span class="name">volumetric flow rate, Q (m&sup3;/min)</span><span class="value" id="val-Q"></span></div>
+        <input type="range" id="slider-Q" min="0.01" max="5" step="0.01" value="1.5">
+      </div>
+      <div class="slider-block">
+        <div class="slider-top"><span class="name">pipe diameter, D (cm)</span><span class="value" id="val-D"></span></div>
+        <input type="range" id="slider-D" min="1" max="50" step="0.1" value="4">
+      </div>
+      <div class="slider-block">
+        <div class="slider-top"><span class="name">pipe length, L (m)</span><span class="value" id="val-L"></span></div>
+        <input type="range" id="slider-L" min="0" max="100" step="0.1" value="20">
+      </div>
+      <div class="slider-block">
+        <div class="slider-top"><span class="name">roughness index, &epsilon;/D</span><span class="value" id="val-eps"></span></div>
+        <input type="range" id="slider-eps" min="0" max="0.05" step="0.0005" value="0">
+      </div>
+      <div class="slider-block">
+        <div class="slider-top"><span class="name">density, &rho; (kg/m&sup3;)</span><span class="value" id="val-rho"></span></div>
+        <input type="range" id="slider-rho" min="500" max="1500" step="0.01" value="910">
+      </div>
+      <div class="slider-block">
+        <div class="slider-top"><span class="name">viscosity, &mu; (Pa&middot;s)</span><span class="value" id="val-mu"></span></div>
+        <input type="range" id="slider-mu" min="0.0001" max="1.5" step="0.0001" value="0.084">
+      </div>
+    </div>
+
+    <div class="right-col">
+      <div class="result-box" id="resultBox"></div>
+      <canvas id="plotCanvas" style="width:460px;height:360px;"></canvas>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var state = { Q:1.5, D:4, L:20, eps:0, rho:910, mu:0.084, plotType:1 };
+
+  var vfrMin=0.01, vfrMax=5, diamMin=1, diamMax=50, lenMin=0, lenMax=100;
+  var dPfMin=0, dPfMax=20000;
+
+  function velocity(Q, D_cm){
+    var D = D_cm/100;
+    return 4*(Q/60)/(Math.PI*D*D);
+  }
+  function reynolds(D_cm, Q, rho, mu){
+    var D = D_cm/100;
+    return D*velocity(Q,D_cm)*rho/mu;
+  }
+  function frictionFactorFromRe(Re, eps){
+    if(Re<=3000) return 64/Re;
+    var f = 0.25/Math.pow(Math.log10(eps/3.7+5.74/Math.pow(Re,0.9)),2);
+    for(var i=0;i<50;i++){
+      var rhs = -2*Math.log10(eps/3.7+2.51/(Re*Math.sqrt(f)));
+      f = 1/(rhs*rhs);
+    }
+    return f;
+  }
+  function frictionFactor(D_cm,Q,rho,mu,eps){
+    return frictionFactorFromRe(reynolds(D_cm,Q,rho,mu), eps);
+  }
+  function pressureDropKPa(D_cm,Q,rho,mu,eps,L){
+    var D = D_cm/100;
+    var u = velocity(Q,D_cm);
+    var f = frictionFactor(D_cm,Q,rho,mu,eps);
+    return f*(L/D)*(rho*u*u/2)/1000;
+  }
+  function massFlowRate(Q,rho){ return Q*rho; }
+
+  function fmtInt(v, maxDigits){
+    var r = Math.round(v);
+    return r.toLocaleString('en-US');
+  }
+  function fmtFixed(v, dec){
+    return v.toFixed(dec);
+  }
+  function sigFigStr(v, sig){
+    if(v === 0) return (0).toFixed(0);
+    var exp = Math.floor(Math.log10(Math.abs(v)));
+    var decimals = sig - exp - 1;
+    var factor = Math.pow(10, decimals);
+    var rounded = Math.round(v*factor)/factor;
+    var outDecimals = Math.max(decimals, 0);
+    return rounded.toFixed(outDecimals);
+  }
+  function fmtSci(v, sig){
+    if(v === 0) return '0';
+    var exp = Math.floor(Math.log10(Math.abs(v)));
+    var mantissa = v/Math.pow(10,exp);
+    mantissa = parseFloat(mantissa.toFixed(sig-1));
+    if(Math.abs(mantissa) >= 10){ mantissa = mantissa/10; exp += 1; }
+    return mantissa.toFixed(sig-1) + ' &times; 10<sup>' + exp + '</sup>';
+  }
+  function fmtRe(v){
+    return (v > 1000) ? fmtSci(v,3) : fmtInt(v);
+  }
+  function fmtDP(v){
+    return (v > 1000) ? fmtSci(v,3) : fmtInt(v);
+  }
+
+  function updateResultBox(){
+    var Re = reynolds(state.D, state.Q, state.rho, state.mu);
+    var f = frictionFactor(state.D, state.Q, state.rho, state.mu, state.eps);
+    var dP = pressureDropKPa(state.D, state.Q, state.rho, state.mu, state.eps, state.L);
+    var mfr = massFlowRate(state.Q, state.rho);
+    document.getElementById('resultBox').innerHTML =
+      '<div>mass flow rate, m&#775; = <span class="num">' + fmtInt(mfr) + ' kg/min</span></div>' +
+      '<div>Reynolds number, <i>Re</i> = <span class="num">' + fmtRe(Re) + '</span></div>' +
+      '<div>friction factor, <i>f</i> = <span class="num">' + sigFigStr(f,3) + '</span></div>' +
+      '<div>pressure drop, &Delta;<i>P<sub>f</sub></i> = <span class="num">' + fmtDP(dP) + ' kPa</span></div>';
+    return {Re:Re, f:f, dP:dP};
+  }
+
+  function fmtVal(id, v){
+    var el = document.getElementById(id);
+    el.textContent = v;
+  }
+
+  function syncSliderLabels(){
+    fmtVal('val-Q', state.Q.toFixed(2));
+    fmtVal('val-D', state.D.toFixed(1));
+    fmtVal('val-L', state.L.toFixed(1));
+    fmtVal('val-eps', state.eps.toFixed(4));
+    fmtVal('val-rho', sigFigStr(state.rho,3));
+    fmtVal('val-mu', sigFigStr(state.mu,3));
+  }
+
+  // ---------- canvas plotting ----------
+  var canvas = document.getElementById('plotCanvas');
+
+  function setupCanvas(){
+    var dpr = window.devicePixelRatio || 1;
+    var cssW = canvas.clientWidth;
+    var cssH = canvas.clientHeight;
+    canvas.width = Math.round(cssW*dpr);
+    canvas.height = Math.round(cssH*dpr);
+    var ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    return {ctx:ctx, W:cssW, H:cssH};
+  }
+
+  function niceNum(range, round){
+    var exponent = Math.floor(Math.log10(range));
+    var fraction = range/Math.pow(10,exponent);
+    var niceFraction;
+    if(round){
+      if(fraction<1.5) niceFraction=1;
+      else if(fraction<3) niceFraction=2;
+      else if(fraction<7) niceFraction=5;
+      else niceFraction=10;
+    } else {
+      if(fraction<=1) niceFraction=1;
+      else if(fraction<=2) niceFraction=2;
+      else if(fraction<=5) niceFraction=5;
+      else niceFraction=10;
+    }
+    return niceFraction*Math.pow(10,exponent);
+  }
+  function niceTicks(min,max,count){
+    if(max<=min) return [min];
+    var range = niceNum(max-min, false);
+    var step = niceNum(range/(count-1), true);
+    var niceMin = Math.floor(min/step)*step;
+    var niceMax = Math.ceil(max/step)*step;
+    var ticks=[];
+    for(var v=niceMin; v<=niceMax+1e-9; v+=step){
+      if(v>=min-1e-9 && v<=max+1e-9) ticks.push(Math.abs(v)<1e-12?0:v);
+    }
+    return ticks;
+  }
+  function formatTick(v){
+    if(Math.abs(v)>=1000) return Math.round(v).toLocaleString('en-US');
+    if(Math.abs(v - Math.round(v))<1e-9) return String(Math.round(v));
+    if(Math.abs(v)>=1) return v.toFixed(1);
+    if(Math.abs(v)>=0.01) return v.toFixed(3).replace(/0+$/,'').replace(/\.$/,'');
+    return v.toPrecision(2);
+  }
+
+  function drawAxesFrame(ctx, W, H, m, xMin,xMax,yMin,yMax,xLabel,yLabel,xFmt,yFmt,yLabelX){
+    xFmt = xFmt || formatTick;
+    yFmt = yFmt || formatTick;
+    yLabelX = (yLabelX===undefined) ? 15 : yLabelX;
+    var plotW = W - m.left - m.right;
+    var plotH = H - m.top - m.bottom;
+
+    ctx.clearRect(0,0,W,H);
+
+    function toPx(x,y){
+      return [
+        m.left + (x-xMin)/(xMax-xMin)*plotW,
+        m.top + (1-(y-yMin)/(yMax-yMin))*plotH
+      ];
+    }
+
+    var xt = niceTicks(xMin,xMax,6);
+    var yt = niceTicks(yMin,yMax,6);
+
+    // small tick marks (light)
+    ctx.strokeStyle = '#888888';
+    ctx.lineWidth = 1;
+    xt.forEach(function(v){
+      var p = toPx(v,yMin);
+      ctx.beginPath();
+      ctx.moveTo(p[0], m.top+plotH);
+      ctx.lineTo(p[0], m.top+plotH+5);
+      ctx.stroke();
+    });
+    yt.forEach(function(v){
+      var p = toPx(xMin,v);
+      ctx.beginPath();
+      ctx.moveTo(m.left-5, p[1]);
+      ctx.lineTo(m.left, p[1]);
+      ctx.stroke();
+    });
+
+    // frame box (light gray)
+    ctx.strokeStyle = '#888888';
+    ctx.strokeRect(m.left+0.5, m.top+0.5, plotW, plotH);
+
+    // black x-axis and y-axis lines
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(m.left, m.top+plotH+0.5);
+    ctx.lineTo(m.left+plotW, m.top+plotH+0.5);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(m.left+0.5, m.top);
+    ctx.lineTo(m.left+0.5, m.top+plotH);
+    ctx.stroke();
+
+    ctx.fillStyle = '#000000';
+    ctx.font = '17px Helvetica, Arial, sans-serif';
+
+    // x tick labels
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    xt.forEach(function(v){
+      var p = toPx(v,yMin);
+      ctx.fillText(xFmt(v), p[0], m.top+plotH+8);
+    });
+
+    // y tick labels
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    yt.forEach(function(v){
+      var p = toPx(xMin,v);
+      ctx.fillText(yFmt(v), m.left-8, p[1]);
+    });
+
+    // x label
+    ctx.font = '17px Helvetica, Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText(xLabel, m.left+plotW/2, H-6);
+
+    // y label
+    ctx.save();
+    ctx.translate(yLabelX, m.top+plotH/2);
+    ctx.rotate(-Math.PI/2);
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText(yLabel, 0, 0);
+    ctx.restore();
+
+    return {toPx:toPx, plotW:plotW, plotH:plotH};
+  }
+
+  function plotCurve(ctx, toPx, xMin,xMax,yMin,yMax, fn, color, nsamp){
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    var drawing = false;
+    ctx.beginPath();
+    for(var i=0;i<=nsamp;i++){
+      var x = xMin + (xMax-xMin)*i/nsamp;
+      var y = fn(x);
+      var visible = isFinite(y) && y>=yMin && y<=yMax;
+      if(visible){
+        var p = toPx(x,y);
+        if(!drawing){ ctx.moveTo(p[0],p[1]); drawing = true; }
+        else ctx.lineTo(p[0],p[1]);
+      } else {
+        drawing = false;
+      }
+    }
+    ctx.stroke();
+  }
+
+  function drawPointMarker(ctx, toPx, x, y, yMin, yMax, xMin, xMax, color){
+    if(!isFinite(y) || y<yMin || y>yMax || x<xMin || x>xMax) return;
+    var p = toPx(x,y);
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(p[0], p[1], 4.5, 0, 2*Math.PI);
+    ctx.fill();
+  }
+
+  function drawPlot1(ctx, W, H){
+    var Re = reynolds(state.D, state.Q, state.rho, state.mu);
+    var fCurr0 = frictionFactor(state.D, state.Q, state.rho, state.mu, state.eps);
+    var ReMin, ReMax;
+    if(Re<=10000){ ReMin=0; ReMax=10000; }
+    else { ReMin=3000; ReMax=500000; }
+
+    var fMaxDefault = 0.10;
+    var fMax;
+    if(fCurr0 <= fMaxDefault){
+      fMax = fMaxDefault;
+    } else {
+      fMax = niceNum(fCurr0*1.1, true);
+      if(fMax <= fCurr0) fMax = niceNum(fCurr0*1.3, true);
+    }
+    function fFmt(v){ return v.toFixed(2); }
+
+    var SUP_DIGITS = {'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹','-':'⁻'};
+    function toSup(n){
+      return String(n).split('').map(function(ch){ return SUP_DIGITS[ch] || ch; }).join('');
+    }
+    function reFmt(v){
+      if(Math.abs(v) >= 100000){
+        var exp = Math.floor(Math.log10(Math.abs(v)));
+        var mantissa = Math.round(v/Math.pow(10,exp));
+        return mantissa + '×10' + toSup(exp);
+      }
+      return formatTick(v);
+    }
+
+    var m = {left:66, right:34, top:14, bottom:52};
+    var frame = drawAxesFrame(ctx, W, H, m, ReMin, ReMax, 0, fMax, 'Reynolds number', 'friction factor', reFmt, fFmt);
+    var toPx = frame.toPx;
+
+    // transition-region shading (2100-4000)
+    var x0 = Math.max(2100, ReMin), x1 = Math.min(4000, ReMax);
+    if(x1>x0){
+      var pTL = toPx(x0, fMax), pBR = toPx(x1, 0);
+      ctx.fillStyle = 'rgba(255,182,193,0.55)';
+      ctx.fillRect(pTL[0], pTL[1], pBR[0]-pTL[0], pBR[1]-pTL[1]);
+    }
+    // dashed lines at 3000 and 4000
+    ctx.strokeStyle = '#696969';
+    ctx.setLineDash([5,4]);
+    [3000,4000].forEach(function(xv){
+      if(xv>=ReMin && xv<=ReMax){
+        var pa = toPx(xv,0), pb = toPx(xv,fMax);
+        ctx.beginPath();
+        ctx.moveTo(pa[0],pa[1]);
+        ctx.lineTo(pb[0],pb[1]);
+        ctx.stroke();
+      }
+    });
+    ctx.setLineDash([]);
+
+    // curve
+    plotCurve(ctx, toPx, Math.max(ReMin,1), ReMax, 0, fMax, function(x){ return frictionFactorFromRe(x, state.eps); }, '#98000D', 400);
+
+    // transition region label + arrows (only meaningful when domain is 0-10000)
+    if(ReMax===10000){
+      var yLab = fMax*0.88;
+      var pLab = toPx(6400, yLab);
+      ctx.fillStyle = '#000000';
+      ctx.font = '16.5px Helvetica, Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('transition region', pLab[0], pLab[1]);
+
+      ctx.strokeStyle = '#000000';
+      ctx.lineWidth = 1.5;
+      function arrow(x0a,x1a,y){
+        var pa = toPx(x0a,y), pb = toPx(x1a,y);
+        ctx.beginPath();
+        ctx.moveTo(pa[0],pa[1]);
+        ctx.lineTo(pb[0],pb[1]);
+        ctx.stroke();
+        var ang = Math.atan2(pb[1]-pa[1], pb[0]-pa[0]);
+        var ah = 6;
+        ctx.beginPath();
+        ctx.moveTo(pb[0],pb[1]);
+        ctx.lineTo(pb[0]-ah*Math.cos(ang-Math.PI/6), pb[1]-ah*Math.sin(ang-Math.PI/6));
+        ctx.lineTo(pb[0]-ah*Math.cos(ang+Math.PI/6), pb[1]-ah*Math.sin(ang+Math.PI/6));
+        ctx.closePath();
+        ctx.fillStyle='#000000';
+        ctx.fill();
+      }
+      arrow(1500,2100,yLab);
+      arrow(4600,4000,yLab);
+    }
+
+    // current point
+    drawPointMarker(ctx, toPx, Re, fCurr0, 0, fMax, ReMin, ReMax, '#98000D');
+  }
+
+  function drawPlotVs(ctx, W, H, varName, xMin, xMax, xLabel, color, currX){
+    function fn(x){
+      var D = state.D, Q = state.Q, L = state.L;
+      if(varName==='Q') Q = x;
+      else if(varName==='D') D = x;
+      else if(varName==='L') L = x;
+      return pressureDropKPa(D, Q, state.rho, state.mu, state.eps, L);
+    }
+    var sampleMin = (varName==='Q') ? Math.max(vfrMin, 1e-6) : (varName==='D' ? diamMin : Math.max(lenMin,1e-6));
+
+    // dynamic y-axis scale: use the default 20,000 kPa cap unless the
+    // curve's actual peak over this domain is under 3000 kPa, in which
+    // case zoom in to 3000 kPa so smaller changes are easier to see.
+    var domainMax = 0;
+    var nProbe = 200;
+    for(var i=0;i<=nProbe;i++){
+      var xv = sampleMin + (xMax-sampleMin)*i/nProbe;
+      var yv = fn(xv);
+      if(isFinite(yv) && yv>domainMax) domainMax = yv;
+    }
+    var yMax = (domainMax < 3000) ? 3000 : dPfMax;
+
+    var m = {left:92, right:16, top:14, bottom:52};
+    var frame = drawAxesFrame(ctx, W, H, m, 0, xMax, dPfMin, yMax, xLabel, 'pressure drop (kPa)', formatTick, formatTick, 22);
+    var toPx = frame.toPx;
+
+    plotCurve(ctx, toPx, sampleMin, xMax, dPfMin, yMax, fn, color, 400);
+
+    var yCurr = pressureDropKPa(state.D, state.Q, state.rho, state.mu, state.eps, state.L);
+    drawPointMarker(ctx, toPx, currX, yCurr, dPfMin, yMax, 0, xMax, color);
+  }
+
+  function redrawPlot(){
+    var setup = setupCanvas();
+    var ctx = setup.ctx, W = setup.W, H = setup.H;
+    if(state.plotType===1){
+      drawPlot1(ctx, W, H);
+    } else if(state.plotType===2){
+      drawPlotVs(ctx, W, H, 'Q', 0, vfrMax, 'volumetric flow rate (m³/min)', '#1E90FF', state.Q);
+    } else if(state.plotType===3){
+      drawPlotVs(ctx, W, H, 'D', 0, diamMax, 'pipe diameter (cm)', '#046A38', state.D);
+    } else if(state.plotType===4){
+      drawPlotVs(ctx, W, H, 'L', 0, lenMax, 'pipe length (m)', '#FF8C00', state.L);
+    }
+  }
+
+  function update(){
+    updateResultBox();
+    syncSliderLabels();
+    redrawPlot();
+  }
+
+  // ---------- wiring ----------
+  document.getElementById('slider-Q').addEventListener('input', function(e){ state.Q = parseFloat(e.target.value); update(); });
+  document.getElementById('slider-D').addEventListener('input', function(e){ state.D = parseFloat(e.target.value); update(); });
+  document.getElementById('slider-L').addEventListener('input', function(e){ state.L = parseFloat(e.target.value); update(); });
+  document.getElementById('slider-eps').addEventListener('input', function(e){ state.eps = parseFloat(e.target.value); update(); });
+  document.getElementById('slider-rho').addEventListener('input', function(e){ state.rho = parseFloat(e.target.value); update(); });
+  document.getElementById('slider-mu').addEventListener('input', function(e){ state.mu = parseFloat(e.target.value); update(); });
+
+  Array.prototype.forEach.call(document.querySelectorAll('.plot-type-btn'), function(btn){
+    btn.addEventListener('click', function(e){
+      state.plotType = parseInt(btn.getAttribute('data-plot'),10);
+      Array.prototype.forEach.call(document.querySelectorAll('.plot-type-btn'), function(b){
+        b.classList.remove('active');
+      });
+      btn.classList.add('active');
+      update();
+    });
+  });
+
+  window.addEventListener('resize', function(){ redrawPlot(); });
+
+  // ---------- panels ----------
+  var panelIds = ['panel-directions','panel-details','panel-about'];
+  var btnMap = { 'btn-directions':'panel-directions', 'btn-details':'panel-details', 'btn-about':'panel-about' };
+
+  function closeAllPanels(){
+    panelIds.forEach(function(id){
+      document.getElementById(id).classList.remove('open');
+    });
+    Object.keys(btnMap).forEach(function(bid){
+      document.getElementById(bid).classList.remove('active');
+    });
+  }
+
+  Object.keys(btnMap).forEach(function(bid){
+    document.getElementById(bid).addEventListener('click', function(){
+      var pid = btnMap[bid];
+      var panel = document.getElementById(pid);
+      var willOpen = !panel.classList.contains('open');
+      closeAllPanels();
+      if(willOpen){
+        panel.classList.add('open');
+        document.getElementById(bid).classList.add('active');
+      }
+    });
+  });
+
+  Array.prototype.forEach.call(document.querySelectorAll('.close-x'), function(x){
+    x.addEventListener('click', function(){
+      closeAllPanels();
+    });
+  });
+
+  document.addEventListener('click', function(e){
+    var topBar = document.getElementById('topBar');
+    if(!topBar.contains(e.target)){
+      closeAllPanels();
+    }
+  });
+
+  // init
+  update();
+})();
+</script>
+</body>
+</html>

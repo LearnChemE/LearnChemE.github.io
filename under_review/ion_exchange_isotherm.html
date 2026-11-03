@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ion Exchange Isotherm</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+  chtml: { displayAlign: 'left', displayIndent: '1em' },
+  startup: { typeset: false }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js" async></script>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: #fff; }
+  body {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 17px;
+    color: #000;
+  }
+  #app {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 16px 16px 24px;   /* title on top keeps controls below the top 40 px */
+  }
+  /* left edge of the control rows lines up with the y-axis label */
+  .toprow { position: relative; padding-left: 30px; }
+  .row1, .row2 {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 20px;
+  }
+  .row2 { margin-top: 12px; justify-content: space-between; flex-wrap: nowrap; column-gap: 10px; }
+  .row2 .left { display: flex; align-items: center; gap: 16px; white-space: nowrap; }
+  h1.title { font-size: 20px; font-weight: bold; margin: 0 0 16px; line-height: 1.3; }
+  #xL, #logK { width: 119px; }
+  #Kval { min-width: 79px; }
+  .row1 { column-gap: 6px; justify-content: space-between; }
+  .row1 .right { display: flex; align-items: center; gap: 8px; }
+  .row1 .ctl { gap: 6px; }
+  .btns { display: flex; gap: 8px; }
+  #xval { min-width: 36px; }
+  #readout { font-size: 18.7px; min-width: 0; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .ctl { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .ctl .val { min-width: 84px; font-variant-numeric: tabular-nums; }
+  button.lc {
+    background: #98000D;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-family: inherit;
+    font-size: 17px;
+    font-weight: normal;
+    cursor: pointer;
+  }
+  button.lc:hover { background: #7a000a; }
+  button.lc:focus-visible { outline: 2px solid #000; outline-offset: 2px; }
+  label.chk { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+  label.chk input { width: 17px; height: 17px; accent-color: #98000D; margin: 0; }
+
+  /* range slider */
+  input[type=range] {
+    -webkit-appearance: none; appearance: none;
+    width: 140px; height: 18px; background: transparent; margin: 0;
+  }
+  input[type=range]:focus { outline: none; }
+  input[type=range]::-webkit-slider-runnable-track { height: 5px; background: #bbb; border-radius: 3px; }
+  input[type=range]::-moz-range-track { height: 5px; background: #bbb; border-radius: 3px; }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: #98000D; border: none; margin-top: -5.5px; cursor: pointer;
+  }
+  input[type=range]::-moz-range-thumb {
+    width: 16px; height: 16px; border-radius: 50%;
+    background: #98000D; border: none; cursor: pointer;
+  }
+  input[type=range]:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 3px rgba(152,0,13,0.3); }
+
+
+  /* flyout panels */
+  .panel {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 30px;
+    z-index: 20;
+    background: #fff;
+    border: 1px solid #888;
+    border-radius: 6px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+    padding: 14px 40px 14px 18px;
+    width: max-content;
+    max-width: min(640px, calc(100vw - 32px));
+    line-height: 1.4;
+  }
+  .panel h3 { margin: 0 0 8px; font-size: 17px; color: #000; }
+  .panel p { margin: 0 0 10px; }
+  .panel p:last-child { margin-bottom: 0; }
+  .panel .close {
+    position: absolute; top: 6px; right: 8px;
+    background: none; border: none; font-size: 24px; line-height: 1;
+    cursor: pointer; color: #000; padding: 2px 6px;
+  }
+  #details { padding-right: 18px; }
+  #details .scroll { max-height: 60vh; overflow-y: auto; padding-right: 26px; }
+  #details .close { right: 14px; }
+  #details mjx-container[display="true"] { text-align: left !important; margin: 0.2em 0 !important; }
+  #details p { margin: 0 0 4px; }
+  .panel a { color: #98000D; }
+  .sym { margin: 0; padding-left: 0; list-style: none; }
+  .sym li { margin-bottom: 4px; }
+
+  .plotwrap { margin-top: 16px; }
+  canvas { display: block; max-width: 100%; touch-action: none; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="toprow">
+    <h1 class="title">Ion Exchange Isotherm for Cs<sup>+</sup>/Na<sup>+</sup> on Crystalline Silicotitanate</h1>
+    <div class="row1">
+      <div class="ctl">
+        <span>K<sub>C</sub></span>
+        <input type="range" id="logK" min="-4" max="4" step="0.01" value="0.48" aria-label="log10 of selectivity coefficient">
+        <span class="val" id="Kval"></span>
+      </div>
+      <div class="right">
+      <div class="ctl">
+        <span>liquid fraction</span>
+        <input type="range" id="xL" min="0" max="1" step="0.01" value="0.3" aria-label="Cs+ equivalent fraction in liquid">
+        <span class="val" id="xval"></span>
+      </div>
+      <button class="lc" id="bAbt">About</button>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="left">
+        <label class="chk"><input type="checkbox" id="family"> show family of curves</label>
+        <span id="readout"></span>
+      </div>
+      <div class="btns">
+        <button class="lc" id="bDir">Directions</button>
+        <button class="lc" id="bDet">Details</button>
+      </div>
+    </div>
+
+    <div class="panel" id="directions" hidden>
+      <button class="close" aria-label="close">&times;</button>
+      <h3>Directions</h3>
+      <p>This simulation shows the equilibrium isotherm for exchange of Cs<sup>+</sup> for Na<sup>+</sup> on a crystalline silicotitanate (CST) ion exchanger, which is used to remove radioactive cesium from nuclear waste. The isotherm plots the equivalent fraction of Cs<sup>+</sup> in the solid versus the equivalent fraction of Cs<sup>+</sup> in the liquid, for an ideal solid and constant selectivity coefficient K<sub>C</sub>.</p>
+      <p>Use the K<sub>C</sub> slider to change the selectivity coefficient on a log scale from 10<sup>&minus;4</sup> to 10<sup>4</sup>. For K<sub>C</sub> &gt; 1 the solid prefers Cs<sup>+</sup> and the isotherm is favorable (concave down); for K<sub>C</sub> = 1 it is the diagonal; for K<sub>C</sub> &lt; 1 the solid prefers Na<sup>+</sup> and the isotherm is unfavorable (concave up). The reported value for Cs<sup>+</sup>/Na<sup>+</sup> on CST is about 10<sup>4</sup>.</p>
+      <p>Use the liquid fraction slider to move the point along the isotherm and read the equilibrium solid fraction. Check "show family of curves" to see isotherms for each decade of K<sub>C</sub> at once. Move a mouse over an isotherm to identify its K<sub>C</sub> value.</p>
+    </div>
+
+    <div class="panel" id="details" hidden>
+      <button class="close" aria-label="close">&times;</button>
+      <div class="scroll">
+        <h3>Details</h3>
+        <p>Ion exchange of Cs<sup>+</sup> from the liquid with Na<sup>+</sup> in the solid (both singly charged) is a stoichiometric process:</p>
+        \[ \mathrm{Cs^+} + \overline{\mathrm{Na^+}} \rightleftharpoons \overline{\mathrm{Cs^+}} + \mathrm{Na^+} \]
+        <p>where the overbar denotes the solid phase. The selectivity coefficient (concentration-based equilibrium constant) is</p>
+        \[ K_C = \frac{Q_{\mathrm{Cs}}\,C_{\mathrm{Na}}}{Q_{\mathrm{Na}}\,C_{\mathrm{Cs}}} \]
+        <p>For ion exchange the total equivalent concentration in each phase is fixed, so</p>
+        \[ Q_{\mathrm{Cs}} + Q_{\mathrm{Na}} = Q_0, \qquad C_{\mathrm{Cs}} + C_{\mathrm{Na}} = C_0 \]
+        <p>Defining equivalent fractions in the liquid and solid,</p>
+        \[ X = \frac{C_{\mathrm{Cs}}}{C_0}, \qquad \bar{X} = \frac{Q_{\mathrm{Cs}}}{Q_0} \]
+        <p>and substituting gives the binary ion exchange isotherm:</p>
+        \[ \bar{X} = \frac{K_C\,X}{1 + (K_C - 1)\,X} \]
+        <p>Because each Cs<sup>+</sup> that enters the solid displaces one Na<sup>+</sup>, the isotherm always passes through (0, 0) and (1, 1), unlike an adsorption isotherm. The shape is concave down (favorable) for K<sub>C</sub> &gt; 1, the diagonal for K<sub>C</sub> = 1, and concave up (unfavorable) for K<sub>C</sub> &lt; 1. The isotherm for K<sub>C</sub> is the mirror image of that for 1/K<sub>C</sub> about the line \( \bar{X} = 1 - X \).</p>
+        <p>At low loading the isotherm reduces to Henry's law:</p>
+        \[ \bar{X} = K_C\,X \]
+        <p>and for K<sub>C</sub> &gt;&gt; 1 it takes the form of the Langmuir isotherm:</p>
+        \[ \bar{X} = \frac{K_C\,X}{1 + K_C\,X} \]
+        <p>Zheng et al. measured K<sub>C</sub> &asymp; 1.0 &times; 10<sup>4</sup> for Cs<sup>+</sup>/Na<sup>+</sup> on CST (TAM-5) in 5.1 M NaNO<sub>3</sub> with 0.6 M NaOH, and 1.8 &times; 10<sup>4</sup> in 5.7 M NaNO<sub>3</sub>. This very high selectivity lets CST remove trace Cs<sup>+</sup> from wastes that are nearly saturated with Na<sup>+</sup>. The solid behaves ideally below its apparent Cs<sup>+</sup> capacity (0.57 mequiv/g); at higher loadings step changes appear in the measured isotherms, which this ideal model does not describe.</p>
+        <p>Reference: Z. Zheng, C. V. Philip, R. G. Anthony, J. L. Krumhansl, D. E. Trudell, and J. E. Miller, "Ion Exchange of Group I Metals by Hydrous Crystalline Silicotitanates," <i>Ind. Eng. Chem. Res.</i> <b>35</b>, 4246&ndash;4256 (1996).</p>
+        <h3>Symbols</h3>
+        <ul class="sym">
+          <li>\( C_{\mathrm{Cs}}, C_{\mathrm{Na}} \) = liquid-phase concentrations of Cs<sup>+</sup> and Na<sup>+</sup> (equiv/L)</li>
+          <li>\( C_0 \) = total equivalent concentration in the liquid (equiv/L)</li>
+          <li>\( K_C \) = selectivity coefficient (dimensionless)</li>
+          <li>\( Q_{\mathrm{Cs}}, Q_{\mathrm{Na}} \) = solid-phase concentrations of Cs<sup>+</sup> and Na<sup>+</sup> (mequiv/g)</li>
+          <li>\( Q_0 \) = ion exchange capacity of the solid (mequiv/g)</li>
+          <li>\( X \) = equivalent fraction of Cs<sup>+</sup> in the liquid</li>
+          <li>\( \bar{X} \) = equivalent fraction of Cs<sup>+</sup> in the solid</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="panel" id="about" hidden>
+      <button class="close" aria-label="close">&times;</button>
+      <h3>About</h3>
+      <p>This simulation was created in the <a href="https://www.colorado.edu/chbe/" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="https://learncheme.com/" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.</p>
+    </div>
+  </div>
+
+
+  <div class="plotwrap">
+    <canvas id="cv"></canvas>
+  </div>
+</div>
+
+<script>
+(function () {
+  const RED = '#98000D';
+  const BLUE = '#1f4fb4';
+  const GRAY = '#777';
+  const FONT = 'Helvetica, Arial, sans-serif';
+
+  const cv = document.getElementById('cv');
+  const ctx = cv.getContext('2d');
+  const sK = document.getElementById('logK');
+  const sX = document.getElementById('xL');
+  const cbFam = document.getElementById('family');
+
+  const W0 = 640, H0 = 580;
+  let W = W0, H = H0, scale = 1;
+  const M = { l: 96, r: 24, t: 20, b: 80 };
+  const AXF = 18.5;   // axis label font size
+  const LBF = 18.4;   // K_C label font size
+  let dprNow = 1;
+  let hoverE = null;  // decade exponent of hovered family curve
+
+  function iso(K, x) { return K * x / (1 + (K - 1) * x); }
+
+  function fmtK(lg) {
+    const K = Math.pow(10, lg);
+    if (Math.abs(lg) < 1e-9) return { m: '1.0', e: null };
+    let e = Math.floor(lg + 1e-9);
+    let m = K / Math.pow(10, e);
+    if (m >= 9.95) { m = 1; e += 1; }
+    if (e === 0) return { m: m.toFixed(1), e: null };
+    return { m: m.toFixed(1), e: e };
+  }
+  function kHTML(lg) {
+    const f = fmtK(lg);
+    if (f.e === null) return f.m;
+    return f.m + ' &times; 10<sup>' + (f.e < 0 ? '&minus;' + (-f.e) : f.e) + '</sup>';
+  }
+
+  /* canvas rich text: parts = [[text, 'n'|'sub'|'sup'], ...] */
+  function richWidth(parts, size, g) {
+    g = g || ctx;
+    let w = 0;
+    for (const [t, k] of parts) {
+      g.font = (k === 'n' ? size : Math.round(size * 0.72)) + 'px ' + FONT;
+      w += g.measureText(t).width;
+    }
+    return w;
+  }
+  function richText(parts, x, y, size, color, align, g) {
+    g = g || ctx;
+    const w = richWidth(parts, size, g);
+    let cx = align === 'right' ? x - w : align === 'center' ? x - w / 2 : x;
+    g.fillStyle = color;
+    g.textAlign = 'left';
+    g.textBaseline = 'alphabetic';
+    for (const [t, k] of parts) {
+      const s = k === 'n' ? size : Math.round(size * 0.72);
+      g.font = s + 'px ' + FONT;
+      const dy = k === 'sub' ? size * 0.25 : k === 'sup' ? -size * 0.42 : 0;
+      g.fillText(t, cx, y + dy);
+      cx += g.measureText(t).width;
+    }
+    return w;
+  }
+  function kParts(lg) {
+    const f = fmtK(lg);
+    const p = [['K', 'n'], ['C', 'sub'], [' = ' + f.m, 'n']];
+    if (f.e !== null) {
+      p.push([' × 10', 'n']);
+      p.push([(f.e < 0 ? '−' + (-f.e) : String(f.e)), 'sup']);
+    }
+    return p;
+  }
+
+  function resize() {
+    const avail = cv.parentElement.clientWidth;
+    W = Math.min(W0, avail);
+    H = Math.round(W * H0 / W0);
+    scale = W / W0;
+    const dpr = window.devicePixelRatio || 1;
+    dprNow = dpr;
+    cv.style.width = W + 'px';
+    cv.style.height = H + 'px';
+    cv.width = Math.round(W * dpr);
+    cv.height = Math.round(H * dpr);
+    ctx.setTransform(dpr * scale, 0, 0, dpr * scale, 0, 0);
+    const plotRight = cv.getBoundingClientRect().left + (W0 - M.r) * scale;
+    document.querySelectorAll('.row1, .row2').forEach(r => {
+      r.style.width = Math.max(0, plotRight - r.getBoundingClientRect().left) + 'px';
+    });
+    draw();
+  }
+
+  const PW = () => W0 - M.l - M.r;
+  const PH = () => H0 - M.t - M.b;
+  const px = x => M.l + x * PW();
+  const py = y => M.t + (1 - y) * PH();
+
+  function curvePath(K) {
+    ctx.beginPath();
+    const N = 600;
+    for (let i = 0; i <= N; i++) {
+      // cluster points near x = 0 for very large K and near x = 1 for very small K
+      const u = i / N;
+      const x = u;
+      const y = iso(K, x);
+      if (i === 0) ctx.moveTo(px(x), py(y)); else ctx.lineTo(px(x), py(y));
+    }
+    // add dense points near the ends so steep curves render smoothly
+  }
+  function curvePathDense(K) {
+    const xs = [];
+    for (let i = 0; i <= 400; i++) xs.push(i / 400);
+    for (let e = -6; e <= -2.5; e += 0.05) { xs.push(Math.pow(10, e)); xs.push(1 - Math.pow(10, e)); }
+    xs.sort((a, b) => a - b);
+    ctx.beginPath();
+    xs.forEach((x, i) => {
+      const y = iso(K, x);
+      if (i === 0) ctx.moveTo(px(x), py(y)); else ctx.lineTo(px(x), py(y));
+    });
+  }
+
+  function drawAxes() {
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 1.2;
+    ctx.strokeRect(M.l, M.t, PW(), PH());
+
+    ctx.font = '17.6px ' + FONT;
+    ctx.fillStyle = '#000';
+    for (let i = 0; i <= 5; i++) {
+      const v = i * 0.2;
+      const lab = v.toFixed(1);
+      // x ticks
+      const X = px(v);
+      ctx.beginPath(); ctx.moveTo(X, py(0)); ctx.lineTo(X, py(0) - 7); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(X, py(1)); ctx.lineTo(X, py(1) + 7); ctx.stroke();
+      ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+      ctx.fillText(lab, X, py(0) + 6);
+      // y ticks
+      const Y = py(v);
+      ctx.beginPath(); ctx.moveTo(px(0), Y); ctx.lineTo(px(0) + 7, Y); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(px(1), Y); ctx.lineTo(px(1) - 7, Y); ctx.stroke();
+      ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+      ctx.fillText(lab, px(0) - 6, Y);
+    }
+
+    // x label
+    const xParts = [['Cs', 'n'], ['+', 'sup'], [' equivalent fraction in liquid, X', 'n']];
+    richText(xParts, M.l + PW() / 2, H0 - 26, AXF, '#000', 'center');
+
+    // y label: rendered horizontally on an offscreen canvas at device resolution,
+    // then copied with an exact 90-degree rotation so it looks identical to the x label
+    const yParts = [['Cs', 'n'], ['+', 'sup'], [' equivalent fraction in solid, X̄', 'n']];
+    const dev = dprNow * scale;
+    const tw = richWidth(yParts, AXF);
+    const off = document.createElement('canvas');
+    off.width = Math.ceil((tw + 8) * dev);
+    off.height = Math.ceil((AXF * 1.8) * dev);
+    const og = off.getContext('2d');
+    og.setTransform(dev, 0, 0, dev, 0, 0);
+    richText(yParts, (tw + 8) / 2, AXF * 1.25, AXF, '#000', 'center', og);
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.translate(Math.round((M.l - 58) * dev), Math.round((M.t + PH() / 2) * dev));
+    ctx.rotate(-Math.PI / 2);
+    ctx.drawImage(off, -Math.round(off.width / 2), -Math.round(off.height / 2));
+    ctx.restore();
+  }
+
+  function labelBg(left, baseline, w) {
+    if (!cbFam.checked) return;
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(left - 3, baseline - LBF * 1.15, w + 6, LBF * 1.5);
+  }
+
+  function clampLabel(x, y, w, alignRight) {
+    let left = alignRight ? x - w : x;
+    left = Math.max(M.l + 6, Math.min(left, M.l + PW() - w - 6));
+    y = Math.max(M.t + 20, Math.min(y, M.t + PH() - 8));
+    return { x: alignRight ? left + w : left, y: y };
+  }
+
+  function draw() {
+    const lg = parseFloat(sK.value);
+    const K = Math.pow(10, lg);
+    const xL = parseFloat(sX.value);
+    const xS = iso(K, xL);
+
+    ctx.clearRect(0, 0, W0, H0);
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, W0, H0);
+
+    ctx.save();
+    ctx.beginPath(); ctx.rect(M.l, M.t, PW(), PH()); ctx.clip();
+
+    // family of curves
+    if (cbFam.checked) {
+      ctx.strokeStyle = '#b8b8b8';
+      ctx.lineWidth = 1.2;
+      for (let e = -4; e <= 4; e++) {
+        if (e === 0) continue;
+        ctx.strokeStyle = e === hoverE ? '#444' : '#b8b8b8';
+        ctx.lineWidth = e === hoverE ? 2.2 : 1.2;
+        curvePathDense(Math.pow(10, e));
+        ctx.stroke();
+      }
+    }
+
+    // diagonal K = 1
+    ctx.strokeStyle = GRAY;
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([6, 5]);
+    ctx.beginPath(); ctx.moveTo(px(0), py(0)); ctx.lineTo(px(1), py(1)); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // current isotherm
+    ctx.strokeStyle = BLUE;
+    ctx.lineWidth = 3;
+    curvePathDense(K);
+    ctx.stroke();
+
+    // operating point
+    ctx.strokeStyle = RED;
+    ctx.lineWidth = 1.2;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(px(xL), py(0)); ctx.lineTo(px(xL), py(xS)); ctx.lineTo(px(0), py(xS));
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+    ctx.fillStyle = RED;
+    ctx.beginPath(); ctx.arc(px(xL), py(xS), 6, 0, 2 * Math.PI); ctx.fill();
+
+    drawAxes();
+
+
+    // on-curve label for current isotherm
+    const parts = kParts(lg);
+    const w = richWidth(parts, LBF);
+    if (Math.abs(lg) >= 0.03) {
+      const xs = 1 / (1 + Math.sqrt(K));     // point of max distance from diagonal
+      const ys = iso(K, xs);
+      let X = px(xs), Y = py(ys), pos;
+      const fav = lg > 0;
+      const extreme = Math.abs(lg) > 1.4;
+      // place label in open space away from the curve
+      let alignRight, dx, dy;
+      if (fav && !extreme)      { alignRight = true;  dx = -24; dy = -22; }
+      else if (fav && extreme)  { alignRight = false; dx = 26;  dy = 46; }
+      else if (!fav && !extreme){ alignRight = false; dx = 14;  dy = 26; }
+      else                      { alignRight = true;  dx = -44; dy = -74; }
+      pos = clampLabel(X + dx, Y + dy, w, alignRight);
+      labelBg(alignRight ? pos.x - w : pos.x, pos.y, w);
+      richText(parts, pos.x, pos.y, LBF, BLUE, alignRight ? 'right' : 'left');
+
+      // diagonal label on the side opposite the curve
+      const dParts = [['K', 'n'], ['C', 'sub'], [' = 1', 'n']];
+      if (fav) richText(dParts, px(0.80) + 12, py(0.80) + 24, LBF, GRAY, 'left');
+      else     richText(dParts, px(0.80) - 12, py(0.80) - 12, LBF, GRAY, 'right');
+    } else {
+      labelBg(px(0.62) - 14 - w, py(0.62) - 14, w);
+      richText(parts, px(0.62) - 14, py(0.62) - 14, LBF, BLUE, 'right');
+    }
+    drawHover();
+  }
+
+  /* sampled family curves in canvas coordinates, for hit-testing */
+  const famPts = {};
+  (function () {
+    const xs = [];
+    for (let i = 0; i <= 400; i++) xs.push(i / 400);
+    for (let e = -6; e <= -2.5; e += 0.05) { xs.push(Math.pow(10, e)); xs.push(1 - Math.pow(10, e)); }
+    xs.sort((a, b) => a - b);
+    for (let e = -4; e <= 4; e++) {
+      const K = Math.pow(10, e);
+      famPts[e] = xs.map(x => [px(x), py(iso(K, x))]);
+    }
+  })();
+  function distToPolyline(pts, mx, my) {
+    let best = Infinity;
+    for (let i = 1; i < pts.length; i++) {
+      const [x1, y1] = pts[i - 1], [x2, y2] = pts[i];
+      const dx = x2 - x1, dy = y2 - y1, L = dx * dx + dy * dy;
+      let t = L > 0 ? ((mx - x1) * dx + (my - y1) * dy) / L : 0;
+      t = Math.max(0, Math.min(1, t));
+      const ex = x1 + t * dx - mx, ey = y1 + t * dy - my;
+      const d = ex * ex + ey * ey;
+      if (d < best) best = d;
+    }
+    return Math.sqrt(best);
+  }
+  let mouse = null;
+  function drawHover() {
+    if (hoverE === null || !mouse) return;
+    const parts = hoverE === 0
+      ? [['K', 'n'], ['C', 'sub'], [' = 1', 'n']]
+      : hoverE === 1
+      ? [['K', 'n'], ['C', 'sub'], [' = 10', 'n']]
+      : [['K', 'n'], ['C', 'sub'], [' = 10', 'n'], [hoverE < 0 ? '\u2212' + (-hoverE) : String(hoverE), 'sup']];
+    const w = richWidth(parts, LBF);
+    const bw = w + 14, bh = 31;
+    let bx = mouse[0] + 14, by = mouse[1] - bh - 10;
+    if (bx + bw > M.l + PW() - 2) bx = mouse[0] - bw - 14;
+    if (by < M.t + 2) by = mouse[1] + 14;
+    ctx.fillStyle = '#fff';
+    ctx.strokeStyle = '#888';
+    ctx.lineWidth = 1;
+    ctx.fillRect(bx, by, bw, bh);
+    ctx.strokeRect(bx + 0.5, by + 0.5, bw - 1, bh - 1);
+    richText(parts, bx + 7, by + 22, LBF, '#000', 'left');
+  }
+  cv.addEventListener('pointermove', ev => {
+    const r = cv.getBoundingClientRect();
+    const mx = (ev.clientX - r.left) / scale, my = (ev.clientY - r.top) / scale;
+    mouse = [mx, my];
+    let found = null;
+    if (cbFam.checked && mx >= M.l && mx <= M.l + PW() && my >= M.t && my <= M.t + PH()) {
+      let best = 8;
+      for (let e = -4; e <= 4; e++) {
+        const d = distToPolyline(famPts[e], mx, my);
+        if (d < best) { best = d; found = e; }
+      }
+    }
+    if (found !== hoverE) { hoverE = found; draw(); }
+    else if (found !== null) draw();
+    cv.style.cursor = found !== null ? 'pointer' : 'default';
+  });
+  cv.addEventListener('pointerleave', () => { mouse = null; if (hoverE !== null) { hoverE = null; draw(); } });
+
+  function update() {
+    if (!cbFam.checked) hoverE = null;
+    const lg = parseFloat(sK.value);
+    const K = Math.pow(10, lg);
+    const xL = parseFloat(sX.value);
+    document.getElementById('Kval').innerHTML = kHTML(lg);
+    document.getElementById('xval').textContent = xL.toFixed(2);
+    document.getElementById('readout').innerHTML =
+      'solid fraction = ' + iso(K, xL).toFixed(3);
+    draw();
+  }
+
+  sK.addEventListener('input', update);
+  sX.addEventListener('input', update);
+  cbFam.addEventListener('change', update);
+  window.addEventListener('resize', resize);
+
+  /* flyout panels */
+  const panels = { bDir: 'directions', bDet: 'details', bAbt: 'about' };
+  let typeset = false;
+  function closeAll(except) {
+    Object.values(panels).forEach(id => { if (id !== except) document.getElementById(id).hidden = true; });
+  }
+  Object.entries(panels).forEach(([b, id]) => {
+    document.getElementById(b).addEventListener('click', () => {
+      const p = document.getElementById(id);
+      const opening = p.hidden;
+      closeAll(id);
+      p.hidden = !opening;
+      if (opening && id === 'details' && !typeset && window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise([p]).then(() => { typeset = true; });
+      }
+      if (opening) clampPanel(p);
+    });
+    document.querySelector('#' + id + ' .close').addEventListener('click', () => {
+      document.getElementById(id).hidden = true;
+    });
+  });
+  function clampPanel(p) {
+    p.style.left = '';
+    const r = p.getBoundingClientRect();
+    if (r.right > window.innerWidth - 8) p.style.left = Math.max(0, 30 - (r.right - window.innerWidth + 8)) + 'px';
+  }
+
+  update();
+  resize();
+})();
+</script>
+</body>
+</html>

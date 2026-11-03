@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Force Balance on a Moving Cart</title>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['\\(', '\\)']], displayMath: [['$$', '$$']] },
+    chtml: { displayAlign: 'left', displayIndent: '0' },
+    startup: { typeset: false }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+<style>
+  :root{
+    --lc-red:#98000D;
+    --ink:#1a1a1a;
+    --panel-bg:#f7f7f5;
+    --panel-border:#d9d9d4;
+    --slider-font:17.25px; /* 15px base + 15% */
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;
+    color:var(--ink);
+    background:#ffffff;
+    -webkit-font-smoothing:antialiased;
+  }
+  #app{
+    max-width:720px;
+    margin:0 auto;
+    padding:16px 18px 28px;
+  }
+  h1{
+    font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight:700;
+    font-size:22px;
+    color:var(--lc-red);
+    text-align:center;
+    margin:4px 0 16px;
+    letter-spacing:.2px;
+  }
+
+  /* ---- sliders: 2 x 2 grid, matching the Manipulate layout ---- */
+  .controls{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px 28px;
+    margin-bottom:14px;
+  }
+  .ctrl{
+    display:grid;
+    grid-template-columns:auto 1fr auto;
+    align-items:center;
+    gap:10px;
+    font-size:var(--slider-font);
+  }
+  .ctrl .lbl{
+    white-space:nowrap;
+    text-align:right;
+  }
+  .ctrl .val{
+    font-variant-numeric:tabular-nums;
+    min-width:2.6em;
+    text-align:left;
+  }
+
+  /* ---- range sliders (LearnChemE standard) ---- */
+  input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+  input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+
+  /* ---- buttons ---- */
+  .buttons{
+    display:flex;
+    gap:10px;
+    margin:4px 0 6px;
+  }
+  .buttons button{
+    font-family:inherit;
+    font-size:15.4px;
+    padding:6px 16px;
+    color:#fff;
+    background:var(--lc-red);
+    border:none;
+    border-radius:4px;
+    cursor:pointer;
+    transition:background .15s;
+  }
+  .buttons button:hover{ background:#b3141f; }
+  .buttons button.active{ background:#6f000a; }
+
+  /* ---- panels ---- */
+  .panel{
+    position:relative;
+    display:none;
+    background:var(--panel-bg);
+    border:1px solid var(--panel-border);
+    border-radius:6px;
+    padding:16px 40px 16px 18px;
+    margin:6px 0 10px;
+    font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size:15px;
+    line-height:1.5;
+  }
+  .panel.open{ display:block; }
+  .panel .close{
+    position:absolute;
+    top:6px; right:8px;
+    width:24px; height:24px;
+    border:none;
+    background:transparent;
+    color:#555;
+    font-size:20px;
+    line-height:1;
+    cursor:pointer;
+    border-radius:4px;
+  }
+  .panel .close:hover{ color:#000; background:#e6e6e0; }
+  /* headings use the same font family and size as the panel text */
+  .panel h2{
+    margin:0 0 8px;
+    font-family:inherit;
+    font-size:inherit;
+    line-height:inherit;
+    font-weight:700;
+    color:#000;
+  }
+  .panel p{ margin:8px 0; }
+  .panel a{ color:var(--lc-red); text-decoration:none; }
+  .panel a:hover{ text-decoration:underline; }
+  .eqn{ margin:10px 0; }
+  .symbols{
+    list-style:none;
+    margin:6px 0 0;
+    padding:0;
+  }
+  .symbols li{ margin:3px 0; }
+
+  /* ---- canvas ---- */
+  .stage{ width:100%; margin-top:6px; }
+  canvas{ width:100%; height:auto; display:block; }
+</style>
+</head>
+<body>
+<div id="app">
+  <h1>Force Balance on a Moving Cart</h1>
+
+  <div class="controls">
+    <div class="ctrl">
+      <span class="lbl">angle (degrees)</span>
+      <input type="range" id="s-theta" min="0" max="45" step="1" value="25">
+      <span class="val" id="v-theta">25</span>
+    </div>
+    <div class="ctrl">
+      <span class="lbl">coefficient of friction</span>
+      <input type="range" id="s-mu" min="0" max="1" step="0.1" value="0.6">
+      <span class="val" id="v-mu">0.6</span>
+    </div>
+    <div class="ctrl">
+      <span class="lbl">mass (kg)</span>
+      <input type="range" id="s-m" min="10" max="25" step="1" value="25">
+      <span class="val" id="v-m">25</span>
+    </div>
+    <div class="ctrl">
+      <span class="lbl">acceleration (m/s<sup>2</sup>)</span>
+      <input type="range" id="s-a" min="1" max="5" step="0.1" value="1.3">
+      <span class="val" id="v-a">1.3</span>
+    </div>
+  </div>
+
+  <div class="buttons">
+    <button id="b-dir">Directions</button>
+    <button id="b-det">Details</button>
+    <button id="b-abt">About</button>
+  </div>
+
+  <div class="panel" id="p-dir">
+    <button class="close" aria-label="Close">&times;</button>
+    <h2>Directions</h2>
+    <p>This simulation calculates the tension required to pull a cart with an
+    acceleration that you vary with a slider. Force balances and Newton's second
+    law of motion are used to calculate the tension, normal force, and force due
+    to friction. Use the sliders to change the angle of the cable used to pull the
+    cart, the mass of the cart, and the coefficient of friction.</p>
+  </div>
+
+  <div class="panel" id="p-det">
+    <button class="close" aria-label="Close">&times;</button>
+    <h2>Details</h2>
+    <p>Force balances in the \(x\) and \(y\) directions:</p>
+    <div class="eqn">$$\sum F_x = m\,a = F_T\cos\theta - F_F,$$</div>
+    <div class="eqn">$$\sum F_y = 0 = F_N + F_T\sin\theta - m\,g,$$</div>
+    <p>where the force due to friction is</p>
+    <div class="eqn">$$F_F = \mu F_N.$$</div>
+    <p>Symbols:</p>
+    <ul class="symbols">
+      <li>\(a\) = acceleration of the cart (m/s\(^2\))</li>
+      <li>\(F_F\) = force due to friction (N)</li>
+      <li>\(F_N\) = normal force pushing up on the cart (N)</li>
+      <li>\(F_T\) = force of tension (N)</li>
+      <li>\(F_x, F_y\) = forces in the \(x\) and \(y\) directions (N)</li>
+      <li>\(g\) = acceleration due to gravity, 9.8 m/s\(^2\)</li>
+      <li>\(m\) = mass of the cart (kg)</li>
+      <li>\(\theta\) = angle of elevation of the rope pulling the cart (degrees)</li>
+      <li>\(\mu\) = coefficient of friction</li>
+    </ul>
+  </div>
+
+  <div class="panel" id="p-abt">
+    <button class="close" aria-label="Close">&times;</button>
+    <h2>About</h2>
+    <p>This simulation was created in the
+    <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a>
+    at University of Colorado Boulder for
+    <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a>
+    by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a
+    <a href="https://demonstrations.wolfram.com/ForceBalanceOnAMovingCart/" target="_blank" rel="noopener">Mathematica simulation</a>
+    by Rachael L. Baumann. It was prepared with financial support from the National
+    Science Foundation (DUE 2336987 and 2336988). Address any questions or comments
+    to <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.</p>
+  </div>
+
+  <div class="stage">
+    <canvas id="cv"></canvas>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- state ----------
+  var state = { theta:25, mu:0.6, m:25, a:1.3 };
+  var G = 9.8;
+
+  // ---------- physics ----------
+  function solve(s){
+    var th = s.theta*Math.PI/180;
+    var FT = s.m*(s.a + s.mu*G)/(Math.cos(th) + s.mu*Math.sin(th));
+    var FN = s.m*G - FT*Math.sin(th);
+    var FF = s.mu*FN;
+    var W  = s.m*G;
+    return { FT:FT, FN:FN, FF:FF, W:W };
+  }
+  // arrow-length scale: weight at m=25 (=245 N) maps to 5 world units
+  function fscale(F){ return 5*Math.abs(F)/245; }
+
+  // ---------- cart geometry (world units, from the Mathematica source) ----------
+  var w1=5, w2=0.5, h1=3, h2=0.5, r=0.75;
+  // plot range
+  var XMIN=-7.5, XMAX=15, YMIN=-6.5, YMAX=3.75;
+
+  // ---------- canvas / DPI ----------
+  var cv = document.getElementById('cv');
+  var ctx = cv.getContext('2d');
+  var cssW=600, cssH=350, sc=1, ox=0, oy=0, fontPx=17;
+
+  function layout(){
+    var wrapW = document.querySelector('.stage').clientWidth || 600;
+    cssW = Math.max(320, Math.min(700, wrapW));
+    cssH = cssW * (YMAX-YMIN)/(XMAX-XMIN);   // preserve plot-range aspect ratio
+    var dpr = window.devicePixelRatio || 1;
+    cv.style.width = cssW+'px';
+    cv.style.height = cssH+'px';
+    cv.width  = Math.round(cssW*dpr);
+    cv.height = Math.round(cssH*dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    // uniform world->px scale that fits the plot range, centered
+    sc = Math.min(cssW/(XMAX-XMIN), cssH/(YMAX-YMIN));
+    ox = (cssW - sc*(XMAX-XMIN))/2 - sc*XMIN;
+    oy = cssH - ((cssH - sc*(YMAX-YMIN))/2 - sc*YMIN);
+    fontPx = 17*(cssW/600);
+  }
+  function PX(x){ return ox + sc*x; }
+  function PY(y){ return oy - sc*y; }
+
+  // ---------- drawing helpers ----------
+  function rect(x0,y0,x1,y1,fill,edge){
+    ctx.beginPath();
+    ctx.rect(PX(x0), PY(y1), sc*(x1-x0), sc*(y1-y0));
+    if(fill){ ctx.fillStyle=fill; ctx.fill(); }
+    if(edge){ ctx.lineWidth=2.5; ctx.strokeStyle=edge; ctx.stroke(); }
+  }
+  function disk(cx,cy,rad,fill){
+    ctx.beginPath();
+    ctx.arc(PX(cx), PY(cy), sc*rad, 0, 2*Math.PI);
+    ctx.fillStyle=fill; ctx.fill();
+    ctx.lineWidth=2.5; ctx.strokeStyle='#000'; ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(PX(cx), PY(cy), Math.max(1.6, sc*0.06), 0, 2*Math.PI);
+    ctx.fillStyle='#000'; ctx.fill();
+  }
+  function segment(x0,y0,x1,y1,lw){
+    ctx.beginPath();
+    ctx.moveTo(PX(x0),PY(y0)); ctx.lineTo(PX(x1),PY(y1));
+    ctx.lineWidth=lw||1; ctx.strokeStyle='#000'; ctx.stroke();
+  }
+  function arrow(x0,y0,x1,y1){
+    var p0x=PX(x0), p0y=PY(y0), p1x=PX(x1), p1y=PY(y1);
+    var ang=Math.atan2(p1y-p0y, p1x-p0x);
+    var head=Math.max(7, sc*0.42);
+    ctx.lineWidth=Math.max(2.4, sc*0.10);
+    ctx.strokeStyle='#000'; ctx.fillStyle='#000';
+    ctx.beginPath();
+    ctx.moveTo(p0x,p0y);
+    ctx.lineTo(p1x - head*0.55*Math.cos(ang), p1y - head*0.55*Math.sin(ang));
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(p1x,p1y);
+    ctx.lineTo(p1x - head*Math.cos(ang-0.42), p1y - head*Math.sin(ang-0.42));
+    ctx.lineTo(p1x - head*Math.cos(ang+0.42), p1y - head*Math.sin(ang+0.42));
+    ctx.closePath(); ctx.fill();
+  }
+  // Mathematica-style text with offset {ox,oy} in [-1,1]; optional white bg
+  function label(lines, x, y, offx, offy, bg){
+    ctx.font = fontPx+'px "Helvetica Neue", Helvetica, Arial, sans-serif';
+    ctx.textAlign = offx<0 ? 'left' : (offx>0 ? 'right':'center');
+    ctx.textBaseline = 'middle';
+    var lh = fontPx*1.2;
+    var px = PX(x), py = PY(y);
+    var n = lines.length;
+    // vertical block placement from offset: offy=-1 block above point, +1 below, 0 centered
+    var totalH = n*lh;
+    var topY;
+    if(offy>0){ topY = py + lh/2; }
+    else if(offy<0){ topY = py - totalH + lh/2; }
+    else { topY = py - totalH/2 + lh/2; }
+    if(bg){
+      var wmax=0;
+      for(var i=0;i<n;i++){ wmax=Math.max(wmax, ctx.measureText(lines[i]).width); }
+      var bx = offx<0 ? px : (offx>0 ? px-wmax : px-wmax/2);
+      ctx.fillStyle='#fff';
+      ctx.fillRect(bx-3, topY-lh/2-1, wmax+6, totalH+2);
+    }
+    ctx.fillStyle='#000';
+    for(var j=0;j<n;j++){ ctx.fillText(lines[j], px, topY + j*lh); }
+  }
+
+  // ---------- main render ----------
+  function draw(){
+    layout();
+    ctx.clearRect(0,0,cssW,cssH);
+
+    var f = solve(state);
+    var th = state.theta*Math.PI/180;
+    var ct=Math.cos(th), st=Math.sin(th);
+
+    // ground line
+    segment(-w2-2, -2*r, w1+w2+2, -2*r, Math.max(1.4, sc*0.05));
+
+    // cart body (cyan) and base (dark gray)
+    rect(0, h2, w1, h1+h2, '#00FFFF', '#000');
+    rect(-w2, 0, w1+w2, h2, '#666666', '#000');
+    // wheels
+    disk(r/2, -r, r, '#999999');
+    disk(w1-r/2, -r, r, '#999999');
+
+    // ----- weight (down) -----
+    var wL=fscale(f.W);
+    arrow(0.5*w1, h2+0.5*h1, 0.5*w1, h2+0.5*h1 - wL);
+    label(['weight = '+Math.round(f.W)+' N'], 0.5*w1, h2+0.5*h1, 0, -1);
+
+    // ----- normal (two arrows, up) -----
+    var nL=fscale(f.FN);
+    arrow(r/2,        -r - nL, r/2,        -1.5*r);
+    arrow(w1-r/2,     -r - nL, w1-r/2,     -1.5*r);
+    label(['normal = '+Math.round(f.FN)+' N'], 0.5*w1, -r - nL, 0, 1);
+
+    // ----- friction (left) -----
+    var fL=fscale(f.FF);
+    arrow(-w2, -r, -w2 - fL, -r);
+    label(['friction', Math.round(f.FF)+' N'], -w2 - fL, -r, 1, 0);
+
+    // ----- tension (up-right at angle) -----
+    var tL=fscale(f.FT);
+    var ax=w1+w2, ay=0.5*h2;
+    var tx=ax + tL*ct, ty=ay + tL*st;
+    arrow(ax, ay, tx, ty);
+    label(['tension', Math.round(f.FT)+' N'], tx, ty, -1, (state.theta===0?0:-1));
+
+    // ----- angle indicator -----
+    if(state.theta>0){
+      segment(ax, ay, ax+1.5, ay, Math.max(1, sc*0.03));
+      // arc from 0 to theta, radius 1, centered at (ax,ay)
+      ctx.beginPath();
+      ctx.arc(PX(ax), PY(ay), sc*1, 0, -th, true); // canvas y is flipped -> negative angle
+      ctx.lineWidth=Math.max(1, sc*0.03); ctx.strokeStyle='#000'; ctx.stroke();
+      // angle value label near the arc, white background
+      var mid=th/2;
+      label([Math.round(state.theta)+'\u00B0'], ax+1.35*Math.cos(mid), ay+1.35*Math.sin(mid), 0, 0, true);
+    }
+  }
+
+  // ---------- controls wiring ----------
+  function fmt(id, v){
+    if(id==='mu' || id==='a') return v.toFixed(1);
+    return String(Math.round(v));
+  }
+  function bindSlider(id, key){
+    var s=document.getElementById('s-'+id), out=document.getElementById('v-'+id);
+    function upd(){
+      state[key]=parseFloat(s.value);
+      out.textContent=fmt(id, state[key]);
+      draw();
+    }
+    s.addEventListener('input', upd);
+    upd();
+  }
+  bindSlider('theta','theta');
+  bindSlider('mu','mu');
+  bindSlider('m','m');
+  bindSlider('a','a');
+
+  // ---------- panels ----------
+  var panels={ dir:document.getElementById('p-dir'), det:document.getElementById('p-det'), abt:document.getElementById('p-abt') };
+  var btns={ dir:document.getElementById('b-dir'), det:document.getElementById('b-det'), abt:document.getElementById('b-abt') };
+  function closeAll(){
+    for(var k in panels){ panels[k].classList.remove('open'); btns[k].classList.remove('active'); }
+  }
+  function toggle(k){
+    var isOpen=panels[k].classList.contains('open');
+    closeAll();
+    if(!isOpen){
+      panels[k].classList.add('open');
+      btns[k].classList.add('active');
+      if(k==='det' && window.MathJax && MathJax.typesetPromise){ MathJax.typesetPromise([panels.det]); }
+    }
+  }
+  btns.dir.addEventListener('click', function(){ toggle('dir'); });
+  btns.det.addEventListener('click', function(){ toggle('det'); });
+  btns.abt.addEventListener('click', function(){ toggle('abt'); });
+  for(var k in panels){
+    (function(p){ p.querySelector('.close').addEventListener('click', closeAll); })(panels[k]);
+  }
+
+  window.addEventListener('resize', draw);
+  draw();
+})();
+</script>
+</body>
+</html>

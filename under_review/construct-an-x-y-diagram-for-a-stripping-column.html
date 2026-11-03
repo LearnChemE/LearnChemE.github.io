@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Construct an x-y Diagram for a Stripping Column</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    font-family: Helvetica, Arial, sans-serif;
+    background: #ffffff;
+  }
+  #app {
+    width: 640px;
+    margin: 8px auto 30px auto;
+    position: relative;
+  }
+  /* ---------- control bar ---------- */
+  #controls {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;          /* wrap instead of overlapping */
+    gap: 6px 8px;
+    padding: 4px 0 6px 0;
+    position: relative;
+    font-size: 14px;
+  }
+  button.mma {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    font-weight: normal;
+    padding: 3px 10px;
+    border: 1px solid #9a9a9a;
+    border-radius: 4px;
+    background: linear-gradient(#fdfdfd, #e8e8e8);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  button.mma:hover { background: linear-gradient(#ffffff, #dcdcdc); }
+  button.mma:active { background: #d5d5d5; }
+  #stepLabel {
+    font-size: 16px;
+    white-space: nowrap;
+  }
+  #controls > * { flex-shrink: 0; }   /* no shrinking -> no overlap */
+  label.chk {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 14px;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+  }
+  label.chk input { cursor: pointer; margin: 0 2px 0 0; }
+  label.chk.disabled, label.chk.disabled input { cursor: default; color: #888; }
+  #solutionLbl, #hintLbl { font-size: 16px; }
+  #panelButtons {
+    margin-left: auto;
+    display: flex;
+    gap: 6px;
+    position: relative;
+  }
+  button.panelBtn {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 15px;   /* +15% */
+    font-weight: normal;
+    color: #ffffff;
+    background: #98000D;
+    border: 1px solid #7a000a;
+    border-radius: 4px;
+    padding: 5px 12px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  button.panelBtn:hover { background: #b00010; }
+  /* ---------- gas flow rate slider row ---------- */
+  #sliderRow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 2px 0 4px 2px;
+    font-size: 16px;
+  }
+  #sliderRow input[type=number] {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    width: 64px;
+    padding: 2px 5px;
+    border: 1px solid #999;
+    border-radius: 4px;
+  }
+  /* ---------- canvases ---------- */
+  #canvasRow {
+    display: flex;
+    align-items: flex-start;
+  }
+  canvas { display: block; }
+  #diagramCanvas.dragging { cursor: grabbing; }
+  /* ---------- flyout panels ---------- */
+  .flyout {
+    position: absolute;
+    top: 38px;             /* opens below the (taller) buttons ...     */
+    right: 0;              /* ... extending to the left of the button  */
+    width: 540px;
+    max-height: 460px;
+    overflow-y: auto;
+    background: #ffffff;
+    border: 1px solid #888;
+    border-radius: 6px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+    padding: 14px 18px 14px 16px;
+    font-size: 14px;
+    line-height: 1.45;
+    z-index: 50;
+    display: none;
+    text-align: left;
+  }
+  .flyout.open { display: block; }
+  .flyout h2 {
+    margin: 0 24px 8px 0;
+    font-size: 16px;
+    font-weight: bold;
+    color: #98000D;
+  }
+  .flyout p { margin: 6px 0; }
+  .flyout .eq { margin: 8px 0 8px 18px; }
+  .closeX {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    width: 22px;
+    height: 22px;
+    line-height: 20px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+    color: #444;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    background: #f2f2f2;
+    cursor: pointer;
+  }
+  .closeX:hover { background: #e0e0e0; color: #000; }
+  .flyout a { color: #0645ad; text-decoration: none; }
+  .flyout a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- ============ control bar ============ -->
+  <div id="controls">
+    <button class="mma" id="newProblemBtn">new problem</button>
+    <span id="stepLabel">1. Liquid flow rate.</span>
+    <button class="mma" id="nextBtn">next</button>
+    <label class="chk" id="solutionLbl"><input type="checkbox" id="solutionChk">solution</label>
+    <label class="chk" id="hintLbl"><input type="checkbox" id="hintChk">hint</label>
+    <label class="chk" id="graphicLbl"><input type="checkbox" id="graphicChk">show column</label>
+    <span id="panelButtons">
+      <button class="panelBtn" id="directionsBtn">Directions</button>
+      <button class="panelBtn" id="detailsBtn">Details</button>
+      <button class="panelBtn" id="aboutBtn">About</button>
+      <!-- ============ flyout panels ============ -->
+      <div class="flyout" id="directionsPanel">
+        <div class="closeX" data-close="directionsPanel">&#215;</div>
+        <h2>Directions</h2>
+        <p>In this simulation, a trayed stripping column is used to remove an impurity from a
+        liquid feed by stripping the impurity into a gas stream. A stage is a plate that contacts
+        the liquid solvent and the gas to promote mass transfer. Construct an
+        <i>x</i>-<i>y</i> diagram step by step to determine the number of stages needed to achieve
+        a certain separation. The operating line is obtained from a mass balance, and the phase
+        equilibrium line is obtained from Henry's law. At any time, click the "new problem" button
+        to generate a new set of conditions. Check "solution" to see the answer before clicking
+        "next" to move on to the next step. Once you check "solution," you cannot change your
+        answer. Once you click "next," you cannot go back to the previous steps. Check "hint" for
+        help at any stage.</p>
+      </div>
+      <div class="flyout" id="detailsPanel">
+        <div class="closeX" data-close="detailsPanel">&#215;</div>
+        <h2>Details</h2>
+        <p>The equilibrium line is calculated using Henry's law:</p>
+        <div class="eq">$y_{\mathrm{eq}} = \dfrac{H}{P}\,x,$</div>
+        <div class="eq">$H = H^0 \, e^{-\frac{E}{R}\left(\frac{1}{T}-\frac{1}{T_0}\right)},$</div>
+        <p>where $H$ is Henry's constant (atm), $P$ is pressure (atm), $H^0$ is Henry's constant
+        at $T_0 = 298\,\mathrm{K}$ (atm), $R$ is the ideal gas constant (J/[mol K]), and $T$ is
+        temperature (K).</p>
+        <p>The operating line is calculated from a mass balance around the stripper:</p>
+        <div class="eq">$x_0 L + y_{N+1} V = x_N L + y_1 V,$</div>
+        <p>which rearranges to:</p>
+        <div class="eq">$y_{N+1} = \dfrac{L}{V}\left(x_N - x_0\right) + y_1.$</div>
+        <p>The operating line is:</p>
+        <div class="eq">$y_{\mathrm{op}} = \dfrac{L}{V}x + \left(y_1 - \dfrac{L}{V}x_0\right),$</div>
+        <p>where $L$ is the liquid solvent molar flow rate (Mmol/h), $V$ is the vapor molar flow
+        rate (Mmol/h), $x_0$ is the mole ratio of the impurity in the inlet liquid solvent stream
+        (ppm), $y_{N+1}$ is the mole ratio of the impurity in the inlet vapor stream (ppm),
+        $x_N$ is the mole ratio of the impurity in the outlet liquid solvent stream (ppm) and
+        $y_1$ is the mole ratio of the impurity in the outlet vapor stream (ppm).</p>
+        <p>To count off stages, start at $x_0$ on the operating line ($x_0$, $y_1$) and draw a
+        horizontal line to the equilibrium line ($x_1$, $y_1$). Then draw a vertical line down to
+        the operating line. Repeat these steps until $x_N$ is reached.</p>
+        <p>The outlet liquid mole ratio $x_N$ is calculated from the mass balance:</p>
+        <div class="eq">$x_N = x_0 + \dfrac{y_{N+1} - y_1}{L/V}.$</div>
+        <p><b>Reference</b></p>
+        <p>[1] P. C. Wankat, <i>Separation Process Engineering: Includes Mass Transfer
+        Analysis</i>, 3rd ed., Upper Saddle River, NJ: Prentice Hall, 2012.</p>
+      </div>
+      <div class="flyout" id="aboutPanel">
+        <div class="closeX" data-close="aboutPanel">&#215;</div>
+        <h2>About</h2>
+        <p>This simulation was created in the
+        <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of
+        Chemical and Biological Engineering</a> at University of Colorado Boulder for
+        <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by
+        John&nbsp;L.&nbsp;Falconer using Claude&nbsp;AI. It is a JavaScript/HTML5 implementation
+        of a <a href="https://demonstrations.wolfram.com/ConstructAnXYDiagramForAStrippingColumn/"
+        target="_blank" rel="noopener">Mathematica simulation</a> by Rachael&nbsp;L.&nbsp;Baumann.
+        It was prepared with financial support from the National Science Foundation
+        (DUE&nbsp;2336987 and 2336988). Address any questions or comments to
+        <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.</p>
+      </div>
+    </span>
+  </div>
+  <!-- ============ gas flow rate slider (step 1 only) ============ -->
+  <div id="sliderRow">
+    <span>select the correct gas flow rate (Mmol/h)</span>
+    <input type="number" id="gasInput" min="1" max="1.5" step="0.1" value="1.0">
+  </div>
+  <!-- ============ figure area ============ -->
+  <div id="canvasRow">
+    <canvas id="diagramCanvas"></canvas>
+    <canvas id="columnCanvas"></canvas>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* =====================================================================
+   Construct an x-y Diagram for a Stripping Column
+   JavaScript/HTML5 port of the Mathematica demonstration
+   ===================================================================== */
+
+/* ------------------------- colors (from CDF) ------------------------ */
+const colL  = "#0000FF";                     // Blue   (liquid)
+const colV  = "rgb(0,153,0)";                // RGBColor[0, 0.6, 0]  (vapor)
+const colOP = "#FF00FF";                     // Magenta (operating line)
+const colEQ = "rgb(255,102,0)";              // RGBColor[1, 0.4, 0]  (equilibrium)
+const colS  = "#800080";                     // Purple (solution)
+const colGrid = "rgb(204,204,204)";          // GrayLevel[0.8]
+
+/* --------------------------- seeded RNG ------------------------------ */
+function mulberry32(a) {
+  return function() {
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+/* ----------------------------- state --------------------------------- */
+const state = {
+  reset: 1,          // seed counter ("new problem")
+  NPR: 1,            // 1..7 problem step
+  solution: false,
+  hint: false,
+  graphic: false,    // show column
+  gas: 1.0,          // gas flow rate slider (Mmol/h)
+  // draggable locators [x, y]
+  op1: [0.05, 15], op2: [0.35, 15],
+  eq1: [0.05, 15], eq2: [0.35, 15],
+  stage1: [0.2, 13], stage2: [0.15, 8], stagen: [0.1, 6]
+};
+
+/* -------------------- problem physics (from CDF) --------------------- */
+const prob = {};
+function computeProblem() {
+  const rnd = mulberry32(state.reset * 747796405 + 2891336453);
+  prob.P = 2.1 + 0.3 * rnd();                       // RandomReal[{2.1, 2.4}]
+  prob.T = 10 + Math.floor(rnd() * 7);              // RandomInteger[{10, 16}]
+  prob.V = (10 + Math.floor(rnd() * 6)) / 10;       // RandomInteger[{10,15}]/10
+  const Ea = 5000, R = 8.314, T0 = 298, H0 = 211.19;
+  prob.H = H0 * Math.exp(-(Ea / R) * (1 / (prob.T + 273) - 1 / T0));
+  prob.L = 100;
+  prob.x0 = 0.35;
+  prob.xN = 0.1;
+  prob.xp1 = 0.385;
+  prob.yn1 = 1;
+  prob.y1 = prob.yn1 - (prob.L / prob.V) * (prob.xN - prob.x0);
+  prob.yeq = x => (prob.H / prob.P) * x;
+  prob.yop = x => (prob.L / prob.V) * (x - prob.x0) + prob.y1;
+  prob.xp2 = prob.x0 - prob.y1 / (prob.L / prob.V);
+  prob.xp3 = prob.x0 + 0.1 * prob.y1 / (prob.L / prob.V);
+  prob.xp4 = 1.1 * prob.y1 / (prob.H / prob.P);
+  // stage stepping
+  prob.X = [prob.x0];
+  prob.Y = [prob.yop(prob.x0)];
+  for (let i = 1; i <= 10; i++) {
+    prob.X[i] = prob.Y[i - 1] / (prob.H / prob.P);
+    prob.Y[i] = prob.yop(prob.X[i]);
+  }
+  let last = 0;
+  for (let i = 1; i <= 10; i++) if (prob.X[i] >= prob.xN) last = i;
+  prob.n = last === 0 ? 0 : last + 1;               // number of stages
+  prob.xop = st => (st[1] - prob.y1) / (prob.L / prob.V) + prob.x0;
+  prob.xeq = st => st[1] / (prob.H / prob.P);
+}
+
+/* ------------------------- number formats ---------------------------- */
+const f1 = v => v.toFixed(1);   // NumberForm[.., {n,1}]
+const f2 = v => v.toFixed(2);   // NumberForm[.., {2,2}]
+const f0 = v => v.toFixed(0);
+
+/* ==================== rich-text canvas helper ========================
+   segs: array of {t: "text", i: italic?, sub: subscript?, c: color?}
+   opts: {size, align: 'left'|'center'|'right', valign:'top'|'middle'|
+          'bottom'|'baseline', bg: 'white'?}                          */
+function fontFor(seg, size) {
+  const s = seg.sub ? Math.round(size * 0.72) : size;
+  return (seg.i ? "italic " : "") + s + "px Helvetica, Arial, sans-serif";
+}
+function measureRich(ctx, segs, size) {
+  let w = 0;
+  for (const seg of segs) {
+    ctx.font = fontFor(seg, size);
+    w += ctx.measureText(seg.t).width;
+  }
+  return w;
+}
+function drawRich(ctx, segs, x, y, size, opts) {
+  opts = opts || {};
+  const w = measureRich(ctx, segs, size);
+  let x0 = x;
+  if (opts.align === "center") x0 = x - w / 2;
+  else if (opts.align === "right") x0 = x - w;
+  let yb = y;                                       // baseline
+  if (opts.valign === "top") yb = y + size * 0.82;
+  else if (opts.valign === "middle") yb = y + size * 0.36;
+  else if (opts.valign === "bottom") yb = y - size * 0.18;
+  if (opts.bg) {
+    ctx.fillStyle = opts.bg;
+    ctx.fillRect(x0 - 2, yb - size * 0.86, w + 4, size * 1.18);
+  }
+  let cx = x0;
+  for (const seg of segs) {
+    ctx.font = fontFor(seg, size);
+    ctx.fillStyle = seg.c || opts.color || "#000";
+    ctx.fillText(seg.t, cx, yb + (seg.sub ? size * 0.22 : 0));
+    cx += ctx.measureText(seg.t).width;
+  }
+  return w;
+}
+
+/* ======================== canvas setup =============================== */
+const dCanvas = document.getElementById("diagramCanvas");
+const cCanvas = document.getElementById("columnCanvas");
+const dCtx = dCanvas.getContext("2d");
+const cCtx = cCanvas.getContext("2d");
+const DPR = window.devicePixelRatio || 1;
+function sizeCanvas(cv, w, h) {
+  cv.width = Math.round(w * DPR);
+  cv.height = Math.round(h * DPR);
+  cv.style.width = w + "px";
+  cv.style.height = h + "px";
+  const ctx = cv.getContext("2d");
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+}
+
+/* geometry of the x-y diagram (recomputed each draw) */
+const geo = { padL: 55, padR: 12, padT: 10, padB: 52, labelH: 48,
+              W: 600, H: 452, plotW: 0, plotH: 0, x0px: 0, y0px: 0 };
+
+function toPx(x, y) {   // data -> pixel on diagram canvas
+  const px = geo.padL + (x / prob.xp1) * geo.plotW;
+  const py = geo.labelH + geo.padT + geo.plotH - (y / (1.1 * prob.y1)) * geo.plotH;
+  return [px, py];
+}
+function fromPx(px, py) {
+  const x = (px - geo.padL) / geo.plotW * prob.xp1;
+  const y = (geo.labelH + geo.padT + geo.plotH - py) / geo.plotH * (1.1 * prob.y1);
+  return [x, y];
+}
+
+/* ======================= x-y diagram drawing ========================= */
+function plotLabelLines() {
+  const it = t => ({ t: t, i: true });
+  switch (state.NPR) {
+    case 1: return [];                              // column shows its own label
+    case 2:
+      return state.hint
+        ? [[{t:"Use mass balance from step 1."}]]
+        : [[{t:"Drag the points to create the operating line, then check solution."}]];
+    case 3:
+      return state.hint
+        ? [[{t:"Use Henry's law."}]]
+        : [[{t:"Drag points to create the equilibrium line, then check solution."}],
+           [it("P"), {t:" = " + f1(prob.P) + " atm and "}, it("H"),
+            {t:" = " + f1(prob.H) + " atm/mole fraction"}]];
+    case 4:
+      return state.hint
+        ? [[{t:"Start counting stages from the top of the column."}]]
+        : [[{t:"Drag the black point to move the dashed line to draw the first stage,"}],
+           [{t:"then check solution."}]];
+    case 5:
+      return state.hint
+        ? [[{t:"Start drawing the second stage where the first stage left off."}]]
+        : [[{t:"Drag the black point to move the dashed line to draw the second stage,"}],
+           [{t:"then check solution."}]];
+    case 6:
+      return state.hint
+        ? [[{t:"Draw the last stage until "}, {t:"x", i:true}, {t:"N", sub:true, i:true},
+            {t:" is reached or surpassed."}]]
+        : [[{t:"Draw the black point to move the dashed line to draw the last stage,"}],
+           [{t:"then check solution."}]];
+    case 7:
+      return [[{t:"Solved "}, {t:"x", i:true}, {t:"\u2010"}, {t:"y", i:true}, {t:" diagram."}]];
+  }
+  return [];
+}
+
+function ringPoint(ctx, p, color, big) {
+  const [px, py] = toPx(p[0], p[1]);
+  const rO = big ? 12 : 7.5, rI = big ? 7.5 : 4.5;
+  ctx.beginPath(); ctx.arc(px, py, rO, 0, 2 * Math.PI);
+  ctx.fillStyle = color; ctx.fill();
+  ctx.beginPath(); ctx.arc(px, py, rI, 0, 2 * Math.PI);
+  ctx.fillStyle = "#fff"; ctx.fill();
+}
+function solidPoint(ctx, p, color, big) {
+  const [px, py] = toPx(p[0], p[1]);
+  ctx.beginPath(); ctx.arc(px, py, big ? 10.5 : 6, 0, 2 * Math.PI);
+  ctx.fillStyle = color; ctx.fill();
+}
+function dataLine(ctx, pts, color, width, dash) {
+  ctx.save();
+  ctx.strokeStyle = color; ctx.lineWidth = width;
+  ctx.setLineDash(dash || []);
+  ctx.lineJoin = "round"; ctx.lineCap = "round";
+  ctx.beginPath();
+  pts.forEach((p, i) => {
+    const [px, py] = toPx(p[0], p[1]);
+    if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+  });
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawDiagram() {
+  const graphic = state.graphic && state.NPR >= 2 && state.NPR <= 4;
+  geo.W = graphic ? 350 : 600;
+  geo.labelH = graphic ? 0 : 54;
+  geo.H = geo.labelH + 404;
+  sizeCanvas(dCanvas, geo.W, geo.H);
+  geo.plotW = geo.W - geo.padL - geo.padR;
+  geo.plotH = geo.H - geo.labelH - geo.padT - geo.padB;
+  const ctx = dCtx;
+  ctx.clearRect(0, 0, geo.W, geo.H);
+  ctx.textBaseline = "alphabetic";
+
+  /* ---- plot label ---- */
+  if (!graphic) {
+    const lines = plotLabelLines();
+    const lh = 24;
+    let ly = lines.length === 1 ? 34 : 22;
+    for (const line of lines) {
+      drawRich(ctx, line, geo.W / 2, ly, 20, { align: "center" });   // +15%
+      ly += lh;
+    }
+  }
+
+  const left = geo.padL, top = geo.labelH + geo.padT;
+  const right = left + geo.plotW, bottom = top + geo.plotH;
+
+  /* ---- gridlines (hidden at step 7) ---- */
+  if (state.NPR !== 7) {
+    ctx.strokeStyle = colGrid; ctx.lineWidth = 1;
+    for (let gx = 0.02; gx < prob.xp1; gx += 0.02) {
+      const [px] = toPx(gx, 0);
+      ctx.beginPath(); ctx.moveTo(px, top); ctx.lineTo(px, bottom); ctx.stroke();
+    }
+    for (let gy = 2; gy < 1.1 * prob.y1; gy += 2) {
+      const [, py] = toPx(0, gy);
+      ctx.beginPath(); ctx.moveTo(left, py); ctx.lineTo(right, py); ctx.stroke();
+    }
+  }
+
+  /* ---- clip to plot for content ---- */
+  ctx.save();
+  ctx.beginPath(); ctx.rect(left, top, geo.plotW, geo.plotH); ctx.clip();
+
+  const big = state.graphic && state.NPR < 4;         // larger points w/ column
+  const N = state.NPR, sol = state.solution;
+  const opLinePts = [[prob.xp2, prob.yop(prob.xp2)], [prob.xp3, prob.yop(prob.xp3)]];
+  const eqLinePts = [[0, 0], [prob.xp4, prob.yeq(prob.xp4)]];
+
+  /* step 2 : operating line construction */
+  if (N === 2) {
+    dataLine(ctx, [state.op1, state.op2], colOP, 2, [7, 6]);
+    if (sol) dataLine(ctx, opLinePts, colOP, 2.5);
+  }
+  if (N > 2) dataLine(ctx, opLinePts, colOP, 2.5);
+
+  /* step 3 : equilibrium line construction */
+  if (N === 3) {
+    dataLine(ctx, [state.eq1, state.eq2], colEQ, 2, [7, 6]);
+    if (sol) dataLine(ctx, eqLinePts, colEQ, 2.5);
+  }
+  if (N > 3) {
+    dataLine(ctx, eqLinePts, colEQ, 2.5);
+    solidPoint(ctx, [prob.x0, prob.y1], colL, state.graphic);
+    solidPoint(ctx, [prob.xN, prob.yn1], colL, state.graphic);
+  }
+
+  /* stage staircase (black, thick) */
+  const X = prob.X, Y = prob.Y;
+  if (N === 4) {
+    dataLine(ctx, [[prob.xop(state.stage1), state.stage1[1]],
+                   [prob.xeq(state.stage1), state.stage1[1]]], "#000", 2, [7, 6]);
+    if (sol) dataLine(ctx, [[X[0], Y[0]], [X[1], Y[0]]], "#000", 2.5);
+  }
+  if (N > 4) dataLine(ctx, [[X[0], Y[0]], [X[1], Y[0]], [X[1], Y[1]]], "#000", 2.5);
+  if (N === 5) {
+    dataLine(ctx, [[prob.xop(state.stage2), state.stage2[1]],
+                   [prob.xeq(state.stage2), state.stage2[1]]], "#000", 2, [7, 6]);
+    if (sol) dataLine(ctx, [[X[1], Y[1]], [X[2], Y[1]]], "#000", 2.5);
+  }
+  if (N > 5) dataLine(ctx, [[X[1], Y[1]], [X[2], Y[1]], [X[2], Y[2]]], "#000", 2.5);
+  if (N === 6) {
+    for (let i = 3; i <= prob.n - 1; i++)
+      dataLine(ctx, [[X[i - 1], Y[i - 1]], [X[i], Y[i - 1]], [X[i], Y[i]]], "#000", 2.5);
+    dataLine(ctx, [[prob.xop(state.stagen), state.stagen[1]],
+                   [prob.xeq(state.stagen), state.stagen[1]]], "#000", 2, [7, 6]);
+    if (sol) dataLine(ctx, [[X[prob.n - 1], Y[prob.n - 1]], [X[prob.n], Y[prob.n - 1]]],
+                      "#000", 2.5);
+  }
+  if (N > 6) {
+    for (let i = 1; i <= prob.n - 1; i++)
+      dataLine(ctx, [[X[i - 1], Y[i - 1]], [X[i], Y[i - 1]], [X[i], Y[i]]], "#000", 2.5);
+    dataLine(ctx, [[X[prob.n - 1], Y[prob.n - 1]], [X[prob.n], Y[prob.n - 1]]], "#000", 2.5);
+  }
+
+  /* draggable locator points on top of lines */
+  if (N === 2) { ringPoint(ctx, state.op1, colOP, big); ringPoint(ctx, state.op2, colOP, big); }
+  if (N === 3) { ringPoint(ctx, state.eq1, colEQ, big); ringPoint(ctx, state.eq2, colEQ, big); }
+  if (N === 4) ringPoint(ctx, state.stage1, "#000", false);
+  if (N === 5) ringPoint(ctx, state.stage2, "#000", false);
+  if (N === 6) ringPoint(ctx, state.stagen, "#000", false);
+  ctx.restore();
+
+  /* ---- point coordinate labels (drawn unclipped, bg white) ---- */
+  function dragLabel(p, color, side) {                // side -1 => below-right, +1 => below-left
+    const [px, py] = toPx(p[0], p[1]);
+    const l1 = [{t:"x", i:true, c:color}, {t:" = " + f2(p[0]) + " ppm", c:color}];
+    const l2 = [{t:"y", i:true, c:color}, {t:" = " + f1(p[1]) + " ppm", c:color}];
+    const ax = side < 0 ? px + 12 : px - 12;
+    const align = side < 0 ? "left" : "right";
+    drawRich(ctx, l1, ax, py + 24, 16, { align: align, bg: "#fff" });
+    drawRich(ctx, l2, ax, py + 44, 16, { align: align, bg: "#fff" });
+  }
+  if (N === 2 && !sol) { dragLabel(state.op1, colOP, -1); dragLabel(state.op2, colOP, 1); }
+  if (N === 3 && !sol) { dragLabel(state.eq1, colEQ, -1); dragLabel(state.eq2, colEQ, 1); }
+
+  if (N > 3) {
+    let [px, py] = toPx(prob.x0, prob.y1);            // (x0, y1) below-right
+    drawRich(ctx, [{t:"("}, {t:"x", i:true, c:colL}, {t:"0", sub:true, i:true, c:colL},
+                   {t:", "}, {t:"y", i:true, c:colV}, {t:"1", sub:true, i:true, c:colV},
+                   {t:")"}],
+             px + 6, py + 26, 16, { align: "left", bg: "#fff" });
+    [px, py] = toPx(prob.xN, prob.yn1);               // (xN, yN+1) to the right
+    drawRich(ctx, [{t:"("}, {t:"x", i:true, c:colL}, {t:"N", sub:true, i:true, c:colL},
+                   {t:", "}, {t:"y", i:true, c:colV},
+                   {t:"N", sub:true, i:true, c:colV}, {t:" + 1", sub:true, c:colV},
+                   {t:")"}],
+             px + 12, py + 5, 16, { align: "left", bg: "#fff" });
+  }
+
+  /* step 7 : stage numbers */
+  if (N === 7) {
+    const stagePts = [[prob.x0, prob.y1, 1]];
+    for (let i = 1; i <= prob.n; i++) stagePts.push([X[i], Y[i], i + 1]);
+    for (const [sx, sy, num] of stagePts) {
+      if (sx < 0 || sx > prob.xp1 || sy < 0 || sy > 1.1 * prob.y1) continue;
+      const [px, py] = toPx(sx, sy);
+      drawRich(ctx, [{t: String(num)}], px + 10, py + 16, 17, { align: "left", bg: "#fff" });
+    }
+  }
+
+  /* ---- frame, ticks, axis labels ---- */
+  ctx.strokeStyle = "#000"; ctx.lineWidth = 1.2;
+  ctx.strokeRect(left, top, geo.plotW, geo.plotH);
+  ctx.fillStyle = "#000";
+  // x ticks: major every 0.1 (labeled), minor every 0.02
+  for (let gx = 0; gx <= prob.xp1 + 1e-9; gx = +(gx + 0.02).toFixed(3)) {
+    const [px] = toPx(gx, 0);
+    const isMajor = Math.abs(gx * 10 - Math.round(gx * 10)) < 1e-6;
+    ctx.beginPath();
+    ctx.moveTo(px, bottom); ctx.lineTo(px, bottom - (isMajor ? 7 : 4)); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(px, top); ctx.lineTo(px, top + (isMajor ? 7 : 4)); ctx.stroke();
+    if (isMajor) {
+      const lbl = gx === 0 ? "0" : gx.toFixed(1);
+      drawRich(ctx, [{t: lbl}], px, bottom + 18, 15, { align: "center" });
+    }
+  }
+  // y ticks: major every 5 (labeled), minor every 1
+  for (let gy = 0; gy <= 1.1 * prob.y1; gy += 1) {
+    const [, py] = toPx(0, gy);
+    const isMajor = gy % 5 === 0;
+    ctx.beginPath();
+    ctx.moveTo(left, py); ctx.lineTo(left + (isMajor ? 7 : 4), py); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(right, py); ctx.lineTo(right - (isMajor ? 7 : 4), py); ctx.stroke();
+    if (isMajor)
+      drawRich(ctx, [{t: String(gy)}], left - 8, py + 5, 15, { align: "right" });
+  }
+  // x axis label
+  drawRich(ctx,
+    [{t:"solute/(solute\u2010free liquid) "}, {t:"x", i:true}, {t:" (ppm)"}],
+    left + geo.plotW / 2, bottom + 42, 17, { align: "center" });
+  // y axis label (rendered offscreen then rotated to avoid glyph overlap)
+  const yl = [{t:"solute/(solute\u2010free vapor) "}, {t:"y", i:true}, {t:" (ppm)"}];
+  const ylW = Math.ceil(measureRich(ctx, yl, 17)) + 8;
+  const off = document.createElement("canvas");
+  off.width = ylW * DPR; off.height = 26 * DPR;
+  const octx = off.getContext("2d");
+  octx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  octx.textBaseline = "alphabetic";
+  drawRich(octx, yl, 4, 19, 17, { align: "left" });
+  ctx.save();
+  ctx.translate(left - 34, top + geo.plotH / 2 + ylW / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.drawImage(off, 0, -13, ylW, 26);
+  ctx.restore();
+}
+
+/* ======================== column drawing ============================= */
+function drawColumn() {
+  const N = state.NPR;
+  const full = N === 1;                       // large single view
+  const W = full ? 600 : 250;
+  const H = full ? 470 : 404;
+  sizeCanvas(cCanvas, W, H);
+  const ctx = cCtx;
+  ctx.clearRect(0, 0, W, H);
+  ctx.textBaseline = "alphabetic";
+
+  const labelH = full ? 50 : 0;
+  /* ---- plot label (step 1 only) ---- */
+  if (full) {
+    const txt = state.hint ? "Do a mass balance"
+                           : "Calculate the gas molar flow rate, then check solution.";
+    drawRich(ctx, [{t: txt}], W / 2, 31, 20, { align: "center" });   // +15%
+  }
+
+  /* model coordinates: vessel width w=12, height h=13, cap ry=2 */
+  const w = 7, h = 13, ry = 1.6;
+  const xmin = -6.6, xmax = 14.5;
+  const ymin = full ? -7.6 : -6.8, ymax = full ? 18.9 : 18.9;
+  const drawTop = labelH + 4, drawH = H - labelH - 8;
+  const sx = W / (xmax - xmin), sy = drawH / (ymax - ymin);
+  const mx = x => (x - xmin) * sx;
+  const my = y => drawTop + drawH - (y - ymin) * sy;
+
+  function line(pts, color, width, dash) {
+    ctx.save();
+    ctx.strokeStyle = color; ctx.lineWidth = width; ctx.setLineDash(dash || []);
+    ctx.lineJoin = "round"; ctx.lineCap = "round";
+    ctx.beginPath();
+    pts.forEach((p, i) => { i === 0 ? ctx.moveTo(mx(p[0]), my(p[1]))
+                                    : ctx.lineTo(mx(p[0]), my(p[1])); });
+    ctx.stroke(); ctx.restore();
+  }
+  function arrow(pts, color) {                 // polyline w/ arrowhead at end
+    line(pts, color, 2.2);
+    const [x2, y2] = pts[pts.length - 1], [x1, y1] = pts[pts.length - 2];
+    const a = Math.atan2(my(y2) - my(y1), mx(x2) - mx(x1));
+    const L = 13, wA = 5.5;
+    ctx.save(); ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(mx(x2), my(y2));
+    ctx.lineTo(mx(x2) - L * Math.cos(a) + wA * Math.sin(a),
+               my(y2) - L * Math.sin(a) - wA * Math.cos(a));
+    ctx.lineTo(mx(x2) - L * Math.cos(a) - wA * Math.sin(a),
+               my(y2) - L * Math.sin(a) + wA * Math.cos(a));
+    ctx.closePath(); ctx.fill(); ctx.restore();
+  }
+
+  /* ---- vessel outline ---- */
+  ctx.strokeStyle = "#000"; ctx.lineWidth = 2.2; ctx.setLineDash([]);
+  line([[0, ry], [0, h - ry]], "#000", 2.2);
+  line([[w, ry], [w, h - ry]], "#000", 2.2);
+  function halfEllipse(cx, cy, rx, ryy, lower) {
+    ctx.beginPath();
+    ctx.ellipse(mx(cx), my(cy), rx * sx, ryy * sy, 0,
+                lower ? 0 : Math.PI, lower ? Math.PI : 2 * Math.PI);
+    ctx.stroke();
+  }
+  halfEllipse(w / 2, ry, w / 2, ry, true);        // bottom cap
+  halfEllipse(w / 2, h - ry, w / 2, ry, false);   // top cap
+
+  /* ---- stream arrows ---- */
+  arrow([[-w / 2, -h / 4], [0.25 * w, -h / 4], [0.25 * w, ry / 10]], colV);       // gas in
+  arrow([[0.25 * w, h - ry / 10], [0.25 * w, h + h / 4], [-w / 2, h + h / 4]], colV); // gas out
+  arrow([[0.75 * w, ry / 10], [0.75 * w, -h / 4], [w + w / 2.3, -h / 4]], colL);  // liquid out
+  arrow([[w + w / 2.3, h + h / 4], [0.75 * w, h + h / 4], [0.75 * w, h - ry / 10]], colL); // liquid in
+
+  /* ---- interior: stage lines (steps 4-6) or P, T (otherwise) ---- */
+  const fs = full ? 17 : 15;
+  const fsPT = full ? 20 : 18;   // P, T label +20%
+  if (N >= 4 && N <= 6) {
+    const stages = [[{t:"N", i:true}, ry], [{t:"n", i:true}, 0.5 * h], [{t:"1"}, h - ry]];
+    for (const [seg, yy] of stages) {
+      line([[0, yy], [w, yy]], "#000", 2.2);
+      drawRich(ctx, [seg], mx(0.5 * w), my(yy) - 5, fs, { align: "center" });
+    }
+  } else {
+    drawRich(ctx, [{t: f1(prob.P) + " atm"}], mx(w / 2), my(h / 2) - 4, fsPT, { align: "center" });
+    drawRich(ctx, [{t: f0(prob.T) + " \u00B0C"}], mx(w / 2), my(h / 2) + fsPT + 2, fsPT, { align: "center" });
+  }
+
+  /* ---- stream labels ---- */
+  const fsS = full ? 17 : 15;   // +15%
+  // liquid feed (top right, above arrow)
+  let yTR = my(h + h / 4) - 10;
+  if (N === 1) {
+    drawRich(ctx, [{t:"liquid solvent feed", c:"#000"}],
+             mx(w + w / 2.3), yTR - (fsS + 4), fsS, { align: "right" });
+  }
+  drawRich(ctx, [{t:"L", i:true, c:colL}, {t:" = " + f0(prob.L) + " Mmol/h", c:colL}],
+           mx(w + w / 2.3), yTR, fsS, { align: "right" });
+
+  // gas feed (bottom left, below arrow)
+  let yBL = my(-h / 4) + fsS + 8;
+  drawRich(ctx, [{t:"V", i:true, c:colV}, {t:" = " + f1(state.gas) + " Mmol/h", c:colV}],
+           mx(-w / 2), yBL, fsS, { align: "left" });
+  yBL += fsS + 4;
+  if (N === 1 && state.solution) {
+    drawRich(ctx, [{t:"correct ", c:colS}, {t:"V", i:true, c:colS},
+                   {t:" = " + f1(prob.V) + " Mmol/h", c:colS}],
+             mx(-w / 2), yBL, fsS, { align: "left" });
+    yBL += fsS + 4;
+  }
+  if (N === 1) {
+    drawRich(ctx, [{t:"gas feed", c:colV}], mx(-w / 2), yBL, fsS, { align: "left" });
+  }
+
+  /* ---- composition labels ---- */
+  const nS = prob.n;
+  // y1 (gas outlet, top left)
+  drawRich(ctx, [{t:"y", i:true, c:colV}, {t:"1", sub:true, i:true, c:colV},
+                 {t:" = " + f1(prob.y1) + " ppm", c:colV}],
+           mx(0) - 6, my(h + 2), fsS, { align: "left", bg: "#fff" });
+  // yN+1 (gas inlet, bottom left)
+  drawRich(ctx, [{t:"y", i:true, c:colV}, {t:String(nS + 1), sub:true, c:colV},
+                 {t:" = " + f1(prob.yn1) + " ppm", c:colV}],
+           mx(0) - 6, my(-2), fsS, { align: "left", bg: "#fff" });
+  // x0 (liquid inlet, top right)
+  drawRich(ctx, [{t:"x", i:true, c:colL}, {t:"0", sub:true, i:true, c:colL},
+                 {t:" = " + f2(prob.x0) + " ppm", c:colL}],
+           mx(w) - 20, my(h + 2.25), fsS, { align: "left", bg: "#fff" });
+  // xN (liquid outlet, bottom right)
+  drawRich(ctx, [{t:"x", i:true, c:colL}, {t:String(nS), sub:true, c:colL},
+                 {t:" = " + prob.xN + " ppm", c:colL}],
+           mx(w) - 20, my(-2), fsS, { align: "left", bg: "#fff" });
+}
+
+/* ====================== master redraw / UI sync ====================== */
+const stepLabels = { 1:"1. Gas flow rate.", 2:"2. Draw operating line.",
+                     3:"3. Draw equilibrium line.", 4:"4. Draw stage 1.",
+                     5:"5. Draw stage 2.", 6:"6. Draw last stage.", 7:"7. Solution." };
+
+function redraw() {
+  const N = state.NPR;
+  document.getElementById("stepLabel").textContent = stepLabels[N];
+  document.getElementById("nextBtn").style.display = N <= 6 ? "" : "none";
+  document.getElementById("solutionLbl").style.display = N <= 6 ? "" : "none";
+  document.getElementById("hintLbl").style.display = N <= 6 ? "" : "none";
+  document.getElementById("graphicLbl").style.display = (N >= 2 && N <= 4) ? "" : "none";
+  document.getElementById("sliderRow").style.display = N === 1 ? "" : "none";
+  const sChk = document.getElementById("solutionChk");
+  sChk.checked = state.solution;
+  sChk.disabled = state.solution;             // once checked, can't change your answer
+  document.getElementById("solutionLbl").classList.toggle("disabled", state.solution);
+  document.getElementById("hintChk").checked = state.hint;
+  document.getElementById("graphicChk").checked = state.graphic;
+
+  const graphic = state.graphic && N >= 2 && N <= 4;
+  dCanvas.style.display = N === 1 ? "none" : "";
+  cCanvas.style.display = (N === 1 || graphic) ? "" : "none";
+  if (N !== 1) drawDiagram();
+  if (N === 1 || graphic) drawColumn();
+}
+
+/* =========================== interaction ============================= */
+function resetLocators() {
+  state.op1 = [0.05, 15]; state.op2 = [0.35, 15];
+  state.eq1 = [0.05, 15]; state.eq2 = [0.35, 15];
+  state.stage1 = [0.2, 13]; state.stage2 = [0.15, 8]; state.stagen = [0.1, 6];
+}
+
+document.getElementById("newProblemBtn").addEventListener("click", () => {
+  state.reset = state.reset < 1000 ? state.reset + 1 : state.reset - 1;
+  state.NPR = 1; state.solution = false; state.hint = false; state.graphic = false;
+  resetLocators();
+  computeProblem();
+  redraw();
+});
+document.getElementById("nextBtn").addEventListener("click", () => {
+  if (state.NPR < 7) state.NPR += 1;
+  state.solution = false; state.hint = false; state.graphic = false;
+  redraw();
+});
+document.getElementById("solutionChk").addEventListener("change", e => {
+  if (!state.solution && e.target.checked) { state.solution = true; redraw(); }
+});
+document.getElementById("hintChk").addEventListener("change", e => {
+  state.hint = e.target.checked; redraw();
+});
+document.getElementById("graphicChk").addEventListener("change", e => {
+  state.graphic = e.target.checked; redraw();
+});
+const gasInput = document.getElementById("gasInput");
+gasInput.addEventListener("input", e => {
+  const v = parseFloat(e.target.value);
+  if (Number.isFinite(v)) { state.gas = v; redraw(); }
+});
+gasInput.addEventListener("change", e => {          // on commit: clamp to 1..1.5
+  let v = parseFloat(e.target.value);
+  if (!Number.isFinite(v)) v = state.gas;
+  v = Math.max(1, Math.min(1.5, v));
+  state.gas = v;
+  e.target.value = v.toFixed(1);
+  redraw();
+});
+
+/* ---- flyout panels ---- */
+let mathTypeset = { detailsPanel: false };
+function togglePanel(id) {
+  for (const pid of ["directionsPanel", "detailsPanel", "aboutPanel"]) {
+    const el = document.getElementById(pid);
+    if (pid === id) {
+      const opening = !el.classList.contains("open");
+      el.classList.toggle("open", opening);
+      if (opening && pid === "detailsPanel" && window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise([el]);         // retypeset: panel was hidden
+      }
+    } else el.classList.remove("open");
+  }
+}
+document.getElementById("directionsBtn").addEventListener("click", () => togglePanel("directionsPanel"));
+document.getElementById("detailsBtn").addEventListener("click", () => togglePanel("detailsPanel"));
+document.getElementById("aboutBtn").addEventListener("click", () => togglePanel("aboutPanel"));
+document.querySelectorAll(".closeX").forEach(x =>
+  x.addEventListener("click", () => document.getElementById(x.dataset.close).classList.remove("open")));
+
+/* ---- locator dragging on the diagram ---- */
+let dragging = null;
+function activeLocators() {
+  if (state.solution) return [];
+  switch (state.NPR) {
+    case 2: return [state.op1, state.op2];
+    case 3: return [state.eq1, state.eq2];
+    case 4: return [state.stage1];
+    case 5: return [state.stage2];
+    case 6: return [state.stagen];
+  }
+  return [];
+}
+function canvasPos(ev) {
+  const r = dCanvas.getBoundingClientRect();
+  const cx = (ev.touches ? ev.touches[0].clientX : ev.clientX) - r.left;
+  const cy = (ev.touches ? ev.touches[0].clientY : ev.clientY) - r.top;
+  return [cx, cy];
+}
+function pickLocator(ev) {
+  const [cx, cy] = canvasPos(ev);
+  for (const p of activeLocators()) {
+    const [px, py] = toPx(p[0], p[1]);
+    if (Math.hypot(px - cx, py - cy) <= 14) return p;
+  }
+  return null;
+}
+function dragTo(ev) {
+  if (!dragging) return;
+  const [cx, cy] = canvasPos(ev);
+  let [x, y] = fromPx(cx, cy);
+  x = Math.max(0, Math.min(prob.xp1, x));
+  y = Math.max(0, Math.min(1.1 * prob.y1, y));
+  dragging[0] = x; dragging[1] = y;
+  redraw();
+}
+dCanvas.addEventListener("mousedown", ev => {
+  dragging = pickLocator(ev);
+  if (dragging) { dCanvas.classList.add("dragging"); ev.preventDefault(); }
+});
+window.addEventListener("mousemove", ev => {
+  if (dragging) { dragTo(ev); }
+  else if (dCanvas.style.display !== "none") {
+    dCanvas.style.cursor = pickLocator(ev) ? "grab" : "default";
+  }
+});
+window.addEventListener("mouseup", () => { dragging = null; dCanvas.classList.remove("dragging"); });
+dCanvas.addEventListener("touchstart", ev => {
+  dragging = pickLocator(ev);
+  if (dragging) ev.preventDefault();
+}, { passive: false });
+dCanvas.addEventListener("touchmove", ev => {
+  if (dragging) { dragTo(ev); ev.preventDefault(); }
+}, { passive: false });
+window.addEventListener("touchend", () => { dragging = null; });
+
+/* ============================== boot ================================= */
+computeProblem();
+redraw();
+</script>
+</body>
+</html>

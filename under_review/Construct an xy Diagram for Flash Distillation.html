@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Construct an x-y Diagram for Flash Distillation</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+  chtml: { displayAlign: 'left', displayIndent: '0.5em' },
+  svg: { displayAlign: 'left', displayIndent: '0.5em' }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-chtml.js" id="MathJax-script" async></script>
+<style>
+  :root{
+    --ink:#1a1a1a;
+    --panelbg:#fdfdfb;
+    --border:#b9b9b9;
+    --accent:#8a0000;
+    --blue:#1c3fbf;
+    --purple:#7a1fa2;
+    --orange:#e07b00;
+    --btnbg:#eeeeee;
+    --btnbg-hover:#e2e2e2;
+    --btnborder:#9a9a9a;
+    --red:#c1121f;
+    --red-dark:#9e0d18;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;padding:0;
+    background:#ffffff;
+    color:var(--ink);
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+  }
+  #app{
+    max-width:760px;
+    margin:0 auto;
+    padding:14px 18px 30px 18px;
+  }
+  h1.title{
+    text-align:center;
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-weight:700;
+    font-size:22px;
+    letter-spacing:0.2px;
+    margin:6px 0 14px 0;
+    color:var(--ink);
+  }
+  h1.title i{font-style:italic;}
+
+  .plot-outer{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:flex-start;
+    justify-content:center;
+    gap:8px;
+  }
+  .plot-wrap{
+    position:relative;
+    width:100%;
+    max-width:560px;
+    aspect-ratio:560/415;
+    flex:1 1 320px;
+    min-width:280px;
+  }
+  svg#plot{
+    width:100%;
+    height:100%;
+    display:block;
+    user-select:none;
+  }
+  .axislabel{
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size:18px;
+    fill:var(--ink);
+  }
+  .axislabel tspan.sub{font-size:13px;}
+  .ticklabel{font-size:17.42px;fill:#333;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;}
+
+  .locator{
+    cursor:grab;
+    touch-action:none;
+  }
+  .locator:active{cursor:grabbing;}
+  .locator.disabled{cursor:default;}
+
+  .overlay-box{
+    position:absolute;
+    background:rgba(255,255,255,0.94);
+    border:1px solid #cfcfcf;
+    border-radius:3px;
+    padding:6px 9px;
+    font-size:12.5px;
+    line-height:1.35;
+    box-shadow:0 1px 3px rgba(0,0,0,0.08);
+  }
+  .overlay-box table{border-collapse:collapse;}
+  .overlay-box th, .overlay-box td{
+    border:1px solid #999;
+    padding:2px 8px;
+    text-align:center;
+    font-size:12.5px;
+  }
+  .overlay-box th{font-style:italic;}
+  .overlay-box .hdrRow{font-style:italic;}
+
+  .column-panel{
+    width:305px;
+    min-height:390px;
+    flex:0 0 auto;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-start;
+    padding-top:6px;
+  }
+  .column-panel.hidden{visibility:hidden;width:0;}
+
+  /* Directions / Details / About buttons */
+  .info-wrap{
+    position:relative;
+  }
+  .info-btn-row{
+    display:flex;
+    gap:8px;
+    justify-content:center;
+    margin:14px 0 0 0;
+  }
+  .info-btn{
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size:15px;
+    font-weight:400;
+    padding:6px 16px;
+    border-radius:4px;
+    border:1px solid var(--red-dark);
+    background:var(--red);
+    color:#ffffff;
+    cursor:pointer;
+  }
+  .info-btn:hover{background:var(--red-dark);}
+  .info-btn.active{
+    background:var(--red-dark);
+    border-color:#6e0910;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,0.4);
+  }
+
+  .panel{
+    position:absolute;
+    bottom:calc(100% + 8px);
+    left:50%;
+    transform:translateX(-50%);
+    width:100%;
+    margin:0 auto;
+    max-width:700px;
+    border:1px solid #c6c6c6;
+    background:var(--panelbg);
+    border-radius:4px;
+    padding:14px 34px 14px 16px;
+    font-family:Verdana,Geneva,sans-serif;
+    font-size:14.3px;
+    line-height:1.55;
+    color:#222;
+    z-index:30;
+    box-shadow:0 6px 18px rgba(0,0,0,0.2);
+  }
+  .panel-scroll{
+    max-height:min(480px, 70vh);
+    overflow-y:auto;
+  }
+  .panel.hidden{display:none;}
+  .panel h2{
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size:14.3px;
+    letter-spacing:0.5px;
+    color:var(--accent);
+    margin:0 0 8px 0;
+    border-bottom:1px solid #ddd;
+    padding-bottom:4px;
+  }
+  .panel-close{
+    position:absolute;
+    top:6px;
+    right:8px;
+    width:22px;
+    height:22px;
+    line-height:20px;
+    text-align:center;
+    border:1px solid #bbb;
+    background:#f2f2f2;
+    border-radius:50%;
+    cursor:pointer;
+    font-size:15px;
+    color:#444;
+    padding:0;
+  }
+  .panel-close:hover{background:#e2e2e2;}
+  .panel .eqline{
+    text-align:left;
+    margin:10px 0;
+  }
+  .panel .tip{
+    margin-top:10px;
+    padding-top:8px;
+    border-top:1px solid #e2e2e2;
+    color:#555;
+    font-size:13.2px;
+  }
+  .panel a{color:#1859b7;}
+  .panel h3{
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size:14.3px;
+    color:var(--accent);
+    margin:16px 0 6px 0;
+    padding-top:8px;
+    border-top:1px solid #e2e2e2;
+  }
+  .panel .symbols{margin:0;padding:0;list-style:none;}
+  .panel .symbols li{margin:3px 0;}
+
+  /* simulation controls row */
+  .controls-row{
+    margin-top:12px;
+    border-top:2px solid #ddd;
+    padding-top:10px;
+  }
+  #stepText{
+    font-family:Verdana,Geneva,sans-serif;
+    font-size:15.84px;
+    color:#222;
+    min-height:32px;
+    margin-bottom:8px;
+  }
+  .controls-buttons{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:16px;
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size:15.6px;
+  }
+  .controls-buttons label{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    cursor:pointer;
+  }
+  .controls-buttons label.disabled{color:#999;cursor:default;}
+  .controls-buttons input[type="checkbox"]{
+    width:15.6px;
+    height:15.6px;
+    margin:0 2px 0 0;
+  }
+  button.simbtn{
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size:15.6px;
+    padding:6px 17px;
+    border-radius:4px;
+    border:1px solid var(--btnborder);
+    background:linear-gradient(#fafafa,#e6e6e6);
+    cursor:pointer;
+  }
+  button.simbtn:hover:not(:disabled){background:linear-gradient(#f3f3f3,#dcdcdc);}
+  button.simbtn:disabled{
+    color:#aaa;
+    background:#f1f1f1;
+    border-color:#ccc;
+    cursor:default;
+  }
+  #qualityWrap{
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  #qualityWrap.hidden{display:none;}
+  #qualitySlider{
+    width:156px;
+    height:19px;
+    margin:0;
+    -webkit-appearance:none;
+    appearance:none;
+    background:transparent;
+    cursor:pointer;
+  }
+  #qualitySlider::-webkit-slider-runnable-track{
+    height:6px;
+    border-radius:3px;
+    background:#ccc;
+  }
+  #qualitySlider::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    appearance:none;
+    width:19px;
+    height:19px;
+    margin-top:-6.5px;
+    border-radius:50%;
+    background:#1c3fbf;
+    border:1px solid #14309a;
+    cursor:pointer;
+  }
+  #qualitySlider::-moz-range-track{
+    height:6px;
+    border-radius:3px;
+    background:#ccc;
+  }
+  #qualitySlider::-moz-range-thumb{
+    width:19px;
+    height:19px;
+    border-radius:50%;
+    background:#1c3fbf;
+    border:1px solid #14309a;
+    cursor:pointer;
+  }
+  #qualitySlider:disabled::-webkit-slider-thumb{background:#aaa;border-color:#888;}
+  #qualitySlider:disabled::-moz-range-thumb{background:#aaa;border-color:#888;}
+  #qualityValue{
+    font-variant-numeric:tabular-nums;
+    min-width:34px;
+    display:inline-block;
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <h1 class="title">Construct an <i>x</i>-<i>y</i> Diagram for Flash Distillation</h1>
+
+  <div class="plot-outer">
+    <div class="plot-wrap">
+      <svg id="plot" viewBox="0 0 560 415"></svg>
+    </div>
+    <div class="column-panel hidden" id="columnPanel">
+      <svg id="columnSvg" width="305" height="390" viewBox="0 0 305 390"></svg>
+    </div>
+  </div>
+
+  <div class="info-wrap">
+    <div class="info-btn-row">
+      <button class="info-btn" data-panel="directions">Directions</button>
+      <button class="info-btn" data-panel="details">Details</button>
+      <button class="info-btn" data-panel="about">About</button>
+    </div>
+
+    <div class="panel hidden" id="infoPanel">
+      <button class="panel-close" id="panelCloseBtn">&times;</button>
+      <div class="panel-scroll"><div id="panelBody"></div></div>
+    </div>
+  </div>
+
+  <div class="controls-row">
+    <div id="stepText"></div>
+    <div class="controls-buttons">
+      <label id="showSolutionLabel"><input type="checkbox" id="showSolution"> show solution</label>
+      <label><input type="checkbox" id="showColumn"> show column</label>
+      <div id="qualityWrap" class="hidden">
+        <span>quality</span>
+        <input type="range" id="qualitySlider" min="0" max="1" step="0.05" value="0.39">
+        <span id="qualityValue">0.39</span>
+      </div>
+      <button class="simbtn" id="nextStepBtn" disabled>next step</button>
+      <button class="simbtn" id="newProblemBtn">new problem</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------------------------------------------------------------------
+   PHYSICS: modified Raoult's law with 2-parameter (3-suffix) Margules
+   activity-coefficient model, Antoine equation for saturation pressure.
+   Component "2" (x-axis / x_B) is the more volatile component.
+--------------------------------------------------------------------- */
+const ANT_MVC   = {A:8.08097, B:1582.271, C:239.726};   // paired with x2 / gamma2
+const ANT_OTHER = {A:8.07131, B:1730.63,  C:233.426};   // paired with x1 / gamma1
+
+function psat(ant,T){ return Math.pow(10, ant.A - ant.B/(T+ant.C)); }
+function gamma1(x2,A12,A21){
+  const x1 = 1-x2;
+  return Math.exp(x2*x2*(A12 + 2*(A21-A12)*x1));
+}
+function gamma2(x2,A12,A21){
+  const x1 = 1-x2;
+  return Math.exp(x1*x1*(A21 + 2*(A12-A21)*x2));
+}
+function bubbleT(x2,A12,A21,P){
+  const x1 = 1-x2;
+  function f(T){
+    return ANT_OTHER ? (psat(ANT_OTHER,T)*gamma1(x2,A12,A21)*x1 + psat(ANT_MVC,T)*gamma2(x2,A12,A21)*x2) - P : 0;
+  }
+  let lo=-40, hi=250;
+  let flo=f(lo), fhi=f(hi);
+  // ensure bracket (should already be, function monotone increasing in T)
+  for(let i=0;i<60;i++){
+    const mid=(lo+hi)/2;
+    const fm=f(mid);
+    if(fm>0){hi=mid;} else {lo=mid;}
+  }
+  return (lo+hi)/2;
+}
+
+let P_, A12_, A21_, randV, randL, xf;
+let curveXY = [];      // 101 points {x,y}
+let tableRows = [];    // 5 rows for step-1 table
+let ans3x = 0.5;
+let ans4x = 0.5;
+
+function fmt2(v){ return v.toFixed(2); }
+
+function equilib(x){
+  x = Math.min(1,Math.max(0,x));
+  const n = curveXY.length-1;
+  let t = x*n;
+  let i = Math.floor(t);
+  if(i>=n) i=n-1;
+  const frac = t-i;
+  const y0=curveXY[i].y, y1=curveXY[i+1].y;
+  return y0 + (y1-y0)*frac;
+}
+
+function buildEquilibriumCurve(){
+  curveXY = [];
+  for(let i=0;i<=100;i++){
+    const x2 = i/100;
+    const T = bubbleT(x2,A12_,A21_,P_);
+    const y2 = x2 * gamma2(x2,A12_,A21_) * psat(ANT_MVC,T) / P_;
+    curveXY.push({x:x2, y:Math.min(1,Math.max(0,y2))});
+  }
+  tableRows = [0.20,0.35,0.50,0.65,0.80].map(x=>({x:x, y:equilib(x)}));
+}
+
+function solveAns3(){
+  // find g such that equilib(g) == xf   (g in (0, ~0.7))
+  let lo=0.0001, hi=0.9999;
+  for(let i=0;i<60;i++){
+    const mid=(lo+hi)/2;
+    if(equilib(mid) > xf){ hi=mid; } else { lo=mid; }
+  }
+  return (lo+hi)/2;
+}
+function solveAns4(){
+  // find x such that xf == randV*equilib(x) + randL*x
+  let lo=0.0001, hi=0.9999;
+  function g(x){ return randV*equilib(x)+randL*x - xf; }
+  let glo=g(lo);
+  for(let i=0;i<60;i++){
+    const mid=(lo+hi)/2;
+    const gm=g(mid);
+    if((gm>0) === (glo>0)){ lo=mid; } else { hi=mid; }
+  }
+  return (lo+hi)/2;
+}
+
+/* ---------------------------------------------------------------------
+   STATE
+--------------------------------------------------------------------- */
+let problemCounter = Math.floor(Math.random()*6);
+const S = {
+  step: 1,
+  sol: false,
+  showColumn: false,
+  quality: 0.39,
+  eq: [ {x:0.03,y:0.85}, {x:0.20,y:0.85}, {x:0.35,y:0.85}, {x:0.50,y:0.85},
+        {x:0.65,y:0.85}, {x:0.80,y:0.85}, {x:0.94,y:0.85} ],
+  endpoint: {x:0.50, y:0.5}
+};
+
+function randRange(a,b){ return a + Math.random()*(b-a); }
+
+function newProblem(){
+  problemCounter++;
+  A12_ = randRange(0,1);
+  A21_ = randRange(-0.5,1);
+  P_   = randRange(100,300);
+  randV = Math.round(randRange(5,95))/100;
+  randL = 1-randV;
+  xf = 0.4 + (problemCounter%6)/5*0.2;
+  buildEquilibriumCurve();
+  ans3x = solveAns3();
+  ans4x = solveAns4();
+
+  S.step = 1;
+  S.sol = false;
+  S.showColumn = false;
+  S.eq = [ {x:0.03,y:0.85}, {x:0.20,y:0.85}, {x:0.35,y:0.85}, {x:0.50,y:0.85},
+           {x:0.65,y:0.85}, {x:0.80,y:0.85}, {x:0.94,y:0.85} ];
+  S.endpoint = {x:0.5, y:equilib(0.5)};
+
+  document.getElementById('showColumn').checked = false;
+  document.getElementById('showSolution').checked = false;
+  document.getElementById('showSolution').disabled = false;
+  render();
+}
+
+function nextStep(){
+  if(!(S.step<4 && S.sol===true)) return;
+  S.step++;
+  S.sol = false;
+  S.showColumn = true;
+  document.getElementById('showColumn').checked = true;
+  document.getElementById('showSolution').checked = false;
+  document.getElementById('showSolution').disabled = false;
+  if(S.step===4){
+    ans4x = solveAns4();
+    S.endpoint = {x:0.5, y:equilib(0.5)};
+  }
+  render();
+}
+
+/* ---------------------------------------------------------------------
+   SVG PLOT GEOMETRY
+--------------------------------------------------------------------- */
+const svgNS = "http://www.w3.org/2000/svg";
+const PLOT = {left:55, right:22, top:14, bottom:52, w:560, h:415};
+function px(x){ return PLOT.left + x*(PLOT.w-PLOT.left-PLOT.right); }
+function py(y){ return (PLOT.h-PLOT.bottom) - y*(PLOT.h-PLOT.top-PLOT.bottom); }
+function invx(px_){ return (px_-PLOT.left)/(PLOT.w-PLOT.left-PLOT.right); }
+function invy(py_){ return ((PLOT.h-PLOT.bottom)-py_)/(PLOT.h-PLOT.top-PLOT.bottom); }
+
+function el(tag,attrs,parent){
+  const e=document.createElementNS(svgNS,tag);
+  for(const k in attrs) e.setAttribute(k,attrs[k]);
+  if(parent) parent.appendChild(e);
+  return e;
+}
+
+function clientToData(svg, clientX, clientY){
+  const pt = svg.createSVGPoint();
+  pt.x = clientX; pt.y = clientY;
+  const ctm = svg.getScreenCTM().inverse();
+  const p = pt.matrixTransform(ctm);
+  return { x: invx(p.x), y: invy(p.y) };
+}
+
+/* ---------------------------------------------------------------------
+   RENDER
+--------------------------------------------------------------------- */
+const stepTexts = {
+  1: "Step 1. Plot the equilibrium curve using the data given.",
+  2: "Step 2. Move the quality slider to represent the maximum possible concentration of the more volatile component in the vapor outlet stream.",
+  3: "Step 3. Move the quality slider to represent the minimum possible concentration of the more volatile component in the vapor outlet stream.",
+  4: "Step 4. Determine the composition of the vapor and liquid streams for the flow rates given by moving the locator."
+};
+
+function clear(node){ while(node.firstChild) node.removeChild(node.firstChild); }
+
+function render(){
+  const svg = document.getElementById('plot');
+  clear(svg);
+
+  document.getElementById('stepText').textContent = stepTexts[S.step];
+  document.getElementById('nextStepBtn').disabled = !(S.step<4 && S.sol===true);
+  document.getElementById('showSolution').checked = S.sol;
+  document.getElementById('showSolution').disabled = S.sol;
+  document.getElementById('showColumn').checked = S.showColumn;
+  document.getElementById('columnPanel').classList.toggle('hidden', !S.showColumn);
+
+  const qWrap = document.getElementById('qualityWrap');
+  qWrap.classList.toggle('hidden', !(S.step===2||S.step===3));
+  document.getElementById('qualitySlider').disabled = S.sol;
+  document.getElementById('qualitySlider').value = S.quality;
+  document.getElementById('qualityValue').textContent = fmt2(S.quality);
+
+  // frame (column diagram lives in its own panel beside the plot, so the
+  // plot frame keeps its full width regardless of the "show column" state)
+  const frameRight = PLOT.w-PLOT.right;
+  el('rect',{x:PLOT.left,y:PLOT.top,width:frameRight-PLOT.left,height:(PLOT.h-PLOT.bottom)-PLOT.top,
+      fill:'none',stroke:'#000',"stroke-width":1.4},svg);
+
+  // ticks
+  for(let t=0;t<=1.0001;t+=0.2){
+    const xx = px(t);
+    if(xx<=frameRight+0.5){
+      el('line',{x1:xx,y1:PLOT.h-PLOT.bottom,x2:xx,y2:PLOT.h-PLOT.bottom+5,stroke:'#000'},svg);
+      const lbl = el('text',{x:xx,y:PLOT.h-PLOT.bottom+18,'text-anchor':'middle',class:'ticklabel'},svg);
+      lbl.textContent = t.toFixed(1);
+    }
+    const yy = py(t);
+    el('line',{x1:PLOT.left-5,y1:yy,x2:PLOT.left,y2:yy,stroke:'#000'},svg);
+    const lbl2 = el('text',{x:PLOT.left-9,y:yy+4,'text-anchor':'end',class:'ticklabel'},svg);
+    lbl2.textContent = t.toFixed(1);
+  }
+
+  // axis labels
+  const xlab = el('text',{x:(PLOT.left+frameRight)/2,y:PLOT.h-10,'text-anchor':'middle',class:'axislabel'},svg);
+  xlab.innerHTML = '';
+  const txSpan1 = el('tspan',{'font-style':'italic'},xlab); txSpan1.textContent='x';
+  const txSpan2 = el('tspan',{class:'sub','baseline-shift':'-4'},xlab); txSpan2.textContent='B';
+
+  const ylabG = el('g',{transform:`translate(16,${(PLOT.top+PLOT.h-PLOT.bottom)/2}) rotate(-90)`},svg);
+  const ylab = el('text',{x:0,y:0,'text-anchor':'middle',class:'axislabel'},ylabG);
+  const tySpan1 = el('tspan',{'font-style':'italic'},ylab); tySpan1.textContent='y';
+  const tySpan2 = el('tspan',{class:'sub','baseline-shift':'-4'},ylab); tySpan2.textContent='B';
+
+  // diagonal y = x (always shown)
+  el('line',{x1:px(0),y1:py(0),x2:px(1),y2:py(1),stroke:'#000','stroke-width':2},svg);
+
+  // equilibrium curve (blue) -- visible when step>1 or solution shown
+  if(S.step>1 || S.sol){
+    let d = 'M '+curveXY.map(p=>`${px(p.x)},${py(p.y)}`).join(' L ');
+    el('path',{d:d, fill:'none', stroke:'#1c3fbf','stroke-width':2.4},svg);
+  }
+
+  // clip path so curve/lines don't spill into column area
+  const clipId='plotclip';
+  const defs = el('defs',{},svg);
+  const clip = el('clipPath',{id:clipId},defs);
+  el('rect',{x:PLOT.left,y:PLOT.top,width:frameRight-PLOT.left,height:(PLOT.h-PLOT.bottom)-PLOT.top},clip);
+
+  const dynG = el('g',{'clip-path':`url(#${clipId})`},svg);
+
+  if(S.step===1){
+    renderStep1(dynG, svg);
+  } else if(S.step===2 || S.step===3){
+    renderStep23(dynG, svg);
+  } else if(S.step===4){
+    renderStep4(dynG, svg);
+  }
+
+  renderOverlayBoxes();
+  renderColumn();
+}
+
+function labelXY(g, x, y, xv, yv, color, dx, dy, opts){
+  opts = opts || {};
+  const fs = opts.fontSize || 12.5;
+  const anchor = opts.anchor || 'start';
+  const lh = opts.lineHeight || (fs+1.5);
+  const tx = px(x)+dx;
+  const box = el('text',{x:tx, y:py(y)+dy, 'font-size':fs, fill:color, 'text-anchor':anchor},g);
+  box.innerHTML='';
+  const l1=el('tspan',{x:tx,dy:0},box);
+  const s1=el('tspan',{'font-style':'italic'},l1); s1.textContent='x';
+  l1.appendChild(document.createTextNode(' = '+fmt2(xv)));
+  const l2=el('tspan',{x:tx,dy:lh},box);
+  const s2=el('tspan',{'font-style':'italic'},l2); s2.textContent='y';
+  l2.appendChild(document.createTextNode(' = '+fmt2(yv)));
+
+  if(opts.bg){
+    const pad = 3;
+    const bb = box.getBBox();
+    const rect = el('rect',{x:bb.x-pad, y:bb.y-pad, width:bb.width+2*pad, height:bb.height+2*pad, fill:'#fff'});
+    g.insertBefore(rect, box);
+  }
+}
+
+// Every render() call clears and rebuilds the SVG, which destroys whatever
+// element originally received pointer capture. So drag state is tracked
+// globally (on window, which is never destroyed) instead of relying on
+// capture surviving element replacement mid-drag.
+let activeDrag = null; // { svgRoot, onDrag }
+
+function makeLocator(g, svgRoot, x, y, color, enabled, onDrag){
+  const c = el('circle',{cx:px(x),cy:py(y),r:7,fill:color,stroke:'#000','stroke-width':1,
+    class:'locator'+(enabled?'':' disabled')},g);
+  if(enabled){
+    c.addEventListener('pointerdown',function(e){
+      activeDrag = { svgRoot, onDrag };
+      e.preventDefault();
+    });
+  }
+  return c;
+}
+
+window.addEventListener('pointermove', function(e){
+  if(!activeDrag) return;
+  const d = clientToData(activeDrag.svgRoot, e.clientX, e.clientY);
+  activeDrag.onDrag(Math.min(1,Math.max(0,d.x)), Math.min(1,Math.max(0,d.y)));
+  if(e.cancelable) e.preventDefault();
+  render();
+});
+window.addEventListener('pointerup', function(){ activeDrag = null; });
+window.addEventListener('pointercancel', function(){ activeDrag = null; });
+
+function renderStep1(g, svgRoot){
+  const enabled = !S.sol;
+  let d = 'M '+S.eq.map(p=>`${px(p.x)},${py(p.y)}`).join(' L ');
+  el('path',{d:d, fill:'none', stroke:'#000', 'stroke-width':1.6},g);
+  S.eq.forEach((p,i)=>{
+    makeLocator(g, svgRoot, p.x, p.y, '#000', enabled, function(nx,ny){ S.eq[i]={x:nx,y:ny}; });
+    // compact single-line "(x, y)" label, placed above or below the point
+    // depending on where it sits in the frame, to minimize crowding
+    // between the closely-spaced points
+    const yPix = py(p.y);
+    const nearTop = yPix < 76;
+    let dy = nearTop ? 25 : -16;
+    // the 7 points sit at fixed, evenly-spaced x positions, so adjacent
+    // labels are stacked in two staggered rows to keep their (now opaque)
+    // backgrounds from covering one another
+    if(i % 2 === 1) dy += nearTop ? 16 : -16;
+    let anchor='middle', dx=0;
+    if(p.x<=0.08){ anchor='start'; dx=10; }
+    else if(p.x>=0.92){ anchor='end'; dx=-10; }
+    const tx = px(p.x)+dx;
+    const lbl = el('text',{x:tx, y:py(p.y)+dy, 'font-size':12.94, fill:'#000', 'text-anchor':anchor},g);
+    lbl.textContent = `(${fmt2(p.x)},${fmt2(p.y)})`;
+    const pad = 2;
+    const bb = lbl.getBBox();
+    const rect = el('rect',{x:bb.x-pad, y:bb.y-pad, width:bb.width+2*pad, height:bb.height+2*pad, fill:'#fff'});
+    g.insertBefore(rect, lbl);
+  });
+}
+
+function renderStep23(g, svgRoot){
+  // feed point marker
+  el('circle',{cx:px(xf),cy:py(xf),r:3,fill:'#000'},g);
+
+  // purple preview q-line, clipped between diagonal and equilibrium curve
+  const q = S.quality;
+  let pts = [];
+  for(let i=0;i<=200;i++){
+    const x = 0.01 + (xf-0.01)*(i/200);
+    let y;
+    if(q>0.02){
+      y = ((-(1-q))/(q+0.01))*x + (1/(q+0.01))*xf;
+    } else {
+      y = xf + (x-xf)*400; // near-vertical
+    }
+    const eq = equilib(x);
+    if(y<=eq+1e-6 && y>=x-1e-6){
+      pts.push({x:x,y:Math.min(1,Math.max(0,y))});
+    }
+  }
+  if(pts.length>1){
+    let d='M '+pts.map(p=>`${px(p.x)},${py(p.y)}`).join(' L ');
+    el('path',{d:d, fill:'none', stroke:'#7a1fa2','stroke-width':2.2},g);
+  }
+
+  if(S.sol){
+    if(S.step===2){
+      el('line',{x1:px(xf),y1:py(xf),x2:px(xf),y2:py(equilib(xf)),stroke:'#e07b00','stroke-width':2.6},g);
+    } else {
+      el('line',{x1:px(xf),y1:py(xf),x2:px(ans3x),y2:py(xf),stroke:'#e07b00','stroke-width':2.6},g);
+    }
+  }
+}
+
+function renderStep4(g, svgRoot){
+  const enabled = !S.sol;
+  const ep = S.endpoint;
+  // purple guide line from locator to feed point
+  el('line',{x1:px(ep.x),y1:py(ep.y),x2:px(xf),y2:py(xf),stroke:'#7a1fa2','stroke-width':2},g);
+
+  if(S.sol){
+    el('line',{x1:px(xf),y1:py(xf),x2:px(ans4x),y2:py(equilib(ans4x)),stroke:'#e07b00','stroke-width':2.6},g);
+  }
+
+  makeLocator(g, svgRoot, ep.x, ep.y, S.sol?'#e07b00':'#7a1fa2', enabled, function(nx,ny){
+    nx = Math.min(0.99,Math.max(0.01,nx));
+    S.endpoint = {x:nx, y:equilib(nx)};
+  });
+
+  const showX = S.sol ? ans4x : ep.x;
+  const showY = S.sol ? equilib(ans4x) : ep.y;
+  let dx = 11, dy = -13;
+  if(ep.x>=0.9) dx=-84;
+  if(ep.y>=0.85) dy=24;
+  labelXY(g, ep.x, ep.y, showX, showY, S.sol?'#e07b00':'#000', dx, dy, {fontSize:18.72, lineHeight:20.2, bg:true});
+}
+
+function renderOverlayBoxes(){
+  let old = document.querySelectorAll('.overlay-box');
+  old.forEach(n=>n.remove());
+  const wrap = document.querySelector('.plot-wrap');
+
+  if(S.step===1){
+    const box = document.createElement('div');
+    box.className='overlay-box';
+    box.style.right='2%';
+    box.style.top='47%';
+    let rows = tableRows.map(r=>`<tr><td>${fmt2(r.x)}</td><td>${fmt2(r.y)}</td></tr>`).join('');
+    box.innerHTML = `<table><tr class="hdrRow"><th><i>x</i><sub>B</sub></th><th><i>y</i><sub>B</sub></th></tr>${rows}</table>`;
+    wrap.appendChild(box);
+  } else if(S.step===2 || S.step===3){
+    const box = document.createElement('div');
+    box.className='overlay-box';
+    box.style.left='59%';
+    box.style.top='70%';
+    box.style.fontSize='15.81px';
+    box.innerHTML = `inlet concentration (<i>z</i><sub>F</sub>) = ${fmt2(xf)}`;
+    wrap.appendChild(box);
+  } else if(S.step===4){
+    const box = document.createElement('div');
+    box.className='overlay-box';
+    box.style.left='12.5%';
+    box.style.top='2%';
+    box.style.fontSize='14.38px';
+    box.innerHTML = `<i>V</i> = ${fmt2(randV)} kmol/s<br><i>L</i> = ${fmt2(randL)} kmol/s`;
+    wrap.appendChild(box);
+  }
+}
+
+function renderColumn(){
+  const svg = document.getElementById('columnSvg');
+  clear(svg);
+  if(!S.showColumn) return;
+
+  const FS = 13.75, FSsub = 10; // column label font sizes (25% larger than the original 11 / 8)
+  const DL = 138, DR = 203, DCX = (DL+DR)/2; // drum left/right wall x, center x
+
+  // simple flash-drum schematic, shifted right to leave room on the left
+  // for the feed label so it never overlaps the drum
+  el('line',{x1:DL,y1:70,x2:DL,y2:230,stroke:'#000','stroke-width':2},svg);
+  el('line',{x1:DR,y1:70,x2:DR,y2:230,stroke:'#000','stroke-width':2},svg);
+  el('path',{d:`M ${DL} 70 A 32.5 16 0 0 1 ${DR} 70`, fill:'none', stroke:'#000','stroke-width':2},svg);
+  el('path',{d:`M ${DL} 230 A 32.5 16 0 0 0 ${DR} 230`, fill:'none', stroke:'#000','stroke-width':2},svg);
+
+  // feed label, shifted right toward the column (but still clear of the
+  // drum wall) and pulled down close to the inlet arrow so the two read
+  // as one group
+  const FX = 28;
+  const feedLbl = el('text',{x:FX,y:149,'font-size':FS},svg);
+  const fs1=el('tspan',{'font-style':'italic'},feedLbl); fs1.textContent='z';
+  const fs1b=el('tspan',{'baseline-shift':'-2','font-size':FSsub},feedLbl); fs1b.textContent='F';
+  feedLbl.appendChild(document.createTextNode(' = '+fmt2(xf)));
+  const fLbl = el('text',{x:FX,y:167,'font-size':FS},svg);
+  const fs2=el('tspan',{'font-style':'italic'},fLbl); fs2.textContent='F';
+  fLbl.appendChild(document.createTextNode(' = 1.00 kmol/s'));
+
+  // feed arrow (dropped a bit lower so the wider, right-shifted label
+  // text never runs into the arrow shaft)
+  el('line',{x1:DL-45,y1:183,x2:DL-2,y2:183,stroke:'#000','stroke-width':2},svg);
+  el('path',{d:`M ${DL-2} 183 L ${DL-10} 178 L ${DL-10} 188 Z`, fill:'#000'},svg);
+
+  // vapor outlet (top)
+  el('line',{x1:DCX,y1:54,x2:DCX,y2:25,stroke:'#000','stroke-width':2},svg);
+  el('path',{d:`M ${DCX} 25 L ${DCX-5} 33 L ${DCX+5} 33 Z`, fill:'#000'},svg);
+
+  // liquid outlet (bottom)
+  el('line',{x1:DCX,y1:246,x2:DCX,y2:275,stroke:'#000','stroke-width':2},svg);
+  el('path',{d:`M ${DCX} 275 L ${DCX-5} 267 L ${DCX+5} 267 Z`, fill:'#000'},svg);
+
+  const LX = DCX+8; // label column hugging the outlet arrows, just to their right
+
+  // V / L flow-rate legend (hidden while step 4 is unsolved, matching original),
+  // each on a single line, positioned close to its outlet arrow.
+  if(!(S.step===4 && !S.sol)){
+    const arrowMode = (S.quality===0 || S.quality===1 || S.sol);
+    let Vval = S.quality, Lval = 1-S.quality, flowColor='#000';
+    if(S.sol){
+      if(S.step===2){ Vval=0; Lval=1; flowColor='#e07b00'; }
+      else if(S.step===3){ Vval=1; Lval=0; flowColor='#e07b00'; }
+      else if(S.step===4){ Vval=randV; Lval=randL; flowColor='#e07b00'; }
+    }
+    const sep = (S.sol||arrowMode) ? ' → ' : ' = ';
+    const vLbl = el('text',{x:LX,y:32,'font-size':FS, fill:flowColor},svg);
+    const vs1=el('tspan',{'font-style':'italic'},vLbl); vs1.textContent='V';
+    vLbl.appendChild(document.createTextNode(sep+fmt2(Vval)+' kmol/s'));
+
+    const lLbl = el('text',{x:LX,y:288,'font-size':FS, fill:flowColor},svg);
+    const ls1=el('tspan',{'font-style':'italic'},lLbl); ls1.textContent='L';
+    lLbl.appendChild(document.createTextNode(sep+fmt2(Lval)+' kmol/s'));
+  }
+
+  // xB / yB composition legend
+  let showComp = false, xB=0,yB=0, compColor='#000';
+  if(S.sol && S.step>=2){
+    showComp=true; compColor='#e07b00';
+    if(S.step===2){ yB=equilib(xf); xB=xf; }
+    else if(S.step===3){ yB=equilib(ans3x); xB=ans3x; }
+    else if(S.step===4){ yB=equilib(ans4x); xB=ans4x; }
+  } else if(S.step===4 && !S.sol){
+    showComp=true; compColor='#333';
+    xB=S.endpoint.x; yB=S.endpoint.y;
+  }
+
+  const yLbl = el('text',{x:LX,y:48,'font-size':FS, fill: showComp?compColor:'#000'},svg);
+  const ys1=el('tspan',{'font-style':'italic'},yLbl); ys1.textContent='y';
+  const ys1b=el('tspan',{'baseline-shift':'-2','font-size':FSsub},yLbl); ys1b.textContent='B';
+  yLbl.appendChild(document.createTextNode(showComp? (' = '+fmt2(yB)) : ' = ?'));
+
+  const xLbl = el('text',{x:LX,y:264,'font-size':FS, fill: showComp?compColor:'#000'},svg);
+  const xs1=el('tspan',{'font-style':'italic'},xLbl); xs1.textContent='x';
+  const xs1b=el('tspan',{'baseline-shift':'-2','font-size':FSsub},xLbl); xs1b.textContent='B';
+  xLbl.appendChild(document.createTextNode(showComp? (' = '+fmt2(xB)) : ' = ?'));
+}
+
+/* ---------------------------------------------------------------------
+   PANEL (Directions / Details / About)
+--------------------------------------------------------------------- */
+const panelContent = {
+  directions: `
+    <h2>Directions</h2>
+    <p>This simulation leads you through a step-by-step procedure to generate an
+    <i>x</i>-<i>y</i> graph for a binary vapor-liquid equilibrium and then determines
+    outlet compositions for a flash distillation column. Points are moved using a
+    locator on the graph or by moving the slider to select the desired quality
+    (defined here as vapor flow rate divided by feed flow rate). After each solution
+    is ready, select &ldquo;show solution&rdquo; to see the correct solution and then
+    select &ldquo;next step&rdquo;. Selecting &ldquo;show column&rdquo; presents a
+    representation of the column with flow rates and mole fractions (when
+    &ldquo;show solution&rdquo; is selected). At any time, &ldquo;new problem&rdquo;
+    can be clicked to generate a new set of values.</p>
+    <div class="tip">Tip: drag any locator (draggable point) on the graph to move it around.</div>
+  `,
+  details: `
+    <h2>Details</h2>
+    <p>Flash distillation (also known as flash evaporation) is steady-state,
+    single-stage distillation. In this simulation, the liquid feed contains two
+    components. An adiabatic throttle reduces the pressure and a fraction of the
+    liquid feed evaporates to maintain constant enthalpy at the lower pressure.
+    Phase equilibrium data at the outlet pressure helps determine the composition
+    and flow rates of the outlet streams.</p>
+
+    <p>The <i>x</i>-<i>y</i> equilibrium curve is generated using the modified Raoult's law:</p>
+    <div class="eqline">\\[ P = x_1\\gamma_1 P_1^{sat} + x_2\\gamma_2 P_2^{sat}, \\]</div>
+    <div class="eqline">\\[ y_i P = x_i \\gamma_i P_i^{sat}, \\]</div>
+    <p>where \\(x_i\\) and \\(y_i\\) are the liquid and vapor mole fractions (\\(i=1\\) for
+    the more volatile component), \\(x_1+x_2=1\\), \\(y_1+y_2=1\\), \\(P\\) is total
+    pressure and \\(P_i^{sat}\\) is the saturation pressure, which is calculated using
+    the Antoine equation:</p>
+    <div class="eqline">\\[ P_i^{sat} = 10^{\\left(A_i - \\dfrac{B_i}{T+C_i}\\right)}. \\]</div>
+    <p>The activity coefficients \\(\\gamma_i\\) in this simulation are pseudorandom.</p>
+
+    <p>Once the equilibrium curve has been determined, a system can be fully defined
+    by mass balances:</p>
+    <div class="eqline">\\[ z_F F = x_i L + y_i V, \\]</div>
+    <div class="eqline">\\[ F = L + V, \\]</div>
+    <p>where \\(z_F\\), \\(x_i\\) and \\(y_i\\) are the mole fractions of the more volatile
+    component in the feed, bottoms (liquid) and distillate (vapor) streams,
+    respectively. The flow rates (\\(F\\), \\(L\\), \\(V\\)) are for the feed, bottoms and
+    distillate, respectively.</p>
+
+    <p>In the case of this simulation, \\(x_i\\) and \\(y_i\\) are determined graphically.
+    This is done by reading the \\(x\\) value and \\(y\\) value at the intersection of
+    the \\(q\\)-line with the equilibrium curve. The \\(q\\)-line equation is a function
+    of the vapor and liquid flow rates and feed conditions:</p>
+    <div class="eqline">\\[ y = \\frac{q-1}{q}x + \\frac{1}{q}z_F, \\]</div>
+    <div class="eqline">\\[ q = \\frac{V}{F}. \\]</div>
+
+    <h3>Symbols</h3>
+    <ul class="symbols">
+      <li>\\(A_i, B_i, C_i\\) = Antoine equation constants for component \\(i\\)</li>
+      <li>\\(F\\) = feed flow rate (kmol/s)</li>
+      <li>\\(L\\) = liquid (bottoms) flow rate (kmol/s)</li>
+      <li>\\(P\\) = total pressure (mmHg)</li>
+      <li>\\(P_i^{sat}\\) = saturation pressure of component \\(i\\) (mmHg)</li>
+      <li>\\(q\\) = quality, fraction of the feed that leaves as vapor (\\(V/F\\))</li>
+      <li>\\(T\\) = temperature (&deg;C)</li>
+      <li>\\(V\\) = vapor (distillate) flow rate (kmol/s)</li>
+      <li>\\(x_i\\) = mole fraction of component \\(i\\) in the liquid</li>
+      <li>\\(y_i\\) = mole fraction of component \\(i\\) in the vapor</li>
+      <li>\\(x_B, y_B\\) = liquid and vapor mole fractions of the more volatile component (plotted on the graph)</li>
+      <li>\\(z_F\\) = mole fraction of the more volatile component in the feed</li>
+      <li>\\(\\gamma_i\\) = activity coefficient of component \\(i\\)</li>
+    </ul>
+  `,
+  about: `
+    <h2>About</h2>
+    <p>This simulation was created in the
+    <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of
+    Chemical and Biological Engineering</a> at University of Colorado Boulder for
+    <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a>
+    by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a
+    Mathematica simulation by Neil Hendren. It was prepared with financial support from
+    the National Science Foundation (DUE 2336987 and 2336988). Address any questions or
+    comments to
+    <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.</p>
+  `
+};
+
+function openPanel(name){
+  const panel = document.getElementById('infoPanel');
+  const body = document.getElementById('panelBody');
+  const buttons = document.querySelectorAll('.info-btn');
+  const alreadyOpen = !panel.classList.contains('hidden') && panel.dataset.current===name;
+  buttons.forEach(b=>b.classList.remove('active'));
+  if(alreadyOpen){
+    panel.classList.add('hidden');
+    panel.dataset.current='';
+    return;
+  }
+  body.innerHTML = panelContent[name];
+  panel.dataset.current = name;
+  panel.classList.remove('hidden');
+  document.querySelector(`.info-btn[data-panel="${name}"]`).classList.add('active');
+  fitPanelHeight();
+  if(window.MathJax && window.MathJax.typesetPromise){
+    window.MathJax.typesetPromise([body]);
+  }
+}
+
+// The panel opens upward, overlapping the figures above the button row.
+// Cap its height to whatever room actually exists between the top of the
+// viewport and the button row, so it can never render off the top of the
+// page; panel-scroll then scrolls internally for anything taller than that.
+function fitPanelHeight(){
+  const panel = document.getElementById('infoPanel');
+  if(panel.classList.contains('hidden')) return;
+  const scrollBox = panel.querySelector('.panel-scroll');
+  const wrapRect = document.querySelector('.info-wrap').getBoundingClientRect();
+  const h2 = panel.querySelector('h2');
+  const cs = getComputedStyle(panel);
+  const chrome = (h2 ? h2.getBoundingClientRect().height : 0)
+    + parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom)
+    + parseFloat(cs.borderTopWidth) + parseFloat(cs.borderBottomWidth) + 12;
+  const available = wrapRect.top - 8 - 12; // gap above the button row, minus a top margin
+  const maxScroll = Math.max(120, Math.min(480, available - chrome));
+  scrollBox.style.maxHeight = maxScroll + 'px';
+}
+window.addEventListener('resize', fitPanelHeight);
+
+document.querySelectorAll('.info-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>openPanel(btn.dataset.panel));
+});
+document.getElementById('panelCloseBtn').addEventListener('click', ()=>{
+  document.getElementById('infoPanel').classList.add('hidden');
+  document.getElementById('infoPanel').dataset.current='';
+  document.querySelectorAll('.info-btn').forEach(b=>b.classList.remove('active'));
+});
+
+/* ---------------------------------------------------------------------
+   CONTROL WIRING
+--------------------------------------------------------------------- */
+document.getElementById('showSolution').addEventListener('change', function(e){
+  S.sol = e.target.checked;
+  render();
+});
+document.getElementById('showColumn').addEventListener('change', function(e){
+  S.showColumn = e.target.checked;
+  render();
+});
+document.getElementById('qualitySlider').addEventListener('input', function(e){
+  S.quality = parseFloat(e.target.value);
+  render();
+});
+document.getElementById('nextStepBtn').addEventListener('click', nextStep);
+document.getElementById('newProblemBtn').addEventListener('click', newProblem);
+
+/* ---------------------------------------------------------------------
+   INIT
+--------------------------------------------------------------------- */
+newProblem();
+
+})();
+</script>
+</body>
+</html>

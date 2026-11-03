@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mass Balance in the Haber Process</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] },
+  svg: { fontCache: 'global' },
+  options: { renderActions: { addMenu: [] } }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.min.js" id="MathJax-script" async></script>
+<style>
+  :root{
+    --darkred:#98000D;
+    --slider-font:15px;      /* slider label / value font */
+    --text-font:17px;        /* general text = 15% larger than sliders */
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    font-family:Helvetica, Arial, sans-serif;
+    color:#111;
+    background:#ffffff;
+    -webkit-font-smoothing:antialiased;
+  }
+  #app{
+    max-width:952px;
+    margin:14px auto;
+    padding:0 12px;
+  }
+  #title{
+    font-size:22px;
+    font-weight:bold;
+    text-align:center;
+    margin:2px 0 12px 0;
+  }
+  #main{
+    position:relative;
+    display:flex;
+    align-items:flex-start;
+    min-height:476px;
+  }
+  #controls{
+    width:300px;
+    flex:0 0 300px;
+    padding:4px 14px 4px 4px;
+    border-right:1px solid #e4e4e4;
+  }
+  .heading{
+    font-size:var(--slider-font);
+    font-weight:normal;
+    color:#000;
+    margin:2px 0 6px 0;
+  }
+  .ctl{ margin:0 0 14px 0; }
+  .ctl .row{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    font-size:var(--slider-font);
+    margin-bottom:2px;
+  }
+  .ctl .name{ color:#000; }
+  .ctl .val{ color:#000; font-variant-numeric:tabular-nums; min-width:64px; text-align:right; }
+  input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+  input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  .panel table.symbols td{ text-align:left; padding:2px 10px 2px 0; vertical-align:top; }
+  #buttons{
+    margin-top:6px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    width:150px;
+  }
+  #buttons button{
+    font-family:Helvetica, Arial, sans-serif;
+    font-size:var(--slider-font);
+    color:#fff;
+    background:var(--darkred);
+    border:none;
+    border-radius:4px;
+    padding:7px 10px;
+    cursor:pointer;
+    text-align:center;
+  }
+  #buttons button:hover{ background:#7d000b; }
+  #buttons button.active{ background:#5f0009; }
+
+  #diagram{
+    flex:1 1 auto;
+    min-width:0;
+    position:relative;
+    padding-left:8px;
+    min-height:476px;
+  }
+  #canvas{ display:block; }
+
+  .panel{
+    position:absolute;
+    top:0;
+    left:4px;
+    right:6px;
+    display:none;
+    background:#ffffff;
+    border:1px solid #b9b9b9;
+    border-radius:6px;
+    box-shadow:0 6px 22px rgba(0,0,0,0.18);
+    padding:16px 18px 18px 18px;
+    max-height:470px;
+    overflow:auto;
+    z-index:10;
+  }
+  .panel.open{ display:block; }
+  .panel .close{
+    position:absolute;
+    top:8px; right:10px;
+    width:24px; height:24px;
+    line-height:22px;
+    text-align:center;
+    font-size:18px;
+    font-weight:bold;
+    color:#fff;
+    background:var(--darkred);
+    border:none;
+    border-radius:4px;
+    cursor:pointer;
+    padding:0;
+  }
+  .panel .close:hover{ background:#7d000b; }
+  .panel h2{
+    font-size:calc(var(--text-font) + 1px);
+    margin:0 34px 10px 0;
+    color:var(--darkred);
+  }
+  .panel, .panel p, .panel li, .panel td{
+    font-size:var(--text-font);
+    line-height:1.45;
+  }
+  .panel p{ margin:0 0 10px 0; }
+  .panel a{ color:var(--darkred); }
+  .panel table.params{
+    border-collapse:collapse;
+    margin:6px 0 10px 0;
+  }
+  .panel table.params th, .panel table.params td{
+    border:1px solid #d0d0d0;
+    padding:3px 9px;
+    text-align:center;
+  }
+  .panel table.params th{ background:#f4f4f4; }
+  /* left-justify MathJax display equations */
+  .panel mjx-container[display="true"]{
+    text-align:left !important;
+    margin:0.5em 0 !important;
+    max-width:100%;
+    overflow-x:auto;
+    overflow-y:hidden;
+  }
+  .panel mjx-container[display="true"] > svg{ margin:0 !important; }
+  .panel mjx-container{ font-size:88% !important; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="title">Mass Balance in the Haber Process</div>
+  <div id="main">
+    <div id="controls">
+      <div class="heading" style="font-weight:bold">reactor conditions</div>
+
+      <div class="ctl">
+        <div class="row"><span class="name">temperature</span><span class="val" id="Tval">600 K</span></div>
+        <input type="range" id="T" min="450" max="650" step="10" value="600">
+      </div>
+
+      <div class="ctl">
+        <div class="row"><span class="name">pressure</span><span class="val" id="Pval">100 bar</span></div>
+        <input type="range" id="P" min="100" max="300" step="10" value="100">
+      </div>
+
+      <div class="ctl">
+        <div class="row"><span class="name">reactor feed flow rate</span><span class="val" id="Fval">10 mol/min</span></div>
+        <input type="range" id="F" min="5" max="60" step="5" value="10">
+      </div>
+
+      <div id="buttons">
+        <button id="btnDir">Directions</button>
+        <button id="btnDet">Details</button>
+        <button id="btnAbt">About</button>
+      </div>
+    </div>
+
+    <div id="diagram">
+      <canvas id="canvas"></canvas>
+
+      <div class="panel" id="panelDir">
+        <button class="close" aria-label="close">&times;</button>
+        <h2>Directions</h2>
+        <p>This simulation models an ideal process for high-pressure ammonia synthesis
+        (\(1.5\,\mathrm{H_2}+0.5\,\mathrm{N_2}\rightarrow \mathrm{NH_3}\)), known as the Haber
+        process. In a commercial process, because \(\mathrm{N_2}\) in the feed is from air, the
+        feed contains some Ar that must be removed by a purge that also contains \(\mathrm{N_2}\)
+        and \(\mathrm{H_2}\). Use the sliders to set the reactor temperature <em>T</em> (K), the
+        reactor pressure <em>P</em> (bar), and the reactor feed flow rate (mol/min). The diagram
+        updates to show the extent of reaction \(\xi\), the fresh feed of nitrogen and hydrogen, the
+        recycled nitrogen and hydrogen, and the ammonia produced.</p>
+        <p>We use the Peng&ndash;Robinson equation of state and the reaction-coordinate
+        method to compute the extent of reaction \(\xi\), in mole of \(\mathrm{NH_3}\) per min, for
+        user-set values of the reactor temperature <em>T</em> in kelvin and
+        pressure <em>P</em> in bar. This simulation carries out the mass balance around the reactor
+        and splitter in order to compute the amount of ammonia produced when chemical equilibrium is
+        reached in the reactor and in the recycle stream. We assume that: (1) the splitter separates
+        the product (ammonia) perfectly from the reactants (nitrogen and hydrogen); and (2) the
+        fresh feed contains stoichiometric amounts of nitrogen and hydrogen. As expected from Le
+        Chatelier's principle, the amount of ammonia produced is greater at low temperatures and
+        high pressures.</p>
+      </div>
+
+      <div class="panel" id="panelDet">
+        <button class="close" aria-label="close">&times;</button>
+        <h2>Details</h2>
+        <p>The reaction is</p>
+        \[ 1.5\,\mathrm{H_2} + 0.5\,\mathrm{N_2} \;\rightleftharpoons\; \mathrm{NH_3} \]
+        <p>Let \(F\) be the total molar flow rate fed to the reactor and \(\xi\) the extent of
+        reaction. The fresh feed is stoichiometric, so the reactor feed is
+        \(\tfrac{1}{4}F\) nitrogen and \(\tfrac{3}{4}F\) hydrogen. The mole fractions leaving the
+        reactor are</p>
+        \[ y_{\mathrm{NH_3}} = \frac{\xi}{F-\xi}, \qquad
+           y_{\mathrm{N_2}} = \frac{\tfrac{1}{4}F - \tfrac{1}{2}\xi}{F-\xi}, \qquad
+           y_{\mathrm{H_2}} = 1 - y_{\mathrm{N_2}} - y_{\mathrm{NH_3}} \]
+        <p>Because the splitter recovers all ammonia and recycles all unreacted gas, a steady-state
+        balance gives the fresh feed, recycle, and product streams (mol per unit time):</p>
+        \[ \text{fresh N}_2=\tfrac{1}{2}\xi,\qquad \text{fresh H}_2=\tfrac{3}{2}\xi,\qquad
+           \text{NH}_3\ \text{product}=\xi \]
+        \[ \text{recycle N}_2=\tfrac{1}{4}F-\tfrac{1}{2}\xi,\qquad
+           \text{recycle H}_2=\tfrac{3}{4}F-\tfrac{3}{2}\xi \]
+        <p>Chemical equilibrium is written with gas-phase fugacities and a 1 bar reference pressure:</p>
+        \[ K_a\, y_{\mathrm{H_2}}^{1.5}\, y_{\mathrm{N_2}}^{0.5}\,
+           \varphi_{\mathrm{H_2}}^{1.5}\, \varphi_{\mathrm{N_2}}^{0.5}
+           = \frac{y_{\mathrm{NH_3}}}{P}\,\varphi_{\mathrm{NH_3}} \]
+        <p>The equilibrium constant uses \(\Delta G^{\circ}=-16.5\) kJ/mol at \(T_0=298.15\) K
+        together with a temperature-dependent heat of reaction (J/mol):</p>
+        \[ \begin{aligned}
+           \Delta H(T)=\,&-46100 + \Delta a\,(T-T_0)+\tfrac{\Delta b}{2}(T^2-T_0^2)\\
+           &+\tfrac{\Delta c}{3}(T^3-T_0^3)+\tfrac{\Delta d}{4}(T^4-T_0^4)
+           \end{aligned} \]
+        \[ K_a(T_0)=\exp\!\left(\frac{16500}{R\,T_0}\right) \]
+        \[ \begin{aligned}
+           K_a(T)=K_a(T_0)\exp\Big[\,&\tfrac{\Delta a}{R}\ln\tfrac{T}{T_0}
+           +\tfrac{\Delta b}{2R}(T-T_0)+\tfrac{\Delta c}{6R}(T^2-T_0^2)\\
+           &+\tfrac{\Delta d}{12R}(T^3-T_0^3)
+           +\tfrac{\Delta H^{\circ}_{\!*}}{R}\Big(\tfrac{1}{T}-\tfrac{1}{T_0}\Big)\Big]
+           \end{aligned} \]
+        <p>where \(\Delta H^{\circ}_{\!*}=46100+T_0\Delta a+\tfrac{\Delta b}{2}T_0^2
+        +\tfrac{\Delta c}{3}T_0^3+\tfrac{\Delta d}{4}T_0^4\), and</p>
+        \[ \Delta a=-29.36,\qquad \Delta b=2.786\times10^{-2} \]
+        \[ \Delta c=-4.10\times10^{-7},\qquad \Delta d=2.74\times10^{-9} \]
+        <p>Fugacity coefficients come from the Peng&ndash;Robinson equation of state. The mixture
+        compressibility factor \(Z\) is the largest real root of</p>
+        \[ Z^3-(1-B)Z^2+(A-3B^2-2B)Z-(AB-B^2-B^3)=0 \]
+        <p>with van der Waals mixing rules</p>
+        \[ A=\sum_i\sum_j y_i y_j A_{ij},\quad B=\sum_i y_i B_i,\quad
+           A_{ij}=\sqrt{A_i A_j}\,(1-k_{ij}) \]
+        \[ A_i=\frac{a_i P}{(RT)^2},\qquad B_i=\frac{b_i P}{RT} \]
+        \[ a_i=0.45724\,\alpha_i\frac{R^2 T_{c,i}^2}{P_{c,i}},\qquad
+           b_i=0.07780\,\frac{R\,T_{c,i}}{P_{c,i}} \]
+        \[ \alpha_i=\left[1+m_i\!\left(1-\sqrt{T/T_{c,i}}\,\right)\right]^2 \]
+        \[ m_i=0.37464+1.54226\,\omega_i-0.26992\,\omega_i^2 \]
+        <p>and the vapor fugacity coefficient of species \(i\)</p>
+        \[ \begin{aligned}
+           \ln\varphi_i=\;&\frac{B_i}{B}(Z-1)-\ln(Z-B)\\
+           &-\frac{A}{2\sqrt{2}\,B}\!\left(\frac{2\sum_j y_j A_{ij}}{A}-\frac{B_i}{B}\right)
+           \ln\!\frac{Z+(1+\sqrt{2})B}{Z+(1-\sqrt{2})B}
+           \end{aligned} \]
+        <p>The two equations (equilibrium and the cubic in \(Z\)) are solved simultaneously for the
+        extent of reaction \(\xi\) and the compressibility factor \(Z\).</p>
+        <p><strong>Pure-component parameters</strong> (\(R=8.314\ \mathrm{J\,mol^{-1}K^{-1}}\)):</p>
+        <table class="params">
+          <tr><th>species</th><th>\(T_c\) (K)</th><th>\(P_c\) (bar)</th><th>\(\omega\)</th></tr>
+          <tr><td>H\(_2\)</td><td>33.2</td><td>13.0</td><td>&minus;0.22</td></tr>
+          <tr><td>N\(_2\)</td><td>126.2</td><td>33.9</td><td>0.04</td></tr>
+          <tr><td>NH\(_3\)</td><td>405.6</td><td>112.8</td><td>0.25</td></tr>
+        </table>
+        <p>Binary interaction parameters:</p>
+        \[ k_{\mathrm{H_2,N_2}}=-0.036,\qquad k_{\mathrm{H_2,NH_3}}=0,\qquad
+           k_{\mathrm{N_2,NH_3}}=0.222 \]
+        <p><strong>Symbols</strong></p>
+        <table class="symbols">
+          <tr><td>\(A,\ B\)</td><td>dimensionless Peng&ndash;Robinson mixture parameters</td></tr>
+          <tr><td>\(A_i,\ B_i\)</td><td>dimensionless Peng&ndash;Robinson parameters of species \(i\)</td></tr>
+          <tr><td>\(A_{ij}\)</td><td>dimensionless cross parameter for species \(i\) and \(j\)</td></tr>
+          <tr><td>\(a_i\)</td><td>Peng&ndash;Robinson attraction parameter of species \(i\) (J&middot;m\(^3\)/mol\(^2\))</td></tr>
+          <tr><td>\(b_i\)</td><td>Peng&ndash;Robinson co-volume of species \(i\) (m\(^3\)/mol)</td></tr>
+          <tr><td>\(F\)</td><td>total molar flow rate fed to the reactor (mol/min)</td></tr>
+          <tr><td>\(K_a\)</td><td>equilibrium constant (dimensionless, 1 bar reference pressure)</td></tr>
+          <tr><td>\(k_{ij}\)</td><td>binary interaction parameter for species \(i\) and \(j\)</td></tr>
+          <tr><td>\(m_i\)</td><td>Peng&ndash;Robinson parameter that depends on \(\omega_i\)</td></tr>
+          <tr><td>\(P\)</td><td>reactor pressure (bar)</td></tr>
+          <tr><td>\(P_{c,i}\)</td><td>critical pressure of species \(i\) (bar)</td></tr>
+          <tr><td>\(R\)</td><td>ideal gas constant (J/(mol&middot;K))</td></tr>
+          <tr><td>\(T\)</td><td>reactor temperature (K)</td></tr>
+          <tr><td>\(T_0\)</td><td>reference temperature, 298.15 K</td></tr>
+          <tr><td>\(T_{c,i}\)</td><td>critical temperature of species \(i\) (K)</td></tr>
+          <tr><td>\(y_i\)</td><td>mole fraction of species \(i\) leaving the reactor</td></tr>
+          <tr><td>\(Z\)</td><td>compressibility factor of the gas mixture</td></tr>
+          <tr><td>\(\alpha_i\)</td><td>temperature-dependent Peng&ndash;Robinson function of species \(i\)</td></tr>
+          <tr><td>\(\Delta a,\ \Delta b,\ \Delta c,\ \Delta d\)</td><td>reaction heat-capacity coefficients (products minus reactants)</td></tr>
+          <tr><td>\(\Delta G^{\circ}\)</td><td>standard Gibbs free energy of reaction at \(T_0\) (kJ/mol)</td></tr>
+          <tr><td>\(\Delta H(T)\)</td><td>heat of reaction at temperature \(T\) (J/mol)</td></tr>
+          <tr><td>\(\Delta H^{\circ}_{\!*}\)</td><td>integration constant in the \(K_a(T)\) expression (J/mol)</td></tr>
+          <tr><td>\(\varphi_i\)</td><td>fugacity coefficient of species \(i\)</td></tr>
+          <tr><td>\(\omega_i\)</td><td>acentric factor of species \(i\)</td></tr>
+          <tr><td>\(\xi\)</td><td>extent of reaction (mol NH\(_3\)/min)</td></tr>
+        </table>
+      </div>
+
+      <div class="panel" id="panelAbt">
+        <button class="close" aria-label="close">&times;</button>
+        <h2>About</h2>
+        <p>This simulation was created in the
+        <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical
+        and Biological Engineering</a> at University of Colorado Boulder for
+        <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a>
+        by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a
+        <a href="https://demonstrations.wolfram.com/MassBalanceInTheHaberProcess/" target="_blank" rel="noopener">Mathematica
+        simulation</a> by Housam Binous, Mohammad Mozahar, and Ahmed Bellagi. It was prepared with
+        financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any
+        questions or comments to LearnChemE@gmail.com.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+/* ---------------- Physics: Haber process, Peng-Robinson EOS ---------------- */
+const R = 8.314;
+// species 1=H2, 2=N2, 3=NH3
+const Pc = {1:13.0, 2:33.9, 3:112.8};
+const Tc = {1:33.2, 2:126.2, 3:405.6};
+const om = {1:-0.22, 2:0.04, 3:0.25};
+const kij = {
+  "1,1":0,"2,2":0,"3,3":0,
+  "1,2":-0.036,"2,1":-0.036,
+  "1,3":0,"3,1":0,
+  "2,3":0.222,"3,2":0.222
+};
+
+// heat-capacity differences for 1.5 H2 + 0.5 N2 -> NH3
+const da = 24.619 - 0.5*27.318 - 1.5*26.879;
+const db = (3.75 - 0.5*0.623 - 1.5*0.435)*1e-2;
+const dc = (-0.138 + 0.5*0.095 + 1.5*0.033)*1e-5;
+const dd = (0.5*2.871 + 1.5*0.87)*1e-9;
+const T0 = 298.15;
+const Ka298 = Math.exp(16.5*(1000/(R*T0)));
+
+function Ka(T){
+  const dHstar = 46100 + T0*da + (db/2)*T0*T0 + (dc/3)*Math.pow(T0,3) + (dd/4)*Math.pow(T0,4);
+  return Ka298*Math.exp(
+      (da/R)*Math.log(T/T0)
+    + (db/(2*R))*(T-T0)
+    + (dc/(6*R))*(T*T-T0*T0)
+    + (dd/(12*R))*(Math.pow(T,3)-Math.pow(T0,3))
+    + (dHstar/R)*(1/T - 1/T0)
+  );
+}
+function m_(i){ return 0.37464 + 1.54226*om[i] - 0.26992*om[i]*om[i]; }
+function a_(i,T){ const t=1 + m_(i)*(1-Math.sqrt(T/Tc[i])); return t*t; }
+function ap_(i,T){ return 0.45724*a_(i,T)*R*R*Tc[i]*Tc[i]/Pc[i]; }
+function Ap_(i,P,T){ return ap_(i,T)*P/Math.pow(R*T,2); }
+function bp_(i){ return 0.0778*R*Tc[i]/Pc[i]; }
+function Bp_(i,P,T){ return P*bp_(i)/(R*T); }
+function Ab_(i,j,P,T){ return Math.sqrt(Ap_(i,P,T)*Ap_(j,P,T))*(1-kij[i+","+j]); }
+
+// largest real root of z^3 + c2 z^2 + c1 z + c0
+function cubicMaxRoot(c2,c1,c0){
+  const p = c1 - c2*c2/3;
+  const q = 2*c2*c2*c2/27 - c2*c1/3 + c0;
+  const disc = q*q/4 + p*p*p/27;
+  const shift = -c2/3;
+  const roots = [];
+  if(disc > 0){
+    const s = Math.sqrt(disc);
+    const u = Math.cbrt(-q/2 + s);
+    const v = Math.cbrt(-q/2 - s);
+    roots.push(u+v+shift);
+  } else {
+    const r = Math.sqrt(-p*p*p/27);
+    let arg = -q/2/r;
+    arg = Math.max(-1, Math.min(1, arg));
+    const phi = Math.acos(arg);
+    const mag = 2*Math.cbrt(r);
+    for(let kk=0; kk<3; kk++){
+      roots.push(mag*Math.cos((phi + 2*Math.PI*kk)/3) + shift);
+    }
+  }
+  return Math.max.apply(null, roots);
+}
+
+function solveHaber(T,P,feed){
+  function comps(Xs){
+    const y3 = Xs/(feed-Xs);
+    const y2 = (feed/4 - 0.5*Xs)/(feed-Xs);
+    const y1 = 1 - y2 - y3;
+    return {1:y1,2:y2,3:y3};
+  }
+  function Av(y,P,T){
+    let s=0;
+    for(const i of [1,2,3]) for(const j of [1,2,3]) s += y[i]*y[j]*Ab_(i,j,P,T);
+    return s;
+  }
+  function Bv(y,P,T){
+    let s=0; for(const i of [1,2,3]) s += y[i]*Bp_(i,P,T); return s;
+  }
+  function Zvap(y,P,T){
+    const A=Av(y,P,T), B=Bv(y,P,T);
+    return cubicMaxRoot((-1+B), (A-3*B*B-2*B), (-A*B+B*B+B*B*B));
+  }
+  function phiv(i,y,P,T,Zv){
+    const A=Av(y,P,T), B=Bv(y,P,T), Bi=Bp_(i,P,T);
+    let sj=0; for(const j of [1,2,3]) sj += y[j]*Ab_(i,j,P,T);
+    const bracket = 2*sj/A - Bi/B;
+    return Math.exp((Zv-1)*(Bi/B) - Math.log(Zv-B)
+      - (A/(2*Math.SQRT2*B))*bracket*Math.log((Zv+(1+Math.SQRT2)*B)/(Zv+(1-Math.SQRT2)*B)));
+  }
+  function resid(Xs){
+    const y=comps(Xs), Zv=Zvap(y,P,T);
+    const lhs=(Ka(T)*Math.pow(y[2],0.5)*Math.pow(y[1],1.5))*(Math.pow(phiv(1,y,P,T,Zv),1.5)*Math.pow(phiv(2,y,P,T,Zv),0.5));
+    const rhs=(y[3]/(P/1.0))*phiv(3,y,P,T,Zv);
+    return lhs-rhs;
+  }
+  let lo=1e-7, hi=feed/2*(1-1e-7);
+  let flo=resid(lo), fhi=resid(hi);
+  for(let it=0; it<200; it++){
+    const mid=(lo+hi)/2, fm=resid(mid);
+    if(Math.sign(fm)===Math.sign(flo)){ lo=mid; flo=fm; } else { hi=mid; fhi=fm; }
+  }
+  const Xs=(lo+hi)/2;
+  return {
+    Xs:Xs,
+    recycledN: feed/4 - Xs/2,
+    recycledH: feed*3/4 - 1.5*Xs,
+    freshN: 0.5*Xs,
+    freshH: 1.5*Xs
+  };
+}
+
+/* ---------------- Diagram rendering ---------------- */
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const CSSW = 636, CSSH = 470;   // display size of the diagram canvas
+
+// plot coordinate window (Mathematica user coordinates)
+const xmin=-9.6, xmax=8.2, ymin=-6.2, ymax=8.0;
+
+function setupCanvas(){
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = Math.round(CSSW*dpr);
+  canvas.height = Math.round(CSSH*dpr);
+  canvas.style.width = CSSW+'px';
+  canvas.style.height = CSSH+'px';
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+function PX(x){ return (x-xmin)/(xmax-xmin)*CSSW; }
+function PY(y){ return CSSH - (y-ymin)/(ymax-ymin)*CSSH; }
+
+function fmt(v){ return v.toFixed(2); }
+function fmtFeed(v){ return (+v.toFixed(2)).toString(); } // no trailing zeros
+
+function poly(pts, close){
+  ctx.beginPath();
+  ctx.moveTo(PX(pts[0][0]), PY(pts[0][1]));
+  for(let i=1;i<pts.length;i++) ctx.lineTo(PX(pts[i][0]), PY(pts[i][1]));
+  if(close) ctx.closePath();
+}
+
+function arrowhead(x0,y0,x1,y1,color){
+  // arrowhead at (x1,y1) pointing from (x0,y0)
+  const ax0=PX(x0), ay0=PY(y0), ax1=PX(x1), ay1=PY(y1);
+  const ang=Math.atan2(ay1-ay0, ax1-ax0);
+  const len=11, wid=Math.PI/7;
+  ctx.beginPath();
+  ctx.moveTo(ax1,ay1);
+  ctx.lineTo(ax1-len*Math.cos(ang-wid), ay1-len*Math.sin(ang-wid));
+  ctx.lineTo(ax1-len*Math.cos(ang+wid), ay1-len*Math.sin(ang+wid));
+  ctx.closePath();
+  ctx.fillStyle=color;
+  ctx.fill();
+}
+
+function arrow(pts,color){
+  ctx.strokeStyle=color;
+  ctx.lineWidth=2.4;
+  ctx.lineJoin='round'; ctx.lineCap='round';
+  poly(pts,false);
+  ctx.stroke();
+  const n=pts.length;
+  arrowhead(pts[n-2][0],pts[n-2][1],pts[n-1][0],pts[n-1][1],color);
+}
+
+// text with plot-coordinate anchor. ox: 0 center, -1 left edge, +1 right edge
+const DFS=1.15; // diagram font scale (15% larger)
+function label(text, x, y, ox, color, px, weight){
+  px = px*DFS;
+  ctx.save();
+  ctx.fillStyle=color;
+  ctx.font=(weight||'normal')+' '+px+'px Helvetica, Arial, sans-serif';
+  ctx.textBaseline='middle';
+  ctx.textAlign = ox<0 ? 'left' : (ox>0 ? 'right' : 'center');
+  const lines=String(text).split('\n');
+  const lh=px*1.18;
+  const startY = PY(y) - (lines.length-1)*lh/2;
+  for(let i=0;i<lines.length;i++){
+    ctx.fillText(lines[i], PX(x), startY + i*lh);
+  }
+  ctx.restore();
+}
+
+let last = {Xs:0,recycledN:0,recycledH:0,freshN:0,freshH:0,feed:10};
+
+function draw(res, feed){
+  ctx.clearRect(0,0,CSSW,CSSH);
+  ctx.lineJoin='miter';
+
+  // reactor: blue rectangle (-2,-2)-(2,2), fill opacity 0.3, black edge
+  ctx.fillStyle='rgba(0,0,255,0.30)';
+  ctx.strokeStyle='#000'; ctx.lineWidth=1.2;
+  let x0=PX(-2), y0=PY(2), w=PX(2)-PX(-2), h=PY(-2)-PY(2);
+  ctx.fillRect(x0,y0,w,h); ctx.strokeRect(x0,y0,w,h);
+
+  // splitter: green rectangle (4,-3)-(6,3)
+  ctx.fillStyle='rgba(0,128,0,0.30)';
+  x0=PX(4); y0=PY(3); w=PX(6)-PX(4); h=PY(-3)-PY(3);
+  ctx.fillRect(x0,y0,w,h); ctx.strokeRect(x0,y0,w,h);
+
+  // mixer: red triangle (-6,-1.5),(-4,0),(-6,1.5), fill opacity 0.3, black edge
+  ctx.fillStyle='rgba(255,0,0,0.30)';
+  ctx.strokeStyle='#000'; ctx.lineWidth=1.2;
+  poly([[-6,-1.5],[-4,0],[-6,1.5]], true);
+  ctx.fill(); ctx.stroke();
+
+  // arrows
+  arrow([[-8,-1],[-6,-1]], '#000');            // fresh feed into mixer (black)
+  arrow([[-4,0],[-2,0]], '#0000ff');           // mixer -> reactor (blue)
+  arrow([[2,0],[4,0]], '#0000ff');             // reactor -> splitter (blue)
+  arrow([[5,-3],[5,-5],[7,-5]], '#ff00ff');    // ammonia out (magenta)
+  arrow([[5,3],[5,7],[-8,7],[-8,1],[-6,1]], '#ff0000'); // recycle (red)
+
+  // text labels
+  label('splitter', 5, 0, 0, '#000', 14);
+  label('mixer', -5.1, 0.05, 0, '#000', 13.5);
+
+  label('extent of\nreaction =\n'+fmt(res.Xs)+' mol/min', 0, 0, 0, '#000', 15);
+
+  label('total feed:\n'+fmtFeed(feed)+' mol/min', -3.5, 1.65, 0, '#0000ff', 13.5);
+
+  label('recycle stream', -1, 6.5, -1, '#ff0000', 15);
+  label('nitrogen: '+fmt(res.recycledN)+' mol/min', -1, 5.75, -1, '#ff0000', 15);
+  label('hydrogen: '+fmt(res.recycledH)+' mol/min', -1, 5.0, -1, '#ff0000', 15);
+
+  label('fresh feed', -8.6, -1.75, -1, '#000', 15);
+  label('nitrogen: '+fmt(res.freshN)+' mol/min', -8.6, -2.5, -1, '#000', 15);
+  label('hydrogen: '+fmt(res.freshH)+' mol/min', -8.6, -3.25, -1, '#000', 15);
+
+  label('ammonia stream: '+fmt(res.Xs)+' mol/min', 8.1, -5.75, 1, '#ff00ff', 15);
+}
+
+/* ---------------- UI wiring ---------------- */
+const Tsl=document.getElementById('T'), Psl=document.getElementById('P'), Fsl=document.getElementById('F');
+const Tval=document.getElementById('Tval'), Pval=document.getElementById('Pval'), Fval=document.getElementById('Fval');
+
+function update(){
+  const T=+Tsl.value, P=+Psl.value, feed=+Fsl.value;
+  Tval.textContent = T+' K';
+  Pval.textContent = P+' bar';
+  Fval.textContent = feed+' mol/min';
+  const res = solveHaber(T,P,feed);
+  last = Object.assign({feed:feed}, res);
+  draw(res, feed);
+}
+
+[Tsl,Psl,Fsl].forEach(s=>s.addEventListener('input', update));
+
+// panels
+const panels = {Dir:document.getElementById('panelDir'), Det:document.getElementById('panelDet'), Abt:document.getElementById('panelAbt')};
+const btns = {Dir:document.getElementById('btnDir'), Det:document.getElementById('btnDet'), Abt:document.getElementById('btnAbt')};
+function closeAll(){ for(const k in panels){ panels[k].classList.remove('open'); btns[k].classList.remove('active'); } }
+function toggle(k){
+  const isOpen = panels[k].classList.contains('open');
+  closeAll();
+  if(!isOpen){ panels[k].classList.add('open'); btns[k].classList.add('active'); panels[k].scrollTop=0; }
+}
+btns.Dir.addEventListener('click', ()=>toggle('Dir'));
+btns.Det.addEventListener('click', ()=>toggle('Det'));
+btns.Abt.addEventListener('click', ()=>toggle('Abt'));
+document.querySelectorAll('.panel .close').forEach(b=>b.addEventListener('click', closeAll));
+
+setupCanvas();
+update();
+window.addEventListener('resize', ()=>{ setupCanvas(); draw(last, last.feed); });
+</script>
+</body>
+</html>

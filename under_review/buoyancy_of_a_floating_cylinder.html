@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Buoyancy of a Floating Cylinder</title>
+<script>
+  window.MathJax = {
+    tex: { displayMath: [['\\[', '\\]']], inlineMath: [['\\(', '\\)']] },
+    chtml: { displayAlign: 'left', displayIndent: '0em' }
+  };
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #e8e8e8;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+
+  #appWrap {
+    width: 660px;
+    margin: 18px auto;
+  }
+
+  #panel {
+    position: relative;
+    background: #ffffff;
+    border: 1px solid #999999;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    padding: 14px 16px 18px 16px;
+  }
+
+  #title {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 19px;
+    font-weight: bold;
+    color: #222222;
+    text-align: center;
+    margin: 2px 0 10px 0;
+  }
+
+  #topButtons {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .topBtn {
+    font-family: Verdana, Geneva, sans-serif;
+    font-size: 15px;
+    font-weight: normal;
+    color: #ffffff;
+    background: #c8102e;
+    border: 1px solid #a10d25;
+    border-radius: 3px;
+    padding: 6px 16px;
+    cursor: pointer;
+  }
+
+  .topBtn:hover {
+    background: #a10d25;
+  }
+
+  .topBtn.active {
+    background: #7d0a1c;
+    border-color: #5c0714;
+  }
+
+  #figureWrap {
+    position: relative;
+  }
+
+  #infoPanel {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    max-height: 100%;
+    z-index: 5;
+    border: 1px solid #cccccc;
+    background: #fbfbf7;
+    padding: 12px 34px 12px 14px;
+    font-family: Verdana, Geneva, sans-serif;
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: #262626;
+    overflow-y: auto;
+    box-sizing: border-box;
+  }
+
+  #infoPanel h3 {
+    margin: 0 0 8px 0;
+    font-family: Verdana, Geneva, sans-serif;
+    font-size: 12.5px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    color: #98003e;
+    border-bottom: 1px solid #dedede;
+    padding-bottom: 5px;
+  }
+
+  #infoPanel h4 {
+    margin: 14px 0 6px 0;
+    font-family: Verdana, Geneva, sans-serif;
+    font-size: 12.5px;
+    font-weight: bold;
+    color: #98003e;
+  }
+
+  #infoPanel p { margin: 0 0 10px 0; }
+
+  #symbolTable {
+    border-collapse: collapse;
+    margin: 0 0 6px 0;
+  }
+  #symbolTable td {
+    padding: 2px 10px 2px 0;
+    vertical-align: top;
+  }
+  #symbolTable td:first-child {
+    white-space: nowrap;
+    padding-right: 14px;
+  }
+
+  #infoClose {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    width: 20px;
+    height: 20px;
+    line-height: 18px;
+    text-align: center;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 15px;
+    font-weight: bold;
+    color: #666666;
+    background: #eeeeee;
+    border: 1px solid #bbbbbb;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  #infoClose:hover { background: #dddddd; color: #222222; }
+
+  #stage {
+    display: block;
+    margin: 0 auto;
+    background: #ffffff;
+    border: 1px solid #cfcfcf;
+  }
+
+  /* Controls: grid so the labels, sliders and number boxes line up in both rows */
+  #controls {
+    border-top: 1px solid #e3e3e3;
+    padding-top: 12px;
+    margin-top: 12px;
+    display: grid;
+    grid-template-columns: auto auto 1fr auto;
+    column-gap: 8px;
+    row-gap: 14px;
+    align-items: center;
+  }
+
+  .ctrlRow, .sliderBlock { display: contents; }
+
+  .radioGroup {
+    display: flex;
+    justify-self: start;
+    border: 1px solid #9c9c9c;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .radioBtn {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    color: #222222;
+    background: linear-gradient(#fbfbfb, #e6e6e6);
+    border: none;
+    border-right: 1px solid #9c9c9c;
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+  #liqRadios .radioBtn { font-size: 13.8px; }
+  .radioGroup .radioBtn:last-child { border-right: none; }
+  .radioBtn.selected {
+    background: linear-gradient(#f6cf7d, #ecab2f);
+    color: #3a2900;
+  }
+  .radioBtn:hover:not(.selected) {
+    background: linear-gradient(#ffffff, #ececec);
+  }
+
+  .sliderBlock .lbl {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 15px;
+    color: #333333;
+    white-space: nowrap;
+    padding-left: 10px;
+  }
+
+  input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+
+  /* keep sliders vertically centered with their labels in the grid */
+  #controls input[type="range"] { margin: 0; min-width: 80px; }
+
+  .sliderBlock input[type="number"] {
+    width: 4ch;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 15px;
+    text-align: right;
+    border: 1px solid #aaaaaa;
+    border-radius: 2px;
+    padding: 2px 4px;
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+  .sliderBlock input[type="number"]::-webkit-inner-spin-button,
+  .sliderBlock input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  #about a { color: #1a5fb4; }
+
+  #infoPanel mjx-container[display="true"] {
+    margin: 0.6em 0 !important;
+    text-align: left !important;
+  }
+</style>
+</head>
+<body>
+
+<div id="appWrap">
+  <div id="panel">
+
+    <div id="title">Buoyancy of a Floating Cylinder</div>
+
+    <div id="topButtons">
+      <button class="topBtn" id="btnDirections" type="button">Directions</button>
+      <button class="topBtn" id="btnDetails" type="button">Details</button>
+      <button class="topBtn" id="btnAbout" type="button">About</button>
+    </div>
+
+    <div id="figureWrap">
+      <canvas id="stage" width="595" height="436"></canvas>
+
+      <div id="infoPanel">
+        <div id="infoClose" title="Close">&times;</div>
+        <div id="infoDirections" style="display:none;">
+          <h3>DIRECTIONS</h3>
+          <p>A cylinder with diameter 2&nbsp;m, length 10/&pi;&nbsp;m (&asymp;&nbsp;3.18&nbsp;m), and volume
+          10&nbsp;m&sup3; is placed in a tub of liquid. Depending on the specific gravities of the cylinder
+          and the liquid, the cylinder either floats or sinks.</p>
+          <p>Select the material of the cylinder (aspen wood, heavy oak wood, or PVC) or the liquid
+          (gasoline, water, or seawater) with the buttons, or set a custom specific gravity for either one
+          with the sliders. The displaced liquid volume, the cylinder weight, and the buoyant force are
+          shown above the cylinder. If the cylinder floats, the distance from the top of the cylinder to
+          the liquid surface, <i>h</i>, is also shown.</p>
+        </div>
+        <div id="infoDetails" style="display:none;">
+          <h3>DETAILS</h3>
+          <p>The buoyant force is equal to the weight of the liquid displaced by an object:</p>
+          <p>\[ F_B = \rho_L V_L g = \gamma_L V_L = SG_L V_L \gamma_w \qquad (1) \]</p>
+          <p>where \(F_B\) is the buoyant force, \(\rho_L\) is the density of the liquid, \(g\) is
+          gravitational acceleration, \(\gamma_L\) and \(\gamma_w\) are the specific weights of the liquid
+          and water, respectively, and \(SG_L\) is the specific gravity of the liquid with respect to
+          water.</p>
+          <p>At equilibrium, an object's buoyant force is equivalent to its weight, or gravitational force
+          \(F_g\):</p>
+          <p>\[ F_B = F_g = \rho_c V_c g = \gamma_c V_c = SG_c V_c \gamma_w \qquad (2) \]</p>
+          <p>Here, the subscript \(c\) denotes the properties of the cylinder. If the specific weight of
+          the object is less than the buoyant force acting upon it, it will float. Otherwise, it will
+          sink.</p>
+          <h4>Symbols</h4>
+          <table id="symbolTable">
+            <tr><td>\(F_B\)</td><td>buoyant force (kN)</td></tr>
+            <tr><td>\(F_g\)</td><td>gravitational force (weight) of the cylinder (kN)</td></tr>
+            <tr><td>\(g\)</td><td>gravitational acceleration (9.81 m/s\(^2\))</td></tr>
+            <tr><td>\(h\)</td><td>distance from the top of the cylinder to the liquid surface (m)</td></tr>
+            <tr><td>\(SG_c\)</td><td>specific gravity of the cylinder</td></tr>
+            <tr><td>\(SG_L\)</td><td>specific gravity of the liquid</td></tr>
+            <tr><td>\(V_c\)</td><td>volume of the cylinder (m\(^3\))</td></tr>
+            <tr><td>\(V_L\)</td><td>volume of liquid displaced (m\(^3\))</td></tr>
+            <tr><td>\(\gamma_c\)</td><td>specific weight of the cylinder (kN/m\(^3\))</td></tr>
+            <tr><td>\(\gamma_L\)</td><td>specific weight of the liquid (kN/m\(^3\))</td></tr>
+            <tr><td>\(\gamma_w\)</td><td>specific weight of water (9.81 kN/m\(^3\))</td></tr>
+            <tr><td>\(\rho_c\)</td><td>density of the cylinder (kg/m\(^3\))</td></tr>
+            <tr><td>\(\rho_L\)</td><td>density of the liquid (kg/m\(^3\))</td></tr>
+          </table>
+        </div>
+        <div id="infoAbout" style="display:none;">
+          <h3>ABOUT</h3>
+          <p id="about">This simulation was created in the
+          <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and
+          Biological Engineering</a> at University of Colorado Boulder for
+          <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L.
+          Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a
+          <a href="https://demonstrations.wolfram.com/BuoyancyOfAFloatingCylinder/" target="_blank" rel="noopener">Mathematica simulation</a>
+          by Neil Hendren. It was prepared with financial support from the National Science Foundation
+          (DUE 2336987 and 2336988). Address any questions or comments to
+          <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="controls">
+      <div class="ctrlRow">
+        <div class="radioGroup" id="objRadios">
+          <button class="radioBtn" data-val="0.42">aspen wood</button>
+          <button class="radioBtn" data-val="0.93">heavy oak wood</button>
+          <button class="radioBtn" data-val="1.33">PVC</button>
+        </div>
+        <div class="sliderBlock">
+          <span class="lbl">custom cylinder specific gravity</span>
+          <input type="range" id="objSlider" min="0.1" max="3" step="0.01" value="0.42">
+          <input type="number" id="objNumber" min="0.1" max="3" step="0.01" value="0.42">
+        </div>
+      </div>
+      <div class="ctrlRow">
+        <div class="radioGroup" id="liqRadios">
+          <button class="radioBtn" data-val="0.68">gasoline</button>
+          <button class="radioBtn" data-val="1">water</button>
+          <button class="radioBtn" data-val="1.022">seawater</button>
+        </div>
+        <div class="sliderBlock">
+          <span class="lbl">custom liquid specific gravity</span>
+          <input type="range" id="liqSlider" min="0.01" max="3" step="0.01" value="1">
+          <input type="number" id="liqNumber" min="0.01" max="3" step="0.01" value="1">
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  // ---------- Physics ----------
+  var RAD = 1;                 // cylinder cross-section radius (m)
+  var L = 10 / Math.PI;        // cylinder length (m)
+  var V = 10;                  // cylinder volume (m^3)
+  var GAMMA_W = 9.81;          // specific weight of water (kN/m^3)
+
+  function clip(x, lo, hi) { return Math.max(lo, Math.min(hi, x)); }
+
+  // submerged cross-sectional area for water line at height b above the
+  // cylinder's center (b in [-RAD, RAD])
+  function segmentArea(b) {
+    var s = clip(RAD * RAD - b * b, 0, Infinity);
+    return RAD * RAD * Math.asin(clip(b / RAD, -1, 1)) + b * Math.sqrt(s) + (Math.PI * RAD * RAD) / 2;
+  }
+
+  function solveB(target) {
+    var lo = -RAD, hi = RAD;
+    for (var i = 0; i < 60; i++) {
+      var mid = (lo + hi) / 2;
+      if (segmentArea(mid) < target) lo = mid; else hi = mid;
+    }
+    return (lo + hi) / 2;
+  }
+
+  function computeState(sgObj, sgLiq) {
+    var floats = sgObj < sgLiq;
+    var height1;
+    if (!floats) {
+      height1 = -1.2;
+    } else {
+      var target = (Math.PI * sgObj) / sgLiq; // 0..pi
+      var b = solveB(clip(target, 0, Math.PI));
+      height1 = -b;
+    }
+    var weight = sgObj * GAMMA_W * V;                       // kN
+    var buoyantForce = clip(weight, 0, sgLiq * GAMMA_W * V); // kN
+    var displacedVol = clip((sgObj / sgLiq) * V, 0, V);      // m^3
+    var h = RAD + height1;                                   // m, valid when floats
+    return {
+      floats: floats,
+      height1: height1,
+      weight: weight,
+      buoyantForce: buoyantForce,
+      displacedVol: displacedVol,
+      h: h
+    };
+  }
+
+  // ---------- Drawing ----------
+  var canvas = document.getElementById("stage");
+  var ctx = canvas.getContext("2d");
+
+  // world coords: x in [-3,3], y in [-2.2,2.2], uniform scale
+  var W = canvas.width, H = canvas.height;
+  var SCALE = W / 6; // px per world unit (uniform x & y)
+  var ORIGIN_X = W / 2;
+  var ORIGIN_Y = H / 2;
+
+  function toPx(x, y) {
+    return { x: ORIGIN_X + x * SCALE, y: ORIGIN_Y - y * SCALE };
+  }
+
+  function fmt2(n) { return n.toFixed(2); }
+
+  function draw(sgObj, sgLiq) {
+    var st = computeState(sgObj, sgLiq);
+
+    ctx.clearRect(0, 0, W, H);
+
+    // cylinder (light red disk), drawn first so the liquid can overlay it
+    var center = toPx(0, st.height1);
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(0, 0, W, H);
+    ctx.clip();
+    ctx.beginPath();
+    ctx.arc(center.x, center.y, RAD * SCALE, 0, Math.PI * 2);
+    ctx.fillStyle = "rgb(255,85,85)";
+    ctx.fill();
+    ctx.restore();
+
+    // water region (y < 0), semi-transparent so the submerged cylinder still shows through
+    var top = toPx(-3, 0);
+    var bot = toPx(3, -2.2);
+    ctx.fillStyle = "rgba(0,0,255,0.4)";
+    ctx.fillRect(top.x, top.y, bot.x - top.x, bot.y - top.y);
+
+    // "liquid surface" label
+    var ls = toPx(-2.9, 0);
+    ctx.fillStyle = "#000000";
+    ctx.font = "17px Arial, Helvetica, sans-serif";
+    ctx.textAlign = "left";
+    ctx.textBaseline = "bottom";
+    ctx.fillText("liquid surface", ls.x, ls.y - 2);
+
+    // info grid (top of plot) - two columns, two rows
+    var col1 = [
+      "cylinder volume: " + fmt2(V) + " m³",
+      "displaced liquid volume: " + fmt2(st.displacedVol) + " m³"
+    ];
+    var col2 = [
+      "weight of cylinder: " + fmt2(st.weight) + " kN",
+      "buoyant force: " + fmt2(st.buoyantForce) + " kN"
+    ];
+    ctx.font = "16px Arial, Helvetica, sans-serif";
+    ctx.textAlign = "left";
+    ctx.textBaseline = "top";
+    var col1Width = Math.max(ctx.measureText(col1[0]).width, ctx.measureText(col1[1]).width);
+    var gap = 30;
+    var lineH = 22;
+    var startX = 20;
+    var startY = 18;
+    ctx.fillText(col1[0], startX, startY);
+    ctx.fillText(col2[0], startX + col1Width + gap, startY);
+    ctx.fillText(col1[1], startX, startY + lineH);
+    ctx.fillText(col2[1], startX + col1Width + gap, startY + lineH);
+
+    // h indicator, only if floating
+    if (st.floats) {
+      var p0 = toPx(0, 0);
+      var p1 = toPx(0, RAD + st.height1);
+
+      ctx.strokeStyle = "#000000";
+      ctx.lineWidth = 1.3;
+      ctx.beginPath();
+      ctx.moveTo(p0.x, p0.y);
+      ctx.lineTo(p1.x, p1.y);
+      ctx.stroke();
+
+      // arrowhead tip sits exactly at the line's endpoint and flares
+      // inward (toward the other end), so it visually points outward
+      function arrowHead(tipX, tipY, towardCenterSign) {
+        var w = 5, off = 8 * towardCenterSign;
+        ctx.beginPath();
+        ctx.moveTo(tipX, tipY);
+        ctx.lineTo(tipX - w, tipY + off);
+        ctx.lineTo(tipX + w, tipY + off);
+        ctx.closePath();
+        ctx.fillStyle = "#000000";
+        ctx.fill();
+      }
+      arrowHead(p1.x, p1.y, 1);   // top: tip points up/out, flares down toward center
+      arrowHead(p0.x, p0.y, -1);  // bottom: tip points down/out, flares up toward center
+
+      var mid = toPx(0.28, (0.5 * RAD) + (RAD * st.height1 * 0.5));
+      var label = "h = " + fmt2(st.h) + " m";
+      ctx.font = "16px Arial, Helvetica, sans-serif";
+      var tw = ctx.measureText(label).width;
+      var padX = 6, padY = 4;
+      ctx.fillStyle = "#ffffff";
+      ctx.strokeStyle = "#888888";
+      ctx.lineWidth = 1;
+      ctx.fillRect(mid.x - padX, mid.y - 10 - padY, tw + padX * 2, 20 + padY);
+      ctx.strokeRect(mid.x - padX, mid.y - 10 - padY, tw + padX * 2, 20 + padY);
+      ctx.fillStyle = "#000000";
+      ctx.textAlign = "left";
+      ctx.textBaseline = "middle";
+      ctx.fillText(label, mid.x, mid.y);
+    }
+  }
+
+  // ---------- UI state ----------
+  var state = { sgObj: 0.42, sgLiq: 1 };
+
+  var objSlider = document.getElementById("objSlider");
+  var objNumber = document.getElementById("objNumber");
+  var liqSlider = document.getElementById("liqSlider");
+  var liqNumber = document.getElementById("liqNumber");
+  var objRadios = document.querySelectorAll("#objRadios .radioBtn");
+  var liqRadios = document.querySelectorAll("#liqRadios .radioBtn");
+
+  function refreshRadios(group, val) {
+    group.forEach(function (btn) {
+      var bv = parseFloat(btn.getAttribute("data-val"));
+      if (Math.abs(bv - val) < 1e-9) btn.classList.add("selected");
+      else btn.classList.remove("selected");
+    });
+  }
+
+  function setObj(val, skipField) {
+    if (isNaN(val)) val = state.sgObj;
+    val = clip(val, 0.1, 3);
+    state.sgObj = val;
+    objSlider.value = val;
+    if (!skipField) objNumber.value = fmt2(val);
+    refreshRadios(objRadios, val);
+    render();
+  }
+
+  function setLiq(val, skipField) {
+    if (isNaN(val)) val = state.sgLiq;
+    val = clip(val, 0.01, 3);
+    state.sgLiq = val;
+    liqSlider.value = val;
+    if (!skipField) liqNumber.value = fmt2(val);
+    refreshRadios(liqRadios, val);
+    render();
+  }
+
+  function render() { draw(state.sgObj, state.sgLiq); }
+
+  objSlider.addEventListener("input", function () { setObj(parseFloat(objSlider.value)); });
+  objNumber.addEventListener("change", function () { setObj(parseFloat(objNumber.value)); });
+  liqSlider.addEventListener("input", function () { setLiq(parseFloat(liqSlider.value)); });
+  liqNumber.addEventListener("change", function () { setLiq(parseFloat(liqNumber.value)); });
+
+  objRadios.forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      setObj(parseFloat(btn.getAttribute("data-val")));
+    });
+  });
+  liqRadios.forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      setLiq(parseFloat(btn.getAttribute("data-val")));
+    });
+  });
+
+  // ---------- Directions / Details / About panel ----------
+  var infoPanel = document.getElementById("infoPanel");
+  var infoClose = document.getElementById("infoClose");
+  var sections = {
+    Directions: document.getElementById("infoDirections"),
+    Details: document.getElementById("infoDetails"),
+    About: document.getElementById("infoAbout")
+  };
+  var buttons = {
+    Directions: document.getElementById("btnDirections"),
+    Details: document.getElementById("btnDetails"),
+    About: document.getElementById("btnAbout")
+  };
+  var currentSection = null;
+
+  function openSection(name) {
+    Object.keys(sections).forEach(function (key) {
+      sections[key].style.display = (key === name) ? "block" : "none";
+      buttons[key].classList.toggle("active", key === name);
+    });
+    infoPanel.style.display = "block";
+    currentSection = name;
+    if (window.MathJax && window.MathJax.typesetPromise) {
+      window.MathJax.typesetPromise([sections[name]]);
+    }
+  }
+
+  function closePanel() {
+    infoPanel.style.display = "none";
+    Object.keys(buttons).forEach(function (key) { buttons[key].classList.remove("active"); });
+    currentSection = null;
+  }
+
+  buttons.Directions.addEventListener("click", function () {
+    if (currentSection === "Directions") { closePanel(); } else { openSection("Directions"); }
+  });
+  buttons.Details.addEventListener("click", function () {
+    if (currentSection === "Details") { closePanel(); } else { openSection("Details"); }
+  });
+  buttons.About.addEventListener("click", function () {
+    if (currentSection === "About") { closePanel(); } else { openSection("About"); }
+  });
+  infoClose.addEventListener("click", closePanel);
+
+  // ---------- init ----------
+  setObj(0.42, false);
+  setLiq(1, false);
+})();
+</script>
+
+</body>
+</html>

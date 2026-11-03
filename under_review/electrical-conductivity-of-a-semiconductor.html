@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Electrical Conductivity of Silicon Semiconductors</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']] },
+  chtml: { displayAlign: 'left', displayIndent: '0' },
+  svg: { fontCache: 'global', displayAlign: 'left', displayIndent: '0' }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js"></script>
+<style>
+  :root{
+    --dark-red:#98000D;
+  }
+  html,body{
+    margin:0; padding:0;
+    font-family: Helvetica, Arial, sans-serif;
+    background:#ffffff;
+    color:#222;
+  }
+  #app{
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 14px 10px 22px 10px;
+    box-sizing: border-box;
+    position: relative;
+  }
+  h1{
+    text-align:center;
+    font-size: 19px;
+    font-weight:bold;
+    margin: 4px 0 14px 0;
+    color:#111;
+  }
+  .controls{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:8px;
+    margin-bottom: 0;
+    margin-left: 22px;
+  }
+  .setter-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+    justify-content:flex-start;
+  }
+  .setter-label{
+    font-size:18.72px;
+    color:#222;
+  }
+  .setter-group{
+    display:flex;
+    border:1px solid #888;
+    border-radius:3px;
+    overflow:hidden;
+  }
+  .setter-btn{
+    font-family: Helvetica, Arial, sans-serif;
+    font-size:15.6px;
+    padding:4.8px 14.4px;
+    background:#f2f2f2;
+    border:none;
+    border-right:1px solid #888;
+    cursor:pointer;
+    color:#222;
+  }
+  .setter-btn:last-child{ border-right:none; }
+  .setter-btn.active{
+    background:#d8d8d8;
+    font-weight:bold;
+    box-shadow: inset 0 0 0 1px #666;
+  }
+  .setter-btn:hover{ background:#e6e6e6; }
+
+  .slider-grid{
+    display:grid;
+    grid-template-columns: max-content 220px max-content;
+    column-gap:10px;
+    row-gap:8px;
+    align-items:center;
+    font-size:17.25px;
+  }
+  .slider-row{ display:contents; }
+  .slider-row label{
+    justify-self:end;
+    text-align:right;
+  }
+  .slider-row input[type=range]{ margin:0; }
+  input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+  input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  .slider-row input[type=range]{
+    width: 220px;
+  }
+  .slider-row .val{
+    min-width: 52px;
+    text-align:left;
+    font-variant-numeric: tabular-nums;
+  }
+
+  #canvasWrap{
+    display:flex;
+    justify-content:center;
+    margin: 2px 0 6px 0;
+  }
+  canvas{
+    display:block;
+  }
+
+  .topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+  }
+  .panelcol{
+    display:flex;
+    flex-direction:row;
+    gap:8px;
+    margin-left: 36px;
+  }
+  .panelcol button{
+    font-family: Helvetica, Arial, sans-serif;
+    background: var(--dark-red);
+    color:#fff;
+    border:none;
+    border-radius:4.8px;
+    padding:6px 0;
+    width: 82px;
+    font-size:15.6px;
+    cursor:pointer;
+    text-align:center;
+  }
+  .panelcol #btnDirections{ width: 104px; }
+  .panelcol button:hover{
+    background:#7c000b;
+  }
+
+  .panel{
+    display:none;
+    position:absolute;
+    width: 560px;
+    max-width: 80%;
+    padding: 12px 16px;
+    border:1px solid #aaa;
+    border-radius:4px;
+    background:#fdfdfd;
+    font-size:14px;
+    line-height:1.5;
+    box-shadow: 2px 3px 10px rgba(0,0,0,0.25);
+    z-index: 20;
+    box-sizing: border-box;
+  }
+  .panel.show{ display:block; }
+  .panel h2{
+    font-size:14px;
+    margin:0 0 8px 0;
+    color: var(--dark-red);
+  }
+  .panel a{ color:#0645AD; }
+  .panel-close{
+    position:absolute;
+    top:6px;
+    right:10px;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size:18px;
+    line-height:1;
+    color:#555;
+    background:none;
+    border:none;
+    cursor:pointer;
+    padding:2px 4px;
+  }
+  .panel-close:hover{ color:#000; }
+  /* left-justify displayed equations in Details */
+  #panelDetails mjx-container[display="true"]{
+    display:block;
+    text-align:left !important;
+    margin: 4px 0 4px 0;
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <h1>Electrical Conductivity of Silicon Semiconductors</h1>
+
+  <div class="topbar">
+    <div class="controls">
+      <div class="setter-row">
+        <span class="setter-label">material type:</span>
+        <div class="setter-group" id="typeGroup">
+          <button class="setter-btn" data-type="1"> Si </button>
+          <button class="setter-btn active" data-type="2"> n-type </button>
+          <button class="setter-btn" data-type="3"> p-type </button>
+        </div>
+        <div class="panelcol">
+          <button id="btnDirections">Directions</button>
+          <button id="btnDetails">Details</button>
+          <button id="btnAbout">About</button>
+        </div>
+      </div>
+
+      <div class="slider-grid">
+      <div class="slider-row">
+        <label for="tempSlider">temperature (K)</label>
+        <input type="range" id="tempSlider" min="1" max="550" step="1" value="300">
+        <span class="val" id="tempVal">300</span>
+      </div>
+
+      <div class="slider-row" id="dopantRow">
+        <label for="dopantSlider">dopant concentration (10<sup>14</sup>&nbsp;cm<sup>-3</sup>)</label>
+        <input type="range" id="dopantSlider" min="0.1" max="5" step="0.1" value="2.5">
+        <span class="val" id="dopantVal">2.5</span>
+      </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="canvasWrap">
+    <canvas id="mainCanvas"></canvas>
+  </div>
+
+  <div class="panel" id="panelDirections">
+    <button class="panel-close" aria-label="Close">&#10005;</button>
+    <h2>Directions</h2>
+    <p>This Demonstration shows the charge carrier concentration in silicon (Si) and doped Si (n- and p-types) as a function of temperature and dopant concentration. The corresponding electron band configurations are shown to the right of the plot. Phosphorous doping creates n-type Si, whereas boron doping creates p-type Si.</p>
+  </div>
+
+  <div class="panel" id="panelDetails">
+    <button class="panel-close" aria-label="Close">&#10005;</button>
+    <h2>Details</h2>
+    <p>The intrinsic carrier concentration ($C_i$) is:</p>
+    <p>$$C_i = N e^{-E_g/(2 k_B T)},$$</p>
+    <p>$$N = N_0 (T/300)^{2.54},$$</p>
+    <p>where $N$ is the effective density of states (cm$^{-3}$), $E_g$ is the energy gap (eV), $k_B$ is Boltzmann's constant (eV/K), $T$ is temperature (K), and $N_0$ is the effective density of states at 300 K.</p>
+    <p>The carrier concentration for pure silicon ($C_{Si}$) is:</p>
+    <p>$$C_{Si} = 5.29\times10^{19}\,(T/300)^{2.54}\,e^{-6729/T}.$$</p>
+    <p>The carrier concentration for doped silicon ($C_{Si,dop}$) is:</p>
+    <p>$$C_{Si,dop} = C_{Si} + C_{dop}\, e^{-E/R/T},$$</p>
+    <p>where $C_{dop}$ is the atomic concentration of dopant atoms, $E$ is the activation energy for the electron of a dopant atom, and $R$ is the ideal gas constant.</p>
+    <p>All carrier concentrations are in units of cm$^{-3}$.</p>
+    <p><b>Symbols</b></p>
+    <p style="margin:0 0 0 12px;">
+      $C_i$ = intrinsic carrier concentration (cm$^{-3}$)<br>
+      $C_{Si}$ = carrier concentration in pure silicon (cm$^{-3}$)<br>
+      $C_{Si,dop}$ = carrier concentration in doped silicon (cm$^{-3}$)<br>
+      $C_{dop}$ = atomic concentration of dopant atoms (cm$^{-3}$)<br>
+      $N$ = effective density of states (cm$^{-3}$)<br>
+      $N_0$ = effective density of states at 300 K (cm$^{-3}$)<br>
+      $E_g$ = energy gap (eV)<br>
+      $E$ = activation energy for the electron of a dopant atom (J/mol)<br>
+      $k_B$ = Boltzmann's constant (eV/K)<br>
+      $R$ = ideal gas constant (J/(mol K))<br>
+      $T$ = temperature (K)
+    </p>
+  </div>
+
+  <div class="panel" id="panelAbout">
+    <button class="panel-close" aria-label="Close">&#10005;</button>
+    <h2>About</h2>
+    <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/ElectricalConductivityOfSiliconSemiconductors/" target="_blank">Mathematica simulation</a> by Nathan S. Nelson. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.</p>
+  </div>
+</div>
+
+<script>
+/* ---------------- Physics ---------------- */
+const Tmin = 1, Tmax = 550, EaDop = 10;
+
+function ncar(T){
+  return 5.29e19 * Math.exp(-6729/T) * Math.pow(T/300, 2.54);
+}
+function ncardop(T, dopant){
+  return dopant * 1e14 * Math.exp(-EaDop/T);
+}
+// mirrors Mathematica cond$[func_, range_] piecewise selector
+function condLevel(func, arr){
+  if (func <= 0.05) return arr[0];
+  if (func <= 0.2)  return arr[1];
+  if (func <= 0.35) return arr[2];
+  if (func <= 0.5)  return arr[3];
+  if (func <= 0.65) return arr[4];
+  if (func <= 0.8)  return arr[5];
+  return arr[6];
+}
+const RANGE7   = [1,2,3,4,5,6,7];
+const RANGE0_6 = [0,1,2,3,4,5,6];
+
+/* ---------------- State ---------------- */
+let state = { type: 2, T: 300, dopant: 2.5 };
+
+/* ---------------- DOM ---------------- */
+const typeGroup   = document.getElementById('typeGroup');
+const tempSlider  = document.getElementById('tempSlider');
+const tempVal     = document.getElementById('tempVal');
+const dopantSlider= document.getElementById('dopantSlider');
+const dopantVal   = document.getElementById('dopantVal');
+const dopantRow   = document.getElementById('dopantRow');
+const canvas      = document.getElementById('mainCanvas');
+const ctx         = canvas.getContext('2d');
+
+typeGroup.addEventListener('click', (e)=>{
+  const btn = e.target.closest('.setter-btn');
+  if(!btn) return;
+  state.type = parseInt(btn.dataset.type,10);
+  [...typeGroup.children].forEach(b=>b.classList.toggle('active', b===btn));
+  dopantRow.style.visibility = (state.type === 1) ? 'hidden' : 'visible';
+  draw();
+});
+tempSlider.addEventListener('input', ()=>{
+  state.T = parseInt(tempSlider.value,10);
+  tempVal.textContent = state.T.toFixed(0);
+  draw();
+});
+dopantSlider.addEventListener('input', ()=>{
+  state.dopant = parseFloat(dopantSlider.value);
+  dopantVal.textContent = state.dopant.toFixed(1);
+  draw();
+});
+
+/* ---------------- Canvas setup (hi-DPI) ---------------- */
+const PLOT_W = 440, PLOT_H = 380;
+const GAP = 24;
+const BAND_W = 210, BAND_H = 380;
+const PAD_L = 80, PAD_T = 8, PAD_B = 56;
+const CSS_W = PAD_L + PLOT_W + GAP + BAND_W + 16;
+const CSS_H = PAD_T + PLOT_H + PAD_B;
+
+function setupCanvas(){
+  const dpr = window.devicePixelRatio || 1;
+  canvas.style.width = CSS_W + 'px';
+  canvas.style.height = CSS_H + 'px';
+  canvas.width = Math.round(CSS_W * dpr);
+  canvas.height = Math.round(CSS_H * dpr);
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+
+/* ---------------- Drawing: concentration plot ---------------- */
+function drawPlot(){
+  const x0 = PAD_L, y0 = PAD_T;
+  const xDomain = [0, 550];
+  const yDomain = [-1, 18];
+
+  function px(x){ return x0 + (x - xDomain[0])/(xDomain[1]-xDomain[0]) * PLOT_W; }
+  function py(y){ return y0 + PLOT_H - (y - yDomain[0])/(yDomain[1]-yDomain[0]) * PLOT_H; }
+
+  // frame box
+  ctx.strokeStyle = '#000';
+  ctx.lineWidth = 1.3;
+  ctx.strokeRect(x0, y0, PLOT_W, PLOT_H);
+
+  // ticks + gridline labels
+  ctx.fillStyle = '#000';
+  ctx.font = '16.5px Helvetica, Arial, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  const xticks = [0,100,200,300,400,500];
+  xticks.forEach(t=>{
+    const xp = px(t);
+    ctx.beginPath();
+    ctx.moveTo(xp, y0+PLOT_H);
+    ctx.lineTo(xp, y0+PLOT_H-6);
+    ctx.stroke();
+    ctx.fillText(String(t), xp, y0+PLOT_H+6);
+  });
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'middle';
+  const yticks = [0,5,10,15];
+  yticks.forEach(t=>{
+    const yp = py(t);
+    ctx.beginPath();
+    ctx.moveTo(x0, yp);
+    ctx.lineTo(x0+6, yp);
+    ctx.stroke();
+    ctx.fillText(String(t), x0-8, yp);
+  });
+
+  // axis labels (x and y share the same font)
+  const axisLabelFont = '17.6px Helvetica, Arial, sans-serif';
+  ctx.fillStyle = '#000';
+  ctx.font = axisLabelFont;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillText('temperature (K)', x0 + PLOT_W/2, y0 + PLOT_H + 38);
+
+  ctx.save();
+  ctx.translate(44, y0 + PLOT_H/2);
+  ctx.rotate(-Math.PI/2);
+  ctx.font = axisLabelFont;
+  ctx.textAlign = 'center';
+  ctx.fillText('carrier concentration (10\u00B9\u2074 cm\u207B\u00B3)', 0, 0);
+  ctx.restore();
+
+  // clip to plot area
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(x0, y0, PLOT_W, PLOT_H);
+  ctx.clip();
+
+  // intrinsic curve (black) - always shown
+  ctx.strokeStyle = '#000';
+  ctx.lineWidth = 2.2;
+  ctx.beginPath();
+  let first = true;
+  for(let T=Tmin; T<=Tmax; T+=2){
+    const y = ncar(T)/1e14;
+    const xp = px(T), yp = py(y);
+    if(first){ ctx.moveTo(xp,yp); first=false; } else ctx.lineTo(xp,yp);
+  }
+  ctx.stroke();
+
+  // total (doped) curve (green) - shown when type != Si
+  if(state.type !== 1){
+    ctx.strokeStyle = 'rgb(0,168,13)';
+    ctx.lineWidth = 2.2;
+    ctx.beginPath();
+    first = true;
+    for(let T=Tmin; T<=Tmax; T+=2){
+      const y = (ncardop(T,state.dopant) + ncar(T))/1e14;
+      const xp = px(T), yp = py(y);
+      if(first){ ctx.moveTo(xp,yp); first=false; } else ctx.lineTo(xp,yp);
+    }
+    ctx.stroke();
+
+    // label the intrinsic (black) curve
+    ctx.fillStyle = '#000';
+    ctx.font = '16.5px Helvetica, Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillText('Si', px(250), py(0) + 1);
+  }
+
+  // current point marker
+  const yTotal = (ncar(state.T) + (state.type===1?0:ncardop(state.T,state.dopant)))/1e14;
+  ctx.fillStyle = '#000';
+  ctx.beginPath();
+  ctx.arc(px(state.T), py(yTotal), 5, 0, Math.PI*2);
+  ctx.fill();
+
+  ctx.restore();
+}
+
+/* ---------------- Drawing: band diagram ---------------- */
+function drawBandDiagram(){
+  const bx0 = PAD_L + PLOT_W + GAP;
+  const by0 = PAD_T;
+  const domX = 1.12, domY = 2.0;
+
+  function mx(x){ return bx0 + (x/domX) * BAND_W; }
+  function my(y){ return by0 + BAND_H - (y/domY) * BAND_H; }
+  const rx = 0.032 * (BAND_W/domX);
+  const ry = 0.028 * (BAND_H/domY);
+
+  function rect(x1,y1,x2,y2, fill, edge, lw){
+    ctx.beginPath();
+    ctx.rect(mx(x1), my(y2), mx(x2)-mx(x1), my(y1)-my(y2));
+    if(fill){ ctx.fillStyle = fill; ctx.fill(); }
+    if(edge){ ctx.strokeStyle = edge; ctx.lineWidth = lw||2; ctx.stroke(); }
+  }
+  function disk(x,y, filled){
+    ctx.beginPath();
+    ctx.ellipse(mx(x), my(y), rx, ry, 0, 0, Math.PI*2);
+    if(filled){ ctx.fillStyle = 'rgb(130,30,150)'; ctx.fill(); }
+    else { ctx.fillStyle = '#fff'; ctx.fill(); ctx.strokeStyle='rgb(130,30,150)'; ctx.lineWidth=1.3; ctx.stroke(); }
+  }
+
+  // outer box
+  rect(0,0,1,2,'#fff','#000',2.2);
+  // valence band
+  rect(0,0,1,0.7,'#c9edc9','#d33',2.2);
+  // conduction band
+  rect(0,1.3,1,2,'#cfe3f7','#3366cc',2.2);
+
+  // labels
+  ctx.fillStyle = '#000';
+  ctx.font = '17.9px Helvetica, Arial, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('conduction', mx(0.5), my(1.65));
+  ctx.fillText('band gap',   mx(0.5), my(1.0));
+  ctx.fillText('valence',    mx(0.5), my(0.35));
+
+  const T = state.T, type = state.type, dopant = state.dopant;
+  const yBase = (type===3) ? 0.5 : 0.6;
+
+  // base lattice positions (outline) 1..6
+  for(let i=1;i<=6;i++) disk(0.15*i, yBase, false);
+
+  // filled valence electrons from start..6
+  const startV = condLevel(ncar(T)/ncar(Tmax), RANGE7);
+  for(let i=startV; i<=6; i++) disk(0.15*i, yBase, true);
+
+  // conduction-band excited electrons 1..count
+  const nCond = condLevel(ncar(T)/ncar(Tmax), RANGE0_6);
+  for(let i=1; i<=nCond; i++) disk(0.15*i, 1.4, true);
+
+  if(type !== 1){
+    const yLevel = (type===2) ? 1.2 : 0.8;
+    const nDop = condLevel(dopant/5, RANGE0_6);
+
+    // donor/acceptor level ticks
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 2.2;
+    for(let i=1;i<=nDop;i++){
+      const cx = 0.13*i;
+      ctx.beginPath();
+      ctx.moveTo(mx(cx-0.045), my(yLevel));
+      ctx.lineTo(mx(cx+0.045), my(yLevel));
+      ctx.stroke();
+    }
+
+    // p-type: holes shown in valence band at acceptor sites
+    if(type===3){
+      for(let i=1;i<=nDop;i++) disk(0.13*i, 0.6, false);
+    }
+
+    // ionized dopant electrons/holes near dopant level
+    const yLevel2 = (type===2) ? 1.2 : 0.6;
+    const startDop = condLevel(ncardop(T,dopant)/(dopant*1e14), RANGE7);
+    for(let i=startDop; i<=nDop; i++) disk(0.13*i, yLevel2, true);
+
+    // free carriers contributed by dopant, just outside the level
+    const yLevel3 = (type===2) ? 1.5 : 0.8;
+    const nFree = condLevel(Math.min(ncardop(T,dopant)/(dopant*1e14), dopant/5), RANGE0_6);
+    for(let i=1;i<=nFree;i++) disk(0.13*i, yLevel3, true);
+  }
+}
+
+function draw(){
+  setupCanvas();
+  ctx.clearRect(0,0,CSS_W,CSS_H);
+  drawPlot();
+  drawBandDiagram();
+}
+
+/* ---------------- Panels ---------------- */
+const app = document.getElementById('app');
+function setupPanel(btnId, panelId){
+  const btn = document.getElementById(btnId);
+  const panel = document.getElementById(panelId);
+  btn.addEventListener('click', ()=>{
+    const isOpen = panel.classList.contains('show');
+    ['panelDirections','panelDetails','panelAbout'].forEach(id=>{
+      document.getElementById(id).classList.remove('show');
+    });
+    if(!isOpen){
+      const appRect = app.getBoundingClientRect();
+      const btnRect = btn.getBoundingClientRect();
+      // just below the button, right edge aligned with the button
+      panel.style.top = (btnRect.bottom - appRect.top + 6) + 'px';
+      if (panelId === 'panelDirections' || panelId === 'panelDetails') {
+        // left edge lines up with the left side of the graph frame
+        const cRect = canvas.getBoundingClientRect();
+        panel.style.right = 'auto';
+        panel.style.left = (cRect.left - appRect.left + PAD_L) + 'px';
+      } else {
+        panel.style.left = 'auto';
+        panel.style.right = Math.max(0, appRect.right - btnRect.right) + 'px';
+      }
+      panel.classList.add('show');
+      if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([panel]);
+    }
+  });
+}
+setupPanel('btnDirections','panelDirections');
+setupPanel('btnDetails','panelDetails');
+setupPanel('btnAbout','panelAbout');
+
+// close-x buttons
+document.querySelectorAll('.panel-close').forEach(x=>{
+  x.addEventListener('click', ()=>{
+    x.closest('.panel').classList.remove('show');
+  });
+});
+
+/* ---------------- Init ---------------- */
+window.addEventListener('resize', draw);
+draw();
+</script>
+</body>
+</html>

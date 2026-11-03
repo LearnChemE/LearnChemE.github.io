@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Method of Joints to Solve a Truss Problem</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] },
+  svg: { fontCache: 'global', displayAlign: 'left', displayIndent: '0' }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.min.js"></script>
+<style>
+  body {
+    font-family: Helvetica, Arial, sans-serif;
+    background: #ffffff;
+    margin: 0;
+    padding: 10px 0 40px 0;
+  }
+  #container {
+    width: 680px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: 21px;
+    font-weight: bold;
+    text-align: center;
+    margin: 8px 0 12px 0;
+  }
+  #controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 8px;
+    min-height: 30px;
+    font-size: 14px;
+  }
+  .setterbar {
+    display: inline-flex;
+  }
+  .setterbar button {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 15.7px;
+    padding: 3px 9px;
+    border: 1px solid #9a9a9a;
+    background: linear-gradient(#fdfdfd, #e9e9e9);
+    cursor: pointer;
+    margin: 0;
+  }
+  .setterbar button + button { border-left: none; }
+  .setterbar button:first-child { border-radius: 4px 0 0 4px; }
+  .setterbar button:last-child { border-radius: 0 4px 4px 0; }
+  .setterbar button.sel {
+    background: #cfe0f4;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.25);
+  }
+  select {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 15.7px;
+    padding: 2px 4px;
+  }
+  .ctl-label { font-size: 14px; }
+  label.chk { font-size: 14px; cursor: pointer; user-select: none; }
+  #simCanvas {
+    display: block;
+    margin: 0 auto;
+    background: #ffffff;
+  }
+  #panelButtons {
+    text-align: center;
+    margin-top: 16px;
+  }
+  #panelButtons button {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    color: #ffffff;
+    background: #98000D;
+    border: none;
+    border-radius: 5px;
+    padding: 7px 20px;
+    margin: 0 8px;
+    cursor: pointer;
+  }
+  #panelButtons button:hover { background: #b3111f; }
+  #panelArea {
+    position: relative;
+  }
+  .panel {
+    display: none;
+    box-sizing: border-box;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 20;
+    overflow-y: auto;
+    border: 1px solid #b5b5b5;
+    border-radius: 6px;
+    background: #fafafa;
+    padding: 12px 18px;
+    font-size: 15px;
+    line-height: 1.5;
+    text-align: left;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+  }
+  .panelClose {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    width: 24px;
+    height: 24px;
+    border: none;
+    background: none;
+    color: #666666;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 20px;
+    line-height: 24px;
+    padding: 0;
+    cursor: pointer;
+  }
+  .panelClose:hover { color: #98000D; }
+  .panel p { margin: 8px 0; }
+  .panel h2 {
+    font-size: 18px;
+    font-weight: bold;
+    color: #000000;
+    margin: 2px 30px 6px 0;
+  }
+  .panel a { color: #0645ad; }
+  #fig1canvas { display: block; margin: 6px auto; }
+</style>
+</head>
+<body>
+<div id="container">
+  <h1>Method of Joints to Solve a Truss Problem</h1>
+
+  <div id="controls">
+    <span class="setterbar" id="stepsBar">
+      <button data-v="1">&nbsp;reaction forces&nbsp;</button>
+      <button data-v="2">&nbsp;balances at joints&nbsp;</button>
+    </span>
+    <span id="optWrap">
+      <select id="optMenu">
+        <option value="0">truss</option>
+        <option value="1">calculate moment</option>
+        <option value="2">x-force balance</option>
+        <option value="3">y-force balance</option>
+        <option value="4">solved</option>
+      </select>
+    </span>
+    <span id="jointsWrap" style="display:none;">
+      <span class="ctl-label">joints&nbsp;&nbsp;</span>
+      <span class="setterbar" id="jointsBar">
+        <button data-v="1">&nbsp;A&nbsp;</button>
+        <button data-v="2">&nbsp;B&nbsp;</button>
+        <button data-v="3">&nbsp;C&nbsp;</button>
+        <button data-v="4">&nbsp;D&nbsp;</button>
+        <button data-v="5">&nbsp;solved&nbsp;</button>
+      </span>
+      <span id="focusWrap" style="margin-left:12px;">
+        <label class="chk">focus on joint <input type="checkbox" id="focusChk"></label>
+      </span>
+    </span>
+  </div>
+
+  <canvas id="simCanvas" width="600" height="395"></canvas>
+
+  <div id="panelArea">
+    <div class="panel" id="panelDirections">
+      <button class="panelClose" data-panel="panelDirections" aria-label="Close" title="Close">&#10005;</button>
+      <h2>Directions</h2>
+      <p>This Demonstration solves a truss using the method of joints, which involves doing force balances around one joint at a time.</p>
+      <p>1. Select "reaction forces" to see how the reaction forces <i>R</i><sub>A</sub> and <i>R</i><sub>E</sub> are calculated.</p>
+      <p>2. Then, under the drop-down menu, select "calculate moment" to see the moment balance around joint A and calculate the reaction force at joint E. Move the mouse over the equations to see an explanation of the moment balance.</p>
+      <p>3. Next, select "<i>x</i>-force balance" to do a force balance in the <i>x</i>-direction at joint A. Note that joint A is fixed but joint E can move in the <i>x</i>-direction.</p>
+      <p>4. Select "<i>y</i>-force balance" to determine the reaction force at joint A.</p>
+      <p>5. Select "balances at joints" and select joint A. Check "focus on joint" to zoom in on the members around the joint and display the force balances. Note that the direction of the arrows are drawn in "focus on joint" because we know the correct direction. If the arrows were drawn assuming all members were under tension, then a negative force would result, indicating the direction should be reversed.</p>
+      <p>6. Repeat step 5 for the other joints.</p>
+      <p>7. When "solved" is selected from the joints, the compression (green) and tension (red) forces are shown on the full diagram. Arrows that point outward represent the member's response to compression forces, which act to shorten the member. Arrows that point inward represent the member's response to tension forces, which act to lengthen the member.</p>
+      <p>When doing balances around the joints, the signs on all of the forces are positive because we assume we can determine which members are under tension and which are under compression before solving the truss. This is done by starting at joint A, seeing that the reaction force points upward and knowing that the member force must point downward for the truss to remain stationary.</p>
+    </div>
+
+    <div class="panel" id="panelDetails">
+      <button class="panelClose" data-panel="panelDetails" aria-label="Close" title="Close">&#10005;</button>
+      <h2>Details</h2>
+      <p>First, calculate the reaction forces by doing a moment balance around joint A and force balances in the \(x\) and \(y\) directions:</p>
+      <p>\[\sum M_{\mathrm{A}} = 0 = w\,F_{\mathrm{C}} - 2\,w\,R_{\mathrm{E}},\]</p>
+      <p>\[\sum F_{x} = 0 = R_{\mathrm{A},\,x},\]</p>
+      <p>\[\sum F_{y} = 0 = R_{\mathrm{A},\,y} - F_{\mathrm{C}} + R_{\mathrm{E}},\]</p>
+      <p>where \(R_{\mathrm{A},\,x}\) and \(R_{\mathrm{A},\,y}\) are the reaction forces at joint A in the \(x\) and \(y\) directions, \(R_{\mathrm{E}}\) is the reaction force at joint E, \(w\) is the width of the members and \(F_{\mathrm{C}}\) is the point load force at joint C.</p>
+      <p>Next, do force balances at the joints. The order of the calculations shown is the order that the joints are solved in. Calculations are done assuming we know which members are under tension and which are under compression. View the labeled truss in Figure 1 below.</p>
+      <p>Joint A</p>
+      <p>\[\sum F_{y} = 0 = -F_{\mathrm{AB}} \sin\theta + R_{\mathrm{A}},\]</p>
+      <p>\[\sum F_{x} = 0 = -F_{\mathrm{AB}} \cos\theta + F_{\mathrm{AC}}.\]</p>
+      <p>Joint B</p>
+      <p>\[\sum F_{y} = 0 = F_{\mathrm{AB}} \sin\theta - F_{\mathrm{BC}} \sin\theta,\]</p>
+      <p>\[\sum F_{x} = 0 = F_{\mathrm{AB}} \cos\theta + F_{\mathrm{BC}} \cos\theta - F_{\mathrm{BD}}.\]</p>
+      <p>Joint C</p>
+      <p>\[\sum F_{y} = 0 = F_{\mathrm{BC}} \sin\theta + F_{\mathrm{CD}} \sin\theta - F_{\mathrm{C}},\]</p>
+      <p>\[\sum F_{x} = 0 = -F_{\mathrm{AC}} - F_{\mathrm{BC}} \cos\theta + F_{\mathrm{CD}} \cos\theta + F_{\mathrm{CE}}.\]</p>
+      <p>Joint D</p>
+      <p>\[\sum F_{y} = 0 = -F_{\mathrm{CD}} \sin\theta + F_{\mathrm{DE}} \sin\theta.\]</p>
+      <p>Figure 1</p>
+      <canvas id="fig1canvas" width="470" height="300"></canvas>
+      <p>References</p>
+      <p>[1] R. C. Hibbeler, <i>Engineering Mechanics: Statics</i>, 12th ed., Upper Saddle River, NJ: Prentice Hall, 2010.</p>
+      <p>[2] D. Morrell. <i>Truss Example-Method of Joints (Edited)</i> [Video]. (Jun 6, 2012) <a href="https://www.youtube.com/watch?v=56eTM36Z9-A" target="_blank" rel="noopener">www.youtube.com/watch?v=56eTM36Z9-A</a>.</p>
+      <p>Symbols</p>
+      <p>\(F_{\mathrm{AB}},\,F_{\mathrm{AC}},\,F_{\mathrm{BC}},\,F_{\mathrm{BD}},\,F_{\mathrm{CD}},\,F_{\mathrm{CE}},\,F_{\mathrm{DE}}\) = forces in the members that connect the two joints in the subscript (kN)<br>
+      \(F_{\mathrm{AB},\,x},\ F_{\mathrm{AB},\,y}\) = \(x\) and \(y\) components of the force in member AB; the same notation is used for the other members (kN)<br>
+      \(F_{\mathrm{C}}\) = point load applied at joint C (kN)<br>
+      \(F_{x},\ F_{y}\) = forces in the \(x\) and \(y\) directions (kN)<br>
+      \(M_{\mathrm{A}}\) = moment about joint A (kN&middot;length)<br>
+      \(R_{\mathrm{A}}\) = reaction force at joint A (kN)<br>
+      \(R_{\mathrm{A},\,x},\ R_{\mathrm{A},\,y}\) = \(x\) and \(y\) components of the reaction force at joint A (kN)<br>
+      \(R_{\mathrm{E}}\) = reaction force at joint E (kN)<br>
+      \(w\) = width (horizontal length) of each member (length)<br>
+      \(x,\ y\) = horizontal and vertical directions<br>
+      \(\theta\) = angle between the slanted members and the horizontal (60&deg;)</p>
+    </div>
+
+    <div class="panel" id="panelAbout">
+      <button class="panelClose" data-panel="panelAbout" aria-label="Close" title="Close">&#10005;</button>
+      <h2>About</h2>
+      <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/MethodOfJointsToSolveATrussProblem/" target="_blank" rel="noopener">Mathematica simulation</a> by Rachael L. Baumann. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.</p>
+    </div>
+
+    <div id="panelButtons">
+      <button id="btnDirections">Directions</button>
+      <button id="btnDetails">Details</button>
+      <button id="btnAbout">About</button>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+/* ============================================================
+   Physics: solved once (matches the Mathematica Solve[] output)
+   ============================================================ */
+const w = 1;
+const TH = 60 * Math.PI / 180;      // theta = 60 degrees
+const h = (w / 2) * Math.tan(TH);   // 0.8660254
+const DLT = 0.25 * h;               // delta used for component arrows
+const FC = 1;
+
+const RE = w * FC / (2 * w);                    //  0.50
+const RA = FC - RE;                             //  0.50
+const F1 = -RA / Math.sin(TH);                  // AB = -0.5774 (compression)
+const F2 = -F1 * Math.cos(TH);                  // AC =  0.2887 (tension)
+const F3 = -F1;                                 // BC =  0.5774 (tension)
+const F4 = (F1 - F3) * Math.cos(TH);            // BD = -0.5774 (compression)
+const F5 = (FC - F3 * Math.sin(TH)) / Math.sin(TH); // CD = 0.5774 (tension)
+const F6 = F2 + (F3 - F5) * Math.cos(TH);       // CE =  0.2887 (tension)
+const F7 = -F5;                                 // DE = -0.5774 (compression)
+
+function fm(x) { return Math.abs(x).toFixed(2); }   // NumberForm[..,{n,2}] style
+
+/* Colors (same RGB values as the CDF) */
+const BLUE = "#0000FF";
+const MAG  = "#FF00FF";
+const ORA  = "#FF6600";       /* RGBColor[1,0.4,0]   */
+const COLC = "#009900";       /* compression green   */
+const COLT = "#FF0040";       /* tension red         */
+const COLA = "#8C00FF";       /* component purple    */
+const GRAY70 = "#B3B3B3";
+const GRAY40 = "#666666";
+
+/* Joint coordinates */
+const A = [0, 0], B = [0.5 * w, h], C = [w, 0], D = [1.5 * w, h], E = [2 * w, 0];
+const NODES = [A, B, C, D, E];
+
+/* ============================================================
+   State
+   ============================================================ */
+const state = { steps: 1, opt: 0, joints: 1, focus: false, momentHover: false };
+
+/* ============================================================
+   Canvas setup with hi-DPI support
+   ============================================================ */
+const canvas = document.getElementById("simCanvas");
+let ctx = canvas.getContext("2d");
+const CW = 600;
+let CH = 395;
+
+function sizeCanvas(hh) {
+  CH = hh;
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = CW * dpr;
+  canvas.height = CH * dpr;
+  canvas.style.width = CW + "px";
+  canvas.style.height = CH + "px";
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+/* Coordinate transform for a plot region (1:1 aspect, centered) */
+function makeXform(range, region) {
+  const rw = range.x1 - range.x0, rh = range.y1 - range.y0;
+  const s = Math.min(region.w / rw, region.h / rh);
+  const ox = region.x + (region.w - rw * s) / 2;
+  const oy = region.y + (region.h - rh * s) / 2;
+  return {
+    s: s,
+    X: x => ox + (x - range.x0) * s,
+    Y: y => oy + (range.y1 - y) * s
+  };
+}
+let T = null;   // current transform
+function PX(p) { return [T.X(p[0]), T.Y(p[1])]; }
+
+/* ============================================================
+   Rich text: pieces = [{t, it, col, sub:[{t,it}]}] with subscripts
+   ============================================================ */
+function setF(c, fs, it) {
+  c.font = (it ? "italic " : "") + fs + "px Helvetica, Arial, sans-serif";
+}
+function measurePieces(c, pieces, fs) {
+  let wsum = 0;
+  for (const p of pieces) {
+    setF(c, fs, p.it);
+    wsum += c.measureText(p.t).width;
+    if (p.sub) {
+      for (const s of p.sub) {
+        setF(c, fs * 0.72, s.it);
+        wsum += c.measureText(s.t).width;
+      }
+    }
+  }
+  return wsum;
+}
+function drawPieces(c, pieces, x, y, fs, defCol) {
+  /* x = left edge, y = baseline of main text; returns width */
+  let cx = x;
+  for (const p of pieces) {
+    setF(c, fs, p.it);
+    c.fillStyle = p.col || defCol || "#000";
+    c.fillText(p.t, cx, y);
+    cx += c.measureText(p.t).width;
+    if (p.sub) {
+      for (const s of p.sub) {
+        setF(c, fs * 0.72, s.it);
+        c.fillStyle = s.col || p.col || defCol || "#000";
+        c.fillText(s.t, cx, y + fs * 0.28);
+        cx += c.measureText(s.t).width;
+      }
+    }
+  }
+  return cx - x;
+}
+/* var["R","A",col]: italic main letter, plain subscript, colored */
+function V(main, sub, col) {
+  const subArr = (typeof sub === "string") ? [{ t: sub }] : sub;
+  return { t: main, it: true, col: col, sub: subArr };
+}
+function TXT(t, opts) { return Object.assign({ t: t }, opts || {}); }
+
+/* Draw a one-line label with Mathematica-style offset semantics.
+   offset [ox,oy]: the point of the text bounding box at box-relative
+   coordinate (ox,oy) coincides with (px,py); box spans -1..1.        */
+function drawLabel(pieces, mpos, fs, offset, opts) {
+  opts = opts || {};
+  const p = PX(mpos);
+  const tw = measurePieces(ctx, pieces, fs);
+  const thh = fs * 1.2;
+  const cx = p[0] - offset[0] * tw / 2;
+  const cy = p[1] + offset[1] * thh / 2;
+  const left = cx - tw / 2;
+  const base = cy + fs * 0.36;
+  if (opts.bg) {
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(left - 3, cy - thh / 2 - 1, tw + 6, thh + 2);
+  }
+  drawPieces(ctx, pieces, left, base, fs, opts.col);
+  return { x: left, y: cy - thh / 2, w: tw, h: thh };
+}
+
+/* Rounded-frame joint label (Framed[...,RoundingRadius->15]) */
+function drawFramed(text, mpos, fs, txtCol) {
+  const p = PX(mpos);
+  setF(ctx, fs, false);
+  const tw = ctx.measureText(text).width;
+  const padX = 7, padY = 4;
+  const bw = tw + 2 * padX, bh = fs + 2 * padY;
+  const r = Math.min(15, bh / 2);
+  ctx.beginPath();
+  roundRectPath(p[0] - bw / 2, p[1] - bh / 2, bw, bh, r);
+  ctx.fillStyle = "#fff";
+  ctx.fill();
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = "#000";
+  ctx.stroke();
+  ctx.fillStyle = txtCol || "#000";
+  ctx.textAlign = "left";
+  ctx.fillText(text, p[0] - tw / 2, p[1] + fs * 0.36);
+}
+function roundRectPath(x, y, wd, ht, r) {
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + wd, y, x + wd, y + ht, r);
+  ctx.arcTo(x + wd, y + ht, x, y + ht, r);
+  ctx.arcTo(x, y + ht, x, y, r);
+  ctx.arcTo(x, y, x + wd, y, r);
+  ctx.closePath();
+}
+
+/* ============================================================
+   Lines / arrows
+   ============================================================ */
+function line(p1, p2, col, lw, dash, cap) {
+  const a = PX(p1), b = PX(p2);
+  ctx.beginPath();
+  ctx.moveTo(a[0], a[1]);
+  ctx.lineTo(b[0], b[1]);
+  ctx.strokeStyle = col;
+  ctx.lineWidth = lw;
+  ctx.setLineDash(dash || []);
+  ctx.lineCap = cap || "butt";
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.lineCap = "butt";
+}
+function polyline(pts, col, lw, cap) {
+  ctx.beginPath();
+  pts.forEach((p, i) => {
+    const q = PX(p);
+    if (i === 0) ctx.moveTo(q[0], q[1]); else ctx.lineTo(q[0], q[1]);
+  });
+  ctx.strokeStyle = col;
+  ctx.lineWidth = lw;
+  ctx.lineCap = cap || "butt";
+  ctx.lineJoin = "round";
+  ctx.stroke();
+  ctx.lineCap = "butt";
+}
+function head(px, py, ang, hl, hw, col) {
+  ctx.save();
+  ctx.translate(px, py);
+  ctx.rotate(ang);
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(-hl, hw / 2);
+  ctx.lineTo(-hl * 0.75, 0);
+  ctx.lineTo(-hl, -hw / 2);
+  ctx.closePath();
+  ctx.fillStyle = col;
+  ctx.fill();
+  ctx.restore();
+}
+/* Single-headed arrow (head at p2) */
+function arrow(p1, p2, col, lw, hl) {
+  lw = lw || 2.5; hl = hl || 14;
+  const a = PX(p1), b = PX(p2);
+  const ang = Math.atan2(b[1] - a[1], b[0] - a[0]);
+  const bx = b[0] - Math.cos(ang) * hl * 0.6, by = b[1] - Math.sin(ang) * hl * 0.6;
+  ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(bx, by);
+  ctx.strokeStyle = col; ctx.lineWidth = lw; ctx.stroke();
+  head(b[0], b[1], ang, hl, hl * 0.62, col);
+}
+/* Compression member: arrowheads at both ends pointing outward */
+function arrowOut(p1, p2, col, lw, hl) {
+  const a = PX(p1), b = PX(p2);
+  const ang = Math.atan2(b[1] - a[1], b[0] - a[0]);
+  ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]);
+  ctx.strokeStyle = col; ctx.lineWidth = lw; ctx.stroke();
+  head(b[0], b[1], ang, hl, hl * 0.62, col);
+  head(a[0], a[1], ang + Math.PI, hl, hl * 0.62, col);
+}
+/* Tension member: heads at 27.5% (forward) and 72.5% (backward) pointing inward */
+function arrowIn(p1, p2, col, lw, hl) {
+  const a = PX(p1), b = PX(p2);
+  const ang = Math.atan2(b[1] - a[1], b[0] - a[0]);
+  ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]);
+  ctx.strokeStyle = col; ctx.lineWidth = lw; ctx.stroke();
+  const q1 = [a[0] + (b[0] - a[0]) * 0.275, a[1] + (b[1] - a[1]) * 0.275];
+  const q2 = [a[0] + (b[0] - a[0]) * 0.725, a[1] + (b[1] - a[1]) * 0.725];
+  head(q1[0], q1[1], ang, hl, hl * 0.62, col);
+  head(q2[0], q2[1], ang + Math.PI, hl, hl * 0.62, col);
+}
+function dashedArc(cen, rr, a1, a2, col, lw) {
+  /* math angles a1->a2 CCW */
+  const p = PX(cen);
+  ctx.beginPath();
+  ctx.arc(p[0], p[1], rr * T.s, -a2, -a1);
+  ctx.strokeStyle = col;
+  ctx.lineWidth = lw;
+  ctx.setLineDash([6, 5]);
+  ctx.stroke();
+  ctx.setLineDash([]);
+}
+function disk(cen, rr, col) {
+  const p = PX(cen);
+  ctx.beginPath();
+  ctx.arc(p[0], p[1], rr * T.s, 0, 2 * Math.PI);
+  ctx.fillStyle = col;
+  ctx.fill();
+}
+function circleStroke(cen, rr, col, lw, dash) {
+  const p = PX(cen);
+  ctx.beginPath();
+  ctx.arc(p[0], p[1], rr * T.s, 0, 2 * Math.PI);
+  ctx.strokeStyle = col;
+  ctx.lineWidth = lw;
+  ctx.setLineDash(dash || []);
+  ctx.stroke();
+  ctx.setLineDash([]);
+}
+function polyFill(pts, col) {
+  ctx.beginPath();
+  pts.forEach((p, i) => {
+    const q = PX(p);
+    if (i === 0) ctx.moveTo(q[0], q[1]); else ctx.lineTo(q[0], q[1]);
+  });
+  ctx.closePath();
+  ctx.fillStyle = col;
+  ctx.fill();
+}
+function polyStroke(pts, col, lw, close) {
+  ctx.beginPath();
+  pts.forEach((p, i) => {
+    const q = PX(p);
+    if (i === 0) ctx.moveTo(q[0], q[1]); else ctx.lineTo(q[0], q[1]);
+  });
+  if (close) ctx.closePath();
+  ctx.strokeStyle = col;
+  ctx.lineWidth = lw;
+  ctx.lineJoin = "round";
+  ctx.stroke();
+}
+
+/* ============================================================
+   Building blocks of the drawing
+   ============================================================ */
+
+/* Thin-outlined triangles (all views except "truss" and focus) */
+function drawTriangles() {
+  polyStroke([A, B, C], "#000", 2.2, true);
+  polyStroke([B, D, C], "#000", 2.2, true);
+  polyStroke([D, E, C], "#000", 2.2, true);
+}
+
+/* Joint node markers (black ring) */
+function drawNodes() {
+  for (const n of NODES) {
+    const p = PX(n);
+    ctx.beginPath(); ctx.arc(p[0], p[1], 4.6, 0, 2 * Math.PI);
+    ctx.fillStyle = "#000"; ctx.fill();
+    ctx.beginPath(); ctx.arc(p[0], p[1], 3.0, 0, 2 * Math.PI);
+    ctx.fillStyle = "#fff"; ctx.fill();
+  }
+}
+
+/* Realistic truss with supports (opt = 0) */
+function drawTrussStructure() {
+  const outer = [A, E, D, B, A];
+  const inner = [B, C, D];
+  /* black outline then gray core -> outlined-member look */
+  polyline(outer, "#000", 0.022 * CW, "round");
+  polyline(inner, "#000", 0.022 * CW, "round");
+  polyline(outer, "#999999", 0.015 * CW, "round");
+  polyline(inner, "#999999", 0.015 * CW, "round");
+
+  /* pin support at A */
+  polyFill([[-0.07, -0.1], [0.07, -0.1], [0.035, 0], [-0.035, 0]], GRAY70);
+  disk(A, 0.035, GRAY70);
+  polyStroke([[-0.035, 0], [-0.07, -0.1], [0.07, -0.1], [0.035, 0]], "#000", 1);
+  /* top semicircle of the pin */
+  {
+    const p = PX(A);
+    ctx.beginPath();
+    ctx.arc(p[0], p[1], 0.035 * T.s, Math.PI, 2 * Math.PI);
+    ctx.strokeStyle = "#000"; ctx.lineWidth = 1; ctx.stroke();
+  }
+  /* roller support at E */
+  disk([2 * w, -0.05], 0.05, GRAY70);
+  disk(E, 0.035, GRAY70);
+  polyFill([[2 * w - 0.0345, 0.0045], [2 * w - 0.044, -0.027],
+            [2 * w + 0.044, -0.027], [2 * w + 0.0345, 0.0045]], GRAY70);
+  polyStroke([[2 * w - 0.0345, 0.006], [2 * w - 0.044, -0.027]], "#000", 1);
+  polyStroke([[2 * w + 0.0345, 0.006], [2 * w + 0.044, -0.027]], "#000", 1);
+  {
+    const p = PX(E);
+    ctx.beginPath();
+    ctx.arc(p[0], p[1], 0.035 * T.s, Math.PI, 2 * Math.PI);
+    ctx.strokeStyle = "#000"; ctx.lineWidth = 1; ctx.stroke();
+    const q = PX([2 * w, -0.05]);
+    ctx.beginPath();
+    ctx.arc(q[0], q[1], 0.05 * T.s, 0, 2 * Math.PI);
+    ctx.stroke();
+  }
+}
+
+/* Aligned equation block:
+   rows = array of {pre:[pieces], post:[pieces], col?} split at the first "=".
+   Draws centered on (cx) starting at top y0. Returns bounding box.        */
+function drawAlignedBlock(rows, cxPix, y0Pix, fs, lineH) {
+  let maxPre = 0, maxPost = 0;
+  for (const r of rows) {
+    maxPre = Math.max(maxPre, measurePieces(ctx, r.pre, fs));
+    maxPost = Math.max(maxPost, measurePieces(ctx, r.post, fs));
+  }
+  const bw = maxPre + maxPost;
+  const left = cxPix - bw / 2;
+  rows.forEach((r, i) => {
+    const preW = measurePieces(ctx, r.pre, fs);
+    const y = y0Pix + i * lineH + fs;
+    drawPieces(ctx, r.pre, left + (maxPre - preW), y, fs, r.col);
+    drawPieces(ctx, r.post, left + maxPre, y, fs, r.col);
+  });
+  return { x: left, y: y0Pix, w: bw, h: rows.length * lineH + 4 };
+}
+
+/* Handy pieces */
+function sumF(sub) { return [TXT("\u2211 "), V("F", [{ t: sub, it: true }])]; }
+
+/* ============================================================
+   STEP 1 views  (reaction forces)
+   ============================================================ */
+const momentEqBox = { x: 0, y: 0, w: 0, h: 0 };
+
+function viewTruss() {
+  drawTrussStructure();
+  /* blue reaction arrows at A */
+  arrow([-0.25 * h, 0], A, BLUE, 3, 15);
+  arrow([0, -0.25 * h], A, BLUE, 3, 15);
+  drawLabel([V("R", [{ t: "A, " }, { t: "x", it: true }], BLUE)], [-0.25 * h, 0], 18, [1.35, 0]);
+  drawLabel([V("R", [{ t: "A, " }, { t: "y", it: true }], BLUE)], [0, -0.25 * h], 18, [0, 1.5]);
+  /* orange reaction at E */
+  arrow([2 * w, -0.25 * h], E, ORA, 3, 15);
+  drawLabel([V("R", "E", ORA)], [2 * w, -0.25 * h], 18, [0, 1.5]);
+  /* magenta load at C */
+  arrow(C, [w, -0.5 * h], MAG, 3, 15);
+  drawLabel([V("F", "C", MAG), TXT(" = " + FC.toFixed(2) + " kN")],
+            [w, -0.5 * h], 18, [0, 1.2], { col: MAG });
+  drawNodes();
+}
+
+function viewMoment() {
+  drawTriangles();
+  line(A, [0, -0.25 * h], GRAY40, 1.2, [5, 5]);
+  /* magenta load at C */
+  arrow(C, [w, -0.5 * h], MAG, 3, 15);
+  drawLabel([V("F", "C", MAG), TXT(" = " + FC.toFixed(2) + " kN")],
+            [w, -0.5 * h], 18, [0, 1.2], { col: MAG });
+  /* point A */
+  disk(A, 0.012, BLUE);
+  drawLabel([TXT("A")], A, 18, [0, -1.7], { col: BLUE });
+  /* orange RE arrow + 2w dimension arrow */
+  arrow([2 * w, -0.25 * h], E, ORA, 3, 15);
+  drawLabel([V("R", "E", ORA)], [2 * w, -0.25 * h], 18, [0, 1.5]);
+  arrow([0, -0.25 * h], [2 * w, -0.25 * h], ORA, 2.5, 13);
+  /* magenta w dimension arrow */
+  arrow([0, -0.15 * h], [w, -0.15 * h], MAG, 2.5, 13);
+  drawLabel([TXT(" w ", { it: true })], [w / 2, -0.15 * h], 17, [0, 0], { bg: true });
+  drawLabel([TXT(" 2 "), TXT("w ", { it: true })], [w, -0.25 * h], 17, [-1.5, 0], { bg: true });
+  /* equations / mouseover explanation */
+  const cp = PX([w, -0.95 * h]);
+  if (!state.momentHover) {
+    const rows = [
+      { pre: [TXT("sum of the moments about A: \u2211 "), V("M", "A"), TXT(" ")],
+        post: [TXT("= 0 = "), TXT("w ", { it: true }), V("F", "C", MAG), TXT(" \u2212 2 "), TXT("w ", { it: true }), V("R", "E", ORA)] },
+      { pre: [TXT("reaction force E: "), V("R", "E", ORA), TXT(" ")],
+        post: [TXT("= \u00BD "), V("F", "C", MAG)] },
+      { pre: [V("R", "E", ORA), TXT(" ", { col: ORA })],
+        post: [TXT("= " + fm(RE) + " kN", { col: ORA })], col: ORA }
+    ];
+    const bb = drawAlignedBlock(rows, cp[0], cp[1] - 36, 18, 25);
+    momentEqBox.x = bb.x; momentEqBox.y = bb.y; momentEqBox.w = bb.w; momentEqBox.h = bb.h;
+  } else {
+    const lines = [
+      "the first term is positive because it would cause a",
+      "clockwise rotation and the second term is negative",
+      "because it would cause a counterclockwise rotation"
+    ];
+    setF(ctx, 18, false);
+    ctx.fillStyle = "#000";
+    ctx.textAlign = "center";
+    lines.forEach((L, i) => ctx.fillText(L, cp[0], cp[1] - 30 + i * 25));
+    ctx.textAlign = "left";
+    /* keep the same hover box so it does not flicker */
+  }
+  drawNodes();
+}
+
+function viewXBalance() {
+  drawTriangles();
+  arrow([-0.25 * h, 0], A, BLUE, 3, 15);
+  arrow([0, -0.25 * h], A, BLUE, 3, 15);
+  arrow(C, [w, -0.5 * h], BLUE, 3, 15);
+  arrow([2 * w, -0.25 * h], E, BLUE, 3, 15);
+  drawLabel([V("R", [{ t: "A, " }, { t: "x", it: true }], BLUE)], [-0.25 * h, 0], 18, [1.35, 0]);
+  drawLabel([V("R", [{ t: "A, " }, { t: "y", it: true }], BLUE)], [0, -0.25 * h], 18, [0, 1]);
+  drawLabel([V("R", "E", BLUE), TXT(" = " + fm(RE) + " kN", { col: BLUE })], [2 * w, -0.25 * h], 18, [0, 1.5]);
+  drawLabel([V("F", "C", BLUE), TXT(" = " + FC.toFixed(2) + " kN", { col: BLUE })], [w, -0.5 * h], 18, [0, 1.5]);
+  const cp = PX([w, -0.9 * h]);
+  const rows = [
+    { pre: [TXT("sum of the "), TXT("x", { it: true }), TXT(" forces: \u2211 "), V("F", [{ t: "x", it: true }]), TXT(" ")],
+      post: [TXT("= 0 = "), V("R", [{ t: "A, " }, { t: "x", it: true }], BLUE)] },
+    { pre: [TXT("x", { it: true }), TXT(" component of reaction force A: "), V("R", [{ t: "A, " }, { t: "x", it: true }], BLUE), TXT(" ", { col: BLUE })],
+      post: [TXT("= 0 kN", { col: BLUE })] }
+  ];
+  drawAlignedBlock(rows, cp[0], cp[1] - 25, 18, 25);
+  drawNodes();
+}
+
+function viewYBalance() {
+  drawTriangles();
+  arrow([2 * w, -0.25 * h], E, BLUE, 3, 15);
+  arrow(C, [w, -0.5 * h], BLUE, 3, 15);
+  arrow([0, -0.25 * h], A, BLUE, 3, 15);
+  drawLabel([V("F", "C", BLUE), TXT(" = " + FC.toFixed(2) + " kN", { col: BLUE })], [w, -0.5 * h], 18, [0, 1.5]);
+  drawLabel([V("R", "A", BLUE)], [0, -0.25 * h], 18, [0, 1.5]);
+  drawLabel([V("R", "E", BLUE), TXT(" = " + fm(RE) + " kN", { col: BLUE })], [2 * w, -0.25 * h], 18, [0, 1.5]);
+  const cp = PX([w, -0.95 * h]);
+  const rows = [
+    { pre: [TXT("sum of the "), TXT("y", { it: true }), TXT(" forces: \u2211 "), V("F", [{ t: "y", it: true }]), TXT(" ")],
+      post: [TXT("= 0 = "), V("R", "A", BLUE), TXT(" \u2212 "), V("F", "C", BLUE), TXT(" + "), V("R", "E", BLUE)] },
+    { pre: [TXT("y", { it: true }), TXT(" component of reaction force A: "), V("R", [{ t: "A, " }, { t: "y", it: true }], BLUE), TXT(" ")],
+      post: [TXT("= "), V("F", "C", BLUE), TXT(" \u2212 "), V("R", "E", BLUE)] },
+    { pre: [V("R", "A", BLUE), TXT(" ", { col: BLUE })],
+      post: [TXT("= " + fm(RA) + " kN", { col: BLUE })], col: BLUE }
+  ];
+  drawAlignedBlock(rows, cp[0], cp[1] - 36, 18, 25);
+  drawNodes();
+}
+
+function viewSolvedReactions() {
+  drawTriangles();
+  arrow([0, -0.25 * h], A, BLUE, 3, 15);
+  arrow(C, [w, -0.5 * h], BLUE, 3, 15);
+  arrow([2 * w, -0.25 * h], E, BLUE, 3, 15);
+  drawLabel([V("F", "C", BLUE), TXT(" = " + FC.toFixed(2) + " kN", { col: BLUE })], [w, -0.5 * h], 18, [0, 1.5]);
+  drawLabel([V("R", "A", BLUE), TXT(" = " + fm(RA) + " kN", { col: BLUE })], [0, -0.25 * h], 18, [0, 1.5]);
+  drawLabel([V("R", "E", BLUE), TXT(" = " + fm(RE) + " kN", { col: BLUE })], [2 * w, -0.25 * h], 18, [0, 1.5]);
+  drawNodes();
+}
+
+/* ============================================================
+   STEP 2 views  (balances at joints)
+   ============================================================ */
+function viewFullStructure() {
+  drawTriangles();
+  const mem = [
+    ["AB", [0.25 * w, 0.5 * h]], ["AC", [0.5 * w, 0]], ["BC", [0.75 * w, 0.5 * h]],
+    ["BD", [w, h]], ["CD", [1.25 * w, 0.5 * h]], ["CE", [1.5 * w, 0]], ["DE", [1.75 * w, 0.5 * h]]
+  ];
+  for (const m of mem) drawLabel([V("F", m[0])], m[1], 18, [0, 0], { bg: true });
+  const jpos = { 1: A, 2: B, 3: C, 4: D, 5: E };
+  circleStroke(jpos[state.joints], 0.2, "#FF0000", 2, [7, 6]);
+  drawFramed(" A ", A, 15, "#000");
+  drawFramed(" B ", B, 15, "#000");
+  drawFramed(" C ", C, 15, "#000");
+  drawFramed(" D ", D, 15, "#000");
+  drawFramed(" E ", E, 15, "#000");
+}
+
+function viewJointsSolved() {
+  drawTriangles();
+  const members = [
+    [F1, "AB", A, B, [0.25 * w, 0.5 * h], TH],
+    [F2, "AC", A, C, [0.5 * w, 0], 0],
+    [F3, "BC", B, C, [0.75 * w, 0.5 * h], -TH],
+    [F4, "BD", B, D, [w, h], 0],
+    [F5, "CD", C, D, [1.25 * w, 0.5 * h], TH],
+    [F6, "CE", C, E, [1.5 * w, 0], 0],
+    [F7, "DE", D, E, [1.75 * w, 0.5 * h], -TH]
+  ];
+  for (const m of members) {
+    const [f, name, p1, p2, mid, rot] = m;
+    if (f < 0) arrowOut(p1, p2, COLC, 3, 18);
+    else arrowIn(p1, p2, COLT, 3, 18);
+    /* rotated label with white background */
+    const pieces = [V(" F", name), TXT(" = " + fm(f) + " ")];
+    const pm = PX(mid);
+    const tw = measurePieces(ctx, pieces, 18);
+    ctx.save();
+    ctx.translate(pm[0], pm[1]);
+    ctx.rotate(-rot);
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(-tw / 2 - 3, -12, tw + 6, 24);
+    drawPieces(ctx, pieces, -tw / 2, 6.5, 18, "#000");
+    ctx.restore();
+  }
+  arrow([0, -0.25 * h], A, BLUE, 3, 15);
+  arrow(C, [w, -0.5 * h], BLUE, 3, 15);
+  arrow([2 * w, -0.25 * h], E, BLUE, 3, 15);
+  drawLabel([V("R", "A", BLUE), TXT(" = " + fm(RA) + " kN", { col: BLUE })], [0, -0.25 * h], 18, [0, 1.5]);
+  drawLabel([V("R", "E", BLUE), TXT(" = " + fm(RE) + " kN", { col: BLUE })], [2 * w, -0.25 * h], 18, [0, 1.5]);
+  drawLabel([V("F", "C", BLUE), TXT(" = " + FC.toFixed(2) + " kN", { col: BLUE })], [w, -0.5 * h], 18, [0, 1.5]);
+  drawLabel([TXT("all ", { col: GRAY40 }), TXT("compression", { col: COLC }),
+             TXT(" and ", { col: GRAY40 }), TXT("tension", { col: COLT }),
+             TXT(" forces are in kN", { col: GRAY40 })], [w, -0.86 * h], 17, [0, 0]);
+  drawNodes();
+}
+
+/* --- focus-on-joint views (free-body diagrams) --- */
+function focusJointA() {
+  /* member force arrows (correct directions) */
+  arrow(B, [0, 0.05 * h], "#000", 3, 15);
+  arrow(A, [w / 2, 0], "#000", 3, 15);
+  arrow([0, -0.25 * h], [0, -0.05 * h], BLUE, 3, 15);
+  drawLabel([V("R", "A", BLUE), TXT(" = " + fm(RA) + " kN", { col: BLUE })], [0, -0.25 * h], 18, [0, 1.5]);
+  /* angle arc + labels */
+  dashedArc(A, 0.1, 0, TH, "#000", 2.5);
+  drawLabel([TXT("\u03B8 = 60\u00B0")], A, 17, [-2.2, -1]);
+  drawLabel([V("F", "AB", BLUE)], B, 18, [-1.5, -1.5]);
+  drawLabel([V("F", "AC", BLUE)], [w / 2, 0], 18, [-1.5, 0]);
+  /* dashed purple component arrows on member AB */
+  const bx = 0.25 * w, by = 0.52 * h;
+  line([bx, by + DLT], [bx, by], COLA, 2, [6, 5]);
+  arrow([bx, by + DLT * 0.35], [bx, by], COLA, 2, 11);
+  line([bx + DLT, by], [bx, by], COLA, 2, [6, 5]);
+  arrow([bx + DLT * 0.35, by], [bx, by], COLA, 2, 11);
+  drawLabel([V("F", [{ t: "AB, " }, { t: "x", it: true }], COLA), TXT(" = "),
+             V("F", "AB", BLUE), TXT(" cos \u03B8")],
+            [bx + DLT, 0.5 * h], 18, [-1, 0], { bg: true });
+  drawLabel([V("F", [{ t: "AB, " }, { t: "y", it: true }], COLA), TXT(" = "),
+             V("F", "AB", BLUE), TXT(" sin \u03B8")],
+            [bx, by + DLT], 18, [0, -1.2], { bg: true });
+  drawFramed(" A ", A, 15, GRAY40);
+}
+
+function focusJointB() {
+  arrow(A, [0.96 * w / 2, 0.96 * h], "#000", 3, 15);
+  arrow(B, C, "#000", 3, 15);
+  arrow([w, h], [1.07 * w / 2, h], "#000", 3, 15);
+  dashedArc(B, 0.1, -TH, 0, "#000", 2.5);
+  drawLabel([TXT("\u03B8 = 60\u00B0")], B, 18, [-2.2, 3]);
+  drawLabel([V("F", "AB", BLUE), TXT(" = " + fm(F1) + " kN", { col: BLUE })], A, 18, [0, 1.2]);
+  drawLabel([V("F", "BC", BLUE)], C, 18, [0, 1.2]);
+  drawLabel([V("F", "BD", BLUE)], [w, h], 18, [-1.2, 0]);
+  /* AB components (numeric, purple) */
+  line([0.25 * w, 0.25 * h], [0.25 * w, 0.25 * h + DLT], COLA, 2, [6, 5]);
+  arrow([0.25 * w, 0.25 * h + DLT * 0.65], [0.25 * w, 0.25 * h + DLT], COLA, 2, 11);
+  line([0.25 * w - DLT, 0.5 * h], [0.25 * w, 0.5 * h], COLA, 2, [6, 5]);
+  arrow([0.25 * w - DLT * 0.35, 0.5 * h], [0.25 * w, 0.5 * h], COLA, 2, 11);
+  drawLabel([V("F", [{ t: "AB, " }, { t: "x", it: true }], COLA),
+             TXT(" = " + fm(F1 * Math.cos(TH)) + " kN", { col: COLA })],
+            [0.25 * w - DLT, 0.5 * h], 18, [1, 0], { bg: true });
+  drawLabel([V("F", [{ t: "AB, " }, { t: "y", it: true }], COLA),
+             TXT(" = " + fm(F1 * Math.sin(TH)) + " kN", { col: COLA })],
+            [0.25 * w, 0.25 * h], 18, [0, 1.2], { bg: true });
+  /* BC components (symbolic) */
+  line([0.75 * w, 0.5 * h], [0.75 * w, 0.5 * h - DLT], COLA, 2, [6, 5]);
+  arrow([0.75 * w, 0.5 * h - DLT * 0.65], [0.75 * w, 0.5 * h - DLT], COLA, 2, 11);
+  line([0.75 * w, 0.5 * h], [0.75 * w + DLT, 0.5 * h], COLA, 2, [6, 5]);
+  arrow([0.75 * w + DLT * 0.65, 0.5 * h], [0.75 * w + DLT, 0.5 * h], COLA, 2, 11);
+  drawLabel([V("F", [{ t: "BC, " }, { t: "x", it: true }], COLA), TXT(" = "),
+             V("F", "BC", BLUE), TXT(" cos \u03B8")],
+            [0.75 * w + DLT, 0.5 * h], 18, [-1, 0], { bg: true });
+  drawLabel([V("F", [{ t: "BC, " }, { t: "y", it: true }], COLA), TXT(" = "),
+             V("F", "BC", BLUE), TXT(" sin \u03B8")],
+            [0.75 * w, 0.5 * h - DLT], 18, [0, 1.2], { bg: true });
+  drawFramed(" B ", B, 15, GRAY40);
+}
+
+function focusJointC() {
+  arrow(C, A, "#000", 3, 15);
+  arrow(C, E, "#000", 3, 15);
+  arrow(C, B, "#000", 3, 15);
+  arrow(C, D, "#000", 3, 15);
+  arrow(C, [w, -0.5 * h], BLUE, 3, 15);
+  drawLabel([V("F", "C", BLUE), TXT(" = " + FC.toFixed(2) + " kN", { col: BLUE })], [w, -0.5 * h], 18, [0, 1.2]);
+  dashedArc(C, 0.1, 0, TH, "#000", 2.5);
+  drawLabel([TXT("\u03B8 = 60\u00B0")], C, 18, [-2, -1]);
+  drawLabel([V("F", "AC", BLUE), TXT(" = " + fm(F2) + " kN", { col: BLUE })], A, 18, [1.2, 0]);
+  drawLabel([V("F", "BC", BLUE), TXT(" = " + fm(F3) + " kN", { col: BLUE })], B, 18, [1, -1.2]);
+  drawLabel([V("F", "CD", BLUE)], D, 18, [-1, -1.2]);
+  drawLabel([V("F", "CE", BLUE)], E, 18, [-1, 0]);
+  /* BC components (numeric) */
+  line([0.75 * w, 0.5 * h], [0.75 * w - DLT, 0.5 * h], COLA, 2, [6, 5]);
+  arrow([0.75 * w - DLT * 0.65, 0.5 * h], [0.75 * w - DLT, 0.5 * h], COLA, 2, 11);
+  line([0.75 * w, 0.5 * h], [0.75 * w, 0.5 * h + DLT], COLA, 2, [6, 5]);
+  arrow([0.75 * w, 0.5 * h + DLT * 0.65], [0.75 * w, 0.5 * h + DLT], COLA, 2, 11);
+  drawLabel([V("F", [{ t: "BC, " }, { t: "x", it: true }], COLA),
+             TXT(" = " + fm(F3 * Math.cos(TH)) + " kN", { col: COLA })],
+            [0.75 * w - DLT, 0.5 * h], 18, [1, 0], { bg: true });
+  drawLabel([V("F", [{ t: "BC, " }, { t: "y", it: true }], COLA),
+             TXT(" = " + fm(F3 * Math.sin(TH)) + " kN", { col: COLA })],
+            [0.75 * w, 0.5 * h + DLT], 18, [0.5, -1.2], { bg: true });
+  /* CD components (symbolic) */
+  line([1.25 * w, 0.5 * h], [1.25 * w + DLT, 0.5 * h], COLA, 2, [6, 5]);
+  arrow([1.25 * w + DLT * 0.65, 0.5 * h], [1.25 * w + DLT, 0.5 * h], COLA, 2, 11);
+  line([1.25 * w, 0.5 * h], [1.25 * w, 0.5 * h + DLT], COLA, 2, [6, 5]);
+  arrow([1.25 * w, 0.5 * h + DLT * 0.65], [1.25 * w, 0.5 * h + DLT], COLA, 2, 11);
+  drawLabel([V("F", [{ t: "CD, " }, { t: "x", it: true }], COLA), TXT(" = "),
+             V("F", "CD", BLUE), TXT(" cos \u03B8")],
+            [1.25 * w + DLT, 0.5 * h], 18, [-1, 0], { bg: true });
+  drawLabel([V("F", [{ t: "CD, " }, { t: "y", it: true }], COLA), TXT(" = "),
+             V("F", "CD", BLUE), TXT(" sin \u03B8")],
+            [1.25 * w, 0.5 * h + DLT], 18, [-0.5, -1.2], { bg: true });
+  drawFramed(" C ", C, 15, GRAY40);
+}
+
+function focusJointD() {
+  arrow(B, [0.96 * 1.5 * w, h], "#000", 3, 15);
+  arrow(D, C, "#000", 3, 15);
+  arrow(E, [1.01 * 1.5 * w, 0.96 * h], "#000", 3, 15);
+  dashedArc(D, 0.1, Math.PI, Math.PI + TH, "#000", 2.5);
+  drawLabel([TXT("\u03B8 = 60\u00B0")], D, 18, [2.2, 2]);
+  drawLabel([V("F", "BD", BLUE), TXT(" = " + fm(F4) + " kN", { col: BLUE })], B, 18, [1.2, 0]);
+  drawLabel([V("F", "CD", BLUE), TXT(" = " + fm(F5) + " kN", { col: BLUE })], C, 18, [1, 1.2]);
+  drawLabel([V("F", "DE", BLUE)], E, 18, [-1, 1.2]);
+  /* CD components (numeric) */
+  line([1.25 * w, 0.5 * h], [1.25 * w, 0.5 * h - DLT], COLA, 2, [6, 5]);
+  arrow([1.25 * w, 0.5 * h - DLT * 0.65], [1.25 * w, 0.5 * h - DLT], COLA, 2, 11);
+  line([1.25 * w, 0.5 * h], [1.25 * w - DLT, 0.5 * h], COLA, 2, [6, 5]);
+  arrow([1.25 * w - DLT * 0.65, 0.5 * h], [1.25 * w - DLT, 0.5 * h], COLA, 2, 11);
+  drawLabel([V("F", [{ t: "CD, " }, { t: "x", it: true }], COLA),
+             TXT(" = " + fm(F5 * Math.cos(TH)) + " kN", { col: COLA })],
+            [1.25 * w - DLT, 0.5 * h], 18, [1, 0], { bg: true });
+  drawLabel([V("F", [{ t: "CD, " }, { t: "y", it: true }], COLA),
+             TXT(" = " + fm(F5 * Math.sin(TH)) + " kN", { col: COLA })],
+            [1.25 * w, 0.5 * h - DLT], 18, [0.5, 1.2], { bg: true });
+  /* DE components (symbolic) */
+  line([1.75 * w, 0.5 * h - DLT], [1.75 * w, 0.5 * h], COLA, 2, [6, 5]);
+  arrow([1.75 * w, 0.5 * h - DLT * 0.35], [1.75 * w, 0.5 * h], COLA, 2, 11);
+  line([1.75 * w + DLT, 0.5 * h], [1.75 * w, 0.5 * h], COLA, 2, [6, 5]);
+  arrow([1.75 * w + DLT * 0.35, 0.5 * h], [1.75 * w, 0.5 * h], COLA, 2, 11);
+  drawLabel([V("F", [{ t: "DE, " }, { t: "x", it: true }], COLA), TXT(" = "),
+             V("F", "DE", BLUE), TXT(" cos \u03B8")],
+            [1.75 * w + DLT, 0.5 * h], 18, [-1, 0], { bg: true });
+  drawLabel([V("F", [{ t: "DE, " }, { t: "y", it: true }], COLA), TXT(" = "),
+             V("F", "DE", BLUE), TXT(" sin \u03B8")],
+            [1.75 * w, 0.5 * h - DLT], 18, [-0.5, 1.2], { bg: true });
+  drawFramed(" D ", D, 15, GRAY40);
+}
+
+/* Equation panel shown below the focused free-body diagrams */
+function eqRowsForJoint(j) {
+  const sin = TXT(" sin \u03B8"), cos = TXT(" cos \u03B8");
+  if (j === 1) return {
+    gap: 60,
+    col1: [
+      { pre: [...sumF("y"), TXT(" ")], post: [TXT("= 0 = "), V("R", "A", BLUE), TXT(" \u2212 "), V("F", "AB", BLUE), sin] },
+      { pre: [V("F", "AB", BLUE), TXT(" ")], post: [TXT("= "), V("R", "A", BLUE), TXT("/sin \u03B8")] },
+      { pre: [V("F", "AB", BLUE), TXT(" ", { col: BLUE })], post: [TXT("= " + fm(F1) + " kN (compression)", { col: BLUE })], col: BLUE }
+    ],
+    col2: [
+      { pre: [...sumF("x"), TXT(" ")], post: [TXT("= 0 = \u2212"), V("F", "AB", BLUE), cos, TXT(" + "), V("F", "AC", BLUE)] },
+      { pre: [V("F", "AC", BLUE), TXT(" ")], post: [TXT("= "), V("F", "AB", BLUE), cos] },
+      { pre: [V("F", "AC", BLUE), TXT(" ", { col: BLUE })], post: [TXT("= " + fm(F2) + " kN (tension)", { col: BLUE })], col: BLUE }
+    ]
+  };
+  if (j === 2) return {
+    gap: 40,
+    col1: [
+      { pre: [...sumF("y"), TXT(" ")], post: [TXT("= 0 = "), V("F", "AB", BLUE), sin, TXT(" \u2212 "), V("F", "BC", BLUE), sin] },
+      { pre: [V("F", "BC", BLUE), TXT(" ")], post: [TXT("= "), V("F", "AB", BLUE)] },
+      { pre: [V("F", "BC", BLUE), TXT(" ", { col: BLUE })], post: [TXT("= " + fm(F3) + " kN (tension)", { col: BLUE })], col: BLUE }
+    ],
+    col2: [
+      { pre: [...sumF("x"), TXT(" ")], post: [TXT("= 0 = "), V("F", "AB", BLUE), cos, TXT(" + "), V("F", "BC", BLUE), cos, TXT(" \u2212 "), V("F", "BD", BLUE)] },
+      { pre: [V("F", "BD", BLUE), TXT(" ")], post: [TXT("= ("), V("F", "AB", BLUE), TXT(" + "), V("F", "BC", BLUE), TXT(") cos \u03B8")] },
+      { pre: [V("F", "BD", BLUE), TXT(" ", { col: BLUE })], post: [TXT("= " + fm(F4) + " kN (compression)", { col: BLUE })], col: BLUE }
+    ]
+  };
+  if (j === 3) return {
+    gap: 25,
+    col1: [
+      { pre: [...sumF("y"), TXT(" ")], post: [TXT("= \u2212"), V("F", "C", BLUE), TXT(" + "), V("F", "BC", BLUE), sin, TXT(" + "), V("F", "CD", BLUE), sin] },
+      { pre: [V("F", "CD", BLUE), TXT(" ")], post: [TXT("= "), V("F", "C", BLUE), TXT("/sin \u03B8 \u2212 "), V("F", "BC", BLUE)] },
+      { pre: [V("F", "CD", BLUE), TXT(" ", { col: BLUE })], post: [TXT("= " + fm(F5) + " kN (tension)", { col: BLUE })], col: BLUE }
+    ],
+    col2: [
+      { pre: [...sumF("x"), TXT(" ")], post: [TXT("= \u2212"), V("F", "AC", BLUE), TXT(" \u2212 "), V("F", "BC", BLUE), cos, TXT(" + "), V("F", "CD", BLUE), cos, TXT(" + "), V("F", "CE", BLUE)] },
+      { pre: [V("F", "CE", BLUE), TXT(" ")], post: [TXT("= "), V("F", "AC", BLUE), TXT(" + ("), V("F", "BC", BLUE), TXT(" \u2212 "), V("F", "CD", BLUE), TXT(") cos \u03B8")] },
+      { pre: [V("F", "CE", BLUE), TXT(" ", { col: BLUE })], post: [TXT("= " + fm(F6) + " kN (tension)", { col: BLUE })], col: BLUE }
+    ]
+  };
+  /* j === 4 : single column */
+  return {
+    gap: 0,
+    col1: [
+      { pre: [...sumF("y"), TXT(" ")], post: [TXT("= 0 = \u2212"), V("F", "CD", BLUE), sin, TXT(" + "), V("F", "DE", BLUE), sin] },
+      { pre: [V("F", "DE", BLUE), TXT(" ")], post: [TXT("= "), V("F", "CD", BLUE)] },
+      { pre: [V("F", "DE", BLUE), TXT(" ", { col: BLUE })], post: [TXT("= " + fm(F7) + " kN (compression)", { col: BLUE })], col: BLUE }
+    ],
+    col2: null
+  };
+}
+
+function colWidths(rows, fs) {
+  let maxPre = 0, maxPost = 0;
+  for (const r of rows) {
+    maxPre = Math.max(maxPre, measurePieces(ctx, r.pre, fs));
+    maxPost = Math.max(maxPost, measurePieces(ctx, r.post, fs));
+  }
+  return maxPre + maxPost;
+}
+
+function drawJointEquations(j, y0) {
+  const eq = eqRowsForJoint(j);
+  let fs = 17;
+  const lineH0 = 26;
+  if (eq.col2) {
+    let total = colWidths(eq.col1, fs) + eq.gap + colWidths(eq.col2, fs);
+    while (total > CW - 14 && fs > 11) {
+      fs -= 0.5;
+      total = colWidths(eq.col1, fs) + eq.gap + colWidths(eq.col2, fs);
+    }
+    const lineH = lineH0 * fs / 17;
+    const w1 = colWidths(eq.col1, fs), w2 = colWidths(eq.col2, fs);
+    const left = (CW - (w1 + eq.gap + w2)) / 2;
+    drawAlignedBlock(eq.col1, left + w1 / 2, y0, fs, lineH);
+    drawAlignedBlock(eq.col2, left + w1 + eq.gap + w2 / 2, y0, fs, lineH);
+  } else {
+    drawAlignedBlock(eq.col1, CW / 2, y0, fs, lineH0);
+  }
+}
+
+/* ============================================================
+   Main draw
+   ============================================================ */
+const FOCUS_RANGE = {
+  1: { x0: -0.30, x1: 1.15, y0: -0.42, y1: 1.02 },
+  2: { x0: -0.30, x1: 1.45, y0: -0.18, y1: 1.10 },
+  3: { x0: -0.35, x1: 2.35, y0: -0.62, y1: 1.05 },
+  4: { x0: 0.25, x1: 2.30, y0: -0.15, y1: 1.18 }
+};
+
+function draw() {
+  let range, graphH, totalH;
+  const focusMode = (state.steps === 2 && state.focus && state.joints < 5);
+
+  if (state.steps === 1) {
+    graphH = 395; totalH = 395;
+    if (state.opt === 0 || state.opt === 4)
+      range = { x0: -0.37 * w, x1: 2.25 * w, y0: -0.64 * h, y1: 1.1 * h };
+    else
+      range = { x0: -0.37 * w, x1: 2.25 * w, y0: -1.2 * h, y1: 1.1 * h };
+  } else if (focusMode) {
+    graphH = 300; totalH = 415;
+    range = FOCUS_RANGE[state.joints];
+  } else if (state.joints === 5) {
+    graphH = 395; totalH = 395;
+    range = { x0: -0.40 * w, x1: 2.40 * w, y0: -0.98 * h, y1: 1.12 * h };
+  } else {
+    graphH = 395; totalH = 395;
+    range = { x0: -0.21 * w, x1: 2.21 * w, y0: -0.25 * h, y1: 1.27 * h };
+  }
+
+  sizeCanvas(totalH);
+  ctx.clearRect(0, 0, CW, CH);
+  ctx.textAlign = "left";
+  T = makeXform(range, { x: 0, y: 0, w: CW, h: graphH });
+
+  if (state.steps === 1) {
+    if (state.opt === 0) viewTruss();
+    else if (state.opt === 1) viewMoment();
+    else if (state.opt === 2) viewXBalance();
+    else if (state.opt === 3) viewYBalance();
+    else viewSolvedReactions();
+  } else if (focusMode) {
+    if (state.joints === 1) focusJointA();
+    else if (state.joints === 2) focusJointB();
+    else if (state.joints === 3) focusJointC();
+    else focusJointD();
+    drawJointEquations(state.joints, graphH + 20);
+  } else if (state.joints === 5) {
+    viewJointsSolved();
+  } else {
+    viewFullStructure();
+  }
+}
+
+/* Mouseover on the moment-balance equations */
+canvas.addEventListener("mousemove", function (ev) {
+  if (!(state.steps === 1 && state.opt === 1)) return;
+  const r = canvas.getBoundingClientRect();
+  const mx = ev.clientX - r.left, my = ev.clientY - r.top;
+  const over = mx >= momentEqBox.x - 6 && mx <= momentEqBox.x + momentEqBox.w + 6 &&
+               my >= momentEqBox.y - 6 && my <= momentEqBox.y + momentEqBox.h + 6;
+  if (over !== state.momentHover) { state.momentHover = over; draw(); }
+});
+canvas.addEventListener("mouseleave", function () {
+  if (state.momentHover) { state.momentHover = false; draw(); }
+});
+
+/* ============================================================
+   Controls
+   ============================================================ */
+function refreshControls() {
+  document.querySelectorAll("#stepsBar button").forEach(b =>
+    b.classList.toggle("sel", +b.dataset.v === state.steps));
+  document.querySelectorAll("#jointsBar button").forEach(b =>
+    b.classList.toggle("sel", +b.dataset.v === state.joints));
+  document.getElementById("optWrap").style.display = state.steps === 1 ? "inline" : "none";
+  document.getElementById("jointsWrap").style.display = state.steps === 2 ? "inline" : "none";
+  document.getElementById("focusWrap").style.display =
+    (state.steps === 2 && state.joints < 5) ? "inline" : "none";
+  document.getElementById("optMenu").value = String(state.opt);
+  document.getElementById("focusChk").checked = state.focus;
+}
+document.getElementById("stepsBar").addEventListener("click", e => {
+  if (e.target.dataset.v) {
+    state.steps = +e.target.dataset.v;
+    state.momentHover = false;
+    refreshControls(); draw();
+  }
+});
+document.getElementById("jointsBar").addEventListener("click", e => {
+  if (e.target.dataset.v) {
+    state.joints = +e.target.dataset.v;
+    refreshControls(); draw();
+  }
+});
+document.getElementById("optMenu").addEventListener("change", e => {
+  state.opt = +e.target.value;
+  state.momentHover = false;
+  draw();
+});
+document.getElementById("focusChk").addEventListener("change", e => {
+  state.focus = e.target.checked;
+  draw();
+});
+
+/* ============================================================
+   Directions / Details / About panels
+   ============================================================ */
+let mathTypeset = false;
+function togglePanel(id) {
+  ["panelDirections", "panelDetails", "panelAbout"].forEach(p => {
+    const el = document.getElementById(p);
+    el.style.display = (p === id && el.style.display !== "block") ? "block" : "none";
+    if (el.style.display === "block") {
+      // Panel bottom sits at the bottom of the button row; limit its height to
+      // the distance from the top of the page so the top is always visible.
+      const area = document.getElementById("panelArea");
+      const avail = area.getBoundingClientRect().bottom + (window.scrollY || 0) - 20;
+      el.style.maxHeight = Math.max(200, avail) + "px";
+    }
+  });
+  if (id === "panelDetails" &&
+      document.getElementById("panelDetails").style.display === "block") {
+    drawFigure1();
+    if (!mathTypeset && window.MathJax && MathJax.typesetPromise) {
+      MathJax.typesetPromise([document.getElementById("panelDetails")]).then(() => { mathTypeset = true; });
+    }
+  }
+}
+document.getElementById("btnDirections").addEventListener("click", () => togglePanel("panelDirections"));
+document.getElementById("btnDetails").addEventListener("click", () => togglePanel("panelDetails"));
+document.getElementById("btnAbout").addEventListener("click", () => togglePanel("panelAbout"));
+document.querySelectorAll(".panelClose").forEach(b =>
+  b.addEventListener("click", () => {
+    document.getElementById(b.dataset.panel).style.display = "none";
+  }));
+
+/* ============================================================
+   Figure 1 in the Details panel (labeled truss)
+   ============================================================ */
+function drawFigure1() {
+  const fc = document.getElementById("fig1canvas");
+  const fctx = fc.getContext("2d");
+  const dpr = window.devicePixelRatio || 1;
+  const FW = 470, FH = 300;
+  fc.width = FW * dpr; fc.height = FH * dpr;
+  fc.style.width = FW + "px"; fc.style.height = FH + "px";
+  fctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  fctx.clearRect(0, 0, FW, FH);
+
+  const savedCtx = ctx2Swap(fctx);
+  const savedT = T;
+  T = makeXform({ x0: -0.38, x1: 2.38, y0: -0.66, y1: 1.02 },
+                { x: 0, y: 0, w: FW, h: FH });
+
+  /* reaction / load arrows */
+  arrow([0, -0.5 * h], [0, -0.05 * h], "#000", 2.5, 13);
+  arrow(C, [1, -0.5 * h], "#000", 2.5, 13);
+  arrow([2, -0.5 * h], [2, -0.05 * h], "#000", 2.5, 13);
+  drawLabel([V("R", "A")], [0, -0.5 * h], 18, [0, 1.5]);
+  drawLabel([V("F", [{ t: "y", it: true }])], [1, -0.5 * h], 18, [0, 1.5]);
+  drawLabel([V("R", "E")], [2, -0.5 * h], 18, [0, 1.5]);
+
+  /* compression members: outward heads */
+  arrowOut(A, B, "#000", 2.5, 14);
+  arrowOut(B, D, "#000", 2.5, 14);
+  arrowOut(D, E, "#000", 2.5, 14);
+  /* tension members: inward heads */
+  arrowIn(A, C, "#000", 2.5, 14);
+  arrowIn(B, C, "#000", 2.5, 14);
+  arrowIn(C, D, "#000", 2.5, 14);
+  arrowIn(C, E, "#000", 2.5, 14);
+
+  /* member labels */
+  const mem = [
+    ["AB", [0.25, 0.5 * h]], ["AC", [0.5, 0]], ["BC", [0.75, 0.5 * h]],
+    ["BD", [1, h]], ["CD", [1.25, 0.5 * h]], ["CE", [1.5, 0]], ["DE", [1.75, 0.5 * h]]
+  ];
+  for (const m of mem) drawLabel([V("F", m[0])], m[1], 18, [0, 0], { bg: true });
+
+  /* joint letters */
+  drawFramedOn(fctx, " A ", A, 16);
+  drawFramedOn(fctx, " B ", B, 16);
+  drawFramedOn(fctx, " C ", C, 16);
+  drawFramedOn(fctx, " D ", D, 16);
+  drawFramedOn(fctx, " E ", E, 16);
+
+  T = savedT;
+  ctx2Swap(savedCtx);
+}
+/* swap the global ctx used by the drawing helpers */
+let _ctxRef = ctx;
+function ctx2Swap(newCtx) {
+  const old = _ctxRef;
+  _ctxRef = newCtx;
+  /* the helpers close over `ctx`; rebind by copying methods is messy, so
+     instead helpers use `ctx` variable — reassign via defineProperty trick */
+  ctxProxySet(newCtx);
+  return old;
+}
+function drawFramedOn(c, text, mpos, fs) {
+  const p = PX(mpos);
+  c.font = fs + "px Helvetica, Arial, sans-serif";
+  const tw = c.measureText(text).width;
+  const padX = 6, padY = 4;
+  const bw = tw + 2 * padX, bh = fs + 2 * padY;
+  const r = Math.min(15, bh / 2);
+  c.beginPath();
+  c.moveTo(p[0] - bw / 2 + r, p[1] - bh / 2);
+  c.arcTo(p[0] + bw / 2, p[1] - bh / 2, p[0] + bw / 2, p[1] + bh / 2, r);
+  c.arcTo(p[0] + bw / 2, p[1] + bh / 2, p[0] - bw / 2, p[1] + bh / 2, r);
+  c.arcTo(p[0] - bw / 2, p[1] + bh / 2, p[0] - bw / 2, p[1] - bh / 2, r);
+  c.arcTo(p[0] - bw / 2, p[1] - bh / 2, p[0] + bw / 2, p[1] - bh / 2, r);
+  c.closePath();
+  c.fillStyle = "#fff"; c.fill();
+  c.lineWidth = 1; c.strokeStyle = "#000"; c.stroke();
+  c.fillStyle = "#000";
+  c.fillText(text, p[0] - tw / 2, p[1] + fs * 0.36);
+}
+
+/* Simple approach: make `ctx` a mutable binding used by helpers */
+function ctxProxySet(c) { ctx = c; }
+
+/* ============================================================ */
+refreshControls();
+draw();
+</script>
+</body>
+</html>

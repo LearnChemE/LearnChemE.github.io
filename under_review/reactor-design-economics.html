@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reactor Design Economics</title>
+<style>
+  :root{
+    --red:#98000d;
+    --red-dark:#7a000a;
+    --panel-border:#c8c8c8;
+    --panel-bg:#f4f4f4;
+  }
+  html,body{margin:0;padding:0;background:#ffffff;
+    font-family:Helvetica,Arial,sans-serif;color:#000;}
+  #app{max-width:840px;margin:0 auto;padding:10px;}
+  .sim{display:flex;flex-wrap:wrap;gap:6px;align-items:flex-start;
+    border:1px solid var(--panel-border);border-radius:3px;
+    background:#fafafa;padding:10px;position:relative;}
+  .controls{width:322px;flex:0 0 322px;font-size:15px;}
+  .plotwrap{flex:1 1 420px;min-width:420px;display:flex;justify-content:center;}
+  canvas{touch-action:none;}
+
+  .row{display:flex;align-items:center;margin:5px 0;}
+  .ctl-label{width:70px;text-align:right;padding-right:8px;font-weight:bold;font-size:15px;}
+  .setter{display:inline-flex;border:1px solid #b0b0b0;border-radius:3px;overflow:hidden;}
+  .setter button{border:none;background:#e8e8e8;color:#000;
+    font-family:inherit;font-size:14px;padding:4px 12px;cursor:pointer;
+    border-right:1px solid #b0b0b0;}
+  .setter button:last-child{border-right:none;}
+  .setter button.sel{background:#a7a7a7;color:#000;font-weight:bold;}
+  .setter button:hover:not(.sel){background:#dcdcdc;}
+
+  .section-head{font-weight:bold;font-size:15px;margin:9px 0 3px 0;}
+  .divider{border-top:1px solid #cfcfcf;margin:9px 0;}
+
+  .slider-row{display:flex;align-items:center;margin:4px 0;}
+  .slider-name{width:78px;text-align:right;padding-right:8px;font-size:14px;}
+  .slider-row input[type=range]{width:120px;margin:0 8px;}
+  .slider-val{min-width:42px;font-size:14px;font-variant-numeric:tabular-nums;
+    text-align:left;}
+
+  .opt-row{display:flex;align-items:center;margin:9px 0 3px 0;}
+  .opt-row label{font-weight:bold;font-size:15px;cursor:pointer;
+    display:flex;align-items:center;gap:6px;}
+
+  /* Mathematica-style slider: dark-red fill left of a light-gray handle */
+  input[type=range]{
+    -webkit-appearance:none; appearance:none;
+    width:120px; height:18px; background:transparent; cursor:pointer;
+    --pct:100%;
+  }
+  input[type=range]::-webkit-slider-runnable-track{
+    height:5px; border-radius:3px; border:1px solid #b3b3b3;
+    background:linear-gradient(to right, var(--red) var(--pct), #dcdcdc var(--pct));
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none; appearance:none;
+    width:11px; height:17px; margin-top:-7px; border-radius:3px;
+    border:1px solid #8f8f8f;
+    background:linear-gradient(#ffffff,#d6d6d6);
+  }
+  input[type=range]::-moz-range-track{
+    height:5px; border-radius:3px; border:1px solid #b3b3b3; background:#dcdcdc;
+  }
+  input[type=range]::-moz-range-progress{
+    height:7px; border-radius:3px; background:var(--red);
+  }
+  input[type=range]::-moz-range-thumb{
+    width:11px; height:17px; border-radius:3px; border:1px solid #8f8f8f;
+    background:linear-gradient(#ffffff,#d6d6d6);
+  }
+
+  .btnbar{display:flex;gap:8px;justify-content:flex-start;margin:12px 0 2px 0;padding-left:2px;}
+  .btnbar button{background:var(--red);color:#fff;border:none;border-radius:3px;
+    font-family:inherit;font-size:15px;padding:6px 15px;cursor:pointer;}
+  .btnbar button:hover{background:var(--red-dark);}
+  .btnbar button.active{background:var(--red-dark);box-shadow:inset 0 0 0 2px rgba(255,255,255,.35);}
+
+  .info{position:absolute;box-sizing:border-box;border:1px solid var(--panel-border);
+    border-radius:3px;background:var(--panel-bg);
+    line-height:1.45;display:none;z-index:20;overflow:hidden;
+    box-shadow:0 4px 14px rgba(0,0,0,0.28);}
+  .info.show{display:flex;flex-direction:column;}
+  .info-scroll{overflow-y:auto;padding:12px 16px;font-size:14.4px;flex:1 1 auto;
+    scrollbar-width:thin;scrollbar-color:#bdbdbd #ededed;}
+  .info-scroll::-webkit-scrollbar{width:11px;}
+  .info-scroll::-webkit-scrollbar-track{background:#ededed;border-radius:6px;}
+  .info-scroll::-webkit-scrollbar-thumb{background:#bdbdbd;border-radius:6px;
+    border:2px solid #ededed;}
+  .info-scroll::-webkit-scrollbar-thumb:hover{background:#9e9e9e;}
+  .info-close{position:absolute;top:4px;right:6px;width:22px;height:22px;z-index:3;
+    border:none;background:var(--panel-bg);color:#555;font-size:20px;line-height:20px;
+    font-family:inherit;cursor:pointer;padding:0;border-radius:3px;}
+  .info-close:hover{background:#e2e2e2;color:#000;}
+  .info h3{margin:0 0 8px 0;font-size:15.36px;color:var(--red);}
+  .info p{margin:7px 0;}
+  .info a{color:var(--red);}
+  .eqn{font-style:italic;text-align:left;margin:6px 0;padding-left:1.6em;font-size:15.36px;}
+  sub{font-size:.78em;}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="sim">
+    <div class="controls">
+      <div class="row">
+        <div class="ctl-label">plot</div>
+        <div class="setter" id="set-plot">
+          <button data-v="1" class="sel">profit</button>
+          <button data-v="2">concentration</button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="ctl-label">reactor</div>
+        <div class="setter" id="set-reactor">
+          <button data-v="1" class="sel">CSTR</button>
+          <button data-v="2">PFR</button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="ctl-label">reaction</div>
+        <div class="setter" id="set-reaction">
+          <button data-v="1" class="sel">first-order</button>
+          <button data-v="2">autocatalytic</button>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+      <div class="section-head">feed concentrations (mol/L)</div>
+      <div class="slider-row">
+        <div class="slider-name">reactant</div>
+        <input type="range" id="Ca0" min="1" max="5" step="1" value="5">
+        <div class="slider-val" id="Ca0v">5</div>
+      </div>
+      <div class="slider-row">
+        <div class="slider-name">product</div>
+        <input type="range" id="Cb0" min="1" max="5" step="1" value="2">
+        <div class="slider-val" id="Cb0v">2</div>
+      </div>
+
+      <div id="cost-block">
+        <div class="divider"></div>
+        <div class="section-head">value and cost ($/mol)</div>
+        <div class="slider-row">
+          <div class="slider-name">product</div>
+          <input type="range" id="pB" min="20" max="100" step="1" value="50">
+          <div class="slider-val" id="pBv">50</div>
+        </div>
+        <div class="slider-row">
+          <div class="slider-name">reactant</div>
+          <input type="range" id="pA" min="1" max="20" step="0.5" value="10">
+          <div class="slider-val" id="pAv">10.</div>
+        </div>
+        <div class="section-head">cost ($/L/min)</div>
+        <div class="slider-row">
+          <div class="slider-name">reactor</div>
+          <input type="range" id="pR" min="2" max="10" step="1" value="5">
+          <div class="slider-val" id="pRv">5</div>
+        </div>
+      </div>
+
+      <div class="opt-row">
+        <label><input type="checkbox" id="op"> optimize</label>
+      </div>
+
+      <div class="btnbar">
+        <button id="btn-dir">Directions</button>
+        <button id="btn-det">Details</button>
+        <button id="btn-abt">About</button>
+      </div>
+    </div>
+
+    <div class="plotwrap">
+      <canvas id="plot" width="420" height="420"></canvas>
+    </div>
+
+  <div class="info" id="info-dir">
+    <button class="info-close" type="button" aria-label="Close">&times;</button>
+    <div class="info-scroll">
+<h3>Directions</h3>
+    <p>This simulation calculates the monetary profit as a function of reactor
+    volume for a continuous stirred-tank reactor (CSTR) or a plug-flow reactor
+    (PFR). The reaction is either first-order or autocatalytic; set the feed
+    concentrations of reactant and product with sliders. Use sliders to set the
+    value of the product and the costs of the reactant and reactor. Select
+    "concentration" to view the reactant and product concentrations plotted
+    versus reactor volume. The final volume corresponds to the volume at the
+    black dot on the profit plot. Click and drag the black dot on the profit
+    versus reactor volume plot. Check "optimize" to solve for the reactor volume
+    with the highest profit. The separations cost is not considered in this
+    simulation, but it can significantly affect profit.</p>
+    </div>
+  </div>
+
+  <div class="info" id="info-det">
+    <button class="info-close" type="button" aria-label="Close">&times;</button>
+    <div class="info-scroll">
+<h3>Details</h3>
+    <p>The rate of reaction <i>r</i><sub>A</sub> for a first-order reaction
+    <i>A</i> &rarr; <i>B</i> is given by:</p>
+    <p class="eqn"><i>r</i><sub>A</sub> = &minus;<i>k</i> <i>C</i><sub>A</sub>,</p>
+    <p>and for an autocatalytic reaction it is:</p>
+    <p class="eqn"><i>r</i><sub>A</sub> = &minus;<i>k</i> <i>C</i><sub>A</sub> <i>C</i><sub>B</sub>,</p>
+    <p>where <i>k</i> is the rate constant (1/min) for a first-order reaction, and
+    <i>C</i><sub>A</sub> and
+    <i>C</i><sub>B</sub> are the reactant and product concentrations (mol/L).</p>
+    <p>A mass balance determines <i>C</i><sub>A</sub> and <i>C</i><sub>B</sub> for
+    a continuous stirred-tank reactor (CSTR):</p>
+    <p class="eqn"><i>V</i> = <i>v</i><sub>0</sub> (<i>C</i><sub>A,0</sub> &minus;
+    <i>C</i><sub>A</sub>) / (&minus;<i>r</i><sub>A</sub>),</p>
+    <p class="eqn"><i>V</i> = <i>v</i><sub>0</sub> (<i>C</i><sub>B,0</sub> &minus;
+    <i>C</i><sub>B</sub>) / <i>r</i><sub>A</sub>,</p>
+    <p>where <i>V</i> is the reactor volume (L), <i>v</i><sub>0</sub> is the inlet
+    volumetric flow rate (L/min) and <i>C</i><sub>A,0</sub> and
+    <i>C</i><sub>B,0</sub> are the reactant and product feed concentrations
+    (mol/L).</p>
+    <p>For a plug-flow reactor (PFR):</p>
+    <p class="eqn">d<i>C</i><sub>A</sub> / d<i>V</i> = <i>r</i><sub>A</sub> /
+    <i>v</i><sub>0</sub>,</p>
+    <p class="eqn">d<i>C</i><sub>B</sub> / d<i>V</i> = &minus;<i>r</i><sub>A</sub> /
+    <i>v</i><sub>0</sub>.</p>
+    <p>Overall conversion <i>x</i><sub>A</sub> of reactant <i>A</i> to product and
+    profit made <i>p</i> are calculated:</p>
+    <p class="eqn"><i>x</i><sub>A</sub> = (<i>C</i><sub>A,0</sub> &minus;
+    <i>C</i><sub>A</sub>) / <i>C</i><sub>A,0</sub>;</p>
+    <p>for a CSTR:</p>
+    <p class="eqn"><i>p</i> = <i>v</i><sub>0</sub> <i>C</i><sub>A,0</sub>
+    <i>x</i><sub>A</sub> (<i>p</i><sub>B</sub> &minus; <i>p</i><sub>A</sub>) &minus;
+    <i>V</i> <i>p</i><sub>R</sub>,</p>
+    <p>for a PFR:</p>
+    <p class="eqn"><i>p</i> = <i>v</i><sub>0</sub> (<i>C</i><sub>B</sub> &minus;
+    <i>C</i><sub>B,0</sub>) <i>p</i><sub>B</sub> &minus; <i>v</i><sub>0</sub>
+    <i>C</i><sub>A,0</sub> <i>x</i><sub>A</sub> <i>p</i><sub>A</sub> &minus;
+    <i>V</i> <i>p</i><sub>R</sub>,</p>
+    <p>where <i>p</i><sub>A</sub> ($/mol) and <i>p</i><sub>R</sub> ($/[L min]) are
+    the costs of the reactant and reactor and <i>p</i><sub>B</sub> ($/mol) is the
+    value of the product.</p>
+    </div>
+  </div>
+
+  <div class="info" id="info-abt">
+    <button class="info-close" type="button" aria-label="Close">&times;</button>
+    <div class="info-scroll">
+<h3>About</h3>
+    <p>This simulation was created in the
+    <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a>
+    at University of Colorado Boulder for
+    <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a>
+    by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a
+    <a href="https://demonstrations.wolfram.com/ReactorDesignEconomics/" target="_blank" rel="noopener">Mathematica simulation</a>
+    by Rachael L. Baumann and Garrison J. Vigil. It was prepared with financial
+    support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or
+    comments to LearnChemE@gmail.com.</p>
+    </div>
+  </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+(function(){
+  const k = 0.1, vo = 10;          // rate constant (1/min), flow rate (L/min)
+  const Vmax = 700;
+
+  const state = {
+    plot:1, reactor:1, reaction:1,
+    Ca0:5, Cb0:2, pB:50, pA:10, pR:5,
+    op:false, vrpt:200
+  };
+
+  /* ---------- physics ---------- */
+  function solveCa(V){
+    const {Ca0,Cb0,reactor,reaction} = state;
+    if(V<=0) return Ca0;
+    if(reactor===1){ // CSTR
+      if(reaction===1) return vo*Ca0/(vo + k*V);
+      // autocatalytic: Vk u^2 - (VkS+vo)u + vo Ca0 = 0 ; take smaller root
+      const S=Ca0+Cb0, a=V*k, b=-(V*k*S+vo), c=vo*Ca0;
+      const disc=Math.sqrt(Math.max(0,b*b-4*a*c));
+      return (-b-disc)/(2*a);
+    } else { // PFR
+      if(reaction===1) return Ca0*Math.exp(-k*V/vo);
+      const S=Ca0+Cb0;
+      const f=(Ca)=>-k*Ca*(S-Ca)/vo;
+      let Ca=Ca0, n=800, h=V/n;
+      for(let i=0;i<n;i++){
+        const k1=f(Ca),k2=f(Ca+h/2*k1),k3=f(Ca+h/2*k2),k4=f(Ca+h*k3);
+        Ca+=h/6*(k1+2*k2+2*k3+k4);
+      }
+      return Ca;
+    }
+  }
+  function conc(V){
+    const Ca=solveCa(V);
+    const Cb=state.Cb0+(state.Ca0-Ca);
+    const x=(state.Ca0-Ca)/state.Ca0;
+    return {Ca,Cb,x};
+  }
+  function profit(V){
+    const {Ca,Cb,x}=conc(V);
+    const prodB = state.reactor===1 ? vo*state.Ca0*x : vo*(Cb-state.Cb0);
+    return prodB*state.pB - vo*x*state.Ca0*state.pA - V*state.pR;
+  }
+  function optimize(){
+    let best=-Infinity,bV=1;
+    for(let V=1;V<=Vmax;V+=0.5){const pr=profit(V); if(pr>best){best=pr;bV=V;}}
+    for(let V=Math.max(1,bV-1);V<=Math.min(Vmax,bV+1);V+=0.01){
+      const pr=profit(V); if(pr>best){best=pr;bV=V;}}
+    return bV;
+  }
+
+  /* ---------- number formatting (match Mathematica) ---------- */
+  function fmtProfit(p){
+    const neg = p<0;
+    const v = Math.round(Math.abs(p));
+    const s = v.toLocaleString('en-US'); // DigitBlock 3
+    return (neg?'-$':'$')+s+'/min';
+  }
+  function fmtConv(x){ return x.toFixed(2); }        // NumberForm {2,2}
+  function fmtVal(id,val){
+    if(id==='pA') return Number.isInteger(val)? val.toFixed(1) : val.toString();
+    return val.toString();
+  }
+
+  /* ---------- canvas / plotting ---------- */
+  const cv=document.getElementById('plot');
+  const ctx=cv.getContext('2d');
+  const CSSW=420, CSSH=420;
+  function setupDPR(){
+    const dpr=window.devicePixelRatio||1;
+    cv.style.width=CSSW+'px'; cv.style.height=CSSH+'px';
+    cv.width=Math.round(CSSW*dpr); cv.height=Math.round(CSSH*dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  // plot margins inside the 420x420 canvas
+  const M={l:76,r:22,t:16,b:52};
+  const PW=CSSW-M.l-M.r, PH=CSSH-M.t-M.b;
+
+  function niceTicks(lo,hi,target){
+    const span=hi-lo; if(span<=0) return [lo];
+    const raw=span/target;
+    const mag=Math.pow(10,Math.floor(Math.log10(raw)));
+    const norm=raw/mag; let step;
+    if(norm<1.5)step=1; else if(norm<3)step=2; else if(norm<7)step=5; else step=10;
+    step*=mag;
+    const t=[]; const start=Math.ceil(lo/step)*step;
+    for(let v=start; v<=hi+step*1e-9; v+=step) t.push(Math.abs(v)<step*1e-9?0:v);
+    return t;
+  }
+
+  function drawFrame(xlo,xhi,ylo,yhi,xlabel,ylabel,xticks,yticks,yfmt){
+    ctx.save();
+    ctx.clearRect(0,0,CSSW,CSSH);
+    // frame box
+    ctx.strokeStyle='#000'; ctx.lineWidth=1;
+    ctx.strokeRect(M.l+0.5,M.t+0.5,PW,PH);
+    const X=v=>M.l+(v-xlo)/(xhi-xlo)*PW;
+    const Y=v=>M.t+PH-(v-ylo)/(yhi-ylo)*PH;
+    ctx.fillStyle='#000'; ctx.strokeStyle='#000';
+    ctx.font='15px Helvetica,Arial,sans-serif';
+    // x ticks
+    ctx.textAlign='center'; ctx.textBaseline='top';
+    xticks.forEach(t=>{
+      if(t<xlo-1e-9||t>xhi+1e-9)return;
+      const px=X(t);
+      ctx.beginPath();ctx.moveTo(px,M.t+PH);ctx.lineTo(px,M.t+PH-6);ctx.stroke();
+      ctx.fillText(String(+t.toFixed(6)),px,M.t+PH+6);
+    });
+    // y ticks
+    ctx.textAlign='right'; ctx.textBaseline='middle';
+    yticks.forEach(t=>{
+      if(t<ylo-1e-9||t>yhi+1e-9)return;
+      const py=Y(t);
+      ctx.beginPath();ctx.moveTo(M.l,py);ctx.lineTo(M.l+6,py);ctx.stroke();
+      ctx.fillText(yfmt?yfmt(t):String(+t.toFixed(6)),M.l-8,py);
+    });
+    // axis labels
+    ctx.font='17px Helvetica,Arial,sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='bottom';
+    ctx.fillText(xlabel,M.l+PW/2,CSSH-4);
+    ctx.save();
+    ctx.translate(12,M.t+PH/2); ctx.rotate(-Math.PI/2);
+    ctx.textBaseline='top';
+    ctx.fillText(ylabel,0,0);
+    ctx.restore();
+    ctx.restore();
+    return {X,Y};
+  }
+
+  function labelBox(text,px,py,color,anchor){
+    ctx.font='17px Helvetica,Arial,sans-serif';
+    const w=ctx.measureText(text).width, h=17, pad=3;
+    let x=px, y=py;
+    if(anchor==='center'){x=px-w/2-pad; y=py-h/2-pad;}
+    else if(anchor==='left'){x=px; y=py-h/2-pad;}
+    ctx.fillStyle='#fff';
+    ctx.fillRect(x,y,w+2*pad,h+2*pad);
+    ctx.fillStyle=color||'#000';
+    ctx.textAlign='left'; ctx.textBaseline='top';
+    ctx.fillText(text,x+pad,y+pad+1);
+  }
+
+  let pointPx={x:0,y:0}; // screen position of draggable dot (profit plot)
+
+  function render(){
+    setupDPR();
+    const vr = state.op ? optimize() : state.vrpt;
+
+    if(state.plot===1){
+      // profit plot, V 0..1000
+      const N=400, xs=[],ys=[];
+      let ymin=Infinity,ymax=-Infinity,peakV=0;
+      for(let i=0;i<=N;i++){const V=Vmax*i/N; const p=profit(V); xs.push(V);ys.push(p);
+        if(p<ymin)ymin=p; if(p>ymax){ymax=p;peakV=V;}}
+      const pad=(ymax-ymin)*0.08||1;
+      let ylo=ymin-pad, yhi=ymax+pad;
+      const xticks=niceTicks(0,Vmax,5), yticks=niceTicks(ylo,yhi,6);
+      const yfmt=t=>String(Math.round(t));
+      const {X,Y}=drawFrame(0,Vmax,ylo,yhi,'reactor volume (L)','profit ($/min)',
+                            xticks,yticks,yfmt);
+      // curve
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(M.l,M.t,PW,PH); ctx.clip();
+      ctx.strokeStyle='rgb(0,112,0)'; ctx.lineWidth=3;
+      ctx.beginPath();
+      for(let i=0;i<=N;i++){const px=X(xs[i]),py=Y(ys[i]); i?ctx.lineTo(px,py):ctx.moveTo(px,py);}
+      ctx.stroke();
+      ctx.restore();
+      // dot
+      const pvr=profit(vr);
+      pointPx={x:X(vr),y:Y(pvr)};
+      ctx.fillStyle='#000';
+      ctx.beginPath();ctx.arc(pointPx.x,pointPx.y,6.8,0,2*Math.PI);ctx.fill();
+      // annotation lower-left (scaled 0.05,0.15)
+      const {x}=conc(vr);
+      const ax=M.l+PW*0.05, ay=M.t+PH*(1-0.15);
+      ctx.font='17px Helvetica,Arial,sans-serif';
+      const l1='profit = '+fmtProfit(pvr);
+      const l2='conversion = '+fmtConv(x);
+      const w=Math.max(ctx.measureText(l1).width,ctx.measureText(l2).width);
+      ctx.fillStyle='#fff'; ctx.fillRect(ax-2,ay-2,w+6,2*20+4);
+      ctx.fillStyle='#000'; ctx.textAlign='left'; ctx.textBaseline='top';
+      ctx.fillText(l1,ax,ay); ctx.fillText(l2,ax,ay+20);
+      // hint (two lines) — choose the first corner whose box is clear of the
+      // curve (and the annotation); hidden while optimizing
+      if(!state.op){
+        ctx.font='17px Helvetica,Arial,sans-serif';
+        const h1='click and drag point', h2='to change volume';
+        const hw=Math.max(ctx.measureText(h1).width,ctx.measureText(h2).width);
+        const bw=hw+6, bh=44;
+        const pts=[]; for(let i=0;i<=N;i++) pts.push([X(xs[i]),Y(ys[i])]);
+        const annBox=[ax-2,ay-2,ax-2+w+6,ay-2+44];
+        const clear=(b)=>{
+          for(const p of pts){ if(p[0]>=b[0]&&p[0]<=b[2]&&p[1]>=b[1]&&p[1]<=b[3]) return false; }
+          if(!(b[2]<annBox[0]||b[0]>annBox[2]||b[3]<annBox[1]||b[1]>annBox[3])) return false;
+          return true;
+        };
+        const tR=M.l+PW-4, tL=M.l+4, tT=M.t+6, tB=M.t+PH-6;
+        const cand=[
+          [tR-bw, tT,      tR, tT+bh, 'right'],   // top-right
+          [tL,    tT,      tL+bw, tT+bh, 'left'],  // top-left
+          [tR-bw, tB-bh,   tR, tB,    'right'],    // bottom-right
+          [tL,    tB-bh,   tL+bw, tB,  'left']     // bottom-left
+        ];
+        let c=cand[0];
+        for(const k of cand){ if(clear(k)){c=k;break;} }
+        ctx.fillStyle='#fff'; ctx.fillRect(c[0],c[1],bw,bh);
+        ctx.fillStyle='#000'; ctx.textBaseline='top';
+        if(c[4]==='right'){ ctx.textAlign='right'; const tx=c[2]-3;
+          ctx.fillText(h1,tx,c[1]+4); ctx.fillText(h2,tx,c[1]+24); }
+        else { ctx.textAlign='left'; const tx=c[0]+3;
+          ctx.fillText(h1,tx,c[1]+4); ctx.fillText(h2,tx,c[1]+24); }
+      }
+    } else {
+      // concentration plot, V 0..vr, y -0.5..12
+      const N=300, vA=[],cA=[],cB=[];
+      for(let i=0;i<=N;i++){const V=vr*i/N; const c=conc(V); vA.push(V);cA.push(c.Ca);cB.push(c.Cb);}
+      const xticks=niceTicks(0,vr,5), yticks=niceTicks(0,12,6);
+      const {X,Y}=drawFrame(0,vr,-0.5,12,'reactor volume (L)','concentration (mol/L)',
+                            xticks,yticks,null);
+      ctx.save(); ctx.beginPath(); ctx.rect(M.l,M.t,PW,PH); ctx.clip();
+      // reactant (blue)
+      ctx.strokeStyle='#0000ff'; ctx.lineWidth=3; ctx.beginPath();
+      for(let i=0;i<=N;i++){const px=X(vA[i]),py=Y(cA[i]); i?ctx.lineTo(px,py):ctx.moveTo(px,py);}
+      ctx.stroke();
+      // product (black)
+      ctx.strokeStyle='#000'; ctx.lineWidth=3; ctx.beginPath();
+      for(let i=0;i<=N;i++){const px=X(vA[i]),py=Y(cB[i]); i?ctx.lineTo(px,py):ctx.moveTo(px,py);}
+      ctx.stroke();
+      ctx.restore();
+      // curve labels
+      const cr=conc(0.33*vr), cp=conc(0.666*vr);
+      labelBox('reactant', X(0.33*vr), Y(cr.Ca), '#0000ff','center');
+      labelBox('product',  X(0.666*vr), Y(cp.Cb), '#000','center');
+      // profit + conversion top center
+      const pvr=profit(vr); const {x}=conc(vr);
+      labelBox('profit = '+fmtProfit(pvr)+'    conversion = '+fmtConv(x),
+               M.l+PW*0.5, M.t+PH*0.05, '#000','center');
+    }
+  }
+
+  /* ---------- drag handling on profit dot ---------- */
+  let dragging=false;
+  function canvasXtoV(clientX){
+    const rect=cv.getBoundingClientRect();
+    const cx=clientX-rect.left;
+    let V=(cx-M.l)/PW*Vmax;
+    return Math.min(Vmax,Math.max(1,V));
+  }
+  function pointerDown(e){
+    if(state.plot!==1||state.op)return;
+    const rect=cv.getBoundingClientRect();
+    const cx=e.clientX-rect.left, cy=e.clientY-rect.top;
+    const d=Math.hypot(cx-pointPx.x,cy-pointPx.y);
+    // allow grabbing anywhere along the curve x-range too
+    if(d<18 || (cx>M.l&&cx<M.l+PW&&cy>M.t&&cy<M.t+PH)){
+      dragging=true;
+      state.vrpt=canvasXtoV(e.clientX);
+      render(); e.preventDefault();
+    }
+  }
+  function pointerMove(e){
+    if(!dragging)return;
+    state.vrpt=canvasXtoV(e.clientX);
+    render(); e.preventDefault();
+  }
+  function pointerUp(){dragging=false;}
+  cv.addEventListener('pointerdown',pointerDown);
+  window.addEventListener('pointermove',pointerMove);
+  window.addEventListener('pointerup',pointerUp);
+
+  /* ---------- controls wiring ---------- */
+  function wireSetter(id,key,after){
+    const grp=document.getElementById(id);
+    grp.querySelectorAll('button').forEach(b=>{
+      b.addEventListener('click',()=>{
+        grp.querySelectorAll('button').forEach(x=>x.classList.remove('sel'));
+        b.classList.add('sel');
+        state[key]=parseInt(b.dataset.v,10);
+        if(after)after();
+        render();
+      });
+    });
+  }
+  wireSetter('set-plot','plot',updateCostVisibility);
+  wireSetter('set-reactor','reactor');
+  wireSetter('set-reaction','reaction');
+
+  function setFill(el){
+    const min=parseFloat(el.min), max=parseFloat(el.max);
+    const pct=(parseFloat(el.value)-min)/(max-min)*100;
+    el.style.setProperty('--pct', pct+'%');
+  }
+  function wireSlider(id,key){
+    const el=document.getElementById(id), out=document.getElementById(id+'v');
+    el.addEventListener('input',()=>{
+      state[key]=parseFloat(el.value);
+      out.textContent=fmtVal(id,state[key]);
+      setFill(el);
+      render();
+    });
+    setFill(el);
+  }
+  ['Ca0','Cb0','pB','pA','pR'].forEach(id=>wireSlider(id,id));
+
+  const opBox=document.getElementById('op');
+  opBox.addEventListener('change',()=>{state.op=opBox.checked; render();});
+
+  function updateCostVisibility(){
+    document.getElementById('cost-block').style.display =
+      (state.plot===1)?'block':'none';
+  }
+
+  /* ---------- info panels ---------- */
+  const panels={dir:'info-dir',det:'info-det',abt:'info-abt'};
+  const btns={dir:'btn-dir',det:'btn-det',abt:'btn-abt'};
+  let openPanel=null;
+  const sim=document.querySelector('.sim');
+  function placePanel(which){
+    const panel=document.getElementById(panels[which]);
+    const sr=sim.getBoundingClientRect();
+    const bar=document.querySelector('.btnbar').getBoundingClientRect();
+    const left=8, right=8, topGap=8;
+    const barTopRel=bar.top-sr.top;              // button row top, relative to sim
+    const panelBottomRel=barTopRel-8;            // panel bottom sits just above buttons
+    const cssBottom=Math.round(sr.height-1-panelBottomRel);
+    const width=Math.max(300, Math.round(sim.clientWidth-left-right));
+    const maxH=Math.max(120, Math.round(panelBottomRel-topGap));
+    panel.style.left=left+'px';
+    panel.style.top='auto';
+    panel.style.bottom=cssBottom+'px';
+    panel.style.width=width+'px';
+    panel.style.maxHeight=maxH+'px';
+  }
+  function toggle(which){
+    Object.keys(panels).forEach(kk=>{
+      document.getElementById(panels[kk]).classList.remove('show');
+      document.getElementById(btns[kk]).classList.remove('active');
+    });
+    if(openPanel===which){openPanel=null;return;}
+    placePanel(which);
+    document.getElementById(panels[which]).classList.add('show');
+    document.getElementById(btns[which]).classList.add('active');
+    openPanel=which;
+  }
+  document.getElementById('btn-dir').addEventListener('click',()=>toggle('dir'));
+  document.getElementById('btn-det').addEventListener('click',()=>toggle('det'));
+  document.getElementById('btn-abt').addEventListener('click',()=>toggle('abt'));
+  function closeOpenPanel(){
+    if(!openPanel)return;
+    document.getElementById(panels[openPanel]).classList.remove('show');
+    document.getElementById(btns[openPanel]).classList.remove('active');
+    openPanel=null;
+  }
+  document.querySelectorAll('.info-close').forEach(b=>
+    b.addEventListener('click',closeOpenPanel));
+  window.addEventListener('resize',()=>{ if(openPanel) placePanel(openPanel); });
+
+  // initial value labels
+  document.getElementById('pAv').textContent=fmtVal('pA',10);
+  updateCostVisibility();
+  render();
+  window.addEventListener('resize',render);
+})();
+</script>
+</body>
+</html>

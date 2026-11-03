@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Adiabatic Humidification</title>
+<style>
+  :root{
+    --page-bg:#f4f5f6;
+    --card-bg:#ffffff;
+    --ink:#000000;
+    --ff: Arial, Helvetica, "Liberation Sans", sans-serif;
+    --accent-red:#a3001c;
+    --accent-blue:#1c3fa3;
+    --accent-magenta:#b5008a;
+    --line:#8a8a8a;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --page-bg:#1b1c1e;
+    }
+  }
+  :root[data-theme="dark"]{
+    --page-bg:#1b1c1e;
+  }
+  *{ box-sizing:border-box; }
+  body{ background:var(--page-bg); margin:0; }
+  .ah-wrap{
+    font-family: var(--ff);
+    font-size:17px;
+    font-weight:400;
+    color:var(--ink);
+    max-width:880px;
+    margin:24px auto;
+    background:var(--card-bg);
+    border:1px solid #d6d6d6;
+    border-radius:10px;
+    padding:20px 22px 26px;
+  }
+  .ah-wrap, .ah-wrap *{ font-family: var(--ff); }
+  .ah-title{
+    font-size:22px;
+    font-weight:400;
+    color:var(--ink);
+    text-align:center;
+    margin:0 0 16px;
+  }
+  .ah-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:22px;
+    align-items:flex-end;
+    margin-bottom:6px;
+  }
+  .ah-label{ font-size:17px; color:var(--ink); margin:2px 0 6px; }
+  .ah-label.red{ color:var(--accent-red); }
+  .ah-label-head{ font-weight:700; }
+  .ah-slider{ flex:0 0 auto; min-width:0; }
+  .ah-sliders{ display:flex; flex-wrap:wrap; gap:8px 34px; align-items:flex-end; }
+  .ah-group .ah-row{ margin-bottom:0; }
+  .ah-slider .ah-sliderline{
+    display:flex; align-items:center; gap:8px;
+  }
+  input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  .ah-slider input[type=range]{
+    flex:0 0 auto;
+    width:180px;
+    max-width:100%;
+  }
+  .ah-slider .ah-val{
+    min-width:2ch;
+    text-align:left;
+    font-variant-numeric: tabular-nums;
+  }
+  .ah-divider{
+    border:none;
+    border-top:1px solid #d0d0d0;
+    margin:10px 0 12px;
+  }
+  .ah-controlsrow{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:12px 18px;
+    margin-bottom:12px;
+  }
+  .ah-radiogroup{ display:flex; flex-wrap:wrap; align-items:center; gap:10px 16px; }
+  .ah-radiogroup label{ display:flex; align-items:center; gap:6px; cursor:pointer; white-space:nowrap; }
+  .ah-radiogroup input[type=radio]{ width:16px; height:16px; accent-color:#3a6fb0; cursor:pointer; }
+  .ah-btnrow{ display:flex; gap:10px; margin-left:auto; flex-wrap:wrap; }
+  .ah-btn{
+    font-family:var(--ff);
+    font-size:17px;
+    font-weight:400;
+    color:#ffffff;
+    background:var(--accent-red);
+    border:1px solid var(--accent-red);
+    border-radius:6px;
+    padding:5px 14px;
+    cursor:pointer;
+  }
+  .ah-btn:hover{ background:#86151d; }
+  .ah-btn:active{ background:#6e0e15; }
+
+  .ah-stage{
+    position:relative;
+    border:1px solid #cfcfcf;
+    border-radius:8px;
+    background:#ffffff;
+    min-height:420px;
+    overflow:hidden;
+  }
+  .ah-stage svg{ display:block; width:100%; height:420px; }
+
+  .ah-table-wrap{ padding:18px 20px; }
+  .ah-table-title{ margin:0 0 10px; font-size:17px; color:var(--ink); }
+  table.ah-table{
+    border-collapse:collapse;
+    width:auto;
+    table-layout:fixed;
+    background:#ffffff;
+  }
+  table.ah-table col.ah-col-prop{ width:236px; }
+  table.ah-table col.ah-col-val{ width:78px; }
+  table.ah-table th, table.ah-table td{
+    border:1px solid #8a8a8a;
+    background:#ffffff;
+    padding:7px 10px 7px 14px;
+    font-size:17px;
+    font-weight:400;
+    color:var(--ink);
+    text-align:left;
+    overflow-wrap:break-word;
+  }
+  table.ah-table td.ah-num{ text-align:left; }
+  table.ah-table th{ text-align:left; }
+
+  .ah-panel{
+    position:absolute;
+    inset:0;
+    background:#ffffff;
+    overflow:auto;
+    padding:16px 44px 18px 18px;
+  }
+  .ah-panel-close{
+    position:absolute;
+    top:8px; right:10px;
+    width:28px; height:28px;
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--ff);
+    font-size:17px;
+    font-weight:400;
+    color:var(--ink);
+    background:#eef0f2;
+    border:1px solid #b7bcc2;
+    border-radius:6px;
+    cursor:pointer;
+  }
+  .ah-panel-close:hover{ background:#e2e5e9; }
+  .ah-panel h3{
+    font-size:17px;
+    font-weight:400;
+    color:var(--ink);
+    text-decoration:underline;
+    margin:0 0 10px;
+  }
+  .ah-panel p{ margin:0 0 4px; line-height:1.42; }
+  .ah-panel p + p{ margin-top:0; }
+  .ah-panel ol, .ah-panel ul{ margin:4px 0 4px 22px; padding:0; }
+  .ah-panel li{ margin-bottom:2px; line-height:1.42; }
+  .ah-panel .ah-subhead{ text-decoration:underline; margin:12px 0 4px; }
+  .ah-eqn-block{ text-align:left; margin:6px 0 14px; }
+  .ah-eqn-block mjx-container[display="true"]{
+    text-align:left !important;
+    margin:6px 0 !important;
+  }
+  .ah-symtable{ border-collapse:collapse; margin:6px 0 14px; }
+  .ah-symtable td{ padding:2px 14px 2px 0; vertical-align:top; font-size:17px; }
+  .ah-about a{ color:#1a4fb4; }
+  hr.ah-thin{ border:none; border-top:1px solid #ddd; margin:14px 0; }
+</style>
+</head>
+<body>
+<div class="ah-wrap" id="ahRoot">
+  <div class="ah-title">Adiabatic Humidification</div>
+
+  <div class="ah-sliders">
+    <div class="ah-group">
+      <div class="ah-label ah-label-head">inlet air conditions:</div>
+      <div class="ah-row">
+        <div class="ah-slider">
+          <div class="ah-label">temperature in &deg;C</div>
+          <div class="ah-sliderline">
+            <input type="range" id="ahT" min="10" max="50" step="1" value="30">
+            <span class="ah-val" id="ahTval">30</span>
+          </div>
+        </div>
+        <div class="ah-slider">
+          <div class="ah-label">relative humidity in %</div>
+          <div class="ah-sliderline">
+            <input type="range" id="ahRHi" min="10" max="25" step="1" value="10">
+            <span class="ah-val" id="ahRHival">10</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ah-group">
+      <div class="ah-label red ah-label-head">humidified air:</div>
+      <div class="ah-row">
+        <div class="ah-slider">
+          <div class="ah-label">relative humidity in %</div>
+          <div class="ah-sliderline">
+            <input type="range" id="ahRHo" min="30" max="60" step="1" value="40">
+            <span class="ah-val" id="ahRHoval">40</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="ah-divider">
+
+  <div class="ah-controlsrow">
+    <div class="ah-radiogroup" id="ahCtrl1">
+      <label><input type="radio" name="ahctrl1" value="1" checked> setup</label>
+      <label><input type="radio" name="ahctrl1" value="2"> psychrometric data</label>
+    </div>
+    <div class="ah-radiogroup" id="ahCtrl2">
+      <label><input type="radio" name="ahctrl2" value="1" checked> inlet air</label>
+      <label><input type="radio" name="ahctrl2" value="2"> humidified air</label>
+    </div>
+    <div class="ah-btnrow">
+      <button class="ah-btn" id="ahBtnDirections" type="button">Directions</button>
+      <button class="ah-btn" id="ahBtnDetails" type="button">Details</button>
+      <button class="ah-btn" id="ahBtnAbout" type="button">About</button>
+    </div>
+  </div>
+
+  <div class="ah-stage" id="ahStage">
+    <svg id="ahSvg" viewBox="0 0 620 420" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div class="ah-table-wrap" id="ahTableWrap" style="display:none;"></div>
+
+    <div class="ah-panel" id="ahPanelDirections" style="display:none;">
+      <button class="ah-panel-close" data-close="ahPanelDirections" type="button">&#10005;</button>
+      <h3>Directions</h3>
+      <p>In adiabatic humidification, liquid water is sprayed into a relatively dry, warm air stream in a tower. Because some water evaporates, the temperature of the air stream decreases and its moisture content increases. Suppose that the adiabatic spray tower operates at approximately 1 atm and that the mass flow rate of the stream of air is 1000&nbsp;kg/hr. You can set the temperature and relative humidity <em>r</em><sub>h</sub> of the inlet air stream.</p>
+      <p>This simulation computes how much water must be evaporated (shown in magenta and expressed in kg H<sub>2</sub>O/hr) for a selected relative humidity of the humidified air (i.e. the outlet air stream, shown in red). In the computation, it is assumed that the rise in temperature of the water in the tower is much smaller than the heat of vaporization of water. Thus, you can follow the constant wet-bulb line on the psychrometric chart. In addition, these thermal properties of both the inlet and outlet air streams are listed:</p>
+      <ol>
+        <li>the dry-bulb temperature</li>
+        <li>the wet-bulb temperature</li>
+        <li>the dew point temperature</li>
+        <li>the relative humidity</li>
+        <li>the absolute humidity or moisture content</li>
+        <li>the humid volume</li>
+        <li>the specific enthalpy</li>
+      </ol>
+      <p>Things to try out or check:</p>
+      <ol>
+        <li>For fixed temperature and relative humidity of the inlet air stream, increase the relative humidity of the humidified air stream. As expected, you will observe an increase in the computed amount of added water.</li>
+        <li>The values of the wet-bulb temperature and specific heat of both the inlet and outlet air streams are identical. This is expected, because we assume adiabatic humidification that moves along a constant wet-bulb line on the psychrometric chart.</li>
+        <li>The dry-bulb temperature of the humidified air is, as expected, lower than the temperature of the inlet air.</li>
+      </ol>
+    </div>
+
+    <div class="ah-panel" id="ahPanelDetails" style="display:none;">
+      <button class="ah-panel-close" data-close="ahPanelDetails" type="button">&#10005;</button>
+      <h3>Details</h3>
+
+      <div class="ah-subhead">Vapor pressure of water (Antoine equation)</div>
+      <div class="ah-eqn-block">\[ \log_{10} P^{sat}(T) \;=\; 5.40221-\dfrac{1838.675}{T+241.263} \]</div>
+
+      <div class="ah-subhead">Relative humidity &ndash; moisture content relation</div>
+      <div class="ah-eqn-block">\[ \dfrac{RH}{100} \;=\; \dfrac{Y}{0.622+0.378\,Y}\cdot\dfrac{P}{P^{sat}(T)} \]</div>
+
+      <div class="ah-subhead">Specific enthalpy of moist air</div>
+      <div class="ah-eqn-block">\[ h \;=\; 1.006\,T + Y\,(1.84\,T+2501) \]</div>
+
+      <div class="ah-subhead">Humid volume</div>
+      <div class="ah-eqn-block">\[ v_H \;=\; \dfrac{(T+273.15)\left(R_a+Y R_w\right)}{p},\qquad R_a=286.9,\ R_w=455\ \tfrac{\text{J}}{\text{kg K}},\ \ p=101325\ \text{Pa} \]</div>
+
+      <div class="ah-subhead">Dew point temperature</div>
+      <div class="ah-eqn-block">\[ P^{sat}(T_{dp}) \;=\; \dfrac{Y}{0.622+0.378\,Y}\,P \]</div>
+
+      <div class="ah-subhead">Wet-bulb (adiabatic-saturation) temperature</div>
+      <div class="ah-eqn-block">\[ P^{sat}(T_w) \;=\; \dfrac{Y_w}{0.622+0.378\,Y_w}\,P, \qquad 1.006\,T_w+Y_w\left(1.84\,T_w+2501\right)=h_i \]</div>
+
+      <div class="ah-subhead">Outlet (humidified-air) state</div>
+      <div class="ah-eqn-block">\[ \dfrac{RH_o}{100} \;=\; \dfrac{Y_o}{0.622+0.378\,Y_o}\cdot\dfrac{P}{P^{sat}(T_o)}, \qquad 1.006\,T_o+Y_o\left(1.84\,T_o+2501\right)=h_i \]</div>
+
+      <div class="ah-subhead">Water evaporation rate</div>
+      <div class="ah-eqn-block">\[ \dot m_{da} = \dot m_a\left(1-Y_i\right), \qquad \dot m_w = \left(Y_o-Y_i\right)\dot m_{da} \]</div>
+
+      <div class="ah-subhead">Reference</div>
+      <p>R. M. Felder and R. W. Rousseau, <em>Elementary Principles of Chemical Processes</em>, 3rd ed., New York: John Wiley &amp; Sons, 2005.</p>
+
+      <div class="ah-subhead">Symbols</div>
+      <table class="ah-symtable">
+        <tr><td>\(T\)</td><td>dry-bulb temperature, &deg;C</td></tr>
+        <tr><td>\(T_w\)</td><td>wet-bulb (adiabatic-saturation) temperature, &deg;C</td></tr>
+        <tr><td>\(T_{dp}\)</td><td>dew point temperature, &deg;C</td></tr>
+        <tr><td>\(RH\)</td><td>relative humidity, %</td></tr>
+        <tr><td>\(Y\)</td><td>moisture content (humidity ratio), kg H<sub>2</sub>O/kg dry air</td></tr>
+        <tr><td>\(v_H\)</td><td>humid volume, m<sup>3</sup>/kg dry air</td></tr>
+        <tr><td>\(h\)</td><td>specific enthalpy, kJ/kg dry air</td></tr>
+        <tr><td>\(P\)</td><td>total pressure, 1.01325&nbsp;bar (1&nbsp;atm)</td></tr>
+        <tr><td>\(P^{sat}(T)\)</td><td>vapor pressure of water at \(T\), bar</td></tr>
+        <tr><td>\(\dot m_a\)</td><td>mass flow rate of inlet moist air, 1000&nbsp;kg/hr</td></tr>
+        <tr><td>\(\dot m_{da}\)</td><td>mass flow rate of dry air, kg/hr</td></tr>
+        <tr><td>\(\dot m_w\)</td><td>rate of water evaporation, kg H<sub>2</sub>O/hr</td></tr>
+        <tr><td>subscripts</td><td>\(i\) = inlet air, \(o\) = humidified (outlet) air</td></tr>
+      </table>
+    </div>
+
+    <div class="ah-panel ah-about" id="ahPanelAbout" style="display:none;">
+      <button class="ah-panel-close" data-close="ahPanelAbout" type="button">&#10005;</button>
+      <h3>About</h3>
+      <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/AdiabaticHumidification/" target="_blank" rel="noopener">Mathematica simulation</a> by Housam Binous and Ahmed Bellagi. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.</p>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  // ---------- Psychrometric engine (matches the original Mathematica model) ----------
+  var P = 1.01325;      // bar, total pressure
+  var Ra = 286.9;        // J/(kg K) dry air
+  var Rw = 455;          // J/(kg K) water vapor
+  var p_Pa = 101325;     // Pa
+
+  function Psat(Tc){ return Math.pow(10, 5.40221 - 1838.675/(Tc+241.263)); }
+
+  function SHfromRH(RHpercent, Tc){
+    var A = (RHpercent/100)*Psat(Tc);
+    return 0.622*A/(P-0.378*A);
+  }
+
+  function enthalpy(Tc, SH){ return 1.006*Tc + SH*(1.84*Tc+2501); }
+
+  function dewPoint(SH){
+    var target = SH*P/(0.622+0.378*SH); // = Psat(Tdp)
+    var logv = Math.log(target)/Math.LN10;
+    return 1838.675/(5.40221-logv) - 241.263;
+  }
+
+  function humidVolume(Tc, SH){ return (Tc+273.15)*(Ra+SH*Rw)/p_Pa; }
+
+  function bisect(f, lo, hi, iters){
+    var flo = f(lo);
+    for(var i=0;i<iters;i++){
+      var mid = 0.5*(lo+hi);
+      var fmid = f(mid);
+      if((fmid<0) === (flo<0)){ lo = mid; flo = fmid; } else { hi = mid; }
+    }
+    return 0.5*(lo+hi);
+  }
+
+  function wetBulbFromEnthalpy(hi){
+    function f(Tw){
+      return SHfromRH(100, Tw) - (hi - 1.006*Tw)/(1.84*Tw+2501);
+    }
+    return bisect(f, -60, 90, 90);
+  }
+
+  function outletTempFromEnthalpy(hi, RHo){
+    function g(To){
+      var SHo = SHfromRH(RHo, To);
+      return enthalpy(To, SHo) - hi;
+    }
+    return bisect(g, -60, 120, 90);
+  }
+
+  function computeAll(T, RHi, RHo){
+    var SHi = SHfromRH(RHi, T);
+    var hi = enthalpy(T, SHi);
+    var Tdpi = dewPoint(SHi);
+    var vHi = humidVolume(T, SHi);
+
+    var Tw = wetBulbFromEnthalpy(hi);
+    var SHu = SHfromRH(100, Tw);
+
+    var To = outletTempFromEnthalpy(hi, RHo);
+    var SHo = SHfromRH(RHo, To);
+    var ho = enthalpy(To, SHo);
+    var Tdpo = dewPoint(SHo);
+    var vHo = humidVolume(To, SHo);
+
+    var enterAir = 1000;
+    var enterDryAir = enterAir*(1-SHi);
+    var rateWater = (SHo-SHi)*enterDryAir;
+
+    return {
+      T:T, RHi:RHi, RHo:RHo,
+      SHi:SHi, hi:hi, Tdpi:Tdpi, vHi:vHi,
+      Tw:Tw, SHu:SHu,
+      To:To, SHo:SHo, ho:ho, Tdpo:Tdpo, vHo:vHo,
+      rateWater:rateWater
+    };
+  }
+
+  // ---------- UI state ----------
+  var el = {
+    T: document.getElementById('ahT'),
+    RHi: document.getElementById('ahRHi'),
+    RHo: document.getElementById('ahRHo'),
+    Tval: document.getElementById('ahTval'),
+    RHival: document.getElementById('ahRHival'),
+    RHoval: document.getElementById('ahRHoval'),
+    ctrl2wrap: document.getElementById('ahCtrl2'),
+    svg: document.getElementById('ahSvg'),
+    tableWrap: document.getElementById('ahTableWrap'),
+    stage: document.getElementById('ahStage')
+  };
+
+  var state = { ctrl:1, ctrl2:1 };
+
+  function fmt(v, d){ return v.toFixed(d); }
+
+  var NS = "http://www.w3.org/2000/svg";
+  function svgEl(tag, attrs){
+    var e = document.createElementNS(NS, tag);
+    for(var k in attrs){ e.setAttribute(k, attrs[k]); }
+    return e;
+  }
+  function svgText(x, y, lines, opts){
+    opts = opts || {};
+    var t = svgEl('text', {
+      x:x, y:y,
+      'font-family':'Arial, Helvetica, sans-serif',
+      'font-size': opts.size || 17,
+      'font-weight':'400',
+      fill: opts.fill || '#000000',
+      'text-anchor': opts.anchor || 'start'
+    });
+    lines.forEach(function(line, i){
+      var ts = svgEl('tspan', { x:x, dy: i===0 ? 0 : (opts.lh || 20) });
+      ts.textContent = line;
+      t.appendChild(ts);
+    });
+    return t;
+  }
+
+  // fixed dot layout so the schematic doesn't jitter between renders
+  var dotLayout = (function(){
+    var arr = [];
+    var seedRows = [
+      {y0:1.65, k:5, jitter:0.06, step:0.05},
+      {y0:1.65, k:10, jitter:0.06, step:0.04, floor:0.15},
+      {y0:1.45, k:20, jitter:0.06, step:0.04, floor:0.15},
+      {y0:1.45, k:25, jitter:0.06, step:0.04, floor:0.15}
+    ];
+    var seed = 12345;
+    function rnd(){ seed = (seed*1103515245+12345) & 0x7fffffff; return (seed % 1000)/1000; }
+    seedRows.forEach(function(r){
+      for(var i=0.25;i<=0.8+1e-9;i+=r.step){
+        var y = r.y0 - r.k*Math.pow(i-0.5,2) + r.jitter*rnd();
+        if(r.floor!==undefined){ y = Math.max(y, r.floor + 0.05*rnd()); }
+        arr.push([i,y]);
+      }
+    });
+    return arr;
+  })();
+
+  function drawArrow(defsParent, id, color){
+    var marker = svgEl('marker', {id:id, markerWidth:8, markerHeight:8, refX:6, refY:3, orient:'auto', markerUnits:'strokeWidth'});
+    var path = svgEl('path', {d:'M0,0 L0,6 L7,3 z', fill:color});
+    marker.appendChild(path);
+    defsParent.appendChild(marker);
+  }
+
+  // All coordinates below are plain pixel coordinates in the 0..620 x 0..420 viewBox.
+  function renderSchematic(c){
+    var svg = el.svg;
+    svg.innerHTML = '';
+    var defs = svgEl('defs', {});
+    drawArrow(defs, 'ahArrowBlack', '#000000');
+    drawArrow(defs, 'ahArrowRed', '#a3001c');
+    drawArrow(defs, 'ahArrowBlue', '#1c3fa3');
+    svg.appendChild(defs);
+
+    // tower
+    var tx0 = 220, tx1 = 380, ty0 = 80, ty1 = 320;
+    svg.appendChild(svgEl('rect', {
+      x:tx0, y:ty0, width:(tx1-tx0), height:(ty1-ty0),
+      fill:'rgba(46,139,87,0.22)', stroke:'#1f6b3a', 'stroke-width':3
+    }));
+
+    // falling water dots (data-space [0,1]x[0,2] mapped onto the tower rect)
+    dotLayout.forEach(function(pt){
+      var cx = tx0 + pt[0]*(tx1-tx0);
+      var cy = ty1 - pt[1]*((ty1-ty0)/2);
+      if(cx>tx0+4 && cx<tx1-4 && cy>ty0+4 && cy<ty1-4){
+        svg.appendChild(svgEl('circle', {cx:cx, cy:cy, r:2.6, fill:'#1c3fa3'}));
+      }
+    });
+
+    svg.appendChild(svgEl('rect', {
+      x:(tx0+tx1)/2-33, y:180, width:66, height:40,
+      fill:'#ffffff', 'fill-opacity':0.85, rx:4
+    }));
+    svg.appendChild(svgText((tx0+tx1)/2, 195, ['spray','tower'], {anchor:'middle', fill:'#555555', lh:18}));
+
+    // inlet air arrow (black) into left side of tower, lower third
+    var inletY = 290;
+    svg.appendChild(svgEl('line', {x1:55, y1:inletY, x2:tx0-4, y2:inletY,
+      stroke:'#000000', 'stroke-width':2.5, 'marker-end':'url(#ahArrowBlack)'}));
+    svg.appendChild(svgText(55, inletY-35, [
+      'inlet air, ' + fmt(c.T,1) + ' °C',
+      'h' + 'ᵣ' + ' = ' + fmt(c.RHi,1) + '%'
+    ], {anchor:'start', fill:'#000000'}));
+
+    // outlet (humidified) air duct (red): straight up from the tower top, then right
+    var outX = 350, outTopY = 45;
+    svg.appendChild(svgEl('polyline', {
+      points: outX+','+ty0+' '+outX+','+outTopY+' '+470+','+outTopY,
+      fill:'none', stroke:'#a3001c', 'stroke-width':2.5, 'marker-end':'url(#ahArrowRed)'
+    }));
+    svg.appendChild(svgText(480, outTopY-14, [
+      'humidified air',
+      'h' + 'ᵣ' + ' = ' + fmt(c.RHo,1) + '%',
+      fmt(c.To,1) + ' °C'
+    ], {anchor:'start', fill:'#a3001c'}));
+
+    // water feed: horizontal pipe entering from the left, running into the tower to a
+    // spray nozzle mounted inside, near the top (matches the original Mathematica figure)
+    var pipeY = 98, nozzleX = 280, nozzleY = 104, nozzleR = 9;
+    svg.appendChild(svgEl('line', {x1:55, y1:pipeY, x2:tx0-2, y2:pipeY,
+      stroke:'#1c3fa3', 'stroke-width':2.5, 'marker-end':'url(#ahArrowBlue)'}));
+    svg.appendChild(svgEl('line', {x1:tx0, y1:pipeY, x2:nozzleX, y2:pipeY,
+      stroke:'#1c3fa3', 'stroke-width':2.5}));
+    svg.appendChild(svgEl('line', {x1:nozzleX, y1:pipeY, x2:nozzleX, y2:nozzleY,
+      stroke:'#1c3fa3', 'stroke-width':2.5}));
+    svg.appendChild(svgEl('line', {x1:nozzleX-nozzleR, y1:nozzleY, x2:nozzleX+nozzleR, y2:nozzleY,
+      stroke:'#1c3fa3', 'stroke-width':2.5}));
+    svg.appendChild(svgEl('path', {
+      d:'M '+(nozzleX-nozzleR)+' '+nozzleY+' A '+nozzleR+' '+nozzleR+' 0 0 0 '+(nozzleX+nozzleR)+' '+nozzleY,
+      fill:'none', stroke:'#1c3fa3', 'stroke-width':2.5
+    }));
+    svg.appendChild(svgText(55, pipeY-12, ['H₂O (l)'], {anchor:'start', fill:'#1c3fa3'}));
+
+    // water out (bottom, unevaporated water drains)
+    var woutX = 300;
+    svg.appendChild(svgEl('polyline', {
+      points: woutX+','+ty1+' '+woutX+','+358+' '+470+','+358,
+      fill:'none', stroke:'#1c3fa3', 'stroke-width':2.5, 'marker-end':'url(#ahArrowBlue)'
+    }));
+    svg.appendChild(svgText(480, 363, ['H₂O (l)'], {anchor:'start', fill:'#1c3fa3'}));
+
+    // evaporation rate label (right of tower, mid-height)
+    svg.appendChild(svgText(tx1+20, 165, [
+      'rate of H₂O',
+      'evaporation',
+      fmt(c.rateWater,2) + ' kg/hr'
+    ], {anchor:'start', fill:'#b5008a'}));
+  }
+
+  function tableHTML(c, which){
+    var isIn = which===1;
+    var title = isIn ? 'Inlet air' : 'Humidified air';
+    var rows = [
+      ['dry-bulb temperature, °C', isIn?c.T:c.To, 1],
+      ['wet-bulb temperature, °C', c.Tw, 1],
+      ['dew point temperature, °C', isIn?c.Tdpi:c.Tdpo, 1],
+      ['relative humidity, %', isIn?c.RHi:c.RHo, 0],
+      ['moisture content, kg H₂O/kg dry air', isIn?c.SHi:c.SHo, 4],
+      ['humid volume, m³/kg dry air', isIn?c.vHi:c.vHo, 3],
+      ['specific enthalpy, kJ/kg dry air', isIn?c.hi:c.ho, 1]
+    ];
+    var html = '<div class="ah-table-title">' + title + ' &mdash; psychrometric data</div>';
+    html += '<table class="ah-table"><colgroup><col class="ah-col-prop"><col class="ah-col-val"></colgroup><tr><th>property</th><th>value</th></tr>';
+    rows.forEach(function(r){
+      html += '<tr><td>'+r[0]+'</td><td class="ah-num">'+fmt(r[1], r[2])+'</td></tr>';
+    });
+    html += '</table>';
+    return html;
+  }
+
+  function render(){
+    var T = +el.T.value, RHi = +el.RHi.value, RHo = +el.RHo.value;
+    el.Tval.textContent = T;
+    el.RHival.textContent = RHi;
+    el.RHoval.textContent = RHo;
+
+    var c = computeAll(T, RHi, RHo);
+
+    el.ctrl2wrap.style.display = (state.ctrl===1) ? 'none' : 'flex';
+
+    if(state.ctrl===1){
+      el.svg.style.display = 'block';
+      el.tableWrap.style.display = 'none';
+      renderSchematic(c);
+    } else {
+      el.svg.style.display = 'none';
+      el.tableWrap.style.display = 'block';
+      el.tableWrap.innerHTML = tableHTML(c, state.ctrl2);
+    }
+  }
+
+  el.T.addEventListener('input', render);
+  el.RHi.addEventListener('input', render);
+  el.RHo.addEventListener('input', render);
+
+  document.querySelectorAll('input[name="ahctrl1"]').forEach(function(r){
+    r.addEventListener('change', function(){
+      state.ctrl = +this.value;
+      if(state.ctrl===1){ state.ctrl2 = 1; document.querySelector('input[name="ahctrl2"][value="1"]').checked = true; }
+      render();
+    });
+  });
+  document.querySelectorAll('input[name="ahctrl2"]').forEach(function(r){
+    r.addEventListener('change', function(){ state.ctrl2 = +this.value; render(); });
+  });
+
+  var panelIds = ['ahPanelDirections','ahPanelDetails','ahPanelAbout'];
+  function openPanel(id){
+    panelIds.forEach(function(p){ document.getElementById(p).style.display = (p===id) ? 'block' : 'none'; });
+  }
+  function closePanel(id){ document.getElementById(id).style.display = 'none'; }
+
+  document.getElementById('ahBtnDirections').addEventListener('click', function(){ openPanel('ahPanelDirections'); });
+  document.getElementById('ahBtnDetails').addEventListener('click', function(){
+    openPanel('ahPanelDetails');
+    if(window.MathJax && MathJax.typesetPromise){ MathJax.typesetPromise([document.getElementById('ahPanelDetails')]); }
+  });
+  document.getElementById('ahBtnAbout').addEventListener('click', function(){ openPanel('ahPanelAbout'); });
+
+  document.querySelectorAll('[data-close]').forEach(function(btn){
+    btn.addEventListener('click', function(){ closePanel(this.getAttribute('data-close')); });
+  });
+
+  render();
+})();
+</script>
+
+</body>
+</html>

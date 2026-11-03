@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Heat Transfer in a Bank of Tubes</title>
+<script>
+MathJax = {
+  tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$','$$'], ['\\[','\\]']] },
+  svg: { fontCache: 'global', displayAlign: 'left', displayIndent: '0' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    font-family: Helvetica, Arial, sans-serif;
+    background: #ffffff;
+  }
+  #app {
+    width: 680px;
+    margin: 10px auto;
+    position: relative;
+  }
+  /* ---------- top button row ---------- */
+  #topRow {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    margin-bottom: 6px;
+  }
+  .setterBar {
+    display: inline-flex;
+  }
+  .setterBtn {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 15.2px;
+    font-weight: normal;
+    padding: 3px 8px;
+    border: 1px solid #999;
+    background: linear-gradient(#fdfdfd, #e8e8e8);
+    color: #000;
+    cursor: pointer;
+    margin: 0;
+  }
+  .setterBtn + .setterBtn { border-left: none; }
+  .setterBtn:first-child { border-radius: 4px 0 0 4px; }
+  .setterBtn:last-child  { border-radius: 0 4px 4px 0; }
+  .setterBtn.selected {
+    background: linear-gradient(#b8d2ef, #8fb8e6);
+    border-color: #6d94bf;
+  }
+  .setterBar.small .setterBtn { font-size: 15.9px; }
+  /* ---------- Directions / Details / About buttons ---------- */
+  .infoBtn {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 15.2px;
+    font-weight: normal;
+    color: #ffffff;
+    background: #98000D;
+    border: 1px solid #7a000a;
+    border-radius: 4px;
+    padding: 4px 10px;
+    margin-left: 8px;
+    cursor: pointer;
+  }
+  .infoBtn:hover { background: #b30010; }
+  /* ---------- controls ---------- */
+  #controls {
+    margin-bottom: 4px;
+  }
+  .ctrlRow {
+    display: flex;
+    align-items: center;
+    margin: 4px 0;
+    min-height: 26px;
+  }
+  .ctrlGroup {
+    display: flex;
+    align-items: center;
+  }
+  .ctrlGroup.col1 { width: 335px; }
+  .sliderLabel {
+    font-size: 15.9px;
+    text-align: right;
+    margin-right: 6px;
+    white-space: nowrap;
+  }
+  /* ---------- title ---------- */
+  #simTitle {
+    font-size: 22px;
+    font-weight: normal;
+    color: #000;
+    margin: 4px 0 10px 0;
+    text-align: center;
+  }
+  /* ---------- sliders ---------- */
+  input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+  input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  /* keep sliders short and inline beside their labels */
+  #controls input[type="range"] {
+    width: 130px;
+    margin: 0 8px 0 0;
+  }
+  .symList p { margin: 2px 0; }
+  .sliderValue {
+    font-size: 15.9px;
+    min-width: 34px;
+  }
+  /* ---------- figure ---------- */
+  #figureWrap {
+    position: relative;
+    width: 600px;
+    height: 380px;
+    margin-top: 6px;
+  }
+  #plotCanvas {
+    width: 600px;
+    height: 380px;
+    display: block;
+  }
+  /* ---------- panels ---------- */
+  .panel {
+    display: none;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 640px;
+    max-height: 430px;
+    overflow-y: auto;
+    background: #f5f5f5;
+    border: 1px solid #aaa;
+    border-radius: 6px;
+    box-shadow: 3px 3px 8px rgba(0,0,0,0.35);
+    padding: 12px 34px 14px 16px;
+    box-sizing: border-box;
+    font-size: 14px;
+    line-height: 1.45;
+    z-index: 50;
+  }
+  .panel.open { display: block; }
+  .panel h2 {
+    margin: 0 0 8px 0;
+    font-size: 16px;
+    font-weight: bold;
+    color: #98000D;
+  }
+  .panel .closeX {
+    position: absolute;
+    top: 6px;
+    right: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #444;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    line-height: 1;
+    font-family: Helvetica, Arial, sans-serif;
+  }
+  .panel .closeX:hover { color: #98000D; }
+  .panel table {
+    border-collapse: collapse;
+    margin: 8px 0;
+  }
+  .panel table td, .panel table th {
+    border: 1px solid #555;
+    padding: 3px 10px;
+    font-size: 13px;
+    text-align: center;
+    font-weight: normal;
+  }
+  .panel table tr:first-child td {
+    background: #d9d9d9;
+  }
+  .panel a { color: #0645ad; text-decoration: none; }
+  .panel a:hover { text-decoration: underline; }
+  .panel p { margin: 6px 0; }
+  /* left-justify display equations */
+  .panel mjx-container[display="true"] {
+    text-align: left !important;
+    margin: 6px 0 !important;
+    display: block;
+  }
+  .panel mjx-container[display="true"] > svg { margin-left: 0 !important; }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <h1 id="simTitle">Heat Transfer in a Bank of Tubes</h1>
+
+  <!-- top row: view selector + info buttons -->
+  <div id="topRow">
+    <div class="setterBar" id="displayBar">
+      <button class="setterBtn selected" data-val="1">&nbsp;tube configuration&nbsp;</button>
+      <button class="setterBtn" data-val="2">&nbsp;air temperature&nbsp;</button>
+      <button class="setterBtn" data-val="3">&nbsp;heat transfer rate&nbsp;</button>
+    </div>
+    <button class="infoBtn" id="btnDirections">Directions</button>
+    <button class="infoBtn" id="btnDetails">Details</button>
+    <button class="infoBtn" id="btnAbout">About</button>
+  </div>
+
+  <!-- controls -->
+  <div id="controls">
+    <div class="ctrlRow">
+      <div class="ctrlGroup col1">
+        <span class="sliderLabel">longitudinal pitch (cm)</span>
+        <input type="range" id="slSlong" min="2.5" max="10" step="0.1" value="3.7">
+        <span class="sliderValue" id="valSlong">3.7</span>
+      </div>
+      <div class="ctrlGroup">
+        <span class="sliderLabel">columns</span>
+        <input type="range" id="slNumcols" min="4" max="25" step="1" value="10">
+        <span class="sliderValue" id="valNumcols">10</span>
+      </div>
+    </div>
+    <div class="ctrlRow">
+      <div class="ctrlGroup col1">
+        <span class="sliderLabel">transverse pitch (cm)</span>
+        <input type="range" id="slStrans" min="2.5" max="10" step="0.1" value="3">
+        <span class="sliderValue" id="valStrans">3.0</span>
+      </div>
+      <div class="ctrlGroup" id="orientationGroup">
+        <span class="sliderLabel">tube configuration</span>
+        <div class="setterBar small" id="orientationBar">
+          <button class="setterBtn selected" data-val="1">&nbsp;aligned&nbsp;</button>
+          <button class="setterBtn" data-val="2">&nbsp;staggered&nbsp;</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- figure -->
+  <div id="figureWrap">
+    <canvas id="plotCanvas"></canvas>
+  </div>
+
+  <!-- Directions panel -->
+  <div class="panel" id="panelDirections">
+    <button class="closeX" aria-label="close">&times;</button>
+    <h2>Directions</h2>
+    <p>This simulation shows convective, steady-state heat transfer from a bank of tubes,
+    which are at a constant temperature of 70&nbsp;&deg;C, to cross-flowing air, which enters at
+    15&nbsp;&deg;C. Align or stagger the tubes with buttons. The aligned configuration has flow
+    lanes for the air, whereas the staggered configuration disrupts these flow lanes. When the
+    air velocity increases, the rate of heat transfer increases and the outlet air temperature
+    decreases. An average Nusselt number is calculated for the entire tube bank, and that number
+    is used to calculate the outlet air temperature and the heat transfer rate per length of
+    tube. Radiation is negligible and air properties are assumed independent of temperature.
+    Use sliders to adjust the arrangement of the tubes. Due to ineffective heat transfer,
+    aligned tubes should not be considered for a ratio of transverse pitch to longitudinal
+    pitch less than 0.7. The tube diameter does not change when the tube arrangement changes,
+    but the diameter displayed in the tube configuration figure changes so that all tubes are
+    shown.</p>
+  </div>
+
+  <!-- Details panel -->
+  <div class="panel" id="panelDetails">
+    <button class="closeX" aria-label="close">&times;</button>
+    <h2>Details</h2>
+    <p>The diagonal pitch $S_D$ of a bank of tubes is:</p>
+    <p>$$S_D = \sqrt{S_L^2 + (S_T/2)^2},$$</p>
+    <p>where $S_L$ and $S_T$ are the longitudinal and transverse pitch (m).</p>
+    <p>A Nusselt correlation is used to calculate the average heat transfer coefficient:</p>
+    <p>$$\overline{Nu} = C_1 \, C_2 \, Re_{max}^{\,m} \, Pr^{0.36} \left( \frac{Pr}{Pr_s} \right)^{1/4},$$</p>
+    <p>$$Re_{max} = u_{max} \, d / \nu,$$</p>
+    <p>If $S_D &lt; \dfrac{S_T + d}{2}$, &nbsp; $u_{max} = \dfrac{S_T}{2 \, (S_D - d)} \, u$, &nbsp; otherwise
+    &nbsp; $u_{max} = \dfrac{S_T}{S_T - d} \, u$,</p>
+    <p>$$\overline{h} = \overline{Nu} \, k / d,$$</p>
+    <p>where $\overline{Nu}$ is the average Nusselt number for the entire bank of tubes,
+    $Re_{max}$ is the Reynolds number at the maximum fluid velocity, $Pr$ and $Pr_s$ are the
+    Prandtl numbers at air and tube surface temperatures, $u_{max}$ is the maximum fluid
+    velocity (m/s), $d$ is tube diameter (m), $\nu$ is the kinematic viscosity of air
+    (m$^2$/s), $u$ is velocity (m/s), $\overline{h}$ is the average heat transfer coefficient
+    (W/[m$^2$ K]), $k$ is thermal conductivity (W/[m K]) and $C_1$, $C_2$ and $m$ are constants
+    from the following two tables:</p>
+    <table>
+      <tr><td>Configuration</td><td>$Re_{max}$</td><td>$C_1$</td><td>$m$</td></tr>
+      <tr><td>Aligned</td><td>$10 - 10^2$</td><td>0.8</td><td>0.4</td></tr>
+      <tr><td>Staggered</td><td>$10 - 10^2$</td><td>0.9</td><td>0.4</td></tr>
+      <tr><td>Aligned</td><td>$10^2 - 10^3$</td><td>0.683</td><td>0.466</td></tr>
+      <tr><td>Staggered</td><td>$10^2 - 10^3$</td><td>0.683</td><td>0.466</td></tr>
+      <tr><td>Aligned ($S_T/S_L &gt; 0.7$)</td><td>$10^3 - 2{\times}10^5$</td><td>0.27</td><td>0.63</td></tr>
+      <tr><td>Staggered ($S_T/S_L &lt; 2$)</td><td>$10^3 - 2{\times}10^5$</td><td>$0.35 \, (S_T/S_L)^{0.2}$</td><td>0.6</td></tr>
+      <tr><td>Staggered ($S_T/S_L &gt; 2$)</td><td>$10^3 - 2{\times}10^5$</td><td>0.4</td><td>0.6</td></tr>
+      <tr><td>Aligned</td><td>$2{\times}10^5 - 2{\times}10^6$</td><td>0.021</td><td>0.84</td></tr>
+      <tr><td>Staggered</td><td>$2{\times}10^5 - 2{\times}10^6$</td><td>0.022</td><td>0.84</td></tr>
+    </table>
+    <p>If the number of columns $N_L &lt; 20$, get $C_2$ from the following table, otherwise
+    $C_2 = 1$:</p>
+    <table>
+      <tr><td>$N_L$</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>7</td><td>10</td><td>13</td><td>16</td></tr>
+      <tr><td>Aligned</td><td>0.7</td><td>0.8</td><td>0.86</td><td>0.9</td><td>0.92</td><td>0.95</td><td>0.97</td><td>0.98</td><td>0.99</td></tr>
+      <tr><td>Staggered</td><td>0.64</td><td>0.76</td><td>0.84</td><td>0.89</td><td>0.92</td><td>0.95</td><td>0.97</td><td>0.98</td><td>0.99</td></tr>
+    </table>
+    <p>The heat transfer rate per unit length of tube is calculated from the $\overline{h}$
+    found from the Nusselt correlation:</p>
+    <p>$$q = N \, \overline{h} \, \pi \, d \, \Delta T_{lm},$$</p>
+    <p>$$\Delta T_{lm} = \frac{(T_s - T_{in}) - (T_s - T_{out})}{\ln \left( \dfrac{T_s - T_{in}}{T_s - T_{out}} \right)}
+    = \frac{T_{out} - T_{in}}{\ln \left( \dfrac{T_s - T_{in}}{T_s - T_{out}} \right)},$$</p>
+    <p>$$T_{out} = T_s - (T_s - T_{in}) \, e^{-\frac{\pi \, d \, N \, \overline{h}}{\rho \, u \, N_T \, S_T \, C_p}},$$</p>
+    <p>where $q$ is in W/m, $N$ is the total number of tubes in the bank, $\Delta T_{lm}$ is
+    the log-mean temperature difference (&deg;C), $T_s$ is the tube surface temperature
+    (&deg;C), $T_{in}$ and $T_{out}$ are the temperatures at the inlet and outlet (&deg;C),
+    $\rho$ is air density (kg/m$^3$), $N_T$ is the number of tubes in each row and $C_p$ is
+    heat capacity (J/[kg K]).</p>
+    <p><b>Reference</b></p>
+    <p>[1] T. L. Bergman, A. S. Lavine, F. P. Incropera and D. P. DeWitt, <i>Introduction to
+    Heat Transfer</i>, 6th ed., Hoboken: John Wiley and Sons, 2011 pp. 447&ndash;451.</p>
+    <p><b>Symbols</b></p>
+    <div class="symList">
+      <p>$C_1$, $m$ = constants in the Nusselt correlation (dimensionless)</p>
+      <p>$C_2$ = correction factor for number of columns (dimensionless)</p>
+      <p>$C_p$ = heat capacity of air (J/[kg K])</p>
+      <p>$d$ = tube diameter (m)</p>
+      <p>$\overline{h}$ = average heat transfer coefficient (W/[m$^2$ K])</p>
+      <p>$k$ = thermal conductivity of air (W/[m K])</p>
+      <p>$N$ = total number of tubes in the bank</p>
+      <p>$N_L$ = number of columns</p>
+      <p>$N_T$ = number of tubes in each row</p>
+      <p>$\overline{Nu}$ = average Nusselt number for the tube bank (dimensionless)</p>
+      <p>$Pr$ = Prandtl number at air temperature (dimensionless)</p>
+      <p>$Pr_s$ = Prandtl number at tube surface temperature (dimensionless)</p>
+      <p>$q$ = heat transfer rate per unit length of tube (W/m)</p>
+      <p>$Re_{max}$ = Reynolds number at maximum air velocity (dimensionless)</p>
+      <p>$S_D$ = diagonal pitch (m)</p>
+      <p>$S_L$ = longitudinal pitch (m)</p>
+      <p>$S_T$ = transverse pitch (m)</p>
+      <p>$T_{in}$ = inlet air temperature (&deg;C)</p>
+      <p>$T_{out}$ = outlet air temperature (&deg;C)</p>
+      <p>$T_s$ = tube surface temperature (&deg;C)</p>
+      <p>$\Delta T_{lm}$ = log-mean temperature difference (&deg;C)</p>
+      <p>$u$ = inlet air velocity (m/s)</p>
+      <p>$u_{max}$ = maximum air velocity between tubes (m/s)</p>
+      <p>$\nu$ = kinematic viscosity of air (m$^2$/s)</p>
+      <p>$\rho$ = density of air (kg/m$^3$)</p>
+    </div>
+  </div>
+
+  <!-- About panel -->
+  <div class="panel" id="panelAbout">
+    <button class="closeX" aria-label="close">&times;</button>
+    <h2>About</h2>
+    <p>This simulation was created in the
+    <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a>
+    at University of Colorado Boulder for
+    <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a>
+    by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a
+    <a href="https://demonstrations.wolfram.com/HeatTransferInABankOfTubes/" target="_blank" rel="noopener">Mathematica simulation</a>
+    by Benjamin L. Kee. It was prepared with financial support from the National Science
+    Foundation (DUE 2336987 and 2336988).
+    Address any questions or comments to
+    <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.</p>
+  </div>
+
+</div>
+
+<script>
+"use strict";
+
+/* ------------------------------------------------------------------ */
+/*  state                                                              */
+/* ------------------------------------------------------------------ */
+const state = {
+  display: 1,       // 1 tube configuration, 2 air temperature, 3 heat transfer rate
+  Slong: 3.7,       // longitudinal pitch (cm)
+  numcols: 10,      // columns
+  Strans: 3,        // transverse pitch (cm)
+  orientation: 1    // 1 aligned, 2 staggered
+};
+
+/* ------------------------------------------------------------------ */
+/*  physics (mirrors the Mathematica Manipulate exactly)               */
+/* ------------------------------------------------------------------ */
+const d    = 0.02;        // tube diameter (m)
+const nu   = 0.00001482;  // kinematic viscosity (m^2/s)
+const Pr   = 0.71;
+const Prs  = 0.701;
+const kAir = 0.0253;      // W/(m K)
+const rho  = 1.217;       // kg/m^3
+const Cp   = 1007;        // J/(kg K)
+const Ts   = 70;          // deg C
+const Tin  = 15;          // deg C
+const numrows = 10;
+
+function physics() {
+  const ST = state.Strans / 100;
+  const SL = state.Slong / 100;
+  const SD = Math.sqrt(SL * SL + (ST / 2) * (ST / 2));
+  const numtubes = numrows * state.numcols;
+
+  function vmax(v) {
+    if (SD < (ST + d) / 2) return (ST / (2 * (SD - d))) * v;
+    return (ST / (ST - d)) * v;
+  }
+  function ReD(v) { return vmax(v) * d / nu; }
+  function C1(v, config) {
+    const Re = ReD(v);
+    if (Re > 10 && Re <= 1e2) return config === 1 ? 0.8 : 0.9;
+    if (Re > 1e2 && Re <= 1e3) return 0.683;
+    if (Re > 1e3 && Re <= 2e5) {
+      if (config === 1) return 0.27;
+      return (ST / SL < 2) ? 0.35 * Math.pow(ST / SL, 0.2) : 0.4;
+    }
+    if (Re > 2e5 && Re <= 2e6) return config === 1 ? 0.021 : 0.022;
+    return NaN;
+  }
+  function mExp(v, config) {
+    const Re = ReD(v);
+    if (Re > 10 && Re <= 1e2) return 0.4;
+    if (Re > 1e2 && Re <= 1e3) return 0.466;
+    if (Re > 1e3 && Re <= 2e5) return config === 1 ? 0.63 : 0.6;
+    if (Re > 2e5 && Re <= 2e6) return 0.84;
+    return NaN;
+  }
+  function C2(config) {
+    const n = state.numcols;
+    if (n === 1) return config === 1 ? 0.7 : 0.64;
+    if (n === 2) return config === 1 ? 0.8 : 0.76;
+    if (n === 3) return config === 1 ? 0.86 : 0.84;
+    if (n === 4) return config === 1 ? 0.9 : 0.89;
+    if (n === 5) return 0.92;
+    if (n <= 7) return 0.95;
+    if (n <= 10) return 0.97;
+    if (n <= 13) return 0.98;
+    if (n <= 16) return 0.99;
+    return 1;
+  }
+  function Nu(v, config) {
+    return C2(config) * C1(v, config) * Math.pow(ReD(v), mExp(v, config)) *
+           Math.pow(Pr, 0.36) * Math.pow(Pr / Prs, 0.25);
+  }
+  function h(v, config) { return Nu(v, config) * kAir / d; }
+  function Tout(v, config) {
+    return Ts - (Ts - Tin) *
+      Math.exp(-(Math.PI * d * numtubes * h(v, config)) /
+               (rho * v * numrows * ST * Cp));
+  }
+  function dTlm(v, config) {
+    const To = Tout(v, config);
+    return ((Ts - Tin) - (Ts - To)) / Math.log((Ts - Tin) / (Ts - To));
+  }
+  function q(v, config) {
+    return numtubes * h(v, config) * Math.PI * d * dTlm(v, config);
+  }
+
+  return { ST, SL, SD, numtubes, Tout, q };
+}
+
+/* ------------------------------------------------------------------ */
+/*  canvas set-up (hi-DPI)                                             */
+/* ------------------------------------------------------------------ */
+const canvas = document.getElementById("plotCanvas");
+const ctx = canvas.getContext("2d");
+const CW = 600, CH = 380;
+function setupCanvas() {
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = CW * dpr;
+  canvas.height = CH * dpr;
+  canvas.style.width = CW + "px";
+  canvas.style.height = CH + "px";
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+/* ------------------------------------------------------------------ */
+/*  tick helper                                                        */
+/* ------------------------------------------------------------------ */
+function niceTicks(lo, hi, target) {
+  const span = hi - lo;
+  const rough = span / target;
+  const mag = Math.pow(10, Math.floor(Math.log10(rough)));
+  let step;
+  const r = rough / mag;
+  if (r <= 1) step = mag;
+  else if (r <= 2) step = 2 * mag;
+  else if (r <= 5) step = 5 * mag;
+  else step = 10 * mag;
+  const ticks = [];
+  const first = Math.ceil(lo / step) * step;
+  for (let t = first; t <= hi + 1e-9; t += step) {
+    ticks.push(Math.abs(t) < 1e-10 ? 0 : t);
+  }
+  return { ticks, step };
+}
+function fmtTick(t, step) {
+  if (step >= 1) return String(Math.round(t));
+  const dec = Math.max(0, -Math.floor(Math.log10(step)));
+  return t.toFixed(dec);
+}
+
+/* ------------------------------------------------------------------ */
+/*  tube configuration view (top view of Graphics3D, ViewPoint->Above) */
+/* ------------------------------------------------------------------ */
+function drawTubeConfig() {
+  const { ST, SL } = physics();
+  const nC = state.numcols, nR = numrows;
+
+  // world coordinates (m): tubes at x=j*SL (j=0..nC-1), y=i*ST (+ST/2 for odd j when staggered)
+  const shift = (state.orientation - 1) * ST / 2;
+  const xMin = -1.5 * SL - d;                       // arrows start at -1.5 SL
+  const xMax = (nC - 1) * SL + d / 2;
+  const yMin = -d / 2;
+  const yMax = (nR - 1) * ST + shift + d / 2;
+
+  const pad = 12;
+  const availW = CW - 2 * pad, availH = CH - 2 * pad;
+  const scale = Math.min(availW / (xMax - xMin), availH / (yMax - yMin));
+  const ox = pad + (availW - scale * (xMax - xMin)) / 2;
+  const oy = pad + (availH - scale * (yMax - yMin)) / 2;
+  const X = x => ox + (x - xMin) * scale;
+  const Y = y => oy + (yMax - y) * scale;
+
+  ctx.clearRect(0, 0, CW, CH);
+
+  // blue inlet arrows: rows k = 0 .. nR-2, y = k*ST + ST/2, from x=-1.5SL to x=0
+  const headLen = Math.min(0.35 * ST * scale, 1.4 * SL * scale * 0.45);
+  ctx.strokeStyle = "#0000ff";
+  ctx.fillStyle = "#0000ff";
+  const lw = Math.max(2, 0.25 * d * scale);
+  ctx.lineWidth = lw;
+  for (let k = 0; k <= nR - 2; k++) {
+    const y = k * ST + ST / 2;
+    const x0 = X(-1.5 * SL), x1 = X(0), yc = Y(y);
+    ctx.beginPath();
+    ctx.moveTo(x0, yc);
+    ctx.lineTo(x1 - headLen * 0.85, yc);
+    ctx.stroke();
+    // arrowhead
+    ctx.beginPath();
+    ctx.moveTo(x1, yc);
+    ctx.lineTo(x1 - headLen, yc - headLen * 0.42);
+    ctx.lineTo(x1 - headLen, yc + headLen * 0.42);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  // red tubes (circles of radius d/2)
+  ctx.fillStyle = "rgb(230,0,0)";
+  const rPix = (d / 2) * scale;
+  for (let i = 0; i <= nR - 1; i++) {
+    for (let j = 0; j <= nC - 1; j++) {
+      const x = j * SL;
+      const y = (j % 2 === 1) ? i * ST + shift : i * ST;
+      ctx.beginPath();
+      ctx.arc(X(x), Y(y), rPix, 0, 2 * Math.PI);
+      ctx.fill();
+    }
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/*  line plots (views 2 and 3)                                         */
+/* ------------------------------------------------------------------ */
+function drawLinePlot(mode) {
+  const P = physics();
+  const f = (mode === 2)
+    ? (v, cfg) => P.Tout(v, cfg)
+    : (v, cfg) => P.q(v, cfg) / 1000;
+  const yLab = (mode === 2) ? "outlet air temperature (\u00B0C)"
+                            : "heat transfer rate (kW/m)";
+
+  // sample curves
+  const vLo = 1, vHi = 20, nPts = 240;
+  const va = [], ya1 = [], ya2 = [];
+  let yMin = Infinity, yMax = -Infinity;
+  for (let i = 0; i <= nPts; i++) {
+    const v = vLo + (vHi - vLo) * i / nPts;
+    const y1 = f(v, 1), y2 = f(v, 2);
+    va.push(v); ya1.push(y1); ya2.push(y2);
+    if (isFinite(y1)) { yMin = Math.min(yMin, y1); yMax = Math.max(yMax, y1); }
+    if (isFinite(y2)) { yMin = Math.min(yMin, y2); yMax = Math.max(yMax, y2); }
+  }
+  const yPad = (yMax - yMin) * 0.04 || 1;
+  yMin -= yPad; yMax += yPad;
+
+  // ImagePadding->{{60,10},{55,10}}
+  const padL = 60, padR = 10, padB = 55, padT = 10;
+  const pw = CW - padL - padR, ph = CH - padT - padB;
+  const X = v => padL + (v - vLo) / (vHi - vLo) * pw;
+  const Y = y => padT + (yMax - y) / (yMax - yMin) * ph;
+
+  ctx.clearRect(0, 0, CW, CH);
+
+  // frame
+  ctx.strokeStyle = "#000";
+  ctx.lineWidth = 1;
+  ctx.strokeRect(padL + 0.5, padT + 0.5, pw - 1, ph - 1);
+
+  // ticks
+  ctx.fillStyle = "#000";
+  ctx.font = "17px Helvetica, Arial, sans-serif";
+  const xt = niceTicks(vLo, vHi, 6);
+  ctx.textAlign = "center"; ctx.textBaseline = "top";
+  xt.ticks.forEach(t => {
+    const x = X(t);
+    ctx.beginPath(); ctx.moveTo(x, padT + ph); ctx.lineTo(x, padT + ph - 6); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x, padT); ctx.lineTo(x, padT + 6); ctx.stroke();
+    ctx.fillText(fmtTick(t, xt.step), x, padT + ph + 5);
+  });
+  const yt = niceTicks(yMin, yMax, 6);
+  ctx.textAlign = "right"; ctx.textBaseline = "middle";
+  yt.ticks.forEach(t => {
+    const y = Y(t);
+    ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(padL + 6, y); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(padL + pw, y); ctx.lineTo(padL + pw - 6, y); ctx.stroke();
+    ctx.fillText(fmtTick(t, yt.step), padL - 6, y);
+  });
+
+  // axis labels
+  ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
+  ctx.fillText("inlet air velocity (m/s)", padL + pw / 2, CH - 12);
+  // rotated y-axis label via offscreen canvas (avoids glyph overlap)
+  drawRotatedYLabel(yLab, padL, padT, ph);
+
+  // curves: aligned = blue, staggered = green
+  const curves = [
+    { ys: ya1, color: "#0000ff" },
+    { ys: ya2, color: "rgb(0,153,0)" }
+  ];
+  ctx.lineWidth = 2.4;
+  curves.forEach(c => {
+    ctx.strokeStyle = c.color;
+    ctx.beginPath();
+    let started = false;
+    for (let i = 0; i < va.length; i++) {
+      if (!isFinite(c.ys[i])) { started = false; continue; }
+      const x = X(va[i]), y = Y(c.ys[i]);
+      if (!started) { ctx.moveTo(x, y); started = true; }
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  });
+
+  // on-curve labels with white background: aligned @ v=10, staggered @ v=15
+  ctx.font = "18px Helvetica, Arial, sans-serif";
+  const labels = [
+    { text: "aligned",   color: "#0000ff",       v: 10, cfg: 1 },
+    { text: "staggered", color: "rgb(0,153,0)",  v: 15, cfg: 2 }
+  ];
+  labels.forEach(L => {
+    const x = X(L.v), y = Y(f(L.v, L.cfg));
+    const w = ctx.measureText(L.text).width;
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(x - w / 2 - 3, y - 11, w + 6, 22);
+    ctx.fillStyle = L.color;
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText(L.text, x, y);
+  });
+}
+
+function drawRotatedYLabel(text, padL, padT, ph) {
+  const dpr = window.devicePixelRatio || 1;
+  const off = document.createElement("canvas");
+  const octx = off.getContext("2d");
+  octx.font = "17px Helvetica, Arial, sans-serif";
+  const w = Math.ceil(octx.measureText(text).width) + 8;
+  const hgt = 26;
+  off.width = w * dpr; off.height = hgt * dpr;
+  octx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  octx.font = "17px Helvetica, Arial, sans-serif";
+  octx.fillStyle = "#000";
+  octx.textAlign = "center";
+  octx.textBaseline = "middle";
+  octx.fillText(text, w / 2, hgt / 2);
+  ctx.save();
+  ctx.translate(14, padT + ph / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.drawImage(off, -w / 2, -hgt / 2, w, hgt);
+  ctx.restore();
+}
+
+/* ------------------------------------------------------------------ */
+/*  render dispatch                                                    */
+/* ------------------------------------------------------------------ */
+function render() {
+  setupCanvas();
+  if (state.display === 1) drawTubeConfig();
+  else drawLinePlot(state.display);
+  // orientation control only shown for tube configuration view
+  document.getElementById("orientationGroup").style.visibility =
+    (state.display === 1) ? "visible" : "hidden";
+}
+
+/* ------------------------------------------------------------------ */
+/*  controls wiring                                                    */
+/* ------------------------------------------------------------------ */
+function wireSetterBar(barId, setter) {
+  const bar = document.getElementById(barId);
+  bar.querySelectorAll(".setterBtn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      bar.querySelectorAll(".setterBtn").forEach(b => b.classList.remove("selected"));
+      btn.classList.add("selected");
+      setter(parseInt(btn.dataset.val, 10));
+      render();
+    });
+  });
+}
+wireSetterBar("displayBar", v => { state.display = v; });
+wireSetterBar("orientationBar", v => { state.orientation = v; });
+
+const slSlong = document.getElementById("slSlong");
+const slNumcols = document.getElementById("slNumcols");
+const slStrans = document.getElementById("slStrans");
+slSlong.addEventListener("input", () => {
+  state.Slong = parseFloat(slSlong.value);
+  document.getElementById("valSlong").textContent = state.Slong.toFixed(1);
+  render();
+});
+slNumcols.addEventListener("input", () => {
+  state.numcols = parseInt(slNumcols.value, 10);
+  document.getElementById("valNumcols").textContent = String(state.numcols);
+  render();
+});
+slStrans.addEventListener("input", () => {
+  state.Strans = parseFloat(slStrans.value);
+  document.getElementById("valStrans").textContent = state.Strans.toFixed(1);
+  render();
+});
+
+/* ------------------------------------------------------------------ */
+/*  panels                                                             */
+/* ------------------------------------------------------------------ */
+const panels = {
+  btnDirections: "panelDirections",
+  btnDetails: "panelDetails",
+  btnAbout: "panelAbout"
+};
+function closeAllPanels() {
+  Object.values(panels).forEach(id =>
+    document.getElementById(id).classList.remove("open"));
+}
+Object.entries(panels).forEach(([btnId, panelId]) => {
+  const btn = document.getElementById(btnId);
+  const panel = document.getElementById(panelId);
+  btn.addEventListener("click", () => {
+    const wasOpen = panel.classList.contains("open");
+    closeAllPanels();
+    if (!wasOpen) {
+      // open the panel below the button row
+      const topRow = document.getElementById("topRow");
+      const app = document.getElementById("app");
+      const top = topRow.offsetTop + topRow.offsetHeight + 4;
+      panel.style.top = top + "px";
+      panel.classList.add("open");
+      // re-typeset MathJax now that the panel is visible
+      if (window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise([panel]);
+      }
+    }
+  });
+});
+document.querySelectorAll(".panel .closeX").forEach(x => {
+  x.addEventListener("click", () => closeAllPanels());
+});
+
+/* ------------------------------------------------------------------ */
+render();
+window.addEventListener("resize", render);
+</script>
+</body>
+</html>

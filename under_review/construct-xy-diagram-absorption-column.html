@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Construct an x-y Diagram for an Absorption Column</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+<style>
+  :root{
+    --ui-font: Verdana, Geneva, "DejaVu Sans", sans-serif;
+    --math-font: Arial, "Helvetica Neue", Helvetica, sans-serif;
+    --line: #999;
+    --panel-bg: #fdfdfd;
+    --accent: #5c5c5c;
+  }
+  *{ box-sizing: border-box; }
+  html,body{
+    margin:0; padding:0;
+    background: #e7e7e7;
+    font-family: var(--ui-font);
+    color:#1a1a1a;
+  }
+  .wrap{
+    max-width: 800px;
+    margin: 22px auto 60px;
+    background: #ffffff;
+    border: 1px solid #c7c7c7;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+    padding: 22px 26px 26px;
+  }
+  h1.title{
+    font-family: var(--ui-font);
+    font-size: 20px;
+    font-weight: bold;
+    color: #262626;
+    text-align: left;
+    margin: 0 0 14px 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+  }
+  h1.title i { font-family: var(--math-font); }
+
+  .notebook{
+    border: 1px solid #bbb;
+    background: #fbfbfb;
+    padding: 14px 16px 16px;
+  }
+
+  /* ---- top bar ---- */
+  .topbar{
+    display:flex;
+    align-items:center;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+  }
+  .mbtn{
+    font-family: var(--ui-font);
+    font-size: 14.4px;
+    color:#222;
+    background: linear-gradient(to bottom, #ffffff 0%, #e9e9e9 55%, #dcdcdc 100%);
+    border: 1px solid #a3a3a3;
+    border-radius: 3px;
+    padding: 5px 12px;
+    cursor: pointer;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.6) inset;
+  }
+  .mbtn:hover{ background: linear-gradient(to bottom, #ffffff 0%, #f1f1f1 55%, #e2e2e2 100%); }
+  .mbtn:active{ background: #d8d8d8; box-shadow: inset 0 1px 3px rgba(0,0,0,0.25); }
+  .mbtn:disabled{ opacity: 0.45; cursor: default; }
+  .mbtn.panelbtn{
+    font-size: 13.8px;
+    padding: 4px 10px;
+    background: #98002e;
+    color: #ffffff;
+    border-color: #7a0025;
+  }
+  .mbtn.panelbtn:hover{ background:#a80f3c; }
+  .mbtn.panelbtn.active{
+    background: #6e0022;
+    color: #ffffff;
+    border-color: #560019;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.35);
+  }
+  .mbtn.panelbtn.active:hover{ background:#6e0022; }
+
+  .steplabel{
+    flex: 1 1 auto;
+    text-align: center;
+    font-size: 17.25px;
+    font-weight: normal;
+    color: #333;
+    letter-spacing: 0.2px;
+  }
+
+  /* ---- plot area ---- */
+  .plotwrap{
+    position: relative;
+    background: #ffffff;
+    border: 1px solid #d4d4d4;
+    min-height: 380px;
+  }
+  .plotwrap.panel-open{ min-height: 0; }
+  .plotwrap.panel-open #plotContent{ display:none; }
+  #plotContent{ padding: 6px 4px 2px; }
+  .stepinstr{
+    text-align:center;
+    font-family: var(--math-font);
+    font-size: 16.68px;
+    color:#111;
+    line-height:1.35;
+    padding: 2px 8px 6px;
+    white-space: pre-line;
+  }
+  .stepinstr sub{ font-size: 70%; }
+  .stepinstr i{ font-style: italic; }
+  .diagram-row{ display:flex; align-items:flex-start; justify-content:center; gap: 4px; flex-wrap:wrap; }
+
+  svg text{ font-family: var(--math-font); }
+  .locator{ cursor: grab; }
+  .locator:active{ cursor: grabbing; }
+
+  /* ---- overlay panels (Directions / Details / About) ---- */
+  .panel-overlay{
+    position:relative;
+    background: #fffef8;
+    z-index: 20;
+    max-height: 480px;
+    overflow-y:auto;
+    padding: 18px 40px 22px 20px;
+  }
+  .panel-overlay.hidden{ display:none; }
+  .panel-close{
+    position:absolute;
+    top:8px; right:10px;
+    width: 26px; height:26px;
+    border-radius: 50%;
+    border: 1px solid #999;
+    background: #f2f2f2;
+    font-size: 16px;
+    line-height: 1;
+    cursor:pointer;
+    color:#333;
+  }
+  .panel-close:hover{ background:#e2e2e2; }
+  .panel-title{
+    font-family: var(--math-font);
+    font-weight:bold;
+    font-size: 14px;
+    color: #98002e;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 6px;
+  }
+  .panel-body{
+    font-family: var(--math-font);
+    font-size: 14px;
+    line-height: 1.55;
+    color:#222;
+  }
+  .panel-body p{ margin: 0 0 10px 0; }
+  .panel-body .ref-heading{ font-weight:bold; margin-top:14px; }
+  .panel-body a{ color:#1a5fb4; }
+  .panel-body sub{ font-size:70%; }
+  .panel-body i{ font-style: italic; }
+  .panel-body mjx-container[display="true"]{
+    display:block !important;
+    text-align:left !important;
+    margin:0.4em 0 !important;
+  }
+  .panel-body mjx-container:not([display="true"]){
+    display:inline-block !important;
+  }
+
+  /* ---- controls row ---- */
+  .controlsrow{
+    display:flex;
+    align-items:center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid #e3e3e3;
+  }
+  .chk{
+    display:flex;
+    align-items:center;
+    gap: 5px;
+    font-size: 15px;
+    color:#222;
+    user-select:none;
+  }
+  .chk input{ margin:0; transform: scale(1.05); }
+  .chk.disabled{ opacity: .5; }
+  .btnrow{ display:flex; gap:6px; }
+
+  .sliderrow{
+    display:flex;
+    align-items:center;
+    gap: 10px;
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid #e3e3e3;
+    flex-wrap:wrap;
+  }
+  .slabel{ font-size: 15.6px; color:#222; }
+  input[type=range]{ width: 220px; }
+  .valbox, .numbox{
+    font-family: var(--math-font);
+    font-size: 16.8px;
+    border: 1px solid #b7b7b7;
+    background:#fafafa;
+    padding: 3px 8px;
+    min-width: 60px;
+    text-align:center;
+    border-radius: 2px;
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <h1 class="title">Construct an <i>x</i>-<i>y</i> Diagram for an Absorption Column</h1>
+
+  <div class="notebook">
+    <div class="topbar">
+      <button id="btnNew" class="mbtn">new problem</button>
+      <div id="stepLabel" class="steplabel">(1) gas flow rate</div>
+      <button id="btnNext" class="mbtn">next</button>
+    </div>
+
+    <div class="plotwrap" id="plotwrap">
+      <div id="plotContent"></div>
+      <div id="panelOverlay" class="panel-overlay hidden">
+        <button id="panelClose" class="panel-close" title="Close">&times;</button>
+        <div id="panelTitle" class="panel-title"></div>
+        <div id="panelBody" class="panel-body"></div>
+      </div>
+    </div>
+
+    <div class="controlsrow">
+      <label class="chk" id="lblSolution"><input type="checkbox" id="chkSolution"> solution</label>
+      <label class="chk" id="lblHint"><input type="checkbox" id="chkHint"> hint</label>
+      <span class="btnrow">
+        <button class="mbtn panelbtn" id="btnDirections">Directions</button>
+        <button class="mbtn panelbtn" id="btnDetails">Details</button>
+        <button class="mbtn panelbtn" id="btnAbout">About</button>
+      </span>
+      <label class="chk" id="lblColumn"><input type="checkbox" id="chkColumn"> show column</label>
+    </div>
+
+    <div class="sliderrow" id="sliderRow">
+      <span class="slabel">select correct gas molar flow rate (Mmol/h)</span>
+      <input type="number" id="gasInput" step="0.1" value="1.2" class="numbox">
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+
+/* ======================= utility / formatting ======================= */
+function rand(min,max){ return Math.random()*(max-min)+min; }
+function randInt(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+function fmt1(x){ return x.toFixed(1); }
+function fmt0(x){ return Math.round(x).toString(); }
+function fmt2(x){ return x.toFixed(2); }
+function sigFig(x, n){
+  if (x===0) return (0).toFixed(n-1);
+  var d = Math.ceil(Math.log10(Math.abs(x)));
+  var power = n-d;
+  var factor = Math.pow(10, power);
+  var rounded = Math.round(x*factor)/factor;
+  return rounded.toFixed(Math.max(0, power));
+}
+function clamp(v,lo,hi){ return Math.max(lo, Math.min(hi, v)); }
+var SVGNS = 'http://www.w3.org/2000/svg';
+function se(tag, attrs, kids){
+  var e = document.createElementNS(SVGNS, tag);
+  if (attrs) for (var k in attrs) e.setAttribute(k, attrs[k]);
+  if (kids) kids.forEach(function(c){ e.appendChild(c); });
+  return e;
+}
+/* rich svg text: segments = [{t:'text', italic:bool, sub:bool}], returns <text> */
+function richText(x, y, segments, attrs){
+  var t = se('text', Object.assign({x:x, y:y}, attrs||{}));
+  segments.forEach(function(s){
+    var ts = document.createElementNS(SVGNS,'tspan');
+    ts.textContent = s.t;
+    if (s.italic) ts.setAttribute('font-style','italic');
+    if (s.sub){ ts.setAttribute('baseline-shift','-25%'); ts.setAttribute('font-size','72%'); }
+    if (s.sup){ ts.setAttribute('baseline-shift','35%'); ts.setAttribute('font-size','72%'); }
+    t.appendChild(ts);
+  });
+  return t;
+}
+
+/* ======================= problem generation ======================= */
+function computeProblem(){
+  var P = rand(2.5,3);
+  var T = randInt(10,25);
+  var L0 = randInt(115,200);
+  var V0choices = [1.2,1.3,1.4,1.5];
+  var V0 = V0choices[randInt(0,3)];
+  var Ea = 5000, R = 8.314, T0 = 298;
+  var H0 = 211.19 * Math.exp(Ea/(R*T0));
+  var H = H0 * Math.exp(-Ea/(R*(T+273)));
+  var L = 1000*L0, V = 1000*V0;
+  var x0 = 0.05, y1 = 10, yn1 = 100;
+  var xp1 = 1.35;
+  function yop(x){ return (L/V)*(x-x0)+y1; }
+  function yeq(x){ return (H/P)*x; }
+  function xFromYop(y){ return x0 + (y-y1)*V/L; }
+  var xp2 = xFromYop(1.1*yn1);
+  var xN = xFromYop(yn1);
+  var X=[xN], Y=[yeq(xN)];
+  for (var i=1;i<=50;i++){
+    X[i] = xFromYop(Y[i-1]);
+    Y[i] = yeq(X[i]);
+  }
+  var lastK=0;
+  for (var k=1;k<=10;k++){ if (X[k] >= x0) lastK=k; }
+  var n = lastK+1;
+  return {P:P,T:T,L0:L0,V0:V0,Ea:Ea,R:R,T0:T0,H0:H0,H:H,L:L,V:V,x0:x0,y1:y1,yn1:yn1,
+          xp1:xp1,xp2:xp2,xN:xN,X:X,Y:Y,n:n,yop:yop,yeq:yeq,xFromYop:xFromYop};
+}
+
+/* ======================= state ======================= */
+var S = {
+  npr: 1,
+  solution: true,
+  hint: false,
+  showColumn: false,
+  gas: 1.2,
+  op1: [0.2,80], op2: [1.15,80],
+  eq1: [0.2,80], eq2: [1.15,80],
+  step1: [0.8,60], step2: [0.5,40], step3: [0.2,20],
+  problem: null,
+  panel: null // 'directions' | 'details' | 'about' | null
+};
+
+function resetLocators(){
+  S.op1=[0.2,80]; S.op2=[1.15,80];
+  S.eq1=[0.2,80]; S.eq2=[1.15,80];
+  S.step1=[0.8,60]; S.step2=[0.5,40]; S.step3=[0.2,20];
+}
+
+function newProblem(keepInitialSolutionTrue){
+  S.problem = computeProblem();
+  S.npr = 1;
+  S.solution = !!keepInitialSolutionTrue;
+  S.hint = false;
+  S.showColumn = false;
+  S.gas = 1.2;
+  resetLocators();
+}
+
+/* ======================= step text ======================= */
+var STEP_LABELS = {
+  1:'(1) gas flow rate', 2:'(2) draw operating line', 3:'(3) draw equilibrium line',
+  4:'(4) draw stage 1', 5:'(5) draw stage 2', 6:'(6) draw last stage', 7:'(7) solution'
+};
+
+function stepInstructionHTML(){
+  var p = S.problem;
+  if (S.npr===1){
+    return S.hint ? 'Hint: Use mass balance on the solute.' :
+      'Step 1: Calculate the gas flow rate,<br>then check solution.';
+  }
+  if (S.npr===2){
+    return S.hint ? 'Hint: use the mass balance from step 1.' :
+      'Step 2: Drag the points to create the operating line,<br>then check solution.';
+  }
+  if (S.npr===3){
+    if (S.hint) return 'Hint: Use Henry\u2019s law.';
+    return 'Step 3: Drag circles to create the equilibrium line,<br>then check solution; ' +
+      '<i>P</i> = '+fmt1(p.P)+' atm and <i>H</i> = '+fmt1(p.H)+' atm/mole fraction.';
+  }
+  if (S.npr===4){
+    return S.hint ? 'Hint: Start counting stages from the bottom of the column.' :
+      'Step 4: Drag the black circle to move the dashed line to draw the first stage,<br>then check solution.';
+  }
+  if (S.npr===5){
+    return S.hint ? 'Hint: Start drawing the second stage where the first stage leaves off.' :
+      'Step 5: Drag the black circle to move the dashed line to draw the second stage,<br>then check solution.';
+  }
+  if (S.npr===6){
+    return S.hint ? 'Hint: Draw the last stage until <i>x</i><sub>0</sub> is reached or surpassed.' :
+      'Step 6: Drag the black circle to move the dashed line to draw the last stage,<br>then check solution.';
+  }
+  if (S.npr===7){
+    return 'solved <i>x</i>-<i>y</i> diagram';
+  }
+  return '';
+}
+
+/* ======================= DOM refs ======================= */
+var stepLabelEl = document.getElementById('stepLabel');
+var btnNew = document.getElementById('btnNew');
+var btnNext = document.getElementById('btnNext');
+var plotwrapEl = document.getElementById('plotwrap');
+var plotContent = document.getElementById('plotContent');
+var panelOverlay = document.getElementById('panelOverlay');
+var panelTitle = document.getElementById('panelTitle');
+var panelBody = document.getElementById('panelBody');
+var panelClose = document.getElementById('panelClose');
+var chkSolution = document.getElementById('chkSolution');
+var chkHint = document.getElementById('chkHint');
+var chkColumn = document.getElementById('chkColumn');
+var lblSolution = document.getElementById('lblSolution');
+var lblColumn = document.getElementById('lblColumn');
+var sliderRow = document.getElementById('sliderRow');
+var gasInput = document.getElementById('gasInput');
+
+/* ======================= panels ======================= */
+var DIRECTIONS_HTML =
+  '<p>This simulation leads you through a step-by-step procedure to construct an ' +
+  '<i>x</i>-<i>y</i> diagram for a trayed absorption column that is used to remove an ' +
+  'impurity from a gas feed by absorbing the impurity in a liquid solvent. The number of ' +
+  'trays/stages needed to obtain an outlet concentration of <i>y</i><sub>1</sub> ppm in the ' +
+  'gas stream is calculated. Click the &ldquo;new problem&rdquo; button to create a different ' +
+  'set of conditions and reset the simulation. Click &ldquo;next&rdquo; to go to the next step. ' +
+  'Check &ldquo;hint&rdquo; for a hint, and check &ldquo;solution&rdquo; to see the solution ' +
+  'before selecting the next step. Once &ldquo;solution&rdquo; is checked, your answer cannot ' +
+  'be changed, and once &ldquo;next&rdquo; is selected, you cannot go back. To restart, press ' +
+  '&ldquo;new problem&rdquo;. For steps 2 and 3, check &ldquo;show column&rdquo; to display a ' +
+  'diagram of the absorption column.</p>' +
+  '<p style="margin-top:14px;"><b>Tip:</b> drag any locator (a small circle) to move it around the plot.</p>';
+
+var DETAILS_HTML =
+  '<p>The operating line (magenta) represents the mass balance:</p>' +
+  '<p>\\[ x_0 L + y V = x L + y_1 V. \\]</p>' +
+  '<p>Rearranging the mass balance to solve for\u00A0\\(y\\):</p>' +
+  '<p>\\[ y_{op} = \\frac{L}{V}(x - x_0) + y_1, \\]</p>' +
+  '<p>where\u00A0\\(x_0\\) is the mole ratio of impurity in the inlet liquid stream (ppm); ' +
+  '\\(y\\) is the mole ratio of impurity (ppm) in the gas stream that corresponds to\u00A0\\(x\\), ' +
+  'which is the mole ratio of impurity in the liquid stream (ppm); \\(y_1\\) is the mole ratio ' +
+  'of impurity in the outlet gas stream (ppm); \\(L\\) is the liquid molar flow rate (Mmol/h); ' +
+  'and\u00A0\\(V\\) is the gas molar flow rate (Mmol/h).</p>' +
+  '<p>The equilibrium line (orange) is calculated using Henry\u2019s law:</p>' +
+  '<p>\\[ y_{eq} = \\frac{H}{P} x, \\]</p>' +
+  '<p>where\u00A0\\(H\\) is Henry\u2019s constant (atm/mole fraction) and\u00A0\\(P\\) is pressure (atm).</p>' +
+  '<p>Henry\u2019s constant is calculated from\u00A0\\(H^0\\), its value at standard ' +
+  'temperature\u00A0\\(T_0 = 298\\text{ K}\\):</p>' +
+  '<p>\\[ H = H^0 \\exp\\left[-\\frac{E}{R}\\left(\\frac{1}{T} - \\frac{1}{T_0}\\right)\\right], \\]</p>' +
+  '<p>where\u00A0\\(E\\) is the activation energy (J/mol), \\(R\\) is the gas constant (J/(mol K)), ' +
+  '\\(T\\) is the column temperature (K), and\u00A0\\(H^0\\) has units of atm/mole fraction.</p>' +
+  '<p class="ref-heading">Reference</p>' +
+  '<p>[1] P. C. Wankat, <i>Separation Process Engineering: Includes Mass Transfer Analysis</i>, ' +
+  '3rd ed., Upper Saddle River, NJ: Prentice Hall, 2012.</p>' +
+  '<p class="ref-heading">Symbols</p>' +
+  '<p style="margin:0;">\\(E\\) = activation energy (J/mol)<br>' +
+  '\\(H\\) = Henry’s constant at temperature \\(T\\) (atm/mole fraction)<br>' +
+  '\\(H^0\\) = Henry’s constant at \\(T_0\\) (atm/mole fraction)<br>' +
+  '\\(L\\) = liquid molar flow rate (Mmol/h)<br>' +
+  '\\(N\\) = number of stages<br>' +
+  '\\(P\\) = pressure (atm)<br>' +
+  '\\(R\\) = gas constant (J/(mol K))<br>' +
+  '\\(T\\) = temperature (K)<br>' +
+  '\\(T_0\\) = standard temperature, 298 K<br>' +
+  '\\(V\\) = gas molar flow rate (Mmol/h)<br>' +
+  '\\(x\\) = mole ratio of solute in liquid (ppm)<br>' +
+  '\\(x_0\\) = mole ratio of solute in inlet liquid (ppm)<br>' +
+  '\\(x_N\\) = mole ratio of solute in outlet liquid (ppm)<br>' +
+  '\\(y\\) = mole ratio of solute in gas (ppm)<br>' +
+  '\\(y_1\\) = mole ratio of solute in outlet gas (ppm)<br>' +
+  '\\(y_{N+1}\\) = mole ratio of solute in inlet gas (ppm)<br>' +
+  '\\(y_{eq}\\) = gas mole ratio in equilibrium with \\(x\\) (ppm)<br>' +
+  '\\(y_{op}\\) = gas mole ratio on the operating line (ppm)</p>';
+
+var ABOUT_HTML =
+  '<p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">' +
+  'Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for ' +
+  '<a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer ' +
+  'using Claude AI. It is a JavaScript/HTML5 implementation of a ' +
+  '<a href="https://demonstrations.wolfram.com/ConstructAnXYDiagramForAnAbsorptionColumn/" target="_blank" rel="noopener">' +
+  'Mathematica simulation</a> by Rachael L. Baumann. It was prepared with financial support from the ' +
+  'National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to ' +
+  '<a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.</p>';
+
+var panelBtns = {
+  directions: document.getElementById('btnDirections'),
+  details: document.getElementById('btnDetails'),
+  about: document.getElementById('btnAbout')
+};
+function updatePanelBtnStates(){
+  for (var k in panelBtns){ panelBtns[k].classList.toggle('active', S.panel===k); }
+}
+function openPanel(which){
+  S.panel = which;
+  var titles = {directions:'Directions', details:'Details', about:'About'};
+  var bodies = {directions:DIRECTIONS_HTML, details:DETAILS_HTML, about:ABOUT_HTML};
+  panelTitle.textContent = titles[which];
+  panelBody.innerHTML = bodies[which];
+  panelOverlay.classList.remove('hidden');
+  plotwrapEl.classList.add('panel-open');
+  updatePanelBtnStates();
+  if (which==='details' && window.MathJax && window.MathJax.typesetPromise){
+    window.MathJax.typesetPromise([panelBody]).catch(function(){});
+  }
+}
+function closePanel(){
+  S.panel = null;
+  panelOverlay.classList.add('hidden');
+  plotwrapEl.classList.remove('panel-open');
+  updatePanelBtnStates();
+}
+function togglePanel(which){
+  if (S.panel === which){ closePanel(); } else { openPanel(which); }
+}
+panelBtns.directions.addEventListener('click', function(){ togglePanel('directions'); });
+panelBtns.details.addEventListener('click', function(){ togglePanel('details'); });
+panelBtns.about.addEventListener('click', function(){ togglePanel('about'); });
+panelClose.addEventListener('click', closePanel);
+
+/* ======================= controls ======================= */
+btnNew.addEventListener('click', function(){
+  newProblem(false);
+  render();
+});
+btnNext.addEventListener('click', function(){
+  if (S.npr < 7){
+    S.npr = S.npr + 1;
+  } else {
+    S.npr = 7;
+  }
+  S.solution = false;
+  S.hint = false;
+  S.showColumn = false;
+  if (S.npr===6 && S.problem.n===2){ S.npr = 7; }
+  render();
+});
+chkSolution.addEventListener('change', function(){
+  if (!S.solution && chkSolution.checked){
+    S.solution = true;
+    render();
+  } else {
+    chkSolution.checked = S.solution; // cannot be unchecked
+  }
+});
+chkHint.addEventListener('change', function(){
+  S.hint = chkHint.checked;
+  render();
+});
+chkColumn.addEventListener('change', function(){
+  S.showColumn = chkColumn.checked;
+  render();
+});
+gasInput.addEventListener('input', function(){
+  var v = parseFloat(gasInput.value);
+  S.gas = isNaN(v) ? 0 : v;
+  renderColumnOnly();
+});
+
+/* ======================= layout constants for x-y plot ======================= */
+var XMAX = 1.35, YMAX = 110; // fixed plot ranges (xp1, 1.1*yn1)
+
+function makeDiagramSVG(widthTotal, heightTotal){
+  var PL=76, PR=14, PT=34, PB=58;
+  var PW = widthTotal-PL-PR, PH = heightTotal-PT-PB;
+  function px(x){ return PL + (x/XMAX)*PW; }
+  function py(y){ return PT + PH - (y/YMAX)*PH; }
+  function invX(pxv){ return ((pxv-PL)/PW)*XMAX; }
+  function invY(pyv){ return ((PT+PH-pyv)/PH)*YMAX; }
+
+  var svg = se('svg', {width:widthTotal, height:heightTotal, viewBox:'0 0 '+widthTotal+' '+heightTotal, class:'diagram-svg'});
+  svg.appendChild(se('rect', {x:0,y:0,width:widthTotal,height:heightTotal,fill:'#ffffff'}));
+
+  // gridlines
+  if (S.npr !== 7){
+    var gg = se('g', {stroke:'#cfcfcf','stroke-width':0.6});
+    for (var gx=0; gx<=XMAX+1e-9; gx+=0.05){
+      gg.appendChild(se('line',{x1:px(gx),y1:py(0),x2:px(gx),y2:py(YMAX)}));
+    }
+    for (var gy=0; gy<=YMAX+1e-9; gy+=5){
+      gg.appendChild(se('line',{x1:px(0),y1:py(gy),x2:px(XMAX),y2:py(gy)}));
+    }
+    svg.appendChild(gg);
+  }
+
+  // frame
+  svg.appendChild(se('rect',{x:px(0),y:py(YMAX),width:px(XMAX)-px(0),height:py(0)-py(YMAX),
+    fill:'none',stroke:'#222','stroke-width':1.2}));
+
+  // ticks
+  var tg = se('g', {'font-size':15.18, fill:'#222'});
+  for (var tx=0; tx<=XMAX+1e-9; tx+=0.2){
+    tg.appendChild(se('line',{x1:px(tx),y1:py(0),x2:px(tx),y2:py(0)+5,stroke:'#222'}));
+    var txt = se('text',{x:px(tx),y:py(0)+20,'text-anchor':'middle'});
+    txt.textContent = tx.toFixed(1);
+    tg.appendChild(txt);
+  }
+  for (var ty=0; ty<=YMAX+1e-9; ty+=20){
+    tg.appendChild(se('line',{x1:px(0)-5,y1:py(ty),x2:px(0),y2:py(ty),stroke:'#222'}));
+    var tyx = se('text',{x:px(0)-9,y:py(ty)+4,'text-anchor':'end'});
+    tyx.textContent = fmt0(ty);
+    tg.appendChild(tyx);
+  }
+  svg.appendChild(tg);
+
+  // axis labels
+  var xlab = richText(px((0+XMAX)/2), heightTotal-6,
+    [{t:'solute/(solute-free liquid) '},{t:'x',italic:true},{t:' (ppm)'}],
+    {'text-anchor':'middle','font-size':17.25, fill:'#111'});
+  svg.appendChild(xlab);
+
+  var ylab = richText(0,0,
+    [{t:'solute/(solute-free gas) '},{t:'y',italic:true},{t:' (ppm)'}],
+    {'text-anchor':'middle','font-size':17.25, fill:'#111'});
+  var yCenter = (py(0)+py(YMAX))/2;
+  ylab.setAttribute('transform','translate(22,'+yCenter+') rotate(-90)');
+  svg.appendChild(ylab);
+
+  return {svg:svg, px:px, py:py, invX:invX, invY:invY, PL:PL,PT:PT,PW:PW,PH:PH};
+}
+
+/* colors */
+var COL = { L:'#1414c8', V:'#009900', OP:'#c800c8', EQ:'#ff6600', S:'#8000a0', black:'#000000' };
+
+function pointMarker(g, x, y, cx, cy, color, big){
+  g.appendChild(se('circle',{cx:cx,cy:cy,r: big?7:5, fill:color}));
+  g.appendChild(se('circle',{cx:cx,cy:cy,r: big?3.4:2.6, fill:'#fff'}));
+}
+
+/* Module-level drag state shared by all locators. We deliberately do NOT
+   attach pointermove/pointerup listeners to the individual <circle>, nor use
+   setPointerCapture on it: render() rebuilds the entire SVG (including the
+   dragged circle) on every drag step, which would destroy the capturing
+   element and silently drop capture per the Pointer Events spec. Instead we
+   track the active drag globally and re-resolve the live diagram <svg> (by
+   class, since split "show column" view can have two <svg> elements) on
+   every move. */
+var activeDrag = null; // {onDrag: fn}
+
+function diagramToData(evt){
+  var svg = document.querySelector('#plotContent svg.diagram-svg');
+  if (!svg) return null;
+  var rect = svg.getBoundingClientRect();
+  var vb = svg.viewBox.baseVal;
+  var scaleX = vb.width / rect.width;
+  var scaleY = vb.height / rect.height;
+  var xPix = (evt.clientX-rect.left)*scaleX;
+  var yPix = (evt.clientY-rect.top)*scaleY;
+  // Re-derive the same fixed margins used by makeDiagramSVG so this stays
+  // correct even though the ctx captured at render time may now be stale.
+  var PL=76, PR=14, PT=34, PB=58;
+  var PW = vb.width-PL-PR, PH = vb.height-PT-PB;
+  var xd = clamp(((xPix-PL)/PW)*XMAX, 0, XMAX);
+  var yd = clamp(((PT+PH-yPix)/PH)*YMAX, 0, YMAX);
+  return [xd,yd];
+}
+
+document.addEventListener('pointermove', function(evt){
+  if (!activeDrag) return;
+  var d = diagramToData(evt);
+  if (!d) return;
+  activeDrag.onDrag(d);
+  render();
+});
+document.addEventListener('pointerup', function(evt){ activeDrag=null; });
+document.addEventListener('pointercancel', function(evt){ activeDrag=null; });
+
+function addLocator(g, ctx, dataPt, color, onDrag, enabled){
+  var cx = ctx.px(dataPt[0]), cy = ctx.py(dataPt[1]);
+  var c = se('circle',{cx:cx,cy:cy,r:8, fill:color, stroke:'#fff','stroke-width':1.5,
+    class:'locator', opacity: enabled?1:0.55});
+  g.appendChild(c);
+  if (!enabled) return;
+  c.addEventListener('pointerdown', function(evt){
+    activeDrag = { onDrag: onDrag };
+    evt.preventDefault();
+  });
+}
+
+function coordLabel(g, ctx, dataPt, color, anchorDY){
+  var x = dataPt[0], y = dataPt[1];
+  var rawX = ctx.px(x);
+  // pick horizontal anchor/offset dynamically so the label never runs past the plot edges
+  var anchor, anchorDX;
+  if (rawX > ctx.PL + ctx.PW*0.6){ anchor='end'; anchorDX=-14; }
+  else if (rawX < ctx.PL + ctx.PW*0.4){ anchor='start'; anchorDX=14; }
+  else { anchor='middle'; anchorDX=0; }
+  var cx = rawX+anchorDX, cy = ctx.py(y)+anchorDY;
+  var lines = [
+    'x = '+fmt2(x)+' ppm',
+    'y = '+fmt0(y)+' ppm'
+  ];
+  var t = se('text',{x:cx,y:cy,'font-size':15.87, fill:color, 'text-anchor':(anchor||'middle')});
+  var bg = se('rect',{fill:'#ffffff',opacity:0.85});
+  g.appendChild(bg);
+  lines.forEach(function(line,i){
+    var ts = document.createElementNS(SVGNS,'tspan');
+    ts.textContent = line;
+    ts.setAttribute('x', cx);
+    ts.setAttribute('dy', i===0? 0: 13);
+    t.appendChild(ts);
+  });
+  g.appendChild(t);
+  // rough backdrop sizing after appended (best-effort)
+  try{
+    var bb = t.getBBox();
+    bg.setAttribute('x', bb.x-3); bg.setAttribute('y', bb.y-2);
+    bg.setAttribute('width', bb.width+6); bg.setAttribute('height', bb.height+4);
+  }catch(e){}
+}
+
+/* ======================= main diagram drawing ======================= */
+function drawDiagram(widthTotal, heightTotal){
+  var ctx = makeDiagramSVG(widthTotal, heightTotal);
+  var p = S.problem;
+  var g = se('g',{});
+  ctx.svg.appendChild(g);
+
+  var npr = S.npr;
+
+  // Operating line (correct), permanently visible for npr>2
+  if (npr>2){
+    var pts=[];
+    for (var xx=0; xx<=p.xp2+1e-9; xx+=0.01) pts.push(ctx.px(xx)+','+ctx.py(p.yop(xx)));
+    g.appendChild(se('polyline',{points:pts.join(' '),fill:'none',stroke:COL.OP,'stroke-width':2}));
+  }
+  // Equilibrium line (correct), permanently visible for npr>3
+  if (npr>3){
+    var pts2=[];
+    for (var xx2=0; xx2<=p.xp1+1e-9; xx2+=0.01) pts2.push(ctx.px(xx2)+','+ctx.py(p.yeq(xx2)));
+    g.appendChild(se('polyline',{points:pts2.join(' '),fill:'none',stroke:COL.EQ,'stroke-width':2}));
+    // endpoint markers
+    var cxN = ctx.px(p.xN), cyN = ctx.py(p.yeq(p.xN));
+    pointMarker(g, p.xN, p.yeq(p.xN), cxN, cyN, COL.black, false);
+    var lbl1 = richText(cxN-10, cyN-10, [{t:'('},{t:'x',italic:true},{t:'N',sub:true},{t:', '},{t:'y',italic:true},{t:'N',sub:true},{t:')'}],
+      {'text-anchor':'end','font-size':15.87, fill:'#111'});
+    g.appendChild(lbl1);
+    var cx0 = ctx.px(p.x0), cy0 = ctx.py(p.y1);
+    pointMarker(g, p.x0, p.y1, cx0, cy0, COL.black, false);
+    var lbl2 = richText(cx0+10, cy0-12, [{t:'('},{t:'x',italic:true},{t:'0',sub:true},{t:', '},{t:'y',italic:true},{t:'1',sub:true},{t:')'}],
+      {'text-anchor':'start','font-size':15.87, fill:'#111'});
+    var lbl2bg = se('rect',{fill:'#ffffff',opacity:0.85});
+    g.appendChild(lbl2bg);
+    g.appendChild(lbl2);
+    try{
+      var lbl2bb = lbl2.getBBox();
+      lbl2bg.setAttribute('x', lbl2bb.x-3); lbl2bg.setAttribute('y', lbl2bb.y-2);
+      lbl2bg.setAttribute('width', lbl2bb.width+6); lbl2bg.setAttribute('height', lbl2bb.height+4);
+    }catch(e){}
+  }
+  // first stage (permanent for npr>4)
+  if (npr>4){
+    g.appendChild(se('polyline',{points:
+      ctx.px(p.X[0])+','+ctx.py(p.yn1)+' '+ctx.px(p.X[0])+','+ctx.py(p.Y[0])+' '+ctx.px(p.X[1])+','+ctx.py(p.Y[0]),
+      fill:'none',stroke:COL.black,'stroke-width':2}));
+  }
+
+  if (npr===2){
+    // student locators for operating line
+    if (S.solution===false){
+      g.appendChild(se('line',{x1:ctx.px(S.op1[0]),y1:ctx.py(S.op1[1]),x2:ctx.px(S.op2[0]),y2:ctx.py(S.op2[1]),
+        stroke:COL.OP,'stroke-width':1.6,'stroke-dasharray':'5,4'}));
+      addLocator(g, ctx, S.op1, COL.OP, function(d){ S.op1=d; }, true);
+      addLocator(g, ctx, S.op2, COL.OP, function(d){ S.op2=d; }, true);
+      coordLabel(g, ctx, S.op1, COL.OP, 26);
+      coordLabel(g, ctx, S.op2, COL.OP, -30);
+    } else {
+      var pts3=[];
+      for (var xx3=0; xx3<=p.xp2+1e-9; xx3+=0.01) pts3.push(ctx.px(xx3)+','+ctx.py(p.yop(xx3)));
+      g.appendChild(se('polyline',{points:pts3.join(' '),fill:'none',stroke:COL.OP,'stroke-width':2}));
+    }
+  }
+
+  if (npr===3){
+    if (S.solution===false){
+      g.appendChild(se('line',{x1:ctx.px(S.eq1[0]),y1:ctx.py(S.eq1[1]),x2:ctx.px(S.eq2[0]),y2:ctx.py(S.eq2[1]),
+        stroke:COL.EQ,'stroke-width':1.6,'stroke-dasharray':'5,4'}));
+      addLocator(g, ctx, S.eq1, COL.EQ, function(d){ S.eq1=d; }, true);
+      addLocator(g, ctx, S.eq2, COL.EQ, function(d){ S.eq2=d; }, true);
+      coordLabel(g, ctx, S.eq1, COL.EQ, 26);
+      coordLabel(g, ctx, S.eq2, COL.EQ, -30);
+    } else {
+      var pts4=[];
+      for (var xx4=0; xx4<=p.xp1+1e-9; xx4+=0.01) pts4.push(ctx.px(xx4)+','+ctx.py(p.yeq(xx4)));
+      g.appendChild(se('polyline',{points:pts4.join(' '),fill:'none',stroke:COL.EQ,'stroke-width':2}));
+    }
+  }
+
+  if (npr===4){
+    var xg = S.step1[0];
+    g.appendChild(se('line',{x1:ctx.px(xg),y1:ctx.py(p.yeq(xg)),x2:ctx.px(xg),y2:ctx.py(p.yop(xg)),
+      stroke:'#000','stroke-width':1.4,'stroke-dasharray':'4,4'}));
+    addLocator(g, ctx, S.step1, COL.black, function(d){ S.step1=d; }, true);
+    if (S.solution){
+      g.appendChild(se('polyline',{points:
+        ctx.px(p.X[0])+','+ctx.py(p.yn1)+' '+ctx.px(p.X[0])+','+ctx.py(p.Y[0])+' '+ctx.px(p.X[1])+','+ctx.py(p.Y[0]),
+        fill:'none',stroke:COL.black,'stroke-width':2}));
+    }
+  }
+  if (npr===5){
+    var xg2 = S.step2[0];
+    g.appendChild(se('line',{x1:ctx.px(xg2),y1:ctx.py(p.yeq(xg2)),x2:ctx.px(xg2),y2:ctx.py(p.yop(xg2)),
+      stroke:'#000','stroke-width':1.4,'stroke-dasharray':'4,4'}));
+    addLocator(g, ctx, S.step2, COL.black, function(d){ S.step2=d; }, true);
+    if (S.solution){
+      g.appendChild(se('polyline',{points:
+        ctx.px(p.X[1])+','+ctx.py(p.Y[0])+' '+ctx.px(p.X[1])+','+ctx.py(p.Y[1])+' '+ctx.px(p.X[2])+','+ctx.py(p.Y[1]),
+        fill:'none',stroke:COL.black,'stroke-width':2}));
+    }
+  }
+  if (npr===6){
+    var xg3 = S.step3[0];
+    g.appendChild(se('line',{x1:ctx.px(xg3),y1:ctx.py(p.yeq(xg3)),x2:ctx.px(xg3),y2:ctx.py(p.yop(xg3)),
+      stroke:'#000','stroke-width':1.4,'stroke-dasharray':'4,4'}));
+    addLocator(g, ctx, S.step3, COL.black, function(d){ S.step3=d; }, true);
+    // completed full stages up to n-2
+    var n = p.n;
+    for (var k=0; k<=n-2; k++){
+      g.appendChild(se('line',{x1:ctx.px(p.X[k]),y1:ctx.py(p.Y[k]),x2:ctx.px(p.X[k+1]),y2:ctx.py(p.Y[k]),
+        stroke:COL.black,'stroke-width':2}));
+    }
+    for (var k2=0; k2<=n-3; k2++){
+      g.appendChild(se('line',{x1:ctx.px(p.X[k2+1]),y1:ctx.py(p.Y[k2]),x2:ctx.px(p.X[k2+1]),y2:ctx.py(p.Y[k2+1]),
+        stroke:COL.black,'stroke-width':2}));
+    }
+    if (S.solution){
+      var kk = n-2;
+      g.appendChild(se('polyline',{points:
+        ctx.px(p.X[kk+1])+','+ctx.py(p.Y[kk])+' '+ctx.px(p.X[kk+1])+','+ctx.py(p.Y[kk+1])+' '+ctx.px(p.X[kk+2])+','+ctx.py(p.Y[kk+1]),
+        fill:'none',stroke:COL.black,'stroke-width':2}));
+    }
+  }
+  if (npr===7){
+    for (var kf=1; kf<=p.n; kf++){
+      g.appendChild(se('polyline',{points:
+        ctx.px(p.X[kf-1])+','+ctx.py(p.Y[kf-1])+' '+ctx.px(p.X[kf])+','+ctx.py(p.Y[kf-1])+' '+ctx.px(p.X[kf])+','+ctx.py(p.Y[kf]),
+        fill:'none',stroke:COL.black,'stroke-width':2}));
+    }
+    var lbl = richText(ctx.PL+8, ctx.PT+16, [{t:p.n+' stage'+(p.n===1?'':'s')+' required'}], {'font-size':14.95,'font-weight':'normal',fill:'#222'});
+    ctx.svg.appendChild(lbl);
+  }
+
+  return ctx.svg;
+}
+
+/* ======================= column schematic ======================= */
+function drawColumn(widthTotal, heightTotal, big){
+  var svg = se('svg', {width:widthTotal, height:heightTotal, viewBox:'0 0 '+widthTotal+' '+heightTotal});
+  svg.appendChild(se('rect', {x:0,y:0,width:widthTotal,height:heightTotal,fill:'#ffffff'}));
+  var p = S.problem;
+  var s = big ? 1 : 0.72; // scale factor for compact column
+
+  var cx = widthTotal/2;
+  var colW = big ? 84 : 56;
+  var colTop = big?50:40, colBot = heightTotal-(big?150:112);
+  var colH = colBot-colTop;
+  var rx = colW/2, ry = big?15:10;
+  var xL = cx-rx, xR = cx+rx;
+  var fsz = big ? 16.56 : 15.0;  // stream labels
+  var fszPT = big ? 17.28 : 15.72; // pressure/temperature label
+  var elbowGap = big ? 22 : 15;   // vertical distance from cap to the elbow's horizontal run
+  var extDist = big ? 50 : 44;    // horizontal distance from column wall to the pipe's outer end
+
+  var g = se('g',{});
+  // body lines
+  g.appendChild(se('line',{x1:xL,y1:colTop+ry,x2:xL,y2:colBot-ry,stroke:'#000','stroke-width':2.2}));
+  g.appendChild(se('line',{x1:xR,y1:colTop+ry,x2:xR,y2:colBot-ry,stroke:'#000','stroke-width':2.2}));
+  // caps
+  g.appendChild(se('path',{d:'M '+xL+' '+(colTop+ry)+' A '+rx+' '+ry+' 0 0 1 '+xR+' '+(colTop+ry),
+    fill:'none',stroke:'#000','stroke-width':2.2}));
+  g.appendChild(se('path',{d:'M '+xL+' '+(colBot-ry)+' A '+rx+' '+ry+' 0 0 0 '+xR+' '+(colBot-ry),
+    fill:'none',stroke:'#000','stroke-width':2.2}));
+
+  // trays (drawn inside the column so they don't collide with outer labels)
+  if (S.npr>=4){
+    var trayY = [colBot-ry, colTop+colH/2, colTop+ry];
+    var trayLbl = ['1','n','N'];
+    trayY.forEach(function(ty,i){
+      g.appendChild(se('line',{x1:xL,y1:ty,x2:xR,y2:ty,stroke:'#000','stroke-width':1.3}));
+      var lt = richText(xR-4, ty-3, [{t:trayLbl[i], italic:(trayLbl[i]!=='1')}],
+        {'font-size':fsz*0.95, fill:'#000','text-anchor':'end'});
+      g.appendChild(lt);
+    });
+  }
+
+  // elbow (bent-pipe) arrows, matching the original Mathematica figure:
+  // gas (green) runs up the LEFT side (enters at bottom, exits at top);
+  // liquid (blue) runs down the RIGHT side (enters at top, exits at bottom).
+  function elbowArrow(pts, color){
+    var mk = 'arrow'+Math.random().toString(36).slice(2);
+    var marker = se('marker',{id:mk, markerWidth:7, markerHeight:7, refX:5, refY:2.5, orient:'auto'});
+    marker.appendChild(se('path',{d:'M0,0 L0,5 L5,2.5 z', fill:color}));
+    var defs = se('defs',{}); defs.appendChild(marker);
+    g.appendChild(defs);
+    var pointStr = pts.map(function(pt){ return pt[0]+','+pt[1]; }).join(' ');
+    g.appendChild(se('polyline',{points:pointStr, fill:'none', stroke:color, 'stroke-width':2.3,
+      'stroke-linejoin':'round', 'marker-end':'url(#'+mk+')'}));
+  }
+  var gasX = xL + (xR-xL)*0.25, liqX = xL + (xR-xL)*0.75;
+  var extLeft = xL - extDist, extRight = xR + extDist;
+  var yApproachTop = colTop - elbowGap, yApproachBot = colBot + elbowGap;
+
+  elbowArrow([[extLeft,yApproachBot],[gasX,yApproachBot],[gasX,colBot-ry*0.3]], COL.V);   // gas entering, bottom-left
+  elbowArrow([[gasX,colTop+ry*0.3],[gasX,yApproachTop],[extLeft,yApproachTop]], COL.V);   // gas exiting, top-left
+  elbowArrow([[extRight,yApproachTop],[liqX,yApproachTop],[liqX,colTop+ry*0.3]], COL.L);  // liquid entering, top-right
+  elbowArrow([[liqX,colBot-ry*0.3],[liqX,yApproachBot],[extRight,yApproachBot]], COL.L);  // liquid exiting, bottom-right
+
+  // center P,T label
+  var lblPT = se('text',{x:cx,y:colTop+colH/2-3,'text-anchor':'middle','font-size': fszPT, fill:'#000'});
+  var t1 = document.createElementNS(SVGNS,'tspan'); t1.textContent = fmt1(p.P)+' atm'; t1.setAttribute('x',cx);
+  var t2 = document.createElementNS(SVGNS,'tspan'); t2.textContent = fmt0(p.T)+' \u00B0C'; t2.setAttribute('x',cx); t2.setAttribute('dy',fszPT+3);
+  lblPT.appendChild(t1); lblPT.appendChild(t2);
+  g.appendChild(lblPT);
+
+  var leftX = extLeft-6, rightX = extRight+6;
+
+  // gas (left side) labels
+  var y1lbl = richText(leftX, yApproachTop-6, [{t:'y',italic:true},{t:'1',sub:true},{t:' = '+fmt0(p.y1)+' ppm'}],
+    {'font-size':fsz, fill:COL.V,'text-anchor':'end'});
+  g.appendChild(y1lbl);
+  var gasBot = richText(leftX, yApproachBot+fsz, [{t:'y',italic:true},{t:'N+1',sub:true},{t:' = '+fmt0(p.yn1)+' ppm'}],
+    {'font-size':fsz,fill:COL.V,'text-anchor':'end'});
+  g.appendChild(gasBot);
+  if (S.npr===1){
+    var gasDesc = se('text',{x:leftX,y:yApproachBot+fsz*2.15,'text-anchor':'end','font-size':fsz, fill:'#666'});
+    gasDesc.textContent = 'gas feed';
+    g.appendChild(gasDesc);
+    var gasVal = richText(leftX, yApproachBot+fsz*3.3, [{t:'V',italic:true},{t:' = '+fmt1(S.gas)+' Mmol/h'}],
+      {'font-size':fsz,fill:COL.S,'text-anchor':'end'});
+    g.appendChild(gasVal);
+    if (S.solution){
+      var gasCorrect = richText(leftX, yApproachBot+fsz*4.45, [{t:'correct '},{t:'V',italic:true},{t:' = '+fmt1(p.V/1000)+' Mmol/h'}],
+        {'font-size':fsz*0.92,fill:COL.V,'text-anchor':'end'});
+      g.appendChild(gasCorrect);
+    }
+  } else {
+    var gasVal2 = richText(leftX, yApproachBot+fsz*2.15, [{t:'V',italic:true},{t:' = '+fmt1(p.V/1000)+' Mmol/h'}],
+      {'font-size':fsz,fill:COL.V,'text-anchor':'end'});
+    g.appendChild(gasVal2);
+  }
+
+  // liquid (right side) labels
+  var liqTopLines = [{t:'x',italic:true},{t:'0',sub:true},{t:' = '+fmt2(p.x0)+' ppm'}];
+  var liqTop = richText(rightX, yApproachTop-6, liqTopLines, {'font-size':fsz,fill:COL.L,'text-anchor':'start'});
+  g.appendChild(liqTop);
+  if (S.npr===1){
+    var liqDesc = se('text',{x:rightX,y:yApproachTop+fsz*1.1,'text-anchor':'start','font-size':fsz, fill:'#666'});
+    liqDesc.textContent = 'liquid feed';
+    g.appendChild(liqDesc);
+    var liqVal = richText(rightX, yApproachTop+fsz*2.25, [{t:'L',italic:true},{t:' = '+fmt0(p.L/1000)+' Mmol/h'}],
+      {'font-size':fsz,fill:COL.L,'text-anchor':'start'});
+    g.appendChild(liqVal);
+  } else {
+    var liqVal2 = richText(rightX, yApproachTop+fsz*1.1, [{t:'L',italic:true},{t:' = '+fmt0(p.L/1000)+' Mmol/h'}],
+      {'font-size':fsz,fill:COL.L,'text-anchor':'start'});
+    g.appendChild(liqVal2);
+  }
+  var xNlbl = richText(rightX, yApproachBot+fsz, [{t:'x',italic:true},{t:'N',sub:true},{t:' = '+sigFig(p.xN,2)+' ppm'}],
+    {'font-size':fsz, fill:COL.L,'text-anchor':'start'});
+  g.appendChild(xNlbl);
+
+  svg.appendChild(g);
+  return svg;
+}
+
+/* ======================= render ======================= */
+function render(){
+  stepLabelEl.textContent = STEP_LABELS[S.npr];
+  btnNext.style.visibility = (S.npr===7) ? 'hidden' : 'visible';
+
+  chkSolution.checked = S.solution;
+  chkSolution.disabled = (S.npr!==1 && S.solution);
+  lblSolution.classList.toggle('disabled', chkSolution.disabled);
+  chkHint.checked = S.hint;
+  chkColumn.checked = S.showColumn;
+  chkColumn.disabled = (S.npr===1);
+  lblColumn.classList.toggle('disabled', chkColumn.disabled);
+
+  sliderRow.style.display = (S.npr===1) ? 'flex' : 'none';
+  if (document.activeElement !== gasInput){ gasInput.value = S.gas; }
+
+  plotContent.innerHTML = '';
+  var instr = document.createElement('div');
+  instr.className='stepinstr';
+  instr.innerHTML = stepInstructionHTML();
+  plotContent.appendChild(instr);
+
+  var row = document.createElement('div');
+  row.className = 'diagram-row';
+  plotContent.appendChild(row);
+
+  if (S.npr===1){
+    row.appendChild(drawColumn(560, 430, true));
+  } else if (S.showColumn){
+    row.appendChild(drawDiagram(320, 340));
+    row.appendChild(drawColumn(360, 400, false));
+  } else {
+    row.appendChild(drawDiagram(600, 340));
+  }
+}
+
+/* lightweight refresh used only by the gas slider (step 1, column redraw only) */
+function renderColumnOnly(){
+  var row = plotContent.querySelector('.diagram-row');
+  if (!row) { render(); return; }
+  row.innerHTML='';
+  row.appendChild(drawColumn(560, 430, true));
+}
+
+/* ======================= init ======================= */
+newProblem(false); // initial load: fresh problem, solution unchecked
+render();
+
+})();
+</script>
+</body>
+</html>

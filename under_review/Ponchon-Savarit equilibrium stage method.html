@@ -1,0 +1,1168 @@
+<title>Ponchon–Savarit Simulator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #eef2f0;
+    --bg-grid: rgba(22,54,58,0.07);
+    --surface: #ffffff;
+    --surface-alt: #f5f8f6;
+    --border: #d6dedb;
+    --border-soft: #e3e9e6;
+    --text: #16232b;
+    --text-soft: #16232b;
+    --text-faint: #16232b;
+    --liquid: #2f5fa8;
+    --liquid-soft: #6f8fc4;
+    --liquid-wash: rgba(47,95,168,0.10);
+    --vapor: #b8442e;
+    --vapor-soft: #cf7862;
+    --vapor-wash: rgba(184,68,46,0.10);
+    --tie: #8a4fa3;
+    --rect: #6f8f3a;
+    --strip: #3f8f78;
+    --ink-marker: #16232b;
+    --danger: #b3432f;
+    --danger-wash: rgba(179,67,47,0.10);
+    --focus: #2f5fa8;
+    --shadow: 0 1px 2px rgba(16,30,33,0.06), 0 6px 20px -8px rgba(16,30,33,0.18);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0e1620;
+      --bg-grid: rgba(255,255,255,0.05);
+      --surface: #162129;
+      --surface-alt: #1c2830;
+      --border: #2c3a43;
+      --border-soft: #24313a;
+      --text: #e8edef;
+      --text-soft: #e8edef;
+      --text-faint: #e8edef;
+      --liquid: #7fa8e0;
+      --liquid-soft: #9fbbe6;
+      --liquid-wash: rgba(127,168,224,0.12);
+      --vapor: #e08268;
+      --vapor-soft: #eaa691;
+      --vapor-wash: rgba(224,130,104,0.13);
+      --tie: #c497d8;
+      --rect: #a4c46f;
+      --strip: #6bc4a8;
+      --ink-marker: #e8edef;
+      --danger: #e2705a;
+      --danger-wash: rgba(226,112,90,0.14);
+      --focus: #9fbbe6;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 6px 24px -8px rgba(0,0,0,0.5);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0e1620;
+    --bg-grid: rgba(255,255,255,0.05);
+    --surface: #162129;
+    --surface-alt: #1c2830;
+    --border: #2c3a43;
+    --border-soft: #24313a;
+    --text: #e8edef;
+    --text-soft: #e8edef;
+    --text-faint: #e8edef;
+    --liquid: #7fa8e0;
+    --liquid-soft: #9fbbe6;
+    --liquid-wash: rgba(127,168,224,0.12);
+    --vapor: #e08268;
+    --vapor-soft: #eaa691;
+    --vapor-wash: rgba(224,130,104,0.13);
+    --tie: #c497d8;
+    --rect: #a4c46f;
+    --strip: #6bc4a8;
+    --ink-marker: #e8edef;
+    --danger: #e2705a;
+    --danger-wash: rgba(226,112,90,0.14);
+    --focus: #9fbbe6;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 6px 24px -8px rgba(0,0,0,0.5);
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    background-image:
+      linear-gradient(var(--bg-grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px);
+    background-size: 28px 28px;
+    color: var(--text);
+    font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+  }
+
+  a { color: var(--liquid); }
+  h1, h2, h3 { font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif; text-wrap: balance; margin: 0; color: var(--text); }
+  code, .mono, .num { font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif; font-variant-numeric: tabular-nums; }
+
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 28px 20px 80px; }
+
+  /* ---------- Header ---------- */
+  header.top {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-bottom: 22px;
+    margin-bottom: 22px;
+    border-bottom: 1px solid var(--border);
+  }
+  .eyebrow {
+    font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.09em;
+    color: var(--liquid);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .eyebrow .dot { width: 6px; height: 6px; border-radius: 999px; background: var(--vapor); display:inline-block; }
+  header.top h1 { font-size: clamp(26px, 3.4vw, 34px); font-weight: 700; letter-spacing: -0.01em; }
+  header.top p { margin: 2px 0 0; color: var(--text-soft); max-width: 66ch; font-size: 15px; }
+
+  /* ---------- Workbench layout ---------- */
+  .workbench {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+  @media (max-width: 900px) {
+    .workbench { grid-template-columns: 1fr; }
+  }
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+  }
+
+  .sidebar-col { position: relative; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+
+  /* ---------- Doc buttons + popovers ---------- */
+  .doc-buttons { display: flex; flex-direction: row; flex-wrap: wrap; align-items: flex-start; gap: 10px; }
+  button.doc-btn {
+    background: var(--danger);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 13px 16px;
+    font-family: "IBM Plex Sans", sans-serif;
+    font-size: 15px;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+    text-align: left;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    width: max-content;
+  }
+  button.doc-btn:hover { filter: brightness(1.08); }
+  button.doc-btn:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  button.doc-btn.active { box-shadow: inset 0 0 0 2px rgba(255,255,255,0.6), var(--shadow); }
+
+  .doc-popover {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: calc(100% + 14px);
+    width: min(620px, 56vw);
+    max-height: 82vh;
+    overflow-y: auto;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    padding: 24px 28px;
+    z-index: 40;
+  }
+  #panel-directions, #panel-details { width: min(744px, 67.2vw); }
+  .doc-popover.open { display: block; }
+  .doc-popover h2 { font-size: 21px; padding-right: 34px; margin-bottom: 14px; }
+  .doc-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 30px;
+    height: 30px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--surface-alt);
+    color: var(--text);
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .doc-close:hover { background: var(--danger-wash); border-color: var(--danger); color: var(--danger); }
+  @media (max-width: 900px) {
+    .doc-popover { position: static; width: 100%; max-height: none; margin-top: 10px; }
+  }
+
+  /* ---------- Controls ---------- */
+  .controls { padding: 18px 18px 8px; display: flex; flex-direction: column; gap: 18px; position: sticky; top: 16px; }
+  @media (max-width: 900px) { .controls { position: static; } }
+  fieldset { border: 0; margin: 0; padding: 0; }
+  .ctrl { margin-bottom: 14px; }
+  .ctrl:last-child { margin-bottom: 0; }
+  .ctrl-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+    font-size: 15.6px;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .ctrl-label .val { color: var(--text); font-size: 16.5px; font-weight: 400; }
+  input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 22px;
+    background: transparent;
+    cursor: pointer;
+  }
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: 4px;
+    background: var(--border);
+    border-radius: 999px;
+  }
+  input[type="range"]::-moz-range-track {
+    height: 4px;
+    background: var(--border);
+    border-radius: 999px;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    margin-top: -7px;
+    width: 18px; height: 18px;
+    border-radius: 999px;
+    background: var(--surface);
+    border: 2.5px solid var(--liquid);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 18px; height: 18px;
+    border-radius: 999px;
+    background: var(--surface);
+    border: 2.5px solid var(--liquid);
+  }
+  input[type="range"]:focus-visible::-webkit-slider-thumb { outline: 2px solid var(--focus); outline-offset: 2px; }
+  input[type="range"]:focus-visible::-moz-range-thumb { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+  .hint { font-size: 13.8px; color: var(--text-faint); margin-top: 2px; }
+
+  .ctrl-sep { border-top: 1px solid var(--border-soft); padding-top: 14px; }
+  .readout-line { display: flex; justify-content: space-between; font-size: 13px; color: var(--text-soft); padding: 5px 0 0; }
+  .readout-line .num { color: var(--text); font-weight: 400; }
+
+  /* ---------- Stats row ---------- */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  @media (max-width: 640px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+  .stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    box-shadow: var(--shadow);
+  }
+  .stat .label { font-size: 15.1px; letter-spacing: 0.07em; color: var(--text-faint); }
+  .stat .value { font-size: 20px; font-weight: 400; margin-top: 3px; }
+  .stat .value.liquid { color: var(--liquid); }
+  .stat .value.vapor { color: var(--vapor); }
+  .stat .value.small { font-size: 16.8px; }
+  .stat .sub { font-size: 13.2px; color: var(--text-faint); margin-top: 1px; }
+
+  .banner {
+    display: none;
+    align-items: flex-start;
+    gap: 10px;
+    background: var(--danger-wash);
+    border: 1px solid var(--danger);
+    color: var(--danger);
+    border-radius: 8px;
+    padding: 10px 13px;
+    font-size: 13px;
+    margin-bottom: 14px;
+  }
+  .banner.show { display: flex; }
+  .banner strong { font-weight: 600; }
+
+  /* ---------- Plot panel ---------- */
+  .plot-panel { padding: 16px 16px 14px; }
+  .plot-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 6px; flex-wrap: wrap; }
+  .plot-head h2 { font-size: 17.25px; font-weight: 400; }
+
+  svg.diagram { width: 100%; height: auto; display: block; }
+  svg.diagram text {
+    font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    fill: var(--text-soft);
+    paint-order: stroke;
+    stroke: var(--surface);
+    stroke-width: 4px;
+    stroke-linejoin: round;
+  }
+  svg.diagram .axis-label { font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif; fill: var(--text-soft); font-size: 18px; }
+  svg.diagram .grid-line { stroke: var(--border-soft); stroke-width: 1; }
+  svg.diagram .axis-line { stroke: var(--text-faint); stroke-width: 1; }
+
+  /* ---------- Step controls ---------- */
+  .stepbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border-soft);
+  }
+  .stepbar .range-wrap { flex: 1 1 180px; display: flex; align-items: center; gap: 8px; }
+  .stepbar .range-wrap input[type="range"] { flex: 1; }
+  button.btn {
+    font-family: "IBM Plex Sans", sans-serif;
+    font-size: 14.95px;
+    font-weight: 500;
+    color: var(--text);
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 7px 12px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  button.btn:hover { border-color: var(--liquid-soft); }
+  button.btn:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+  button.btn.primary { background: var(--liquid); border-color: var(--liquid); color: #fff; }
+  button.btn.primary:hover { background: var(--liquid-soft); border-color: var(--liquid-soft); }
+  button.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+  .step-readout { font-size: 14.375px; color: var(--text-soft); min-width: 128px; text-align: right; }
+
+  /* ---------- Stage table ---------- */
+  .stage-table-wrap { margin-top: 14px; overflow-x: auto; }
+  table.stages { border-collapse: collapse; width: 100%; font-size: 15px; }
+  table.stages th, table.stages td { padding: 6px 10px; text-align: right; border-bottom: 1px solid var(--border-soft); white-space: nowrap; }
+  table.stages th { color: var(--text-faint); font-weight: 600; font-size: 12.6px; letter-spacing: 0.05em; }
+  table.stages td:first-child, table.stages th:first-child { text-align: left; }
+  table.stages tr.feed-row td { background: var(--vapor-wash); }
+  table.stages tr.dim td { color: var(--text-faint); }
+
+  /* ---------- Doc sections ---------- */
+  .docs { margin-top: 40px; display: flex; flex-direction: column; gap: 34px; }
+  .doc-section h2 {
+    font-size: 22px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .doc-section h2 .idx { font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif; font-size: 13px; color: var(--vapor); font-weight: 500; }
+  .doc-card { }
+  .doc-card p { max-width: 74ch; color: var(--text-soft); margin: 0 0 12px; font-size: 14.5px; }
+  .doc-card p:last-child { margin-bottom: 0; }
+  .doc-card ul, .doc-card ol { max-width: 74ch; color: var(--text-soft); font-size: 14.5px; padding-left: 20px; margin: 0 0 14px; }
+  .doc-card li { margin-bottom: 6px; }
+  .doc-card li:last-child { margin-bottom: 0; }
+  .doc-card strong { color: var(--text); font-weight: 600; }
+  .doc-card a { color: var(--liquid); text-decoration: underline; text-underline-offset: 2px; }
+  .doc-card a:hover { color: var(--liquid-soft); }
+  .doc-card h3 { font-size: 15px; margin: 18px 0 8px; color: var(--text); }
+  .doc-card h3:first-child { margin-top: 0; }
+
+  .eqn {
+    background: var(--surface-alt);
+    border: 1px solid var(--border-soft);
+    border-left: 3px solid var(--liquid);
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    font-size: 13px;
+    color: var(--text);
+    margin: 10px 0 16px;
+    overflow-x: auto;
+  }
+  .eqn .rem { color: var(--text-faint); font-size: 12px; display: block; margin-top: 3px; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
+
+  .kicker-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 14px; margin-top: 6px; }
+  .kicker-list .item { border: 1px solid var(--border-soft); border-radius: 8px; padding: 12px 14px; background: var(--surface-alt); }
+  .kicker-list .item .k { font-size: 11px; letter-spacing: 0.06em; color: var(--vapor); font-weight: 600; margin-bottom: 4px; }
+  .kicker-list .item p { font-size: 13px; margin: 0; color: var(--text-soft); }
+
+  footer.note { margin-top: 36px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 12px; color: var(--text-faint); text-align: center; }
+</style>
+
+<div class="wrap">
+
+  <header class="top">
+    <h1>Ponchon&ndash;Savarit Simulator</h1>
+  </header>
+
+  <div class="banner" id="infeasibleBanner">
+    <span>&#9888;&#65039;</span>
+    <span><strong>This configuration isn't buildable.</strong> <span id="infeasibleMsg">Try moving the distillate and bottoms compositions further apart, or easing the feed quality back toward the middle of its range.</span></span>
+  </div>
+
+  <div class="workbench">
+
+    <!-- CONTROLS -->
+    <div class="sidebar-col">
+    <div class="panel controls">
+
+      <fieldset>
+        <div class="ctrl">
+          <div class="ctrl-label"><span>Feed composition, z<sub>F</sub></span><span class="val num" id="v-zF">0.500</span></div>
+          <input type="range" id="zF" min="0.15" max="0.85" step="0.005" value="0.5">
+        </div>
+        <div class="ctrl">
+          <div class="ctrl-label"><span>Feed condition</span><span class="val num" id="v-q">0.41</span></div>
+          <input type="range" id="q" min="0.05" max="0.95" step="0.01" value="0.41">
+          <div class="hint" id="feedCondLabel">Liquid + vapor</div>
+        </div>
+        <div class="ctrl">
+          <div class="ctrl-label"><span>Distillate composition, x<sub>D</sub></span><span class="val num" id="v-xD">0.950</span></div>
+          <input type="range" id="xD" min="0.5" max="0.99" step="0.005" value="0.95">
+        </div>
+        <div class="ctrl">
+          <div class="ctrl-label"><span>Bottoms composition, x<sub>B</sub></span><span class="val num" id="v-xB">0.050</span></div>
+          <input type="range" id="xB" min="0.01" max="0.5" step="0.005" value="0.05">
+        </div>
+      </fieldset>
+
+      <div class="ctrl ctrl-sep">
+        <div class="ctrl-label"><span>Reflux multiplier, R / R<sub>min</sub></span><span class="val num" id="v-k">1.50</span></div>
+        <input type="range" id="k" min="1.05" max="3" step="0.01" value="1.5">
+        <div class="readout-line"><span>Minimum reflux, R<sub>min</sub></span><span class="num" id="v-rmin">&mdash;</span></div>
+        <div class="readout-line"><span>Reflux ratio, R = L<sub>0</sub>/D</span><span class="num" id="v-ractual">&mdash;</span></div>
+      </div>
+
+    </div>
+
+    <div class="doc-buttons">
+      <button class="doc-btn" type="button" data-panel="directions">Directions</button>
+      <button class="doc-btn" type="button" data-panel="details">Details</button>
+      <button class="doc-btn" type="button" data-panel="about">About</button>
+
+      <div class="doc-popover" id="panel-directions">
+        <button class="doc-close" type="button" aria-label="Close">&times;</button>
+        <h2>Directions</h2>
+        <div class="doc-card">
+          <h3>Set the column</h3>
+          <p>Use <strong>Feed composition</strong>, <strong>Distillate composition</strong> and <strong>Bottoms composition</strong> to fix what the column has to do (compositions are mole fraction n&#8209;hexane); the sliders keep them a sensible distance apart automatically. <strong>Feed condition</strong> moves the feed from mostly vapor toward mostly liquid &mdash; watch the feed point F slide along the vertical at z<sub>F</sub> and the feed stage shift with it. There's no reflux slider: the minimum reflux R<sub>min</sub> is solved for directly, and the column runs at R = 1.5&times;R<sub>min</sub> by default. Use the <strong>Reflux multiplier</strong> slider to dial that up or down and watch the stage count respond &mdash; drag it toward 1.0 and the column pinches.</p>
+          <h3>Read the diagram</h3>
+          <p>The blue curve is h&#8209;x, the saturated&#8209;liquid enthalpy; the red curve is H&#8209;y, the saturated&#8209;vapor enthalpy. Purple dashed segments are <strong>tie lines</strong>, connecting a liquid and a vapor in equilibrium on the same stage. Green segments are rectifying <strong>operating lines</strong>; teal segments are stripping operating lines &mdash; each is a straight mass&ndash;and&ndash;energy balance running out to that section's difference point, &Delta;<sub>R</sub> or &Delta;<sub>S</sub>, marked with a bold dot (along with the feed point F). When a difference point would land far off the visible range, its lines are cut off at the frame with a small arrow rather than blowing out the scale.</p>
+          <h3>Step through the solution</h3>
+          <p>The diagram solves immediately when you move a slider. To walk it stage by stage the way it's drawn by hand, hit <strong>Reset</strong> then <strong>Step &#8594;</strong> to reveal one tie line and one operating line at a time, or press <strong>Play</strong> to animate through automatically. The row highlighted in the stage table is the optimal feed stage &mdash; found, not assumed, as the point where a line from &Delta;<sub>R</sub> through the feed first crosses the liquid curve.</p>
+          <h3>About this simulation</h3>
+          <p>This simulator reproduces a classic chemical engineering teaching example &mdash; separating n&#8209;hexane from n&#8209;octane by the Ponchon&ndash;Savarit graphical method, with a partial condenser and partial reboiler, saturated&#8209;liquid reflux, and the reflux ratio pinned to 1.5&times; the computed minimum &mdash; as an interactive tool instead of a single static hand&#8209;drawn figure. Move any slider and the whole construction re&#8209;solves: the bubble/dew temperature field, the equilibrium curve, the minimum&#8209;reflux pinch tie line, the optimal feed stage, and the full stage&#8209;by&#8209;stage staircase.</p>
+          <p><strong>What's real and what's simplified:</strong> the vapor&ndash;liquid equilibrium and enthalpies come from actual Antoine coefficients, heat capacities, and latent heats for n&#8209;hexane and n&#8209;octane &mdash; not an idealized curve fit to the sliders. What's simplified is everything a full process simulator would also model: heat capacities are treated as temperature&#8209;independent, the column runs at a flat 1&nbsp;bar with no pressure drop, and Raoult's law stands in for a proper activity&#8209;coefficient model (a reasonable approximation for two chemically similar alkanes, less so for a mixture with real non&#8209;idealities). Treat the stage counts and duties as a faithful worked example, not a substitute for a process simulator.</p>
+          <p>Push the sliders toward the edges of their ranges and you may see the red "not buildable" banner &mdash; that's the same kind of infeasibility a real design would hit: compositions specified too close together, or a feed condition that puts the pinch tie line somewhere the numerical search can't resolve cleanly. Ease the sliders back toward the middle of their ranges and the construction returns.</p>
+        </div>
+      </div>
+
+      <div class="doc-popover" id="panel-details">
+        <button class="doc-close" type="button" aria-label="Close">&times;</button>
+        <h2>Details</h2>
+        <div class="doc-card">
+          <h3>The system</h3>
+          <p>This models a real binary pair, n&#8209;hexane (the more volatile component, A) and n&#8209;octane (B), at a fixed column pressure of 1&nbsp;bar. Vapor&ndash;liquid equilibrium comes from the Antoine equation and Raoult's law: at each liquid composition x, the bubble temperature T(x) solves P<sub>A</sub><sup>sat</sup>(T)x + P<sub>B</sub><sup>sat</sup>(T)(1&minus;x) = P, and the equilibrium vapor composition is y = P<sub>A</sub><sup>sat</sup>(T)x/P. Enthalpies are built from that same temperature field: saturated&#8209;liquid enthalpy is a sensible&#8209;heat mixture at the bubble point, saturated&#8209;vapor enthalpy adds each component's latent heat at the dew point. None of this is fitted to the slider positions &mdash; it's the same handful of physical constants (Antoine coefficients, heat capacities, latent heats) regardless of what column you ask it to design.</p>
+
+          <h3>Partial condenser, partial reboiler</h3>
+          <p>Unlike a design with a total condenser, the vapor leaving the top stage isn't fully condensed. The distillate is drawn off as <strong>saturated vapor</strong> at x<sub>D</sub>, which sits on the H&#8209;y curve; the liquid reflux returned to the column is whatever liquid composition is in equilibrium with that vapor, one tie line over. That reflux liquid, not x<sub>D</sub> itself, is the true starting point for stepping stages down the rectifying section &mdash; and the partial condenser counts as one of the theoretical stages, same as the partial reboiler does at the bottom.</p>
+
+          <h3>Minimum reflux, without guessing</h3>
+          <p>At minimum reflux, the operating line's difference point sits exactly on the extension of a tie line &mdash; the classic Ponchon&ndash;Savarit pinch condition. This tool finds that tie line directly: the one liquid/vapor equilibrium pair whose connecting line, extended, passes through the feed point F. Extending that same line out to x<sub>D</sub> gives &Delta;<sub>R,min</sub>, and the inverse&#8209;lever&#8209;arm rule on the segment from the reflux liquid to the resulting top vapor gives R<sub>min</sub> = L<sub>0</sub>/D directly, with no trial and error. The actual reflux ratio is then set as a multiple of that minimum.</p>
+
+          <h3>Governing relations</h3>
+          <div class="eqn">
+            P<sub>A</sub><sup>sat</sup>(T)&middot;x + P<sub>B</sub><sup>sat</sup>(T)&middot;(1&minus;x) = P &nbsp;&nbsp; y = P<sub>A</sub><sup>sat</sup>(T)&middot;x / P
+            <span class="rem">Antoine + Raoult's law bubble&#8209;point relation, solved for T at every x</span>
+          </div>
+          <div class="eqn">
+            H<sub>&Delta;R</sub> = H<sub>V1</sub> + R&middot;(H<sub>V1</sub> &minus; h<sub>L0</sub>) &nbsp;&nbsp; Q<sub>c</sub>/D = H<sub>&Delta;R</sub> &minus; H<sub>V</sub>(x<sub>D</sub>)
+            <span class="rem">top difference point and condenser duty, from an envelope around the partial condenser</span>
+          </div>
+          <div class="eqn">
+            &Delta;<sub>S</sub> on the line through &Delta;<sub>R</sub> and F, at x = x<sub>B</sub> &nbsp;&nbsp; Q<sub>R</sub>/B = h<sub>L</sub>(x<sub>B</sub>) &minus; H<sub>&Delta;S</sub>
+            <span class="rem">bottom difference point and reboiler duty, from overall and reboiler envelopes</span>
+          </div>
+          <div class="two-col">
+            <div class="kicker-list">
+              <div class="item"><div class="k">Liquid enthalpy</div><p>h<sub>L</sub>(x) = x&middot;C<sub>p,A</sub><sup>L</sup>&middot;T(x) + (1&minus;x)&middot;C<sub>p,B</sub><sup>L</sup>&middot;T(x), sensible heat only.</p></div>
+              <div class="item"><div class="k">Vapor enthalpy</div><p>H<sub>V</sub>(y) = y&middot;[&lambda;<sub>A</sub>+C<sub>p,A</sub><sup>V</sup>T(y)] + (1&minus;y)&middot;[&lambda;<sub>B</sub>+C<sub>p,B</sub><sup>V</sup>T(y)], latent heat plus sensible heat at the dew point.</p></div>
+              <div class="item"><div class="k">Feed enthalpy</div><p>h<sub>F</sub> = q&middot;h<sub>L</sub>(z<sub>F</sub>) + (1&minus;q)&middot;H<sub>V</sub>(z<sub>F</sub>), linear in the feed&#8209;quality slider q.</p></div>
+            </div>
+          </div>
+          <p>The graphical procedure &mdash; enthalpy curves, tie lines, difference points, straight operating lines stepped off until the bottoms composition is reached &mdash; is the genuine Ponchon&ndash;Savarit method. Every number on this page comes from that same construction, solved numerically instead of drawn by hand.</p>
+        </div>
+      </div>
+
+      <div class="doc-popover" id="panel-about">
+        <button class="doc-close" type="button" aria-label="Close">&times;</button>
+        <h2>About</h2>
+        <div class="doc-card">
+          <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/PonchonSavaritGraphicalEquilibriumStageMethod/" target="_blank" rel="noopener">Mathematica simulation</a> by Housam Binous. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.</p>
+        </div>
+      </div>
+    </div>
+    </div>
+
+    <!-- PLOT + STATS -->
+    <div>
+      <div class="stats">
+        <div class="stat"><div class="label">Theoretical stages</div><div class="value" id="statStages">&mdash;</div><div class="sub" id="statStagesSub">&nbsp;</div></div>
+        <div class="stat"><div class="label">Feed stage</div><div class="value" id="statFeed">&mdash;</div><div class="sub">counted from the top</div></div>
+        <div class="stat"><div class="label">Reflux ratio, R</div><div class="value liquid" id="statR">&mdash;</div><div class="sub" id="statRSub">&nbsp;</div></div>
+        <div class="stat"><div class="label">Duties, Q<sub>c</sub>/D &middot; Q<sub>R</sub>/B</div><div class="value small" id="statQ">&mdash;</div><div class="sub">top &middot; bottom</div></div>
+      </div>
+
+      <div class="panel plot-panel">
+        <div class="plot-head">
+          <h2>Enthalpy&ndash;composition diagram</h2>
+        </div>
+
+        <svg class="diagram" id="svg" viewBox="0 0 820 540" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ponchon-Savarit enthalpy-composition diagram for n-hexane / n-octane"></svg>
+
+        <div class="stepbar">
+          <button class="btn" id="btnReset" title="Jump to top stage">&#8676; Reset</button>
+          <button class="btn" id="btnBack" title="Previous stage">&#8592; Step</button>
+          <button class="btn primary" id="btnPlay">&#9654; Play</button>
+          <button class="btn" id="btnFwd" title="Next stage">Step &#8594;</button>
+          <button class="btn" id="btnAll" title="Reveal every stage">Show all &#8677;</button>
+          <div class="range-wrap">
+            <input type="range" id="revealRange" min="0" max="0" step="1" value="0">
+          </div>
+          <div class="step-readout" id="stepReadout">&nbsp;</div>
+        </div>
+
+        <div class="stage-table-wrap">
+          <table class="stages">
+            <thead><tr><th>Stage</th><th>x<sub>n</sub> (liquid)</th><th>y<sub>n</sub> (vapor)</th><th>Section</th></tr></thead>
+            <tbody id="stageTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="note">Educational simulation &middot; n&#8209;hexane / n&#8209;octane at 1 bar &middot; not for process design use</footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  // ================= Thermodynamic model (n-hexane [A] / n-octane [B]) =================
+  var Aa1 = 3.99695, Ba1 = 1171.530, Ca1 = -48.784;
+  var Aa2 = 4.04296, Ba2 = 1355.126, Ca2 = -63.633;
+  var PPRESS = 1;
+  function Psat1(T) { return Math.pow(10, Aa1 - Ba1 / (T + 273.15 + Ca1)); }
+  function Psat2(T) { return Math.pow(10, Aa2 - Ba2 / (T + 273.15 + Ca2)); }
+  function bisect(f, lo, hi, iters) {
+    var flo = f(lo);
+    for (var k = 0; k < iters; k++) {
+      var mid = (lo + hi) / 2, fm = f(mid);
+      if (flo * fm <= 0) { hi = mid; } else { lo = mid; flo = fm; }
+    }
+    return (lo + hi) / 2;
+  }
+
+  var lamA = 3.316e4, lamB = 4.341e4, CpVA = 132.0, CpVB = 173.8, CpLA = 189.3, CpLB = 242.1, CONV = 0.001;
+  var NPTS = 300;
+  var TBL = { x: [], T: [], y: [], HL: [], HV: [] };
+  (function buildTables() {
+    for (var i = 0; i <= NPTS; i++) {
+      var x = i / NPTS;
+      var T = bisect(function (T) { return Psat1(T) * x + Psat2(T) * (1 - x) - PPRESS; }, 10, 200, 60);
+      var y = Psat1(T) * x / PPRESS;
+      TBL.x.push(x); TBL.T.push(T); TBL.y.push(y);
+      TBL.HL.push(CONV * (x * CpLA * T + (1 - x) * CpLB * T));
+      TBL.HV.push(CONV * (y * (lamA + CpVA * T) + (1 - y) * (lamB + CpVB * T)));
+    }
+  })();
+
+  function interpMono(arrX, arrY, xq) {
+    var n = arrX.length;
+    if (xq <= arrX[0]) return arrY[0];
+    if (xq >= arrX[n - 1]) return arrY[n - 1];
+    var lo = 0, hi = n - 1;
+    while (hi - lo > 1) { var mid = (lo + hi) >> 1; if (arrX[mid] <= xq) lo = mid; else hi = mid; }
+    var t = (xq - arrX[lo]) / (arrX[hi] - arrX[lo]);
+    return arrY[lo] + t * (arrY[hi] - arrY[lo]);
+  }
+  function yEquil(x) { return interpMono(TBL.x, TBL.y, x); }
+  function xFromY(y) { return interpMono(TBL.y, TBL.x, y); }
+  function HL(x) { return interpMono(TBL.x, TBL.HL, x); }
+  function HV(y) { return interpMono(TBL.y, TBL.HV, y); }
+
+  function crossingsWithLine(curveXArr, curveYArr, lineFn) {
+    var roots = [];
+    var prevG = null, prevX = null;
+    for (var i = 0; i < curveXArr.length; i++) {
+      var xx = curveXArr[i];
+      var g = curveYArr[i] - lineFn(xx);
+      if (prevG !== null && prevG * g < 0) {
+        var t = prevG / (prevG - g);
+        roots.push(prevX + t * (xx - prevX));
+      } else if (g === 0) { roots.push(xx); }
+      prevG = g; prevX = xx;
+    }
+    return roots;
+  }
+
+  // ================= Column solver =================
+  function solveColumn(xf, xd, xb, q, k) {
+    var hf = q * HL(xf) + (1 - q) * HV(xf);
+
+    var pinchRoots = crossingsWithLine(TBL.x, TBL.HL, function () { return NaN; }); // placeholder unused
+    pinchRoots = [];
+    (function () {
+      var prevG = null, prevX = null;
+      for (var i = 0; i < TBL.x.length; i++) {
+        var x2 = TBL.x[i], x1 = TBL.y[i];
+        var hLv = TBL.HL[i], hVv = TBL.HV[i];
+        if (Math.abs(x1 - x2) < 1e-6) continue;
+        var lineAtF = hLv + (hVv - hLv) / (x1 - x2) * (xf - x2);
+        var g = lineAtF - hf;
+        if (prevG !== null && prevG * g < 0) {
+          var t = prevG / (prevG - g);
+          pinchRoots.push(prevX + t * (x2 - prevX));
+        }
+        prevG = g; prevX = x2;
+      }
+    })();
+    if (pinchRoots.length === 0) return { feasible: false, reason: "no minimum-reflux pinch tie line found" };
+    pinchRoots.sort(function (a, b) { return Math.abs(a - xf) - Math.abs(b - xf); });
+
+    var xe1 = xFromY(xd);
+    var HLxe1 = HL(xe1);
+
+    var chosen = null;
+    for (var pi = 0; pi < pinchRoots.length; pi++) {
+      var x2p = pinchRoots[pi];
+      var x1p = yEquil(x2p);
+      var aP = (HV(x1p) - HL(x2p)) / (x1p - x2p);
+      var H_dR_min = aP * (xd - xf) + hf;
+      (function () {
+        function lineMin(x) { return H_dR_min + (HLxe1 - H_dR_min) / (xe1 - xd) * (x - xd); }
+        var rootsMin = crossingsWithLine(TBL.y, TBL.HV, lineMin).filter(function (r) { return Math.abs(r - xe1) > 1e-4 && Math.abs(r - xd) > 1e-4; });
+        if (rootsMin.length === 0) return;
+        rootsMin.sort(function (a, b) { return Math.abs(a - xd) - Math.abs(b - xd); });
+        var xVn1 = rootsMin[0];
+        var Rmin = (H_dR_min - HV(xVn1)) / (HV(xVn1) - HLxe1);
+        if (Rmin > 0 && isFinite(Rmin) && chosen === null) { chosen = { Rmin: Rmin }; }
+      })();
+      if (chosen) break;
+    }
+    if (!chosen) return { feasible: false, reason: "could not find a valid minimum-reflux condition" };
+    var Rmin = chosen.Rmin;
+    var R = k * Rmin;
+
+    function gY1(y1) {
+      var hV = HV(y1);
+      var lhs = HLxe1 + (hV - HLxe1) / (y1 - xe1) * (xd - xe1);
+      var rhs = hV + R * (hV - HLxe1);
+      return lhs - rhs;
+    }
+    var y1Roots = [];
+    (function () {
+      var prevG = null, prevX = null;
+      for (var i = 0; i < TBL.y.length; i++) {
+        var y1c = TBL.y[i];
+        if (y1c <= xe1) continue;
+        var g = gY1(y1c);
+        if (prevG !== null && prevG * g < 0) {
+          var t = prevG / (prevG - g);
+          y1Roots.push(prevX + t * (y1c - prevX));
+        }
+        prevG = g; prevX = y1c;
+      }
+    })();
+    if (y1Roots.length === 0) return { feasible: false, reason: "could not solve the actual top operating line" };
+    y1Roots.sort(function (a, b) { return Math.abs(a - xd) - Math.abs(b - xd); });
+    var y1 = y1Roots[0];
+    var H_dR = HV(y1) + R * (HV(y1) - HLxe1);
+
+    var swRoots = crossingsWithLine(TBL.x, TBL.HL, function (x) { return (x - xf) * (H_dR - hf) / (xd - xf) + hf; });
+    if (swRoots.length === 0) return { feasible: false, reason: "could not locate the optimal feed stage" };
+    var belowXf = swRoots.filter(function (r) { return r < xf - 1e-4; }).sort(function (a, b) { return b - a; });
+    var xSwitch = belowXf.length ? belowXf[0] : swRoots.sort(function (a, b) { return Math.abs(a - xf) - Math.abs(b - xf); })[0];
+
+    var H_dS = (xb - xf) * (H_dR - hf) / (xd - xf) + hf;
+
+    var stages = [];
+    var xe = [null, xe1], ye = [null, y1];
+    var i = 1, guardMax = 60, section = "rectifying", pinched = false;
+
+    function opLineCross(anchorX, anchorH, fromX, fromH, guessNear) {
+      var a = (anchorH - fromH) / (anchorX - fromX);
+      function line(x) { return fromH + a * (x - fromX); }
+      var rs = crossingsWithLine(TBL.y, TBL.HV, line).filter(function (r) { return Math.abs(r - fromX) > 1e-4; });
+      if (rs.length === 0) return null;
+      rs.sort(function (p, q2) { return Math.abs(p - guessNear) - Math.abs(q2 - guessNear); });
+      return rs[0];
+    }
+
+    while (i < guardMax) {
+      stages.push({ n: i, x: xe[i], y: ye[i], section: section });
+      if (xe[i] <= xb) break;
+      if (section === "rectifying" && xe[i] <= xSwitch) section = "stripping";
+      var xnext, ynext;
+      if (section === "rectifying") {
+        xnext = xFromY(ye[i]);
+        ynext = opLineCross(xd, H_dR, xnext, HL(xnext), ye[i]);
+      } else {
+        ynext = opLineCross(xb, H_dS, xe[i], HL(xe[i]), ye[i]);
+        xnext = ynext !== null ? xFromY(ynext) : null;
+      }
+      if (ynext === null || xnext === null) { pinched = true; break; }
+      if (Math.abs(xnext - xe[i]) < 1e-6) { pinched = true; i++; break; }
+      xe[i + 1] = xnext; ye[i + 1] = ynext;
+      i++;
+    }
+    if (i >= guardMax - 1) pinched = true;
+
+    var xSwitchStage = null;
+    for (var s = 0; s < stages.length; s++) {
+      if (stages[s].section === "stripping") { xSwitchStage = stages[s].n; break; }
+    }
+
+    var QcOverD = H_dR - HV(xd);
+    var QrOverB = HL(xb) - H_dS;
+
+    return {
+      feasible: true, hf: hf, Rmin: Rmin, R: R, xe1: xe1, y1: y1,
+      H_dR: H_dR, H_dS: H_dS, xSwitch: xSwitch, QcOverD: QcOverD, QrOverB: QrOverB,
+      stages: stages, feedStageIndex: xSwitchStage, pinched: pinched, totalStages: stages.length
+    };
+  }
+
+  // ================= State & UI =================
+  var state = { zF: 0.5, xD: 0.95, xB: 0.05, q: 0.41, k: 1.5 };
+  var solution = null;
+  var revealed = 0;
+  var playTimer = null;
+
+  var els = {};
+  ["zF", "xD", "xB", "q", "k"].forEach(function (id) { els[id] = document.getElementById(id); });
+
+  function fmt(v, d) { return Number(v).toFixed(d); }
+
+  function feedLabel(q) {
+    if (q >= 0.94) return "Nearly saturated liquid";
+    if (q > 0.55) return "Mostly liquid";
+    if (q >= 0.45) return "Liquid + vapor";
+    if (q > 0.06) return "Mostly vapor";
+    return "Nearly saturated vapor";
+  }
+
+  function syncSliderRanges() {
+    var zF = parseFloat(els.zF.value);
+    var MARGIN = 0.18;
+    els.xD.min = Math.max(0.5, zF + MARGIN).toFixed(3);
+    els.xB.max = Math.min(0.5, zF - MARGIN).toFixed(3);
+    var xD = parseFloat(els.xD.value), xB = parseFloat(els.xB.value);
+    els.zF.min = Math.max(0.15, xB + MARGIN).toFixed(3);
+    els.zF.max = Math.min(0.85, xD - MARGIN).toFixed(3);
+  }
+
+  function readState() {
+    state.zF = parseFloat(els.zF.value);
+    state.xD = parseFloat(els.xD.value);
+    state.xB = parseFloat(els.xB.value);
+    state.q = parseFloat(els.q.value);
+    state.k = parseFloat(els.k.value);
+  }
+
+  function updateReadouts() {
+    document.getElementById("v-zF").textContent = fmt(state.zF, 3);
+    document.getElementById("v-xD").textContent = fmt(state.xD, 3);
+    document.getElementById("v-xB").textContent = fmt(state.xB, 3);
+    document.getElementById("v-q").textContent = fmt(state.q, 2);
+    document.getElementById("v-k").textContent = fmt(state.k, 2) + "×";
+    document.getElementById("feedCondLabel").textContent = feedLabel(state.q);
+  }
+
+  // ================= SVG rendering =================
+  var svg = document.getElementById("svg");
+  var NS = "http://www.w3.org/2000/svg";
+  var M = { left: 68, right: 34, top: 26, bottom: 54 };
+  var VB_W = 820, VB_H = 540;
+  var plotW = VB_W - M.left - M.right;
+  var plotH = VB_H - M.top - M.bottom;
+
+  function el(tag, attrs) {
+    var e = document.createElementNS(NS, tag);
+    for (var k in attrs) { e.setAttribute(k, attrs[k]); }
+    return e;
+  }
+
+  // Solid backing plate behind a label so crossing lines don't read through it.
+  function labelBackdrop(textEl, bgFill, padX, padY) {
+    try {
+      var bbox = textEl.getBBox();
+      var rect = el("rect", {
+        x: bbox.x - padX, y: bbox.y - padY,
+        width: bbox.width + padX * 2, height: bbox.height + padY * 2,
+        fill: bgFill
+      });
+      textEl.parentNode.insertBefore(rect, textEl);
+    } catch (e) { /* getBBox unavailable before layout; skip the backdrop */ }
+  }
+
+  function niceStep(range, target) {
+    var raw = range / target;
+    var mag = Math.pow(10, Math.floor(Math.log10(raw)));
+    var norm = raw / mag;
+    var step = norm < 1.5 ? 1 : norm < 3 ? 2 : norm < 7 ? 5 : 10;
+    return step * mag;
+  }
+
+  function makeScales(lo, hi) {
+    return {
+      x: function (x) { return M.left + x * plotW; },
+      h: function (h) { return M.top + (hi - h) / (hi - lo) * plotH; },
+      lo: lo, hi: hi
+    };
+  }
+
+  function pathFrom(points, sc) {
+    var d = "";
+    for (var i = 0; i < points.length; i++) {
+      var px = sc.x(points[i][0]), py = sc.h(points[i][1]);
+      d += (i === 0 ? "M" : "L") + px.toFixed(2) + "," + py.toFixed(2) + " ";
+    }
+    return d;
+  }
+
+  // clip a segment from (x0,h0) toward (x1,h1) to a vertical bound hBound (only clips if h1 is beyond hBound in the direction away from h0)
+  function clipToBound(x0, h0, x1, h1, hBound, isUpper) {
+    var beyond = isUpper ? (h1 > hBound) : (h1 < hBound);
+    if (!beyond) return { x: x1, h: h1, clipped: false };
+    var t = (hBound - h0) / (h1 - h0);
+    var xC = x0 + t * (x1 - x0);
+    return { x: xC, h: hBound, clipped: true };
+  }
+
+  function render() {
+    while (svg.firstChild) { svg.removeChild(svg.firstChild); }
+    if (!solution || !solution.feasible) { return; }
+    var sol = solution;
+
+    var curveMin = Math.min.apply(null, TBL.HL), curveMax = Math.max.apply(null, TBL.HV);
+    var span = curveMax - curveMin;
+    var capMargin = span * 1.4;
+    var pad = span * 0.08;
+    var upper = (sol.H_dR <= curveMax + capMargin) ? Math.max(curveMax + pad, sol.H_dR + pad) : (curveMax + capMargin);
+    var lower = (sol.H_dS >= curveMin - capMargin) ? Math.min(curveMin - pad, sol.H_dS - pad) : (curveMin - capMargin);
+    var sc = makeScales(lower, upper);
+
+    var css = getComputedStyle(document.documentElement);
+    var c = {};
+    ["liquid", "vapor", "tie", "rect", "strip", "ink-marker", "text-faint", "surface", "text", "border-soft"].forEach(function (n) {
+      c[n] = css.getPropertyValue("--" + n).trim();
+    });
+
+    // grid + axes
+    for (var xt = 0; xt <= 1.0001; xt += 0.1) {
+      var gx = sc.x(xt);
+      svg.appendChild(el("line", { x1: gx, x2: gx, y1: M.top, y2: M.top + plotH, class: "grid-line" }));
+      var t = el("text", { x: gx, y: M.top + plotH + 18, "text-anchor": "middle", "font-size": 16.5 });
+      t.textContent = xt.toFixed(1);
+      svg.appendChild(t);
+    }
+    var hStep = niceStep(sc.hi - sc.lo, 6);
+    var hStart = Math.ceil(sc.lo / hStep) * hStep;
+    for (var hv = hStart; hv <= sc.hi; hv += hStep) {
+      var gy = sc.h(hv);
+      svg.appendChild(el("line", { x1: M.left, x2: M.left + plotW, y1: gy, y2: gy, class: "grid-line" }));
+      var ty = el("text", { x: M.left - 10, y: gy + 4, "text-anchor": "end", "font-size": 16.5 });
+      ty.textContent = Math.round(hv);
+      svg.appendChild(ty);
+    }
+    svg.appendChild(el("line", { x1: M.left, x2: M.left + plotW, y1: M.top + plotH, y2: M.top + plotH, class: "axis-line" }));
+    svg.appendChild(el("line", { x1: M.left, x2: M.left, y1: M.top, y2: M.top + plotH, class: "axis-line" }));
+
+    var xlab = el("text", { x: M.left + plotW / 2, y: VB_H - 8, "text-anchor": "middle", class: "axis-label" });
+    xlab.textContent = "mole fraction n-hexane,  x (liquid)  /  y (vapor)";
+    svg.appendChild(xlab);
+    var ylab = el("text", { x: 16, y: M.top + plotH / 2, "text-anchor": "middle", class: "axis-label", transform: "rotate(-90 16 " + (M.top + plotH / 2) + ")" });
+    ylab.textContent = "molar enthalpy (kJ/mol)";
+    svg.appendChild(ylab);
+
+    var curveL = TBL.x.map(function (x, i) { return [x, TBL.HL[i]]; });
+    var curveV = TBL.y.map(function (y, i) { return [y, TBL.HV[i]]; });
+
+    var lensPts = curveL.map(function (p) { return [sc.x(p[0]), sc.h(p[1])]; })
+      .concat(curveV.map(function (p) { return [sc.x(p[0]), sc.h(p[1])]; }).reverse());
+    var lensD = "M" + lensPts.map(function (p) { return p[0].toFixed(1) + "," + p[1].toFixed(1); }).join(" L") + " Z";
+    svg.appendChild(el("path", { d: lensD, fill: c.liquid, opacity: 0.05, stroke: "none" }));
+
+    svg.appendChild(el("path", { d: pathFrom(curveL, sc), fill: "none", stroke: c.liquid, "stroke-width": 3, "stroke-linecap": "round" }));
+    svg.appendChild(el("path", { d: pathFrom(curveV, sc), fill: "none", stroke: c.vapor, "stroke-width": 3, "stroke-linecap": "round" }));
+
+    var lblD = el("text", { x: sc.x(state.xD) + 6, y: sc.h(HV(state.xD)) - 8, "font-size": 19.8, fill: c.vapor });
+    lblD.textContent = "D";
+    svg.appendChild(lblD);
+    var lblB = el("text", { x: sc.x(state.xB) - 6, y: sc.h(HL(state.xB)) + 16, "font-size": 19.8, "text-anchor": "end", fill: c.liquid });
+    lblB.textContent = "B";
+    svg.appendChild(lblB);
+
+    // on-graph curve identity labels (replace legend) — placed in low-traffic corners
+    var liqLabelX = 0.55;
+    var liqLabelPt = { x: sc.x(liqLabelX), h: sc.h(HL(liqLabelX)) };
+    var liqLbl = el("text", { x: liqLabelPt.x, y: liqLabelPt.h + 22, "text-anchor": "middle", "font-size": 18.63, fill: c.liquid });
+    liqLbl.textContent = "h–x, saturated liquid";
+    svg.appendChild(liqLbl);
+    var vapLabelY = 0.06;
+    var vapLabelPt = { x: sc.x(vapLabelY), h: sc.h(HV(vapLabelY)) };
+    var vapLbl = el("text", { x: vapLabelPt.x, y: vapLabelPt.h - 14, "text-anchor": "start", "font-size": 18.63, fill: c.vapor });
+    vapLbl.textContent = "H–y, saturated vapor";
+    svg.appendChild(vapLbl);
+
+    // Delta points + labels (drawn once, behind operating lines look fine on top too)
+    function drawDeltaMarker(x, h, label) {
+      var px = sc.x(x), py = sc.h(h);
+      svg.appendChild(el("circle", { cx: px, cy: py, r: 5, fill: c["ink-marker"], stroke: c.surface, "stroke-width": 1.5 }));
+      var lt = el("text", { x: px + 8, y: py + 4, "font-size": 20.7, fill: c.text });
+      lt.textContent = label;
+      svg.appendChild(lt);
+    }
+    var dRIn = sol.H_dR >= sc.lo && sol.H_dR <= sc.hi;
+    var dSIn = sol.H_dS >= sc.lo && sol.H_dS <= sc.hi;
+    if (dRIn) drawDeltaMarker(state.xD, sol.H_dR, "ΔR");
+    if (dSIn) drawDeltaMarker(state.xB, sol.H_dS, "ΔS");
+
+    function arrowHint(x, y, up) {
+      var d = up
+        ? "M" + (x - 4) + "," + (y + 6) + " L" + x + "," + y + " L" + (x + 4) + "," + (y + 6)
+        : "M" + (x - 4) + "," + (y - 6) + " L" + x + "," + y + " L" + (x + 4) + "," + (y - 6);
+      svg.appendChild(el("path", { d: d, fill: "none", stroke: c["text-faint"], "stroke-width": 1.4 }));
+    }
+
+    // stage geometry, drawn up to `revealed`
+    var stagesToShow = sol.stages.slice(0, revealed);
+    var lineLabelQueue = []; // rendered after every line so labels always sit on top
+
+    stagesToShow.forEach(function (st, idx) {
+      var Lx = sc.x(st.x), LH = sc.h(HL(st.x));
+      var Vx = sc.x(st.y), VH = sc.h(HV(st.y));
+
+      // tie line
+      svg.appendChild(el("line", { x1: Lx, x2: Vx, y1: LH, y2: VH, stroke: c.tie, "stroke-width": 1.4, "stroke-dasharray": "4,3", opacity: 0.85 }));
+      if (idx === 0) {
+        var tieLbl = el("text", { x: (Lx + Vx) / 2, y: (LH + VH) / 2 - 7, "text-anchor": "middle", "font-size": 18.22, fill: c.tie });
+        tieLbl.textContent = "tie line";
+        lineLabelQueue.push(tieLbl);
+      }
+
+      // operating line from this stage's liquid point out toward the section's Delta point
+      var isRect = st.section === "rectifying";
+      var anchorX = isRect ? state.xD : state.xB;
+      var anchorH = isRect ? sol.H_dR : sol.H_dS;
+      var opColor = isRect ? c.rect : c.strip;
+      var bound = isRect ? sc.hi : sc.lo;
+      var clip = clipToBound(st.x, HL(st.x), anchorX, anchorH, bound, isRect);
+      var cx = sc.x(clip.x), ch = sc.h(clip.h);
+      svg.appendChild(el("line", { x1: Lx, x2: cx, y1: LH, y2: ch, stroke: opColor, "stroke-width": 2 }));
+      if (clip.clipped) { arrowHint(cx, ch, isRect); }
+      var isFirstOfSection = stagesToShow.slice(0, idx).every(function (s) { return s.section !== st.section; });
+      if (isFirstOfSection) {
+        var opLbl = el("text", { x: (Lx + cx) / 2, y: (LH + ch) / 2 - 7, "text-anchor": "middle", "font-size": 18.22, fill: opColor });
+        opLbl.textContent = isRect ? "rectifying line" : "stripping line";
+        lineLabelQueue.push(opLbl);
+      }
+
+      // markers
+      svg.appendChild(el("circle", { cx: Lx, cy: LH, r: 4, fill: c.surface, stroke: c.liquid, "stroke-width": 2 }));
+      svg.appendChild(el("circle", { cx: Vx, cy: VH, r: 4, fill: c.surface, stroke: c.vapor, "stroke-width": 2 }));
+      var numTxt = el("text", { x: Lx - 8, y: LH - 6, "text-anchor": "end", "font-size": 18.9, fill: c["ink-marker"] });
+      numTxt.textContent = st.n;
+      svg.appendChild(numTxt);
+    });
+
+    // draw the tie/operating-line labels last, on top of every stage's lines, each on its own backdrop
+    lineLabelQueue.forEach(function (lbl) {
+      svg.appendChild(lbl);
+      labelBackdrop(lbl, c.surface, 4, 3);
+    });
+
+    // F marker (diamond, ink)
+    (function () {
+      var px = sc.x(state.zF), py = sc.h(sol.hf);
+      svg.appendChild(el("path", { d: "M" + px + "," + (py - 6) + " L" + (px + 6) + "," + py + " L" + px + "," + (py + 6) + " L" + (px - 6) + "," + py + " Z", fill: c.surface, stroke: c["ink-marker"], "stroke-width": 2.2 }));
+      var lt = el("text", { x: px + 9, y: py - 8, "font-size": 21.6, fill: c.text });
+      lt.textContent = "F";
+      svg.appendChild(lt);
+    })();
+  }
+
+  // ================= Table / stats / stepping =================
+  function buildStageTable(sol) {
+    var body = document.getElementById("stageTableBody");
+    body.innerHTML = "";
+    if (!sol || !sol.feasible) { return; }
+    sol.stages.forEach(function (st, idx) {
+      var tr = document.createElement("tr");
+      var isFeed = sol.feedStageIndex === st.n;
+      if (isFeed) tr.className = "feed-row";
+      else if (idx >= revealed) tr.className = "dim";
+      tr.innerHTML =
+        "<td>" + st.n + (isFeed ? " &larr; feed" : "") + "</td>" +
+        "<td class=\"num\">" + st.x.toFixed(3) + "</td>" +
+        "<td class=\"num\">" + st.y.toFixed(3) + "</td>" +
+        "<td>" + (st.section === "rectifying" ? "Rectifying" : "Stripping") + "</td>";
+      body.appendChild(tr);
+    });
+  }
+
+  function updateStats(sol) {
+    var banner = document.getElementById("infeasibleBanner");
+    if (!sol.feasible) {
+      banner.classList.add("show");
+      document.getElementById("infeasibleMsg").textContent = "Try moving the distillate and bottoms compositions further apart, or easing the feed quality back toward the middle of its range.";
+      ["statStages", "statFeed", "statR", "statQ"].forEach(function (id) { document.getElementById(id).textContent = "—"; });
+      document.getElementById("statStagesSub").innerHTML = "&nbsp;";
+      document.getElementById("statRSub").innerHTML = "&nbsp;";
+      document.getElementById("v-rmin").textContent = "—";
+      document.getElementById("v-ractual").textContent = "—";
+      document.getElementById("stageTableBody").innerHTML = "";
+      return;
+    }
+    banner.classList.remove("show");
+    var n = sol.stages.length;
+    document.getElementById("statStages").textContent = n + (sol.pinched ? "+" : "");
+    document.getElementById("statStagesSub").textContent = sol.pinched ? "column pinches — raise R/Rmin" : "incl. partial condenser + reboiler";
+    document.getElementById("statFeed").textContent = sol.feedStageIndex || "—";
+    document.getElementById("statR").textContent = sol.R.toFixed(2);
+    document.getElementById("statRSub").textContent = state.k.toFixed(2) + "× Rmin (" + sol.Rmin.toFixed(2) + ")";
+    document.getElementById("statQ").textContent = sol.QcOverD.toFixed(1) + " · " + sol.QrOverB.toFixed(1) + " kJ/mol";
+    document.getElementById("v-rmin").textContent = sol.Rmin.toFixed(3);
+    document.getElementById("v-ractual").textContent = sol.R.toFixed(3);
+    if (sol.pinched) {
+      banner.classList.add("show");
+      document.getElementById("infeasibleMsg").textContent = "The construction pinched before reaching the bottoms composition — raise the reflux multiplier.";
+    }
+  }
+
+  function recompute() {
+    readState();
+    updateReadouts();
+    solution = solveColumn(state.zF, state.xD, state.xB, state.q, state.k);
+    var total = solution.feasible ? solution.stages.length : 0;
+    document.getElementById("revealRange").max = total;
+    revealed = total;
+    document.getElementById("revealRange").value = revealed;
+    updateStats(solution);
+    buildStageTable(solution);
+    updateStepReadout();
+    render();
+  }
+
+  function updateStepReadout() {
+    var total = solution && solution.feasible ? solution.stages.length : 0;
+    document.getElementById("stepReadout").textContent = total === 0 ? "—" : ("showing " + revealed + " / " + total + " stages");
+    document.getElementById("btnBack").disabled = revealed <= 0;
+    document.getElementById("btnFwd").disabled = revealed >= total;
+  }
+
+  function setRevealed(n) {
+    var total = solution && solution.feasible ? solution.stages.length : 0;
+    revealed = Math.max(0, Math.min(total, n));
+    document.getElementById("revealRange").value = revealed;
+    buildStageTable(solution);
+    updateStepReadout();
+    render();
+  }
+
+  function stopPlay() {
+    if (playTimer) { clearInterval(playTimer); playTimer = null; document.getElementById("btnPlay").innerHTML = "▶ Play"; }
+  }
+
+  ["zF", "xD", "xB", "q", "k"].forEach(function (id) {
+    els[id].addEventListener("input", function () {
+      if (["zF", "xD", "xB"].indexOf(id) !== -1) { syncSliderRanges(); }
+      stopPlay();
+      recompute();
+    });
+  });
+
+  document.getElementById("revealRange").addEventListener("input", function (e) {
+    stopPlay();
+    setRevealed(parseInt(e.target.value, 10));
+  });
+  document.getElementById("btnBack").addEventListener("click", function () { stopPlay(); setRevealed(revealed - 1); });
+  document.getElementById("btnFwd").addEventListener("click", function () { stopPlay(); setRevealed(revealed + 1); });
+  document.getElementById("btnReset").addEventListener("click", function () { stopPlay(); setRevealed(0); });
+  document.getElementById("btnAll").addEventListener("click", function () { stopPlay(); setRevealed(solution ? solution.stages.length : 0); });
+  document.getElementById("btnPlay").addEventListener("click", function () {
+    if (playTimer) { stopPlay(); return; }
+    var total = solution && solution.feasible ? solution.stages.length : 0;
+    if (revealed >= total) { setRevealed(0); }
+    document.getElementById("btnPlay").innerHTML = "⏸ Pause";
+    playTimer = setInterval(function () {
+      var t = solution && solution.feasible ? solution.stages.length : 0;
+      if (revealed >= t) { stopPlay(); return; }
+      setRevealed(revealed + 1);
+    }, 750);
+  });
+
+  window.addEventListener("resize", render);
+  if (window.matchMedia) {
+    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", render);
+  }
+
+  // ================= Doc buttons / popovers =================
+  (function () {
+    var buttons = Array.prototype.slice.call(document.querySelectorAll(".doc-btn"));
+    function closeAll() {
+      buttons.forEach(function (b) {
+        b.classList.remove("active");
+        var p = document.getElementById("panel-" + b.getAttribute("data-panel"));
+        if (p) { p.classList.remove("open"); }
+      });
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener("click", function () {
+        var panel = document.getElementById("panel-" + b.getAttribute("data-panel"));
+        var wasOpen = panel && panel.classList.contains("open");
+        closeAll();
+        if (panel && !wasOpen) {
+          panel.classList.add("open");
+          b.classList.add("active");
+        }
+      });
+    });
+    document.querySelectorAll(".doc-popover .doc-close").forEach(function (btn) {
+      btn.addEventListener("click", closeAll);
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") { closeAll(); }
+    });
+  })();
+
+  syncSliderRanges();
+  recompute();
+})();
+</script>

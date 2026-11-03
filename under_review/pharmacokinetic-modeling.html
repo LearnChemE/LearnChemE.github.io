@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pharmacokinetic Modeling</title>
+<style>
+  :root{
+    --dark-red:#98000D;
+    --dark-red-hover:#7a000a;
+    --panel-bg:#f5f5f5;
+    --border-gray:#c9c9c9;
+  }
+  *{box-sizing:border-box;}
+  body{
+    font-family:Helvetica, Arial, sans-serif;
+    background:#ffffff;
+    color:#231f20;
+    margin:0;
+    padding:16px;
+    display:flex;
+    justify-content:center;
+  }
+  .sim-wrap{
+    max-width:780px;
+    width:100%;
+  }
+  h1.title{
+    font-family:Helvetica, Arial, sans-serif;
+    font-size:22px;
+    font-weight:bold;
+    color:#231f20;
+    margin:0 0 12px 0;
+    text-align:center;
+  }
+  .canvas-row{
+    display:flex;
+    justify-content:center;
+    margin-bottom:10px;
+  }
+  canvas#mainCanvas{
+    max-width:100%;
+  }
+  .controls{
+    border:1px solid var(--border-gray);
+    border-radius:6px;
+    padding:14px 16px;
+    background:#fbfbfb;
+  }
+  .ctrl-row{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:18px;
+    margin-bottom:12px;
+  }
+  .ctrl-row:last-child{margin-bottom:0;}
+  .setter-group{
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .setter-label{
+    font-size:16px;
+    color:#231f20;
+  }
+  .setter-label-lg{
+    font-size:15px;
+    color:#231f20;
+  }
+  .setter-buttons{
+    display:flex;
+  }
+  .setter-btn{
+    font-family:Helvetica, Arial, sans-serif;
+    font-size:13px;
+    padding:4px 12px;
+    border:1px solid var(--dark-red);
+    background:#ffffff;
+    color:var(--dark-red);
+    cursor:pointer;
+    margin:0;
+    border-right-width:0;
+  }
+  .setter-btn:last-child{border-right-width:1px;}
+  .setter-btn.active{
+    background:var(--dark-red);
+    color:#ffffff;
+  }
+  .setter-btn:hover:not(.active){
+    background:#f3d9db;
+  }
+  #compButtons .setter-btn, #adButtons .setter-btn{
+    font-size:14.3px;
+  }
+  .slider-group{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    flex:0 1 150px;
+    min-width:110px;
+  }
+  .pair-group{
+    display:flex;
+    flex-wrap:nowrap;
+    align-items:center;
+    gap:18px;
+    min-width:0;
+  }
+  .slider-label-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    font-size:17px;
+    gap:6px;
+  }
+  .slider-value{
+    font-weight:normal;
+    color:var(--dark-red);
+    min-width:34px;
+    text-align:right;
+    font-size:17px;
+  }
+  input[type=range]{
+    -webkit-appearance:none;
+    width:100%;
+    height:4px;
+    background:#d9d9d9;
+    border-radius:2px;
+    outline:none;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    width:14px;
+    height:14px;
+    border-radius:50%;
+    background:var(--dark-red);
+    cursor:pointer;
+    border:none;
+  }
+  input[type=range]::-moz-range-thumb{
+    width:14px;
+    height:14px;
+    border-radius:50%;
+    background:var(--dark-red);
+    cursor:pointer;
+    border:none;
+  }
+  .section-label{
+    font-weight:normal;
+    font-size:17px;
+    color:#231f20;
+  }
+  .hidden{display:none !important;}
+
+  .panels{
+    position:relative;
+    margin-bottom:0px;
+    text-align:center;
+    z-index:20;
+  }
+  .panel-btn{
+    font-family:Helvetica, Arial, sans-serif;
+    font-size:16px;
+    font-weight:normal;
+    padding:7px 17px;
+    border:1px solid var(--dark-red);
+    background:var(--dark-red);
+    color:#ffffff;
+    cursor:pointer;
+    margin:0 4px 2px 4px;
+    border-radius:3px;
+    position:relative;
+    z-index:40;
+  }
+  .panel-btn.active{
+    background:var(--dark-red-hover);
+    box-shadow:inset 0 0 0 2px rgba(255,255,255,0.5);
+  }
+  .panel-btn:hover:not(.active){
+    background:var(--dark-red-hover);
+  }
+  .panel-content{
+    display:none;
+    position:absolute;
+    border:1px solid var(--border-gray);
+    border-radius:4px;
+    padding:16px 40px 16px 16px;
+    background:#fbfbfb;
+    font-size:15px;
+    line-height:1.55;
+    box-shadow:0 4px 14px rgba(0,0,0,0.18);
+    z-index:30;
+    text-align:left;
+  }
+  .panel-content.open{display:block;}
+  .panel-close{
+    position:absolute;
+    top:8px;
+    right:10px;
+    width:22px;
+    height:22px;
+    line-height:20px;
+    text-align:center;
+    font-size:18px;
+    font-weight:normal;
+    color:var(--dark-red);
+    background:transparent;
+    border:none;
+    cursor:pointer;
+    padding:0;
+    border-radius:3px;
+  }
+  .panel-close:hover{
+    background:#f3d9db;
+  }
+  .panel-content sub{font-size:75%;}
+  .panel-content sup{font-size:75%;}
+  .panel-content .eq{
+    display:block;
+    margin:8px 0;
+    font-style:italic;
+    text-align:left;
+  }
+  .panel-content table.symbols{border-collapse:collapse;margin:4px 0 0 0;}
+  .panel-content table.symbols td{padding:1px 0;vertical-align:top;}
+  .panel-content table.symbols td:first-child{padding-right:14px;white-space:nowrap;}
+  .about-attribution a{color:var(--dark-red);}
+  .about-attribution{color:#444;}
+</style>
+</head>
+<body>
+<div class="sim-wrap">
+  <h1 class="title">Pharmacokinetic Modeling</h1>
+
+  <div class="panels">
+    <button class="panel-btn" data-panel="directions">Directions</button>
+    <button class="panel-btn" data-panel="details">Details</button>
+    <button class="panel-btn" data-panel="about">About</button>
+
+    <div class="panel-content" id="panel-directions">
+      <button class="panel-close" data-close="directions" aria-label="Close">&times;</button>
+      One- and two-compartment pharmacokinetic models calculate the concentration of a drug in the body as a function of time for a given dosing scheme. There are two options for administering the drug: injection into compartment 1 (e.g., inject into the blood stream with a needle) or absorption into compartment 1 from compartment 2 (e.g., drug in stomach absorbed into blood stream). Select the mass of the dose, number of doses and intervals between doses with sliders. The objective is to select a dosing scheme so that as much of the drug as possible has a concentration between the effective dose and the toxic dose (the therapeutic window). The drug can be eliminated from compartment 1 (set rate constant <i>k</i><sub>e,1</sub> with a slider) or transferred to compartment 2 (slider <i>k</i><sub>12</sub>). Similarly, in compartment 2 the drug can be eliminated (slider <i>k</i><sub>e,2</sub>) or transferred back to compartment 1 (slider <i>k</i><sub>21</sub>). Change the reaction order of the drug elimination kinetics with buttons. The areas under the curves correspond to the total exposure to the drug.
+    </div>
+
+    <div class="panel-content" id="panel-details">
+      <button class="panel-close" data-close="details" aria-label="Close">&times;</button>
+      <p>The drug is well-mixed in either compartment. The drug is either administered as a rapid dose (i.e., bolus injection) or it absorbs into compartment 1. The constants <i>k</i><sub>12</sub> and <i>k</i><sub>21</sub> represent the rate transfer coefficients from compartment 1 to compartment 2 and vice versa, assuming a first-order transfer between them. Each compartment has its own elimination rate <i>k</i><sub>e,1</sub> and <i>k</i><sub>e,2</sub>. The absorption coefficient <i>k</i><sub>a</sub> determines the rate at which the drug absorbs into compartment 1, and it assumes first-order absorption in the amount of the dose. The concentrations and time are intentionally left unit-less, but the system is dimensionally consistent. The drug elimination reaction order is <i>ro</i>.</p>
+      <p>When the dose absorbs into compartment 1, then the amount changes with time:</p>
+      <span class="eq">d(dose)/dt&nbsp;=&nbsp;&minus;<i>k</i><sub>a</sub>&nbsp;(dose)</span>
+      <p>If there is no absorption and the dose is directly injected, then the dose amount is distributed within compartment 1 at the injection time. The first dose is at time zero, and the same mass is then injected for each subsequent dose.</p>
+      <p><b>Compartment 1:</b></p>
+      <span class="eq">dC<sub>1</sub>/dt&nbsp;=&nbsp;<i>k</i><sub>a</sub>(dose/V)&nbsp;&minus;&nbsp;<i>k</i><sub>12</sub>C<sub>1</sub>&nbsp;+&nbsp;<i>k</i><sub>21</sub>C<sub>2</sub>&nbsp;&minus;&nbsp;<i>k</i><sub>e,1</sub>C<sub>1</sub><sup>ro</sup></span>
+      <p>where C<sub>1</sub> is the drug concentration in compartment 1, C<sub>2</sub> is the drug concentration in compartment 2, and V is the volume of compartments 1 and 2.</p>
+      <p>Initial condition for compartment 1: C<sub>1</sub> = 0 when absorption occurs; C<sub>1</sub> = (mass of dose)/V when absorption does not occur.</p>
+      <p><b>Compartment 2:</b></p>
+      <span class="eq">dC<sub>2</sub>/dt&nbsp;=&nbsp;<i>k</i><sub>12</sub>C<sub>1</sub>&nbsp;&minus;&nbsp;<i>k</i><sub>21</sub>C<sub>2</sub>&nbsp;&minus;&nbsp;<i>k</i><sub>e,2</sub>C<sub>2</sub><sup>ro</sup></span>
+      <p>with initial condition C<sub>2</sub> = 0.</p>
+      <p><b>Symbols:</b></p>
+      <table class="symbols">
+        <tr><td>C<sub>1</sub></td><td>drug concentration in compartment 1</td></tr>
+        <tr><td>C<sub>2</sub></td><td>drug concentration in compartment 2</td></tr>
+        <tr><td>dose</td><td>amount of drug not yet absorbed into compartment 1</td></tr>
+        <tr><td><i>k</i><sub>a</sub></td><td>absorption rate coefficient</td></tr>
+        <tr><td><i>k</i><sub>e,1</sub></td><td>elimination rate constant in compartment 1</td></tr>
+        <tr><td><i>k</i><sub>e,2</sub></td><td>elimination rate constant in compartment 2</td></tr>
+        <tr><td><i>k</i><sub>12</sub></td><td>transfer rate coefficient from compartment 1 to compartment 2</td></tr>
+        <tr><td><i>k</i><sub>21</sub></td><td>transfer rate coefficient from compartment 2 to compartment 1</td></tr>
+        <tr><td><i>ro</i></td><td>reaction order of drug elimination</td></tr>
+        <tr><td><i>t</i></td><td>time</td></tr>
+        <tr><td>V</td><td>volume of each compartment</td></tr>
+      </table>
+    </div>
+
+    <div class="panel-content about-attribution" id="panel-about">
+      <button class="panel-close" data-close="about" aria-label="Close">&times;</button>
+      This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/PharmacokineticModeling/" target="_blank" rel="noopener">Mathematica simulation</a> by Nicholas R. Larson. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988) in collaboration with Washington State University. Address any questions or comments to LearnChemE@gmail.com.
+    </div>
+  </div>
+
+  <div class="canvas-row">
+    <canvas id="mainCanvas"></canvas>
+  </div>
+
+  <div class="controls">
+    <div class="ctrl-row">
+      <div class="setter-group">
+        <span class="setter-label-lg">number of compartments</span>
+        <div class="setter-buttons" id="compButtons">
+          <button class="setter-btn" data-val="1">one</button>
+          <button class="setter-btn active" data-val="2">two</button>
+        </div>
+      </div>
+      <div class="setter-group">
+        <span class="setter-label-lg">dosing method</span>
+        <div class="setter-buttons" id="adButtons">
+          <button class="setter-btn active" data-val="1">injection</button>
+          <button class="setter-btn" data-val="2">absorption</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="ctrl-row">
+      <div class="slider-group">
+        <div class="slider-label-row"><span>dose mass</span><span class="slider-value" id="DinVal">1.50</span></div>
+        <input type="range" id="Din" min="0.05" max="2" step="0.05" value="1.5">
+      </div>
+      <div class="slider-group" style="flex-basis:190px; min-width:170px;">
+        <div class="slider-label-row"><span>number of doses</span><span class="slider-value" id="nVal">5</span></div>
+        <input type="range" id="n" min="1" max="8" step="1" value="5">
+      </div>
+      <div class="slider-group">
+        <div class="slider-label-row"><span>dose interval</span><span class="slider-value" id="roiVal">1.4</span></div>
+        <input type="range" id="roi" min="0.2" max="4" step="0.1" value="1.4">
+      </div>
+    </div>
+
+    <div class="ctrl-row" id="kaoRow">
+      <div class="slider-group">
+        <div class="slider-label-row"><span>absorption coefficient <i>k</i><sub>a</sub></span><span class="slider-value" id="kaoVal">2.0</span></div>
+        <input type="range" id="kao" min="0" max="4" step="0.1" value="2">
+      </div>
+    </div>
+
+    <div class="ctrl-row">
+      <span class="section-label">elimination rate constants:</span>
+      <div class="pair-group">
+        <div class="slider-group">
+          <div class="slider-label-row"><span><i>k</i><sub>e,1</sub></span><span class="slider-value" id="ke1Val">1.0</span></div>
+          <input type="range" id="ke1" min="0" max="4" step="0.1" value="1">
+        </div>
+        <div class="slider-group" id="ke2Row">
+          <div class="slider-label-row"><span><i>k</i><sub>e,2</sub></span><span class="slider-value" id="ke2oVal">1.0</span></div>
+          <input type="range" id="ke2o" min="0" max="4" step="0.1" value="1">
+        </div>
+      </div>
+      <div class="setter-group">
+        <span class="setter-label">elimination order</span>
+        <div class="setter-buttons" id="roButtons">
+          <button class="setter-btn" data-val="0">0<sup>th</sup></button>
+          <button class="setter-btn active" data-val="1">1<sup>st</sup></button>
+          <button class="setter-btn" data-val="2">2<sup>nd</sup></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="ctrl-row" id="transferRow">
+      <span class="section-label">rate constants for transfer between compartments:</span>
+      <div class="pair-group">
+        <div class="slider-group">
+          <div class="slider-label-row"><span><i>k</i><sub>12</sub></span><span class="slider-value" id="k12oVal">1.0</span></div>
+          <input type="range" id="k12o" min="0" max="4" step="0.1" value="1">
+        </div>
+        <div class="slider-group">
+          <div class="slider-label-row"><span><i>k</i><sub>21</sub></span><span class="slider-value" id="k21oVal">1.0</span></div>
+          <input type="range" id="k21o" min="0" max="4" step="0.1" value="1">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- state ----------
+  const state = {
+    comp: 2,
+    ad: 1,
+    Din: 1.5,
+    n: 5,
+    roi: 1.4,
+    kao: 2,
+    ke1: 1,
+    ke2o: 1,
+    ro: 1,
+    k12o: 1,
+    k21o: 1
+  };
+
+  // ---------- DOM refs ----------
+  const canvas = document.getElementById('mainCanvas');
+  const ctx = canvas.getContext('2d');
+
+  const sliders = {
+    Din: document.getElementById('Din'),
+    n: document.getElementById('n'),
+    roi: document.getElementById('roi'),
+    kao: document.getElementById('kao'),
+    ke1: document.getElementById('ke1'),
+    ke2o: document.getElementById('ke2o'),
+    k12o: document.getElementById('k12o'),
+    k21o: document.getElementById('k21o')
+  };
+  const valLabels = {
+    Din: document.getElementById('DinVal'),
+    n: document.getElementById('nVal'),
+    roi: document.getElementById('roiVal'),
+    kao: document.getElementById('kaoVal'),
+    ke1: document.getElementById('ke1Val'),
+    ke2o: document.getElementById('ke2oVal'),
+    k12o: document.getElementById('k12oVal'),
+    k21o: document.getElementById('k21oVal')
+  };
+  const decimals = { Din:2, n:0, roi:1, kao:1, ke1:1, ke2o:1, k12o:1, k21o:1 };
+
+  const kaoRow = document.getElementById('kaoRow');
+  const ke2Row = document.getElementById('ke2Row');
+  const transferRow = document.getElementById('transferRow');
+
+  function updateValueLabel(key){
+    valLabels[key].textContent = Number(sliders[key].value).toFixed(decimals[key]);
+  }
+
+  Object.keys(sliders).forEach(key=>{
+    sliders[key].addEventListener('input', ()=>{
+      state[key] = Number(sliders[key].value);
+      updateValueLabel(key);
+      draw();
+    });
+    updateValueLabel(key);
+  });
+
+  function setupSetter(containerId, stateKey, onChange){
+    const container = document.getElementById(containerId);
+    const btns = container.querySelectorAll('.setter-btn');
+    btns.forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        btns.forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        state[stateKey] = Number(btn.dataset.val);
+        if(onChange) onChange();
+        draw();
+      });
+    });
+  }
+
+  setupSetter('compButtons', 'comp', updateVisibility);
+  setupSetter('adButtons', 'ad', updateVisibility);
+  setupSetter('roButtons', 'ro');
+
+  function updateVisibility(){
+    kaoRow.classList.toggle('hidden', state.ad !== 2);
+    ke2Row.classList.toggle('hidden', state.comp !== 2);
+    transferRow.classList.toggle('hidden', state.comp !== 2);
+  }
+  updateVisibility();
+
+  // ---------- panels ----------
+  const panelsContainer = document.querySelector('.panels');
+
+  function positionPanel(btn, content){
+    const containerW = panelsContainer.offsetWidth;
+    const top = panelsContainer.offsetHeight + 6;
+    content.style.left = '0px';
+    content.style.right = 'auto';
+    content.style.top = top + 'px';
+    content.style.width = containerW + 'px';
+  }
+
+  function repositionOpenPanel(){
+    const openBtn = document.querySelector('.panel-btn.active');
+    if(!openBtn) return;
+    const content = document.getElementById('panel-'+openBtn.dataset.panel);
+    positionPanel(openBtn, content);
+  }
+
+  function closeAllPanels(){
+    document.querySelectorAll('.panel-content').forEach(p=>p.classList.remove('open'));
+    document.querySelectorAll('.panel-btn').forEach(b=>b.classList.remove('active'));
+  }
+
+  document.querySelectorAll('.panel-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const name = btn.dataset.panel;
+      const content = document.getElementById('panel-'+name);
+      const isOpen = content.classList.contains('open');
+      closeAllPanels();
+      if(!isOpen){
+        positionPanel(btn, content);
+        content.classList.add('open');
+        btn.classList.add('active');
+      }
+    });
+  });
+  document.querySelectorAll('.panel-close').forEach(btn=>{
+    btn.addEventListener('click', closeAllPanels);
+  });
+  window.addEventListener('resize', repositionOpenPanel);
+
+  // ---------- physics ----------
+  function deriv(y, ka, k12, k21, ke1, ke2, ro){
+    const d = y[0], C1 = y[1], C2 = y[2];
+    const dd = -ka*d;
+    const dC1 = ka*d - k12*C1 - ke1*Math.pow(C1, ro) + k21*C2;
+    const dC2 = k12*C1 - k21*C2 - ke2*Math.pow(C2, ro);
+    return [dd, dC1, dC2];
+  }
+  function rk4step(y, h, p){
+    const k1 = deriv(y, p[0],p[1],p[2],p[3],p[4],p[5]);
+    const y2 = [y[0]+h/2*k1[0], y[1]+h/2*k1[1], y[2]+h/2*k1[2]];
+    const k2 = deriv(y2, p[0],p[1],p[2],p[3],p[4],p[5]);
+    const y3 = [y[0]+h/2*k2[0], y[1]+h/2*k2[1], y[2]+h/2*k2[2]];
+    const k3 = deriv(y3, p[0],p[1],p[2],p[3],p[4],p[5]);
+    const y4 = [y[0]+h*k3[0], y[1]+h*k3[1], y[2]+h*k3[2]];
+    const k4 = deriv(y4, p[0],p[1],p[2],p[3],p[4],p[5]);
+    return [
+      y[0] + h/6*(k1[0]+2*k2[0]+2*k3[0]+k4[0]),
+      y[1] + h/6*(k1[1]+2*k2[1]+2*k3[1]+k4[1]),
+      y[2] + h/6*(k1[2]+2*k2[2]+2*k3[2]+k4[2])
+    ];
+  }
+
+  function simulate(){
+    const V1 = 1;
+    let ka, C1_0, r;
+    if(state.ad === 1){ ka = 0; C1_0 = state.Din/V1; r = 0; }
+    else { ka = state.kao; C1_0 = 0; r = state.Din; }
+
+    let k12, k21, ke2;
+    if(state.comp === 1){ k12 = 0; k21 = 0; ke2 = 0; }
+    else { k12 = state.k12o; k21 = state.k21o; ke2 = state.ke2o; }
+
+    const ke1 = state.ke1, ro = state.ro;
+
+    const T = 10;
+    const doseTimes = [];
+    for(let i=0;i<state.n;i++){
+      const t = i*state.roi;
+      if(t < T) doseTimes.push(t); else break;
+    }
+
+    const dt = 0.0025;
+    const times = [], C1arr = [], C2arr = [];
+    let y = [0,0,0];
+    let t = 0;
+    let doseIdx = 0;
+    const params = [ka,k12,k21,ke1,ke2,ro];
+
+    function applyDose(){
+      while(doseIdx < doseTimes.length && Math.abs(doseTimes[doseIdx]-t) < 1e-9){
+        y[0] += r;
+        y[1] += C1_0;
+        doseIdx++;
+      }
+    }
+    applyDose();
+    times.push(t); C1arr.push(y[1]); C2arr.push(y[2]);
+
+    while(t < T - 1e-9){
+      let step = dt;
+      if(doseIdx < doseTimes.length){
+        const nd = doseTimes[doseIdx];
+        if(nd > t && nd < t+step) step = nd - t;
+      }
+      y = rk4step(y, step, params);
+      t += step;
+      applyDose();
+      times.push(t); C1arr.push(y[1]); C2arr.push(y[2]);
+    }
+    return {times, C1arr, C2arr};
+  }
+
+  // ---------- rendering ----------
+  const PLOT_W = 480, PLOT_H = 300;
+  const DIAG_W = 175, DIAG_H = 330;
+  const MARGIN_L = 76, MARGIN_R = 18, MARGIN_T = 36, MARGIN_B = 62;
+  const SPACER = 14;
+
+  const CANVAS_W = MARGIN_L + PLOT_W + MARGIN_R + SPACER + DIAG_W;
+  const CANVAS_H = Math.max(MARGIN_T + PLOT_H + MARGIN_B, DIAG_H + 20);
+
+  function setupCanvasDPI(){
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = CANVAS_W * dpr;
+    canvas.height = CANVAS_H * dpr;
+    canvas.style.width = CANVAS_W + 'px';
+    canvas.style.height = CANVAS_H + 'px';
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  setupCanvasDPI();
+  window.addEventListener('resize', ()=>{ setupCanvasDPI(); draw(); });
+
+  const X0 = 0, X1 = 10, Y0 = 0, Y1 = 3;
+  function px(t){ return MARGIN_L + (t - X0)/(X1-X0) * PLOT_W; }
+  function py(c){ return MARGIN_T + (1 - (c - Y0)/(Y1-Y0)) * PLOT_H; }
+
+  function withHalo(fn){
+    ctx.save();
+    ctx.lineJoin = 'round';
+    ctx.miterLimit = 2;
+    ctx.strokeStyle = 'rgba(255,255,255,0.92)';
+    ctx.lineWidth = 3;
+    fn('stroke');
+    ctx.restore();
+    fn('fill');
+  }
+
+  function drawText(text, x, y, opts){
+    opts = opts || {};
+    const font = opts.font || '13px Helvetica, Arial, sans-serif';
+    const color = opts.color || '#231f20';
+    const align = opts.align || 'left';
+    const baseline = opts.baseline || 'alphabetic';
+    ctx.font = font;
+    ctx.textAlign = align;
+    ctx.textBaseline = baseline;
+    if(opts.halo === false){
+      ctx.fillStyle = color;
+      ctx.fillText(text, x, y);
+      return;
+    }
+    withHalo((mode)=>{
+      if(mode === 'stroke'){ ctx.strokeText(text, x, y); }
+      else { ctx.fillStyle = color; ctx.fillText(text, x, y); }
+    });
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,CANVAS_W,CANVAS_H);
+    drawPlot();
+    drawDiagram();
+  }
+
+  function drawPlot(){
+    ctx.save();
+
+    // frame
+    ctx.strokeStyle = '#231f20';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(MARGIN_L, MARGIN_T, PLOT_W, PLOT_H);
+
+    // ticks/labels x: 0,2,4,6,8,10
+    ctx.font = '16px Helvetica, Arial, sans-serif';
+    ctx.fillStyle = '#231f20';
+    ctx.strokeStyle = '#231f20';
+    for(let t=0; t<=10; t+=2){
+      const x = px(t);
+      ctx.beginPath();
+      ctx.moveTo(x, MARGIN_T+PLOT_H);
+      ctx.lineTo(x, MARGIN_T+PLOT_H+5);
+      ctx.stroke();
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      ctx.fillText(t.toString(), x, MARGIN_T+PLOT_H+8);
+    }
+    // ticks/labels y: 0,1,2,3
+    for(let c=0;c<=3;c+=1){
+      const y = py(c);
+      ctx.beginPath();
+      ctx.moveTo(MARGIN_L-5, y);
+      ctx.lineTo(MARGIN_L, y);
+      ctx.stroke();
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(c.toString(), MARGIN_L-8, y);
+    }
+    // axis titles
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'alphabetic';
+    ctx.font = '18px Helvetica, Arial, sans-serif';
+    ctx.fillText('time', MARGIN_L + PLOT_W/2, MARGIN_T+PLOT_H+44);
+    ctx.save();
+    ctx.translate(46, MARGIN_T + PLOT_H/2);
+    ctx.rotate(-Math.PI/2);
+    ctx.fillText('concentration (mol/L)', 0, 0);
+    ctx.restore();
+
+    // clip to plot interior for curves/reference lines
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(MARGIN_L, MARGIN_T, PLOT_W, PLOT_H);
+    ctx.clip();
+
+    // reference lines: effective dose (y=1, green dashed), toxic dose (y=2, purple dashed)
+    ctx.setLineDash([7,5]);
+    ctx.lineWidth = 1.6;
+    ctx.strokeStyle = 'rgb(0,204,51)';
+    ctx.beginPath(); ctx.moveTo(MARGIN_L, py(1)); ctx.lineTo(MARGIN_L+PLOT_W, py(1)); ctx.stroke();
+    ctx.strokeStyle = 'rgb(128,0,128)';
+    ctx.beginPath(); ctx.moveTo(MARGIN_L, py(2)); ctx.lineTo(MARGIN_L+PLOT_W, py(2)); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // simulate
+    const {times, C1arr, C2arr} = simulate();
+    function clip(v){ return Math.max(Y0, Math.min(Y1, v)); }
+
+    // compartment 1 curve (orange)
+    ctx.lineWidth = 2.6;
+    ctx.strokeStyle = 'rgb(230,126,34)';
+    ctx.beginPath();
+    for(let i=0;i<times.length;i++){
+      const x = px(times[i]), y = py(clip(C1arr[i]));
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+
+    // compartment 2 curve (blue) if two compartments
+    if(state.comp === 2){
+      ctx.strokeStyle = 'rgb(30,90,200)';
+      ctx.beginPath();
+      for(let i=0;i<times.length;i++){
+        const x = px(times[i]), y = py(clip(C2arr[i]));
+        if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      }
+      ctx.stroke();
+    }
+    ctx.restore(); // remove clip
+
+    // curve labels placed at each curve's peak (used instead of a legend)
+    function findLabelSpot(arr){
+      const loT = Math.floor(times.length*0.04), hiT = Math.floor(times.length*0.62);
+      let bestI = loT, bestV = -Infinity;
+      for(let i=loT;i<hiT;i++){
+        if(arr[i] > bestV){ bestV = arr[i]; bestI = i; }
+      }
+      return bestI;
+    }
+    const c1Idx = findLabelSpot(C1arr);
+    drawText('compartment 1', px(times[c1Idx]), py(clip(C1arr[c1Idx])) - 14, {color:'rgb(200,100,20)', font:'bold 16px Helvetica, Arial, sans-serif', align:'center', baseline:'alphabetic'});
+    if(state.comp === 2){
+      const c2Idx = findLabelSpot(C2arr);
+      drawText('compartment 2', px(times[c2Idx]), py(clip(C2arr[c2Idx])) - 14, {color:'rgb(20,70,170)', font:'bold 16px Helvetica, Arial, sans-serif', align:'center', baseline:'alphabetic'});
+    }
+
+    // annotation labels (kept clear of the right edge where curve labels sit)
+    drawText('toxic dose', px(1.9), py(2)-10, {color:'rgb(128,0,128)', font:'17.6px Helvetica, Arial, sans-serif', align:'center'});
+    drawText('effective dose', px(2.15), py(1)-10, {color:'rgb(0,150,40)', font:'17.6px Helvetica, Arial, sans-serif', align:'center'});
+
+    // rotated "therapeutic window" text (two lines) between the dashed lines near right edge
+    ctx.save();
+    const twx = px(9.5), twy = py(1.5);
+    ctx.translate(twx, twy);
+    ctx.rotate(-Math.PI/2);
+    drawText('therapeutic', 0, -10, {font:'16px Helvetica, Arial, sans-serif', align:'center', baseline:'middle'});
+    drawText('window', 0, 10, {font:'16px Helvetica, Arial, sans-serif', align:'center', baseline:'middle'});
+    ctx.restore();
+
+    ctx.restore();
+  }
+
+  function drawDiagram(){
+    const dx0 = MARGIN_L + PLOT_W + MARGIN_R + SPACER;
+    const dy0 = 10;
+
+    // local coordinate system: x in [0,2] -> width DIAG_W ; y in [-0.5,3] -> height DIAG_H (y flipped, 0 at bottom of box)
+    const XR0 = 0, XR1 = 2;
+    const YR0 = -0.7, YR1 = 3.3;
+    function qx(x){ return dx0 + (x - XR0)/(XR1-XR0) * DIAG_W; }
+    function qy(y){ return dy0 + (1 - (y - YR0)/(YR1-YR0)) * DIAG_H; }
+
+    ctx.save();
+
+    // outer box representing compartment(s): from (0,0) to (1,3)
+    ctx.strokeStyle = '#231f20';
+    ctx.lineWidth = 1.6;
+    ctx.strokeRect(qx(0), qy(3), qx(1)-qx(0), qy(0)-qy(3));
+
+    // dose arrow into bottom of box
+    drawArrow(qx(0.5), qy(-0.5), qx(0.5), qy(0), '#231f20');
+    drawText('dose', qx(0.5), qy(-0.55), {align:'center', baseline:'top', font:'20px Helvetica, Arial, sans-serif'});
+
+    if(state.comp === 1){
+      drawText('1', qx(0.5), qy(1.5), {color:'rgb(230,126,34)', font:'bold 26px Helvetica, Arial, sans-serif', align:'center', baseline:'middle'});
+      if(state.ke1 !== 0){
+        drawArrow(qx(1), qy(1.5), qx(1.85), qy(1.5), '#231f20');
+        drawText('k', qx(1.12), qy(1.5)-14, {align:'left', baseline:'alphabetic', font:'italic 21px Helvetica, Arial, sans-serif'});
+        drawText('e,1', qx(1.12)+13, qy(1.5)-8, {align:'left', baseline:'alphabetic', font:'15px Helvetica, Arial, sans-serif'});
+      }
+    } else {
+      // dividing line
+      ctx.beginPath();
+      ctx.moveTo(qx(0), qy(1.5));
+      ctx.lineTo(qx(1), qy(1.5));
+      ctx.stroke();
+
+      // elimination arrows
+      if(state.ke1 !== 0){
+        drawArrow(qx(1), qy(0.75), qx(1.85), qy(0.75), '#231f20');
+        drawText('k', qx(1.12), qy(0.75)-14, {align:'left', font:'italic 21px Helvetica, Arial, sans-serif'});
+        drawText('e,1', qx(1.12)+13, qy(0.75)-8, {align:'left', font:'15px Helvetica, Arial, sans-serif'});
+      }
+      if(state.ke2o !== 0){
+        drawArrow(qx(1), qy(2.25), qx(1.85), qy(2.25), '#231f20');
+        drawText('k', qx(1.12), qy(2.25)-14, {align:'left', font:'italic 21px Helvetica, Arial, sans-serif'});
+        drawText('e,2', qx(1.12)+13, qy(2.25)-8, {align:'left', font:'15px Helvetica, Arial, sans-serif'});
+      }
+      // transfer arrows -- labels sit at the end of the line opposite the arrowhead,
+      // positioned clear of the line with proper subscripts attached to k
+      if(state.k12o !== 0){
+        drawArrow(qx(0.25), qy(1), qx(0.25), qy(2), '#231f20');
+        const k12x = qx(0.25) - 36, k12y = qy(1) + 6;
+        drawText('k', k12x, k12y, {align:'left', baseline:'alphabetic', font:'italic 21px Helvetica, Arial, sans-serif'});
+        drawText('12', k12x+13, k12y+6, {align:'left', baseline:'alphabetic', font:'15px Helvetica, Arial, sans-serif'});
+      }
+      if(state.k21o !== 0){
+        drawArrow(qx(0.75), qy(2), qx(0.75), qy(1), '#231f20');
+        const k21x = qx(0.75) + 8, k21y = qy(2) - 6;
+        drawText('k', k21x, k21y, {align:'left', baseline:'alphabetic', font:'italic 21px Helvetica, Arial, sans-serif'});
+        drawText('21', k21x+13, k21y+6, {align:'left', baseline:'alphabetic', font:'15px Helvetica, Arial, sans-serif'});
+      }
+
+      drawText('1', qx(0.5), qy(0.5), {color:'rgb(230,126,34)', font:'bold 26px Helvetica, Arial, sans-serif', align:'center', baseline:'middle'});
+      drawText('2', qx(0.5), qy(2.5), {color:'rgb(30,90,200)', font:'bold 26px Helvetica, Arial, sans-serif', align:'center', baseline:'middle'});
+    }
+
+    ctx.restore();
+  }
+
+  function drawArrow(x1,y1,x2,y2,color){
+    ctx.save();
+    ctx.strokeStyle = color;
+    ctx.fillStyle = color;
+    ctx.lineWidth = 2.1;
+    ctx.beginPath();
+    ctx.moveTo(x1,y1);
+    ctx.lineTo(x2,y2);
+    ctx.stroke();
+    const ang = Math.atan2(y2-y1, x2-x1);
+    const headLen = 10.4;
+    ctx.beginPath();
+    ctx.moveTo(x2,y2);
+    ctx.lineTo(x2 - headLen*Math.cos(ang-Math.PI/7), y2 - headLen*Math.sin(ang-Math.PI/7));
+    ctx.lineTo(x2 - headLen*Math.cos(ang+Math.PI/7), y2 - headLen*Math.sin(ang+Math.PI/7));
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  draw();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Combined Free and Forced Convection</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+  chtml: { displayAlign: 'left', displayIndent: '0' },
+  startup: { typeset: false }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-chtml.min.js" id="MathJax-script" async></script>
+<style>
+  html, body {
+    margin: 0; padding: 0;
+    font-family: Helvetica, Arial, sans-serif;
+    color: #000; background: #fff;
+  }
+  #app {
+    position: relative;
+    width: 640px;
+    margin: 12px auto;
+    padding: 8px 12px 14px 12px;
+    box-sizing: border-box;
+  }
+  #title {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 2px 0 10px 0;
+  }
+  /* ---- top button row ---- */
+  #topRow {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .setter {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    padding: 5px 12px;
+    border: 1px solid #7a7a7a;
+    background: #f0f0f0;
+    color: #000;
+    cursor: pointer;
+    border-radius: 3px;
+  }
+  .setter.active {
+    background: #98000D;
+    color: #fff;
+    border-color: #98000D;
+  }
+  .infoBtn {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    padding: 5px 12px;
+    border: none;
+    background: #98000D;
+    color: #fff;
+    cursor: pointer;
+    border-radius: 3px;
+  }
+  .infoBtn:hover { background: #b3101c; }
+  #spacer { flex: 1 1 auto; }
+  /* ---- sliders ---- */
+  #controls { margin-bottom: 8px; }
+  .ctrlRow { display: flex; gap: 16px; margin: 4px 0; flex-wrap: nowrap; }
+  .ctrl {
+    display: flex; align-items: center;
+    font-size: 15px;
+  }
+  .ctrl label {
+    display: inline-block;
+    width: 150px;
+    text-align: right;
+    margin-right: 8px;
+  }
+  input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+  input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  .ctrl input[type=range] { width: 100px; vertical-align: middle; margin-top: 0; margin-bottom: 0; }
+  .ctrl .val {
+    display: inline-block;
+    width: 30px;
+    text-align: left;
+    margin-left: 8px;
+    font-variant-numeric: tabular-nums;
+  }
+  /* ---- canvas ---- */
+  #plotWrap { border: 0; }
+  canvas { display: block; }
+  /* ---- info panels ---- */
+  .panel {
+    position: absolute;
+    top: 92px;
+    left: 12px;
+    width: 600px;
+    max-height: 430px;
+    overflow-y: auto;
+    background: #fff;
+    border: 1px solid #999;
+    box-shadow: 0 3px 14px rgba(0,0,0,0.28);
+    padding: 10px 18px 16px 18px;
+    box-sizing: border-box;
+    z-index: 20;
+    display: none;
+    font-size: 15px;
+    line-height: 1.45;
+  }
+  .panel h2 {
+    margin: 0 0 2px 0;
+    font-size: 17px;
+    color: #98000D;
+  }
+  .panel p { margin: 6px 0; }
+  .panel h2 + p { margin-top: 0; }
+  .panel .close {
+    position: absolute;
+    top: 6px; right: 10px;
+    border: none; background: none;
+    font-size: 20px; line-height: 1;
+    cursor: pointer; color: #444;
+  }
+  .panel a { color: #98000D; }
+  .eq { margin: 6px 0 6px 0; }
+  .panel mjx-container[display="true"] {
+    text-align: left !important;
+    margin: 6px 0 !important;
+    margin-left: 0 !important;
+  }
+  .symbols { border-collapse: collapse; margin: 2px 0 6px 0; }
+  .symbols td { padding: 1px 10px 1px 0; vertical-align: top; }
+  .symbols td:first-child { width: 48px; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="title">Combined Free and Forced Convection</div>
+
+  <div id="topRow">
+    <button class="setter" id="setPlate" data-w="1">plate diagram</button>
+    <button class="setter active" id="setGraph" data-w="2">Gr and Re versus velocity</button>
+    <button class="infoBtn" data-panel="directions">Directions</button>
+    <button class="infoBtn" data-panel="details">Details</button>
+    <button class="infoBtn" data-panel="about">About</button>
+  </div>
+
+  <div id="controls">
+    <div class="ctrlRow">
+      <div class="ctrl">
+        <label for="sL">length of plate (m)</label>
+        <input type="range" id="sL" min="5" max="10" step="1" value="5">
+        <span class="val" id="vL">5</span>
+      </div>
+      <div class="ctrl">
+        <label for="sV">velocity (m/s)</label>
+        <input type="range" id="sV" min="0" max="20" step="1" value="5">
+        <span class="val" id="vV">5</span>
+      </div>
+    </div>
+    <div class="ctrlRow">
+      <div class="ctrl">
+        <label for="sT">fluid temperature (K)</label>
+        <input type="range" id="sT" min="100" max="600" step="20" value="260">
+        <span class="val" id="vT">260</span>
+      </div>
+      <div class="ctrl">
+        <label for="sTs">plate temperature (K)</label>
+        <input type="range" id="sTs" min="100" max="600" step="20" value="430">
+        <span class="val" id="vTs">430</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="plotWrap">
+    <canvas id="cv" width="600" height="380"></canvas>
+  </div>
+
+  <!-- ===== Directions ===== -->
+  <div class="panel" id="directions">
+    <button class="close" data-close>&times;</button>
+    <h2>Directions</h2>
+    <p>The Grashof number \(\mathrm{Gr}\) and the square of the Reynolds number
+    \(\mathrm{Re}\) are plotted as functions of the velocity of air as it passes over a
+    flat plate. The yellow area represents the region where \(\mathrm{Re}^2/\mathrm{Gr} &lt; 0.2\)
+    and free convection dominates heat transfer. The blue area represents the region where
+    \(\mathrm{Re}^2/\mathrm{Gr} &gt; 5\) and forced convection dominates heat transfer. The
+    dashed purple line represents the air velocity (select with slider), and the Nusselt
+    number \(\mathrm{Nu}\) is displayed above the plot for that velocity. The plate diagram
+    is a representation of the system. You can vary the plate temperature, fluid temperature
+    and plate length with sliders.</p>
+  </div>
+
+  <!-- ===== Details ===== -->
+  <div class="panel" id="details">
+    <button class="close" data-close>&times;</button>
+    <h2>Details</h2>
+    <p>This simulation shows parameters that lead to combined forced and free convection
+    over a flat plate. The conventional range where free and forced convection are combined
+    is \(0.2 &lt; \mathrm{Re}^2/\mathrm{Gr} &lt; 5\). A combined equation was used to calculate
+    the Nusselt number \(\mathrm{Nu}\) for all velocities:</p>
+
+    <div class="eq">\[ \mathrm{Nu}^{1/4} = \mathrm{Nu}_{N}^{\,1/4} + \mathrm{Nu}_{F}^{\,1/4}, \]</div>
+    <div class="eq">\[ \mathrm{Nu}_{F} = \left(0.037\,\mathrm{Re}^{4/5} - A\right)\mathrm{Pr}^{1/3}, \]</div>
+    <div class="eq">\[ \mathrm{Nu}_{N} = \left(0.825 + \frac{0.387\,\mathrm{Ra}^{1/6}}
+        {\left(1 + \left(0.492\,\mathrm{Pr}^{-9/16}\right)^{8/27}\right)}\right)^{2}, \]</div>
+
+    <p>where the subscripts \(F\) and \(N\) refer to forced and natural convection, and \(A\)
+    is a constant determined by the critical Reynolds number.</p>
+
+    <p>The Reynolds number is:</p>
+    <div class="eq">\[ \mathrm{Re} = \frac{u\,L}{v}, \]</div>
+    <p>where \(u\) is the velocity of air, \(L\) is plate length and \(v\) is kinematic
+    viscosity of air.</p>
+
+    <p>The Grashof \(\mathrm{Gr}\) and Rayleigh \(\mathrm{Ra}\) numbers are:</p>
+    <div class="eq">\[ \mathrm{Gr} = g\,\beta\,\lvert T_{S} - T\rvert\,\frac{L^{3}}{v^{2}}, \]</div>
+    <div class="eq">\[ \mathrm{Ra} = \mathrm{Gr}\,\mathrm{Pr}, \]</div>
+    <p>where \(g\) is acceleration due to gravity, \(\beta\) is the thermal expansion
+    coefficient (approximated as \(1/T\)), \(T\) is the air temperature, \(T_{S}\) is plate
+    temperature and \(\mathrm{Pr}\) is the Prandtl number (\(v\) and \(\mathrm{Pr}\) are
+    approximated by fitting an equation to a range of known values of \(v\) and \(\mathrm{Pr}\)
+    at corresponding temperatures for air).</p>
+
+    <p style="margin-top:12px"><b>Symbols</b></p>
+    <table class="symbols">
+      <tr><td>\(A\)</td><td>constant determined by the critical Reynolds number</td></tr>
+      <tr><td>\(g\)</td><td>acceleration due to gravity (m/s\(^2\))</td></tr>
+      <tr><td>\(\mathrm{Gr}\)</td><td>Grashof number</td></tr>
+      <tr><td>\(L\)</td><td>plate length (m)</td></tr>
+      <tr><td>\(\mathrm{Nu}\)</td><td>Nusselt number for combined convection</td></tr>
+      <tr><td>\(\mathrm{Nu}_F\)</td><td>Nusselt number for forced convection</td></tr>
+      <tr><td>\(\mathrm{Nu}_N\)</td><td>Nusselt number for natural (free) convection</td></tr>
+      <tr><td>\(\mathrm{Pr}\)</td><td>Prandtl number</td></tr>
+      <tr><td>\(\mathrm{Ra}\)</td><td>Rayleigh number</td></tr>
+      <tr><td>\(\mathrm{Re}\)</td><td>Reynolds number</td></tr>
+      <tr><td>\(T\)</td><td>air (fluid) temperature (K)</td></tr>
+      <tr><td>\(T_S\)</td><td>plate surface temperature (K)</td></tr>
+      <tr><td>\(u\)</td><td>air velocity (m/s)</td></tr>
+      <tr><td>\(v\)</td><td>kinematic viscosity of air (m\(^2\)/s)</td></tr>
+      <tr><td>\(\beta\)</td><td>thermal expansion coefficient (1/K)</td></tr>
+    </table>
+
+    <p style="margin-top:12px"><b>Reference</b></p>
+    <p>[1] T. L. Bergman, A. S. Lavine, F. P. Incropera and D. P. DeWitt,
+    <i>Introduction to Heat Transfer</i>, 6th ed., Hoboken: John Wiley and Sons, 2011.</p>
+  </div>
+
+  <!-- ===== About ===== -->
+  <div class="panel" id="about">
+    <button class="close" data-close>&times;</button>
+    <h2>About</h2>
+    <p>This simulation was created in the
+    <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of
+    Chemical and Biological Engineering</a> at University of Colorado Boulder for
+    <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a>
+    by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a
+    <a href="https://demonstrations.wolfram.com/CombinedFreeAndForcedConvection/"
+    target="_blank" rel="noopener">Mathematica simulation</a> by Mathew L. Williams,
+    Rachael L. Baumann, and John L. Falconer. It was prepared with financial support from
+    the National Science Foundation (DUE 2336987 and 2336988). Address any questions or
+    comments to LearnChemE@gmail.com.</p>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  // ---------------- state ----------------
+  const state = { W: 2, L: 5, v: 5, T: 260, Ts: 430 };
+
+  // ---------------- physics ----------------
+  const BETA = 0.003, G = 9.8, ACONST = 871;
+
+  function physics(s) {
+    const Tavg = (s.Ts + s.T) / 2;
+    const visc = 7e-11 * Tavg * Tavg + 6e-8 * Tavg - 7e-6;
+    const Gr = G * BETA * Math.abs(s.Ts - s.T) * (Math.pow(s.L, 3) / (visc * visc));
+    const Pr = 3e-7 * Tavg * Tavg - 0.0004 * Tavg + 0.7969;
+    const Ra = Gr * Pr;
+    const Rey = (u) => u * (s.L / visc);
+    const reyPt = Rey(s.v);
+    let NuF;
+    if (s.v > 5) {
+      NuF = (0.037 * Math.pow(reyPt, 4 / 5) - ACONST) * Math.pow(Pr, 1 / 3);
+    } else {
+      NuF = 0.664 * Math.pow(reyPt, 1 / 2) * Math.pow(Pr, 1 / 3);
+    }
+    const NuN = Math.pow(
+      0.825 + 0.387 * Math.pow(Ra, 1 / 6) /
+        Math.pow(1 + Math.pow(0.492 / Pr, 9 / 16), 8 / 27), 2);
+    const Nu = Math.pow(Math.pow(NuF, 4) + Math.pow(NuN, 4), 1 / 4);
+    // velocity where Re^2/Gr = k  (k = 0.2 free edge, 5 forced edge)
+    const fx = (k) => Math.sqrt(k * Gr) * (visc / s.L);
+    // velocity where Re^2/1e13 = 0.5 (positive root) -> Reynolds^2 label anchor
+    const solRe = Math.sqrt(5e12) * visc / s.L;
+    return { visc, Gr, Pr, Ra, Rey, reyPt, NuF, NuN, Nu, fx, solRe };
+  }
+
+  // 3-significant-figure scientific form  ->  {mant:"1.09", exp:3}
+  function sci3(x) {
+    if (!isFinite(x) || x === 0) return { mant: "0.00", exp: 0 };
+    const s = x.toExponential(2);            // e.g. "1.09e+3"
+    const m = parseFloat(s.split("e")[0]).toFixed(2);
+    const e = parseInt(s.split("e")[1], 10);
+    return { mant: m, exp: e };
+  }
+
+  // ---------------- canvas / hi-DPI ----------------
+  const cv = document.getElementById("cv");
+  const ctx = cv.getContext("2d");
+  const CW = 600, CH = 380;
+  function setupHiDPI() {
+    const dpr = window.devicePixelRatio || 1;
+    cv.width = CW * dpr;
+    cv.height = CH * dpr;
+    cv.style.width = CW + "px";
+    cv.style.height = CH + "px";
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  setupHiDPI();
+
+  // rotated y-axis label via offscreen bitmap (crisp, no rotated-font artifacts)
+  function drawRotatedLabel(text, cx, cy, font) {
+    const pad = 4;
+    const off = document.createElement("canvas");
+    const octx = off.getContext("2d");
+    octx.font = font;
+    const tw = Math.ceil(octx.measureText(text).width);
+    const th = 20;
+    const dpr = window.devicePixelRatio || 1;
+    off.width = (tw + pad * 2) * dpr;
+    off.height = (th + pad * 2) * dpr;
+    octx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    octx.font = font;
+    octx.fillStyle = "#000";
+    octx.textBaseline = "middle";
+    octx.textAlign = "center";
+    octx.fillText(text, (tw + pad * 2) / 2, (th + pad * 2) / 2);
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(-Math.PI / 2);
+    ctx.drawImage(off, -(tw + pad * 2) / 2, -(th + pad * 2) / 2, tw + pad * 2, th + pad * 2);
+    ctx.restore();
+  }
+
+  // draw a text with a trailing superscript exponent, returns total width
+  function fillTextSup(base, expo, x, y, baseFont, supFont, color) {
+    ctx.fillStyle = color;
+    ctx.textAlign = "left";
+    ctx.textBaseline = "alphabetic";
+    ctx.font = baseFont;
+    ctx.fillText(base, x, y);
+    const w1 = ctx.measureText(base).width;
+    ctx.font = supFont;
+    ctx.fillText(expo, x + w1, y - 7);
+    const w2 = ctx.measureText(expo).width;
+    return w1 + w2;
+  }
+
+  // ---------------- drawing: graph (W=2) ----------------
+  const PX0 = 70, PX1 = 585, PY0 = 50, PY1 = 330;   // plot rectangle (top,bottom)
+  const XMIN = 0, XMAX = 20, YMIN = 0, YMAX = 1.5;
+  const mapX = (x) => PX0 + (x - XMIN) / (XMAX - XMIN) * (PX1 - PX0);
+  const mapY = (y) => PY1 - (y - YMIN) / (YMAX - YMIN) * (PY1 - PY0);
+
+  function drawGraph(p) {
+    ctx.clearRect(0, 0, CW, CH);
+
+    // --- filled convection regions ---
+    const xFree = Math.min(p.fx(0.2), XMAX);
+    const xForced = Math.min(p.fx(5), XMAX);
+    // yellow: free  (0 .. fx(0.2))
+    ctx.fillStyle = "rgba(255,220,0,0.5)";
+    ctx.fillRect(mapX(0), mapY(YMAX), mapX(xFree) - mapX(0), mapY(0) - mapY(YMAX));
+    // cyan: forced (fx(5) .. 20)
+    if (xForced < XMAX) {
+      ctx.fillStyle = "rgba(0,220,230,0.5)";
+      ctx.fillRect(mapX(xForced), mapY(YMAX), mapX(XMAX) - mapX(xForced), mapY(0) - mapY(YMAX));
+    }
+
+    // --- region text labels at y = 1.43 ---
+    ctx.fillStyle = "rgba(64,64,64,1)";
+    ctx.font = "15px Helvetica, Arial, sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    const fx02 = p.fx(0.2), fx5 = p.fx(5);
+    if (fx02 > 2) ctx.fillText("free", mapX(fx02 / 2), mapY(1.43));
+    if (20 - fx5 > 2) ctx.fillText("forced", mapX((20 + fx5) / 2), mapY(1.43));
+    if (fx5 - fx02 > 2) ctx.fillText("combined", mapX((fx5 + fx02) / 2), mapY(1.43));
+
+    // --- Reynolds^2 curve: Rey(u)^2/1e13 ---
+    ctx.strokeStyle = "#000";
+    ctx.lineWidth = 1.8;
+    ctx.beginPath();
+    let started = false;
+    for (let i = 0; i <= 400; i++) {
+      const u = XMIN + (XMAX - XMIN) * i / 400;
+      const yv = Math.pow(p.Rey(u), 2) / 1e13;
+      if (yv > YMAX) {                      // clip to top of frame
+        if (started) {
+          // extend to boundary then stop segment
+          ctx.lineTo(mapX(u), mapY(YMAX));
+        }
+        started = false;
+        continue;
+      }
+      if (!started) { ctx.moveTo(mapX(u), mapY(yv)); started = true; }
+      else ctx.lineTo(mapX(u), mapY(yv));
+    }
+    ctx.stroke();
+
+    // --- Grashof horizontal line: Gr/1e13 ---
+    const grY = p.Gr / 1e13;
+    if (grY <= YMAX) {
+      ctx.beginPath();
+      ctx.moveTo(mapX(0), mapY(grY));
+      ctx.lineTo(mapX(XMAX), mapY(grY));
+      ctx.stroke();
+    }
+
+    // --- dashed purple velocity line ---
+    ctx.save();
+    ctx.strokeStyle = "#8000c0";
+    ctx.lineWidth = 2;
+    ctx.setLineDash([6, 5]);
+    ctx.beginPath();
+    ctx.moveTo(mapX(state.v), mapY(0));
+    ctx.lineTo(mapX(state.v), mapY(1.5));
+    ctx.stroke();
+    ctx.restore();
+
+    // --- framed labels: Reynolds^2  and  Grashof ---
+    // draws text (optionally with a "2" superscript) centered on (cx,cy),
+    // with a white background box sized to fully cover the whole label
+    const CURVE_FS = 17;                         // +15% from 15px
+    const CURVE_SUP_FS = 12;                     // superscript, +15% from 10px
+    const baseFont = CURVE_FS + "px Helvetica, Arial, sans-serif";
+    const supFont = CURVE_SUP_FS + "px Helvetica, Arial, sans-serif";
+    function framedLabel(text, hasSup, cx, cy) {
+      ctx.font = baseFont;
+      const wBase = ctx.measureText(text).width;
+      let wSup = 0;
+      if (hasSup) { ctx.font = supFont; wSup = ctx.measureText("2").width; }
+      const totalW = wBase + wSup;
+      const padX = 6, padY = 4;
+      const boxW = totalW + padX * 2;
+      const boxH = CURVE_FS + padY * 2;
+      // white background covering the entire word
+      ctx.fillStyle = "rgba(255,255,255,0.95)";
+      ctx.fillRect(cx - boxW / 2, cy - boxH / 2, boxW, boxH);
+      // text, vertically centered
+      const tx = cx - totalW / 2;
+      ctx.fillStyle = "#000";
+      ctx.textAlign = "left";
+      ctx.textBaseline = "middle";
+      ctx.font = baseFont;
+      ctx.fillText(text, tx, cy);
+      if (hasSup) {
+        ctx.font = supFont;
+        ctx.fillText("2", tx + wBase, cy - CURVE_FS * 0.32);
+      }
+    }
+    // Reynolds^2 anchor
+    let rx, ry;
+    if (p.solRe < 2) { rx = 2; ry = 0.5; }
+    else if (p.solRe > 18) { rx = 18; ry = Math.min(Math.pow(p.Rey(18), 2) / 1e13, YMAX); }
+    else { rx = p.solRe; ry = 0.5; }
+    framedLabel("Reynolds", true, mapX(rx), mapY(ry));
+    // Grashof anchor {17, Gr/1e13}
+    if (grY <= YMAX) {
+      framedLabel("Grashof", false, mapX(17), mapY(grY));
+    }
+
+    // --- frame box ---
+    ctx.strokeStyle = "#000";
+    ctx.lineWidth = 1;
+    ctx.strokeRect(PX0, PY0, PX1 - PX0, PY1 - PY0);
+
+    // --- ticks + tick labels ---
+    ctx.fillStyle = "#000";
+    ctx.font = "15px Helvetica, Arial, sans-serif";
+    // x ticks
+    ctx.textAlign = "center"; ctx.textBaseline = "top";
+    [0, 5, 10, 15, 20].forEach((xt) => {
+      const X = mapX(xt);
+      ctx.beginPath(); ctx.moveTo(X, PY1); ctx.lineTo(X, PY1 - 6); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(X, PY0); ctx.lineTo(X, PY0 + 6); ctx.stroke();
+      ctx.fillText(String(xt), X, PY1 + 6);
+    });
+    // y ticks
+    ctx.textAlign = "right"; ctx.textBaseline = "middle";
+    [0, 0.5, 1.0, 1.5].forEach((yt) => {
+      const Y = mapY(yt);
+      ctx.beginPath(); ctx.moveTo(PX0, Y); ctx.lineTo(PX0 + 6, Y); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(PX1, Y); ctx.lineTo(PX1 - 6, Y); ctx.stroke();
+      ctx.fillText(yt.toFixed(1), PX0 - 8, Y);
+    });
+
+    // --- axis labels ---
+    ctx.fillStyle = "#000";
+    ctx.font = "17px Helvetica, Arial, sans-serif";
+    ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
+    ctx.fillText("velocity (m/s)", (PX0 + PX1) / 2, PY1 + 42);
+    drawRotatedLabel("(Grashof and Reynolds\u00B2) \u00D7 10\u207B\u00B9\u00B3",
+      16, (PY0 + PY1) / 2, "17px Helvetica, Arial, sans-serif");
+
+    // --- Nusselt title (3 sig figs, scientific) ---
+    const sc = sci3(p.Nu);
+    ctx.font = "17px Helvetica, Arial, sans-serif";
+    const pre = "Nusselt number = ";
+    const mantTxt = sc.mant + " \u00D7 10";
+    ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
+    // measure to center the whole string
+    ctx.font = "17px Helvetica, Arial, sans-serif";
+    const wPre = ctx.measureText(pre + mantTxt).width;
+    ctx.font = "12px Helvetica, Arial, sans-serif";
+    const wExp = ctx.measureText(String(sc.exp)).width;
+    const total = wPre + wExp;
+    let sx = (PX0 + PX1) / 2 - total / 2;
+    const sy = 28;
+    ctx.font = "17px Helvetica, Arial, sans-serif";
+    ctx.fillStyle = "#000";
+    ctx.fillText(pre + mantTxt, sx, sy);
+    ctx.font = "12px Helvetica, Arial, sans-serif";
+    ctx.fillText(String(sc.exp), sx + wPre, sy - 8);
+  }
+
+  // ---------------- drawing: plate diagram (W=1) ----------------
+  // plot range x:-10..10  y:-11..0
+  const D = { x0: 40, x1: 585, y0: 60, y1: 340 };
+  const dX = (x) => D.x0 + (x - (-10)) / 20 * (D.x1 - D.x0);
+  const dY = (y) => D.y1 - (y - (-11)) / 11 * (D.y1 - D.y0);
+
+  function drawPlate(p) {
+    ctx.clearRect(0, 0, CW, CH);
+    const ratio = state.v === 0 ? 0 : p.reyPt * p.reyPt / p.Gr;
+
+    // regime -> color + title
+    let fill, title;
+    if (state.v === 0) { title = "no flow"; }
+    if (p.reyPt * p.reyPt <= p.Gr * 0.2) { fill = "rgba(255,230,0,0.35)"; }
+    else if (p.reyPt * p.reyPt < p.Gr * 5) { fill = "rgba(0,170,0,0.6)"; }
+    else { fill = "rgba(0,255,255,1)"; }
+    if (state.v === 0) title = "no flow";
+    else if (ratio < 1 / 5) title = "free convection dominates";
+    else if (ratio >= 5) title = "forced convection dominates";
+    else title = "mixed region";
+
+    // title
+    ctx.fillStyle = "#000";
+    ctx.font = "18px Helvetica, Arial, sans-serif";
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText(title, CW / 2, 34);
+
+    // plate: x in [-L,L], y in [-5,0]
+    const px0 = dX(-state.L), px1 = dX(state.L);
+    const py0 = dY(0), py1 = dY(-5);
+    ctx.fillStyle = fill;
+    ctx.strokeStyle = "#333";
+    ctx.lineWidth = 1.2;
+    ctx.fillRect(px0, py0, px1 - px0, py1 - py0);
+    ctx.strokeRect(px0, py0, px1 - px0, py1 - py0);
+    // plate label
+    ctx.fillStyle = "#000";
+    ctx.font = "16.8px Helvetica, Arial, sans-serif";
+    ctx.fillText("flat plate", (px0 + px1) / 2, (py0 + py1) / 2);
+
+    // flow arrows (only if v>0): from y=-8-3*rescale to y=-5, x in Range[-L,L,L/4]
+    if (state.v > 0) {
+      const rescale = state.v / 20;
+      const yTail = -8 - 3 * rescale, yHead = -5;
+      ctx.strokeStyle = "rgb(219,26,64)";
+      ctx.fillStyle = "rgb(219,26,64)";
+      ctx.lineWidth = 2.4;
+      const step = state.L / 4;
+      for (let x = -state.L; x <= state.L + 1e-9; x += step) {
+        const X = dX(x), Yt = dY(yTail), Yh = dY(yHead);
+        ctx.beginPath(); ctx.moveTo(X, Yt); ctx.lineTo(X, Yh); ctx.stroke();
+        // arrowhead pointing up
+        ctx.beginPath();
+        ctx.moveTo(X, Yh);
+        ctx.lineTo(X - 5, Yh + 9);
+        ctx.lineTo(X + 5, Yh + 9);
+        ctx.closePath(); ctx.fill();
+      }
+      ctx.fillStyle = "#000";
+      ctx.font = "16.25px Helvetica, Arial, sans-serif";
+      ctx.fillText("air flow", CW / 2, dY(-10.4));
+    }
+  }
+
+  // ---------------- render ----------------
+  function render() {
+    const p = physics(state);
+    if (state.W === 1) drawPlate(p); else drawGraph(p);
+  }
+
+  // ---------------- wiring ----------------
+  const sL = document.getElementById("sL"), vL = document.getElementById("vL");
+  const sV = document.getElementById("sV"), vV = document.getElementById("vV");
+  const sT = document.getElementById("sT"), vT = document.getElementById("vT");
+  const sTs = document.getElementById("sTs"), vTs = document.getElementById("vTs");
+
+  sL.addEventListener("input", () => { state.L = +sL.value; vL.textContent = sL.value; render(); });
+  sV.addEventListener("input", () => { state.v = +sV.value; vV.textContent = sV.value; render(); });
+
+  // T and Ts cannot be equal (Exclusions)
+  sT.addEventListener("input", () => {
+    let val = +sT.value;
+    if (val === state.Ts) { val = val + 20 <= 600 ? val + 20 : val - 20; sT.value = val; }
+    state.T = val; vT.textContent = val; render();
+  });
+  sTs.addEventListener("input", () => {
+    let val = +sTs.value;
+    if (val === state.T) { val = val + 20 <= 600 ? val + 20 : val - 20; sTs.value = val; }
+    state.Ts = val; vTs.textContent = val; render();
+  });
+
+  // setter buttons
+  const setPlate = document.getElementById("setPlate");
+  const setGraph = document.getElementById("setGraph");
+  setPlate.addEventListener("click", () => {
+    state.W = 1; setPlate.classList.add("active"); setGraph.classList.remove("active"); render();
+  });
+  setGraph.addEventListener("click", () => {
+    state.W = 2; setGraph.classList.add("active"); setPlate.classList.remove("active"); render();
+  });
+
+  // info panels
+  const panels = ["directions", "details", "about"];
+  document.querySelectorAll(".infoBtn").forEach((b) => {
+    b.addEventListener("click", () => {
+      const id = b.getAttribute("data-panel");
+      const el = document.getElementById(id);
+      const isOpen = el.style.display === "block";
+      panels.forEach((pn) => { document.getElementById(pn).style.display = "none"; });
+      if (!isOpen) {
+        el.style.display = "block";
+        if (window.MathJax && MathJax.typesetPromise) {
+          MathJax.typesetPromise([el]).catch(() => {});
+        }
+      }
+    });
+  });
+  document.querySelectorAll("[data-close]").forEach((b) => {
+    b.addEventListener("click", () => { b.parentElement.style.display = "none"; });
+  });
+
+  window.addEventListener("resize", () => { setupHiDPI(); render(); });
+
+  render();
+})();
+</script>
+</body>
+</html>

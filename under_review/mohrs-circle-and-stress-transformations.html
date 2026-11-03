@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mohr's Circle and Stress Transformations</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
+<style>
+  body {
+    font-family: Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 12px 8px 30px 8px;
+    background: #ffffff;
+    color: #000;
+  }
+  #app {
+    width: 700px;
+    margin: 0 auto;
+  }
+  /* ---------- controls ---------- */
+  #controls {
+    display: grid;
+    grid-template-columns: 375px 1fr;
+    row-gap: 8px;
+    column-gap: 10px;
+    align-items: center;
+    margin-bottom: 4px;
+    padding: 6px 4px 10px 4px;
+  }
+  .ctl-label-text {
+    font-size: 16.5px;
+  }
+  .slider-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 15px;
+  }
+  .slider-row .slab {
+    width: 48px;
+    font-size: 17.25px;
+    text-align: right;
+    white-space: nowrap;
+  }
+  .slider-row input[type=range] {
+    width: 230px;
+    margin: 0 4px;
+  }
+  .slider-row .sval {
+    width: 34px;
+    text-align: left;
+  }
+  sub, sup { font-size: 72%; }
+  .tauSerif { font-family: 'Times New Roman', Times, serif; }
+  .setter {
+    display: inline-flex;
+    border: 1px solid #9a9a9a;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .setter button {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    padding: 4px 12px;
+    border: none;
+    background: #f2f2f2;
+    cursor: pointer;
+    border-right: 1px solid #9a9a9a;
+    color: #000;
+  }
+  .setter button:last-child { border-right: none; }
+  .setter button.sel {
+    background: #cfe0f5;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.25);
+  }
+  .checkbox-row {
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  #radioRow {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 15px;
+    flex-wrap: wrap;
+  }
+  #radioRow label {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .hidden { visibility: hidden; }
+  .display-none { display: none !important; }
+  /* ---------- body ---------- */
+  #simbody {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  #rightcol {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  #thetaHeading {
+    font-size: 19.8px;
+    text-align: center;
+  }
+  table.stressTable {
+    border-collapse: collapse;
+    font-size: 18px;
+  }
+  table.stressTable td {
+    border: 1px solid #000;
+    width: 62px;
+    height: 28px;
+    text-align: center;
+  }
+  canvas { display: block; }
+  /* ---------- bottom buttons & panels ---------- */
+  #btnRow {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 18px;
+  }
+  .panelBtn {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 18.4px;
+    background: #98000D;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 22px;
+    cursor: pointer;
+  }
+  .panelBtn:hover { background: #7a000a; }
+  #panelAnchor {
+    position: relative;
+    height: 0;
+  }
+  .panel {
+    display: none;
+    position: absolute;
+    bottom: 8px;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    border: 1px solid #bbbbbb;
+    border-radius: 5px;
+    padding: 12px 34px 12px 18px;
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.5;
+    background: #ffffff;
+    box-shadow: 0 3px 14px rgba(0,0,0,0.28);
+  }
+  .panel.open { display: block; }
+  #detailsPanel .panelScroll { max-height: 320px; overflow-y: auto; padding-right: 6px; }
+  .closeX {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    border: none;
+    background: none;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 20px;
+    line-height: 1;
+    color: #555;
+    cursor: pointer;
+    padding: 2px 6px;
+  }
+  .closeX:hover { color: #98000D; }
+  .panel a { color: #98000D; }
+  .eqline { margin: 6px 0 6px 24px; }
+  .panel h3 { margin: 0 0 2px 0; font-size: 15px; font-weight: bold; }
+  .panel h3 + p, .panel h3 + .panelScroll > p:first-child { margin-top: 0; }
+  #simTitle { text-align: center; font-size: 24px; font-weight: bold; margin: 0 0 10px 0; }
+  table.symTable { border-collapse: collapse; margin: 4px 0 4px 12px; }
+  table.symTable td { padding: 2px 10px 2px 0; vertical-align: top; }
+  table.symTable td:first-child { white-space: nowrap; min-width: 60px; }
+  /* LearnChemE slider style */
+  input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+  input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+</style>
+</head>
+<body>
+<div id="app">
+  <h1 id="simTitle">Mohr's Circle and Stress Transformations</h1>
+
+  <!-- ============ CONTROLS ============ -->
+  <div id="controls">
+    <!-- row 1 -->
+    <div class="ctl-label-text">stresses at &theta; = 0 (MPa)</div>
+    <div>
+      <span class="setter" id="plotTypeSetter">
+        <button data-v="1" class="sel">Mohr's circle</button>
+        <button data-v="2">stress plot</button>
+      </span>
+    </div>
+    <!-- row 2 -->
+    <div class="slider-row">
+      <span class="slab">&sigma;<sub><i>x</i></sub></span>
+      <input type="range" id="sx" min="-30" max="30" step="1" value="-20">
+      <span class="sval" id="sxVal">-20</span>
+    </div>
+    <div class="checkbox-row" id="ticksRow">
+      <input type="checkbox" id="ticksChk" checked>
+      <label for="ticksChk">show axes ticks</label>
+    </div>
+    <!-- row 3 -->
+    <div class="slider-row">
+      <span class="slab">&sigma;<sub><i>y</i></sub></span>
+      <input type="range" id="sy" min="-30" max="30" step="1" value="15">
+      <span class="sval" id="syVal">15</span>
+    </div>
+    <div>
+      <span class="setter" id="pathSetter">
+        <button data-v="1" class="sel">set angle</button>
+        <button data-v="2">critical stresses</button>
+      </span>
+    </div>
+    <!-- row 4 -->
+    <div class="slider-row">
+      <span class="slab"><span class="tauSerif">&tau;</span><sub><i>xy</i></sub></span>
+      <input type="range" id="txy" min="-30" max="30" step="1" value="10">
+      <span class="sval" id="txyVal">10</span>
+    </div>
+    <div>
+      <div class="slider-row" id="thetaRow">
+        <span class="slab">&theta;</span>
+        <input type="range" id="thetaD" min="0" max="180" step="1" value="50" style="width:170px;">
+        <span class="sval" id="thetaVal">50</span>
+      </div>
+      <div id="radioRow" class="display-none">
+        <label><input type="radio" name="stressSel" value="1" checked>&sigma;<sub>1</sub></label>
+        <label><input type="radio" name="stressSel" value="2">&sigma;<sub>2</sub></label>
+        <label><input type="radio" name="stressSel" value="3">+<span class="tauSerif">&tau;</span><sub>max</sub></label>
+        <label><input type="radio" name="stressSel" value="4">&minus;<span class="tauSerif">&tau;</span><sub>max</sub></label>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ BODY ============ -->
+  <div id="simbody">
+    <canvas id="plotCanvas"></canvas>
+    <div id="rightcol">
+      <div id="thetaHeading"></div>
+      <table class="stressTable">
+        <tr>
+          <td>&sigma;<sub><i>x</i>&prime;</sub></td>
+          <td>&sigma;<sub><i>y</i>&prime;</sub></td>
+          <td><span class="tauSerif">&tau;</span><sub><i>x</i>&prime;<i>y</i>&prime;</sub></td>
+        </tr>
+        <tr>
+          <td id="tSx1"></td>
+          <td id="tSy1"></td>
+          <td id="tTx1y1"></td>
+        </tr>
+      </table>
+      <canvas id="elemCanvas"></canvas>
+    </div>
+  </div>
+
+  <!-- ============ BUTTONS & PANELS ============ -->
+  <div id="panelAnchor">
+  <div class="panel" id="directionsPanel">
+    <button class="closeX" aria-label="Close">&times;</button>
+    <h3>Directions</h3>
+    <p>This Demonstration uses a Mohr's circle and a stress plot to show the effects of stress
+    transformation on a differential element or area. Use sliders to vary the stresses
+    \(\sigma_x\), \(\sigma_y\) and \(\tau_{xy}\), which correspond to the stresses on the
+    differential element at \(\theta = 0^{\circ}\) (dashed black line). Select "set angle" to vary
+    the angle \(\theta\) with a slider. Stress transformation equations are used to compute the
+    transformed stresses \(\sigma_{x'}\), \(\sigma_{y'}\) and \(\tau_{x'y'}\) (solid black line),
+    which are shown on the differential stress element as blue, green and black arrows,
+    respectively. Select the "Mohr's circle" button to display Mohr's circle on the left. An angle
+    of \(\theta\) on the differential stress element corresponds to an angle of \(2\theta\) on the
+    Mohr's circle. Select the "stress plot" button to display a plot of all three transformed
+    stresses versus \(\theta\) on the left. Select "set angle" to set \(\theta\) with a slider or
+    "critical stresses" to snap the diagram to the angle of one of the principal stresses
+    (\(\sigma_1\) and \(\sigma_2\)) or one of the maximum in-plane shear stresses
+    (\(+\tau_{max}\) and \(-\tau_{max}\)). Note that Mohr's circle is displayed with positive
+    \(+\tau_{xy}\) in the downward direction, so an increase in \(\theta\) results in a
+    counterclockwise rotation on both the Mohr's circle and the differential stress element.</p>
+  </div>
+
+  <div class="panel" id="detailsPanel">
+    <button class="closeX" aria-label="Close">&times;</button>
+    <h3>Details</h3>
+    <div class="panelScroll">
+    <p>The transformed stresses are calculated from the normal stresses at \(\theta = 0^{\circ}\):</p>
+    <div class="eqline">\(\sigma_{x'} = \sigma_{ave} + \dfrac{\sigma_x - \sigma_y}{2}\cos(2\,\theta) + \tau_{xy}\sin(2\,\theta)\),</div>
+    <div class="eqline">\(\sigma_{y'} = \sigma_{ave} - \dfrac{\sigma_x - \sigma_y}{2}\cos(2\,\theta) - \tau_{xy}\sin(2\,\theta)\),</div>
+    <div class="eqline">\(\tau_{x'y'} = -\dfrac{\sigma_x - \sigma_y}{2}\sin(2\,\theta) + \tau_{xy}\cos(2\,\theta)\),</div>
+    <p>where \(\sigma_{ave} = \dfrac{\sigma_x + \sigma_y}{2}\) is the average of the \(x\) and
+    \(y\) stresses, \(\sigma_x\) and \(\sigma_y\) are the normal stresses in the \(x\) and \(y\)
+    directions and \(\tau_{xy}\) is the shear stress (MPa) at \(\theta = 0^{\circ}\). Here
+    \(\theta\) is the angle of rotation (positive in the counterclockwise direction),
+    \(\sigma_{x'}\) and \(\sigma_{y'}\) are the normal stresses in the \(x\) and \(y\) directions
+    (MPa) and \(\tau_{x'y'}\) is the shear stress (MPa).</p>
+    <p>The principal stresses occur for \(\tau_{x'y'} = 0\):</p>
+    <div class="eqline">\(\sigma_1 = \sigma_{ave} + R\),</div>
+    <div class="eqline">\(\sigma_2 = \sigma_{ave} - R\),</div>
+    <div class="eqline">\(\theta_{\mathrm{p}1} = \dfrac{1}{2}\tan^{-1}\left(\dfrac{2\,\tau_{xy}}{\sigma_x - \sigma_y}\right)\),</div>
+    <div class="eqline">\(\theta_{\mathrm{p}2} = \theta_{\mathrm{p}1} + 90^{\circ}\),</div>
+    <div class="eqline">\(R = \sqrt{\left(\dfrac{\sigma_x - \sigma_y}{2}\right)^{2} + \tau_{xy}^{2}}\),</div>
+    <p>where \(\sigma_1\) and \(\sigma_2\) are the first and second principal stresses (MPa),
+    \(\theta_{\mathrm{p}1}\) and \(\theta_{\mathrm{p}2}\) are the first and second principal
+    angles and \(R\) is the radius of Mohr's circle (MPa). By convention, the right-hand principal
+    stress on the Mohr's circle is denoted as \(\sigma_1\).</p>
+    <p>The maximum in-plane shear stress is \(\tau_{max} = R\) and the maximum shear angle is
+    \(\theta_{\mathrm{s}} = \dfrac{1}{2}\tan^{-1}\left(\dfrac{\sigma_y - \sigma_x}{2\,\tau_{xy}}\right)\).</p>
+
+    <p><b>Symbols</b></p>
+    <table class="symTable">
+      <tr><td>\(\sigma_x,\ \sigma_y\)</td><td>normal stresses in the \(x\) and \(y\) directions at \(\theta = 0^{\circ}\) (MPa)</td></tr>
+      <tr><td>\(\tau_{xy}\)</td><td>shear stress at \(\theta = 0^{\circ}\) (MPa)</td></tr>
+      <tr><td>\(\theta\)</td><td>rotation angle of the element, positive counterclockwise (&deg;)</td></tr>
+      <tr><td>\(\sigma_{x'},\ \sigma_{y'}\)</td><td>transformed normal stresses at angle \(\theta\) (MPa)</td></tr>
+      <tr><td>\(\tau_{x'y'}\)</td><td>transformed shear stress at angle \(\theta\) (MPa)</td></tr>
+      <tr><td>\(\sigma_{ave}\)</td><td>average normal stress; center of Mohr's circle (MPa)</td></tr>
+      <tr><td>\(R\)</td><td>radius of Mohr's circle (MPa)</td></tr>
+      <tr><td>\(\sigma_1,\ \sigma_2\)</td><td>first and second principal stresses (MPa)</td></tr>
+      <tr><td>\(\theta_{\mathrm{p}1},\ \theta_{\mathrm{p}2}\)</td><td>first and second principal angles (&deg;)</td></tr>
+      <tr><td>\(\tau_{max}\)</td><td>maximum in-plane shear stress (MPa)</td></tr>
+      <tr><td>\(\theta_{\mathrm{s}}\)</td><td>angle of maximum in-plane shear stress (&deg;)</td></tr>
+    </table>
+  </div>
+  </div>
+
+  <div class="panel" id="aboutPanel">
+    <button class="closeX" aria-label="Close">&times;</button>
+    <h3>About</h3>
+    <p>This simulation was created in the
+    <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a>
+    at University of Colorado Boulder for
+    <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer
+    using Claude AI. It is a JavaScript/HTML5 implementation of a
+    <a href="https://demonstrations.wolfram.com/MohrsCircleAndStressTransformations/" target="_blank" rel="noopener">Mathematica simulation</a>
+    by Nick Bongiardina, Jeffery Knutsen, Rachael L. Baumann, and John L. Falconer. It was prepared
+    with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to
+    LearnChemE@gmail.com.</p>
+  </div>
+
+  </div>
+
+<div id="btnRow">
+    <button class="panelBtn" data-panel="directionsPanel">Directions</button>
+    <button class="panelBtn" data-panel="detailsPanel">Details</button>
+    <button class="panelBtn" data-panel="aboutPanel">About</button>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* ================= state ================= */
+const state = {
+  plotType: 1,   // 1 = Mohr's circle, 2 = stress plot
+  path: 1,       // 1 = set angle, 2 = critical stresses
+  stressSel: 1,  // 1: sigma1, 2: sigma2, 3: +tau max, 4: -tau max
+  ticks: true,
+  sx: -20,
+  sy: 15,
+  txy: 10,
+  thetaD: 50     // degrees (slider)
+};
+
+const BLUE  = "#0000ff";
+const GREEN = "rgb(0,153,0)";
+const BLACK = "#000000";
+const DEG = Math.PI / 180;
+
+/* ================= physics (from the CDF Manipulate) ================= */
+function computeAll() {
+  const sx = state.sx, sy = state.sy, txy = state.txy;
+
+  // principal angle theta_p1
+  let tp1;
+  if (sx === sy) {
+    tp1 = (txy < 0) ? 3 * Math.PI / 4 : Math.PI / 4;
+  } else {
+    const t = 0.5 * Math.atan(2 * txy / (sx - sy));
+    if (sx < sy)       tp1 = t + Math.PI / 2;
+    else if (txy < 0)  tp1 = t + Math.PI;
+    else               tp1 = t;
+  }
+  // principal angle theta_p2
+  let tp2;
+  if (sx === sy) {
+    tp2 = (txy < 0) ? Math.PI / 4 : 3 * Math.PI / 4;
+  } else {
+    tp2 = (txy < 0) ? tp1 - Math.PI / 2 : tp1 + Math.PI / 2;
+  }
+  // max shear angle theta_s1
+  let ts1;
+  if (txy !== 0) {
+    const t = 0.5 * Math.atan((sy - sx) / (2 * txy));
+    if (txy < 0)        ts1 = t + Math.PI / 2;
+    else if (sx <= sy)  ts1 = t;
+    else                ts1 = t + Math.PI;
+  } else {
+    ts1 = (sx < sy) ? Math.PI / 4 : 3 * Math.PI / 4;
+  }
+  const ts2 = (sx <= sy) ? ts1 + Math.PI / 2 : ts1 - Math.PI / 2;
+
+  const save = (sx + sy) / 2;
+  const R = Math.sqrt(Math.pow((sx - sy) / 2, 2) + txy * txy);
+  const tmax1 = R, tmax2 = -R;
+
+  // rotation angle theta (radians)
+  let th;
+  if (state.path === 1) {
+    th = state.thetaD * DEG;
+  } else {
+    switch (state.stressSel) {
+      case 1: th = tp1; break;
+      case 2: th = tp2; break;
+      case 3: th = ts1; break;
+      default: th = ts2;
+    }
+    state.thetaD = Math.round(th / DEG);  // keep the slider in sync
+  }
+
+  const c2 = Math.cos(2 * th), s2 = Math.sin(2 * th);
+  const sx1 = Math.round(save + ((sx - sy) / 2) * c2 + txy * s2);
+  const sy1 = Math.round(save - ((sx - sy) / 2) * c2 - txy * s2);
+  let tx1y1;
+  if (state.path === 1) {
+    tx1y1 = Math.round(-((sx - sy) / 2) * s2 + txy * c2);
+  } else {
+    tx1y1 = (state.stressSel === 1 || state.stressSel === 2) ? 0
+          : (state.stressSel === 3) ? Math.round(tmax1) : Math.round(tmax2);
+  }
+  const s1 = save + R, s2p = save - R;
+
+  return { th, tp1, tp2, ts1, ts2, save, R, tmax1, tmax2, sx1, sy1, tx1y1, s1, s2: s2p };
+}
+
+// exact (unrounded) transformed stresses, theta in degrees — for the stress plot curves
+function sigX1(thd) {
+  return (state.sx + state.sy) / 2 + ((state.sx - state.sy) / 2) * Math.cos(2 * thd * DEG)
+         + state.txy * Math.sin(2 * thd * DEG);
+}
+function sigY1(thd) {
+  return (state.sx + state.sy) / 2 - ((state.sx - state.sy) / 2) * Math.cos(2 * thd * DEG)
+         - state.txy * Math.sin(2 * thd * DEG);
+}
+function tauX1Y1(thd) {
+  return -((state.sx - state.sy) / 2) * Math.sin(2 * thd * DEG)
+         + state.txy * Math.cos(2 * thd * DEG);
+}
+
+/* ================= canvas helpers ================= */
+function setupCanvas(canvas, w, h) {
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width  = Math.round(w * dpr);
+  canvas.height = Math.round(h * dpr);
+  canvas.style.width  = w + "px";
+  canvas.style.height = h + "px";
+  const ctx = canvas.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return ctx;
+}
+
+/* rich text with subscripts: segments = [{t, sub, italic, color, size}] */
+function segFont(s, size) {
+  const fs = (s.sub ? size * 0.72 : size) * (s.scale || 1);
+  const fam = s.serif ? "'Times New Roman', Times, serif" : "Helvetica, Arial, sans-serif";
+  return (s.italic ? "italic " : "") + fs + "px " + fam;
+}
+function measureRich(ctx, segs, size) {
+  let w = 0;
+  for (const s of segs) {
+    ctx.font = segFont(s, size);
+    w += ctx.measureText(s.t).width;
+  }
+  return w;
+}
+function drawRich(ctx, segs, x, y, size, opts) {
+  // x,y = left, baseline unless opts.align
+  opts = opts || {};
+  const total = measureRich(ctx, segs, size);
+  let cx = x;
+  if (opts.align === "center") cx = x - total / 2;
+  else if (opts.align === "right") cx = x - total;
+  if (opts.bg) {
+    ctx.save();
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(cx - 3, y - size * 0.86 - 2, total + 6, size * 1.14 + 4);
+    ctx.restore();
+    if (opts.frame) {
+      ctx.save();
+      ctx.strokeStyle = opts.frame;
+      ctx.lineWidth = 1;
+      ctx.strokeRect(cx - 3, y - size * 0.86 - 2, total + 6, size * 1.14 + 4);
+      ctx.restore();
+    }
+  }
+  ctx.textAlign = "left";
+  ctx.textBaseline = "alphabetic";
+  for (const s of segs) {
+    ctx.font = segFont(s, size);
+    ctx.fillStyle = s.color || opts.color || "#000";
+    ctx.fillText(s.t, cx, y + (s.sub ? size * 0.2 : 0));
+    cx += ctx.measureText(s.t).width;
+  }
+  return total;
+}
+// common label segment sets
+const SEG = {
+  sx1: [{t:"\u03c3"}, {t:"x\u2032", sub:true, italic:true}],
+  sy1: [{t:"\u03c3"}, {t:"y\u2032", sub:true, italic:true}],
+  tx1y1: [{t:"\u03c4", serif:true}, {t:"x\u2032y\u2032", sub:true, italic:true}],
+  s1: [{t:"\u03c3"}, {t:"1", sub:true}],
+  s2: [{t:"\u03c3"}, {t:"2", sub:true}],
+  ptmax: [{t:"+"}, {t:"\u03c4", serif:true}, {t:"max", sub:true}],
+  mtmax: [{t:"\u2212"}, {t:"\u03c4", serif:true}, {t:"max", sub:true}],
+  sigx: [{t:"\u03c3"}, {t:"x", sub:true, italic:true}],
+  mtauxy: [{t:"\u2212"}, {t:"\u03c4", serif:true}, {t:"xy", sub:true, italic:true}, {t:" (MPa)", scale:0.9}]
+};
+
+function drawArrow(ctx, x1, y1, x2, y2, headLen, color, lw) {
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.fillStyle = color;
+  ctx.lineWidth = lw || 1.7;
+  const ang = Math.atan2(y2 - y1, x2 - x1);
+  const hw = headLen * 0.42;
+  // shorten shaft so it doesn't poke through the head
+  const bx = x2 - headLen * 0.8 * Math.cos(ang);
+  const by = y2 - headLen * 0.8 * Math.sin(ang);
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(bx, by);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(x2, y2);
+  ctx.lineTo(x2 - headLen * Math.cos(ang) - hw * Math.sin(ang),
+             y2 - headLen * Math.sin(ang) + hw * Math.cos(ang));
+  ctx.lineTo(x2 - headLen * Math.cos(ang) + hw * Math.sin(ang),
+             y2 - headLen * Math.sin(ang) - hw * Math.cos(ang));
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
+/* ================= Mohr's circle plot ================= */
+const PLOT_W = 340, PLOT_H = 350;
+const plotCanvas = document.getElementById("plotCanvas");
+
+function drawMohr(r) {
+  const ctx = setupCanvas(plotCanvas, PLOT_W, PLOT_H);
+  ctx.clearRect(0, 0, PLOT_W, PLOT_H);
+
+  // world: sigma in [-75,75] horizontally; tau positive DOWNWARD (matches the CDF's flipped axes)
+  const mL = 10, mR = 52, mT = 34, mB = 12;
+  const availW = PLOT_W - mL - mR, availH = PLOT_H - mT - mB;
+  const s = Math.min(availW, availH) / 150;   // px per MPa
+  const cx0 = mL + availW / 2;                // sigma = 0
+  const cy0 = mT + availH / 2;                // tau = 0
+  const X = v => cx0 + v * s;
+  const Y = v => cy0 + v * s;                 // +tau down
+
+  const xMin = X(-75), xMax = X(75), yMin = Y(-75), yMax = Y(75);
+
+  // axes
+  ctx.strokeStyle = "#000";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(xMin, cy0); ctx.lineTo(xMax, cy0);
+  ctx.moveTo(cx0, yMin); ctx.lineTo(cx0, yMax);
+  ctx.stroke();
+
+  // ticks
+  if (state.ticks) {
+    ctx.font = "12px Helvetica, Arial, sans-serif";
+    ctx.fillStyle = "#000";
+    for (let v = -75; v <= 75; v += 5) {
+      if (v === 0) continue;
+      const major = (v % 25 === 0);
+      const len = major ? 5 : 3;
+      // x axis
+      ctx.beginPath();
+      ctx.moveTo(X(v), cy0); ctx.lineTo(X(v), cy0 - len);
+      ctx.stroke();
+      // y axis (tau, positive down; labels show tau values)
+      ctx.beginPath();
+      ctx.moveTo(cx0, Y(v)); ctx.lineTo(cx0 + len, Y(v));
+      ctx.stroke();
+      if (major) {
+        ctx.textAlign = "center"; ctx.textBaseline = "top";
+        ctx.fillText(String(v), X(v), cy0 + 4);
+        ctx.textAlign = "right"; ctx.textBaseline = "middle";
+        ctx.fillText(String(v), cx0 - 4, Y(v));
+      }
+    }
+  }
+
+  // axis labels (17 px)
+  ctx.fillStyle = "#000";
+  drawRich(ctx, SEG.mtauxy, cx0, yMin - 17, 17, { align: "center" });
+  drawRich(ctx, SEG.sigx, xMax + 8, cy0 - 4, 17);
+  ctx.font = (17 * 0.9) + "px Helvetica, Arial, sans-serif";
+  ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
+  ctx.fillText("(MPa)", xMax + 10, cy0 + 15);
+
+  // circle
+  ctx.strokeStyle = "#000";
+  ctx.lineWidth = 1.3;
+  ctx.beginPath();
+  ctx.arc(X(r.save), Y(0), r.R * s, 0, 2 * Math.PI);
+  ctx.stroke();
+
+  // dashed line: center -> (sigma_x, tau_xy)
+  ctx.save();
+  ctx.setLineDash([6, 5]);
+  ctx.lineWidth = 1.2;
+  ctx.beginPath();
+  ctx.moveTo(X(r.save), Y(0));
+  ctx.lineTo(X(state.sx), Y(state.txy));
+  ctx.stroke();
+  ctx.restore();
+
+  // thick line: center -> (sigma_x', tau_x'y')
+  ctx.lineWidth = 2.6;
+  ctx.beginPath();
+  ctx.moveTo(X(r.save), Y(0));
+  ctx.lineTo(X(r.sx1), Y(r.tx1y1));
+  ctx.stroke();
+
+  // points
+  const dBig = 0.027 * (xMax - xMin), dSm = 0.022 * (xMax - xMin);
+  ctx.fillStyle = "#000";
+  const pt = (sx, sy, d) => { ctx.beginPath(); ctx.arc(sx, sy, d / 2, 0, 2 * Math.PI); ctx.fill(); };
+  pt(X(r.sx1), Y(r.tx1y1), dBig);
+  pt(X(r.save), Y(0), dSm);
+  pt(X(state.sx), Y(state.txy), dSm);
+  pt(X(r.s1), Y(0), dSm);
+  pt(X(r.s2), Y(0), dSm);
+  pt(X(r.save), Y(r.tmax1), dSm);
+  pt(X(r.save), Y(r.tmax2), dSm);
+
+  // labels (20 px, white background)
+  drawRich(ctx, SEG.s1, X(r.s1) + 8, Y(0) - 8, 20, { bg: true });
+  drawRich(ctx, SEG.s2, X(r.s2) - 8, Y(0) - 8, 20, { bg: true, align: "right" });
+  // +tau_max point is at the bottom (tau positive downward), -tau_max at the top
+  drawRich(ctx, SEG.ptmax, X(r.save), Y(r.tmax1) + 22, 20, { bg: true, align: "center" });
+  drawRich(ctx, SEG.mtmax, X(r.save), Y(r.tmax2) - 12, 20, { bg: true, align: "center" });
+}
+
+/* ================= stress plot ================= */
+function drawStressPlot(r) {
+  const ctx = setupCanvas(plotCanvas, PLOT_W, PLOT_H);
+  ctx.clearRect(0, 0, PLOT_W, PLOT_H);
+
+  // world: theta -26..190 (deg), stress -60..60, y up
+  const mL = 6, mR = 26, mT = 16, mB = 14;
+  const wx0 = -26, wx1 = 197, wy0 = -64, wy1 = 64;
+  const X = v => mL + (v - wx0) / (wx1 - wx0) * (PLOT_W - mL - mR);
+  const Y = v => PLOT_H - mB - (v - wy0) / (wy1 - wy0) * (PLOT_H - mT - mB);
+
+  // axes through origin
+  ctx.strokeStyle = "#000";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(X(wx0), Y(0)); ctx.lineTo(X(wx1), Y(0));
+  ctx.moveTo(X(0), Y(wy0)); ctx.lineTo(X(0), Y(wy1));
+  ctx.stroke();
+
+  // ticks
+  ctx.font = "13px Helvetica, Arial, sans-serif";
+  ctx.fillStyle = "#000";
+  for (let v = 30; v <= 180; v += 30) {
+    ctx.beginPath(); ctx.moveTo(X(v), Y(0)); ctx.lineTo(X(v), Y(0) - 5); ctx.stroke();
+    ctx.textAlign = "center"; ctx.textBaseline = "top";
+    ctx.fillText(String(v), X(v), Y(0) + 4);
+  }
+  for (let v = -40; v <= 40; v += 20) {
+    if (v === 0) continue;
+    ctx.beginPath(); ctx.moveTo(X(0), Y(v)); ctx.lineTo(X(0) + 5, Y(v)); ctx.stroke();
+    ctx.textAlign = "right"; ctx.textBaseline = "middle";
+    ctx.fillText(String(v), X(0) - 4, Y(v));
+  }
+
+  // axis label theta (17 px)
+  ctx.font = "italic 17px Helvetica, Arial, sans-serif";
+  ctx.textAlign = "left"; ctx.textBaseline = "middle";
+  ctx.fillStyle = "#000";
+  ctx.fillText("\u03b8", X(wx1) + 6, Y(0));
+
+  // curves
+  const curves = [
+    { f: sigX1,   color: BLUE  },
+    { f: sigY1,   color: GREEN },
+    { f: tauX1Y1, color: BLACK }
+  ];
+  ctx.lineWidth = 2.4;
+  for (const c of curves) {
+    ctx.strokeStyle = c.color;
+    ctx.beginPath();
+    for (let t = 0; t <= 180; t += 0.5) {
+      const px = X(t), py = Y(c.f(t));
+      if (t === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    ctx.stroke();
+  }
+
+  // moving points at current theta
+  const thDeg = r.th / DEG;
+  const d = 0.03 * (PLOT_W - mL - mR);
+  const pts = [
+    { y: r.sx1,   color: BLUE  },
+    { y: r.sy1,   color: GREEN },
+    { y: r.tx1y1, color: BLACK }
+  ];
+  for (const p of pts) {
+    ctx.fillStyle = p.color;
+    ctx.beginPath();
+    ctx.arc(X(thDeg), Y(p.y), d / 2, 0, 2 * Math.PI);
+    ctx.fill();
+  }
+
+  // framed labels at theta_d — stacked vertically so they never overlap
+  const thd = state.thetaD;
+  const LS = 20, boxH = LS * 1.14 + 4, gap = 3;
+  const labels = [
+    { segs: SEG.sx1,   val: r.sx1,   color: BLUE  },
+    { segs: SEG.sy1,   val: r.sy1,   color: GREEN },
+    { segs: SEG.tx1y1, val: r.tx1y1, color: BLACK }
+  ];
+  // desired box center = point height; sort top to bottom
+  for (const L of labels) L.cy = Y(L.val);
+  labels.sort((a, b) => a.cy - b.cy);
+  const minSep = boxH + gap;
+  const top = mT + boxH / 2, bot = PLOT_H - mB - boxH / 2;
+  // push down to remove overlaps, then pull back up if past the bottom
+  labels[0].cy = Math.max(labels[0].cy, top);
+  for (let i = 1; i < labels.length; i++)
+    labels[i].cy = Math.max(labels[i].cy, labels[i - 1].cy + minSep);
+  if (labels[labels.length - 1].cy > bot) {
+    labels[labels.length - 1].cy = bot;
+    for (let i = labels.length - 2; i >= 0; i--)
+      labels[i].cy = Math.min(labels[i].cy, labels[i + 1].cy - minSep);
+  }
+  // re-centre the stack on the points, keeping it inside the plot
+  let off = labels.reduce((t, L) => t + (Y(L.val) - L.cy), 0) / labels.length;
+  off = Math.max(off, top - labels[0].cy);
+  off = Math.min(off, bot - labels[labels.length - 1].cy);
+  for (const L of labels) L.cy += off;
+  // put labels left of the points, or right when theta is small
+  const onRight = thd < 80;
+  const px = X(thd);
+  const lx = onRight ? px + 16 : px - 16;
+  for (const L of labels) {
+    const py = Y(L.val);
+    const baseline = L.cy + LS * 0.3;
+    if (Math.abs(L.cy - py) > 4) {           // leader line when displaced
+      ctx.save();
+      ctx.strokeStyle = L.color;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(px + (onRight ? 5 : -5), py);
+      ctx.lineTo(lx + (onRight ? -3 : 3), L.cy);
+      ctx.stroke();
+      ctx.restore();
+    }
+    drawRich(ctx, L.segs, lx, baseline, LS,
+      { bg: true, frame: L.color, color: L.color, align: onRight ? "left" : "right" });
+  }
+}
+
+/* ================= differential element ================= */
+const ELEM_S = 260;
+const elemCanvas = document.getElementById("elemCanvas");
+
+function drawElement(r) {
+  const ctx = setupCanvas(elemCanvas, ELEM_S, ELEM_S);
+  ctx.clearRect(0, 0, ELEM_S, ELEM_S);
+
+  const half = 3.4;                       // world half-range
+  const s = ELEM_S / (2 * half);          // px per world unit
+  const X = v => ELEM_S / 2 + v * s;
+  const Y = v => ELEM_S / 2 - v * s;      // y up
+  const th = r.th;
+  const headLen = 0.06 * ELEM_S;
+
+  // rotated square (corners at sqrt(2), angles th + odd multiples of pi/4)
+  const corner = k => {
+    const a = [th + Math.PI/4, th + 3*Math.PI/4, th - 3*Math.PI/4, th - Math.PI/4][k];
+    return [Math.SQRT2 * Math.cos(a), Math.SQRT2 * Math.sin(a)];
+  };
+  ctx.strokeStyle = "#000";
+  ctx.lineWidth = 1.3;
+  ctx.beginPath();
+  for (let k = 0; k <= 4; k++) {
+    const [px, py] = corner(k % 4);
+    if (k === 0) ctx.moveTo(X(px), Y(py)); else ctx.lineTo(X(px), Y(py));
+  }
+  ctx.closePath();
+  ctx.stroke();
+
+  // angle arc, radius line, dashed baseline
+  ctx.beginPath();
+  ctx.arc(X(0), Y(0), 0.5 * s, -th, 0);   // canvas angles are clockwise-positive
+  ctx.stroke();
+  ctx.lineWidth = 2.4;
+  ctx.beginPath();
+  ctx.moveTo(X(0), Y(0));
+  ctx.lineTo(X(0.5 * Math.cos(th)), Y(0.5 * Math.sin(th)));
+  ctx.stroke();
+  ctx.save();
+  ctx.setLineDash([5, 4]);
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(X(0), Y(0));
+  ctx.lineTo(X(0.5), Y(0));
+  ctx.stroke();
+  ctx.restore();
+
+  // theta label
+  ctx.fillStyle = "#000";
+  ctx.font = "italic 20px Helvetica, Arial, sans-serif";
+  ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  ctx.fillText("\u03b8", X(0.73 * Math.cos(th / 2)), Y(0.73 * Math.sin(th / 2)));
+
+  // put a label beyond radius rWorld along unit vector (ux,uy) so its box never touches the arrow
+  const LBL = 20, BOX_H = 22, PAD = 8;
+  const placeLabel = (segs, ux, uy, rWorld, color) => {
+    const w = measureRich(ctx, segs, LBL) + 4;
+    const d = rWorld * s + Math.abs(ux) * w / 2 + Math.abs(uy) * BOX_H / 2 + PAD;
+    const cxp = X(0) + ux * d, cyp = Y(0) - uy * d;
+    drawRich(ctx, segs, cxp, cyp + 4, LBL, { align: "center", color: color });
+  };
+
+  // sigma_x' arrows + labels (blue), along th and th+pi
+  if (r.sx1 !== 0) {
+    for (const ph of [0, Math.PI]) {
+      const ux = Math.cos(th + ph), uy = Math.sin(th + ph);
+      const rOut = 1 + Math.abs(r.sx1) / 30;
+      if (r.sx1 > 0) {
+        drawArrow(ctx, X(ux), Y(uy), X(rOut * ux), Y(rOut * uy), headLen, BLUE);
+      } else {
+        drawArrow(ctx, X(rOut * ux), Y(rOut * uy), X(ux), Y(uy), headLen, BLUE);
+      }
+      placeLabel(SEG.sx1, ux, uy, rOut, BLUE);
+    }
+  }
+  // sigma_y' arrows + labels (green), along th +/- pi/2
+  if (r.sy1 !== 0) {
+    for (const k of [1, -1]) {
+      const ux = Math.cos(th + k * Math.PI / 2), uy = Math.sin(th + k * Math.PI / 2);
+      const rOut = 1 + Math.abs(r.sy1) / 30;
+      if (r.sy1 > 0) {
+        drawArrow(ctx, X(ux), Y(uy), X(rOut * ux), Y(rOut * uy), headLen, GREEN);
+      } else {
+        drawArrow(ctx, X(rOut * ux), Y(rOut * uy), X(ux), Y(uy), headLen, GREEN);
+      }
+      placeLabel(SEG.sy1, ux, uy, rOut, GREEN);
+    }
+  }
+  // shear arrows (black), tangential on all four faces
+  if (r.tx1y1 !== 0) {
+    const th2 = Math.atan(r.tx1y1 / 30);
+    const scale = Math.sqrt(1 + Math.pow(Math.abs(r.tx1y1) / 30, 2));
+    const faces = [[0, 1], [Math.PI / 2, -1], [Math.PI, 1], [-Math.PI / 2, -1]];
+    for (const [ph, sgn] of faces) {
+      const a1 = th + ph, a2 = th + ph + sgn * th2;
+      drawArrow(ctx, X(Math.cos(a1)), Y(Math.sin(a1)),
+                     X(scale * Math.cos(a2)), Y(scale * Math.sin(a2)), headLen, BLACK);
+    }
+  }
+}
+
+/* ================= UI wiring ================= */
+function fmtInt(v) { return String(Math.round(v)); }
+
+function render() {
+  const r = computeAll();
+
+  // sync theta slider/readout (critical mode writes thetaD back)
+  document.getElementById("thetaD").value = state.thetaD;
+  document.getElementById("thetaVal").textContent = state.thetaD;
+  document.getElementById("sxVal").textContent = state.sx;
+  document.getElementById("syVal").textContent = state.sy;
+  document.getElementById("txyVal").textContent = state.txy;
+
+  // heading + table
+  document.getElementById("thetaHeading").innerHTML =
+    "stresses at &theta; = " + fmtInt(r.th / DEG) + " (MPa)";
+  document.getElementById("tSx1").textContent = fmtInt(r.sx1);
+  document.getElementById("tSy1").textContent = fmtInt(r.sy1);
+  document.getElementById("tTx1y1").textContent = fmtInt(r.tx1y1);
+
+  // left plot
+  if (state.plotType === 1) drawMohr(r); else drawStressPlot(r);
+  drawElement(r);
+
+  // conditional controls
+  document.getElementById("ticksRow").classList.toggle("hidden", state.plotType !== 1);
+  document.getElementById("thetaRow").classList.toggle("display-none", state.path !== 1);
+  document.getElementById("radioRow").classList.toggle("display-none", state.path !== 2);
+}
+
+function wireSetter(id, key) {
+  const el = document.getElementById(id);
+  el.querySelectorAll("button").forEach(btn => {
+    btn.addEventListener("click", () => {
+      state[key] = Number(btn.dataset.v);
+      el.querySelectorAll("button").forEach(b => b.classList.toggle("sel", b === btn));
+      render();
+    });
+  });
+}
+wireSetter("plotTypeSetter", "plotType");
+wireSetter("pathSetter", "path");
+
+for (const [id, key] of [["sx", "sx"], ["sy", "sy"], ["txy", "txy"], ["thetaD", "thetaD"]]) {
+  document.getElementById(id).addEventListener("input", e => {
+    state[key] = Number(e.target.value);
+    render();
+  });
+}
+document.getElementById("ticksChk").addEventListener("change", e => {
+  state.ticks = e.target.checked;
+  render();
+});
+document.querySelectorAll("input[name=stressSel]").forEach(rb => {
+  rb.addEventListener("change", e => {
+    state.stressSel = Number(e.target.value);
+    render();
+  });
+});
+
+// bottom panels
+document.querySelectorAll(".panelBtn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const panel = document.getElementById(btn.dataset.panel);
+    const wasOpen = panel.classList.contains("open");
+    document.querySelectorAll(".panel").forEach(p => p.classList.remove("open"));
+    if (!wasOpen) {
+      panel.classList.add("open");
+      if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([panel]);
+    }
+  });
+});
+
+document.querySelectorAll(".closeX").forEach(x => {
+  x.addEventListener("click", () => x.closest(".panel").classList.remove("open"));
+});
+
+render();
+</script>
+</body>
+</html>

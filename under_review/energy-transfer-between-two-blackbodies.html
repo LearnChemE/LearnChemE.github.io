@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Energy Transfer between Two Blackbodies</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(', '\\)']], displayMath: [['$$', '$$']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    font-family: Helvetica, Arial, sans-serif;
+    background: #ffffff;
+    color: #000000;
+  }
+  #sim {
+    position: relative;
+    width: 740px;
+    margin: 10px auto;
+  }
+  h1 {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 20px;
+    font-weight: bold;
+    margin: 4px 0 10px 0;
+  }
+  .row {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    margin: 8px 0;
+  }
+  #buttonRow {
+    margin: 4px 0;
+  }
+  .ctl-label {
+    font-size: 15.2px;   /* 12 px base increased 15%, then 10% more */
+    margin-right: 6px;
+    white-space: nowrap;
+  }
+  .lead-label {
+    font-size: 15.2px;
+    margin-right: 10px;
+    white-space: nowrap;
+  }
+  .ctl-group {
+    display: flex;
+    align-items: center;
+    margin-right: 18px;
+  }
+  input[type="range"]{--accent:#98000D;--grey:#999;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+  input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  /* layout within the control rows: fixed slider length, vertically centred */
+  .ctl-group input[type="range"] {
+    width: 100px;
+    margin: 0 6px 0 0;
+  }
+  .val {
+    font-size: 15.2px;
+    min-width: 32px;
+    display: inline-block;
+  }
+  /* Mathematica-style setter buttons */
+  .setter {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 13.8px;
+    font-weight: normal;
+    padding: 3px 10px;
+    margin-right: 4px;
+    border: 1px solid #999;
+    border-radius: 4px;
+    background: linear-gradient(#fdfdfd, #e8e8e8);
+    cursor: pointer;
+    color: #000;
+  }
+  .setter.selected {
+    background: linear-gradient(#c9d6e8, #a8bdd8);
+    border-color: #6b83a3;
+  }
+  .setter:hover:not(.selected) {
+    background: linear-gradient(#ffffff, #f0f0f0);
+  }
+  /* LearnChemE panel buttons */
+  .panel-btn {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 13.8px;
+    font-weight: normal;
+    padding: 4px 12px;
+    margin-left: 6px;
+    border: 1px solid #7a000a;
+    border-radius: 4px;
+    background: #98000D;
+    color: #ffffff;
+    cursor: pointer;
+  }
+  .panel-btn:hover { background: #b0000f; }
+  .panel-btn.active { background: #6f000a; }
+  /* Flyout panels */
+  .panel {
+    display: none;
+    position: absolute;
+    left: 0;
+    width: 660px;
+    background: #ffffff;
+    border: 1px solid #888;
+    border-radius: 6px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+    padding: 12px 34px 12px 16px;
+    font-size: 14px;
+    line-height: 1.45;
+    z-index: 20;
+    box-sizing: border-box;
+  }
+  .panel.open { display: block; }
+  .panel .close-x {
+    position: absolute;
+    top: 4px;
+    right: 8px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #555;
+    background: none;
+    border: none;
+    cursor: pointer;
+    line-height: 1;
+    padding: 2px 4px;
+  }
+  .panel .close-x:hover { color: #98000D; }
+  .panel p { margin: 6px 0; }
+  .panel .panel-title {
+    font-size: 14px;
+    font-weight: bold;
+    margin: 0 0 6px 0;
+  }
+  .panel table.symbols { border-collapse: collapse; margin: 4px 0 6px 0; }
+  .panel table.symbols td { padding: 2px 12px 2px 0; vertical-align: top; }
+  .panel mjx-container {
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+  .panel mjx-container[display="true"] {
+    text-align: left !important;
+    margin-left: 0 !important;
+  }
+  .panel mjx-container[display="true"] > mjx-math {
+    margin-left: 0 !important;
+    margin-right: auto !important;
+  }
+  .panel a { color: #0645ad; }
+  canvas {
+    display: block;
+    margin-top: 6px;
+  }
+</style>
+</head>
+<body>
+<div id="sim">
+  <h1>Energy Transfer between Two Blackbodies</h1>
+
+  <div id="controls">
+    <div class="row" id="buttonRow">
+      <button class="setter selected" id="set1">parallel plates</button>
+      <button class="setter" id="set2">perpendicular walls</button>
+      <button class="setter" id="set3">parallel cylinders</button>
+      <span style="flex:0 0 14px"></span>
+      <button class="panel-btn" id="btnDirections">Directions</button>
+      <button class="panel-btn" id="btnDetails">Details</button>
+      <button class="panel-btn" id="btnAbout">About</button>
+    </div>
+
+    <div class="row">
+      <span class="lead-label">temperature (K):</span>
+      <span class="ctl-group">
+        <span class="ctl-label">green surface</span>
+        <input type="range" id="T1" min="200" max="600" step="20" value="480">
+        <span class="val" id="T1val">480</span>
+      </span>
+      <span class="ctl-group">
+        <span class="ctl-label">black surface</span>
+        <input type="range" id="T2" min="200" max="500" step="20" value="440">
+        <span class="val" id="T2val">440</span>
+      </span>
+    </div>
+
+    <!-- view 1: parallel plates -->
+    <div id="ctrlView1">
+      <div class="row">
+        <span class="ctl-group">
+          <span class="ctl-label">plate length (cm)</span>
+          <input type="range" id="X1" min="0.5" max="10" step="0.5" value="8">
+          <span class="val" id="X1val">8.</span>
+        </span>
+        <span class="ctl-group">
+          <span class="ctl-label">plate width (cm)</span>
+          <input type="range" id="Y1" min="0.5" max="10" step="0.5" value="8">
+          <span class="val" id="Y1val">8.</span>
+        </span>
+      </div>
+      <div class="row">
+        <span class="ctl-group">
+          <span class="ctl-label">distance between surfaces (cm)</span>
+          <input type="range" id="L1" min="0.5" max="10" step="0.5" value="3">
+          <span class="val" id="L1val">3.</span>
+        </span>
+      </div>
+    </div>
+
+    <!-- view 2: perpendicular walls -->
+    <div id="ctrlView2" style="display:none">
+      <div class="row">
+        <span class="lead-label">length (cm):</span>
+        <span class="ctl-group">
+          <span class="ctl-label">green surface</span>
+          <input type="range" id="Y2" min="0.5" max="10" step="0.5" value="8">
+          <span class="val" id="Y2val">8.</span>
+        </span>
+        <span class="ctl-group">
+          <span class="ctl-label">black surface</span>
+          <input type="range" id="X2" min="0.5" max="10" step="0.5" value="8">
+          <span class="val" id="X2val">8.</span>
+        </span>
+      </div>
+    </div>
+
+    <!-- view 3: parallel cylinders -->
+    <div id="ctrlView3" style="display:none">
+      <div class="row">
+        <span class="lead-label">radius (cm):</span>
+        <span class="ctl-group">
+          <span class="ctl-label">green cylinder</span>
+          <input type="range" id="X3" min="0.5" max="10" step="0.5" value="8">
+          <span class="val" id="X3val">8.</span>
+        </span>
+        <span class="ctl-group">
+          <span class="ctl-label">black cylinder</span>
+          <input type="range" id="Y3" min="0.5" max="10" step="0.5" value="8">
+          <span class="val" id="Y3val">8.</span>
+        </span>
+      </div>
+      <div class="row">
+        <span class="ctl-group">
+          <span class="ctl-label">distance between cylinders (cm)</span>
+          <input type="range" id="L3" min="0.5" max="10" step="0.5" value="3">
+          <span class="val" id="L3val">3.</span>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- flyout panels -->
+  <div class="panel" id="panelDirections">
+    <button class="close-x" aria-label="close">&times;</button>
+    <h3 class="panel-title">Directions</h3>
+    <p>This simulation calculates radiative heat transfer from the green
+    surface to the black surface as a function of the temperature of the green
+    surface. Both surfaces are blackbodies which lose energy by emission, but
+    absorb all incident radiation. The blackbodies are maintained at constant
+    temperatures by internal heaters. You can select &ldquo;parallel
+    plates&rdquo;, &ldquo;perpendicular walls&rdquo; or &ldquo;parallel
+    cylinders&rdquo;. The view factor \(F_{ij}\) is shown. The rate that heat
+    transfers from the green surface and is intercepted by the black surface is
+    plotted as a function of the temperature of the green surface. The magenta
+    point on the plot represents the green surface temperature (select with a
+    slider). You can change distances between surfaces and dimensions of the
+    plates, walls or cylinders.</p>
+  </div>
+
+  <div class="panel" id="panelDetails">
+    <button class="close-x" aria-label="close">&times;</button>
+    <h3 class="panel-title">Details</h3>
+    <p>The view factor \(F_{ij}\) is defined as the fraction of the radiation
+    leaving the green surface i that is intercepted by the black surface j. The
+    view factors for each situation are shown below.</p>
+    <p><b>Parallel plates:</b></p>
+    <p>$$\begin{aligned}F_{ij}=\frac{2}{\pi\,\bar{X}\,\bar{Y}}\Bigg(&\ln\sqrt{\frac{\left(1+\bar{X}^{2}\right)\left(1+\bar{Y}^{2}\right)}{1+\bar{X}^{2}+\bar{Y}^{2}}}
+      +\bar{X}\sqrt{1+\bar{Y}^{2}}\,\tan^{-1}\!\left(\frac{\bar{X}}{\sqrt{1+\bar{Y}^{2}}}\right)\\
+      &+\bar{Y}\sqrt{1+\bar{X}^{2}}\,\tan^{-1}\!\left(\frac{\bar{Y}}{\sqrt{1+\bar{X}^{2}}}\right)
+      -\bar{X}\tan^{-1}\bar{X}-\bar{Y}\tan^{-1}\bar{Y}\Bigg),\end{aligned}$$</p>
+    <p>$$\bar{X}=\frac{X}{L},$$</p>
+    <p>$$\bar{Y}=\frac{Y}{L},$$</p>
+    <p>where \(X\) is the plate length, \(Y\) is the plate width and \(L\) is
+    the distance between the plates.</p>
+    <p><b>Perpendicular walls:</b></p>
+    <p>$$F_{ij}=\frac{1+X/Y-\sqrt{1+\left(X/Y\right)^{2}}}{2},$$</p>
+    <p>where \(X\) and \(Y\) are the lengths of the walls.</p>
+    <p><b>Parallel cylinders:</b></p>
+    <p>$$\begin{aligned}F_{ij}=\frac{1}{2\pi}\Bigg(&\pi+\sqrt{C^{2}-\left(R+1\right)^{2}}-\sqrt{C^{2}-\left(R-1\right)^{2}}\\
+      &+\left(R-1\right)\cos^{-1}\!\left(\frac{R}{C}-\frac{1}{C}\right)
+      -\left(R+1\right)\cos^{-1}\!\left(\frac{R}{C}+\frac{1}{C}\right)\Bigg),\end{aligned}$$</p>
+    <p>$$R=\frac{r_{\mathrm{j}}}{r_{\mathrm{i}}},$$</p>
+    <p>$$S=\frac{s}{r_{\mathrm{i}}},$$</p>
+    <p>$$C=1+R+S,$$</p>
+    <p>where \(r\) is the cylinder radius and \(s\) is the space between the
+    cylinders.</p>
+    <p>The rate of heat transfer from surface \(\mathrm{i}\) to
+    \(\mathrm{j}\) is:</p>
+    <p>$$q_{\mathrm{i}}=A_{\mathrm{i}}F_{ij}\sigma\left(T_{\mathrm{i}}^{4}-T_{\mathrm{j}}^{4}\right),$$</p>
+    <p>where \(A_{\mathrm{i}}\) is the area of surface \(\mathrm{i}\),
+    \(\sigma\times 10^{-4}=5.67\times 10^{-12}\) is the Stefan&ndash;Boltzmann
+    constant and \(T\) is surface temperature.</p>
+    <p>Reference</p>
+    <p>[1] T. L. Bergman, A. S. Lavine, F. P. Incropera and D. P. DeWitt,
+    <i>Introduction to Heat Transfer</i>, 6th ed., Hoboken: John Wiley and
+    Sons, 2011 pp. 832&ndash;833, 839.</p>
+    <p><b>Symbols</b></p>
+    <table class="symbols">
+      <tr><td>\(A_{\mathrm{i}}\)</td><td>area of the green surface i (cm\(^2\)); per cm of depth for walls and cylinders</td></tr>
+      <tr><td>\(C\)</td><td>dimensionless parameter, \(1+R+S\)</td></tr>
+      <tr><td>\(F_{ij}\)</td><td>view factor from surface i to surface j</td></tr>
+      <tr><td>\(L\)</td><td>distance between the plates (cm)</td></tr>
+      <tr><td>\(q_{\mathrm{i}}\)</td><td>rate of radiative heat transfer from surface i to surface j (W)</td></tr>
+      <tr><td>\(R\)</td><td>ratio of cylinder radii, \(r_{\mathrm{j}}/r_{\mathrm{i}}\)</td></tr>
+      <tr><td>\(r_{\mathrm{i}},\ r_{\mathrm{j}}\)</td><td>radii of the green (i) and black (j) cylinders (cm)</td></tr>
+      <tr><td>\(S\)</td><td>dimensionless spacing, \(s/r_{\mathrm{i}}\)</td></tr>
+      <tr><td>\(s\)</td><td>space between the cylinders (cm)</td></tr>
+      <tr><td>\(T_{\mathrm{i}},\ T_{\mathrm{j}}\)</td><td>temperatures of the green (i) and black (j) surfaces (K)</td></tr>
+      <tr><td>\(X\)</td><td>plate length, or length of wall i (cm)</td></tr>
+      <tr><td>\(Y\)</td><td>plate width, or length of wall j (cm)</td></tr>
+      <tr><td>\(\bar{X},\ \bar{Y}\)</td><td>dimensionless plate length and width, \(X/L\) and \(Y/L\)</td></tr>
+      <tr><td>\(\sigma\)</td><td>Stefan&ndash;Boltzmann constant (W/(cm\(^2\)&middot;K\(^4\)))</td></tr>
+      <tr><td>i, j</td><td>subscripts for the green and black surfaces</td></tr>
+    </table>
+  </div>
+
+  <div class="panel" id="panelAbout">
+    <button class="close-x" aria-label="close">&times;</button>
+    <h3 class="panel-title">About</h3>
+    <p>This simulation was created in the
+    <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department
+    of Chemical and Biological Engineering</a> at University of Colorado
+    Boulder for <a href="http://www.learncheme.com" target="_blank"
+    rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It
+    is a JavaScript/HTML5 implementation of a
+    <a href="https://demonstrations.wolfram.com/EnergyTransferBetweenTwoBlackbodies/"
+    target="_blank" rel="noopener">Mathematica simulation</a> by Mathew L.
+    Williams, Rachael L. Baumann, and John L. Falconer. It was prepared with
+    financial support from the National Science Foundation (DUE 2336987 and
+    2336988). Address any questions or comments to LearnChemE@gmail.com.</p>
+  </div>
+
+  <canvas id="plot" width="685" height="445"></canvas>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ---------------------------------------------------------------- state
+  // Shared Manipulate variables (persist across views, as in the CDF)
+  var state = { view: 1, T1: 480, T2: 440, X: 8, Y: 8, L: 3 };
+  var SIGMA = 5.67e-12; // W/(cm^2 K^4)
+
+  // ---------------------------------------------------------------- physics
+  function viewFactorAndArea(view, X, Y, L) {
+    var F, Ai;
+    if (view === 1) {
+      var Xb = X / L, Yb = Y / L;
+      var arg = (1 + Xb * Xb) * (1 + Yb * Yb) / (1 + Xb * Xb + Yb * Yb);
+      // Matches CDF code: Log[...]^(1/2)
+      F = (2 / (Math.PI * Xb * Yb)) * (
+        Math.pow(Math.log(arg), 0.5)
+        + Xb * Math.sqrt(1 + Yb * Yb) * Math.atan(Xb / Math.sqrt(1 + Yb * Yb))
+        + Yb * Math.sqrt(1 + Xb * Xb) * Math.atan(Yb / Math.sqrt(1 + Xb * Xb))
+        - Xb * Math.atan(Xb) - Yb * Math.atan(Yb));
+      Ai = X * Y;
+    } else if (view === 2) {
+      F = (1 + X / Y - Math.sqrt(1 + Math.pow(X / Y, 2))) / 2;
+      Ai = X;
+    } else {
+      var R = Y / X, S = L / X, C1 = 1 + R + S;
+      F = (1 / (2 * Math.PI)) * (Math.PI
+        + Math.sqrt(C1 * C1 - (R + 1) * (R + 1))
+        - Math.sqrt(C1 * C1 - (R - 1) * (R - 1))
+        + (R - 1) * Math.acos(R / C1 - 1 / C1)
+        - (R + 1) * Math.acos(R / C1 + 1 / C1));
+      Ai = Math.PI * 2 * X;
+    }
+    return { F: F, Ai: Ai };
+  }
+
+  function qij(x, Ai, F, T2) {
+    return Ai * F * SIGMA * (Math.pow(x, 4) - Math.pow(T2, 4));
+  }
+
+  // NumberForm[x, 3] equivalent: 3 significant figures, Mathematica display
+  function nf3(x) {
+    if (!isFinite(x)) return '\u2014';
+    if (x === 0) return '0.';
+    var s = x.toPrecision(3);
+    if (s.indexOf('e') !== -1 || s.indexOf('E') !== -1) {
+      s = Number(s).toString();
+    }
+    // strip a redundant leading zero exponent style is not needed here
+    if (s.indexOf('.') === -1) s += '.'; // Mathematica shows "462."
+    return s;
+  }
+
+  // Mathematica "Labeled" slider readout for reals: 8 -> "8.", 7.5 -> "7.5"
+  function realLabel(v) {
+    return (v % 1 === 0) ? v + '.' : v.toFixed(1);
+  }
+
+  // ---------------------------------------------------------------- canvas
+  var canvas = document.getElementById('plot');
+  var ctx = canvas.getContext('2d');
+  var DPR = window.devicePixelRatio || 1;
+  var CW = 685, CH = 445;
+  canvas.style.width = CW + 'px';
+  canvas.style.height = CH + 'px';
+  canvas.width = Math.round(CW * DPR);
+  canvas.height = Math.round(CH * DPR);
+
+  // Plot frame geometry (ImagePadding {{65,20},{55,5}} + label strip on top)
+  var LBL = 30;                 // strip for the plot label
+  var padL = 65, padR = 20, padB = 55, padT = 5;
+  var frameL = padL, frameR = CW - padR;          // 65 .. 665  (600 wide)
+  var frameT = LBL + padT, frameB = LBL + padT + 350; // 35 .. 385 (350 tall)
+  var plotW = frameR - frameL, plotH = frameB - frameT;
+
+  var yRanges = { 1: [-40, 40], 2: [-1.5, 2], 3: [-4, 6] };
+  var yTicks = {
+    1: { major: 20, minor: 5 },
+    2: { major: 0.5, minor: 0.1 },
+    3: { major: 2, minor: 0.5 }
+  };
+  var xMin = 200, xMax = 600;
+
+  function xPix(x) { return frameL + (x - xMin) / (xMax - xMin) * plotW; }
+
+  function drawRotatedYLabel(text, cx, cy, fontPx) {
+    // Render horizontally to an offscreen canvas, then draw rotated
+    // (avoids glyph overlap seen with direct rotated fillText).
+    // Supersampled 2x and explicitly normal weight so it isn't blurred
+    // into a boldface appearance.
+    var SS = 2;
+    var font = 'normal ' + fontPx + 'px Helvetica, Arial, sans-serif';
+    var off = document.createElement('canvas');
+    var octx = off.getContext('2d');
+    octx.font = font;
+    var w = Math.ceil(octx.measureText(text).width) + 8;
+    var h = fontPx + 10;
+    off.width = Math.round(w * DPR * SS);
+    off.height = Math.round(h * DPR * SS);
+    octx = off.getContext('2d');
+    octx.scale(DPR * SS, DPR * SS);
+    octx.font = font;
+    octx.fillStyle = '#000';
+    octx.textAlign = 'center';
+    octx.textBaseline = 'middle';
+    octx.fillText(text, w / 2, h / 2);
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(-Math.PI / 2);
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(off, -w / 2, -h / 2, w, h);
+    ctx.restore();
+  }
+
+  function fmtTick(v, step) {
+    if (step >= 1) return String(Math.round(v));
+    var d = (String(step).split('.')[1] || '').length;
+    return v.toFixed(d).replace(/\.?0+$/, function (m) {
+      return m.indexOf('.') === 0 ? '' : m;
+    });
+  }
+
+  function tickLabel(v, major) {
+    if (major >= 1) return String(Math.round(v));
+    // one decimal for 0.5 steps
+    var s = (Math.round(v * 10) / 10).toString();
+    return s;
+  }
+
+  // ---- small inset diagram (75 x 75), mirrors CDF Graphics `thing`
+  function drawInset(cx, cy) {
+    var S = 75;
+    var x0 = cx - S / 2, y0 = cy - S / 2;
+    var X = state.X, Y = state.Y, L = state.L;
+    ctx.save();
+    if (state.view === 1) {
+      // PlotRange {{0,15},{0,15}}
+      var sc = S / 15;
+      function px(u) { return x0 + u * sc; }
+      function py(v) { return y0 + S - v * sc; }
+      // black rectangle (0.5X,0.5Y)-(1.5X,1.5Y)
+      ctx.fillStyle = '#000';
+      ctx.fillRect(px(0.5 * X), py(1.5 * Y),
+                   (1.5 * X - 0.5 * X) * sc, (1.5 * Y - 0.5 * Y) * sc);
+      // green rectangle (0,0)-(X,Y)
+      ctx.fillStyle = 'rgb(0,153,0)';
+      ctx.fillRect(px(0), py(Y), X * sc, Y * sc);
+    } else if (state.view === 2) {
+      // black line (0,0)-(X,0); green line (X,0)-(X,Y); fit with 4% pad
+      var w = X, h = Y;
+      var sc2 = Math.min(S / (w * 1.08), S / (h * 1.08));
+      var ox = cx - (w * sc2) / 2, oy = cy + (h * sc2) / 2;
+      ctx.lineWidth = 2.5;
+      ctx.lineCap = 'butt';
+      ctx.strokeStyle = '#000';
+      ctx.beginPath();
+      ctx.moveTo(ox, oy);
+      ctx.lineTo(ox + X * sc2, oy);
+      ctx.stroke();
+      ctx.strokeStyle = 'rgb(0,153,0)';
+      ctx.beginPath();
+      ctx.moveTo(ox + X * sc2, oy);
+      ctx.lineTo(ox + X * sc2, oy - Y * sc2);
+      ctx.stroke();
+    } else {
+      // green disk center (0,0) r=X ; black disk center (X+Y+L,0) r=Y
+      var xmin = -X, xmax = X + Y + L + Y;
+      var ymax = Math.max(X, Y);
+      var w3 = xmax - xmin, h3 = 2 * ymax;
+      var sc3 = Math.min(S / (w3 * 1.04), S / (h3 * 1.04));
+      var midx = cx - ((xmin + xmax) / 2) * sc3;
+      function px3(u) { return midx + u * sc3; }
+      ctx.fillStyle = '#000';
+      ctx.beginPath();
+      ctx.arc(px3(X + Y + L), cy, Y * sc3, 0, 2 * Math.PI);
+      ctx.fill();
+      ctx.fillStyle = 'rgb(0,153,0)';
+      ctx.beginPath();
+      ctx.arc(px3(0), cy, X * sc3, 0, 2 * Math.PI);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  // ---- view factor label with F_ij subscript, framed on LightYellow
+  function drawViewFactorLabel(cx, cy, F) {
+    var f1 = '18px Helvetica, Arial, sans-serif';
+    var fI = 'italic 18px Helvetica, Arial, sans-serif';
+    var fS = '13px Helvetica, Arial, sans-serif';
+    var t1 = 'view factor ', t2 = 'F', t3 = 'ij', t4 = ' = ' + nf3(F);
+    ctx.font = f1; var w1 = ctx.measureText(t1).width;
+    ctx.font = fI; var w2 = ctx.measureText(t2).width;
+    ctx.font = fS; var w3 = ctx.measureText(t3).width;
+    ctx.font = f1; var w4 = ctx.measureText(t4).width;
+    var w = w1 + w2 + w3 + w4;
+    var h = 24, padX = 7;
+    var bx = cx - w / 2 - padX, by = cy - h / 2 - 3;
+    var bw = w + 2 * padX, bh = h + 6;
+    ctx.fillStyle = '#FFFFD9';                 // LightYellow
+    ctx.fillRect(bx, by, bw, bh);
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(bx, by, bw, bh);
+    ctx.fillStyle = '#000';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    var x = cx - w / 2;
+    ctx.font = f1; ctx.fillText(t1, x, cy); x += w1;
+    ctx.font = fI; ctx.fillText(t2, x, cy); x += w2;
+    ctx.font = fS; ctx.fillText(t3, x, cy + 5); x += w3;
+    ctx.font = f1; ctx.fillText(t4, x, cy);
+  }
+
+  // ---------------------------------------------------------------- draw
+  function draw() {
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    ctx.clearRect(0, 0, CW, CH);
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, CW, CH);
+
+    var view = state.view;
+    var vf = viewFactorAndArea(view, state.X, state.Y, state.L);
+    var F = vf.F, Ai = vf.Ai;
+    var yr = yRanges[view], yMin = yr[0], yMax = yr[1];
+    function yPix(y) { return frameB - (y - yMin) / (yMax - yMin) * plotH; }
+
+    // ---- plot label (18 px)
+    var q1 = qij(state.T1, Ai, F, state.T2);
+    ctx.font = '18px Helvetica, Arial, sans-serif';
+    ctx.fillStyle = '#000';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('heat transfer from green to black = ' + nf3(q1) + ' W',
+                 frameL + plotW / 2, LBL / 2 + 4);
+
+    // ---- ticks (labels 17 px, LabelStyle -> {17, Black})
+    var tickFont = '17px Helvetica, Arial, sans-serif';
+    ctx.font = tickFont;
+    ctx.strokeStyle = '#000';
+    ctx.fillStyle = '#000';
+    ctx.lineWidth = 1;
+
+    var majLen = 7, minLen = 4;
+
+    // x ticks: majors every 100, minors every 20
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    for (var x = xMin; x <= xMax + 1e-9; x += 20) {
+      var isMajor = (Math.round(x) % 100 === 0);
+      var len = isMajor ? majLen : minLen;
+      var xp = xPix(x);
+      ctx.beginPath(); ctx.moveTo(xp, frameB); ctx.lineTo(xp, frameB - len); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(xp, frameT); ctx.lineTo(xp, frameT + len); ctx.stroke();
+      if (isMajor) ctx.fillText(String(Math.round(x)), xp, frameB + 5);
+    }
+
+    // y ticks
+    var tk = yTicks[view];
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    var start = Math.ceil((yMin - 1e-9) / tk.minor) * tk.minor;
+    for (var y = start; y <= yMax + 1e-9; y += tk.minor) {
+      var yv = Math.round(y / tk.minor) * tk.minor;
+      var isMaj = Math.abs(yv / tk.major - Math.round(yv / tk.major)) < 1e-6;
+      var l = isMaj ? majLen : minLen;
+      var yp = yPix(yv);
+      ctx.beginPath(); ctx.moveTo(frameL, yp); ctx.lineTo(frameL + l, yp); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(frameR, yp); ctx.lineTo(frameR - l, yp); ctx.stroke();
+      if (isMaj) ctx.fillText(tickLabel(yv, tk.major), frameL - 6, yp);
+    }
+
+    // ---- frame
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = '#000';
+    ctx.strokeRect(frameL, frameT, plotW, plotH);
+
+    // ---- frame labels (17 px)
+    var geomWord = view === 1 ? 'plate' : (view === 2 ? 'wall' : 'cylinder');
+    ctx.font = tickFont;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText('temperature of green ' + geomWord + ' (K)',
+                 frameL + plotW / 2, frameB + 45);
+    drawRotatedYLabel('radiative heat transfer (W)', frameL - 45,
+                      frameT + plotH / 2, 17);
+
+    // ---- curve (clipped to frame)
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(frameL, frameT, plotW, plotH);
+    ctx.clip();
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    var first = true;
+    for (var i = 0; i <= 400; i++) {
+      var xv = xMin + (xMax - xMin) * i / 400;
+      var qv = qij(xv, Ai, F, state.T2);
+      var px = xPix(xv), py = yPix(qv);
+      if (first) { ctx.moveTo(px, py); first = false; }
+      else ctx.lineTo(px, py);
+    }
+    ctx.stroke();
+
+    // ---- magenta point (PointSize 0.025 of 600-px width -> r = 7.5)
+    ctx.fillStyle = '#FF00FF';
+    ctx.beginPath();
+    ctx.arc(xPix(state.T1), yPix(q1), 7.5, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.restore();
+
+    // ---- inset diagram at Scaled[{0.15, 0.8}]
+    drawInset(frameL + 0.15 * plotW, frameT + (1 - 0.8) * plotH);
+
+    // ---- view factor label at Scaled[{0.75, 0.15}]
+    drawViewFactorLabel(frameL + 0.75 * plotW, frameB - 0.15 * plotH, F);
+  }
+
+  // ---------------------------------------------------------------- controls
+  function $(id) { return document.getElementById(id); }
+
+  var setters = { 1: $('set1'), 2: $('set2'), 3: $('set3') };
+  var ctrlDivs = { 1: $('ctrlView1'), 2: $('ctrlView2'), 3: $('ctrlView3') };
+
+  function syncSliders() {
+    // shared X, Y, L across the three views
+    $('X1').value = state.X; $('Y1').value = state.Y; $('L1').value = state.L;
+    $('X2').value = state.X; $('Y2').value = state.Y;
+    $('X3').value = state.X; $('Y3').value = state.Y; $('L3').value = state.L;
+    $('X1val').textContent = realLabel(state.X);
+    $('Y1val').textContent = realLabel(state.Y);
+    $('L1val').textContent = realLabel(state.L);
+    $('X2val').textContent = realLabel(state.X);
+    $('Y2val').textContent = realLabel(state.Y);
+    $('X3val').textContent = realLabel(state.X);
+    $('Y3val').textContent = realLabel(state.Y);
+    $('L3val').textContent = realLabel(state.L);
+    $('T1val').textContent = String(state.T1);
+    $('T2val').textContent = String(state.T2);
+  }
+
+  function setView(v) {
+    state.view = v;
+    for (var k = 1; k <= 3; k++) {
+      setters[k].classList.toggle('selected', k === v);
+      ctrlDivs[k].style.display = (k === v) ? '' : 'none';
+    }
+    positionPanels();
+    draw();
+  }
+
+  setters[1].addEventListener('click', function () { setView(1); });
+  setters[2].addEventListener('click', function () { setView(2); });
+  setters[3].addEventListener('click', function () { setView(3); });
+
+  function hook(id, key) {
+    $(id).addEventListener('input', function () {
+      state[key] = parseFloat(this.value);
+      syncSliders();
+      draw();
+    });
+  }
+  hook('T1', 'T1'); hook('T2', 'T2');
+  hook('X1', 'X'); hook('Y1', 'Y'); hook('L1', 'L');
+  hook('X2', 'X'); hook('Y2', 'Y');
+  hook('X3', 'X'); hook('Y3', 'Y'); hook('L3', 'L');
+
+  // ---------------------------------------------------------------- panels
+  var panels = {
+    Directions: $('panelDirections'),
+    Details: $('panelDetails'),
+    About: $('panelAbout')
+  };
+  var panelBtns = {
+    Directions: $('btnDirections'),
+    Details: $('btnDetails'),
+    About: $('btnAbout')
+  };
+
+  function positionPanels() {
+    var row = $('buttonRow');
+    var top = row.offsetTop + row.offsetHeight + 4;
+    for (var k in panels) panels[k].style.top = top + 'px';
+  }
+
+  function closeAll() {
+    for (var k in panels) {
+      panels[k].classList.remove('open');
+      panelBtns[k].classList.remove('active');
+    }
+  }
+
+  function typeset(panel) {
+    if (window.MathJax && MathJax.typesetPromise) {
+      MathJax.typesetPromise([panel]).catch(function () {});
+    }
+  }
+
+  Object.keys(panelBtns).forEach(function (name) {
+    panelBtns[name].addEventListener('click', function () {
+      var p = panels[name];
+      var wasOpen = p.classList.contains('open');
+      closeAll();
+      if (!wasOpen) {
+        positionPanels();
+        p.classList.add('open');
+        panelBtns[name].classList.add('active');
+        typeset(p);  // re-typeset: MathJax cannot measure hidden panels
+      }
+    });
+  });
+
+  Array.prototype.forEach.call(document.querySelectorAll('.panel .close-x'),
+    function (btn) { btn.addEventListener('click', closeAll); });
+
+  // ---------------------------------------------------------------- init
+  syncSliders();
+  positionPanels();
+  setView(1);
+  window.addEventListener('resize', positionPanels);
+})();
+</script>
+</body>
+</html>

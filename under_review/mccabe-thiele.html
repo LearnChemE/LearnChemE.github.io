@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How to Use the McCabe–Thiele Method for Fractional Distillation</title>
+<style>
+  html,body{margin:0;padding:0;background:#fff;color:#000;
+    font-family:Helvetica,Arial,sans-serif;}
+  #app{width:920px;margin:8px auto 24px auto;position:relative;}
+  .title{font-size:17px;font-weight:bold;text-align:center;margin:6px 0 10px 0;}
+  /* ---- controls ---- */
+  .controls{border:1px solid #c8c8c8;background:#fafafa;border-radius:3px;
+    padding:10px 12px;margin-bottom:8px;display:flex;align-items:flex-start;gap:18px;}
+  .control-stack{flex:0 0 auto;}
+  .ctrl-row{display:flex;align-items:center;min-height:30px;margin:5px 0;}
+  .ctrl-label{font-size:14px;color:#000;text-align:left;padding-right:10px;}
+  .setterbar{display:inline-flex;border:1px solid #9a9a9a;border-radius:3px;overflow:hidden;}
+  .setterbar button{font-family:Helvetica,Arial,sans-serif;font-size:13px;
+    border:none;border-right:1px solid #9a9a9a;background:#ececec;color:#222;
+    padding:5px 12px;cursor:pointer;outline:none;}
+  .setterbar button:last-child{border-right:none;}
+  .setterbar button.sel{background:#8b0000;color:#fff;}
+  .setterbar button:hover:not(.sel){background:#dcdcdc;}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:300px;height:7px;
+    background:#9a9a9a;border:1px solid #7a7a7a;border-radius:4px;outline:none;margin:0 10px;
+    vertical-align:middle;}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
+    width:15px;height:22px;background:#4a4a4a;border:1px solid #2a2a2a;border-radius:3px;cursor:pointer;}
+  input[type=range]::-moz-range-thumb{width:15px;height:22px;background:#4a4a4a;
+    border:1px solid #2a2a2a;border-radius:3px;cursor:pointer;}
+  .valbox{font-size:14px;min-width:42px;display:inline-block;text-align:left;}
+  /* ---- plots ---- */
+  .plots{display:flex;gap:6px;}
+  #xyWrap{flex:0 0 560px;}
+  #colWrap{flex:1;}
+  canvas{display:block;}
+  /* ---- info buttons (vertical column, right side of controls panel) ---- */
+  .infobar{display:flex;flex-direction:column;gap:8px;flex:0 0 auto;align-self:flex-start;}
+  .infobar button{font-family:Helvetica,Arial,sans-serif;font-size:16.1px;
+    background:#8b0000;color:#fff;border:none;border-radius:3px;padding:8px 0;width:132px;
+    cursor:pointer;text-align:center;}
+  .infobar button:hover{background:#a40000;}
+  .infobar button.active{background:#5e0000;}
+  /* ---- flyout panels: absolute, just right of + below their button ---- */
+  .panel{display:none;position:absolute;z-index:30;border:1px solid #999;background:#fff;
+    box-shadow:0 3px 12px rgba(0,0,0,0.28);border-radius:4px;
+    padding:12px 16px;font-size:14px;line-height:1.5;color:#111;
+    max-height:560px;overflow:auto;}
+  .panel.show{display:block;}
+  .panel-close{position:sticky;top:0;float:right;margin:-2px -4px 0 10px;
+    cursor:pointer;color:#8b0000;font:bold 22px/1 Helvetica,Arial,sans-serif;
+    user-select:none;z-index:2;}
+  .panel-close:hover{color:#c00000;}
+  .panel h4{margin:0 0 6px 0;font-size:15px;}
+  .panel a{color:#98000d;}
+  .eq{font-style:italic;margin:8px 0;font-size:14.5px;text-align:center;}
+  .gam{font-family:"Cambria Math","STIX Two Math",Georgia,"Times New Roman",serif;
+    font-style:normal;font-size:1.08em;}
+  .ovl{text-decoration:overline;}
+  sub{font-size:0.75em;}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="title">How to Use the McCabe&ndash;Thiele Method for Fractional Distillation</div>
+
+  <div class="controls">
+    <div class="control-stack">
+      <div class="ctrl-row">
+        <div class="setterbar" id="modeBar">
+          <button data-m="1">plot points</button>
+          <button data-m="2">draw operating lines</button>
+          <button data-m="3">count stages</button>
+          <button data-m="4">optimal feed location</button>
+        </div>
+      </div>
+
+      <div class="ctrl-row" id="pointRow">
+        <div class="setterbar" id="pointBar">
+          <button data-p="1">feed</button>
+          <button data-p="2">distillate</button>
+          <button data-p="3">bottoms</button>
+        </div>
+      </div>
+
+      <div class="ctrl-row" id="qRow">
+        <span class="ctrl-label">feed quality</span>
+        <input type="range" id="qSlider" min="-0.2" max="1.5" step="0.1" value="0.5">
+        <span class="valbox" id="qVal">0.5</span>
+      </div>
+      <div class="ctrl-row" id="lineRow">
+        <div class="setterbar" id="lineBar">
+          <button data-l="1">feed</button>
+          <button data-l="2">rectifying</button>
+          <button data-l="3">stripping</button>
+        </div>
+      </div>
+
+      <div class="ctrl-row" id="stepRow">
+        <span class="ctrl-label">step off stages</span>
+        <input type="range" id="stepSlider" min="0" max="10" step="1" value="0">
+        <span class="valbox" id="stepVal">0</span>
+      </div>
+    </div>
+
+    <div class="infobar">
+      <button id="bDir">Directions</button>
+      <button id="bDet">Details</button>
+      <button id="bAbt">About</button>
+    </div>
+  </div>
+
+  <div class="plots">
+    <div id="xyWrap"><canvas id="xy" width="560" height="500"></canvas></div>
+    <div id="colWrap"><canvas id="col" width="354" height="500"></canvas></div>
+  </div>
+
+  <div class="panel" id="pDir">
+    <div class="panel-close" title="close">&times;</div>
+    <h4>Directions</h4>
+    <p>This simulation shows how to use the McCabe&ndash;Thiele method to determine the number of
+    equilibrium stages needed to separate a binary mixture (methanol and water) in a distillation
+    column. First, select &ldquo;plot points&rdquo; to show the location of the feed, distillate, and
+    bottoms compositions on the <i>x</i>-<i>y</i> diagram. The methanol feed mole fraction is
+    <i>z</i><sub>F</sub>&nbsp;=&nbsp;0.5, the desired methanol mole fraction in the distillate is
+    <i>x</i><sub>D</sub>&nbsp;=&nbsp;0.85, and the desired methanol mole fraction in the bottoms is
+    <i>x</i><sub>B</sub>&nbsp;=&nbsp;0.05. Next, select &ldquo;draw operating lines&rdquo; to set the
+    feed quality (fraction of liquid in the feed, where <i>q</i>&nbsp;&gt;&nbsp;1 is for a subcooled
+    liquid) with a slider and plot the operating lines for the feed, rectifying and stripping
+    sections. The diagram on the right shows a representation of part of the distillation column and
+    explains the equations used for the operating lines. Then, select &ldquo;count stages&rdquo; and
+    use the slider to step off stages and draw lines for each stage; the diagram on the right
+    highlights the corresponding location on the column. The partial reboiler is considered an
+    equilibrium stage. The green horizontal lines on the <i>x</i>-<i>y</i> diagram result from a
+    material balance between stages. The purple vertical lines correspond to vapor-liquid equilibrium
+    (VLE) on each stage. Finally, select &ldquo;optimal feed location&rdquo; to determine where the
+    feed should enter the column; the feed should enter above the stage where the rectifying and
+    stripping sections meet. Mouse over the stage numbers on the <i>x</i>-<i>y</i> diagram to see to
+    which section the numbers correspond.</p>
+  </div>
+
+  <div class="panel" id="pDet">
+    <div class="panel-close" title="close">&times;</div>
+    <h4>Details</h4>
+    <p>The equilibrium curve is calculated using the modified Raoult&rsquo;s law:</p>
+    <p class="eq">P = x<sub>1</sub> <span class="gam">&gamma;</span><sub>1</sub> P<sub>1</sub><sup>sat</sup> +
+       x<sub>2</sub> <span class="gam">&gamma;</span><sub>2</sub> P<sub>2</sub><sup>sat</sup></p>
+    <p>where <i>x</i><sub>i</sub> and <i>y</i><sub>i</sub> are the liquid and vapor mole fractions
+    (<i>i</i>&nbsp;=&nbsp;1 for methanol, <i>i</i>&nbsp;=&nbsp;2 for water),
+    <i>x</i><sub>1</sub>&nbsp;+&nbsp;<i>x</i><sub>2</sub>&nbsp;=&nbsp;1,
+    <i>y</i><sub>1</sub>&nbsp;+&nbsp;<i>y</i><sub>2</sub>&nbsp;=&nbsp;1, <i>P</i> is total pressure
+    (bar), and <i>P</i><sub>i</sub><sup>sat</sup> is the saturation pressure (bar), which is
+    calculated using the Antoine equation:</p>
+    <p class="eq">log<sub>10</sub>[P<sub>i</sub><sup>sat</sup>] = A<sub>i</sub> &minus;
+       B<sub>i</sub> / (T + C<sub>i</sub>)</p>
+    <p>where <i>T</i> is temperature (&deg;C) and <i>A</i><sub>i</sub>, <i>B</i><sub>i</sub> and
+    <i>C</i><sub>i</sub> are constants.</p>
+    <p>The activity coefficients <span class="gam">&gamma;</span><sub>i</sub> are calculated using the
+    two-parameter Margules model:</p>
+    <p class="eq">ln&nbsp;<span class="gam">&gamma;</span><sub>1</sub> = x<sub>2</sub><sup>2</sup>
+       (A<sub>12</sub> + 2 (A<sub>21</sub> &minus; A<sub>12</sub>) x<sub>1</sub>) ,</p>
+    <p class="eq">ln&nbsp;<span class="gam">&gamma;</span><sub>2</sub> = x<sub>1</sub><sup>2</sup>
+       (A<sub>21</sub> + 2 (A<sub>12</sub> &minus; A<sub>21</sub>) x<sub>2</sub>) ,</p>
+    <p>where <i>A</i><sub>12</sub>&nbsp;=&nbsp;0.7923 and <i>A</i><sub>21</sub>&nbsp;=&nbsp;0.5434 are
+    the dimensionless Margules parameters for a methanol-water mixture.</p>
+
+    <p>The operating line for the rectifying section from stages 1 to <i>n</i> is found from a
+    material balance:</p>
+    <p class="eq">y<sub>n+1</sub> V = x<sub>n</sub> L + x<sub>D</sub> D ,</p>
+    <p>written in slope-intercept form as</p>
+    <p class="eq">y<sub>n+1</sub> = (L / V) x<sub>n</sub> + (D / V) x<sub>D</sub> ,</p>
+    <p>where <i>L</i> and <i>V</i> are the liquid and vapor molar flow rates in the rectifying
+    section, <i>D</i> is the distillate molar flow rate, and <i>x</i><sub>D</sub> is the mole
+    fraction of methanol in the distillate stream.</p>
+    <p>Under the assumption of constant molar overflow (CMO), the reflux ratio
+    <i>R</i>&nbsp;=&nbsp;<i>L</i>/<i>D</i> is the same everywhere. Because
+    <i>V</i>&nbsp;=&nbsp;<i>L</i>&nbsp;+&nbsp;<i>D</i>, the rectifying section&rsquo;s operating line
+    can be written in terms of the reflux ratio:</p>
+    <p class="eq">y = [R / (R + 1)] x + [1 / (R + 1)] x<sub>D</sub></p>
+
+    <p>The operating line for the stripping section from stages <i>N</i> to <i>m</i>&nbsp;+&nbsp;1 is
+    found from a material balance:</p>
+    <p class="eq">x<sub>m</sub> <span class="ovl">L</span> = y<sub>m+1</sub> <span class="ovl">V</span>
+       + x<sub>B</sub> B ,</p>
+    <p>which, when written in slope-intercept form, is:</p>
+    <p class="eq">y<sub>m+1</sub> = (<span class="ovl">L</span> / <span class="ovl">V</span>)
+       x<sub>m</sub> &minus; (B / <span class="ovl">V</span>) x<sub>B</sub> ,</p>
+    <p>where <span class="ovl">L</span> and <span class="ovl">V</span> are the liquid and vapor molar
+    flow rates in the stripping section, <i>B</i> is the bottoms molar flow rate, and
+    <i>x</i><sub>B</sub> is the mole fraction of methanol in the bottoms stream.</p>
+    <p>The boilup ratio <i>S</i>&nbsp;=&nbsp;<span class="ovl">V</span>/<i>B</i> is constant everywhere.
+    Combining <i>S</i> with a material balance around the partial reboiler,
+    <span class="ovl">L</span>&nbsp;=&nbsp;<span class="ovl">V</span>&nbsp;+&nbsp;<i>B</i>, the operating
+    line for the stripping section can be written in terms of the boilup ratio:</p>
+    <p class="eq">y = [(S + 1) / S] x &minus; (1 / S) x<sub>B</sub> .</p>
+
+    <p>The feed operating line (<i>q</i>-line) can also be used to locate the stripping operating
+    line, because all three operating lines share an intersection point. The parameter <i>q</i> is
+    defined as the ratio of the increase in molar reflux rate across the feed stage to the molar feed
+    rate:</p>
+    <p class="eq">q = (<span class="ovl">L</span> &minus; L) / F = 1 +
+       (<span class="ovl">V</span> &minus; V) / F ,</p>
+    <p>where <i>F</i> is the feed molar flow rate. The <i>q</i>-line can be derived from the following
+    mass balance:</p>
+    <p class="eq">y (V &minus; <span class="ovl">V</span>) = x (L &minus; <span class="ovl">L</span>)
+       + x<sub>D</sub> D + x<sub>B</sub> B .</p>
+    <p>By combining an overall material balance around the column
+    z<sub>F</sub>&nbsp;F&nbsp;=&nbsp;x<sub>D</sub>&nbsp;D&nbsp;+&nbsp;x<sub>B</sub>&nbsp;B (where
+    <i>z</i><sub>F</sub> is the mole fraction of methanol in the feed), a material balance around the
+    feed stage
+    <i>F</i>&nbsp;+&nbsp;<i>L</i>&nbsp;+&nbsp;<span class="ovl">V</span>&nbsp;=&nbsp;<span class="ovl">L</span>&nbsp;+&nbsp;<i>V</i>,
+    and the definition of <i>q</i>, the <i>q</i>-line can be written in slope-intercept form as</p>
+    <p class="eq">y = [q / (q &minus; 1)] x &minus; [1 / (q &minus; 1)] z<sub>F</sub></p>
+
+    <p>Once the operating lines and compositions are plotted on the <i>x</i>-<i>y</i> diagram, the
+    number of equilibrium stages needed to achieve a bottoms composition of <i>x</i><sub>B</sub> is
+    determined. Start at the top of the column at
+    <i>x</i><sub>D</sub>&nbsp;=&nbsp;<i>y</i><sub>D</sub>. On each stage, the liquid and vapor streams
+    are in VLE, so the stream has a liquid composition <i>x</i><sub>n</sub> and a vapor composition
+    <i>y</i><sub>n</sub>. A vertical line (purple) is drawn from the equilibrium curve at
+    <i>y</i><sub>n</sub> to the <i>x</i>-<i>y</i> line at <i>x</i><sub>n</sub>. This process is
+    repeated until the bottoms composition <i>x</i><sub>B</sub> is reached. Typically the number of
+    stages drawn is not a whole number. The partial reboiler is considered an equilibrium stage.</p>
+  </div>
+
+  <div class="panel" id="pAbt">
+    <div class="panel-close" title="close">&times;</div>
+    <h4>About</h4>
+    <p>This simulation was created in the
+    <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological
+    Engineering</a> at University of Colorado Boulder for
+    <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by John&nbsp;L.&nbsp;Falconer
+    using Claude AI. It is a JavaScript/HTML5 implementation of a
+    <a href="https://demonstrations.wolfram.com/HowToUseTheMcCabeThieleMethodForFractionalDistillation/"
+    target="_blank">Mathematica simulation</a> by Rachael&nbsp;L.&nbsp;Baumann and
+    John&nbsp;L.&nbsp;Falconer. It was prepared with financial support from the National Science
+    Foundation (DUE 2336987 and 2336988) in collaboration with Washington State University. Address
+    any questions or comments to LearnChemE@gmail.com.</p>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* ============================== physics ============================== */
+const zF=0.5, xD=0.85, xB=0.05, R=1.5, P=1.0;
+const A12=0.7923, A21=0.5434;
+const Psat1=T=>Math.pow(10,5.31301-1676.569/(T+251.272)); // methanol, T in C, bar
+const Psat2=T=>Math.pow(10,4.6542 -1435.264/(T+208.152)); // water
+const g1=x=>Math.exp((1-x)*(1-x)*(A12+2*(A21-A12)*x));
+const g2=x=>Math.exp(x*x*(A21+2*(A12-A21)*(1-x)));
+
+function bubbleT(x){ // T (C) s.t. bubble pressure = P
+  let lo=0, hi=150;
+  const f=T=>x*g1(x)*Psat1(T)+(1-x)*g2(x)*Psat2(T)-P;
+  let flo=f(lo);
+  for(let k=0;k<80;k++){const mid=0.5*(lo+hi); if(f(mid)*flo<=0)hi=mid; else{lo=mid;flo=f(mid);} }
+  return 0.5*(lo+hi);
+}
+function eqY(x){ // vapor y given liquid x on equilibrium curve
+  if(x<=0)return 0; if(x>=1)return 1;
+  const T=bubbleT(x);
+  return x*g1(x)*Psat1(T)/P;
+}
+function invEq(y){ // x s.t. eqY(x)=y  (bisection)
+  if(y<=0)return 0; if(y>=1)return 1;
+  let lo=1e-7, hi=1-1e-7;
+  for(let k=0;k<80;k++){const mid=0.5*(lo+hi); if(eqY(mid)>y)hi=mid; else lo=mid;}
+  return 0.5*(lo+hi);
+}
+const feedLine=(x,q)=> (Math.abs(q-1)<1e-9)? NaN : (q/(q-1))*x - zF/(q-1);
+const rect=x=> (R/(R+1))*x + xD/(R+1);
+
+function solveXiByCurve(f,g,a,b){ // root of f-g on [a,b]
+  let fa=f(a)-g(a);
+  for(let k=0;k<100;k++){const m=0.5*(a+b); const fm=f(m)-g(m);
+    if(fa*fm<=0)b=m; else{a=m;fa=fm;} }
+  return 0.5*(a+b);
+}
+
+// precompute equilibrium curve polyline
+const EQX=[],EQY=[];
+for(let i=0;i<=200;i++){const x=i/200; EQX.push(x); EQY.push(eqY(x));}
+
+/* compute all q-dependent quantities + staircase */
+function solveAll(q){
+  let xi,yi,Vb,xeq;
+  if(Math.abs(q-1)<1e-9){ xi=zF; }            // vertical q-line
+  else { xi=solveXiByCurve(x=>feedLine(x,q),x=>rect(x),0.001,0.999); }
+  yi=rect(xi);
+  Vb=(xB-xi)/(xi-yi);
+  const strip=x=>((Vb+1)/Vb)*x-(1/Vb)*xB;
+  // xeq = feed line ∩ equilibrium curve
+  if(Math.abs(q-1)<1e-9){ xeq=zF; }
+  else { xeq=solveXiByCurve(x=>feedLine(x,q),x=>eqY(x),0.001,0.999); }
+
+  // staircase (rectifying then stripping)
+  const xR=[xD], yR=[xD];
+  let i=0, guard=0;
+  while(xR[i]>xi && guard++<60){
+    const x1=invEq(yR[i]); const y1=rect(x1);
+    if(x1>xi){ xR.push(x1); yR.push(y1); }
+    i++;
+    if(xR.length<=i) break;
+  }
+  const nR=xR.length-1;
+  const xS=[xR[nR]], yS=[yR[nR]];
+  i=0; guard=0;
+  while(xS[i]>xB && guard++<60){
+    const x1=invEq(yS[i]); const y1=strip(x1);
+    xS.push(x1); yS.push(y1); i++;
+  }
+  const nStrip=xS.length-1;     // stripping steps drawn, including the partial reboiler
+  const nS=nStrip-1;            // Mathematica's nS = i-1 (stripping stages excluding reboiler)
+  const nT=nR+nStrip;          // total equilibrium stages, partial reboiler = stage nT
+
+  // ordered staircase segments: alternating H (green, material balance) and V (purple, VLE)
+  // start at (xD,xD); for each level: H to equilibrium curve, V down to operating line
+  const segs=[]; // {x1,y1,x2,y2,type:'H'|'V',sec:'R'|'S', stage:n}
+  // rectifying
+  for(let k=0;k<nR;k++){
+    segs.push({x1:xR[k],y1:yR[k],x2:xR[k+1],y2:yR[k],type:'H',sec:'R',stage:k+1});
+    segs.push({x1:xR[k+1],y1:yR[k],x2:xR[k+1],y2:yR[k+1],type:'V',sec:'R',stage:k+1});
+  }
+  // stripping (continues from last rect point); last pair is the partial reboiler
+  for(let k=0;k<nStrip;k++){
+    segs.push({x1:xS[k],y1:yS[k],x2:xS[k+1],y2:yS[k],type:'H',sec:'S',stage:nR+k+1});
+    segs.push({x1:xS[k+1],y1:yS[k],x2:xS[k+1],y2:yS[k+1],type:'V',sec:'S',stage:nR+k+1});
+  }
+  // stage label corner points (liquid composition on each stage) + section
+  const stageLabels=[];
+  for(let k=1;k<=nR;k++)stageLabels.push({x:xR[k],y:yR[k-1],n:k,sec:'rectifying'});
+  for(let k=1;k<=nStrip;k++)stageLabels.push({x:xS[k],y:yS[k-1],n:nR+k,sec:(nR+k===nT?'partial reboiler':'stripping')});
+
+  return {xi,yi,Vb,xeq,strip,nR,nS,nT,xR,yR,xS,yS,segs,stageLabels};
+}
+
+/* ============================== state ============================== */
+const S={mode:1, point:1, q:0.5, line:1, step:0, hover:null};
+
+/* ============================== drawing: x-y diagram ============================== */
+const COL_FEED="#0000ff", COL_DIST="#ff6600", COL_BOT="#ff0099";
+const COL_GREEN="#009900", COL_PURPLE="#800080";
+
+const xyc=document.getElementById('xy'), xyx=xyc.getContext('2d');
+const colc=document.getElementById('col'), colx=colc.getContext('2d');
+function hidpi(cv,ctx){const r=window.devicePixelRatio||1; const w=cv.width,h=cv.height;
+  cv.width=w*r;cv.height=h*r;cv.style.width=w+'px';cv.style.height=h+'px';ctx.scale(r,r);
+  cv._w=w;cv._h=h;}
+hidpi(xyc,xyx); hidpi(colc,colx);
+
+// plot frame for x-y
+const PL={l:62,r:18,t:18,b:52,w:560,h:500};
+const px=x=>PL.l+x*(PL.w-PL.l-PL.r);
+const py=y=>(PL.h-PL.b)-y*(PL.h-PL.t-PL.b);
+
+function line(ctx,x1,y1,x2,y2,c,w){ctx.strokeStyle=c;ctx.lineWidth=w||1;
+  ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();}
+
+function drawXY(s){
+  const ctx=xyx; ctx.clearRect(0,0,PL.w,PL.h);
+  ctx.font='16.8px Helvetica,Arial,sans-serif'; ctx.textBaseline='alphabetic';
+  // axes box
+  ctx.strokeStyle='#000';ctx.lineWidth=1;
+  ctx.strokeRect(px(0),py(1),px(1)-px(0),py(0)-py(1));
+  // ticks
+  ctx.fillStyle='#000';ctx.textAlign='center';
+  for(let i=0;i<=10;i+=2){const v=i/10;
+    line(ctx,px(v),py(0),px(v),py(0)-5,'#000',1);
+    ctx.fillText(v.toFixed(1),px(v),py(0)+18);
+    line(ctx,px(0),py(v),px(0)+5,py(v),'#000',1);
+    ctx.textAlign='right';ctx.fillText(v.toFixed(1),px(0)-8,py(v)+4);ctx.textAlign='center';
+  }
+  // axis labels (identical font for both axes, 10% larger than the tick numbers)
+  ctx.font='18.5px Helvetica,Arial,sans-serif';ctx.textAlign='center';
+  ctx.fillText('liquid mole fraction  x',(px(0)+px(1))/2,PL.h-13);
+  ctx.save();ctx.translate(17,(py(0)+py(1))/2);ctx.rotate(-Math.PI/2);
+  ctx.font='18.5px Helvetica,Arial,sans-serif';ctx.textAlign='center';
+  ctx.fillText('vapor mole fraction  y',0,0);ctx.restore();
+  // diagonal y=x
+  line(ctx,px(0),py(0),px(1),py(1),'#000',1);
+  // equilibrium curve
+  ctx.strokeStyle='#000';ctx.lineWidth=1.6;ctx.beginPath();
+  for(let i=0;i<EQX.length;i++){const X=px(EQX[i]),Y=py(EQY[i]);
+    i?ctx.lineTo(X,Y):ctx.moveTo(X,Y);}
+  ctx.stroke();
+
+  /* ---- mode 1: plot points ---- */
+  if(s===null) return;
+  if(S.mode===1){
+    const pts=[[1,zF,COL_FEED,'feed  z',  'F'],
+               [2,xD,COL_DIST,'distillate  x','D'],
+               [3,xB,COL_BOT ,'bottoms  x','B']];
+    pts.forEach(p=>{ if(S.point!==p[0])return;
+      const v=p[1];
+      ctx.setLineDash([5,4]);
+      line(ctx,px(v),py(0),px(v),py(v),p[2],1.4);
+      line(ctx,px(0),py(v),px(v),py(v),p[2],1.4);
+      ctx.setLineDash([]);
+      dot(ctx,px(v),py(v),p[2]);
+      label(ctx,p[3],p[4],' = '+fmt(v),p[2],px(v),py(v),p[0]);
+    });
+  }
+
+  /* ---- mode 2: operating lines ---- */
+  if(S.mode===2){
+    drawOpLines(s,ctx,true);
+  }
+
+  /* ---- mode 3: count stages ---- */
+  if(S.mode===3){
+    drawOpLines(s,ctx,false);
+    drawStaircase(s,ctx);
+  }
+
+  /* ---- mode 4: optimal feed ---- */
+  if(S.mode===4){
+    drawOpLines(s,ctx,false);
+    drawStaircaseAll(s,ctx);
+    // arrow from (xi,yi) to (xeq, feedLine(xeq))
+    const ax1=px(s.xi),ay1=py(s.yi),ax2=px(s.xeq),ay2=py(feedLine(s.xeq,S.q));
+    arrow(ctx,ax1,ay1,ax2,ay2,COL_FEED);
+    ctx.fillStyle=COL_FEED;ctx.font='15.6px Helvetica';ctx.textAlign='left';
+    const oflines=['feed enters above the stage','where rectifying and stripping',
+                   'lines intersect'];
+    oflines.forEach((t,i)=>ctx.fillText(t,px(0.44),py(0.27)+i*22));
+  }
+}
+
+function fmt(v){ // significant figures: zF=0.5, xD=0.85, xB=0.05 → trim trailing zeros
+  let s=v.toFixed(2); if(s.endsWith('0'))s=s.slice(0,-1); return s; }
+
+function dot(ctx,X,Y,c){ctx.fillStyle=c;ctx.beginPath();ctx.arc(X,Y,5,0,7);ctx.fill();}
+function subText(ctx,parts,X,Y,c,align){
+  // parts: array of [text, isSub]; align 'left'|'right'
+  ctx.fillStyle=c;
+  let total=0;
+  parts.forEach(p=>{ctx.font=(p[1]?'italic 13.2px ':'italic 18px ')+'Helvetica,Arial';
+    total+=ctx.measureText(p[0]).width;});
+  let cx = align==='right'? X-total : X;
+  parts.forEach(p=>{ctx.font=(p[1]?'italic 13.2px ':'italic 18px ')+'Helvetica,Arial';
+    ctx.textAlign='left';ctx.fillText(p[0],cx,Y+(p[1]?3:0));cx+=ctx.measureText(p[0]).width;});
+}
+function labelBG(ctx,parts,X,Y,align){
+  let total=0;parts.forEach(p=>{ctx.font=(p[1]?'italic 13.2px ':'italic 18px ')+'Helvetica,Arial';
+    total+=ctx.measureText(p[0]).width;});
+  const x0=align==='right'?X-total:X;
+  ctx.fillStyle='#fff';ctx.fillRect(x0-2,Y-16,total+4,22);
+}
+function label(ctx,t1,sub,t2,c,X,Y,which){
+  // which: 1 feed (left & above), 2 distillate (left & below), 3 bottoms (right of point)
+  const parts=[[t1,false],[sub,true],[t2,false]];
+  if(which===2){
+    labelBG(ctx,parts,X-10,Y+22,'right');
+    subText(ctx,parts,X-10,Y+22,c,'right');
+  } else if(which===1){
+    subText(ctx,parts,X-8,Y-12,c,'right');
+  } else {
+    subText(ctx,parts,X+12,Y+6,c,'left');
+  }
+}
+
+function drawOpLines(s,ctx,progressive){
+  const q=S.q;
+  const drawFeed=()=>{
+    if(Math.abs(q-1)<1e-9){line(ctx,px(zF),py(zF),px(zF),py(eqY(zF)),COL_FEED,2);return;}
+    const xa=(progressive&&S.line===1)? s.xeq : s.xi;
+    line(ctx,px(xa),py(feedLine(xa,q)),px(zF),py(zF),COL_FEED,2);
+  };
+  const drawRect=()=>line(ctx,px(s.xi),py(s.yi),px(xD),py(xD),COL_DIST,2);
+  const drawStrip=()=>line(ctx,px(xB),py(xB),px(s.xi),py(s.yi),COL_BOT,2);
+
+  if(progressive){
+    drawFeed();
+    if(S.line>=2)drawRect();
+    if(S.line>=3)drawStrip();
+    // slope label
+    ctx.font='italic 16px Helvetica';
+    if(S.line===1){ctx.fillStyle=COL_FEED;ctx.textAlign='left';
+      ctx.font='italic 19.2px Helvetica';
+      ctx.fillText('slope = q/(q \u2212 1)',px(zF)+8,py(zF)+6);}
+    if(S.line===2){ctx.font='italic 19.2px Helvetica';ctx.textAlign='left';
+      const t='slope = L/V',tw=ctx.measureText(t).width,lx=px(0.45),ly=py(0.77);
+      ctx.fillStyle='#fff';ctx.fillRect(lx-3,ly-17,tw+6,22);
+      ctx.fillStyle=COL_DIST;ctx.fillText(t,lx,ly);}
+    if(S.line===3){ctx.font='italic 19.2px Helvetica';ctx.textAlign='left';
+      const t='slope = L\u0305/V\u0305',tw=ctx.measureText(t).width,lx=px(0.30),ly=py(0.31);
+      ctx.fillStyle='#fff';ctx.fillRect(lx-3,ly-17,tw+6,22);
+      ctx.fillStyle=COL_BOT;ctx.fillText(t,lx,ly);}
+  } else {
+    drawFeed();drawRect();drawStrip();
+  }
+}
+
+function drawStaircase(s,ctx){
+  const n=Math.min(S.step,s.segs.length);
+  for(let k=0;k<n;k++){
+    const sg=s.segs[k];
+    const c=(sg.type==='H')?COL_GREEN:COL_PURPLE;
+    const wd=(k===n-1)?2.6:1.8;
+    line(ctx,px(sg.x1),py(sg.y1),px(sg.x2),py(sg.y2),c,wd);
+  }
+  if(n>0) drawStageNumbers(s,ctx,n);
+}
+function drawStaircaseAll(s,ctx){
+  s.segs.forEach(sg=>{const c=(sg.type==='H')?COL_GREEN:COL_PURPLE;
+    line(ctx,px(sg.x1),py(sg.y1),px(sg.x2),py(sg.y2),c,1.8);});
+  drawStageNumbers(s,ctx,s.segs.length);
+}
+function drawStageNumbers(s,ctx,nSegShown){
+  // show a stage number once its vertical (VLE) segment has been drawn
+  const shownStages=new Set();
+  for(let k=0;k<nSegShown;k++){if(s.segs[k].type==='V')shownStages.add(s.segs[k].stage);}
+  ctx.font='15px Helvetica';
+  s.stageLabels.forEach(L=>{
+    if(!shownStages.has(L.n))return;
+    const X=px(L.x),Y=py(L.y);
+    ctx.fillStyle=(L.sec==='rectifying')?COL_DIST:(L.sec==='partial reboiler'?'#000':COL_BOT);
+    ctx.textAlign='right';ctx.textBaseline='middle';
+    ctx.fillText(String(L.n),X-7,Y-2);
+    L._sx=X-14;L._sy=Y-2; // store for hover
+  });
+  ctx.textBaseline='alphabetic';
+  // hover tooltip
+  if(S.hover){
+    const L=S.hover;
+    ctx.fillStyle='#ffffe0';ctx.strokeStyle='#888';
+    const t='stage '+L.n+': '+L.sec;
+    ctx.font='13px Helvetica';const tw=ctx.measureText(t).width;
+    const bx=px(L.x)+8,by=py(L.y)-10;
+    ctx.fillRect(bx,by-14,tw+10,20);ctx.strokeRect(bx,by-14,tw+10,20);
+    ctx.fillStyle='#000';ctx.textAlign='left';ctx.fillText(t,bx+5,by);
+  }
+}
+function arrow(ctx,x1,y1,x2,y2,c){
+  line(ctx,x1,y1,x2,y2,c,2);
+  const a=Math.atan2(y2-y1,x2-x1),L=9;
+  ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);
+  ctx.lineTo(x2-L*Math.cos(a-0.4),y2-L*Math.sin(a-0.4));
+  ctx.lineTo(x2-L*Math.cos(a+0.4),y2-L*Math.sin(a+0.4));
+  ctx.closePath();ctx.fill();
+}
+
+/* ============================== drawing: column schematic ============================== */
+// vertical / horizontal arrows (optional dashed shaft) for the column canvas
+function vArrow(ctx,x,y1,y2,c,dash){
+  ctx.strokeStyle=c;ctx.lineWidth=1.6;ctx.setLineDash(dash?[5,4]:[]);
+  ctx.beginPath();ctx.moveTo(x,y1);ctx.lineTo(x,y2);ctx.stroke();ctx.setLineDash([]);
+  const d=Math.sign(y2-y1);ctx.fillStyle=c;ctx.beginPath();
+  ctx.moveTo(x,y2);ctx.lineTo(x-4.5,y2-8*d);ctx.lineTo(x+4.5,y2-8*d);ctx.closePath();ctx.fill();
+}
+function hArrow(ctx,x1,x2,y,c){
+  ctx.strokeStyle=c;ctx.lineWidth=2;ctx.setLineDash([]);
+  ctx.beginPath();ctx.moveTo(x1,y);ctx.lineTo(x2,y);ctx.stroke();
+  const d=Math.sign(x2-x1);ctx.fillStyle=c;ctx.beginPath();
+  ctx.moveTo(x2,y);ctx.lineTo(x2-9*d,y-5);ctx.lineTo(x2-9*d,y+5);ctx.closePath();ctx.fill();
+}
+// multi-segment pipe ending in an arrowhead (dir up|down|left|right)
+function pipe(ctx,pts,c,dir){
+  ctx.strokeStyle=c;ctx.lineWidth=1.7;ctx.setLineDash([]);
+  ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);
+  for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i][0],pts[i][1]);
+  ctx.stroke();
+  const ex=pts[pts.length-1][0],ey=pts[pts.length-1][1];ctx.fillStyle=c;ctx.beginPath();
+  if(dir==='up'){ctx.moveTo(ex,ey);ctx.lineTo(ex-4.5,ey+8);ctx.lineTo(ex+4.5,ey+8);}
+  else if(dir==='down'){ctx.moveTo(ex,ey);ctx.lineTo(ex-4.5,ey-8);ctx.lineTo(ex+4.5,ey-8);}
+  else if(dir==='left'){ctx.moveTo(ex,ey);ctx.lineTo(ex+8,ey-4.5);ctx.lineTo(ex+8,ey+4.5);}
+  else{ctx.moveTo(ex,ey);ctx.lineTo(ex-8,ey-4.5);ctx.lineTo(ex-8,ey+4.5);}
+  ctx.closePath();ctx.fill();
+}
+// curved path ending in an arrowhead (dir 'up'|'down'), optional dashed
+function curveArrow(ctx,x0,y0,cx,cy,x1,y1,ex,ey,c,dash,dir){
+  ctx.strokeStyle=c;ctx.lineWidth=2;ctx.setLineDash(dash?[5,4]:[]);
+  ctx.beginPath();ctx.moveTo(x0,y0);ctx.quadraticCurveTo(cx,cy,x1,y1);ctx.lineTo(ex,ey);ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle=c;ctx.beginPath();
+  const d=(dir==='down')?1:-1;
+  ctx.moveTo(ex,ey);ctx.lineTo(ex-4.5,ey-8*d);ctx.lineTo(ex+4.5,ey-8*d);ctx.closePath();ctx.fill();
+}
+// rich label: tokens [{t,ob,sub}] with overbar / subscript; align left|center|right
+function richLabel(ctx,tokens,cx,y,c,size,align){
+  size=size||19;ctx.fillStyle=c;
+  const big='italic '+size+'px Helvetica,Arial', sm='italic '+(size*0.72)+'px Helvetica,Arial';
+  let tot=0;tokens.forEach(tk=>{ctx.font=tk.sub?sm:big;tot+=ctx.measureText(tk.t).width;});
+  let x=align==='center'?cx-tot/2:align==='right'?cx-tot:cx;
+  ctx.textAlign='left';
+  tokens.forEach(tk=>{ctx.font=tk.sub?sm:big;const w=ctx.measureText(tk.t).width;
+    ctx.fillText(tk.t,x,y+(tk.sub?size*0.24:0));
+    if(tk.ob){ctx.strokeStyle=c;ctx.lineWidth=1.2;ctx.beginPath();
+      ctx.moveTo(x+1,y-size*0.78);ctx.lineTo(x+w-1,y-size*0.78);ctx.stroke();}
+    x+=w;});
+  return tot;
+}
+function measTokens(ctx,tokens,size){let t=0;const big='italic '+size+'px Helvetica',sm='italic '+(size*0.72)+'px Helvetica';
+  tokens.forEach(tk=>{ctx.font=tk.sub?sm:big;t+=ctx.measureText(tk.t).width;});return t;}
+// fraction with rich numerator/denominator, top-left at x; bar at ymid
+function fracR(ctx,num,den,x,ymid,size,c){
+  const wn=measTokens(ctx,num,size),wd=measTokens(ctx,den,size),w=Math.max(wn,wd);
+  richLabel(ctx,num,x+w/2,ymid-4,c,size,'center');
+  richLabel(ctx,den,x+w/2,ymid+size-1,c,size,'center');
+  ctx.strokeStyle=c;ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(x,ymid);ctx.lineTo(x+w,ymid);ctx.stroke();
+  return w;
+}
+
+// Column figure for "draw operating lines" + "feed": the feed stage with q defined
+function drawFeedColumn(ctx){
+  const W=354,H=500;ctx.clearRect(0,0,W,H);ctx.textAlign='left';
+  const bx1=88,bx2=322,by1=206,by2=266,byc=236;   // horizontal "feed stage" box
+  const xF=138, xL=150, xVup=257, xVdn=272;        // stream x-positions
+  // title = feed-quality description
+  ctx.fillStyle='#000';ctx.font='17px Helvetica,Arial';ctx.textAlign='center';
+  ctx.fillText(qualName(S.q)+' feed',177,44);
+  // box
+  ctx.strokeStyle='#000';ctx.lineWidth=1.7;ctx.setLineDash([]);
+  ctx.strokeRect(bx1,by1,bx2-bx1,by2-by1);
+  ctx.fillStyle='#5a5148';ctx.font='italic 18px Helvetica,Arial';ctx.textAlign='left';
+  ctx.fillText('feed stage',196,byc+6);
+  // L in (top, black solid down)
+  vArrow(ctx,xL,130,by1,'#000',false);
+  richLabel(ctx,[{t:'L'}],xL,120,'#000',20,'center');
+  // V out (top-right): black dashed (V\u0305 through) + blue dashed (V_F from feed)
+  vArrow(ctx,xVdn,by1,130,'#000',true);
+  richLabel(ctx,[{t:'V = '},{t:'V',ob:true},{t:' + '},{t:'V'},{t:'F',sub:true}],290,120,'#000',20,'center');
+  // V\u0305 in (bottom-right, black dashed up)
+  vArrow(ctx,xVdn,322,by2,'#000',true);
+  richLabel(ctx,[{t:'V',ob:true}],xVdn,352,'#000',20,'center');
+  // L\u0305 out (bottom, black solid down)
+  vArrow(ctx,xL,by2,322,'#000',false);
+  richLabel(ctx,[{t:'L',ob:true},{t:' = L + '},{t:'L'},{t:'F',sub:true}],150,352,'#000',20,'center');
+  // feed F in (left, blue solid)
+  hArrow(ctx,46,bx1,byc,COL_FEED);
+  richLabel(ctx,[{t:'F'}],30,byc+6,COL_FEED,20,'left');
+  // feed splitting inside the box: blue solid down (L_F) and blue dashed up-right (V_F)
+  curveArrow(ctx,bx1,byc, 130,byc, xF,by2, xF,316, COL_FEED,false,'down');
+  curveArrow(ctx,bx1,byc, 190,byc, xVup,by1, xVup,132, COL_FEED,true,'up');
+  // q definition (two equivalent material-balance forms)
+  ctx.fillStyle='#000';ctx.textAlign='left';
+  const ymid=432,size=16;
+  const wq=measTokens(ctx,[{t:'q = '}],size);
+  const wf1=Math.max(measTokens(ctx,[{t:'L',ob:true},{t:' \u2212 L'}],size),measTokens(ctx,[{t:'F'}],size));
+  const weq=measTokens(ctx,[{t:'  =  1 \u2212 '}],size);
+  const wf2=Math.max(measTokens(ctx,[{t:'V',ob:true},{t:' \u2212 V'}],size),measTokens(ctx,[{t:'F'}],size));
+  let x=177-(wq+wf1+weq+wf2)/2;
+  richLabel(ctx,[{t:'q = '}],x,ymid+5,'#000',size,'left');x+=wq;
+  x+=fracR(ctx,[{t:'L',ob:true},{t:' \u2212 L'}],[{t:'F'}],x,ymid,size,'#000');
+  richLabel(ctx,[{t:'  =  1 \u2212 '}],x,ymid+5,'#000',size,'left');x+=weq;
+  fracR(ctx,[{t:'V',ob:true},{t:' \u2212 V'}],[{t:'F'}],x,ymid,size,'#000');
+}
+
+/* ---------------------------------------------------------------------- */
+// Column figure for "draw operating lines" + "rectifying": condenser material balance
+function drawRectColumn(ctx){
+  const W=354,H=500;ctx.clearRect(0,0,W,H);ctx.textAlign='left';ctx.fillStyle='#000';
+  const xcL=58,xcR=150,mid=(xcL+xcR)/2;          // column walls
+  const domeTop=76,bodyTop=112,bodyBot=302;      // dome apex, wall start, shown bottom
+  const condX=262,condY=104,condR=13;            // condenser circle
+  ctx.strokeStyle='#000';ctx.lineWidth=1.6;ctx.setLineDash([]);
+  // column: rounded (domed) top + vertical walls, open bottom
+  ctx.beginPath();
+  ctx.moveTo(xcL,bodyBot);ctx.lineTo(xcL,bodyTop);
+  ctx.quadraticCurveTo(xcL,domeTop,mid,domeTop);
+  ctx.quadraticCurveTo(xcR,domeTop,xcR,bodyTop);
+  ctx.lineTo(xcR,bodyBot);ctx.stroke();
+  // overhead vapor pipe from dome to condenser
+  ctx.beginPath();ctx.moveTo(mid,domeTop);ctx.lineTo(mid,24);ctx.lineTo(condX,24);
+  ctx.lineTo(condX,condY-condR);ctx.stroke();
+  richLabel(ctx,[{t:'V, y'},{t:'1',sub:true}],(mid+condX)/2,18,'#000',18,'center');
+  // condenser
+  ctx.beginPath();ctx.arc(condX,condY,condR,0,7);ctx.stroke();
+  ctx.fillStyle='#000';ctx.font='15px Helvetica';ctx.textAlign='center';ctx.fillText('C',condX,condY+5);
+  // reflux L (left, into column) and distillate D (right, out)
+  hArrow(ctx,condX-condR,xcR+1,condY,'#000');
+  hArrow(ctx,condX+condR,342,condY,'#000');
+  richLabel(ctx,[{t:'L, x'},{t:'D',sub:true}],xcR+8,condY-8,'#000',18,'left');
+  richLabel(ctx,[{t:'D, x'},{t:'D',sub:true}],300,condY-8,'#000',18,'center');
+  // reflux ratio
+  ctx.fillStyle='#000';ctx.textAlign='left';
+  richLabel(ctx,[{t:'R = '}],250,175,'#000',18,'left');
+  fracR(ctx,[{t:'L'}],[{t:'D'}],250+ctx.measureText('R = ').width,171,17,'#000');
+  // trays (stages) 1, 2, ... , n
+  const trays=[150,192,228,264];
+  ctx.strokeStyle='#000';ctx.lineWidth=1.4;
+  trays.forEach(y=>{ctx.beginPath();ctx.moveTo(xcL,y);ctx.lineTo(xcR,y);ctx.stroke();});
+  ctx.fillStyle='#000';ctx.font='16px Helvetica';ctx.textAlign='right';
+  ctx.fillText('1',xcL-8,trays[0]+5);
+  ctx.fillText('2',xcL-8,trays[1]+5);
+  ctx.fillText('n',xcL-8,trays[3]+5);
+  ctx.textAlign='center';ctx.fillText('\u22ee',xcL-11,trays[2]+8);
+  // internal streams: vapor up (y2, yn), liquid down (x2)
+  vArrow(ctx,mid+8,trays[1]-3,trays[0]+3,'#000');
+  richLabel(ctx,[{t:'y'},{t:'2',sub:true}],mid-2,trays[0]+22,'#000',16,'right');
+  vArrow(ctx,mid-12,trays[1]+3,trays[2]-3,'#000');
+  richLabel(ctx,[{t:'x'},{t:'2',sub:true}],mid-16,trays[1]+24,'#000',16,'right');
+  vArrow(ctx,mid+8,trays[3]-3,trays[2]+3,'#000');
+  richLabel(ctx,[{t:'y'},{t:'n',sub:true}],mid-2,trays[2]+24,'#000',16,'right');
+  // streams leaving the rectifying section at the bottom
+  vArrow(ctx,mid-12,bodyBot,bodyBot+30,'#000');
+  vArrow(ctx,mid+12,bodyBot+30,bodyBot,'#000');
+  richLabel(ctx,[{t:'L, x'},{t:'n',sub:true}],mid-18,bodyBot+48,'#000',16,'right');
+  richLabel(ctx,[{t:'V, y'},{t:'n+1',sub:true}],mid+18,bodyBot+48,'#000',16,'left');
+  // condenser material balance
+  ctx.fillStyle='#000';ctx.font='17px Helvetica';ctx.textAlign='center';
+  ctx.fillText('material balance: condenser',177,398);
+  // y = (L/V) x + (D/V) xD
+  const size=16,ymid=430;
+  const wy=measTokens(ctx,[{t:'y = '}],size);
+  const wf1=Math.max(measTokens(ctx,[{t:'L'}],size),measTokens(ctx,[{t:'V'}],size));
+  const wmidt=measTokens(ctx,[{t:' x + '}],size);
+  const wf2=Math.max(measTokens(ctx,[{t:'D'}],size),measTokens(ctx,[{t:'V'}],size));
+  const wend=measTokens(ctx,[{t:' x'},{t:'D',sub:true}],size);
+  let x=177-(wy+wf1+wmidt+wf2+wend)/2;
+  ctx.textAlign='left';
+  richLabel(ctx,[{t:'y = '}],x,ymid+5,'#000',size,'left');x+=wy;
+  x+=fracR(ctx,[{t:'L'}],[{t:'V'}],x,ymid,size,'#000');
+  richLabel(ctx,[{t:' x + '}],x,ymid+5,'#000',size,'left');x+=wmidt;
+  x+=fracR(ctx,[{t:'D'}],[{t:'V'}],x,ymid,size,'#000');
+  richLabel(ctx,[{t:' x'},{t:'D',sub:true}],x,ymid+5,'#000',size,'left');
+}
+
+/* ---------------------------------------------------------------------- */
+// Column figure for "draw operating lines" + "stripping": reboiler material balance
+function drawStripColumn(ctx){
+  const W=354,H=500;ctx.clearRect(0,0,W,H);ctx.textAlign='left';ctx.fillStyle='#000';
+  const xcL=58,xcR=150,mid=(xcL+xcR)/2;          // column walls
+  const bodyTop=56,bodyBot=206,domeBot=248;      // wall top, wall bottom, dome apex
+  const rebX=262,rebY=250,rebR=14;               // reboiler circle
+  ctx.strokeStyle='#000';ctx.lineWidth=1.6;ctx.setLineDash([]);
+  // column: vertical walls + domed bottom, open top
+  ctx.beginPath();
+  ctx.moveTo(xcL,bodyTop);ctx.lineTo(xcL,bodyBot);
+  ctx.quadraticCurveTo(xcL,domeBot,mid,domeBot);
+  ctx.quadraticCurveTo(xcR,domeBot,xcR,bodyBot);
+  ctx.lineTo(xcR,bodyTop);ctx.stroke();
+  // trays m, m+1, ... , N
+  const trays=[88,120,152,184];
+  ctx.lineWidth=1.4;
+  trays.forEach(y=>{ctx.beginPath();ctx.moveTo(xcL,y);ctx.lineTo(xcR,y);ctx.stroke();});
+  ctx.fillStyle='#000';ctx.font='16px Helvetica';ctx.textAlign='right';
+  ctx.fillText('m',xcL-8,trays[0]+5);
+  ctx.fillText('m + 1',xcL-8,trays[1]+5);
+  ctx.fillText('N',xcL-8,trays[3]+5);
+  ctx.textAlign='center';ctx.fillText('\u22ee',xcL-13,trays[2]+8);
+  // internal streams: y_{m+1} up (vapor), x_m down (liquid), y_N up
+  vArrow(ctx,mid+13,trays[1]-3,trays[0]+3,'#000');
+  richLabel(ctx,[{t:'y'},{t:'m+1',sub:true}],mid-2,trays[0]-8,'#000',16,'center');
+  vArrow(ctx,mid-12,trays[0]+3,trays[1]-3,'#000');
+  richLabel(ctx,[{t:'x'},{t:'m',sub:true}],mid-16,trays[0]+24,'#000',16,'right');
+  vArrow(ctx,mid+8,trays[3]-3,trays[2]+3,'#000');
+  richLabel(ctx,[{t:'y'},{t:'N',sub:true}],mid-2,trays[2]+24,'#000',16,'right');
+  // reboiler
+  ctx.strokeStyle='#000';ctx.lineWidth=1.6;
+  ctx.beginPath();ctx.arc(rebX,rebY,rebR,0,7);ctx.stroke();
+  ctx.fillStyle='#000';ctx.font='15px Helvetica';ctx.textAlign='center';ctx.fillText('R',rebX,rebY+5);
+  // L̄, x_N : liquid leaves column bottom, down and right into reboiler
+  pipe(ctx,[[mid+14,domeBot-2],[mid+14,300],[rebX,300],[rebX,rebY+rebR]],'#000','up');
+  richLabel(ctx,[{t:'L',ob:true},{t:', x'},{t:'N',sub:true}],150,294,'#000',17,'center');
+  // V̄, y_B : vapor returns from reboiler up-left into column bottom
+  pipe(ctx,[[rebX,rebY-rebR],[rebX,214],[xcR-2,214]],'#000','left');
+  richLabel(ctx,[{t:'V',ob:true},{t:', y'},{t:'B',sub:true}],262,208,'#000',17,'center');
+  // B̄, x_B : bottoms product out to the right
+  hArrow(ctx,rebX+rebR,342,rebY,'#000');
+  richLabel(ctx,[{t:'B',ob:true},{t:', x'},{t:'B',sub:true}],302,rebY-8,'#000',17,'center');
+  // reboiler material balance
+  ctx.fillStyle='#000';ctx.font='17px Helvetica';ctx.textAlign='center';
+  ctx.fillText('material balance: reboiler',177,398);
+  // y = (L̄/V̄) x + (B/V̄) xB
+  const size=16,ymid=430;
+  const wy=measTokens(ctx,[{t:'y = '}],size);
+  const wf1=Math.max(measTokens(ctx,[{t:'L',ob:true}],size),measTokens(ctx,[{t:'V',ob:true}],size));
+  const wmidt=measTokens(ctx,[{t:' x + '}],size);
+  const wf2=Math.max(measTokens(ctx,[{t:'B'}],size),measTokens(ctx,[{t:'V',ob:true}],size));
+  const wend=measTokens(ctx,[{t:' x'},{t:'B',sub:true}],size);
+  let x=177-(wy+wf1+wmidt+wf2+wend)/2;
+  ctx.textAlign='left';
+  richLabel(ctx,[{t:'y = '}],x,ymid+5,'#000',size,'left');x+=wy;
+  x+=fracR(ctx,[{t:'L',ob:true}],[{t:'V',ob:true}],x,ymid,size,'#000');
+  richLabel(ctx,[{t:' x + '}],x,ymid+5,'#000',size,'left');x+=wmidt;
+  x+=fracR(ctx,[{t:'B'}],[{t:'V',ob:true}],x,ymid,size,'#000');
+  richLabel(ctx,[{t:' x'},{t:'B',sub:true}],x,ymid+5,'#000',size,'left');
+}
+
+/* ---------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------- */
+// Column figure for "count stages": full column with condenser, reboiler and numbered stages
+function drawStageColumn(ctx,s){
+  const W=354,H=500;ctx.clearRect(0,0,W,H);ctx.textAlign='left';ctx.fillStyle='#000';
+  const xcL=48,xcR=146,mid=(xcL+xcR)/2;
+  const domeTop=40,bodyTop=78,bodyBot=384,domeBot=420;
+  const condX=252,condY=84,condR=15,rebX=252,rebY=402,rebR=15;
+  const m=Math.max(1,s.nT-1);                 // trays (equilibrium stages that are not the reboiler)
+  const yStageTop=132,yStageBot=380,dy=(yStageBot-yStageTop)/s.nT;
+  const ytray=[];for(let k=1;k<=m;k++)ytray.push(yStageTop+k*dy);
+  const lastTray=ytray[m-1];
+  ctx.strokeStyle='#000';ctx.lineWidth=1.6;ctx.setLineDash([]);
+  // column body: rounded top + rounded bottom
+  ctx.beginPath();
+  ctx.moveTo(xcL,bodyTop);
+  ctx.quadraticCurveTo(xcL,domeTop,mid,domeTop);
+  ctx.quadraticCurveTo(xcR,domeTop,xcR,bodyTop);
+  ctx.lineTo(xcR,bodyBot);
+  ctx.quadraticCurveTo(xcR,domeBot,mid,domeBot);
+  ctx.quadraticCurveTo(xcL,domeBot,xcL,bodyBot);
+  ctx.closePath();ctx.stroke();
+  // overhead vapor pipe to condenser
+  ctx.beginPath();ctx.moveTo(mid,domeTop);ctx.lineTo(mid,18);ctx.lineTo(condX,18);
+  ctx.lineTo(condX,condY-condR);ctx.stroke();
+  // condenser
+  ctx.beginPath();ctx.arc(condX,condY,condR,0,7);ctx.stroke();
+  ctx.fillStyle='#000';ctx.font='15px Helvetica';ctx.textAlign='center';ctx.fillText('C',condX,condY+5);
+  hArrow(ctx,condX+condR,340,condY,'#000');                       // distillate out
+  ctx.strokeStyle='#000';ctx.lineWidth=1.5;                        // reflux back to column top
+  ctx.beginPath();ctx.moveTo(condX-condR,condY);ctx.lineTo(mid,condY);ctx.stroke();
+  // reboiler
+  ctx.beginPath();ctx.arc(rebX,rebY,rebR,0,7);ctx.stroke();
+  ctx.fillStyle='#000';ctx.font='15px Helvetica';ctx.textAlign='center';ctx.fillText('R',rebX,rebY+5);
+  ctx.strokeStyle='#000';ctx.lineWidth=1.5;                        // liquid to reboiler
+  ctx.beginPath();ctx.moveTo(mid,domeBot);ctx.lineTo(mid,450);ctx.lineTo(rebX,450);
+  ctx.lineTo(rebX,rebY+rebR);ctx.stroke();
+  pipe(ctx,[[rebX,rebY-rebR],[rebX,bodyBot-4],[xcR-2,bodyBot-4]],'#000','left'); // vapor return
+  hArrow(ctx,rebX+rebR,340,rebY,'#000');                           // bottoms out
+  // trays + stage numbers
+  ctx.strokeStyle='#000';ctx.lineWidth=1.4;
+  ytray.forEach(y=>{ctx.beginPath();ctx.moveTo(xcL,y);ctx.lineTo(xcR,y);ctx.stroke();});
+  ctx.fillStyle='#000';ctx.font='16px Helvetica';ctx.textAlign='right';
+  ytray.forEach((y,k)=>ctx.fillText(String(k+1),xcL-9,y+5));
+  // inter-stage liquid (x, down) and vapor (y, up) arrows with labels
+  const xdn=mid-22,xup=mid+22;
+  function gap(ytop,ybot,liqSub,vapSub){
+    const a=ytop+8,b=ybot-6,cyv=(a+b)/2;
+    vArrow(ctx,xdn,a,b,'#000');
+    vArrow(ctx,xup,b,a,'#000');
+    richLabel(ctx,[{t:'x'},{t:liqSub,sub:true}],xdn+6,cyv+8,'#000',15,'left');
+    richLabel(ctx,[{t:'y'},{t:vapSub,sub:true}],xup-6,cyv-6,'#000',15,'right');
+  }
+  gap(condY+2,ytray[0],'D','1');                        // reflux x_D + vapor y1
+  for(let k=1;k<m;k++) gap(ytray[k-1],ytray[k],String(k),String(k+1));
+  gap(lastTray,bodyBot-2,String(m),'B');                // x_m + vapor y_B from reboiler
+  // highlight the current stage as the user steps off stages
+  if(S.step>0){
+    const sg=s.segs[Math.min(S.step,s.segs.length)-1],st=sg.stage;
+    const c=(sg.type==='V')?COL_PURPLE:COL_GREEN;
+    ctx.strokeStyle=c;ctx.lineWidth=2.6;
+    if(st<=m){const y=ytray[st-1];ctx.strokeRect(xcL-3,y-dy*0.46,(xcR-xcL)+6,dy*0.92);}
+    else{ctx.beginPath();ctx.arc(rebX,rebY,rebR+4,0,7);ctx.stroke();}
+  }
+}
+
+/* ---------------------------------------------------------------------- */
+// Column figure for "optimal feed location": feed enters above the first stripping stage,
+// each stage labeled by section (rectifying / stripping)
+function drawOptFeedColumn(ctx,s){
+  const W=354,H=500;ctx.clearRect(0,0,W,H);ctx.textAlign='left';ctx.fillStyle='#000';
+  const xcL=48,xcR=146,mid=(xcL+xcR)/2;
+  const domeTop=40,bodyTop=78,bodyBot=384,domeBot=420;
+  const condX=252,condY=84,condR=15,rebX=252,rebY=402,rebR=15;
+  const m=Math.max(1,s.nT-1),nR=s.nR;
+  const yStageTop=132,yStageBot=380,dy=(yStageBot-yStageTop)/s.nT;
+  const ytray=[];for(let k=1;k<=m;k++)ytray.push(yStageTop+k*dy);
+  ctx.strokeStyle='#000';ctx.lineWidth=1.6;ctx.setLineDash([]);
+  // column body: rounded top + rounded bottom
+  ctx.beginPath();
+  ctx.moveTo(xcL,bodyTop);
+  ctx.quadraticCurveTo(xcL,domeTop,mid,domeTop);
+  ctx.quadraticCurveTo(xcR,domeTop,xcR,bodyTop);
+  ctx.lineTo(xcR,bodyBot);
+  ctx.quadraticCurveTo(xcR,domeBot,mid,domeBot);
+  ctx.quadraticCurveTo(xcL,domeBot,xcL,bodyBot);
+  ctx.closePath();ctx.stroke();
+  // overhead vapor pipe + condenser
+  ctx.beginPath();ctx.moveTo(mid,domeTop);ctx.lineTo(mid,18);ctx.lineTo(condX,18);
+  ctx.lineTo(condX,condY-condR);ctx.stroke();
+  ctx.beginPath();ctx.arc(condX,condY,condR,0,7);ctx.stroke();
+  ctx.fillStyle='#000';ctx.font='15px Helvetica';ctx.textAlign='center';ctx.fillText('C',condX,condY+5);
+  hArrow(ctx,condX+condR,340,condY,'#000');
+  ctx.strokeStyle='#000';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(condX-condR,condY);ctx.lineTo(mid,condY);ctx.stroke();
+  // reboiler + bottom plumbing
+  ctx.beginPath();ctx.arc(rebX,rebY,rebR,0,7);ctx.stroke();
+  ctx.fillStyle='#000';ctx.font='15px Helvetica';ctx.textAlign='center';ctx.fillText('R',rebX,rebY+5);
+  ctx.strokeStyle='#000';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(mid,domeBot);ctx.lineTo(mid,450);ctx.lineTo(rebX,450);
+  ctx.lineTo(rebX,rebY+rebR);ctx.stroke();
+  pipe(ctx,[[rebX,rebY-rebR],[rebX,bodyBot-4],[xcR-2,bodyBot-4]],'#000','left');
+  hArrow(ctx,rebX+rebR,340,rebY,'#000');
+  // trays (feed-stage tray drawn blue), stage numbers, section labels
+  ytray.forEach((y,k)=>{
+    const st=k+1, isFeed=(st===nR+1);
+    ctx.strokeStyle=isFeed?COL_FEED:'#000';ctx.lineWidth=isFeed?2.2:1.4;
+    ctx.beginPath();ctx.moveTo(xcL,y);ctx.lineTo(xcR,y);ctx.stroke();
+    ctx.fillStyle='#000';ctx.font='16px Helvetica';ctx.textAlign='right';
+    ctx.fillText(String(st),xcL-9,y+5);
+    let txt,c;
+    if(st<=nR){txt='rectifying';c=COL_DIST;}
+    else if(isFeed){txt='stripping';c=COL_FEED;}
+    else{txt='stripping';c=COL_BOT;}
+    ctx.fillStyle=c;ctx.font='15px Helvetica';ctx.textAlign='left';
+    ctx.fillText(txt,xcL+8,y-7);
+  });
+  // feed enters above the first stripping stage: center of stage (nR+1)
+  let feedY;
+  if(nR===0) feedY=(yStageTop+ytray[0])/2;
+  else if(nR<m) feedY=(ytray[nR-1]+ytray[nR])/2;
+  else feedY=(ytray[m-1]+yStageBot)/2;
+  hArrow(ctx,4,xcL,feedY,COL_FEED);
+}
+
+/* ---------------------------------------------------------------------- */
+function drawCol(s){
+  const ctx=colx, W=354,H=500; ctx.clearRect(0,0,W,H);
+  ctx.font='13px Helvetica,Arial';ctx.textAlign='left';ctx.fillStyle='#000';
+  // column body
+  const cx=150, cw=70, ctop=70, cbot=430;
+  if(S.mode===2 && S.line===1){ drawFeedColumn(ctx); return; }
+  if(S.mode===2 && S.line===2){ drawRectColumn(ctx); return; }
+  if(S.mode===2 && S.line===3){ drawStripColumn(ctx); return; }
+  if(S.mode===3){ drawStageColumn(ctx,s); return; }
+  if(S.mode===4){ drawOptFeedColumn(ctx,s); return; }
+  if(S.mode===1){
+    ctx.fillStyle='#555';ctx.font='13px Helvetica';
+    ctx.fillText('Select \u201cdraw operating lines\u201d',24,250);
+    ctx.fillText('to see the column and equations.',24,270);
+  }
+  // draw column outline for modes 2,3,4
+  if(S.mode>=2){
+    ctx.strokeStyle='#000';ctx.lineWidth=1.5;
+    roundCol(ctx,cx,ctop,cw,cbot-ctop);
+    // feed stage location (above where rect & strip meet ~ proportional)
+    const nT=s.nT, nR=s.nR;
+    const stageH=(cbot-ctop)/nT;
+    // streams
+    ctx.fillStyle='#000';ctx.font='13px Helvetica';
+    // distillate
+    arrowCol(ctx,cx+cw/2,ctop, cx+cw/2,ctop-32,'up');
+    ctx.fillStyle=COL_DIST;ctx.textAlign='left';
+    ctx.fillText('distillate  x',cx+cw/2+8,ctop-22);ctx.fillText('D',cx+cw/2+78,ctop-19);
+    // bottoms
+    arrowCol(ctx,cx+cw/2,cbot, cx+cw/2,cbot+30,'down');
+    ctx.fillStyle=COL_BOT;ctx.textAlign='left';
+    ctx.fillText('bottoms  x',cx+cw/2+8,cbot+26);ctx.fillText('B',cx+cw/2+70,cbot+29);
+    // feed
+    const feedY=ctop+nR*stageH;
+    arrowCol2(ctx,cx-34,feedY, cx,feedY);
+    ctx.fillStyle=COL_FEED;ctx.textAlign='right';
+    ctx.fillText('feed  z',cx-40,feedY-3);ctx.fillText('F',cx-12,feedY);
+    ctx.textAlign='left';
+    // reboiler
+    ctx.strokeStyle='#000';ctx.lineWidth=1.4;
+    ctx.beginPath();ctx.arc(cx+cw/2,cbot+0,0,0,0);ctx.stroke();
+
+    if(S.mode===2){
+      // section brackets + equations depending on selected line
+      ctx.fillStyle=COL_DIST;ctx.font='italic 12px Helvetica';
+      bracket(ctx,cx+cw+12,ctop,feedY,'rectifying',COL_DIST);
+      bracket(ctx,cx+cw+12,feedY,cbot,'stripping',COL_BOT);
+      // equation text below
+      ctx.font='13px Helvetica';ctx.textAlign='left';
+      let ey=H-78;
+      const q=S.q;
+      if(S.line===1){
+        ctx.fillStyle=COL_FEED;
+        ctx.fillText('feed ('+'q'+'-line):',24,ey);
+        ctx.fillStyle='#000';ctx.font='italic 13px Helvetica';
+        ctx.fillText('y = [q/(q\u22121)] x \u2212 z_F/(q\u22121)',24,ey+20);
+        ctx.font='13px Helvetica';ctx.fillStyle='#333';
+        ctx.fillText('q = '+S.q.toFixed(1)+'   ('+qualName(q)+')',24,ey+40);
+      } else if(S.line===2){
+        ctx.fillStyle=COL_DIST;ctx.fillText('rectifying section:',24,ey);
+        ctx.fillStyle='#000';ctx.font='italic 13px Helvetica';
+        ctx.fillText('y = [R/(R+1)] x + x_D/(R+1)',24,ey+20);
+        ctx.font='13px Helvetica';ctx.fillStyle='#333';
+        ctx.fillText('R = 1.5,  slope = L/V = 0.60',24,ey+40);
+      } else {
+        ctx.fillStyle=COL_BOT;ctx.fillText('stripping section:',24,ey);
+        ctx.fillStyle='#000';ctx.font='italic 13px Helvetica';
+        ctx.fillText('y = [(V\u0305+1)/V\u0305] x \u2212 x_B/V\u0305',24,ey+20);
+        ctx.font='13px Helvetica';ctx.fillStyle='#333';
+        ctx.fillText('V\u0305 = '+s.Vb.toFixed(2)+',  slope = L\u0305/V\u0305 = '
+          +((s.Vb+1)/s.Vb).toFixed(2),24,ey+40);
+      }
+    }
+
+    if(S.mode===3 || S.mode===4){
+      // draw stage divisions
+      ctx.strokeStyle='#bbb';ctx.lineWidth=1;
+      for(let k=1;k<nT;k++){const y=ctop+k*stageH;
+        ctx.beginPath();ctx.moveTo(cx,y);ctx.lineTo(cx+cw,y);ctx.stroke();}
+      // stage numbers inside
+      ctx.fillStyle='#000';ctx.font='12px Helvetica';ctx.textAlign='center';
+      for(let k=1;k<=nT;k++){const y=ctop+(k-0.5)*stageH;
+        const lab=(k===nT)?'R':String(k);
+        ctx.fillStyle=(k<=nR)?COL_DIST:(k===nT?'#000':COL_BOT);
+        ctx.fillText(lab,cx+cw/2,y+4);}
+      ctx.fillStyle='#000';ctx.font='11px Helvetica';
+      ctx.fillText('reboiler',cx+cw/2,ctop+(nT-0.5)*stageH+16);
+
+      if(S.mode===3 && S.step>0){
+        // highlight stage corresponding to current step
+        const sg=s.segs[Math.min(S.step,s.segs.length)-1];
+        const st=sg.stage;
+        const y0=ctop+(st-1)*stageH, y1=ctop+st*stageH;
+        ctx.lineWidth=2.5;
+        if(sg.type==='V'){ // VLE on the stage  → purple box
+          ctx.strokeStyle=COL_PURPLE;
+          ctx.strokeRect(cx-2,y0+1,cw+4,stageH-2);
+          ctx.fillStyle=COL_PURPLE;ctx.font='12px Helvetica';ctx.textAlign='left';
+          ctx.fillText('on the stage:',24,H-58);
+          ctx.fillStyle='#000';
+          ctx.fillText('liquid x is in VLE',24,H-40);
+          ctx.fillText('with vapor y',24,H-24);
+        } else { // material balance between stages → green slice at boundary
+          ctx.strokeStyle=COL_GREEN;
+          ctx.strokeRect(cx-2,y0-stageH*0.18,cw+4,stageH*0.36);
+          ctx.fillStyle=COL_GREEN;ctx.font='12px Helvetica';ctx.textAlign='left';
+          ctx.fillText('material balance',24,H-46);
+          ctx.fillText('between stages',24,H-30);
+        }
+      }
+      if(S.mode===4){
+        // highlight optimal feed stage = stage above where sections meet (= nR)
+        const y0=ctop+(s.nR-0)*stageH;
+        ctx.strokeStyle=COL_FEED;ctx.lineWidth=2.5;
+        ctx.beginPath();ctx.moveTo(cx-6,y0);ctx.lineTo(cx+cw+6,y0);ctx.stroke();
+        ctx.fillStyle=COL_FEED;ctx.font='12px Helvetica';ctx.textAlign='center';
+        ctx.fillStyle='#000';ctx.font='12px Helvetica';ctx.textAlign='left';
+        ctx.fillText('feed enters above the stage',18,H-44);
+        ctx.fillText('where rectifying and stripping',18,H-28);
+        ctx.fillText('operating lines intersect',18,H-12);
+      }
+    }
+  }
+}
+function qualName(q){
+  if(q<0)return 'superheated vapor';
+  if(Math.abs(q)<1e-9)return 'saturated vapor';
+  if(q<1)return 'partially vaporized';
+  if(Math.abs(q-1)<1e-9)return 'saturated liquid';
+  return 'subcooled liquid';
+}
+function roundCol(ctx,x,y,w,h){
+  ctx.beginPath();
+  ctx.moveTo(x,y+10);ctx.quadraticCurveTo(x,y,x+w/2,y);ctx.quadraticCurveTo(x+w,y,x+w,y+10);
+  ctx.lineTo(x+w,y+h-10);ctx.quadraticCurveTo(x+w,y+h,x+w/2,y+h);
+  ctx.quadraticCurveTo(x,y+h,x,y+h-10);ctx.closePath();ctx.stroke();
+}
+function arrowCol(ctx,x1,y1,x2,y2,dir){line(ctx,x1,y1,x2,y2,'#000',1.4);
+  ctx.fillStyle='#000';ctx.beginPath();
+  if(dir==='up'){ctx.moveTo(x2,y2-1);ctx.lineTo(x2-4,y2+7);ctx.lineTo(x2+4,y2+7);}
+  else{ctx.moveTo(x2,y2+1);ctx.lineTo(x2-4,y2-7);ctx.lineTo(x2+4,y2-7);}
+  ctx.closePath();ctx.fill();}
+function arrowCol2(ctx,x1,y1,x2,y2){line(ctx,x1,y1,x2,y2,'#000',1.4);
+  ctx.fillStyle='#000';ctx.beginPath();
+  ctx.moveTo(x2,y2);ctx.lineTo(x2-7,y2-4);ctx.lineTo(x2-7,y2+4);ctx.closePath();ctx.fill();}
+function bracket(ctx,x,y0,y1,txt,c){
+  ctx.strokeStyle=c;ctx.lineWidth=1.4;
+  ctx.beginPath();ctx.moveTo(x,y0+2);ctx.lineTo(x+6,y0+2);
+  ctx.lineTo(x+6,y1-2);ctx.lineTo(x,y1-2);ctx.stroke();
+  ctx.fillStyle=c;ctx.save();ctx.translate(x+20,(y0+y1)/2);ctx.rotate(-Math.PI/2);
+  ctx.textAlign='center';ctx.font='13px Helvetica';ctx.fillText(txt,0,0);ctx.restore();
+}
+
+/* ============================== controller ============================== */
+let STATE=solveAll(S.q);
+function recompute(){STATE=solveAll(S.q);
+  const mx=Math.max(10,STATE.segs.length);
+  const ss=document.getElementById('stepSlider'); ss.max=mx;
+  if(S.step>mx){S.step=mx; ss.value=mx;}
+}
+function render(){drawXY(STATE);drawCol(STATE);}
+
+function syncControls(){
+  document.querySelectorAll('#modeBar button').forEach(b=>b.classList.toggle('sel',+b.dataset.m===S.mode));
+  document.querySelectorAll('#pointBar button').forEach(b=>b.classList.toggle('sel',+b.dataset.p===S.point));
+  document.querySelectorAll('#lineBar button').forEach(b=>b.classList.toggle('sel',+b.dataset.l===S.line));
+  document.getElementById('qVal').textContent=S.q.toFixed(1);
+  document.getElementById('stepVal').textContent=S.step;
+  document.getElementById('pointRow').style.display=(S.mode===1)?'flex':'none';
+  document.getElementById('qRow').style.display=(S.mode>=2)?'flex':'none';
+  document.getElementById('lineRow').style.display=(S.mode===2)?'flex':'none';
+  document.getElementById('stepRow').style.display=(S.mode===3)?'flex':'none';
+}
+
+document.querySelectorAll('#modeBar button').forEach(b=>b.onclick=()=>{
+  S.mode=+b.dataset.m; syncControls(); recompute(); render();});
+document.querySelectorAll('#pointBar button').forEach(b=>b.onclick=()=>{
+  S.point=+b.dataset.p; syncControls(); render();});
+document.querySelectorAll('#lineBar button').forEach(b=>b.onclick=()=>{
+  S.line=+b.dataset.l; syncControls(); render();});
+document.getElementById('qSlider').oninput=e=>{
+  S.q=parseFloat(e.target.value); syncControls(); recompute(); render();};
+document.getElementById('stepSlider').oninput=e=>{
+  S.step=parseInt(e.target.value); syncControls(); render();};
+
+// hover over stage numbers on xy diagram
+xyc.addEventListener('mousemove',e=>{
+  if(S.mode!==3 && S.mode!==4){if(S.hover){S.hover=null;render();}return;}
+  const r=xyc.getBoundingClientRect();
+  const mx=(e.clientX-r.left), my=(e.clientY-r.top);
+  let found=null;
+  STATE.stageLabels.forEach(L=>{ if(L._sx===undefined)return;
+    if(Math.abs(mx-L._sx)<14 && Math.abs(my-L._sy)<12)found=L;});
+  if(found!==S.hover){S.hover=found;render();}
+});
+xyc.addEventListener('mouseleave',()=>{if(S.hover){S.hover=null;render();}});
+
+// info panels
+function togglePanel(id,btn){
+  const p=document.getElementById(id);const open=p.classList.contains('show');
+  ['pDir','pDet','pAbt'].forEach(x=>document.getElementById(x).classList.remove('show'));
+  ['bDir','bDet','bAbt'].forEach(x=>document.getElementById(x).classList.remove('active'));
+  if(!open){
+    const app=document.getElementById('app');
+    const ar=app.getBoundingClientRect(), br=btn.getBoundingClientRect();
+    const right=(br.left-ar.left)-10;            // panel's right edge, just left of the button
+    p.style.left='0px';                          // span from the figure's left edge
+    p.style.top=((br.top-ar.top)+6)+'px';        // a few pixels below the button top
+    p.style.width=Math.max(300,right)+'px';
+    p.classList.add('show');btn.classList.add('active');
+  }
+}
+document.getElementById('bDir').onclick=function(){togglePanel('pDir',this);};
+document.getElementById('bDet').onclick=function(){togglePanel('pDet',this);};
+document.getElementById('bAbt').onclick=function(){togglePanel('pAbt',this);};
+function closePanels(){
+  ['pDir','pDet','pAbt'].forEach(x=>document.getElementById(x).classList.remove('show'));
+  ['bDir','bDet','bAbt'].forEach(x=>document.getElementById(x).classList.remove('active'));
+}
+document.querySelectorAll('.panel-close').forEach(el=>el.onclick=closePanels);
+
+syncControls(); render();
+</script>
+</body>
+</html>
