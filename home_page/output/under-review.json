@@ -135,6 +135,15 @@
     "simulation_type": "under-review"
   },
   {
+    "title": "Bioseparations: Ion-Exchange Chromatography Simulator",
+    "href": "https://learncheme.github.io/under_review/bioseparations_chromatography.html",
+    "image": "/home_page/media/under-review-bioseparations-chromatography.png",
+    "tooltip": "Bioseparations: Ion-Exchange Chromatography Simulator",
+    "description": "",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "simulation_type": "under-review"
+  },
+  {
     "title": "Blending Process: Dynamic Simulation and Linearization",
     "href": "https://learncheme.github.io/under_review/blending-process-simulation.html",
     "image": "",
@@ -495,6 +504,15 @@
     "simulation_type": "under-review"
   },
   {
+    "title": "Inhibition of Enzyme Reactions in a CSTR and a Batch Reactor",
+    "href": "https://learncheme.github.io/under_review/Inhibition%20of%20enzyme%20reactions%20in%20CSTR%20batch.html",
+    "image": "/home_page/media/under-review-inhibition-of-enzyme-reactions-in-cstr-batch.png",
+    "tooltip": "Inhibition of Enzyme Reactions in a CSTR and a Batch Reactor",
+    "description": "",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "simulation_type": "under-review"
+  },
+  {
     "title": "Injecting Water into Liquid Nitrogen Tanks",
     "href": "https://learncheme.github.io/under_review/injecting-water-into-liquid-nitrogen-tanks.html",
     "image": "/home_page/media/under-review-injecting-water-into-liquid-nitrogen-tanks.png",
@@ -527,15 +545,6 @@
     "image": "/home_page/media/under-review-ion-exchange-isotherm.png",
     "tooltip": "Ion Exchange Isotherm",
     "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
-    "simulation_type": "under-review"
-  },
-  {
-    "title": "Jablonski Diagram",
-    "href": "https://learncheme.github.io/under_review/JablonskiDiagram_standalone.html",
-    "image": "/home_page/media/under-review-jablonskidiagram-standalone.png",
-    "tooltip": "An interactive Jablonski diagram showing photophysical processes and quantum yield.",
-    "description": "An interactive Jablonski diagram showing photophysical processes and quantum yield.",
     "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
     "simulation_type": "under-review"
   },
@@ -630,10 +639,28 @@
     "simulation_type": "under-review"
   },
   {
+    "title": "Nonisothermal Effectiveness Factor",
+    "href": "https://learncheme.github.io/under_review/nonisothermal_effectiveness_factor.html",
+    "image": "/home_page/media/under-review-nonisothermal-effectiveness-factor.png",
+    "tooltip": "Nonisothermal Effectiveness Factor",
+    "description": "",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "simulation_type": "under-review"
+  },
+  {
     "title": "Transformations for Linear Regression",
     "href": "https://learncheme.github.io/under_review/nonlinear-transformations.html",
     "image": "/home_page/media/under-review-nonlinear-transformations.png",
     "tooltip": "Transformations for Linear Regression",
+    "description": "",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "simulation_type": "under-review"
+  },
+  {
+    "title": "Nuclear Fusion Reaction Simulation",
+    "href": "https://learncheme.github.io/under_review/nuclear_fusion_simulation.html",
+    "image": "/home_page/media/under-review-nuclear-fusion-simulation.png",
+    "tooltip": "Nuclear Fusion Reaction Simulation",
     "description": "",
     "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
     "simulation_type": "under-review"
