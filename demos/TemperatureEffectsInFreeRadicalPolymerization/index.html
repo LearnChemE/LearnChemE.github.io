@@ -1,737 +1,751 @@
-<title>Polymerization Temperature Effects</title>
-<script>
-window.MathJax = {
-  tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
-  chtml: { displayAlign: 'left', displayIndent: '0em' },
-  svg: { fontCache: 'global', displayAlign: 'left', displayIndent: '0em' }
-};
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.js" async></script>
-<style>
-/* Layout: LearnChemE simulation frame — buttons kept below the top 40px strip; slider rows (label, slider, number); plot left, activation-energy bars and values right */
-:root {
-  --red: #98000D;
-  --red-hover: #b3101f;
-  --ink: #000000;
-  --line: #d9d4d5;
-  --panel: #faf8f8;
-  --bg: #ffffff;
-  --font: Helvetica, "Helvetica Neue", Arial, sans-serif;
-  color-scheme: light;
-}
-html, body { background: var(--bg); color: var(--ink); }
-body { font-family: var(--font); font-size: 17px; font-weight: normal; }
-* { font-weight: normal; }
-.wrap { max-width: 1200px; margin: 0 auto; padding: 44px 16px 28px; }
-.toprow { position: relative; display: flex; flex-wrap: wrap; align-items: flex-start; gap: 12px 16px; margin-bottom: 14px; }
-h1 { font-size: 21.25px; margin: 0 0 12px; }
-.btns { display: flex; flex-direction: column; align-items: stretch; gap: 8px; }
-button.lce {
-  font-family: var(--font); font-size: 17px; font-weight: normal; color: #fff; background: var(--red);
-  border: none; border-radius: 4px; padding: 6px 14px; cursor: pointer;
-}
-button.lce:hover { background: var(--red-hover); }
-button.lce:focus-visible, .seg button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+<!DOCTYPE html>
+<html lang="en">
+<head>
 
-/* flyout panels: overlay the simulation, never push content */
-.panel {
-  position: absolute; top: 0; right: 0; z-index: 50;
-  width: max-content; max-width: min(660px, calc(100vw - 32px)); background: var(--bg);
-  border: 1px solid var(--line); border-radius: 6px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
-  display: flex; flex-direction: column; max-height: 78vh;
-}
-.panel[hidden] { display: none; }
-.panel header { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 8px 12px 6px 16px; border-bottom: 1px solid var(--line); flex: none; }
-.panel header h2 { font-size: 17px; color: var(--ink); margin: 0; }
-.panel .x { background: none; border: none; font-size: 26px; line-height: 1; cursor: pointer; color: var(--ink); padding: 0 4px; }
-.panel .x:hover { color: var(--red); }
-.panel .body { overflow-y: auto; padding: 10px 16px 16px; line-height: 1.5; }
-.panel .body p { margin: 0 0 0.7em; max-width: 66ch; }
-.panel .body mjx-container[display="true"] { margin: 0.4em 0 0.7em !important; text-align: left !important; overflow-x: auto; overflow-y: hidden; max-width: 100%; }
-.panel table { border-collapse: collapse; font-size: 17px; margin: 4px 0 12px; }
-.panel td { padding: 2px 14px 2px 0; vertical-align: top; }
-.panel a { color: var(--red); }
+  <title>Polymerization Temperature Effects</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
 
-/* controls: label | slider | number, two sets per row */
-.controls {
-  display: grid; grid-template-columns: auto 150px 4.5em auto 150px 4.5em;
-  align-items: center; column-gap: 10px; row-gap: 10px;
-  width: fit-content; max-width: 100%; box-sizing: border-box;
-  padding: 12px 16px; background: var(--panel);
-  border: 1px solid var(--line); border-radius: 6px;
-}
-.ctl { display: contents; }
-.ctl label { white-space: nowrap; justify-self: end; text-align: right; }
-.ctl .v { font-variant-numeric: tabular-nums; white-space: nowrap; margin-right: 18px; }
-.ctl select { font-family: var(--font); font-size: 17px; padding: 3px 4px; width: auto; justify-self: start; grid-column: span 2; }
-@media (max-width: 900px) {
-  .controls { grid-template-columns: auto minmax(90px, 150px) 4.5em; }
-  .ctl label { white-space: normal; }
-}
+  <script>
+  window.MathJax = {
+    tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+    chtml: { displayAlign: 'left', displayIndent: '0em' },
+    svg: { fontCache: 'global', displayAlign: 'left', displayIndent: '0em' }
+  };
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.js" async></script>
+  <style>
+  /* Layout: LearnChemE simulation frame — buttons kept below the top 40px strip; slider rows (label, slider, number); plot left, activation-energy bars and values right */
+  :root {
+    --red: #98000D;
+    --red-hover: #b3101f;
+    --ink: #000000;
+    --line: #d9d4d5;
+    --panel: #faf8f8;
+    --bg: #ffffff;
+    --font: Helvetica, "Helvetica Neue", Arial, sans-serif;
+    color-scheme: light;
+  }
+  html, body { background: var(--bg); color: var(--ink); }
+  body { font-family: var(--font); font-size: 17px; font-weight: normal; }
+  * { font-weight: normal; }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 44px 16px 28px; }
+  .toprow { position: relative; display: flex; flex-wrap: wrap; align-items: flex-start; gap: 12px 16px; margin-bottom: 14px; }
+  h1 { font-size: 21.25px; margin: 0 0 12px; }
+  .btns { display: flex; flex-direction: column; align-items: stretch; gap: 8px; }
+  button.lce {
+    font-family: var(--font); font-size: 17px; font-weight: normal; color: #fff; background: var(--red);
+    border: none; border-radius: 4px; padding: 6px 14px; cursor: pointer;
+  }
+  button.lce:hover { background: var(--red-hover); }
+  button.lce:focus-visible, .seg button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 
-input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
-.ctl input[type="range"] { margin: 0; }
+  /* flyout panels: overlay the simulation, never push content */
+  .panel {
+    position: absolute; top: 0; right: 0; z-index: 50;
+    width: max-content; max-width: min(660px, calc(100vw - 32px)); background: var(--bg);
+    border: 1px solid var(--line); border-radius: 6px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+    display: flex; flex-direction: column; max-height: 78vh;
+  }
+  .panel[hidden] { display: none; }
+  .panel header { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 8px 12px 6px 16px; border-bottom: 1px solid var(--line); flex: none; }
+  .panel header h2 { font-size: 17px; color: var(--ink); margin: 0; }
+  .panel .x { background: none; border: none; font-size: 26px; line-height: 1; cursor: pointer; color: var(--ink); padding: 0 4px; }
+  .panel .x:hover { color: var(--red); }
+  .panel .body { overflow-y: auto; padding: 10px 16px 16px; line-height: 1.5; }
+  .panel .body p { margin: 0 0 0.7em; max-width: 66ch; }
+  .panel .body mjx-container[display="true"] { margin: 0.4em 0 0.7em !important; text-align: left !important; overflow-x: auto; overflow-y: hidden; max-width: 100%; }
+  .panel table { border-collapse: collapse; font-size: 17px; margin: 4px 0 12px; }
+  .panel td { padding: 2px 14px 2px 0; vertical-align: top; }
+  .panel a { color: var(--red); }
 
-.main { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
-.plotcard { flex: 1 1 560px; min-width: 0; }
-.side { flex: 1 1 420px; max-width: 540px; min-width: 0; display: flex; flex-direction: column; gap: 16px; align-items: flex-start; }
-.card { border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; min-width: 0; box-sizing: border-box; }
-.side .card.wide { width: 100%; }
-.card.fit { width: fit-content; max-width: 100%; }
-.card h3 { font-size: 17px; margin: 0 0 6px; }
-.seg { display: inline-flex; border: 1px solid var(--red); border-radius: 4px; overflow: hidden; margin-bottom: 8px; }
-.seg button { font-family: var(--font); font-size: 17px; border: none; background: var(--bg); color: var(--red); padding: 5px 12px; cursor: pointer; }
-.seg button[aria-pressed="true"] { background: var(--red); color: #fff; }
-canvas { display: block; width: 100%; }
-#plot { height: 470px; }
-#budget { height: 336px; }
-@media (max-width: 520px) { #plot { height: 400px; } }
-.caption { margin: 6px 0 0; line-height: 1.4; }
-.verdict { line-height: 1.45; margin: 8px 0 2px; }
-table.ro { border-collapse: collapse; font-variant-numeric: tabular-nums; }
-table.ro td { padding: 3px 6px; border-bottom: 1px solid var(--line); }
-table.ro td:last-child { text-align: right; white-space: nowrap; padding-left: 18px; }
-.note { margin: 8px 0 0; max-width: 34em; }
-@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
-</style>
+  /* controls: label | slider | number, two sets per row */
+  .controls {
+    display: grid; grid-template-columns: auto 150px 4.5em auto 150px 4.5em;
+    align-items: center; column-gap: 10px; row-gap: 10px;
+    width: fit-content; max-width: 100%; box-sizing: border-box;
+    padding: 12px 16px; background: var(--panel);
+    border: 1px solid var(--line); border-radius: 6px;
+  }
+  .ctl { display: contents; }
+  .ctl label { white-space: nowrap; justify-self: end; text-align: right; }
+  .ctl .v { font-variant-numeric: tabular-nums; white-space: nowrap; margin-right: 18px; }
+  .ctl select { font-family: var(--font); font-size: 17px; padding: 3px 4px; width: auto; justify-self: start; grid-column: span 2; }
+  @media (max-width: 900px) {
+    .controls { grid-template-columns: auto minmax(90px, 150px) 4.5em; }
+    .ctl label { white-space: normal; }
+  }
 
-<div class="wrap">
-  <h1>Temperature effects in free-radical polymerization</h1>
-  <div class="toprow">
-    <div class="controls">
-      <div class="ctl">
-        <label for="sT">temperature (°C)</label>
-        <input type="range" id="sT" min="40" max="100" step="0.5" value="60">
-        <span class="v" id="vT"></span>
+  input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  .ctl input[type="range"] { margin: 0; }
+
+  .main { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
+  .plotcard { flex: 1 1 560px; min-width: 0; }
+  .side { flex: 1 1 420px; max-width: 540px; min-width: 0; display: flex; flex-direction: column; gap: 16px; align-items: flex-start; }
+  .card { border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; min-width: 0; box-sizing: border-box; }
+  .side .card.wide { width: 100%; }
+  .card.fit { width: fit-content; max-width: 100%; }
+  .card h3 { font-size: 17px; margin: 0 0 6px; }
+  .seg { display: inline-flex; border: 1px solid var(--red); border-radius: 4px; overflow: hidden; margin-bottom: 8px; }
+  .seg button { font-family: var(--font); font-size: 17px; border: none; background: var(--bg); color: var(--red); padding: 5px 12px; cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--red); color: #fff; }
+  canvas { display: block; width: 100%; }
+  #plot { height: 470px; }
+  #budget { height: 336px; }
+  @media (max-width: 520px) { #plot { height: 400px; } }
+  .caption { margin: 6px 0 0; line-height: 1.4; }
+  .verdict { line-height: 1.45; margin: 8px 0 2px; }
+  table.ro { border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  table.ro td { padding: 3px 6px; border-bottom: 1px solid var(--line); }
+  table.ro td:last-child { text-align: right; white-space: nowrap; padding-left: 18px; }
+  .note { margin: 8px 0 0; max-width: 34em; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  </style>
+
+</head>
+<body>
+
+  <div class="wrap">
+    <div class="toprow">
+      <div class="controls">
+        <div class="ctl">
+          <label for="sT">temperature (°C)</label>
+          <input type="range" id="sT" min="40" max="100" step="0.5" value="60">
+          <span class="v" id="vT"></span>
+        </div>
+        <div class="ctl">
+          <label for="sI">initiator concentration (mol/L)</label>
+          <input type="range" id="sI" min="0.001" max="0.05" step="0.001" value="0.01">
+          <span class="v" id="vI"></span>
+        </div>
+        <div class="ctl">
+          <label for="sEd">initiator decomposition, <i>E</i><sub>d</sub> (kJ/mol)</label>
+          <input type="range" id="sEd" min="0" max="160" step="1" value="128">
+          <span class="v" id="vEd"></span>
+        </div>
+        <div class="ctl">
+          <label for="sEp">propagation, <i>E</i><sub>p</sub> (kJ/mol)</label>
+          <input type="range" id="sEp" min="10" max="50" step="0.5" value="32.5">
+          <span class="v" id="vEp"></span>
+        </div>
+        <div class="ctl">
+          <label for="sEt">termination, <i>E</i><sub>t</sub> (kJ/mol)</label>
+          <input type="range" id="sEt" min="0" max="30" step="0.5" value="10">
+          <span class="v" id="vEt"></span>
+        </div>
+        <div class="ctl">
+          <label for="selTerm">termination by</label>
+          <select id="selTerm">
+            <option value="comb" selected>combination</option>
+            <option value="disp">disproportionation</option>
+          </select>
+        </div>
       </div>
-      <div class="ctl">
-        <label for="sI">initiator concentration (mol/L)</label>
-        <input type="range" id="sI" min="0.001" max="0.05" step="0.001" value="0.01">
-        <span class="v" id="vI"></span>
+      <div class="btns" id="btns">
+        <button class="lce" id="bDir" aria-controls="pDir">Directions</button>
+        <button class="lce" id="bDet" aria-controls="pDet">Details</button>
+        <button class="lce" id="bAbout" aria-controls="pAbout">About</button>
       </div>
-      <div class="ctl">
-        <label for="sEd">initiator decomposition, <i>E</i><sub>d</sub> (kJ/mol)</label>
-        <input type="range" id="sEd" min="0" max="160" step="1" value="128">
-        <span class="v" id="vEd"></span>
+
+      <div class="panel" id="pDir" hidden>
+        <header><h2>Directions</h2><button class="x" aria-label="Close">×</button></header>
+        <div class="body">
+          <p>This simulation shows why increasing the temperature of a free-radical polymerization increases the rate of polymerization, \(R_p\), but decreases the number-average molecular weight, \(M_n\). The rate constants for initiator decomposition (\(k_d\)), propagation (\(k_p\)), and termination (\(k_t\)) each follow the Arrhenius equation with their own activation energy. Because these rate constants combine differently in \(R_p\) and in \(M_n\), the overall activation energy is positive for \(R_p\) and negative for \(M_n\).</p>
+          <p>Use the sliders to change the temperature, the initiator concentration, and the activation energies \(E_d\), \(E_p\), and \(E_t\). Select whether chains terminate by combination or by disproportionation.</p>
+          <p>The plot on the left shows \(R_p\) (left axis) and \(M_n\) (right axis) versus temperature on logarithmic axes; the dashed vertical line marks the selected temperature. Click "Arrhenius plot" to see the natural log of each quantity divided by its value at 60 °C versus \(1000/T\); the slope of each line is \(-E/R\).</p>
+          <p>The bar chart on the right shows how the three activation energies add to give the overall activation energies for \(R_p\) and for \(X_n\). One-half of \(E_d\) is added for \(R_p\) but subtracted for \(X_n\). Decrease \(E_d\) toward zero (as for photoinitiation) to see when the molecular weight increases with temperature.</p>
+        </div>
       </div>
-      <div class="ctl">
-        <label for="sEp">propagation, <i>E</i><sub>p</sub> (kJ/mol)</label>
-        <input type="range" id="sEp" min="10" max="50" step="0.5" value="32.5">
-        <span class="v" id="vEp"></span>
+
+      <div class="panel" id="pDet" hidden>
+        <header><h2>Details</h2><button class="x" aria-label="Close">×</button></header>
+        <div class="body">
+          <p>Each rate constant follows the Arrhenius equation, written relative to a reference temperature \(T_\mathrm{ref}\) = 60 °C:</p>
+          \[ k_i = k_{i,\mathrm{ref}}\exp\!\left[-\frac{E_i}{R}\left(\frac{1}{T}-\frac{1}{T_\mathrm{ref}}\right)\right], \qquad i = d,\,p,\,t \]
+          <p>Initiation, propagation, and termination steps:</p>
+          \[ \mathrm{I}\xrightarrow{k_d}2\,\mathrm{R}\cdot \]
+          \[ \mathrm{R}\cdot+\mathrm{M}\xrightarrow{k_p}\mathrm{R}\cdot \]
+          \[ \mathrm{R}\cdot+\mathrm{R}\cdot\xrightarrow{k_t}\text{dead polymer} \]
+          <p>The steady-state approximation sets the rate of radical initiation equal to the rate of termination:</p>
+          \[ R_i = 2fk_d[\mathrm{I}] = 2k_t[\mathrm{R}\cdot]^2 \]
+          \[ [\mathrm{R}\cdot] = \left(\frac{fk_d[\mathrm{I}]}{k_t}\right)^{1/2} \]
+          <p>The rate of polymerization is:</p>
+          \[ R_p = k_p[\mathrm{M}][\mathrm{R}\cdot] = k_p\left(\frac{fk_d}{k_t}\right)^{1/2}[\mathrm{M}][\mathrm{I}]^{1/2} \]
+          <p>The kinetic chain length is the rate of propagation divided by the rate of initiation:</p>
+          \[ \nu = \frac{R_p}{R_i} = \frac{k_p[\mathrm{M}]}{2\left(fk_dk_t[\mathrm{I}]\right)^{1/2}} \]
+          <p>The number-average degree of polymerization and molecular weight are:</p>
+          \[ X_n = 2\nu \quad \text{(combination)}, \qquad X_n = \nu \quad \text{(disproportionation)} \]
+          \[ M_n = X_n M_0 \]
+          <p>Collecting the rate constants shows how each activation energy enters:</p>
+          \[ R_p \propto k_p\,k_d^{1/2}\,k_t^{-1/2} \]
+          \[ E_{R_p} = E_p + \tfrac{1}{2}E_d - \tfrac{1}{2}E_t \]
+          \[ X_n \propto k_p\,k_d^{-1/2}\,k_t^{-1/2} \]
+          \[ E_{X_n} = E_p - \tfrac{1}{2}E_d - \tfrac{1}{2}E_t \]
+          <p>For thermal initiators such as AIBN or benzoyl peroxide, \(E_d\) ≈ 120–150 kJ/mol, much larger than \(E_p\) ≈ 20–40 kJ/mol and \(E_t\) ≈ 5–20 kJ/mol. Thus \(E_{R_p}\) is large and positive (≈ 80–90 kJ/mol), so \(R_p\) increases rapidly with temperature, whereas \(E_{X_n}\) is negative, so \(X_n\) and \(M_n\) decrease. A higher temperature generates radicals faster, so \([\mathrm{R}\cdot]\) increases. More radicals consume monomer faster, but they also terminate each other more often, so each chain adds fewer monomer units before it terminates.</p>
+          <p>\(E_{X_n}\) is positive only if \(E_d < 2E_p - E_t\), as for photoinitiation or radiation initiation, where \(E_d\) ≈ 0.</p>
+          <p>The parameters at \(T_\mathrm{ref}\) = 60 °C are representative of bulk styrene with AIBN initiator:</p>
+          <table>
+            <tr><td>\(k_{d,\mathrm{ref}}\)</td><td>9.5 × 10<sup>−6</sup> s<sup>−1</sup></td></tr>
+            <tr><td>\(k_{p,\mathrm{ref}}\)</td><td>341 L mol<sup>−1</sup> s<sup>−1</sup></td></tr>
+            <tr><td>\(k_{t,\mathrm{ref}}\)</td><td>6.0 × 10<sup>7</sup> L mol<sup>−1</sup> s<sup>−1</sup></td></tr>
+            <tr><td>\(f\)</td><td>0.6</td></tr>
+            <tr><td>\([\mathrm{M}]\)</td><td>8.35 mol/L</td></tr>
+            <tr><td>\(M_0\)</td><td>104.15 g/mol</td></tr>
+          </table>
+          <p>The model assumes low conversion (constant \([\mathrm{M}]\) and \([\mathrm{I}]\)), a temperature-independent \(f\), no chain transfer, and no gel effect.</p>
+          <p>Symbols:</p>
+          <table>
+            <tr><td>\(E_d\)</td><td>activation energy for initiator decomposition (kJ/mol)</td></tr>
+            <tr><td>\(E_p\)</td><td>activation energy for propagation (kJ/mol)</td></tr>
+            <tr><td>\(E_t\)</td><td>activation energy for termination (kJ/mol)</td></tr>
+            <tr><td>\(E_{R_p}\)</td><td>overall activation energy for the rate of polymerization (kJ/mol)</td></tr>
+            <tr><td>\(E_{X_n}\)</td><td>overall activation energy for the degree of polymerization (kJ/mol)</td></tr>
+            <tr><td>\(f\)</td><td>initiator efficiency</td></tr>
+            <tr><td>\([\mathrm{I}]\)</td><td>initiator concentration (mol/L)</td></tr>
+            <tr><td>\(k_d\)</td><td>initiator decomposition rate constant (s<sup>−1</sup>)</td></tr>
+            <tr><td>\(k_p\)</td><td>propagation rate constant (L mol<sup>−1</sup> s<sup>−1</sup>)</td></tr>
+            <tr><td>\(k_t\)</td><td>termination rate constant (L mol<sup>−1</sup> s<sup>−1</sup>)</td></tr>
+            <tr><td>\(k_{i,\mathrm{ref}}\)</td><td>rate constant \(i\) at \(T_\mathrm{ref}\)</td></tr>
+            <tr><td>\([\mathrm{M}]\)</td><td>monomer concentration (mol/L)</td></tr>
+            <tr><td>\(M_0\)</td><td>monomer molar mass (g/mol)</td></tr>
+            <tr><td>\(M_n\)</td><td>number-average molecular weight (g/mol)</td></tr>
+            <tr><td>\(R\)</td><td>ideal gas constant, 8.314 J mol<sup>−1</sup> K<sup>−1</sup></td></tr>
+            <tr><td>\([\mathrm{R}\cdot]\)</td><td>radical concentration (mol/L)</td></tr>
+            <tr><td>\(R_i\)</td><td>rate of initiation (mol L<sup>−1</sup> s<sup>−1</sup>)</td></tr>
+            <tr><td>\(R_p\)</td><td>rate of polymerization (mol L<sup>−1</sup> s<sup>−1</sup>)</td></tr>
+            <tr><td>\(T\)</td><td>temperature (K)</td></tr>
+            <tr><td>\(T_\mathrm{ref}\)</td><td>reference temperature, 333.15 K (60 °C)</td></tr>
+            <tr><td>\(X_n\)</td><td>number-average degree of polymerization</td></tr>
+            <tr><td>\(\nu\)</td><td>kinetic chain length</td></tr>
+          </table>
+        </div>
       </div>
-      <div class="ctl">
-        <label for="sEt">termination, <i>E</i><sub>t</sub> (kJ/mol)</label>
-        <input type="range" id="sEt" min="0" max="30" step="0.5" value="10">
-        <span class="v" id="vEt"></span>
-      </div>
-      <div class="ctl">
-        <label for="selTerm">termination by</label>
-        <select id="selTerm">
-          <option value="comb" selected>combination</option>
-          <option value="disp">disproportionation</option>
-        </select>
+
+      <div class="panel" id="pAbout" hidden>
+        <header><h2>About</h2><button class="x" aria-label="Close">×</button></header>
+        <div class="body">
+          <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.</p>
+        </div>
       </div>
     </div>
-    <div class="btns" id="btns">
-      <button class="lce" id="bDir" aria-controls="pDir">Directions</button>
-      <button class="lce" id="bDet" aria-controls="pDet">Details</button>
-      <button class="lce" id="bAbout" aria-controls="pAbout">About</button>
-    </div>
 
-    <div class="panel" id="pDir" hidden>
-      <header><h2>Directions</h2><button class="x" aria-label="Close">×</button></header>
-      <div class="body">
-        <p>This simulation shows why increasing the temperature of a free-radical polymerization increases the rate of polymerization, \(R_p\), but decreases the number-average molecular weight, \(M_n\). The rate constants for initiator decomposition (\(k_d\)), propagation (\(k_p\)), and termination (\(k_t\)) each follow the Arrhenius equation with their own activation energy. Because these rate constants combine differently in \(R_p\) and in \(M_n\), the overall activation energy is positive for \(R_p\) and negative for \(M_n\).</p>
-        <p>Use the sliders to change the temperature, the initiator concentration, and the activation energies \(E_d\), \(E_p\), and \(E_t\). Select whether chains terminate by combination or by disproportionation.</p>
-        <p>The plot on the left shows \(R_p\) (left axis) and \(M_n\) (right axis) versus temperature on logarithmic axes; the dashed vertical line marks the selected temperature. Click "Arrhenius plot" to see the natural log of each quantity divided by its value at 60 °C versus \(1000/T\); the slope of each line is \(-E/R\).</p>
-        <p>The bar chart on the right shows how the three activation energies add to give the overall activation energies for \(R_p\) and for \(X_n\). One-half of \(E_d\) is added for \(R_p\) but subtracted for \(X_n\). Decrease \(E_d\) toward zero (as for photoinitiation) to see when the molecular weight increases with temperature.</p>
+    <div class="main">
+      <div class="card plotcard">
+        <div class="seg" role="group" aria-label="Plot">
+          <button id="vwT" aria-pressed="true">rate and molecular weight</button>
+          <button id="vwA" aria-pressed="false">Arrhenius plot</button>
+        </div>
+        <canvas id="plot"></canvas>
+        <p class="caption" id="caption"></p>
       </div>
-    </div>
 
-    <div class="panel" id="pDet" hidden>
-      <header><h2>Details</h2><button class="x" aria-label="Close">×</button></header>
-      <div class="body">
-        <p>Each rate constant follows the Arrhenius equation, written relative to a reference temperature \(T_\mathrm{ref}\) = 60 °C:</p>
-        \[ k_i = k_{i,\mathrm{ref}}\exp\!\left[-\frac{E_i}{R}\left(\frac{1}{T}-\frac{1}{T_\mathrm{ref}}\right)\right], \qquad i = d,\,p,\,t \]
-        <p>Initiation, propagation, and termination steps:</p>
-        \[ \mathrm{I}\xrightarrow{k_d}2\,\mathrm{R}\cdot \]
-        \[ \mathrm{R}\cdot+\mathrm{M}\xrightarrow{k_p}\mathrm{R}\cdot \]
-        \[ \mathrm{R}\cdot+\mathrm{R}\cdot\xrightarrow{k_t}\text{dead polymer} \]
-        <p>The steady-state approximation sets the rate of radical initiation equal to the rate of termination:</p>
-        \[ R_i = 2fk_d[\mathrm{I}] = 2k_t[\mathrm{R}\cdot]^2 \]
-        \[ [\mathrm{R}\cdot] = \left(\frac{fk_d[\mathrm{I}]}{k_t}\right)^{1/2} \]
-        <p>The rate of polymerization is:</p>
-        \[ R_p = k_p[\mathrm{M}][\mathrm{R}\cdot] = k_p\left(\frac{fk_d}{k_t}\right)^{1/2}[\mathrm{M}][\mathrm{I}]^{1/2} \]
-        <p>The kinetic chain length is the rate of propagation divided by the rate of initiation:</p>
-        \[ \nu = \frac{R_p}{R_i} = \frac{k_p[\mathrm{M}]}{2\left(fk_dk_t[\mathrm{I}]\right)^{1/2}} \]
-        <p>The number-average degree of polymerization and molecular weight are:</p>
-        \[ X_n = 2\nu \quad \text{(combination)}, \qquad X_n = \nu \quad \text{(disproportionation)} \]
-        \[ M_n = X_n M_0 \]
-        <p>Collecting the rate constants shows how each activation energy enters:</p>
-        \[ R_p \propto k_p\,k_d^{1/2}\,k_t^{-1/2} \]
-        \[ E_{R_p} = E_p + \tfrac{1}{2}E_d - \tfrac{1}{2}E_t \]
-        \[ X_n \propto k_p\,k_d^{-1/2}\,k_t^{-1/2} \]
-        \[ E_{X_n} = E_p - \tfrac{1}{2}E_d - \tfrac{1}{2}E_t \]
-        <p>For thermal initiators such as AIBN or benzoyl peroxide, \(E_d\) ≈ 120–150 kJ/mol, much larger than \(E_p\) ≈ 20–40 kJ/mol and \(E_t\) ≈ 5–20 kJ/mol. Thus \(E_{R_p}\) is large and positive (≈ 80–90 kJ/mol), so \(R_p\) increases rapidly with temperature, whereas \(E_{X_n}\) is negative, so \(X_n\) and \(M_n\) decrease. A higher temperature generates radicals faster, so \([\mathrm{R}\cdot]\) increases. More radicals consume monomer faster, but they also terminate each other more often, so each chain adds fewer monomer units before it terminates.</p>
-        <p>\(E_{X_n}\) is positive only if \(E_d < 2E_p - E_t\), as for photoinitiation or radiation initiation, where \(E_d\) ≈ 0.</p>
-        <p>The parameters at \(T_\mathrm{ref}\) = 60 °C are representative of bulk styrene with AIBN initiator:</p>
-        <table>
-          <tr><td>\(k_{d,\mathrm{ref}}\)</td><td>9.5 × 10<sup>−6</sup> s<sup>−1</sup></td></tr>
-          <tr><td>\(k_{p,\mathrm{ref}}\)</td><td>341 L mol<sup>−1</sup> s<sup>−1</sup></td></tr>
-          <tr><td>\(k_{t,\mathrm{ref}}\)</td><td>6.0 × 10<sup>7</sup> L mol<sup>−1</sup> s<sup>−1</sup></td></tr>
-          <tr><td>\(f\)</td><td>0.6</td></tr>
-          <tr><td>\([\mathrm{M}]\)</td><td>8.35 mol/L</td></tr>
-          <tr><td>\(M_0\)</td><td>104.15 g/mol</td></tr>
-        </table>
-        <p>The model assumes low conversion (constant \([\mathrm{M}]\) and \([\mathrm{I}]\)), a temperature-independent \(f\), no chain transfer, and no gel effect.</p>
-        <p>Symbols:</p>
-        <table>
-          <tr><td>\(E_d\)</td><td>activation energy for initiator decomposition (kJ/mol)</td></tr>
-          <tr><td>\(E_p\)</td><td>activation energy for propagation (kJ/mol)</td></tr>
-          <tr><td>\(E_t\)</td><td>activation energy for termination (kJ/mol)</td></tr>
-          <tr><td>\(E_{R_p}\)</td><td>overall activation energy for the rate of polymerization (kJ/mol)</td></tr>
-          <tr><td>\(E_{X_n}\)</td><td>overall activation energy for the degree of polymerization (kJ/mol)</td></tr>
-          <tr><td>\(f\)</td><td>initiator efficiency</td></tr>
-          <tr><td>\([\mathrm{I}]\)</td><td>initiator concentration (mol/L)</td></tr>
-          <tr><td>\(k_d\)</td><td>initiator decomposition rate constant (s<sup>−1</sup>)</td></tr>
-          <tr><td>\(k_p\)</td><td>propagation rate constant (L mol<sup>−1</sup> s<sup>−1</sup>)</td></tr>
-          <tr><td>\(k_t\)</td><td>termination rate constant (L mol<sup>−1</sup> s<sup>−1</sup>)</td></tr>
-          <tr><td>\(k_{i,\mathrm{ref}}\)</td><td>rate constant \(i\) at \(T_\mathrm{ref}\)</td></tr>
-          <tr><td>\([\mathrm{M}]\)</td><td>monomer concentration (mol/L)</td></tr>
-          <tr><td>\(M_0\)</td><td>monomer molar mass (g/mol)</td></tr>
-          <tr><td>\(M_n\)</td><td>number-average molecular weight (g/mol)</td></tr>
-          <tr><td>\(R\)</td><td>ideal gas constant, 8.314 J mol<sup>−1</sup> K<sup>−1</sup></td></tr>
-          <tr><td>\([\mathrm{R}\cdot]\)</td><td>radical concentration (mol/L)</td></tr>
-          <tr><td>\(R_i\)</td><td>rate of initiation (mol L<sup>−1</sup> s<sup>−1</sup>)</td></tr>
-          <tr><td>\(R_p\)</td><td>rate of polymerization (mol L<sup>−1</sup> s<sup>−1</sup>)</td></tr>
-          <tr><td>\(T\)</td><td>temperature (K)</td></tr>
-          <tr><td>\(T_\mathrm{ref}\)</td><td>reference temperature, 333.15 K (60 °C)</td></tr>
-          <tr><td>\(X_n\)</td><td>number-average degree of polymerization</td></tr>
-          <tr><td>\(\nu\)</td><td>kinetic chain length</td></tr>
-        </table>
-      </div>
-    </div>
-
-    <div class="panel" id="pAbout" hidden>
-      <header><h2>About</h2><button class="x" aria-label="Close">×</button></header>
-      <div class="body">
-        <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.</p>
+      <div class="side">
+        <div class="card wide">
+          <h3>How the activation energies combine</h3>
+          <canvas id="budget"></canvas>
+          <p class="verdict" id="verdict"></p>
+        </div>
+        <div class="card fit">
+          <h3>Values at <span id="hT"></span></h3>
+          <table class="ro" id="ro"></table>
+          <p class="note">Parameters are representative of bulk styrene with AIBN initiator.</p>
+        </div>
       </div>
     </div>
   </div>
 
-  <div class="main">
-    <div class="card plotcard">
-      <div class="seg" role="group" aria-label="Plot">
-        <button id="vwT" aria-pressed="true">rate and molecular weight</button>
-        <button id="vwA" aria-pressed="false">Arrhenius plot</button>
-      </div>
-      <canvas id="plot"></canvas>
-      <p class="caption" id="caption"></p>
-    </div>
+  <script>
+  (() => {
+    const RG = 8.314;               // J/(mol K)
+    const TREF = 333.15;            // K
+    const REF = { kd: 9.5e-6, kp: 341, kt: 6.0e7 };
+    const F = 0.6, MCONC = 8.35, M0 = 104.15;
+    const FONT = 'Helvetica, "Helvetica Neue", Arial, sans-serif';
+    const FS_AXIS = 17, FS_NUM = 16, FS_LAB = 16;
+    const COL = { ink: '#000000', grid: '#e6e2e2', axis: '#000000', guide: '#777777',
+                  rp: '#98000D', mn: '#1d4a9c', ep: '#2b6cc4', ed: '#2f8a3e', et: '#c87000' };
 
-    <div class="side">
-      <div class="card wide">
-        <h3>How the activation energies combine</h3>
-        <canvas id="budget"></canvas>
-        <p class="verdict" id="verdict"></p>
-      </div>
-      <div class="card fit">
-        <h3>Values at <span id="hT"></span></h3>
-        <table class="ro" id="ro"></table>
-        <p class="note">Parameters are representative of bulk styrene with AIBN initiator.</p>
-      </div>
-    </div>
-  </div>
-</div>
+    const $ = id => document.getElementById(id);
+    const S = { T: 60, Ed: 128, Ep: 32.5, Et: 10, I: 0.01, term: 'comb', view: 'T' };
 
-<script>
-(() => {
-  const RG = 8.314;               // J/(mol K)
-  const TREF = 333.15;            // K
-  const REF = { kd: 9.5e-6, kp: 341, kt: 6.0e7 };
-  const F = 0.6, MCONC = 8.35, M0 = 104.15;
-  const FONT = 'Helvetica, "Helvetica Neue", Arial, sans-serif';
-  const FS_AXIS = 17, FS_NUM = 16, FS_LAB = 16;
-  const COL = { ink: '#000000', grid: '#e6e2e2', axis: '#000000', guide: '#777777',
-                rp: '#98000D', mn: '#1d4a9c', ep: '#2b6cc4', ed: '#2f8a3e', et: '#c87000' };
-
-  const $ = id => document.getElementById(id);
-  const S = { T: 60, Ed: 128, Ep: 32.5, Et: 10, I: 0.01, term: 'comb', view: 'T' };
-
-  // ---------- model ----------
-  const kArr = (kref, E, T) => kref * Math.exp(-E * 1000 / RG * (1 / T - 1 / TREF));
-  function model(Tc) {
-    const T = Tc + 273.15;
-    const kd = kArr(REF.kd, S.Ed, T), kp = kArr(REF.kp, S.Ep, T), kt = kArr(REF.kt, S.Et, T);
-    const R = Math.sqrt(F * kd * S.I / kt);
-    const Rp = kp * MCONC * R;
-    const Ri = 2 * F * kd * S.I;
-    const nu = Rp / Ri;
-    const Xn = S.term === 'comb' ? 2 * nu : nu;
-    return { T, kd, kp, kt, R, Rp, Ri, nu, Xn, Mn: Xn * M0 };
-  }
-  const ERp = () => S.Ep + S.Ed / 2 - S.Et / 2;
-  const EXn = () => S.Ep - S.Ed / 2 - S.Et / 2;
-
-  // ---------- canvas helpers ----------
-  const DPR = () => window.devicePixelRatio || 1;
-  function setup(c) {
-    const dpr = DPR();
-    const w = c.clientWidth, h = c.clientHeight;
-    c.width = Math.round(w * dpr); c.height = Math.round(h * dpr);
-    const ctx = c.getContext('2d');
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.clearRect(0, 0, w, h);
-    return { ctx, w, h };
-  }
-  // rich text: _{...} subscript, ^{...} superscript
-  function parse(s) {
-    const out = []; let i = 0, buf = '';
-    const flush = () => { if (buf) { out.push({ t: buf, m: 0 }); buf = ''; } };
-    while (i < s.length) {
-      const c = s[i];
-      if ((c === '_' || c === '^') && i + 1 < s.length) {
-        flush();
-        let t;
-        if (s[i + 1] === '{') { const j = s.indexOf('}', i + 2); t = s.slice(i + 2, j); i = j + 1; }
-        else { t = s[i + 1]; i += 2; }
-        out.push({ t, m: c === '_' ? -1 : 1 });
-      } else { buf += c; i++; }
+    // ---------- model ----------
+    const kArr = (kref, E, T) => kref * Math.exp(-E * 1000 / RG * (1 / T - 1 / TREF));
+    function model(Tc) {
+      const T = Tc + 273.15;
+      const kd = kArr(REF.kd, S.Ed, T), kp = kArr(REF.kp, S.Ep, T), kt = kArr(REF.kt, S.Et, T);
+      const R = Math.sqrt(F * kd * S.I / kt);
+      const Rp = kp * MCONC * R;
+      const Ri = 2 * F * kd * S.I;
+      const nu = Rp / Ri;
+      const Xn = S.term === 'comb' ? 2 * nu : nu;
+      return { T, kd, kp, kt, R, Rp, Ri, nu, Xn, Mn: Xn * M0 };
     }
-    flush();
-    return out;
-  }
-  const fontFor = (size, m) => `normal ${m ? Math.round(size * 0.72) : size}px ${FONT}`;
-  function measure(ctx, s, size) {
-    let W = 0;
-    for (const g of parse(s)) { ctx.font = fontFor(size, g.m); W += ctx.measureText(g.t).width; }
-    return W;
-  }
-  function rich(ctx, s, x, y, opt = {}) {
-    const size = opt.size || FS_NUM;
-    const W = measure(ctx, s, size);
-    let x0 = opt.align === 'center' ? x - W / 2 : opt.align === 'right' ? x - W : x;
-    ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
-    ctx.fillStyle = opt.color || COL.ink;
-    for (const g of parse(s)) {
-      ctx.font = fontFor(size, g.m);
-      const dy = g.m === -1 ? size * 0.3 : g.m === 1 ? -size * 0.36 : 0;
-      ctx.fillText(g.t, x0, y + dy);
-      x0 += ctx.measureText(g.t).width;
-    }
-    return W;
-  }
-  // y-axis label: draw horizontally on an offscreen canvas, then rotate it into place
-  function yLabel(ctx, s, cx, cy, opt = {}) {
-    const size = opt.size || FS_AXIS, dpr = DPR();
-    const W = Math.ceil(measure(ctx, s, size)) + 6, H = Math.ceil(size * 1.6);
-    // offscreen bitmap is built in whole device pixels and copied 1:1 (no rescaling),
-    // so the text is not smeared across pixels and does not look bold
-    const ow = 2 * Math.ceil(W * dpr / 2), oh = 2 * Math.ceil(H * dpr / 2);
-    const off = document.createElement('canvas');
-    off.width = ow; off.height = oh;
-    // opaque white background: the text is antialiased against white exactly like the x-axis label,
-    // instead of against transparency, which can render darker and look bold on some displays
-    const o = off.getContext('2d', { alpha: false });
-    o.fillStyle = '#ffffff'; o.fillRect(0, 0, ow, oh);
-    o.setTransform(dpr, 0, 0, dpr, 0, 0);
-    rich(o, s, ow / dpr / 2, oh / dpr / 2, { size, align: 'center', color: opt.color });
-    ctx.save();
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.translate(Math.round(cx * dpr), Math.round(cy * dpr));
-    ctx.rotate(opt.cw ? Math.PI / 2 : -Math.PI / 2);
-    ctx.imageSmoothingEnabled = false;
-    ctx.drawImage(off, -ow / 2, -oh / 2);
-    ctx.restore();
-  }
-  const sup = n => String(n).replace('-', '−');
-  function logRange(vals) {
-    let lo = Math.floor(Math.log10(Math.min(...vals)));
-    let hi = Math.ceil(Math.log10(Math.max(...vals)));
-    if (hi - lo < 1) hi = lo + 1;
-    return [lo, hi];
-  }
+    const ERp = () => S.Ep + S.Ed / 2 - S.Et / 2;
+    const EXn = () => S.Ep - S.Ed / 2 - S.Et / 2;
 
-  // ---------- label placement that avoids curves and other labels ----------
-  function boxHitsPolyline(b, pts) {
-    for (let i = 1; i < pts.length; i++) {
-      const [x1, y1] = pts[i - 1], [x2, y2] = pts[i];
-      if (Math.max(x1, x2) < b.x || Math.min(x1, x2) > b.x + b.w || Math.max(y1, y2) < b.y || Math.min(y1, y2) > b.y + b.h) continue;
-      const n = Math.max(2, Math.ceil(Math.hypot(x2 - x1, y2 - y1) / 2));
-      for (let k = 0; k <= n; k++) {
-        const x = x1 + (x2 - x1) * k / n, y = y1 + (y2 - y1) * k / n;
-        if (x >= b.x && x <= b.x + b.w && y >= b.y && y <= b.y + b.h) return true;
+    // ---------- canvas helpers ----------
+    const DPR = () => window.devicePixelRatio || 1;
+    function setup(c) {
+      const dpr = DPR();
+      const w = c.clientWidth, h = c.clientHeight;
+      c.width = Math.round(w * dpr); c.height = Math.round(h * dpr);
+      const ctx = c.getContext('2d');
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, w, h);
+      return { ctx, w, h };
+    }
+    // rich text: _{...} subscript, ^{...} superscript
+    function parse(s) {
+      const out = []; let i = 0, buf = '';
+      const flush = () => { if (buf) { out.push({ t: buf, m: 0 }); buf = ''; } };
+      while (i < s.length) {
+        const c = s[i];
+        if ((c === '_' || c === '^') && i + 1 < s.length) {
+          flush();
+          let t;
+          if (s[i + 1] === '{') { const j = s.indexOf('}', i + 2); t = s.slice(i + 2, j); i = j + 1; }
+          else { t = s[i + 1]; i += 2; }
+          out.push({ t, m: c === '_' ? -1 : 1 });
+        } else { buf += c; i++; }
       }
+      flush();
+      return out;
     }
-    return false;
-  }
-  const overlap = (a, b) => a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
-  function placeLabel(ctx, text, cands, env, opt) {
-    const size = opt.size || FS_LAB;
-    const W = measure(ctx, text, size), H = size * 1.45, pad = 4;
-    const B = env.bounds;
-    let best = null;
-    for (const c of cands) {
-      const x0 = c.align === 'center' ? c.x - W / 2 : c.align === 'right' ? c.x - W : c.x;
-      const b = { x: x0 - pad, y: c.y - H / 2 - pad, w: W + 2 * pad, h: H + 2 * pad };
-      if (b.x < B.x || b.y < B.y || b.x + b.w > B.x + B.w || b.y + b.h > B.y + B.h) continue;
-      const hitsLabel = env.placed.some(p => overlap(p, b));
-      const hits = env.lines.reduce((n, p) => n + (boxHitsPolyline(b, p) ? 1 : 0), 0);
-      if (!hits && !hitsLabel) { env.placed.push(b); rich(ctx, text, x0, c.y, { size, color: opt.color }); return; }
-      const score = hits + (hitsLabel ? 100 : 0);
-      if (!best || score < best.score) best = { x0, y: c.y, b, score };
+    const fontFor = (size, m) => `normal ${m ? Math.round(size * 0.72) : size}px ${FONT}`;
+    function measure(ctx, s, size) {
+      let W = 0;
+      for (const g of parse(s)) { ctx.font = fontFor(size, g.m); W += ctx.measureText(g.t).width; }
+      return W;
     }
-    if (!best) return;
-    // no clear spot: draw the label on a white background so it stays readable over the lines
-    window.__labelFallbacks = (window.__labelFallbacks || 0) + 1;
-    env.placed.push(best.b);
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(best.b.x + 1, best.b.y + 1, best.b.w - 2, best.b.h - 2);
-    rich(ctx, text, best.x0, best.y, { size, color: opt.color });
-  }
-  // candidates spread along a curve, above and below it; preferred fractions first, then every 5%
-  function curveCands(pts, fracs, offs) {
-    const out = [], all = fracs.slice();
-    for (let f = 0.03; f <= 0.97; f += 0.05) all.push(f);
-    for (const f of all) {
-      const p = pts[Math.min(pts.length - 1, Math.max(0, Math.round(f * (pts.length - 1))))];
-      for (const d of offs) {
-        for (const [dx, al] of [[0, 'center'], [8, 'left'], [-8, 'right']]) {
-          out.push({ x: p[0] + dx, y: p[1] - d, align: al });
-          out.push({ x: p[0] + dx, y: p[1] + d, align: al });
+    function rich(ctx, s, x, y, opt = {}) {
+      const size = opt.size || FS_NUM;
+      const W = measure(ctx, s, size);
+      let x0 = opt.align === 'center' ? x - W / 2 : opt.align === 'right' ? x - W : x;
+      ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
+      ctx.fillStyle = opt.color || COL.ink;
+      for (const g of parse(s)) {
+        ctx.font = fontFor(size, g.m);
+        const dy = g.m === -1 ? size * 0.3 : g.m === 1 ? -size * 0.36 : 0;
+        ctx.fillText(g.t, x0, y + dy);
+        x0 += ctx.measureText(g.t).width;
+      }
+      return W;
+    }
+    // y-axis label: draw horizontally on an offscreen canvas, then rotate it into place
+    function yLabel(ctx, s, cx, cy, opt = {}) {
+      const size = opt.size || FS_AXIS, dpr = DPR();
+      const W = Math.ceil(measure(ctx, s, size)) + 6, H = Math.ceil(size * 1.6);
+      // offscreen bitmap is built in whole device pixels and copied 1:1 (no rescaling),
+      // so the text is not smeared across pixels and does not look bold
+      const ow = 2 * Math.ceil(W * dpr / 2), oh = 2 * Math.ceil(H * dpr / 2);
+      const off = document.createElement('canvas');
+      off.width = ow; off.height = oh;
+      // opaque white background: the text is antialiased against white exactly like the x-axis label,
+      // instead of against transparency, which can render darker and look bold on some displays
+      const o = off.getContext('2d', { alpha: false });
+      o.fillStyle = '#ffffff'; o.fillRect(0, 0, ow, oh);
+      o.setTransform(dpr, 0, 0, dpr, 0, 0);
+      rich(o, s, ow / dpr / 2, oh / dpr / 2, { size, align: 'center', color: opt.color });
+      ctx.save();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.translate(Math.round(cx * dpr), Math.round(cy * dpr));
+      ctx.rotate(opt.cw ? Math.PI / 2 : -Math.PI / 2);
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(off, -ow / 2, -oh / 2);
+      ctx.restore();
+    }
+    const sup = n => String(n).replace('-', '−');
+    function logRange(vals) {
+      let lo = Math.floor(Math.log10(Math.min(...vals)));
+      let hi = Math.ceil(Math.log10(Math.max(...vals)));
+      if (hi - lo < 1) hi = lo + 1;
+      return [lo, hi];
+    }
+
+    // ---------- label placement that avoids curves and other labels ----------
+    function boxHitsPolyline(b, pts) {
+      for (let i = 1; i < pts.length; i++) {
+        const [x1, y1] = pts[i - 1], [x2, y2] = pts[i];
+        if (Math.max(x1, x2) < b.x || Math.min(x1, x2) > b.x + b.w || Math.max(y1, y2) < b.y || Math.min(y1, y2) > b.y + b.h) continue;
+        const n = Math.max(2, Math.ceil(Math.hypot(x2 - x1, y2 - y1) / 2));
+        for (let k = 0; k <= n; k++) {
+          const x = x1 + (x2 - x1) * k / n, y = y1 + (y2 - y1) * k / n;
+          if (x >= b.x && x <= b.x + b.w && y >= b.y && y <= b.y + b.h) return true;
         }
       }
+      return false;
     }
-    return out;
-  }
-  function pointCands(x, y) {
-    const out = [];
-    for (const dx of [12, 26, 44, 70])
-      for (const dy of [-18, 18, -30, 30, -44, 44, -60, 60, 0])
-        for (const [sx, al] of [[1, 'left'], [-1, 'right']]) out.push({ x: x + sx * dx, y: y + dy, align: al });
-    return out;
-  }
-
-  // ---------- plot: Rp and Mn vs T ----------
-  function drawVsT() {
-    const c = $('plot'); const { ctx, w, h } = setup(c);
-    const Tmin = 40, Tmax = 100;
-    const N = 121, Ts = [], Rps = [], Mns = [];
-    for (let i = 0; i < N; i++) { const t = Tmin + (Tmax - Tmin) * i / (N - 1); const m = model(t); Ts.push(t); Rps.push(m.Rp); Mns.push(m.Mn); }
-    const [a0, a1] = logRange(Rps), [b0, b1] = logRange(Mns);
-    let tickWL = 0, tickWR = 0;
-    for (let n = a0; n <= a1; n++) tickWL = Math.max(tickWL, measure(ctx, '10^{' + sup(n) + '}', FS_NUM));
-    for (let n = b0; n <= b1; n++) tickWR = Math.max(tickWR, measure(ctx, '10^{' + sup(n) + '}', FS_NUM));
-    const L = Math.ceil(tickWL) + 8 + 30, R = Math.ceil(tickWR) + 8 + 30, T = 18, B = 60;
-    const pw = w - L - R, ph = h - T - B;
-    const X = t => L + (t - Tmin) / (Tmax - Tmin) * pw;
-    const YA = v => T + ph - (Math.log10(v) - a0) / (a1 - a0) * ph;
-    const YB = v => T + ph - (Math.log10(v) - b0) / (b1 - b0) * ph;
-
-    ctx.lineWidth = 1; ctx.strokeStyle = COL.grid;
-    for (let t = Tmin; t <= Tmax; t += 10) { ctx.beginPath(); ctx.moveTo(X(t), T); ctx.lineTo(X(t), T + ph); ctx.stroke(); }
-    for (let n = a0; n <= a1; n++) { const y = YA(10 ** n); ctx.beginPath(); ctx.moveTo(L, y); ctx.lineTo(L + pw, y); ctx.stroke(); }
-    ctx.strokeStyle = COL.axis; ctx.strokeRect(L, T, pw, ph);
-
-    for (let t = Tmin; t <= Tmax; t += 10) {
-      ctx.beginPath(); ctx.moveTo(X(t), T + ph); ctx.lineTo(X(t), T + ph - 6); ctx.stroke();
-      rich(ctx, String(t), X(t), T + ph + 15, { align: 'center', size: FS_NUM });
+    const overlap = (a, b) => a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
+    function placeLabel(ctx, text, cands, env, opt) {
+      const size = opt.size || FS_LAB;
+      const W = measure(ctx, text, size), H = size * 1.45, pad = 4;
+      const B = env.bounds;
+      let best = null;
+      for (const c of cands) {
+        const x0 = c.align === 'center' ? c.x - W / 2 : c.align === 'right' ? c.x - W : c.x;
+        const b = { x: x0 - pad, y: c.y - H / 2 - pad, w: W + 2 * pad, h: H + 2 * pad };
+        if (b.x < B.x || b.y < B.y || b.x + b.w > B.x + B.w || b.y + b.h > B.y + B.h) continue;
+        const hitsLabel = env.placed.some(p => overlap(p, b));
+        const hits = env.lines.reduce((n, p) => n + (boxHitsPolyline(b, p) ? 1 : 0), 0);
+        if (!hits && !hitsLabel) { env.placed.push(b); rich(ctx, text, x0, c.y, { size, color: opt.color }); return; }
+        const score = hits + (hitsLabel ? 100 : 0);
+        if (!best || score < best.score) best = { x0, y: c.y, b, score };
+      }
+      if (!best) return;
+      // no clear spot: draw the label on a white background so it stays readable over the lines
+      window.__labelFallbacks = (window.__labelFallbacks || 0) + 1;
+      env.placed.push(best.b);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(best.b.x + 1, best.b.y + 1, best.b.w - 2, best.b.h - 2);
+      rich(ctx, text, best.x0, best.y, { size, color: opt.color });
     }
-    rich(ctx, 'temperature (°C)', L + pw / 2, T + ph + 42, { align: 'center', size: FS_AXIS });
-
-    function logTicks(lo, hi, Y, side) {
-      ctx.strokeStyle = COL.axis; ctx.lineWidth = 1;
-      const x0 = side === 'L' ? L : L + pw, dir = side === 'L' ? 1 : -1;
-      for (let n = lo; n <= hi; n++) {
-        const y = Y(10 ** n);
-        ctx.beginPath(); ctx.moveTo(x0, y); ctx.lineTo(x0 + dir * 7, y); ctx.stroke();
-        rich(ctx, '10^{' + sup(n) + '}', side === 'L' ? x0 - 6 : x0 + 6, y, { align: side === 'L' ? 'right' : 'left', size: FS_NUM });
-        if (n < hi) for (let k = 2; k <= 9; k++) {
-          const yy = Y(k * 10 ** n);
-          ctx.beginPath(); ctx.moveTo(x0, yy); ctx.lineTo(x0 + dir * 4, yy); ctx.stroke();
+    // candidates spread along a curve, above and below it; preferred fractions first, then every 5%
+    function curveCands(pts, fracs, offs) {
+      const out = [], all = fracs.slice();
+      for (let f = 0.03; f <= 0.97; f += 0.05) all.push(f);
+      for (const f of all) {
+        const p = pts[Math.min(pts.length - 1, Math.max(0, Math.round(f * (pts.length - 1))))];
+        for (const d of offs) {
+          for (const [dx, al] of [[0, 'center'], [8, 'left'], [-8, 'right']]) {
+            out.push({ x: p[0] + dx, y: p[1] - d, align: al });
+            out.push({ x: p[0] + dx, y: p[1] + d, align: al });
+          }
         }
       }
+      return out;
     }
-    logTicks(a0, a1, YA, 'L');
-    logTicks(b0, b1, YB, 'R');
-    const fitY = (long, short) => measure(ctx, long, FS_AXIS) < ph - 6 ? long : short;
-    yLabel(ctx, fitY('rate of polymerization, R_{p} (mol L^{−1} s^{−1})', 'R_{p} (mol L^{−1} s^{−1})'), L - tickWL - 8 - 13, T + ph / 2, { color: COL.rp });
-    yLabel(ctx, fitY('number-average molecular weight, M_{n} (g/mol)', 'molecular weight, M_{n} (g/mol)'), L + pw + tickWR + 8 + 13, T + ph / 2, { cw: true, color: COL.mn });
-
-    const ptsRp = Ts.map((t, i) => [X(t), YA(Rps[i])]);
-    const ptsMn = Ts.map((t, i) => [X(t), YB(Mns[i])]);
-    ctx.save(); ctx.beginPath(); ctx.rect(L, T, pw, ph); ctx.clip();
-    const line = (pts, col) => {
-      ctx.strokeStyle = col; ctx.lineWidth = 2.6; ctx.beginPath();
-      pts.forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y));
-      ctx.stroke();
-    };
-    line(ptsRp, COL.rp); line(ptsMn, COL.mn);
-    const m = model(S.T), xc = X(S.T);
-    ctx.setLineDash([5, 4]); ctx.strokeStyle = COL.guide; ctx.lineWidth = 1.2;
-    ctx.beginPath(); ctx.moveTo(xc, T); ctx.lineTo(xc, T + ph); ctx.stroke(); ctx.setLineDash([]);
-    const dots = [[YA(m.Rp), COL.rp], [YB(m.Mn), COL.mn]];
-    for (const [y, col] of dots) {
-      ctx.fillStyle = '#fff'; ctx.strokeStyle = col; ctx.lineWidth = 2.5;
-      ctx.beginPath(); ctx.arc(xc, y, 6, 0, 2 * Math.PI); ctx.fill(); ctx.stroke();
+    function pointCands(x, y) {
+      const out = [];
+      for (const dx of [12, 26, 44, 70])
+        for (const dy of [-18, 18, -30, 30, -44, 44, -60, 60, 0])
+          for (const [sx, al] of [[1, 'left'], [-1, 'right']]) out.push({ x: x + sx * dx, y: y + dy, align: al });
+      return out;
     }
-    ctx.restore();
 
-    const env = {
-      bounds: { x: L + 2, y: T + 2, w: pw - 4, h: ph - 4 },
-      lines: [ptsRp, ptsMn, [[xc, T], [xc, T + ph]]],
-      placed: dots.map(([y]) => ({ x: xc - 8, y: y - 8, w: 16, h: 16 })),
-    };
-    placeLabel(ctx, sciTxt(m.Rp), pointCands(xc, YA(m.Rp)), env, { color: COL.rp });
-    placeLabel(ctx, sciTxt(m.Mn), pointCands(xc, YB(m.Mn)), env, { color: COL.mn });
-    const fr = [0.9, 0.8, 0.12, 0.2, 0.7, 0.3, 0.6, 0.4, 0.5];
-    const offs = [18, 28, 40, 54];
-    placeLabel(ctx, 'R_{p} (left axis)', curveCands(ptsRp, fr, offs), env, { color: COL.rp });
-    placeLabel(ctx, 'M_{n} (right axis)', curveCands(ptsMn, fr, offs), env, { color: COL.mn });
+    // ---------- plot: Rp and Mn vs T ----------
+    function drawVsT() {
+      const c = $('plot'); const { ctx, w, h } = setup(c);
+      const Tmin = 40, Tmax = 100;
+      const N = 121, Ts = [], Rps = [], Mns = [];
+      for (let i = 0; i < N; i++) { const t = Tmin + (Tmax - Tmin) * i / (N - 1); const m = model(t); Ts.push(t); Rps.push(m.Rp); Mns.push(m.Mn); }
+      const [a0, a1] = logRange(Rps), [b0, b1] = logRange(Mns);
+      let tickWL = 0, tickWR = 0;
+      for (let n = a0; n <= a1; n++) tickWL = Math.max(tickWL, measure(ctx, '10^{' + sup(n) + '}', FS_NUM));
+      for (let n = b0; n <= b1; n++) tickWR = Math.max(tickWR, measure(ctx, '10^{' + sup(n) + '}', FS_NUM));
+      const L = Math.ceil(tickWL) + 8 + 30, R = Math.ceil(tickWR) + 8 + 30, T = 18, B = 60;
+      const pw = w - L - R, ph = h - T - B;
+      const X = t => L + (t - Tmin) / (Tmax - Tmin) * pw;
+      const YA = v => T + ph - (Math.log10(v) - a0) / (a1 - a0) * ph;
+      const YB = v => T + ph - (Math.log10(v) - b0) / (b1 - b0) * ph;
 
-    $('caption').textContent = 'The dashed line marks the selected temperature.';
-  }
-  function sciTxt(v) {
-    const e = Math.floor(Math.log10(v)); const m = v / 10 ** e;
-    return m.toFixed(2) + ' × 10^{' + sup(e) + '}';
-  }
+      ctx.lineWidth = 1; ctx.strokeStyle = COL.grid;
+      for (let t = Tmin; t <= Tmax; t += 10) { ctx.beginPath(); ctx.moveTo(X(t), T); ctx.lineTo(X(t), T + ph); ctx.stroke(); }
+      for (let n = a0; n <= a1; n++) { const y = YA(10 ** n); ctx.beginPath(); ctx.moveTo(L, y); ctx.lineTo(L + pw, y); ctx.stroke(); }
+      ctx.strokeStyle = COL.axis; ctx.strokeRect(L, T, pw, ph);
 
-  // ---------- plot: Arrhenius ----------
-  function drawArr() {
-    const c = $('plot'); const { ctx, w, h } = setup(c);
-    const x0 = 2.65, x1 = 3.20, xr = 1000 / TREF;
-    const lines = [
-      { E: S.Ed, col: COL.ed, wd: 2.2, dash: false, name: 'k_{d}' },
-      { E: S.Ep, col: COL.ep, wd: 2.2, dash: false, name: 'k_{p}' },
-      { E: S.Et, col: COL.et, wd: 2.2, dash: false, name: 'k_{t}' },
-      { E: ERp(), col: COL.rp, wd: 3.2, dash: true, name: 'R_{p}' },
-      { E: EXn(), col: COL.mn, wd: 3.2, dash: true, name: 'X_{n}' },
-    ];
-    const lnr = (E, x) => -E * 1000 / RG * (x - xr) / 1000;
-    let ymax = 2;
-    for (const l of lines) ymax = Math.max(ymax, Math.abs(lnr(l.E, x0)), Math.abs(lnr(l.E, x1)));
-    ymax = Math.ceil(ymax);
-    const step = ymax > 8 ? 2 : 1;
-    if (ymax % step) ymax += step - (ymax % step);
-    let tickW = 0;
-    for (let v = -ymax; v <= ymax; v += step) tickW = Math.max(tickW, measure(ctx, sup(v), FS_NUM));
-    const L = Math.ceil(tickW) + 8 + 30, R = 22, T = 62, B = 60;
-    const pw = w - L - R, ph = h - T - B;
-    const X = x => L + (x - x0) / (x1 - x0) * pw;
-    const Y = v => T + ph / 2 - v / ymax * (ph / 2);
+      for (let t = Tmin; t <= Tmax; t += 10) {
+        ctx.beginPath(); ctx.moveTo(X(t), T + ph); ctx.lineTo(X(t), T + ph - 6); ctx.stroke();
+        rich(ctx, String(t), X(t), T + ph + 15, { align: 'center', size: FS_NUM });
+      }
+      rich(ctx, 'temperature (°C)', L + pw / 2, T + ph + 42, { align: 'center', size: FS_AXIS });
 
-    ctx.lineWidth = 1; ctx.strokeStyle = COL.grid;
-    for (let x = 2.7; x <= 3.2001; x += 0.1) { ctx.beginPath(); ctx.moveTo(X(x), T); ctx.lineTo(X(x), T + ph); ctx.stroke(); }
-    for (let v = -ymax; v <= ymax; v += step) { ctx.beginPath(); ctx.moveTo(L, Y(v)); ctx.lineTo(L + pw, Y(v)); ctx.stroke(); }
-    ctx.strokeStyle = COL.axis; ctx.strokeRect(L, T, pw, ph);
+      function logTicks(lo, hi, Y, side) {
+        ctx.strokeStyle = COL.axis; ctx.lineWidth = 1;
+        const x0 = side === 'L' ? L : L + pw, dir = side === 'L' ? 1 : -1;
+        for (let n = lo; n <= hi; n++) {
+          const y = Y(10 ** n);
+          ctx.beginPath(); ctx.moveTo(x0, y); ctx.lineTo(x0 + dir * 7, y); ctx.stroke();
+          rich(ctx, '10^{' + sup(n) + '}', side === 'L' ? x0 - 6 : x0 + 6, y, { align: side === 'L' ? 'right' : 'left', size: FS_NUM });
+          if (n < hi) for (let k = 2; k <= 9; k++) {
+            const yy = Y(k * 10 ** n);
+            ctx.beginPath(); ctx.moveTo(x0, yy); ctx.lineTo(x0 + dir * 4, yy); ctx.stroke();
+          }
+        }
+      }
+      logTicks(a0, a1, YA, 'L');
+      logTicks(b0, b1, YB, 'R');
+      const fitY = (long, short) => measure(ctx, long, FS_AXIS) < ph - 6 ? long : short;
+      yLabel(ctx, fitY('rate of polymerization, R_{p} (mol L^{−1} s^{−1})', 'R_{p} (mol L^{−1} s^{−1})'), L - tickWL - 8 - 13, T + ph / 2, { color: COL.rp });
+      yLabel(ctx, fitY('number-average molecular weight, M_{n} (g/mol)', 'molecular weight, M_{n} (g/mol)'), L + pw + tickWR + 8 + 13, T + ph / 2, { cw: true, color: COL.mn });
 
-    for (let x = 2.7; x <= 3.2001; x += 0.1) {
-      ctx.beginPath(); ctx.moveTo(X(x), T + ph); ctx.lineTo(X(x), T + ph - 6); ctx.stroke();
-      rich(ctx, x.toFixed(1), X(x), T + ph + 15, { align: 'center', size: FS_NUM });
+      const ptsRp = Ts.map((t, i) => [X(t), YA(Rps[i])]);
+      const ptsMn = Ts.map((t, i) => [X(t), YB(Mns[i])]);
+      ctx.save(); ctx.beginPath(); ctx.rect(L, T, pw, ph); ctx.clip();
+      const line = (pts, col) => {
+        ctx.strokeStyle = col; ctx.lineWidth = 2.6; ctx.beginPath();
+        pts.forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y));
+        ctx.stroke();
+      };
+      line(ptsRp, COL.rp); line(ptsMn, COL.mn);
+      const m = model(S.T), xc = X(S.T);
+      ctx.setLineDash([5, 4]); ctx.strokeStyle = COL.guide; ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.moveTo(xc, T); ctx.lineTo(xc, T + ph); ctx.stroke(); ctx.setLineDash([]);
+      const dots = [[YA(m.Rp), COL.rp], [YB(m.Mn), COL.mn]];
+      for (const [y, col] of dots) {
+        ctx.fillStyle = '#fff'; ctx.strokeStyle = col; ctx.lineWidth = 2.5;
+        ctx.beginPath(); ctx.arc(xc, y, 6, 0, 2 * Math.PI); ctx.fill(); ctx.stroke();
+      }
+      ctx.restore();
+
+      const env = {
+        bounds: { x: L + 2, y: T + 2, w: pw - 4, h: ph - 4 },
+        lines: [ptsRp, ptsMn, [[xc, T], [xc, T + ph]]],
+        placed: dots.map(([y]) => ({ x: xc - 8, y: y - 8, w: 16, h: 16 })),
+      };
+      placeLabel(ctx, sciTxt(m.Rp), pointCands(xc, YA(m.Rp)), env, { color: COL.rp });
+      placeLabel(ctx, sciTxt(m.Mn), pointCands(xc, YB(m.Mn)), env, { color: COL.mn });
+      const fr = [0.9, 0.8, 0.12, 0.2, 0.7, 0.3, 0.6, 0.4, 0.5];
+      const offs = [18, 28, 40, 54];
+      placeLabel(ctx, 'R_{p} (left axis)', curveCands(ptsRp, fr, offs), env, { color: COL.rp });
+      placeLabel(ctx, 'M_{n} (right axis)', curveCands(ptsMn, fr, offs), env, { color: COL.mn });
+
+      $('caption').textContent = 'The dashed line marks the selected temperature.';
     }
-    rich(ctx, 'inverse temperature, 1000/T (K^{−1})', L + pw / 2, T + ph + 42, { align: 'center', size: FS_AXIS });
-    for (let v = -ymax; v <= ymax; v += step) {
-      ctx.beginPath(); ctx.moveTo(L, Y(v)); ctx.lineTo(L + 6, Y(v)); ctx.stroke();
-      rich(ctx, sup(v), L - 6, Y(v), { align: 'right', size: FS_NUM });
+    function sciTxt(v) {
+      const e = Math.floor(Math.log10(v)); const m = v / 10 ** e;
+      return m.toFixed(2) + ' × 10^{' + sup(e) + '}';
     }
-    const yl = 'natural log of (value / value at 60 °C)';
-    yLabel(ctx, measure(ctx, yl, FS_AXIS) < ph - 6 ? yl : 'ln(value / value at 60 °C)', L - tickW - 8 - 13, T + ph / 2);
-    for (let tc = 40; tc <= 100; tc += 10) {
-      const x = X(1000 / (tc + 273.15));
-      ctx.beginPath(); ctx.moveTo(x, T); ctx.lineTo(x, T + 6); ctx.stroke();
-      rich(ctx, String(tc), x, T - 13, { align: 'center', size: FS_NUM });
-    }
-    rich(ctx, 'temperature (°C)', L + pw / 2, T - 42, { align: 'center', size: FS_AXIS });
 
-    const polys = lines.map(l => { const p = []; for (let i = 0; i <= 60; i++) { const x = x0 + (x1 - x0) * i / 60; p.push([X(x), Y(lnr(l.E, x))]); } return p; });
-    ctx.save(); ctx.beginPath(); ctx.rect(L, T, pw, ph); ctx.clip();
-    ctx.setLineDash([2, 3]); ctx.strokeStyle = COL.guide; ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(X(xr), T); ctx.lineTo(X(xr), T + ph); ctx.stroke();
-    lines.forEach((l, i) => {
-      ctx.setLineDash(l.dash ? [9, 5] : []); ctx.strokeStyle = l.col; ctx.lineWidth = l.wd;
-      ctx.beginPath(); ctx.moveTo(...polys[i][0]); ctx.lineTo(...polys[i][polys[i].length - 1]); ctx.stroke();
-    });
-    ctx.setLineDash([]);
-    const xc = 1000 / (S.T + 273.15);
-    ctx.setLineDash([5, 4]); ctx.strokeStyle = COL.ink; ctx.lineWidth = 1.2;
-    ctx.beginPath(); ctx.moveTo(X(xc), T); ctx.lineTo(X(xc), T + ph); ctx.stroke(); ctx.setLineDash([]);
-    const dots = [];
-    for (const l of lines) {
-      const y = Y(lnr(l.E, xc));
-      ctx.fillStyle = '#fff'; ctx.strokeStyle = l.col; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.arc(X(xc), y, 4.5, 0, 2 * Math.PI); ctx.fill(); ctx.stroke();
-      dots.push({ x: X(xc) - 6, y: y - 6, w: 12, h: 12 });
-    }
-    ctx.restore();
-
-    const env = {
-      bounds: { x: L + 2, y: T + 2, w: pw - 4, h: ph - 4 },
-      lines: polys.concat([[[X(xr), T], [X(xr), T + ph]], [[X(xc), T], [X(xc), T + ph]]]),
-      placed: dots,
-    };
-    const f1 = v => (Math.abs(v) < 0.05 ? 0 : v).toFixed(1).replace('-', '−');
-    const fr = [0.06, 0.14, 0.22, 0.32, 0.94, 0.88, 0.8, 0.42];
-    const offs = [14, 24, 36, 50];
-    // place the most crowded (smallest |E|) lines first
-    lines.map((l, i) => i).sort((a, b) => Math.abs(lines[a].E) - Math.abs(lines[b].E)).forEach(i => {
-      const l = lines[i];
-      placeLabel(ctx, `${l.name} (E = ${f1(l.E)})`, curveCands(polys[i], fr, offs), env, { color: l.col });
-    });
-    placeLabel(ctx, 'T_{ref}', [{ x: X(xr) + 6, y: T + ph - 14, align: 'left' }, { x: X(xr) - 6, y: T + ph - 14, align: 'right' },
-      { x: X(xr) + 6, y: T + 14, align: 'left' }, { x: X(xr) - 6, y: T + 14, align: 'right' }], env, { color: COL.ink });
-
-    $('caption').innerHTML = 'Activation energies <i>E</i> are in kJ/mol, and the slope of each line is −<i>E</i>/<i>R</i>. Solid lines are rate constants; dashed lines are <i>R</i><sub>p</sub> and <i>X</i><sub>n</sub>. The dashed vertical line marks the selected temperature.';
-  }
-
-  // ---------- activation-energy bars ----------
-  function drawBudget() {
-    const c = $('budget'); const { ctx, w, h } = setup(c);
-    const labels = ['E_{p}', '+ ½E_{d}', '− ½E_{d}', '− ½E_{t}', 'E_{Rp}', 'E_{Xn}'];
-    const L = Math.ceil(Math.max(...labels.map(s => measure(ctx, s, FS_LAB)))) + 14, R = 16, top = 6, axisH = 56;
-    const emin = -100, emax = 150;
-    const X = e => L + (e - emin) / (emax - emin) * (w - L - R);
-    const bh = 15, rs = 25;
-    const groups = [
-      { title: 'rate of polymerization, R_{p}', sgn: +1, net: ERp(), netName: 'E_{Rp}', netCol: COL.rp },
-      { title: 'degree of polymerization, X_{n}', sgn: -1, net: EXn(), netName: 'E_{Xn}', netCol: COL.mn },
-    ];
-    const plotBot = h - axisH;
-    for (let e = emin; e <= emax; e += 25) {
-      ctx.strokeStyle = e === 0 ? COL.axis : COL.grid;
-      ctx.lineWidth = e === 0 ? 1.5 : 1;
-      ctx.beginPath(); ctx.moveTo(X(e), top); ctx.lineTo(X(e), plotBot); ctx.stroke();
-    }
-    ctx.strokeStyle = COL.axis; ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(L, plotBot); ctx.lineTo(w - R, plotBot); ctx.stroke();
-    for (let e = emin; e <= emax; e += 50) {
-      ctx.beginPath(); ctx.moveTo(X(e), plotBot); ctx.lineTo(X(e), plotBot + 5); ctx.stroke();
-      rich(ctx, sup(e), X(e), plotBot + 15, { align: 'center', size: FS_NUM });
-    }
-    rich(ctx, 'activation energy (kJ/mol)', L + (w - L - R) / 2, plotBot + 41, { align: 'center', size: FS_AXIS });
-
-    let y = top + 12;
-    const titles = [];
-    for (const g of groups) {
-      titles.push([g.title, y]);
-      y += 24;
-      const c1 = S.Ep, c2 = c1 + g.sgn * S.Ed / 2, c3 = c2 - S.Et / 2;
-      const bars = [
-        { lab: 'E_{p}', a: 0, b: c1, col: COL.ep },
-        { lab: (g.sgn > 0 ? '+' : '−') + ' ½E_{d}', a: c1, b: c2, col: COL.ed },
-        { lab: '− ½E_{t}', a: c2, b: c3, col: COL.et },
-        { lab: g.netName, a: 0, b: g.net, col: g.netCol, net: true },
+    // ---------- plot: Arrhenius ----------
+    function drawArr() {
+      const c = $('plot'); const { ctx, w, h } = setup(c);
+      const x0 = 2.65, x1 = 3.20, xr = 1000 / TREF;
+      const lines = [
+        { E: S.Ed, col: COL.ed, wd: 2.2, dash: false, name: 'k_{d}' },
+        { E: S.Ep, col: COL.ep, wd: 2.2, dash: false, name: 'k_{p}' },
+        { E: S.Et, col: COL.et, wd: 2.2, dash: false, name: 'k_{t}' },
+        { E: ERp(), col: COL.rp, wd: 3.2, dash: true, name: 'R_{p}' },
+        { E: EXn(), col: COL.mn, wd: 3.2, dash: true, name: 'X_{n}' },
       ];
-      bars.forEach((bar, i) => {
-        const yc = y + i * rs;
-        rich(ctx, bar.lab, L - 8, yc, { align: 'right', size: FS_LAB });
-        const xa = X(Math.min(bar.a, bar.b)), xb = X(Math.max(bar.a, bar.b));
-        ctx.fillStyle = bar.col;
-        ctx.fillRect(xa, yc - bh / 2, Math.max(xb - xa, 1.5), bh);
-        if (!bar.net && Math.abs(bar.b - bar.a) > 3) {
-          const xe = X(bar.b), d = bar.b > bar.a ? 1 : -1;
-          ctx.beginPath(); ctx.moveTo(xe + d * 7, yc); ctx.lineTo(xe, yc - bh / 2 - 2); ctx.lineTo(xe, yc + bh / 2 + 2); ctx.closePath(); ctx.fill();
-        }
-        if (i < 3) {
-          ctx.setLineDash([3, 3]); ctx.strokeStyle = COL.guide; ctx.lineWidth = 1;
-          const xe = X(bar.b);
-          ctx.beginPath(); ctx.moveTo(xe, yc + bh / 2); ctx.lineTo(xe, yc + rs - bh / 2); ctx.stroke(); ctx.setLineDash([]);
-        }
-        const val = bar.b - bar.a;
-        const txt = bar.net ? val.toFixed(1).replace('-', '−') : (val >= 0 ? '+' : '−') + Math.abs(val).toFixed(1);
-        const tw = measure(ctx, txt, FS_NUM);
-        const rx = X(Math.max(bar.a, bar.b)) + (bar.net || val < 0 ? 6 : 11);
-        if (rx + tw < w - 2) rich(ctx, txt, rx, yc, { size: FS_NUM });
-        else rich(ctx, txt, X(Math.min(bar.a, bar.b)) - (val < 0 ? 11 : 6), yc, { size: FS_NUM, align: 'right' });
+      const lnr = (E, x) => -E * 1000 / RG * (x - xr) / 1000;
+      let ymax = 2;
+      for (const l of lines) ymax = Math.max(ymax, Math.abs(lnr(l.E, x0)), Math.abs(lnr(l.E, x1)));
+      ymax = Math.ceil(ymax);
+      const step = ymax > 8 ? 2 : 1;
+      if (ymax % step) ymax += step - (ymax % step);
+      let tickW = 0;
+      for (let v = -ymax; v <= ymax; v += step) tickW = Math.max(tickW, measure(ctx, sup(v), FS_NUM));
+      const L = Math.ceil(tickW) + 8 + 30, R = 22, T = 62, B = 60;
+      const pw = w - L - R, ph = h - T - B;
+      const X = x => L + (x - x0) / (x1 - x0) * pw;
+      const Y = v => T + ph / 2 - v / ymax * (ph / 2);
+
+      ctx.lineWidth = 1; ctx.strokeStyle = COL.grid;
+      for (let x = 2.7; x <= 3.2001; x += 0.1) { ctx.beginPath(); ctx.moveTo(X(x), T); ctx.lineTo(X(x), T + ph); ctx.stroke(); }
+      for (let v = -ymax; v <= ymax; v += step) { ctx.beginPath(); ctx.moveTo(L, Y(v)); ctx.lineTo(L + pw, Y(v)); ctx.stroke(); }
+      ctx.strokeStyle = COL.axis; ctx.strokeRect(L, T, pw, ph);
+
+      for (let x = 2.7; x <= 3.2001; x += 0.1) {
+        ctx.beginPath(); ctx.moveTo(X(x), T + ph); ctx.lineTo(X(x), T + ph - 6); ctx.stroke();
+        rich(ctx, x.toFixed(1), X(x), T + ph + 15, { align: 'center', size: FS_NUM });
+      }
+      rich(ctx, 'inverse temperature, 1000/T (K^{−1})', L + pw / 2, T + ph + 42, { align: 'center', size: FS_AXIS });
+      for (let v = -ymax; v <= ymax; v += step) {
+        ctx.beginPath(); ctx.moveTo(L, Y(v)); ctx.lineTo(L + 6, Y(v)); ctx.stroke();
+        rich(ctx, sup(v), L - 6, Y(v), { align: 'right', size: FS_NUM });
+      }
+      const yl = 'natural log of (value / value at 60 °C)';
+      yLabel(ctx, measure(ctx, yl, FS_AXIS) < ph - 6 ? yl : 'ln(value / value at 60 °C)', L - tickW - 8 - 13, T + ph / 2);
+      for (let tc = 40; tc <= 100; tc += 10) {
+        const x = X(1000 / (tc + 273.15));
+        ctx.beginPath(); ctx.moveTo(x, T); ctx.lineTo(x, T + 6); ctx.stroke();
+        rich(ctx, String(tc), x, T - 13, { align: 'center', size: FS_NUM });
+      }
+      rich(ctx, 'temperature (°C)', L + pw / 2, T - 42, { align: 'center', size: FS_AXIS });
+
+      const polys = lines.map(l => { const p = []; for (let i = 0; i <= 60; i++) { const x = x0 + (x1 - x0) * i / 60; p.push([X(x), Y(lnr(l.E, x))]); } return p; });
+      ctx.save(); ctx.beginPath(); ctx.rect(L, T, pw, ph); ctx.clip();
+      ctx.setLineDash([2, 3]); ctx.strokeStyle = COL.guide; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(X(xr), T); ctx.lineTo(X(xr), T + ph); ctx.stroke();
+      lines.forEach((l, i) => {
+        ctx.setLineDash(l.dash ? [9, 5] : []); ctx.strokeStyle = l.col; ctx.lineWidth = l.wd;
+        ctx.beginPath(); ctx.moveTo(...polys[i][0]); ctx.lineTo(...polys[i][polys[i].length - 1]); ctx.stroke();
       });
-      y += 4 * rs + 14;
-    }
-    // group titles last, each on a white background so no line crosses them
-    for (const [t, ty] of titles) {
-      const tw = measure(ctx, t, FS_AXIS);
-      ctx.fillStyle = '#ffffff'; ctx.fillRect(L + 1, ty - 13, tw + 10, 26);
-      rich(ctx, t, L + 5, ty, { size: FS_AXIS });
-    }
-  }
-
-  // ---------- readouts ----------
-  function sciHTML(v, d = 3) {
-    const e = Math.floor(Math.log10(Math.abs(v))); const m = v / 10 ** e;
-    if (e >= -1 && e <= 4) return v.toPrecision(d);
-    return `${m.toFixed(d - 1)} × 10<sup>${sup(e)}</sup>`;
-  }
-  function readouts() {
-    const m = model(S.T), m10 = model(S.T + 10);
-    const fRp = m10.Rp / m.Rp, fMn = m10.Mn / m.Mn;
-    $('hT').textContent = `${S.T.toFixed(1)} °C`;
-    $('ro').innerHTML = `
-      <tr><td>decomposition rate constant, <i>k</i><sub>d</sub> (s<sup>−1</sup>)</td><td>${sciHTML(m.kd)}</td></tr>
-      <tr><td>propagation rate constant, <i>k</i><sub>p</sub> (L mol<sup>−1</sup> s<sup>−1</sup>)</td><td>${sciHTML(m.kp)}</td></tr>
-      <tr><td>termination rate constant, <i>k</i><sub>t</sub> (L mol<sup>−1</sup> s<sup>−1</sup>)</td><td>${sciHTML(m.kt)}</td></tr>
-      <tr><td>radical concentration, [R·] (mol/L)</td><td>${sciHTML(m.R)}</td></tr>
-      <tr><td>rate of polymerization, <i>R</i><sub>p</sub> (mol L<sup>−1</sup> s<sup>−1</sup>)</td><td>${sciHTML(m.Rp)}</td></tr>
-      <tr><td>kinetic chain length, ν</td><td>${Math.round(m.nu).toLocaleString('en-US')}</td></tr>
-      <tr><td>degree of polymerization, <i>X</i><sub>n</sub></td><td>${Math.round(m.Xn).toLocaleString('en-US')}</td></tr>
-      <tr><td>molecular weight, <i>M</i><sub>n</sub> (g/mol)</td><td>${(() => { const e = Math.floor(Math.log10(m.Mn)); return `${(m.Mn / 10 ** e).toFixed(2)} × 10<sup>${e}</sup>`; })()}</td></tr>`;
-    const e1 = ERp(), e2 = EXn();
-    const word = (E, f, name) => {
-      if (Math.abs(E) < 0.05) return `${name} does not change with temperature (<i>E</i> = 0).`;
-      const up = E > 0;
-      return `${name} ${up ? 'increases' : 'decreases'} by a factor of ${(up ? f : 1 / f).toFixed(2)} for each 10 °C increase (<i>E</i> = ${E.toFixed(1).replace('-', '−')} kJ/mol).`;
-    };
-    $('verdict').innerHTML = `${word(e1, fRp, '<i>R</i><sub>p</sub>')} ${word(e2, fMn, '<i>M</i><sub>n</sub>')}`;
-  }
-
-  // ---------- wiring ----------
-  function render() {
-    $('vT').textContent = S.T.toFixed(1);
-    $('vEd').textContent = S.Ed.toFixed(0);
-    $('vEp').textContent = S.Ep.toFixed(1);
-    $('vEt').textContent = S.Et.toFixed(1);
-    $('vI').textContent = S.I.toFixed(3);
-    S.view === 'T' ? drawVsT() : drawArr();
-    drawBudget();
-    readouts();
-  }
-  const bind = (id, key) => $(id).addEventListener('input', e => { S[key] = parseFloat(e.target.value); render(); });
-  bind('sT', 'T'); bind('sEd', 'Ed'); bind('sEp', 'Ep'); bind('sEt', 'Et'); bind('sI', 'I');
-  $('selTerm').addEventListener('change', e => { S.term = e.target.value; render(); });
-  const setView = v => { S.view = v; $('vwT').setAttribute('aria-pressed', v === 'T'); $('vwA').setAttribute('aria-pressed', v === 'A'); render(); };
-  $('vwT').addEventListener('click', () => setView('T'));
-  $('vwA').addEventListener('click', () => setView('A'));
-
-  // flyout panels: overlay below the buttons; clicking the same button again closes it
-  const panels = { bDir: 'pDir', bDet: 'pDet', bAbout: 'pAbout' };
-  function closeAll() { Object.values(panels).forEach(p => $(p).hidden = true); }
-  Object.entries(panels).forEach(([b, p]) => {
-    $(b).addEventListener('click', ev => {
-      ev.stopPropagation();
-      const el = $(p), wasOpen = !el.hidden;
-      closeAll();
-      if (wasOpen) return;
-      el.hidden = false;
-      const row = el.parentElement.getBoundingClientRect(), bt = $('btns').getBoundingClientRect();
-      el.style.left = 'auto';
-      el.style.top = (bt.top - row.top) + 'px';
-      el.style.right = (row.right - bt.left + 8) + 'px';
-      if (el.getBoundingClientRect().left < 8) {
-        el.style.top = (bt.bottom - row.top + 6) + 'px';
-        el.style.right = Math.max(0, row.right - bt.right) + 'px';
-        if (el.getBoundingClientRect().left < 8) { el.style.right = 'auto'; el.style.left = (8 - row.left) + 'px'; }
+      ctx.setLineDash([]);
+      const xc = 1000 / (S.T + 273.15);
+      ctx.setLineDash([5, 4]); ctx.strokeStyle = COL.ink; ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.moveTo(X(xc), T); ctx.lineTo(X(xc), T + ph); ctx.stroke(); ctx.setLineDash([]);
+      const dots = [];
+      for (const l of lines) {
+        const y = Y(lnr(l.E, xc));
+        ctx.fillStyle = '#fff'; ctx.strokeStyle = l.col; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.arc(X(xc), y, 4.5, 0, 2 * Math.PI); ctx.fill(); ctx.stroke();
+        dots.push({ x: X(xc) - 6, y: y - 6, w: 12, h: 12 });
       }
-      if (window.MathJax && MathJax.typesetPromise && !el.dataset.typeset) {
-        el.dataset.typeset = '1';
-        MathJax.typesetPromise([el]).catch(() => {});
+      ctx.restore();
+
+      const env = {
+        bounds: { x: L + 2, y: T + 2, w: pw - 4, h: ph - 4 },
+        lines: polys.concat([[[X(xr), T], [X(xr), T + ph]], [[X(xc), T], [X(xc), T + ph]]]),
+        placed: dots,
+      };
+      const f1 = v => (Math.abs(v) < 0.05 ? 0 : v).toFixed(1).replace('-', '−');
+      const fr = [0.06, 0.14, 0.22, 0.32, 0.94, 0.88, 0.8, 0.42];
+      const offs = [14, 24, 36, 50];
+      // place the most crowded (smallest |E|) lines first
+      lines.map((l, i) => i).sort((a, b) => Math.abs(lines[a].E) - Math.abs(lines[b].E)).forEach(i => {
+        const l = lines[i];
+        placeLabel(ctx, `${l.name} (E = ${f1(l.E)})`, curveCands(polys[i], fr, offs), env, { color: l.col });
+      });
+      placeLabel(ctx, 'T_{ref}', [{ x: X(xr) + 6, y: T + ph - 14, align: 'left' }, { x: X(xr) - 6, y: T + ph - 14, align: 'right' },
+        { x: X(xr) + 6, y: T + 14, align: 'left' }, { x: X(xr) - 6, y: T + 14, align: 'right' }], env, { color: COL.ink });
+
+      $('caption').innerHTML = 'Activation energies <i>E</i> are in kJ/mol, and the slope of each line is −<i>E</i>/<i>R</i>. Solid lines are rate constants; dashed lines are <i>R</i><sub>p</sub> and <i>X</i><sub>n</sub>. The dashed vertical line marks the selected temperature.';
+    }
+
+    // ---------- activation-energy bars ----------
+    function drawBudget() {
+      const c = $('budget'); const { ctx, w, h } = setup(c);
+      const labels = ['E_{p}', '+ ½E_{d}', '− ½E_{d}', '− ½E_{t}', 'E_{Rp}', 'E_{Xn}'];
+      const L = Math.ceil(Math.max(...labels.map(s => measure(ctx, s, FS_LAB)))) + 14, R = 16, top = 6, axisH = 56;
+      const emin = -100, emax = 150;
+      const X = e => L + (e - emin) / (emax - emin) * (w - L - R);
+      const bh = 15, rs = 25;
+      const groups = [
+        { title: 'rate of polymerization, R_{p}', sgn: +1, net: ERp(), netName: 'E_{Rp}', netCol: COL.rp },
+        { title: 'degree of polymerization, X_{n}', sgn: -1, net: EXn(), netName: 'E_{Xn}', netCol: COL.mn },
+      ];
+      const plotBot = h - axisH;
+      for (let e = emin; e <= emax; e += 25) {
+        ctx.strokeStyle = e === 0 ? COL.axis : COL.grid;
+        ctx.lineWidth = e === 0 ? 1.5 : 1;
+        ctx.beginPath(); ctx.moveTo(X(e), top); ctx.lineTo(X(e), plotBot); ctx.stroke();
       }
+      ctx.strokeStyle = COL.axis; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(L, plotBot); ctx.lineTo(w - R, plotBot); ctx.stroke();
+      for (let e = emin; e <= emax; e += 50) {
+        ctx.beginPath(); ctx.moveTo(X(e), plotBot); ctx.lineTo(X(e), plotBot + 5); ctx.stroke();
+        rich(ctx, sup(e), X(e), plotBot + 15, { align: 'center', size: FS_NUM });
+      }
+      rich(ctx, 'activation energy (kJ/mol)', L + (w - L - R) / 2, plotBot + 41, { align: 'center', size: FS_AXIS });
+
+      let y = top + 12;
+      const titles = [];
+      for (const g of groups) {
+        titles.push([g.title, y]);
+        y += 24;
+        const c1 = S.Ep, c2 = c1 + g.sgn * S.Ed / 2, c3 = c2 - S.Et / 2;
+        const bars = [
+          { lab: 'E_{p}', a: 0, b: c1, col: COL.ep },
+          { lab: (g.sgn > 0 ? '+' : '−') + ' ½E_{d}', a: c1, b: c2, col: COL.ed },
+          { lab: '− ½E_{t}', a: c2, b: c3, col: COL.et },
+          { lab: g.netName, a: 0, b: g.net, col: g.netCol, net: true },
+        ];
+        bars.forEach((bar, i) => {
+          const yc = y + i * rs;
+          rich(ctx, bar.lab, L - 8, yc, { align: 'right', size: FS_LAB });
+          const xa = X(Math.min(bar.a, bar.b)), xb = X(Math.max(bar.a, bar.b));
+          ctx.fillStyle = bar.col;
+          ctx.fillRect(xa, yc - bh / 2, Math.max(xb - xa, 1.5), bh);
+          if (!bar.net && Math.abs(bar.b - bar.a) > 3) {
+            const xe = X(bar.b), d = bar.b > bar.a ? 1 : -1;
+            ctx.beginPath(); ctx.moveTo(xe + d * 7, yc); ctx.lineTo(xe, yc - bh / 2 - 2); ctx.lineTo(xe, yc + bh / 2 + 2); ctx.closePath(); ctx.fill();
+          }
+          if (i < 3) {
+            ctx.setLineDash([3, 3]); ctx.strokeStyle = COL.guide; ctx.lineWidth = 1;
+            const xe = X(bar.b);
+            ctx.beginPath(); ctx.moveTo(xe, yc + bh / 2); ctx.lineTo(xe, yc + rs - bh / 2); ctx.stroke(); ctx.setLineDash([]);
+          }
+          const val = bar.b - bar.a;
+          const txt = bar.net ? val.toFixed(1).replace('-', '−') : (val >= 0 ? '+' : '−') + Math.abs(val).toFixed(1);
+          const tw = measure(ctx, txt, FS_NUM);
+          const rx = X(Math.max(bar.a, bar.b)) + (bar.net || val < 0 ? 6 : 11);
+          if (rx + tw < w - 2) rich(ctx, txt, rx, yc, { size: FS_NUM });
+          else rich(ctx, txt, X(Math.min(bar.a, bar.b)) - (val < 0 ? 11 : 6), yc, { size: FS_NUM, align: 'right' });
+        });
+        y += 4 * rs + 14;
+      }
+      // group titles last, each on a white background so no line crosses them
+      for (const [t, ty] of titles) {
+        const tw = measure(ctx, t, FS_AXIS);
+        ctx.fillStyle = '#ffffff'; ctx.fillRect(L + 1, ty - 13, tw + 10, 26);
+        rich(ctx, t, L + 5, ty, { size: FS_AXIS });
+      }
+    }
+
+    // ---------- readouts ----------
+    function sciHTML(v, d = 3) {
+      const e = Math.floor(Math.log10(Math.abs(v))); const m = v / 10 ** e;
+      if (e >= -1 && e <= 4) return v.toPrecision(d);
+      return `${m.toFixed(d - 1)} × 10<sup>${sup(e)}</sup>`;
+    }
+    function readouts() {
+      const m = model(S.T), m10 = model(S.T + 10);
+      const fRp = m10.Rp / m.Rp, fMn = m10.Mn / m.Mn;
+      $('hT').textContent = `${S.T.toFixed(1)} °C`;
+      $('ro').innerHTML = `
+        <tr><td>decomposition rate constant, <i>k</i><sub>d</sub> (s<sup>−1</sup>)</td><td>${sciHTML(m.kd)}</td></tr>
+        <tr><td>propagation rate constant, <i>k</i><sub>p</sub> (L mol<sup>−1</sup> s<sup>−1</sup>)</td><td>${sciHTML(m.kp)}</td></tr>
+        <tr><td>termination rate constant, <i>k</i><sub>t</sub> (L mol<sup>−1</sup> s<sup>−1</sup>)</td><td>${sciHTML(m.kt)}</td></tr>
+        <tr><td>radical concentration, [R·] (mol/L)</td><td>${sciHTML(m.R)}</td></tr>
+        <tr><td>rate of polymerization, <i>R</i><sub>p</sub> (mol L<sup>−1</sup> s<sup>−1</sup>)</td><td>${sciHTML(m.Rp)}</td></tr>
+        <tr><td>kinetic chain length, ν</td><td>${Math.round(m.nu).toLocaleString('en-US')}</td></tr>
+        <tr><td>degree of polymerization, <i>X</i><sub>n</sub></td><td>${Math.round(m.Xn).toLocaleString('en-US')}</td></tr>
+        <tr><td>molecular weight, <i>M</i><sub>n</sub> (g/mol)</td><td>${(() => { const e = Math.floor(Math.log10(m.Mn)); return `${(m.Mn / 10 ** e).toFixed(2)} × 10<sup>${e}</sup>`; })()}</td></tr>`;
+      const e1 = ERp(), e2 = EXn();
+      const word = (E, f, name) => {
+        if (Math.abs(E) < 0.05) return `${name} does not change with temperature (<i>E</i> = 0).`;
+        const up = E > 0;
+        return `${name} ${up ? 'increases' : 'decreases'} by a factor of ${(up ? f : 1 / f).toFixed(2)} for each 10 °C increase (<i>E</i> = ${E.toFixed(1).replace('-', '−')} kJ/mol).`;
+      };
+      $('verdict').innerHTML = `${word(e1, fRp, '<i>R</i><sub>p</sub>')} ${word(e2, fMn, '<i>M</i><sub>n</sub>')}`;
+    }
+
+    // ---------- wiring ----------
+    function render() {
+      $('vT').textContent = S.T.toFixed(1);
+      $('vEd').textContent = S.Ed.toFixed(0);
+      $('vEp').textContent = S.Ep.toFixed(1);
+      $('vEt').textContent = S.Et.toFixed(1);
+      $('vI').textContent = S.I.toFixed(3);
+      S.view === 'T' ? drawVsT() : drawArr();
+      drawBudget();
+      readouts();
+    }
+    const bind = (id, key) => $(id).addEventListener('input', e => { S[key] = parseFloat(e.target.value); render(); });
+    bind('sT', 'T'); bind('sEd', 'Ed'); bind('sEp', 'Ep'); bind('sEt', 'Et'); bind('sI', 'I');
+    $('selTerm').addEventListener('change', e => { S.term = e.target.value; render(); });
+    const setView = v => { S.view = v; $('vwT').setAttribute('aria-pressed', v === 'T'); $('vwA').setAttribute('aria-pressed', v === 'A'); render(); };
+    $('vwT').addEventListener('click', () => setView('T'));
+    $('vwA').addEventListener('click', () => setView('A'));
+
+    // flyout panels: overlay below the buttons; clicking the same button again closes it
+    const panels = { bDir: 'pDir', bDet: 'pDet', bAbout: 'pAbout' };
+    function closeAll() { Object.values(panels).forEach(p => $(p).hidden = true); }
+    Object.entries(panels).forEach(([b, p]) => {
+      $(b).addEventListener('click', ev => {
+        ev.stopPropagation();
+        const el = $(p), wasOpen = !el.hidden;
+        closeAll();
+        if (wasOpen) return;
+        el.hidden = false;
+        const row = el.parentElement.getBoundingClientRect(), bt = $('btns').getBoundingClientRect();
+        el.style.left = 'auto';
+        el.style.top = (bt.top - row.top) + 'px';
+        el.style.right = (row.right - bt.left + 8) + 'px';
+        if (el.getBoundingClientRect().left < 8) {
+          el.style.top = (bt.bottom - row.top + 6) + 'px';
+          el.style.right = Math.max(0, row.right - bt.right) + 'px';
+          if (el.getBoundingClientRect().left < 8) { el.style.right = 'auto'; el.style.left = (8 - row.left) + 'px'; }
+        }
+        if (window.MathJax && MathJax.typesetPromise && !el.dataset.typeset) {
+          el.dataset.typeset = '1';
+          MathJax.typesetPromise([el]).catch(() => {});
+        }
+      });
+      $(p).querySelector('.x').addEventListener('click', () => { $(p).hidden = true; });
+      $(p).addEventListener('click', ev => ev.stopPropagation());
     });
-    $(p).querySelector('.x').addEventListener('click', () => { $(p).hidden = true; });
-    $(p).addEventListener('click', ev => ev.stopPropagation());
-  });
-  document.addEventListener('click', closeAll);
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAll(); });
+    document.addEventListener('click', closeAll);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAll(); });
 
-  const ro = new ResizeObserver(render);
-  ro.observe($('plot')); ro.observe($('budget'));
-})();
-</script>
+    const ro = new ResizeObserver(render);
+    ro.observe($('plot')); ro.observe($('budget'));
+  })();
+  </script>
+
+  
+</body>
+</html>

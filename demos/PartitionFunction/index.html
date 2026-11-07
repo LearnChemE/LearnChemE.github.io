@@ -6,7 +6,7 @@
 <title>Partition Function Builder</title>
 <style>
 :root{
-  --bg:#f3f4f6; --panel:#ffffff; --ink:#000000; --line:#d9dde4; --grid:#e8ebf0;
+  --bg:#fff; --panel:#ffffff; --ink:#000000; --line:#d9dde4; --grid:#e8ebf0;
   --accent:#98000D; --accent-dark:#7a000a;
   --c-t:#2563eb; --c-r:#059669; --c-v:#d97706; --c-e:#9333ea; --c-tot:#000000; --c-cv:#555555;
 }
@@ -115,9 +115,6 @@ svg text{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;fill:#
 </head>
 <body>
 <div class="wrap">
-<header>
-  <h1>Partition Function Builder</h1>
-</header>
 
 <div class="app">
   <aside>
@@ -166,7 +163,7 @@ svg text{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;fill:#
       <div class="modes" id="modes"></div>
       <label for="rotMode">rotational treatment</label>
       <select id="rotMode">
-        <option value="exact">exact sum over J (&divide; &sigma;)</option>
+        <option value="exact">exact sum over allowed J</option>
         <option value="high">high-T limit&nbsp; q = T/(&sigma;&theta;<sub>rot</sub>)</option>
         <option value="equil" data-h2="1">H&#8322; equilibrium ortho/para</option>
         <option value="frozen" data-h2="1">H&#8322; normal (3:1 frozen)</option>
@@ -213,9 +210,10 @@ svg text{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;fill:#
         <div class="eq">C<sub>v,trans</sub> = (3/2)R &nbsp;&nbsp;&nbsp; S<sub>trans</sub>/R = ln(q<sub>trans</sub>/N)+5/2 &nbsp;(Sackur&ndash;Tetrode)</div>
 
         <p><b>rotational</b> (rigid rotor):</p>
-        <div class="eq">q<sub>rot</sub> = (1/&sigma;)&Sigma;<sub>J</sub>(2J+1)exp[&minus;J(J+1)&theta;<sub>rot</sub>/T]</div>
+        <div class="eq">q<sub>rot</sub> = &Sigma;<sub>J</sub>(2J+1)exp[&minus;J(J+1)&theta;<sub>rot</sub>/T]</div>
         <div class="eq">high-T limit: q<sub>rot</sub> &rarr; T/(&sigma;&theta;<sub>rot</sub>)</div>
-        <p>As T &#8811; &theta;<sub>rot</sub>, C<sub>v,rot</sub>/R &rarr; 1. Heteronuclear molecules briefly overshoot this limit (C<sub>v,rot</sub>/R &asymp; 1.1) before settling back to 1.</p>
+        <p>For a heteronuclear molecule (&sigma; = 1) the sum runs over all J. For a homonuclear molecule (&sigma; = 2), the symmetry of the nuclear spins allows only every other J level, so the sum runs over even J only (odd J only for O&#8322;, with energies measured from J = 1). Skipping half the levels is what produces the factor 1/&sigma; in the high-T limit, but unlike dividing the full sum by &sigma;, it keeps q<sub>rot</sub> &ge; 1 at low temperature, so ln q<sub>rot</sub> and S<sub>rot</sub> never go negative.</p>
+        <p>As T &#8811; &theta;<sub>rot</sub>, C<sub>v,rot</sub>/R &rarr; 1. On the way there, C<sub>v,rot</sub>/R briefly overshoots: to about 1.1 for a heteronuclear molecule (all J), and to about 1.47 near T &asymp; 2&theta;<sub>rot</sub> for an even-J homonuclear molecule, because the first allowed excitation (J = 0 &rarr; 2) is a larger jump. The odd-J sum used for O&#8322; has almost no overshoot.</p>
 
         <p><b>vibrational</b> (harmonic oscillator, energy measured from the ground vibrational state):</p>
         <div class="eq">q<sub>vib</sub> = 1/(1&minus;e<sup>&minus;&theta;<sub>vib</sub>/T</sup>)</div>
@@ -229,21 +227,25 @@ svg text{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;fill:#
 
         <p><b>H&#8322; spin isomers</b>: ortho-H&#8322; (odd J, nuclear spin weight 3) and para-H&#8322; (even J, weight 1). "equilibrium" mixes the two populations at every temperature; "normal" H&#8322; freezes the room-temperature 3:1 ortho:para ratio, which is what most measured H&#8322; heat-capacity data actually follow.</p>
 
-        <p><b>Model limits</b>: this is a rigid-rotor, harmonic-oscillator, ideal-gas model &mdash; no dissociation, anharmonicity, centrifugal distortion, or vibration&ndash;rotation coupling. Curves above roughly 2000&ndash;3000 K (H&#8322; up to about 3000 K) are a thought experiment, not real gas behavior.</p>
+        <p><b>Model limits</b>: this is a rigid-rotor, harmonic-oscillator, ideal-gas model &mdash; no dissociation, anharmonicity, centrifugal distortion, or vibration&ndash;rotation coupling. Curves above roughly 2000&ndash;3000 K (H&#8322; up to about 3000 K) are a thought experiment, not real gas behavior. At the other extreme, the translational partition function treats the gas classically, which requires many translational states per molecule (q<sub>trans</sub>/N &#8811; 1, that is, &Lambda;&sup3; &#8810; V/N). For light molecules at very low temperature (H&#8322; below about 3 K at 1 bar) q<sub>trans</sub>/N falls below 1: the thermal wavelength is then larger than the space available to each molecule, quantum (Bose&ndash;Einstein or Fermi&ndash;Dirac) statistics are needed, and the Sackur&ndash;Tetrode entropy can even become negative. That region is shaded gray on the plots; real gases have condensed long before it is reached. The H&#8322; equilibrium and normal ortho/para options divide out the nuclear-spin degeneracy (the factor 1/4), so their ln q<sub>rot</sub> and S<sub>rot</sub> can be negative at low temperature; that is a bookkeeping convention, not an error.</p>
 
         <h2 style="margin-top:16px">Symbols</h2>
         <ul class="symlist">
           <li><b>q</b><span>molecular partition function (and q<sub>trans</sub>, q<sub>rot</sub>, q<sub>vib</sub>, q<sub>elec</sub> for each mode)</span></li>
           <li><b>T</b><span>absolute temperature (K)</span></li>
           <li><b>&theta;<sub>rot</sub></b><span>characteristic rotational temperature, &theta;<sub>rot</sub> = h&sup2;/(8&pi;&sup2;Ik) (K)</span></li>
+          <li><b>I</b><span>moment of inertia of the molecule, I = &mu;r<sub>e</sub>&sup2;, where &mu; is the reduced mass and r<sub>e</sub> is the equilibrium bond length</span></li>
           <li><b>&theta;<sub>vib</sub></b><span>characteristic vibrational temperature, &theta;<sub>vib</sub> = h&nu;/k (K)</span></li>
+          <li><b>&nu;</b><span>vibrational frequency of the bond (s<sup>&minus;1</sup>)</span></li>
           <li><b>&theta;<sub>el</sub></b><span>energy of the first excited electronic state, divided by k (K)</span></li>
           <li><b>&sigma;</b><span>symmetry number (2 for a homonuclear diatomic, 1 for heteronuclear)</span></li>
           <li><b>J</b><span>rotational quantum number</span></li>
           <li><b>g<sub>0</sub>, g<sub>1</sub></b><span>degeneracy of the ground and first excited electronic states</span></li>
           <li><b>k, h, R</b><span>Boltzmann constant, Planck constant, gas constant</span></li>
           <li><b>&Lambda;</b><span>thermal de Broglie wavelength</span></li>
-          <li><b>P, N</b><span>pressure, number of molecules</span></li>
+          <li><b>m</b><span>mass of one molecule</span></li>
+          <li><b>P, V, N</b><span>pressure, volume, number of molecules</span></li>
+          <li><b>U</b><span>internal energy</span></li>
           <li><b>C<sub>v</sub>, C<sub>p</sub></b><span>heat capacity at constant volume, at constant pressure</span></li>
           <li><b>S</b><span>entropy</span></li>
           <li><b>&gamma;</b><span>heat-capacity ratio, C<sub>p</sub>/C<sub>v</sub></span></li>
@@ -281,7 +283,7 @@ const kB=1.380649e-23, hP=6.62607015e-34, R=8.314462618, LN10=Math.LN10;
 const MOLS={
   H2:{name:"H₂",thr:87.6,thv:6332,sigma:2,M:2.016,g0:1,thel:0,g1:0,note:"Textbook case: rotation switches on near 90 K, vibration near a few thousand K."},
   N2:{name:"N₂",thr:2.88,thv:3393,sigma:2,M:28.014,g0:1,thel:0,g1:0,note:"Rotation is fully active by ~10 K, so at room temperature C<sub>v</sub> = 5/2 R."},
-  O2:{name:"O₂",thr:2.08,thv:2274,sigma:2,M:31.998,g0:3,thel:11393,g1:2,note:"Triplet ground state (g<sub>0</sub>&nbsp;=&nbsp;3); the a¹Δg level at ~11,400 K is included."},
+  O2:{name:"O₂",thr:2.08,thv:2274,sigma:2,oddJ:true,M:31.998,g0:3,thel:11393,g1:2,note:"Triplet ground state (g<sub>0</sub>&nbsp;=&nbsp;3); the a¹Δg level at ~11,400 K is included."},
   CO:{name:"CO",thr:2.78,thv:3122,sigma:1,M:28.010,g0:1,thel:0,g1:0,note:"Heteronuclear (σ = 1), otherwise very similar to N₂."},
   NO:{name:"NO",thr:2.45,thv:2740,sigma:1,M:30.006,g0:2,thel:174.2,g1:2,note:"Doublet ground state with a 121 cm⁻¹ spin–orbit level: watch the electronic C<sub>v</sub> bump near 100 to 200 K."},
   HCl:{name:"HCl",thr:15.2,thv:4303,sigma:1,M:36.461,g0:1,thel:0,g1:0,note:"Large θ<sub>rot</sub> (15 K) makes the rotational step easy to see."},
@@ -309,11 +311,11 @@ function trans(T,p,P){
   const lnq=Math.log(kB*T/(P*1e5))-3*Math.log(lam);
   return {lnq:lnq,cv:1.5,u:1.5,s:lnq+2.5};
 }
-function rotSums(th,T,parity){ // parity 0 all J, 1 even, 2 odd
+function rotSums(th,T,parity,ref){ // parity 0 all J, 1 even, 2 odd; energies measured from ref (default J = 0)
   const Jmax=Math.ceil(Math.sqrt(60*T/th))+3;
   let q=0,e1=0,e2=0;
   for(let J=(parity===2?1:0);J<=Jmax;J+=(parity?2:1)){
-    const E=J*(J+1)*th, w=(2*J+1)*Math.exp(-E/T);
+    const E=J*(J+1)*th-(ref||0), w=(2*J+1)*Math.exp(-E/T);
     q+=w;e1+=w*E;e2+=w*E*E;
   }
   const U=e1/q;
@@ -322,7 +324,12 @@ function rotSums(th,T,parity){ // parity 0 all J, 1 even, 2 odd
 function rot(p,T,mode){
   const th=p.thr;
   if(mode==="high"){const l=Math.log(T/(p.sigma*th));return {lnq:l,cv:1,u:1,s:l+1};}
-  if(mode==="exact"){const r=rotSums(th,T,0),l=Math.log(r.q/p.sigma);return {lnq:l,cv:r.cv,u:r.u,s:l+r.u};}
+  if(mode==="exact"){
+    // homonuclear (σ = 2): nuclear-spin symmetry allows only even J (odd J for ¹⁶O₂, energies measured from J = 1).
+    // This sum -> T/(2θrot) at high T, like the ÷σ shortcut, but stays >= 1 as T -> 0 (no negative ln q or S).
+    if(p.sigma>=2){const odd=!!p.oddJ, r=rotSums(th,T,odd?2:1,odd?2*th:0), l=Math.log(r.q);return {lnq:l,cv:r.cv,u:r.u,s:l+r.u};}
+    const r=rotSums(th,T,0),l=Math.log(r.q);return {lnq:l,cv:r.cv,u:r.u,s:l+r.u};
+  }
   const ev=rotSums(th,T,1), od=rotSums(th,T,2);
   if(mode==="equil"){
     const qe=ev.q, qo=3*od.q, qt=qe+qo, pe=qe/qt, po=qo/qt;
@@ -469,6 +476,15 @@ function drawChart(sp){
   const X=T=>ML+fracFromT(T)*PW, Y=v=>MT+PH-(v-lo)/(hi-lo)*PH;
   const id=sp.id;
   let g="";
+  // shade where the classical translational treatment fails (q_trans/N < 1); q_trans ∝ T^(5/2)
+  const Tq1=Math.exp(-trans(1,state.p,state.P).lnq/2.5);
+  if(Tq1>state.Tmin){
+    const x1=ML, x2=X(Math.min(Tq1,state.Tmax)), wq=x2-x1;
+    g+="<rect x='"+x1+"' y='"+MT+"' width='"+wq+"' height='"+PH+"' style='fill:#9aa0a6;opacity:.22'/>";
+    // key for the shading, top-left above the plot (clear of curves and equipartition labels)
+    g+="<rect x='"+ML+"' y='"+(22-FSC*0.8).toFixed(2)+"' width='"+(FSC*0.9).toFixed(2)+"' height='"+(FSC*0.9).toFixed(2)+"' style='fill:#9aa0a6;opacity:.45'/>"+
+       "<text x='"+(ML+FSC*1.25).toFixed(2)+"' y='22' font-size='"+FSC+"' style='fill:#444'>q<tspan font-size='"+(FSC*0.75).toFixed(2)+"' baseline-shift='sub'>trans</tspan>/N &lt; 1</text>";
+  }
   // grid + x ticks
   let xt=[];
   if(state.log){
