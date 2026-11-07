@@ -1,0 +1,195 @@
+item_number,item,source_url,html_page,status
+1,Inhibition of Enzyme Reactions in a CSTR and a Batch Reactor,https://learncheme.github.io/demos/InhibitionOfEnzymeRxnsInCSTRandBatch/,under_review/Inhibition of enzyme reactions in CSTR batch.html,matched
+2,Multiple steady-states in isothermal CSTR,https://learncheme.github.io/demos/MultipleSteadyStatesInAnIsothermalCSTR/,under_review/multiple-states-isothermal cstr.html,matched
+3,Fugacity from Equation of State for Water,https://learncheme.github.io/demos/FugacityFromEOSForWater/,under_review/FugacityfromEOSforwater.html,matched
+4,Measuring Flow Rates with a Pitot Tube,https://learncheme.github.io/demos/MeasuringFlowRatesWithAPitotTube/,under_review/measuring-flow-rates-with-a-pitot-tube_7.html,matched
+5,Membrane Reactor for an Equilibrium-Limited Reaction,https://learncheme.github.io/demos/MembraneReactorForAnEqmLimitedRxn/,under_review/membranereactorforanequilibriumlimitedreaction.html,matched
+6,Water Contact Angle for Heterogeneous Surface,https://learncheme.github.io/demos/WaterContactAngleForHeterogeneousSurface/,under_review/water-contact-angle.html,matched
+7,Steady-State Binary Fickian Diffusion,,under_review/steady-state-binary-fickian-diffusion.html,matched
+8,Batch Reactor with Multiple Reactions,https://learncheme.github.io/demos/BatchReactorWithMultipleReactions/,under_review/batch-reactor-with-multiple-reactions.html,matched
+9,Parametric Sensitivity of Plug Flow Reactor With Heat Exchange,https://learncheme.github.io/demos/ParametricSensitivityOfPFRWithHeatExchange/index.html,under_review/pfrparametricsensitivity.html,matched
+10,Reaction in an Isothermal CSTR,https://learncheme.github.io/demos/RxnInIsothermalCSTR/index.html,under_review/reaction-in-an-isothermal-cstr.html,matched
+11,Reactor Rate and Conversion versus Space Velocity,https://learncheme.github.io/demos/RxrRateAndConversionVsSpaceVelocity/index.html,under_review/reactor-rate-and-conversion-versus-space-velocity.html,matched
+12,Adiabatic Plug Flow Reactor with Recycle,https://learncheme.github.io/demos/AdiabaticPFRwithRecycle/index.html,under_review/adiabaticpfrwithrecycle.html,matched
+13,P-T diagram for binary mixture,https://learncheme.github.io/demos/PTDiagramForBinaryMixture/index.html,under_review/pressure-temperature-diagram-binary-mixture.html,matched
+14,Solid-Solid-Liquid Equilibrium,https://learncheme.github.io/demos/SolidSolidEquilibrium/index.html,under_review/solid-solid-liquid-equilibrium.html,matched
+15,Refrigeration Cycle Coefficient of Performance,https://learncheme.github.io/demos/RefrigerationCycleCOP/index.html,under_review/refrigeration-cycle-cop.html,matched
+16,Capillary action in a tube,https://learncheme.github.io/demos/CapillaryAction/index.html,under_review/capillary_action.html,matched
+17,Non-Ideal VLE Modeled by the Margules Equation,https://learncheme.github.io/demos/NonIdealVLEMargulesEquation/index.html,under_review/non-ideal-vle-margules.html,matched
+18,Enthalpy and Entropy Departure Functions for Gases,https://learncheme.github.io/demos/EnthalpyEntropyDepartureFxnsGases/index.html,under_review/enthalpy-entropy-departure-functions.html,matched
+19,Diffusion-Controlled Drug Delivery,https://learncheme.github.io/demos/DiffusionControlledDrugDelivery/index.html,under_review/diffusion-controlled-drug-delivery.html,matched
+20,Membrane Concentration Profile,https://learncheme.github.io/demos/MembraneConcentrationProfile/index.html,under_review/membrane-concentration-profile.html,matched
+21,Reactor Design Economics,https://learncheme.github.io/demos/ReactorDesignEconomics/index.html,under_review/reactor-design-economics.html,matched
+22,Pressure Drop in a PBR Using the Ergun Equation,https://learncheme.github.io/demos/ErgunEquationPressureDropPBR/index.html,under_review/pressure-drop-in-a-pbr.html,matched
+23,Autothermal Reactor,https://learncheme.github.io/demos/AutothermalRxr/index.html,under_review/autothermal-reactor.html,matched
+24,Temperature-Programmed Desorption,https://learncheme.github.io/demos/TemperatureProgrammedDesorption/index.html,under_review/temperature-programmed-desorption.html,matched
+25,Diffusion in solids,https://learncheme.github.io/demos/DiffusionInSolids/index.html,under_review/diffusion-in-solids.html,matched
+26,Mass Balances in Absorption and Stripping Units,https://learncheme.github.io/demos/MassBalancesInAbsorptionAndStrippingUnits/index.html,under_review/mass_balances_absorption_stripping.html,matched
+27,Double-Sided Couette Flow,https://learncheme.github.io/demos/DoubleSidedCouetteFlow/index.html,under_review/double-sided-couette-flow.html,matched
+28,Force Balances on a Truss,https://learncheme.github.io/demos/ForceBalancesOnATruss/index.html,,unmatched
+29,Heat Transfer through a Cylinder,https://learncheme.github.io/demos/HeatTransferThroughACylinder/index.html,under_review/heat-transfer-through-a-cylinder.html,matched
+30,Reaction in an Adiabatic Continuous Stirred-Tank Reactor,https://learncheme.github.io/demos/RxnInAnAdiabaticCSTR/index.html,under_review/reaction-in-an-adiabatic-cstr.html,matched
+31,Multistage Batch Distillation with Azeotrope,https://learncheme.github.io/demos/MultiStageBatchDistillationWithAzeotrope/index.html,under_review/multistage-batch-distillation-with-azeotrope.html,matched
+32,Reverse Osmosis,https://learncheme.github.io/demos/ReverseOsmosis/index.html,under_review/reverse-osmosis.html,matched
+33,PFR with Heat Transfer Jacket,https://learncheme.github.io/demos/HeatJacketedPFR/index.html,under_review/pfr_heat_jacket.html,matched
+34,How to use the McCabe-Thiele Method for Distillation,,under_review/mccabe-thiele.html,matched
+35,Phase Behavior on a Pressure-Volume Diagram,https://learncheme.github.io/demos/PhaseBehaviorOnPVDiagram/index.html,under_review/phase-behavior-pv.html,matched
+36,Feed Stages in a Distillation Column,,under_review/feed-stages-distillation-column.html,matched
+37,Pharmacokinetic Modeling,,under_review/pharmacokinetic-modeling.html,matched
+38,Adiabatic reactors: temperature and concentration versus residence time,,under_review/adiabatic-reactor-tau.html,matched
+39,Polymerization in a Batch Reactor,https://learncheme.github.io/demos/PolymerizationInBatchRxr/index.html,under_review/polymerizationbatchreactor.html,matched
+40,Osmotic pressure,https://learncheme.github.io/demos/OsmoticPressure/index.html,under_review/osmotic-pressure.html,matched
+41,Chemical Potential Dependence on T and P,https://learncheme.github.io/demos/ChemicalPotentialDependenceOnTandP/index.html,under_review/ChemicalPotentialDependenceOnTemperatureAndPressure.html,matched
+42,First- and Second-Order Transfer Functions,,under_review/first-and-second-order-transfer-functions.html,matched
+43,Compressible flow through nozzle,,under_review/compressible-flow-nozzle-diffuser.html,matched
+44,Electrical Conductivity of a Semiconductor,,under_review/electrical-conductivity-of-a-semiconductor.html,matched
+45,Reactor with Recycle Stream,,under_review/reactor-with-recycle-stream.html,matched
+46,Separation of CO2and CH4 Using Well-Mixed Gas Permeation,,under_review/co2-ch4-permeation.html,matched
+47,Irreversible and Reversible Temperature Equilibration,https://learncheme.github.io/demos/IrreversibleReversibleTemperatureEq/index.html,under_review/irreversible-and-reversible-temperature-equilibration.html,matched
+48,Adiabatic Compression of Water in VLE,https://learncheme.github.io/demos/AdiabaticCompressionOfWaterInVLE/index.html,under_review/adiabatic-compression-water-vle.html,matched
+49,Fugacity as a Driving Force for Mass Transfer,https://learncheme.github.io/demos/FugacityDrivingMassTransfer/index.html,under_review/fugacity-driving-force-for-mass-transfer.html,matched
+50,Enthalpy-Entropy Diagram For Water,https://learncheme.github.io/demos/EnthalpyEntropyDiagramForWater/index.html,under_review/enthalpy-entropy-diagram-for-water.html,matched
+51,Binomial Distribution via Coin Flips,,under_review/binomial-distribution-via-coin-flips.html,matched
+52,Volumetric Flow Rates in a Plug Flow Reactor,,under_review/volumetric-flow-rates-in-a-pfr.html,matched
+53,Sensitivity of PFR to Model Parameters,,under_review/sensitivity-of-pfr-to-model-parameters.html,matched
+54,Solving a Double Scissor Truss,,under_review/SolvingADoubleScissorTruss.html,matched
+55,Method of Joints to Solve a Truss Problem,,under_review/MethodOfJointsToSolveATrussProblem.html,matched
+56,Method of Sections to Solve a Truss,,under_review/MethodOfSectionsToSolveATruss.html,matched
+57,Square wave,,under_review/square-wave-fourier.html,matched
+58,Least Squares Criteria for the Least Squares Regression Line,,under_review/least-squares-criteria-for-the-least-squares-regression-line.html,matched
+59,Simple linear regression,,under_review/simple-linear-regression.html,matched
+60,Standard Normal Distribution Areas,,under_review/standard_normal_distribution_areas.html,matched
+61,Blending process,,under_review/blending-process-simulation.html,matched
+62,Simple Crystal Structures and Miller Indices,,under_review/simple-crystal-structures-and-miller-indices.html,matched
+63,Nonlinear Transformations,,under_review/nonlinear-transformations.html,matched
+64,Visualizing R-Squared in Statistics,,under_review/visualizing-r-squared.html,matched
+65,First order transfer function,,under_review/first-order-transfer-functions.html,matched
+66,Forces in a Power Tower Truss,,under_review/ForcesInAPowerTowerTruss.html,matched
+67,Cable Tension Needed to Support Platform,,under_review/CableTensionNeededToSupportPlatform.html,matched
+68,Weight Suspended by Two Cables,,under_review/WeightSuspendedByTwoCables.html,matched
+69,Determine if a Truss Can Be Solved,,under_review/DetermineIfATrussCanBeSolved.html,matched
+70,Deflection of a Diving Board,,under_review/DeflectionOfADivingBoard.html,matched
+71,Estimating Kinetic Parameters from a Batch Reactor Experiment,,under_review/estimating-kinetic-parameters-from-a-batch-reactor-experiment.html,matched
+72,Radiation Shielding of a Spherical Black Body,,under_review/radiation-shielding-of-a-spherical-body.html,matched
+73,Heat Transfer between Flowing Liquids in Cylindrical Tubes,,under_review/heat-transfer-between-flowing-liquids-in-cylindrical-tubes.html,matched
+74,Heat Transfer in a Bank of Tubes,,under_review/heat-transfer-in-a-bank-of-tubes.html,matched
+75,Transient Conduction through a Plane Wall,,under_review/transient-conduction-through-a-plane-wall.html,matched
+76,Steady- state plane wall heat transfer,,under_review/steady-state-conduction-plane-wall.html,matched
+77,Heat Transfer in Fins,,under_review/HeatTransferInFins.html,matched
+78,Energy Transfer between Two Blackbodies,,under_review/energy-transfer-between-two-blackbodies.html,matched
+79,Mohr's Circle and Stress Transformations,,under_review/mohrs-circle-and-stress-transformations.html,matched
+80,Construct a Conversion-Temperature Diagram for a Reversible Adiabatic Reaction,,under_review/conversion-temperature-diagram.html,matched
+81,Construct an x-y Diagram for a Stripping Column,,under_review/construct-an-x-y-diagram-for-a-stripping-column.html,matched
+82,Identify Reversible and Irreversible Expansion and Compression,https://learncheme.github.io/demos/IdentifyReversibleAndIrreversibleExpansionAndCompression/index.html,under_review/identify-reversible-and-irreversible-expansion-and-compression.html,matched
+83,Identify Chemical Potential Plots,https://learncheme.github.io/demos/IdentifyChemicalPotentialPlots/index.html,under_review/IdentifyChemicalPotentialPlots.html,matched
+84,Construct an x-y Diagram for an Absorption Column,,under_review/construct-xy-diagram-absorption-column.html,matched
+85,Construct a McCabe-Thiele Diagram for Distillation,,under_review/mccabe-thiele-construct.html,matched
+86,Cryogenic Recovery of Acetone from Air,,under_review/cryogenic-recovery-of-acetone-from-air.html,matched
+87,Fugacities in a Can of Soda,https://learncheme.github.io/demos/FugacitiesInSodaCan/index.html,under_review/fugacities-in-a-can-of-soda.html,matched
+88,Force Balance on a Moving Cart,,under_review/ForceBalanceOnAMovingCart.html,matched
+89,The 14 3D Bravais Lattices,,under_review/bravais-lattices.html,matched
+90,CSTRs in Series versus Plug Flow Reactor: title starts equally-sized CSTRs,,under_review/equally-sized-CSTRs_in_series-versus-PFR.html,matched
+91,Operation of an Air Conditioner,,under_review/operation-of-an-air-conditioner.html,matched
+92,Mass Balance in the Haber Process,,under_review/mass-balance-in-the-haber-process.html,matched
+93,Uranium isotope decay,https://learncheme.github.io/demos/UraniumIsotopeDecay/index.html,under_review/uranium-isotope-decay.html,matched
+94,Batch Radioactive Decay of a Four-Isotope Chain(batchdecay_8),https://learncheme.github.io/demos/BatchRadioactiveDecayOfFourIsotopeChain/index.html,under_review/batch-decay.html,matched
+95,Injecting Water into Liquid Nitrogen Tanks,,under_review/injecting-water-into-liquid-nitrogen-tanks.html,matched
+96,Compare fins(filename fin_compare),,under_review/fin_compare.html,matched
+97,Combined Free and Forced Convection,,under_review/combined-free-and-forced-convection.html,matched
+98,Continuous isotope production,https://learncheme.github.io/demos/ContinuousIsotopeProduction/index.html,under_review/Continuous isotope production.html,matched
+99,Fission chain reaction kinetics,https://learncheme.github.io/demos/NuclearFissionKinetics/index.html,under_review/nuclear_fission_simulation.html,matched
+100,Buoyancy of a Floating Cylinder,,under_review/buoyancy_of_a_floating_cylinder.html,matched
+101,Nuclear Fusion Reaction Simulation,https://learncheme.github.io/demos/NuclearFusionKinetics/index.html,under_review/nuclear_fusion_simulation.html,matched
+102,Continuous production with shutdown,https://learncheme.github.io/demos/ContinuousProductionWithShutdown/index.html,under_review/Continuous_isotope_production_with_shutdown.html,matched
+103,Continuous isotope production with continuous removal,https://learncheme.github.io/demos/ContinuousProductionContinuousRemoval/index.html,under_review/Continuous isotope production with continuous removal.html,matched
+104,Construct an x-y diagram for flash distillation,,under_review/Construct an xy Diagram for Flash Distillation.html,matched
+105,Psychrometric Chart Analyzer (Silverstein simulation),https://learncheme.github.io/demos/PsychrometricChartAnalyzer/index.html,under_review/psychrometric_chart_simulator.html,matched
+106,Ponchon-Savarit Equilibrium Stage Method,,under_review/Ponchon-Savarit equilibrium stage method.html,matched
+107,Gas chromatography,,under_review/gc_simulation.html,matched
+108,Ponchon-Savit diagram for ethanol-water,https://learncheme.github.io/demos/PonchonSavaritEthanolWater/index.html,under_review/ponchon_savarit_ethanol_water.html,matched
+109,Impinging jet,https://learncheme.github.io/demos/ImpingingJet/index.html,under_review/Impinging jet.html,matched
+110,Packed Bed Fluidization (for AI-generated simulations),https://learncheme.github.io/demos/PackedBedFluidization/index.html,under_review/Packed_Bed_Simulation.html,matched
+111,Reactor sizing: PFR versus CSTR (for AI-generated simulations)- title is Levenspiel plots,https://learncheme.github.io/demos/LevenspielPlots/index.html,under_review/Levenspiel_Plots.html,matched
+112,Batch reactor data analysis (for AI-generated simulations),https://learncheme.github.io/demos/BatchReactorDataAnalysis/index.html,under_review/Batch_Reactor_Data_Analysis.html,matched
+113,High-Pressure Chemical Equilibrium,https://learncheme.github.io/demos/HighPressureChemicalEquilibrium/index.html,under_review/High-pressure chemical equilibrium.html,matched
+114,Three Intermolecular Potential Models,https://learncheme.github.io/demos/ThreeIntermolecularPotentialModels/index.html,under_review/three_intermolecular_potentials.html,matched
+115,Carnot cycles with irreversible heat transfer,https://learncheme.github.io/demos/CarnotCyclesWithIrreversibleHeatTransfer/index.html,under_review/carnot-cycle-simulation.html,matched
+116,Arranging Balls into Boxes,https://learncheme.github.io/demos/ArrangingBallsIntoBoxes/index.html,under_review/arranging-balls-into-boxes.html,matched
+117,Boundary Layer in Flow between Parallel Plates,https://learncheme.github.io/demos/BoundaryLayerBetweenParallelPlates/index.html,under_review/boundary-layer.html,matched
+118,Standard Normal Distribution Areas,,under_review/standard_normal_distribution_areas.html,matched
+119,Cooling curves for eutectic system,https://learncheme.github.io/demos/CoolingCurvesEutecticSystem/index.html,under_review/Cooling curves for a eutectic.html,matched
+120,Retrograde Condensation of a Binary Mixture,https://learncheme.github.io/demos/RetrogradeCondensationOfBinaryMixture/index.html,under_review/retrograde_condensation.html,matched
+121,Evaporation of a Binary Liquid Mixture on a Stove,https://learncheme.github.io/demos/EvaporationOfBinaryLiqLiqMixtureOnStove/index.html,under_review/binary_mixture_evaporation.html,matched
+122,Gibbs Phase rule,https://learncheme.github.io/demos/GibbsPhaseRule/index.html,under_review/gibbs_phase_rule.html,matched
+123,Adiabatic humidification,,under_review/adiabatic_humidification.html,matched
+124,Adiabatic Compression of Pure Gases,,under_review/adiabatic-compression-of-pure-gases.html,matched
+125,Adiabatic Evaporation of Water into Vacuum,,under_review/adiabatic-evaporation-of-water-into-vacuum.html,matched
+126,Single-component phase diagram,,under_review/single-component-phase-diagram.html,matched
+127,Solvent extraction,https://learncheme.github.io/demos/SolventExtraction/index.html,under_review/Solvent extraction.html,matched
+128,Ion exchange column,,under_review/ion_exchange_breakthrough.html,matched
+129,Frictional Pressure Drop in a Pipe,,under_review/frictional-pressure-drop-pipe.html,matched
+130,Non-Newtonian fluids,https://learncheme.github.io/demos/NonNewtonianFluids/index.html,under_review/Non-Newtonian_fluids.html,matched
+131,Non-isothermal effectiveness factor,https://learncheme.github.io/demos/NonIsothermalEffectivenessInCatalystPore/index.html,under_review/nonisothermal_effectiveness_factor.html,matched
+132,Laminar flow reactor,https://learncheme.github.io/demos/LaminarFlowReactor/index.html,under_review/laminar_flow_reactor.html,matched
+133,Jablonski Diagram,https://learncheme.github.io/demos/JablonskiDiagram/index.html,under_review/JablonskiDiagram_standalone_5.html,matched
+134,Digital Light Processing DLP Cure Depth,https://learncheme.github.io/demos/DLPCureDepth/index.html,under_review/Digital Light Processing DLP Cure Depth.html,matched
+135,Light Attenuation  Broadband Source,https://learncheme.github.io/demos/BroadbandSourceLightAttenuation/index.html,under_review/Attenuation_Broadband.html,matched
+136,Steam table calculator,https://learncheme.github.io/demos/SteamTable/index.html,under_review/Steam Table Calculator.html,matched
+137,Electrophoretic Mobility,,under_review/electrophoretic mobility.html,matched
+138,Bioseparations: Ion-Exchange Chromatography,https://learncheme.github.io/demos/BioSepsIonExchangeChromatography/index.html,under_review/bioseparations_chromatography.html,matched
+139,Boltzmann Distribution,https://learncheme.github.io/demos/BoltzmannDistribution/index.html,under_review/boltzmann_distribution_explorer.html,matched
+140,Non-ideal reactors,https://learncheme.github.io/demos/NonidealReactors/index.html,under_review/nonideal-reactor.html,matched
+141,Catalyst deactivation in reactors,,under_review/catalyst-deactivation.html,matched
+142,Chemical vapor deposition (CVD growth rate),,under_review/cvd_growth_rate.html,matched
+143,Atomic Layer Deposition of Al2O3,https://learncheme.github.io/demos/AtomicLayerDeposition/index.html,under_review/atomic-layer-deposition.html,matched
+144,Polymer molecular weight distributions,https://learncheme.github.io/demos/PolymerMolecularWeightDistributions/index.html,under_review/molecular-weight-distributions.html,matched
+145,FeFe3C Phase Diagram,,under_review/fe-fe3c-phase-diagram.html,matched
+146,"Density, and atomic packing factor and interstitial sites",,under_review/density-atomic pakcing-interstitials.html,matched
+147,StressStrain Curves,,under_review/stress-strain-curves.html,matched
+148,Dopant diffusion in silicon,,under_review/dopant-diffusion.html,matched
+149,Thermal Runaway in a Batch Polymerization Reactor,https://learncheme.github.io/demos/BatchPolymerizationThermalRunaway/index.html,under_review/batch-polymerization-runaway.html,matched
+150,"Molecular Weight Distributions: Batch, PFR and CSTR Polymerization",https://learncheme.github.io/demos/PolymerizationReactorMWDs/index.html,under_review/polymer-mwd-reactors.html,matched
+151,Multiple states in CSTR polymerization,https://learncheme.github.io/demos/MultiSteadyStateCSTRPolymerization/index.html,under_review/Multiple states cstr_polymerization.html,matched
+152,FloryHuggins Solution Thermodynamics,https://learncheme.github.io/demos/FloryHuggins/index.html,under_review/flory-huggins.html,matched
+153,MaxwellBoltzmann speed distribution,,under_review/maxwell-boltzmann-speeds.html,matched
+154,Partition Function,,under_review/partition_function_builder.html,matched
+155,Polymer Molecular Weight Characterization,,under_review/polymer molecular weight characterization.html,matched
+156,Tubular Polymerization Reactor,,under_review/tubular-polymerization-reactor.html,matched
+157,X-Ray Diffraction and Bragg's Law,,under_review/xrd-bragg-law.html,matched
+158,Transient Start-Up of a Non-Isothermal Plug Flow Reactor (PFR start up),,under_review/PFR_Startup.html,matched
+159,Concentration polarization at a membrane surface,,under_review/concentration_polarization_membrane.html,matched
+160,TTT and CCT Diagrams for Eutectoid Steel,,under_review/TTT_CCT_diagrams.html,matched
+161,Emulsion polymerization,,under_review/emulsion-polymerization.html,matched
+162,Cooling tower,,under_review/cooling_tower_simulation.html,matched
+163,Temperature effects in free-radical polymerization,,under_review/Temperature effects in free radical polymerization.html,matched
+164,Photovoltaic Cell Performance,,under_review/photovoltaic_cell_performance.html,matched
+165,Living Anionic Polymerization: Initiation Rate and Chain-Length Distribution,,under_review/living-anionic-polymerization.html,matched
+166,Gelation with multifunctional monomers,,under_review/gelation-multifunctional-monomers.html,matched
+167,Equilibrium-limited polycondensation,,under_review/polycondensation_equilibrium.html,matched
+168,Dimensional analysis and similitude,,under_review/dimensional-analysis-similitude.html,matched
+169,Ion exchange isotherm,,under_review/ion_exchange_isotherm.html,matched
+170,Ion exchange isotherm with 2 sites,,under_review/Ion exchange with 2 types of site.html,matched
+171,"Glass Transition, WLF Equation, and TimeTemperature Superposition",,,unmatched
+172,Langmuir adsorption from statistical mechanics,,,unmatched
+173,Why entropy increases: counting microstates,,under_review/boltzmann_distribution_explorer.html,matched
+174,2D Lennard-Jones,,,unmatched
+175,Polymerization,,,unmatched
+176,Free-Radical Polymerization: Rate vs. Kinetic Chain Length,,,unmatched
+177,Chain confirmation,,,unmatched
+178,Viscoelasticity: Maxwell and KelvinVoigt Models,,,unmatched
+179,Elementary steps and the quasi-steady-state approximation,,,unmatched
+180,Temperature effects via Arrhenius for polymerization,,under_review/Temperature effects in free radical polymerization.html,matched
+181,Semibatch Copolymer Feed Design,,,unmatched
+182,Carothers Equation: Degree of Polymerization,,under_review/polycondensation_equilibrium.html,matched
+183,Block copolymer synthesis by sequential addition,,,unmatched
+184,Ceiling temperature in polymerization,,,unmatched
+185,Polymer Gelation and the Gel Effect,,under_review/gelation-multifunctional-monomers.html,matched
+186,Materials,,,unmatched
+187,Multi-stage solvent extraction,,under_review/Solvent extraction.html,matched
+188,Solid-liquid extraction (leaching),,,unmatched
+189,Pressure-swing adsorption,,,unmatched
+190,Cake filtration,,,unmatched
+191,Cooling crystallization,,,unmatched
+192,Lithium-Ion Cell Operation,,,unmatched
+193,Dislocations,,,unmatched
+194,Equilibrium Vacancy Concentration,,,unmatched

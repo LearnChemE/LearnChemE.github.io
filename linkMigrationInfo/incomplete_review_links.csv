@@ -1,0 +1,94 @@
+item_number,item,source_url,html_page,status
+7,Steady-State Binary Fickian Diffusion,,under_review/steady-state-binary-fickian-diffusion.html,matched
+34,How to use the McCabe-Thiele Method for Distillation,,under_review/mccabe-thiele.html,matched
+36,Feed Stages in a Distillation Column,,under_review/feed-stages-distillation-column.html,matched
+37,Pharmacokinetic Modeling,,under_review/pharmacokinetic-modeling.html,matched
+38,Adiabatic reactors: temperature and concentration versus residence time,,under_review/adiabatic-reactor-tau.html,matched
+42,First- and Second-Order Transfer Functions,,under_review/first-and-second-order-transfer-functions.html,matched
+43,Compressible flow through nozzle,,under_review/compressible-flow-nozzle-diffuser.html,matched
+44,Electrical Conductivity of a Semiconductor,,under_review/electrical-conductivity-of-a-semiconductor.html,matched
+45,Reactor with Recycle Stream,,under_review/reactor-with-recycle-stream.html,matched
+46,Separation of CO2and CH4 Using Well-Mixed Gas Permeation file is CO2/CH4 permeation,,under_review/co2-ch4-permeation.html,matched
+51,Binomial Distribution via Coin Flips,,under_review/binomial-distribution-via-coin-flips.html,matched
+52,Volumetric Flow Rates in a Plug Flow Reactor,,under_review/volumetric-flow-rates-in-a-pfr.html,matched
+53,Sensitivity of PFR to Model Parameters,,under_review/sensitivity-of-pfr-to-model-parameters.html,matched
+54,Solving a Double Scissor Truss,,under_review/SolvingADoubleScissorTruss.html,matched
+55,Method of Joints to Solve a Truss Problem,,under_review/MethodOfJointsToSolveATrussProblem.html,matched
+56,Method of Sections to Solve a Truss,,under_review/MethodOfSectionsToSolveATruss.html,matched
+57,Square wave,,under_review/square-wave-fourier.html,matched
+58,Least Squares Criteria for the Least Squares Regression Line,,under_review/least-squares-criteria-for-the-least-squares-regression-line.html,matched
+59,Simple linear regression,,under_review/simple-linear-regression.html,matched
+60,Standard Normal Distribution Areas,,under_review/standard_normal_distribution_areas.html,matched
+61,Blending process,,under_review/blending-process-simulation.html,matched
+62,Simple Crystal Structures and Miller Indices,,under_review/simple-crystal-structures-and-miller-indices.html,matched
+63,Nonlinear Transformations,,under_review/nonlinear-transformations.html,matched
+64,Visualizing R-Squared in Statistics,,under_review/visualizing-r-squared.html,matched
+65,First order transfer function,,under_review/first-order-transfer-functions.html,matched
+66,Forces in a Power Tower Truss,,under_review/ForcesInAPowerTowerTruss.html,matched
+67,Cable Tension Needed to Support Platform,,under_review/CableTensionNeededToSupportPlatform.html,matched
+68,Weight Suspended by Two Cables,,under_review/WeightSuspendedByTwoCables.html,matched
+69,Determine if a Truss Can Be Solved,,under_review/DetermineIfATrussCanBeSolved.html,matched
+70,Deflection of a Diving Board,,under_review/DeflectionOfADivingBoard.html,matched
+71,Estimating Kinetic Parameters from a Batch Reactor Experiment,,under_review/estimating-kinetic-parameters-from-a-batch-reactor-experiment.html,matched
+72,Radiation Shielding of a Spherical Black Body,,under_review/radiation-shielding-of-a-spherical-body.html,matched
+73,Heat Transfer between Flowing Liquids in Cylindrical Tubes,,under_review/heat-transfer-between-flowing-liquids-in-cylindrical-tubes.html,matched
+74,Heat Transfer in a Bank of Tubes,,under_review/heat-transfer-in-a-bank-of-tubes.html,matched
+75,Transient Conduction through a Plane Wall,,under_review/transient-conduction-through-a-plane-wall.html,matched
+76,Steady- state plane wall heat transfer,,under_review/steady-state-conduction-plane-wall.html,matched
+77,Heat Transfer in Fins,,under_review/HeatTransferInFins.html,matched
+78,Energy Transfer between Two Blackbodies,,under_review/energy-transfer-between-two-blackbodies.html,matched
+79,Mohr's Circle and Stress Transformations,,under_review/mohrs-circle-and-stress-transformations.html,matched
+80,Construct a Conversion-Temperature Diagram for a Reversible Adiabatic Reaction,,under_review/conversion-temperature-diagram.html,matched
+81,Construct an x-y Diagram for a Stripping Column,,under_review/construct-an-x-y-diagram-for-a-stripping-column.html,matched
+84,Construct an x-y Diagram for an Absorption Column,,under_review/construct-xy-diagram-absorption-column.html,matched
+85,Construct a McCabe-Thiele Diagram for Distillation,,under_review/mccabe-thiele-construct.html,matched
+86,Cryogenic Recovery of Acetone from Air,,under_review/cryogenic-recovery-of-acetone-from-air.html,matched
+88,Force Balance on a Moving Cart,,under_review/ForceBalanceOnAMovingCart.html,matched
+89,The 14 3D Bravais Lattices,,under_review/bravais-lattices.html,matched
+90,CSTRs in Series versus Plug Flow Reactor: title starts equally-sized CSTRs,,under_review/equally-sized-CSTRs_in_series-versus-PFR.html,matched
+91,Operation of an Air Conditioner,,under_review/operation-of-an-air-conditioner.html,matched
+92,Mass Balance in the Haber Process,,under_review/mass-balance-in-the-haber-process.html,matched
+95,Injecting Water into Liquid Nitrogen Tanks,,under_review/injecting-water-into-liquid-nitrogen-tanks.html,matched
+96,Compare fins(filename fin_compare),,under_review/fin_compare.html,matched
+97,Combined Free and Forced Convection,,under_review/combined-free-and-forced-convection.html,matched
+100,Buoyancy of a Floating Cylinder,,under_review/buoyancy_of_a_floating_cylinder.html,matched
+104,Construct an x-y diagram for flash distillation,,under_review/Construct an xy Diagram for Flash Distillation.html,matched
+106,Ponchon-Savarit Equilibrium Stage Method,,under_review/Ponchon-Savarit equilibrium stage method.html,matched
+107,Gas chromatography,,under_review/gc_simulation.html,matched
+118,Standard Normal Distribution Areas,,under_review/standard_normal_distribution_areas.html,matched
+123,Adiabatic humidification,,under_review/adiabatic_humidification.html,matched
+124,Adiabatic Compression of Pure Gases,,under_review/adiabatic-compression-of-pure-gases.html,matched
+125,Adiabatic Evaporation of Water into Vacuum,,under_review/adiabatic-evaporation-of-water-into-vacuum.html,matched
+126,Single-component phase diagram,,under_review/single-component-phase-diagram.html,matched
+128,Ion exchange column,,under_review/ion_exchange_breakthrough.html,matched
+129,Frictional Pressure Drop in a Pipe,,under_review/frictional-pressure-drop-pipe.html,matched
+137,Electrophoretic Mobility,,under_review/electrophoretic mobility.html,matched
+141,Catalyst deactivation in reactors,,under_review/catalyst-deactivation.html,matched
+142,Chemical vapor deposition (CVD growth rate),,under_review/cvd_growth_rate.html,matched
+145,FeFe3C Phase Diagram,,under_review/fe-fe3c-phase-diagram.html,matched
+146,"Density, and atomic packing factor and interstitial sites",,under_review/density-atomic pakcing-interstitials.html,matched
+147,StressStrain Curves,,under_review/stress-strain-curves.html,matched
+148,Dopant diffusion in silicon,,under_review/dopant-diffusion.html,matched
+153,MaxwellBoltzmann speed distribution,,under_review/maxwell-boltzmann-speeds.html,matched
+154,Partition Function,,under_review/partition_function_builder.html,matched
+155,Polymer Molecular Weight Characterization,,under_review/polymer molecular weight characterization.html,matched
+156,Tubular Polymerization Reactor,,under_review/tubular-polymerization-reactor.html,matched
+157,X-Ray Diffraction and Bragg's Law,,under_review/xrd-bragg-law.html,matched
+158,Transient Start-Up of a Non-Isothermal Plug Flow Reactor (PFR start up),,under_review/PFR_Startup.html,matched
+159,Concentration polarization at a membrane surface,,under_review/concentration_polarization_membrane.html,matched
+160,TTT and CCT Diagrams for Eutectoid Steel,,under_review/TTT_CCT_diagrams.html,matched
+161,Emulsion polymerization,,under_review/emulsion-polymerization.html,matched
+162,Cooling tower,,under_review/cooling_tower_simulation.html,matched
+163,Temperature effects in free-radical polymerization,,under_review/Temperature effects in free radical polymerization.html,matched
+164,Photovoltaic Cell Performance,,under_review/photovoltaic_cell_performance.html,matched
+165,Living Anionic Polymerization: Initiation Rate and Chain-Length Distribution,,under_review/living-anionic-polymerization.html,matched
+166,Gelation with multifunctional monomers,,under_review/gelation-multifunctional-monomers.html,matched
+167,Equilibrium-limited polycondensation,,under_review/polycondensation_equilibrium.html,matched
+168,Dimensional analysis and similitude,,under_review/dimensional-analysis-similitude.html,matched
+169,Ion exchange isotherm,,under_review/ion_exchange_isotherm.html,matched
+170,Ion exchange isotherm with 2 sites,,under_review/Ion exchange with 2 types of site.html,matched
+173,Why entropy increases: counting microstates,,under_review/boltzmann_distribution_explorer.html,matched
+180,Temperature effects via Arrhenius for polymerization,,under_review/Temperature effects in free radical polymerization.html,matched
+182,Carothers Equation: Degree of Polymerization,,under_review/polycondensation_equilibrium.html,matched
+185,Polymer Gelation and the Gel Effect,,under_review/gelation-multifunctional-monomers.html,matched
+187,Multi-stage solvent extraction,,under_review/Solvent extraction.html,matched
