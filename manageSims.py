@@ -28,11 +28,6 @@ for index, row in to_migrate.iterrows():
     # print(f"Creating directory: {directory_name}")
     if not os.path.exists(directory_name):
         # Create the directory if it doesn't exist
-        os.makedirs(directory_name)
-        # Copy the source file to the new directory
-        index_dir = directory_name + '/index.html'
-        # print(f"Moving file from {oldPath} to {index_dir}")
-        subprocess.run(['cp', row['source_file'], index_dir])
 
         # Replace the link in the homepage_info JSON with the new link
         search_key = 'https://learncheme.github.io/' + row['html_page'].lstrip('/').replace(' ','%20')  # Remove leading slash if present
@@ -43,6 +38,12 @@ for index, row in to_migrate.iterrows():
         else:
             # print(f"Updating link for {row['item']} from {search_key} to {new_link}")
             homepage_info.loc[homepage_info['href'] == search_key, 'href'] = "https://learncheme.github.io/" + new_link
+
+            os.makedirs(directory_name)
+            # Copy the source file to the new directory
+            index_dir = directory_name + '/index.html'
+            print(f"Moving file from {oldPath} to {index_dir}")
+            subprocess.run(['mv', oldPath, index_dir])
         
         i += 1
     # try:
