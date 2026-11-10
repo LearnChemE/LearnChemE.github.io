@@ -306,6 +306,24 @@
     "simulation_type": "in-browser"
   },
   {
+    "title":"Steady-State Binary Fickian Diffusion",
+    "href":"https://learncheme.github.io/demos/SteadyStateBinaryFickianDiffusion/index.html",
+    "image":"",
+    "tooltip":"Steady-State Binary Fickian Diffusion",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/SteadyStateBinaryFickianDiffusion/",
+    "simulation_type":"in-browser"
+  },
+  {
+    "title":"Nuclear Fusion Reaction Simulation",
+    "href":"https://learncheme.github.io/demos/NuclearFusionKinetics/index.html",
+    "image":"/home_page/media/under-review-nuclear-fusion-simulation.png",
+    "tooltip":"Nuclear Fusion Reaction Simulation",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/NuclearFissionKinetics/",
+    "simulation_type":"in-browser"
+  },
+  {
     "title": "Binary Mixture Evaporation",
     "href": "https://learncheme.github.io/demos/EvaporationOfBinaryLiqLiqMixtureOnStove/index.html",
     "image": "",
