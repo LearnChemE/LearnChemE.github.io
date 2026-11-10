@@ -5,7 +5,7 @@
     "image":"/home_page/media/under-review-adiabatic-humidification.png",
     "tooltip":"Adiabatic Humidification",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/AdiabaticHumidification/",
     "simulation_type":"under-review"
   },
   {
@@ -14,7 +14,7 @@
     "image":"/home_page/media/under-review-adiabatic-compression-of-pure-gases.png",
     "tooltip":"Adiabatic Compression of Pure Gases",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/AdiabaticCompressionOfPureGases/",
     "simulation_type":"under-review"
   },
   {
@@ -23,7 +23,7 @@
     "image":"",
     "tooltip":"Adiabatic Evaporation of Water into Vacuum",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/AdiabaticEvaporationOfWaterIntoVacuum/",
     "simulation_type":"under-review"
   },
   {
@@ -32,7 +32,7 @@
     "image":"/home_page/media/under-review-adiabatic-reactor-tau.png",
     "tooltip":"Adiabatic Reactors: Temperature and Concentration versus Residence Time",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/AdiabaticReactorsTemperatureAndConcentrationVersusResidenceTime/",
     "simulation_type":"under-review"
   },
   {
@@ -77,7 +77,7 @@
     "image":"",
     "tooltip":"The 14 3D Bravais Lattices",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/The143dBravaisLattices/",
     "simulation_type":"under-review"
   },
   {
@@ -86,7 +86,7 @@
     "image":"/home_page/media/under-review-buoyancy-of-a-floating-cylinder.png",
     "tooltip":"Buoyancy of a Floating Cylinder",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/BuoyancyOfAFloatingCylinder/",
     "simulation_type":"under-review"
   },
   {
@@ -95,7 +95,7 @@
     "image":"/home_page/media/under-review-cabletensionneededtosupportplatform.png",
     "tooltip":"Cable Tension Needed to Support Platform",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/CableTensionNeededToSupportPlatform/",
     "simulation_type":"under-review"
   },
   {
@@ -104,7 +104,7 @@
     "image":"/home_page/media/under-review-catalyst-deactivation.png",
     "tooltip":"Catalyst Deactivation in Reactors",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/CatalystDeactivationInReactors/",
     "simulation_type":"under-review"
   },
   {
@@ -113,7 +113,7 @@
     "image":"/home_page/media/under-review-co2-ch4-permeation.png",
     "tooltip":"Separation of Carbon Dioxide and Methane Using Well-Mixed Gas Permeation",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/SeparationOfCo2andCh4UsingWellMixedGasPermeation/",
     "simulation_type":"under-review"
   },
   {
@@ -122,7 +122,7 @@
     "image":"",
     "tooltip":"Combined Free and Forced Convection",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/CombinedFreeAndForcedConvection/",
     "simulation_type":"under-review"
   },
   {
@@ -131,7 +131,7 @@
     "image":"/home_page/media/under-review-compressible-flow-nozzle-diffuser.png",
     "tooltip":"Compressible Flow through a Nozzle/Diffuser",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/CompressibleFlowThroughNozzle/",
     "simulation_type":"under-review"
   },
   {
@@ -140,7 +140,7 @@
     "image":"/home_page/media/under-review-concentration-polarization-membrane.png",
     "tooltip":"Concentration Polarization at a Membrane",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ConcentrationPolarizationAtAMembraneSurface/",
     "simulation_type":"under-review"
   },
   {
@@ -149,7 +149,7 @@
     "image":"/home_page/media/under-review-construct-an-xy-diagram-for-flash-distillation.png",
     "tooltip":"Construct an x-y Diagram for Flash Distillation",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ConstructAnXYDiagramForFlashDistillation/",
     "simulation_type":"under-review"
   },
   {
@@ -158,7 +158,7 @@
     "image":"/home_page/media/under-review-construct-an-x-y-diagram-for-a-stripping-column.png",
     "tooltip":"Construct an x-y Diagram for a Stripping Column",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ConstructAnXYDiagramForAStrippingColumn/",
     "simulation_type":"under-review"
   },
   {
@@ -167,7 +167,7 @@
     "image":"/home_page/media/under-review-construct-xy-diagram-absorption-column.png",
     "tooltip":"Construct an x-y Diagram for an Absorption Column",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ConstructAnXYDiagramForAnAbsorptionColumn/",
     "simulation_type":"under-review"
   },
   {
@@ -176,7 +176,7 @@
     "image":"/home_page/media/under-review-conversion-temperature-diagram.png",
     "tooltip":"Construct a Conversion-Temperature Diagram for a Reversible Adiabatic Reaction",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ConstructAConversionTemperatureDiagramForAReversibleAdiabaticReaction/",
     "simulation_type":"under-review"
   },
   {
@@ -185,7 +185,7 @@
     "image":"/home_page/media/under-review-cooling-tower-simulation.png",
     "tooltip":"Cooling Tower Simulation",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/CoolingTower/",
     "simulation_type":"under-review"
   },
   {
@@ -194,7 +194,7 @@
     "image":"/home_page/media/under-review-cryogenic-recovery-of-acetone-from-air.png",
     "tooltip":"Cryogenic Recovery of Acetone from Air",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/CryogenicRecoveryOfAcetoneFromAir/",
     "simulation_type":"under-review"
   },
   {
@@ -203,7 +203,7 @@
     "image":"/home_page/media/under-review-cvd-growth-rate.png",
     "tooltip":"Chemical Vapor Deposition Growth Rate",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ChemicalVaporDeposition/",
     "simulation_type":"under-review"
   },
   {
@@ -212,7 +212,7 @@
     "image":"/home_page/media/under-review-deflectionofadivingboard.png",
     "tooltip":"Deflection of a Diving Board",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/DeflectionOfADivingBoard/",
     "simulation_type":"under-review"
   },
   {
@@ -221,7 +221,7 @@
     "image":"/home_page/media/under-review-density-atomic-pakcing-interstitials.png",
     "tooltip":"Crystal Packing and Interstitials",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/DensityAndAtomicPackingFactorAndInterstitialSites/",
     "simulation_type":"under-review"
   },
   {
@@ -230,7 +230,7 @@
     "image":"/home_page/media/under-review-determineifatrusscanbesolved.png",
     "tooltip":"Determine if a Truss Can Be Solved",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/DetermineIfATrussCanBeSolved/",
     "simulation_type":"under-review"
   },
   {
@@ -239,7 +239,7 @@
     "image":"",
     "tooltip":"Dimensional analysis and similitude",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/DimensionalAnalysisAndSimilitude/",
     "simulation_type":"under-review"
   },
   {
@@ -248,7 +248,7 @@
     "image":"",
     "tooltip":"Dopant Diffusion in Silicon",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/DopantDiffusionInSilicon/",
     "simulation_type":"under-review"
   },
   {
@@ -257,7 +257,7 @@
     "image":"/home_page/media/under-review-electrical-conductivity-of-a-semiconductor.png",
     "tooltip":"Electrical Conductivity of Silicon Semiconductors",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ElectricalConductivityOfASemiconductor/",
     "simulation_type":"under-review"
   },
   {
@@ -266,7 +266,7 @@
     "image":"/home_page/media/under-review-electrophoretic-mobility.png",
     "tooltip":"Electrophoretic Mobility",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ElectrophoreticMobility/",
     "simulation_type":"under-review"
   },
   {
@@ -275,7 +275,7 @@
     "image":"/home_page/media/under-review-emulsion-polymerization.png",
     "tooltip":"Emulsion Polymerization (Smith\u2013Ewart)",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/EmulsionPolymerization/",
     "simulation_type":"under-review"
   },
   {
@@ -284,7 +284,7 @@
     "image":"/home_page/media/under-review-energy-transfer-between-two-blackbodies.png",
     "tooltip":"Energy Transfer between Two Blackbodies",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/EnergyTransferBetweenTwoBlackbodies/",
     "simulation_type":"under-review"
   },
   {
@@ -293,7 +293,7 @@
     "image":"/home_page/media/under-review-equally-sized-cstrs-in-series-versus-pfr.png",
     "tooltip":"CSTRs in Series versus Plug Flow Reactor",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/CstrsInSeriesVersusPlugFlowReactorTitleStartsEquallySizedCstrs/",
     "simulation_type":"under-review"
   },
   {
@@ -302,7 +302,7 @@
     "image":"/home_page/media/under-review-estimating-kinetic-parameters-from-a-batch-reactor-experiment.png",
     "tooltip":"Estimating Kinetic Parameters from a Batch Reactor Experiment",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/EstimatingKineticParametersFromABatchReactorExperiment/",
     "simulation_type":"under-review"
   },
   {
@@ -311,7 +311,7 @@
     "image":"/home_page/media/under-review-fe-fe3c-phase-diagram.png",
     "tooltip":"Fe\u2013Fe\u2083C Phase Diagram",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/Fefe3cPhaseDiagram/",
     "simulation_type":"under-review"
   },
   {
@@ -320,7 +320,7 @@
     "image":"/home_page/media/under-review-feed-stages-distillation-column.png",
     "tooltip":"Feed Stages in a Distillation Column",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/FeedStagesInADistillationColumn/",
     "simulation_type":"under-review"
   },
   {
@@ -329,7 +329,7 @@
     "image":"",
     "tooltip":"Fins with Different Tip Boundary Conditions",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/CompareFins/",
     "simulation_type":"under-review"
   },
   {
@@ -338,7 +338,7 @@
     "image":"/home_page/media/under-review-first-and-second-order-transfer-functions.png",
     "tooltip":"First- and Second-Order Transfer Functions",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/FirstAndSecondOrderTransferFunctions/",
     "simulation_type":"under-review"
   },
   {
@@ -347,7 +347,7 @@
     "image":"/home_page/media/under-review-first-order-transfer-functions.png",
     "tooltip":"First-Order Transfer Functions in Process Control",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/FirstOrderTransferFunction/",
     "simulation_type":"under-review"
   },
   {
@@ -356,7 +356,7 @@
     "image":"/home_page/media/under-review-forcebalanceonamovingcart.png",
     "tooltip":"Force Balance on a Moving Cart",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ForceBalanceOnAMovingCart/",
     "simulation_type":"under-review"
   },
   {
@@ -365,7 +365,7 @@
     "image":"/home_page/media/under-review-forcesinapowertowertruss.png",
     "tooltip":"Forces in a Power Tower Truss",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ForcesInAPowerTowerTruss/",
     "simulation_type":"under-review"
   },
   {
@@ -374,7 +374,7 @@
     "image":"/home_page/media/under-review-frictional-pressure-drop-pipe.png",
     "tooltip":"Frictional Pressure Drop in a Pipe",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/FrictionalPressureDropInAPipe/",
     "simulation_type":"under-review"
   },
   {
@@ -383,7 +383,7 @@
     "image":"/home_page/media/under-review-gc-simulation.png",
     "tooltip":"GC Bench",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/GasChromatography/",
     "simulation_type":"under-review"
   },
   {
@@ -392,7 +392,7 @@
     "image":"",
     "tooltip":"Gelation with Multifunctional Monomers",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/GelationWithMultifunctionalMonomers/",
     "simulation_type":"under-review"
   },
   {
@@ -401,7 +401,7 @@
     "image":"/home_page/media/under-review-heat-transfer-between-flowing-liquids-in-cylindrical-tubes.png",
     "tooltip":"Heat Transfer between Flowing Liquids in Cylindrical Tubes",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/HeatTransferBetweenFlowingLiquidsInCylindricalTubes/",
     "simulation_type":"under-review"
   },
   {
@@ -410,7 +410,7 @@
     "image":"/home_page/media/under-review-heat-transfer-in-a-bank-of-tubes.png",
     "tooltip":"Heat Transfer in a Bank of Tubes",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/HeatTransferInABankOfTubes/",
     "simulation_type":"under-review"
   },
   {
@@ -419,7 +419,7 @@
     "image":"",
     "tooltip":"Heat Transfer in Fins",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/HeatTransferInFins/",
     "simulation_type":"under-review"
   },
   {
@@ -428,7 +428,7 @@
     "image":"/home_page/media/under-review-injecting-water-into-liquid-nitrogen-tanks.png",
     "tooltip":"Injecting Water into Liquid Nitrogen Tanks",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/InjectingWaterIntoLiquidNitrogenTanks/",
     "simulation_type":"under-review"
   },
   {
@@ -437,7 +437,7 @@
     "image":"/home_page/media/under-review-ion-exchange-with-2-types-of-site.png",
     "tooltip":"Two-Site Ion Exchange Isotherm",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/IonExchangeIsothermWith2Sites/",
     "simulation_type":"under-review"
   },
   {
@@ -446,7 +446,7 @@
     "image":"",
     "tooltip":"Ion exchange column",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/IonExchangeColumn/",
     "simulation_type":"under-review"
   },
   {
@@ -455,7 +455,7 @@
     "image":"/home_page/media/under-review-ion-exchange-isotherm.png",
     "tooltip":"Ion Exchange Isotherm",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/IonExchangeIsotherm/",
     "simulation_type":"under-review"
   },
   {
@@ -464,7 +464,7 @@
     "image":"/home_page/media/under-review-least-squares-criteria-for-the-least-squares-regression-line.png",
     "tooltip":"Least Squares Criteria for the Least Squares Regression Line",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/LeastSquaresCriteriaForTheLeastSquaresRegressionLine/",
     "simulation_type":"under-review"
   },
   {
@@ -473,7 +473,7 @@
     "image":"/home_page/media/under-review-liquid-liquid-extraction-uranyl-nitrate.png",
     "tooltip":"Liquid-Liquid Extraction of Uranyl Nitrate - LearnChemE",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/LiquidLiquidExtractionOfUranylNitrate/",
     "simulation_type":"under-review"
   },
   {
@@ -482,7 +482,7 @@
     "image":"/home_page/media/under-review-living-anionic-polymerization.png",
     "tooltip":"Living Anionic Polymerization",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/LivingAnionicPolymerizationInitiationRateAndChainLengthDistribution/",
     "simulation_type":"under-review"
   },
   {
@@ -491,7 +491,7 @@
     "image":"/home_page/media/under-review-mass-balance-in-the-haber-process.png",
     "tooltip":"Mass Balance in the Haber Process",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/MassBalanceInTheHaberProcess/",
     "simulation_type":"under-review"
   },
   {
@@ -500,7 +500,7 @@
     "image":"/home_page/media/under-review-maxwell-boltzmann-speeds.png",
     "tooltip":"Maxwell\u2013Boltzmann Speeds",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/MaxwellboltzmannSpeedDistribution/",
     "simulation_type":"under-review"
   },
   {
@@ -509,7 +509,7 @@
     "image":"/home_page/media/under-review-mccabe-thiele-construct.png",
     "tooltip":"Construct a McCabe-Thiele Diagram for Distillation",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ConstructAMccabeThieleDiagramForDistillation/",
     "simulation_type":"under-review"
   },
   {
@@ -518,7 +518,7 @@
     "image":"/home_page/media/under-review-mccabe-thiele.png",
     "tooltip":"How to Use the McCabe\u2013Thiele Method for Fractional Distillation",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/HowToUseTheMccabeThieleMethodForDistillation/",
     "simulation_type":"under-review"
   },
   {
@@ -527,7 +527,7 @@
     "image":"/home_page/media/under-review-methodofjointstosolveatrussproblem.png",
     "tooltip":"Method of Joints to Solve a Truss Problem",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/MethodOfJointsToSolveATrussProblem/",
     "simulation_type":"under-review"
   },
   {
@@ -536,7 +536,7 @@
     "image":"/home_page/media/under-review-methodofsectionstosolveatruss.png",
     "tooltip":"Method of Sections to Solve a Truss",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/MethodOfSectionsToSolveATruss/",
     "simulation_type":"under-review"
   },
   {
@@ -545,7 +545,7 @@
     "image":"/home_page/media/under-review-mohrs-circle-and-stress-transformations.png",
     "tooltip":"Mohr's Circle and Stress Transformations",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/MohrSCircleAndStressTransformations/",
     "simulation_type":"under-review"
   },
   {
@@ -554,7 +554,7 @@
     "image":"/home_page/media/under-review-nonlinear-transformations.png",
     "tooltip":"Transformations for Linear Regression",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/NonlinearTransformations/",
     "simulation_type":"under-review"
   },
   {
@@ -563,7 +563,7 @@
     "image":"/home_page/media/under-review-operation-of-an-air-conditioner.png",
     "tooltip":"Operation of an Air Conditioner",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/OperationOfAnAirConditioner/",
     "simulation_type":"under-review"
   },
   {
@@ -572,7 +572,7 @@
     "image":"/home_page/media/under-review-partition-function-builder.png",
     "tooltip":"Partition Function Builder",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/PartitionFunction/",
     "simulation_type":"under-review"
   },
   {
@@ -581,7 +581,7 @@
     "image":"/home_page/media/under-review-pfr-startup.png",
     "tooltip":"PFR Start-Up Dynamics",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/TransientStartUpOfANonIsothermalPlugFlowReactor/",
     "simulation_type":"under-review"
   },
   {
@@ -590,7 +590,7 @@
     "image":"/home_page/media/under-review-pharmacokinetic-modeling.png",
     "tooltip":"Pharmacokinetic Modeling",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/PharmacokineticModeling/",
     "simulation_type":"under-review"
   },
   {
@@ -599,7 +599,7 @@
     "image":"/home_page/media/under-review-photovoltaic-cell-performance.png",
     "tooltip":"Photovoltaic Cell Performance",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/PhotovoltaicCellPerformance/",
     "simulation_type":"under-review"
   },
   {
@@ -608,7 +608,7 @@
     "image":"/home_page/media/under-review-polycondensation-equilibrium.png",
     "tooltip":"Equilibrium-Limited Polycondensation",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/EquilibriumLimitedPolycondensation/",
     "simulation_type":"under-review"
   },
   {
@@ -617,7 +617,7 @@
     "image":"/home_page/media/under-review-polymer-molecular-weight-characterization.png",
     "tooltip":"Polymer Molecular Weight Characterization",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/PolymerMolecularWeightCharacterization/",
     "simulation_type":"under-review"
   },
   {
@@ -626,7 +626,7 @@
     "image":"/home_page/media/under-review-radiation-shielding-of-a-spherical-body.png",
     "tooltip":"Radiation Shielding of a Spherical Body",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/RadiationShieldingOfASphericalBlackBody/",
     "simulation_type":"under-review"
   },
   {
@@ -635,7 +635,7 @@
     "image":"/home_page/media/under-review-reactor-with-recycle-stream.png",
     "tooltip":"Reactor with Recycle Stream",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ReactorWithRecycleStream/",
     "simulation_type":"under-review"
   },
   {
@@ -644,7 +644,7 @@
     "image":"/home_page/media/under-review-sensitivity-of-pfr-to-model-parameters.png",
     "tooltip":"Sensitivity of a Plug Flow Reactor to Model Parameters",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/SensitivityOfPfrToModelParameters/",
     "simulation_type":"under-review"
   },
   {
@@ -653,7 +653,7 @@
     "image":"/home_page/media/under-review-simple-crystal-structures-and-miller-indices.png",
     "tooltip":"Simple Crystal Structures and Miller Indices",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/SimpleCrystalStructuresAndMillerIndices/",
     "simulation_type":"under-review"
   },
   {
@@ -662,7 +662,7 @@
     "image":"/home_page/media/under-review-simple-linear-regression.png",
     "tooltip":"Simple Linear Regression",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/SimpleLinearRegression/",
     "simulation_type":"under-review"
   },
   {
@@ -671,7 +671,7 @@
     "image":"/home_page/media/under-review-single-component-phase-diagram.png",
     "tooltip":"Single-component phase diagram",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/SingleComponentPhaseDiagram/",
     "simulation_type":"under-review"
   },
   {
@@ -680,7 +680,7 @@
     "image":"/home_page/media/under-review-solvingadoublescissortruss.png",
     "tooltip":"Solving a Double Scissor Truss",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/SolvingADoubleScissorTruss/",
     "simulation_type":"under-review"
   },
   {
@@ -689,7 +689,7 @@
     "image":"/home_page/media/under-review-square-wave-fourier.png",
     "tooltip":"Fourier Series: Square Wave",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/SquareWave/",
     "simulation_type":"under-review"
   },
   {
@@ -698,7 +698,7 @@
     "image":"/home_page/media/under-review-standard-normal-distribution-areas.png",
     "tooltip":"Standard Normal Distribution Areas",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/StandardNormalDistributionAreas/",
     "simulation_type":"under-review"
   },
   {
@@ -707,7 +707,7 @@
     "image":"/home_page/media/under-review-steady-state-conduction-plane-wall.png",
     "tooltip":"Steady-State Conduction in a Plane Wall",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/SteadyStatePlaneWallHeatTransfer/",
     "simulation_type":"under-review"
   },
   {
@@ -716,7 +716,7 @@
     "image":"/home_page/media/under-review-stress-strain-curves.png",
     "tooltip":"Stress\u2013Strain Curves",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/StressstrainCurves/",
     "simulation_type":"under-review"
   },
   {
@@ -725,7 +725,7 @@
     "image":"/home_page/media/under-review-temperature-effects-in-free-radical-polymerization.png",
     "tooltip":"Polymerization Temperature Effects",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/TemperatureEffectsInFreeRadicalPolymerization/",
     "simulation_type":"under-review"
   },
   {
@@ -734,7 +734,7 @@
     "image":"/home_page/media/under-review-transient-conduction-through-a-plane-wall.png",
     "tooltip":"Transient Conduction through a Plane Wall",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/TransientConductionThroughAPlaneWall/",
     "simulation_type":"under-review"
   },
   {
@@ -743,7 +743,7 @@
     "image":"/home_page/media/under-review-ttt-cct-diagrams.png",
     "tooltip":"TTT and CCT diagrams for steel",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/TttAndCctDiagramsForEutectoidSteel/",
     "simulation_type":"under-review"
   },
   {
@@ -752,7 +752,7 @@
     "image":"/home_page/media/under-review-tubular-polymerization-reactor.png",
     "tooltip":"Tubular Polymerization Reactor",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/TubularPolymerizationReactor/",
     "simulation_type":"under-review"
   },
   {
@@ -761,7 +761,7 @@
     "image":"/home_page/media/under-review-visualizing-r-squared.png",
     "tooltip":"Visualizing R-Squared in Statistics",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/VisualizingRSquaredInStatistics/",
     "simulation_type":"under-review"
   },
   {
@@ -770,7 +770,7 @@
     "image":"/home_page/media/under-review-volumetric-flow-rates-in-a-pfr.png",
     "tooltip":"Volumetric Flow Rates in a Plug Flow Reactor",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/VolumetricFlowRatesInAPlugFlowReactor/",
     "simulation_type":"under-review"
   },
   {
@@ -779,7 +779,7 @@
     "image":"/home_page/media/under-review-weightsuspendedbytwocables.png",
     "tooltip":"Weight Suspended by Two Cables",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/WeightSuspendedByTwoCables/",
     "simulation_type":"under-review"
   },
   {
@@ -788,7 +788,7 @@
     "image":"/home_page/media/under-review-xrd-bragg-law.png",
     "tooltip":"X-Ray Diffraction and Bragg's Law",
     "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/under_review/",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/XRayDiffractionAndBraggSLaw/",
     "simulation_type":"under-review"
   }
 ]
