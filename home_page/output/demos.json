@@ -576,15 +576,6 @@
     "simulation_type": "in-browser"
   },
   {
-    "title": "Attenuation: Broadband",
-    "href": "https://learncheme.github.io/demos/LightAttenuation-Broadband/index.html",
-    "image": "",
-    "tooltip": "Attenuation: Broadband",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/LightAttenuation-Broadband/",
-    "simulation_type": "in-browser"
-  },
-  {
     "title": "Attenuation: Multiple Wavelengths",
     "href": "https://learncheme.github.io/demos/LightAttenuation-MultipleWavelength/index.html",
     "image": "",
@@ -627,15 +618,6 @@
     "tooltip": "Material and Energy Balances in a Reactor with Heat Exchange",
     "description": "",
     "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/MEB_ReactorWithHeatExchange/src/html/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "docs",
-    "href": "https://learncheme.github.io/demos/MeltingIce/libraries/quicksettings3/docs/index.html",
-    "image": "",
-    "tooltip": "docs",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/MeltingIce/libraries/quicksettings3/docs/",
     "simulation_type": "in-browser"
   },
   {
@@ -774,10 +756,10 @@
     "simulation_type": "in-browser"
   },
   {
-    "title": "heattransferinareactor",
+    "title": "Heat Transfer in a Reactor",
     "href": "https://learncheme.github.io/demos/ParallelHeatTransferStlite/dist/index.html",
     "image": "",
-    "tooltip": "heattransferinareactor",
+    "tooltip": "Heat Transfer in a Reactor",
     "description": "",
     "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ParallelHeatTransferStlite/",
     "simulation_type": "in-browser"
@@ -792,10 +774,10 @@
     "simulation_type": "in-browser"
   },
   {
-    "title": "ThermoMix",
+    "title": "Partial Miscibility Binary Liquid",
     "href": "https://learncheme.github.io/demos/PartialMiscibilityBinaryLiquid/index.html",
     "image": "",
-    "tooltip": "ThermoMix",
+    "tooltip": "Partial Miscibility Binary Liquid",
     "description": "",
     "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/PartialMiscibilityBinaryLiquid/",
     "simulation_type": "in-browser"
@@ -999,12 +981,12 @@
     "simulation_type": "in-browser"
   },
   {
-    "title": "overlay",
-    "href": "https://learncheme.github.io/demos/SteadyStateFlowFromATank/Overlay/overlay.html",
+    "title": "Steady State Flow from a Tank",
+    "href": "https://learncheme.github.io/demos/SteadyStateFlowFromATank/SteadyStateFlow/index.html",
     "image": "",
-    "tooltip": "overlay",
+    "tooltip": "Steady State Flow from a Tank",
     "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/SteadyStateFlowFromATank/Overlay/",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/SteadyStateFlowFromATank/",
     "simulation_type": "in-browser"
   },
   {
@@ -1062,39 +1044,12 @@
     "simulation_type": "in-browser"
   },
   {
-    "title": "vectors demonstration",
+    "title": "Vectors Demonstration",
     "href": "https://learncheme.github.io/demos/vectors/app.html",
     "image": "",
-    "tooltip": "vectors demonstration",
+    "tooltip": "Vectors Demonstration",
     "description": "",
     "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/vectors/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "MathJax Documentation",
-    "href": "https://learncheme.github.io/demos/vectors/libraries/MathJax-master/docs/html/index.html",
-    "image": "",
-    "tooltip": "MathJax Documentation",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/vectors/libraries/MathJax-master/docs/html/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "MathJax Test Page",
-    "href": "https://learncheme.github.io/demos/vectors/libraries/MathJax-master/test/index.html",
-    "image": "",
-    "tooltip": "MathJax Test Page",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/vectors/libraries/MathJax-master/test/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "docs",
-    "href": "https://learncheme.github.io/demos/vectors/libraries/quicksettings3/docs/index.html",
-    "image": "",
-    "tooltip": "docs",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/vectors/libraries/quicksettings3/docs/",
     "simulation_type": "in-browser"
   },
   {
