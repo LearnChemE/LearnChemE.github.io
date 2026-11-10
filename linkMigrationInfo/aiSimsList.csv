@@ -1,0 +1,205 @@
+title,link
+Inhibition of Enzyme Reactions in a CSTR and a Batch Reactor,https://learncheme.github.io/demos/InhibitionOfEnzymeRxnsInCSTRandBatch/
+Multiple steady-states in isothermal CSTR,https://learncheme.github.io/demos/MultipleSteadyStatesInAnIsothermalCSTR/
+Fugacity from Equation of State for Water,https://learncheme.github.io/demos/FugacityFromEOSForWater/
+Measuring Flow Rates with a Pitot Tube,https://learncheme.github.io/demos/MeasuringFlowRatesWithAPitotTube/
+Membrane Reactor for an Equilibrium-Limited Reaction,https://learncheme.github.io/demos/MembraneReactorForAnEqmLimitedRxn/
+Water Contact Angle for Heterogeneous Surface ,https://learncheme.github.io/demos/WaterContactAngleForHeterogeneousSurface/
+Steady-State Binary Fickian Diffusion ,
+Batch Reactor with Multiple Reactions,https://learncheme.github.io/demos/BatchReactorWithMultipleReactions/
+Parametric Sensitivity of Plug Flow Reactor With Heat Exchange,https://learncheme.github.io/demos/ParametricSensitivityOfPFRWithHeatExchange/index.html
+Reaction in an Isothermal CSTR ,https://learncheme.github.io/demos/RxnInIsothermalCSTR/index.html
+Reactor Rate and Conversion versus Space Velocity,https://learncheme.github.io/demos/RxrRateAndConversionVsSpaceVelocity/index.html
+Adiabatic Plug Flow Reactor with Recycle,https://learncheme.github.io/demos/AdiabaticPFRwithRecycle/index.html
+P-T diagram for binary mixture ,https://learncheme.github.io/demos/PTDiagramForBinaryMixture/index.html
+Solid-Solid-Liquid Equilibrium,https://learncheme.github.io/demos/SolidSolidEquilibrium/index.html
+Refrigeration Cycle Coefficient of Performance,https://learncheme.github.io/demos/RefrigerationCycleCOP/index.html
+Capillary action in a tube,https://learncheme.github.io/demos/CapillaryAction/index.html
+Non-Ideal VLE Modeled by the Margules Equation ,https://learncheme.github.io/demos/NonIdealVLEMargulesEquation/index.html
+Enthalpy and Entropy Departure Functions for Gases,https://learncheme.github.io/demos/EnthalpyEntropyDepartureFxnsGases/index.html
+Diffusion-Controlled Drug Delivery,https://learncheme.github.io/demos/DiffusionControlledDrugDelivery/index.html
+Membrane Concentration Profile,https://learncheme.github.io/demos/MembraneConcentrationProfile/index.html
+Reactor Design Economics,https://learncheme.github.io/demos/ReactorDesignEconomics/index.html
+Pressure Drop in a PBR Using the Ergun Equation,https://learncheme.github.io/demos/ErgunEquationPressureDropPBR/index.html
+Autothermal Reactor,https://learncheme.github.io/demos/AutothermalRxr/index.html
+Temperature-Programmed Desorption,https://learncheme.github.io/demos/TemperatureProgrammedDesorption/index.html
+Diffusion in solids,https://learncheme.github.io/demos/DiffusionInSolids/index.html
+Mass Balances in Absorption and Stripping Units,https://learncheme.github.io/demos/MassBalancesInAbsorptionAndStrippingUnits/index.html
+,
+Double-Sided Couette Flow,https://learncheme.github.io/demos/DoubleSidedCouetteFlow/index.html
+Force Balances on a Truss,https://learncheme.github.io/demos/ForceBalancesOnATruss/index.html
+Heat Transfer through a Cylinder,https://learncheme.github.io/demos/HeatTransferThroughACylinder/index.html
+Reaction in an Adiabatic Continuous Stirred-Tank Reactor,https://learncheme.github.io/demos/RxnInAnAdiabaticCSTR/index.html
+Multistage Batch Distillation with Azeotrope,https://learncheme.github.io/demos/MultiStageBatchDistillationWithAzeotrope/index.html
+Reverse Osmosis,https://learncheme.github.io/demos/ReverseOsmosis/index.html
+PFR with Heat Transfer Jacket,https://learncheme.github.io/demos/HeatJacketedPFR/index.html
+How to use the McCabe-Thiele Method for Distillation ,
+Phase Behavior on a Pressure-Volume Diagram,https://learncheme.github.io/demos/PhaseBehaviorOnPVDiagram/index.html
+Feed Stages in a Distillation Column,
+Pharmacokinetic Modeling,
+Adiabatic reactors: temperature and concentration versus residence time,
+Polymerization in a Batch Reactor,https://learncheme.github.io/demos/PolymerizationInBatchRxr/index.html
+Osmotic pressure,https://learncheme.github.io/demos/OsmoticPressure/index.html
+Chemical Potential Dependence on T and P,https://learncheme.github.io/demos/ChemicalPotentialDependenceOnTandP/index.html
+First- and Second-Order Transfer Functions,
+Compressible flow through nozzle ,
+Electrical Conductivity of a Semiconductor,
+Reactor with Recycle Stream,
+Separation of CO2and CH4Using Well-Mixed Gas Permeation file is CO2/CH4 permeation,
+Irreversible and Reversible Temperature Equilibration,https://learncheme.github.io/demos/IrreversibleReversibleTemperatureEq/index.html
+Adiabatic Compression of Water in VLE,https://learncheme.github.io/demos/AdiabaticCompressionOfWaterInVLE/index.html
+Fugacity as a Driving Force for Mass Transfer,https://learncheme.github.io/demos/FugacityDrivingMassTransfer/index.html
+Enthalpy-Entropy Diagram For Water,https://learncheme.github.io/demos/EnthalpyEntropyDiagramForWater/index.html
+Binomial Distribution via Coin Flips,
+Volumetric Flow Rates in a Plug Flow Reactor,
+Sensitivity of PFR to Model Parameters,
+Solving a Double Scissor Truss,
+Method of Joints to Solve a Truss Problem,
+Method of Sections to Solve a Truss,
+Square wave,
+Least Squares Criteria for the Least Squares Regression Line,
+Simple linear regression,
+Standard Normal Distribution Areas,
+Blending process,
+Simple Crystal Structures and Miller Indices,
+Nonlinear Transformations ,
+Visualizing R-Squared in Statistics,
+First order transfer function,
+Forces in a Power Tower Truss,
+Cable Tension Needed to Support Platform,
+Weight Suspended by Two Cables,
+Determine if a Truss Can Be Solved,
+Deflection of a Diving Board,
+Estimating Kinetic Parameters from a Batch Reactor Experiment,
+Radiation Shielding of a Spherical Black Body,
+Heat Transfer between Flowing Liquids in Cylindrical Tubes,
+Heat Transfer in a Bank of Tubes,
+Transient Conduction through a Plane Wall,
+Steady- state plane wall heat transfer,
+Heat Transfer in Fins,
+Energy Transfer between Two Blackbodies,
+Mohr's Circle and Stress Transformations,
+Construct a Conversion-Temperature Diagram for a Reversible Adiabatic Reaction,
+Construct an x-y Diagram for a Stripping Column,
+Identify Reversible and Irreversible Expansion and Compression,https://learncheme.github.io/demos/IdentifyReversibleAndIrreversibleExpansionAndCompression/index.html
+Identify Chemical Potential Plots,https://learncheme.github.io/demos/IdentifyChemicalPotentialPlots/index.html
+Construct an x-y Diagram for an Absorption Column,
+Construct a McCabe-Thiele Diagram for Distillation,
+Cryogenic Recovery of Acetone from Air,
+Fugacities in a Can of Soda,https://learncheme.github.io/demos/FugacitiesInSodaCan/index.html
+Force Balance on a Moving Cart,
+The 14 3D Bravais Lattices,
+CSTRs in Series versus Plug Flow Reactor: title starts equally-sized CSTRs,
+Operation of an Air Conditioner,
+Mass Balance in the Haber Process,
+Uranium isotope decay,https://learncheme.github.io/demos/UraniumIsotopeDecay/index.html
+Batch Radioactive Decay of a Four-Isotope Chain(batchdecay_8),https://learncheme.github.io/demos/BatchRadioactiveDecayOfFourIsotopeChain/index.html
+Injecting Water into Liquid Nitrogen Tanks,
+Compare fins(filename fin_compare),
+Combined Free and Forced Convection,
+Continuous isotope production,https://learncheme.github.io/demos/ContinuousIsotopeProduction/index.html
+ Fission chain reaction kinetics,https://learncheme.github.io/demos/NuclearFissionKinetics/index.html
+Buoyancy of a Floating Cylinder,
+Nuclear Fusion Reaction Simulation,https://learncheme.github.io/demos/NuclearFusionKinetics/index.html
+Continuous production with shutdown,https://learncheme.github.io/demos/ContinuousProductionWithShutdown/index.html
+Continuous isotope production with continuous removal,https://learncheme.github.io/demos/ContinuousProductionContinuousRemoval/index.html
+Construct an x-y diagram for flash distillation,
+Psychrometric Chart Analyzer (Silverstein simulation),https://learncheme.github.io/demos/PsychrometricChartAnalyzer/index.html
+Ponchon-Savarit Equilibrium Stage Method,
+Gas chromatography,
+Ponchon-Savit diagram for ethanol-water,https://learncheme.github.io/demos/PonchonSavaritEthanolWater/index.html
+Impinging jet,https://learncheme.github.io/demos/ImpingingJet/index.html
+Packed Bed Fluidization (for AI-generated simulations),https://learncheme.github.io/demos/PackedBedFluidization/index.html
+Reactor sizing: PFR versus CSTR (for AI-generated simulations)- title is Levenspiel plots,https://learncheme.github.io/demos/LevenspielPlots/index.html
+Batch reactor data analysis (for AI-generated simulations),https://learncheme.github.io/demos/BatchReactorDataAnalysis/index.html
+High-Pressure Chemical Equilibrium,https://learncheme.github.io/demos/HighPressureChemicalEquilibrium/index.html
+Three Intermolecular Potential Models,https://learncheme.github.io/demos/ThreeIntermolecularPotentialModels/index.html
+Carnot cycles with irreversible heat transfer,https://learncheme.github.io/demos/CarnotCyclesWithIrreversibleHeatTransfer/index.html
+Arranging Balls into Boxes,https://learncheme.github.io/demos/ArrangingBallsIntoBoxes/index.html
+Boundary Layer in Flow between Parallel Plates,https://learncheme.github.io/demos/BoundaryLayerBetweenParallelPlates/index.html
+Standard Normal Distribution Areas,
+Cooling curves for eutectic system,https://learncheme.github.io/demos/CoolingCurvesEutecticSystem/index.html
+Retrograde Condensation of a Binary Mixture,https://learncheme.github.io/demos/RetrogradeCondensationOfBinaryMixture/index.html
+Evaporation of a Binary Liquid Mixture on a Stove,https://learncheme.github.io/demos/EvaporationOfBinaryLiqLiqMixtureOnStove/index.html
+Gibbs Phase rule,https://learncheme.github.io/demos/GibbsPhaseRule/index.html
+Adiabatic humidification,
+Adiabatic Compression of Pure Gases,
+Adiabatic Evaporation of Water into Vacuum,
+Single-component phase diagram,
+Solvent extraction,https://learncheme.github.io/demos/SolventExtraction/index.html
+Ion exchange column,
+Frictional Pressure Drop in a Pipe,
+Non-Newtonian fluids,https://learncheme.github.io/demos/NonNewtonianFluids/index.html
+Non-isothermal effectiveness factor,https://learncheme.github.io/demos/NonIsothermalEffectivenessInCatalystPore/index.html
+Laminar flow reactor,https://learncheme.github.io/demos/LaminarFlowReactor/index.html
+Jablonski Diagram,https://learncheme.github.io/demos/JablonskiDiagram/index.html
+Digital Light Processing DLP Cure Depth,https://learncheme.github.io/demos/DLPCureDepth/index.html
+Light Attenuation  Broadband Source,https://learncheme.github.io/demos/BroadbandSourceLightAttenuation/index.html
+Steam table calculator,https://learncheme.github.io/demos/SteamTable/index.html
+Electrophoretic Mobility,
+Bioseparations: Ion-Exchange Chromatography ,https://learncheme.github.io/demos/BioSepsIonExchangeChromatography/index.html
+Boltzmann Distribution,https://learncheme.github.io/demos/BoltzmannDistribution/index.html
+Non-ideal reactors,https://learncheme.github.io/demos/NonidealReactors/index.html
+Catalyst deactivation in reactors,
+Chemical vapor deposition (CVD growth rate),
+Atomic Layer Deposition of Al2O3,https://learncheme.github.io/demos/AtomicLayerDeposition/index.html
+Polymer molecular weight distributions,https://learncheme.github.io/demos/PolymerMolecularWeightDistributions/index.html
+FeFe3C Phase Diagram,
+"Density, and atomic packing factor and interstitial sites",
+StressStrain Curves,
+Dopant diffusion in silicon,
+Thermal Runaway in a Batch Polymerization Reactor,https://learncheme.github.io/demos/BatchPolymerizationThermalRunaway/index.html
+"Molecular Weight Distributions: Batch, PFR and CSTR Polymerization",https://learncheme.github.io/demos/PolymerizationReactorMWDs/index.html
+Multiple states in CSTR polymerization,https://learncheme.github.io/demos/MultiSteadyStateCSTRPolymerization/index.html
+FloryHuggins Solution Thermodynamics,https://learncheme.github.io/demos/FloryHuggins/index.html
+MaxwellBoltzmann speed distribution,
+Partition Function,
+Polymer Molecular Weight Characterization,
+Tubular Polymerization Reactor,
+X-Ray Diffraction and Bragg's Law,
+Transient Start-Up of a Non-Isothermal Plug Flow Reactor (PFR start up),
+Concentration polarization at a membrane surface,
+TTT and CCT Diagrams for Eutectoid Steel,
+Emulsion polymerization,
+Cooling tower,
+Temperature effects in free-radical polymerization,
+Photovoltaic Cell Performance,
+Living Anionic Polymerization: Initiation Rate and Chain-Length Distribution,
+Gelation with multifunctional monomers,
+Equilibrium-limited polycondensation,
+Dimensional analysis and similitude,
+Ion exchange isotherm,
+Ion exchange isotherm with 2 sites,
+"Glass Transition, WLF Equation, and TimeTemperature Superposition",
+,
+,
+,
+,
+Langmuir adsorption from statistical mechanics,
+Why entropy increases: counting microstates,
+2D Lennard-Jones,
+Polymerization,
+Free-Radical Polymerization: Rate vs. Kinetic Chain Length,
+Chain confirmation,
+Viscoelasticity: Maxwell and KelvinVoigt Models,
+Elementary steps and the quasi-steady-state approximation,
+Temperature effects via Arrhenius for polymerization,
+Semibatch Copolymer Feed Design,
+Carothers Equation: Degree of Polymerization,
+Block copolymer synthesis by sequential addition,
+Ceiling temperature in polymerization,
+Polymer Gelation and the Gel Effect,
+,
+,
+,
+Materials,
+,
+Multi-stage solvent extraction,
+Solid-liquid extraction (leaching),
+Pressure-swing adsorption,
+Cake filtration,
+,
+Cooling crystallization,
+Lithium-Ion Cell Operation,
+Dislocations,
+Equilibrium Vacancy Concentration,
