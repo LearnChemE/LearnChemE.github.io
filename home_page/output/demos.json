@@ -306,22 +306,22 @@
     "simulation_type": "in-browser"
   },
   {
-    "title":"Steady-State Binary Fickian Diffusion",
-    "href":"https://learncheme.github.io/demos/SteadyStateBinaryFickianDiffusion/index.html",
-    "image":"",
-    "tooltip":"Steady-State Binary Fickian Diffusion",
-    "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/SteadyStateBinaryFickianDiffusion/",
-    "simulation_type":"in-browser"
+    "title": "Steady-State Binary Fickian Diffusion",
+    "href": "https://learncheme.github.io/demos/SteadyStateBinaryFickianDiffusion/index.html",
+    "image": "",
+    "tooltip": "Steady-State Binary Fickian Diffusion",
+    "description": "",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/SteadyStateBinaryFickianDiffusion/",
+    "simulation_type": "in-browser"
   },
   {
-    "title":"Nuclear Fusion Reaction Simulation",
-    "href":"https://learncheme.github.io/demos/NuclearFusionKinetics/index.html",
-    "image":"/home_page/media/under-review-nuclear-fusion-simulation.png",
-    "tooltip":"Nuclear Fusion Reaction Simulation",
-    "description":"",
-    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/NuclearFissionKinetics/",
-    "simulation_type":"in-browser"
+    "title": "Nuclear Fusion Reaction Simulation",
+    "href": "https://learncheme.github.io/demos/NuclearFusionKinetics/index.html",
+    "image": "/home_page/media/under-review-nuclear-fusion-simulation.png",
+    "tooltip": "Nuclear Fusion Reaction Simulation",
+    "description": "",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/NuclearFissionKinetics/",
+    "simulation_type": "in-browser"
   },
   {
     "title": "Binary Mixture Evaporation",
@@ -468,15 +468,6 @@
     "simulation_type": "in-browser"
   },
   {
-    "title": "How to Use the McCabe-Thiele Method for Fractional Distillation",
-    "href": "https://learncheme.github.io/demos/HowToUseMcCabeThiele/src/html/index.html",
-    "image": "",
-    "tooltip": "How to Use the McCabe-Thiele Method for Fractional Distillation",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/HowToUseMcCabeThiele/src/html/",
-    "simulation_type": "in-browser"
-  },
-  {
     "title": "Identify Chemical Potential Plots",
     "href": "https://learncheme.github.io/demos/IdentifyChemicalPotentialPlots/index.html",
     "image": "",
@@ -540,10 +531,10 @@
     "simulation_type": "in-browser"
   },
   {
-    "title": "Langmuir–Hinshelwood Reaction",
+    "title": "Langmuir\u2013Hinshelwood Reaction",
     "href": "https://learncheme.github.io/demos/LangmuirHinshelwoodReaction/dist/index.html",
     "image": "",
-    "tooltip": "Langmuir–Hinshelwood Reaction",
+    "tooltip": "Langmuir\u2013Hinshelwood Reaction",
     "description": "",
     "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/LangmuirHinshelwoodReaction/",
     "simulation_type": "in-browser"

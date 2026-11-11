@@ -790,5 +790,14 @@
     "description":"",
     "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/XRayDiffractionAndBraggSLaw/",
     "simulation_type":"under-review"
+  },
+  {
+    "title": "Ponchon-Savit Equilibrium Stage Method",
+    "href": "https://learncheme.github.io/demos/PonchonSavaritEquilibriumStageMethod/index.html",
+    "image": "",
+    "tooltip": "Ponchon-Savit Equilibrium Stage Method",
+    "description": "",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/PonchonSavaritEquilibriumStageMethod/",
+    "simulation_type": "in-browser"
   }
 ]
