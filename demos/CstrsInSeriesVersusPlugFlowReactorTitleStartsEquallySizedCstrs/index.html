@@ -178,43 +178,6 @@ window.MathJax = {
 </style>
 </head>
 <body>
-<div id="app">
-  <div class="title">CSTRs in Series versus Plug Flow Reactor</div>
-
-  <div id="plotWrap">
-    <canvas id="plot" width="560" height="400"></canvas>
-  </div>
-
-  <div id="controls">
-    <div class="sliders">
-      <div class="sliderRow">
-        <div class="sliderLabel">
-          <span class="name">residence time</span>
-          <input type="range" id="tau" min="1" max="5" step="0.1" value="2">
-          <span class="val" id="tauVal">2.0</span>
-        </div>
-      </div>
-      <div class="sliderRow">
-        <div class="sliderLabel">
-          <span class="name">number of CSTRs</span>
-          <input type="range" id="nreac" min="1" max="30" step="1" value="10">
-          <span class="val" id="nVal">10</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="btnCol">
-      <button class="infoBtn" data-panel="directions">Directions</button>
-      <button class="infoBtn" data-panel="details">Details</button>
-      <button class="infoBtn" data-panel="about">About</button>
-    </div>
-
-    <div id="panel">
-      <button id="panelClose" aria-label="Close">&times;</button>
-      <div id="panelContent"></div>
-    </div>
-  </div>
-</div>
 
 <script>
 (function(){
