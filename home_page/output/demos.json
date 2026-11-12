@@ -1,1082 +1,1322 @@
 [
   {
-    "title": "2D Heat Distribution Simulator",
-    "href": "https://learncheme.github.io/demos/2DHeatDistributionSimulator/index.html",
-    "image": "/home_page/media/demos-2dheatdistributionsimulator.png",
-    "tooltip": "2D Heat Distribution Simulator",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/2DHeatDistributionSimulator/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Adiabatic Compression of Water in Vapor-Liquid Equilibrium (VLE)",
-    "href": "https://learncheme.github.io/demos/AdiabaticCompressionOfWaterInVLE/index.html",
-    "image": "/home_page/media/demos-adiabaticcompressionofwaterinvle.png",
-    "tooltip": "Adiabatic Compression of Water in Vapor-Liquid Equilibrium (VLE)",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/AdiabaticCompressionOfWaterInVLE/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Adiabatic Plug Flow Reactor with Recycle",
-    "href": "https://learncheme.github.io/demos/AdiabaticPFRwithRecycle/index.html",
-    "image": "/home_page/media/demos-adiabaticpfrwithrecycle.png",
-    "tooltip": "Adiabatic Plug Flow Reactor with Recycle",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/AdiabaticPFRwithRecycle/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Arranging Balls into Boxes",
-    "href": "https://learncheme.github.io/demos/ArrangingBallsIntoBoxes/index.html",
-    "image": "/home_page/media/demos-arrangingballsintoboxes.png",
-    "tooltip": "Arranging Balls into Boxes",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ArrangingBallsIntoBoxes/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Autothermal Reactor",
-    "href": "https://learncheme.github.io/demos/AutothermalRxr/index.html",
-    "image": "/home_page/media/demos-autothermalrxr.png",
-    "tooltip": "Autothermal Reactor",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/AutothermalRxr/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Batch Polymerization Runaway",
-    "href": "https://learncheme.github.io/demos/BatchPolymerizationThermalRunaway/index.html",
-    "image": "/home_page/media/demos-batchpolymerizationthermalrunaway.png",
-    "tooltip": "Batch Polymerization Runaway",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/BatchPolymerizationThermalRunaway/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Batch Radioactive Decay",
-    "href": "https://learncheme.github.io/demos/BatchRadioactiveDecayOfFourIsotopeChain/index.html",
-    "image": "/home_page/media/demos-batchradioactivedecayoffourisotopechain.png",
-    "tooltip": "Batch Radioactive Decay",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/BatchRadioactiveDecayOfFourIsotopeChain/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Batch Reactor Data Analysis",
-    "href": "https://learncheme.github.io/demos/BatchReactorDataAnalysis/index.html",
-    "image": "",
-    "tooltip": "Batch Reactor Data Analysis",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/BatchReactorDataAnalysis/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Batch Reactor with Multiple Reactions",
-    "href": "https://learncheme.github.io/demos/BatchReactorWithMultipleReactions/index.html",
-    "image": "/home_page/media/demos-batchreactorwithmultiplereactions.png",
-    "tooltip": "Batch Reactor with Multiple Reactions",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/BatchReactorWithMultipleReactions/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Benzene-Toluene Txy Diagram",
-    "href": "https://learncheme.github.io/demos/BenzeneTolueneTxyDiagram/index.html",
-    "image": "/home_page/media/demos-benzenetoluenetxydiagram.png",
-    "tooltip": "Benzene-Toluene Txy Diagram",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/BenzeneTolueneTxyDiagram/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Bernoulli's Equation in a Network of Pipes",
-    "href": "https://learncheme.github.io/demos/BernoulliNetworkOfPipes/dist/index.html",
-    "image": "/home_page/media/demos-bernoullinetworkofpipes.png",
-    "tooltip": "Bernoulli's Equation in a Network of Pipes",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/BernoulliNetworkOfPipes/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Boltzmann Distribution",
-    "href": "https://learncheme.github.io/demos/BoltzmannDistribution/index.html",
-    "image": "/home_page/media/demos-boltzmanndistribution.png",
-    "tooltip": "Boltzmann Distribution",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/BoltzmannDistribution/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Boundary Layer Flow",
-    "href": "https://learncheme.github.io/demos/BoundaryLayerBetweenParallelPlates/index.html",
-    "image": "/home_page/media/demos-boundarylayerbetweenparallelplates.png",
-    "tooltip": "Boundary Layer Flow",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/BoundaryLayerBetweenParallelPlates/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Attenuation: Broadband",
-    "href": "https://learncheme.github.io/demos/BroadbandSourceLightAttenuation/index.html",
-    "image": "",
-    "tooltip": "Attenuation: Broadband",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/BroadbandSourceLightAttenuation/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Capillary Action",
-    "href": "https://learncheme.github.io/demos/CapillaryAction/index.html",
-    "image": "",
-    "tooltip": "Capillary Action",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/CapillaryAction/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Carnot Cycle Simulator",
-    "href": "https://learncheme.github.io/demos/CarnotCyclesWithIrreversibleHeatTransfer/index.html",
-    "image": "",
-    "tooltip": "Carnot Cycle Simulator",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/CarnotCyclesWithIrreversibleHeatTransfer/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Chemical Potential Dependence on Temperature and Pressure",
-    "href": "https://learncheme.github.io/demos/ChemicalPotentialDependenceOnTandP/index.html",
-    "image": "",
-    "tooltip": "Chemical Potential Dependence on Temperature and Pressure",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ChemicalPotentialDependenceOnTandP/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Compare Compressors or Turbines with Different Efficiencies",
-    "href": "https://learncheme.github.io/demos/CompareCompressorsorTurbineswithDifferentEfficiencies/dist/index.html",
-    "image": "",
-    "tooltip": "This simulation compares two adiabatic compressors or turbines with different efficiencies.",
-    "description": "This simulation compares two adiabatic compressors or turbines with different efficiencies.",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/CompareCompressorsorTurbineswithDifferentEfficiencies/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Compare Cubic Equations of State",
-    "href": "https://learncheme.github.io/demos/ComparingCubicEquationsOfState/index.html",
-    "image": "",
-    "tooltip": "Compare Cubic Equations of State",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ComparingCubicEquationsOfState/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Compressed-Gas Spray",
-    "href": "https://learncheme.github.io/demos/CompressedGasSpray/dist/index.html",
-    "image": "",
-    "tooltip": "A simulation of a compressed gas spray used to remove dust from electronics.",
-    "description": "A simulation of a compressed gas spray used to remove dust from electronics.",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/CompressedGasSpray/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Contact Angle Measurement",
-    "href": "https://learncheme.github.io/demos/ContactAngleMeasurement/dist/index.html",
-    "image": "",
-    "tooltip": "Contact Angle Measurement",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ContactAngleMeasurement/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Continuous Isotope Production",
-    "href": "https://learncheme.github.io/demos/ContinuousIsotopeProduction/index.html",
-    "image": "",
-    "tooltip": "Continuous Isotope Production",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ContinuousIsotopeProduction/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Continuous Isotope Production with Continuous Removal",
-    "href": "https://learncheme.github.io/demos/ContinuousProductionContinuousRemoval/index.html",
-    "image": "",
-    "tooltip": "Continuous Isotope Production with Continuous Removal",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ContinuousProductionContinuousRemoval/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Continuous Isotope Production with Shutdown",
-    "href": "https://learncheme.github.io/demos/ContinuousProductionWithShutdown/index.html",
-    "image": "",
-    "tooltip": "Continuous Isotope Production with Shutdown",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ContinuousProductionWithShutdown/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Eutectic Cooling Curves",
-    "href": "https://learncheme.github.io/demos/CoolingCurvesEutecticSystem/index.html",
-    "image": "",
-    "tooltip": "Eutectic Cooling Curves",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/CoolingCurvesEutecticSystem/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Diffusion and Reaction in a Catalyst Pellet",
-    "href": "https://learncheme.github.io/demos/DiffusionAndReactionInACatalystPellet/dist/index.html",
-    "image": "",
-    "tooltip": "Diffusion and Reaction in a Catalyst Pellet",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/DiffusionAndReactionInACatalystPellet/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Diffusion-Controlled Drug Delivery",
-    "href": "https://learncheme.github.io/demos/DiffusionControlledDrugDelivery/index.html",
-    "image": "",
-    "tooltip": "Diffusion-Controlled Drug Delivery",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/DiffusionControlledDrugDelivery/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Diffusion in Solids",
-    "href": "https://learncheme.github.io/demos/DiffusionInSolids/index.html",
-    "image": "",
-    "tooltip": "Diffusion in Solids",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/DiffusionInSolids/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "DLP Cure Depth Simulator",
-    "href": "https://learncheme.github.io/demos/DLPCureDepth/index.html",
-    "image": "",
-    "tooltip": "DLP Cure Depth Simulator",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/DLPCureDepth/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Double-Sided Couette Flow",
-    "href": "https://learncheme.github.io/demos/DoubleSidedCouetteFlow/index.html",
-    "image": "",
-    "tooltip": "Double-Sided Couette Flow",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/DoubleSidedCouetteFlow/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Enthalpy and Entropy Departure Functions for Gases",
-    "href": "https://learncheme.github.io/demos/EnthalpyEntropyDepartureFxnsGases/index.html",
-    "image": "",
-    "tooltip": "Enthalpy and Entropy Departure Functions for Gases",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/EnthalpyEntropyDepartureFxnsGases/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Enthalpy-Entropy Diagram for Water",
-    "href": "https://learncheme.github.io/demos/EnthalpyEntropyDiagramForWater/index.html",
-    "image": "",
-    "tooltip": "Enthalpy-Entropy Diagram for Water",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/EnthalpyEntropyDiagramForWater/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Pressure Drop in a Packed Bed Reactor (PBR) Using the Ergun Equation",
-    "href": "https://learncheme.github.io/demos/ErgunEquationPressureDropPBR/index.html",
-    "image": "",
-    "tooltip": "Pressure Drop in a Packed Bed Reactor (PBR) Using the Ergun Equation",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ErgunEquationPressureDropPBR/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Ethanol Production Flowsheet",
-    "href": "https://learncheme.github.io/demos/EthanolProduction/index.html",
-    "image": "",
-    "tooltip": "Ethanol Production Flowsheet",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/EthanolProduction/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Steady-State Binary Fickian Diffusion",
-    "href": "https://learncheme.github.io/demos/SteadyStateBinaryFickianDiffusion/index.html",
-    "image": "",
-    "tooltip": "Steady-State Binary Fickian Diffusion",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/SteadyStateBinaryFickianDiffusion/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Nuclear Fusion Reaction Simulation",
-    "href": "https://learncheme.github.io/demos/NuclearFusionKinetics/index.html",
-    "image": "/home_page/media/under-review-nuclear-fusion-simulation.png",
-    "tooltip": "Nuclear Fusion Reaction Simulation",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/NuclearFissionKinetics/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Binary Mixture Evaporation",
-    "href": "https://learncheme.github.io/demos/EvaporationOfBinaryLiqLiqMixtureOnStove/index.html",
-    "image": "",
-    "tooltip": "Binary Mixture Evaporation",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/EvaporationOfBinaryLiqLiqMixtureOnStove/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Feed Stages in a Distillation Column",
-    "href": "https://learncheme.github.io/demos/Feed%20Stages%20in%20a%20Distillation%20Column/dist/index.html",
-    "image": "",
-    "tooltip": "Simulation description here.",
-    "description": "Simulation description here.",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/Feed%20Stages%20in%20a%20Distillation%20Column/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Flow Between Three Tanks",
-    "href": "https://learncheme.github.io/demos/FlowBetweenThreeTanks/dist/index.html",
-    "image": "",
-    "tooltip": "Flow Between Three Tanks",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/FlowBetweenThreeTanks/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Force Balances on a Truss",
-    "href": "https://learncheme.github.io/demos/ForceBalancesOnATruss/index.html",
-    "image": "",
-    "tooltip": "Force Balances on a Truss",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ForceBalancesOnATruss/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Fugacities in a Can of Soda",
-    "href": "https://learncheme.github.io/demos/FugacitiesInSodaCan/index.html",
-    "image": "",
-    "tooltip": "Fugacities in a Can of Soda",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/FugacitiesInSodaCan/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Fugacity Dependence on Pressure in an Ideal Binary Mixture",
-    "href": "https://learncheme.github.io/demos/FugacityDependenceonPressureinanIdealBinaryMixture/dist/index.html",
-    "image": "",
-    "tooltip": "Plots fugacity of a hypothetical single component as a function of temperature or pressure.",
-    "description": "Plots fugacity of a hypothetical single component as a function of temperature or pressure.",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/FugacityDependenceonPressureinanIdealBinaryMixture/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Fugacity Dependence on Temperature in an Ideal Binary Mixture",
-    "href": "https://learncheme.github.io/demos/FugacityDependenceonTemperatureinanIdealBinaryMixture/dist/index.html",
-    "image": "",
-    "tooltip": "Plots fugacity of a hypothetical single component as a function of temperature or pressure.",
-    "description": "Plots fugacity of a hypothetical single component as a function of temperature or pressure.",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/FugacityDependenceonTemperatureinanIdealBinaryMixture/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Fugacity as a Driving Force for Mass Transfer",
-    "href": "https://learncheme.github.io/demos/FugacityDrivingMassTransfer/index.html",
-    "image": "",
-    "tooltip": "Fugacity as a Driving Force for Mass Transfer",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/FugacityDrivingMassTransfer/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Fugacity from Equation of State for Water",
-    "href": "https://learncheme.github.io/demos/FugacityFromEOSForWater/index.html",
-    "image": "",
-    "tooltip": "Fugacity from Equation of State for Water",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/FugacityFromEOSForWater/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Gibbs Phase Rule",
-    "href": "https://learncheme.github.io/demos/GibbsPhaseRule/index.html",
-    "image": "",
-    "tooltip": "Gibbs Phase Rule",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/GibbsPhaseRule/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Heat Exchanger Virtual Lab",
-    "href": "https://learncheme.github.io/demos/HeatExchangerVirtualLabVer/index.html",
-    "image": "",
-    "tooltip": "Heat Exchanger Virtual Lab",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/HeatExchangerVirtualLabVer/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Heating Water and Air in a Sealed Container",
-    "href": "https://learncheme.github.io/demos/HeatingWaterAndAirInASealedContainer/index.html",
-    "image": "",
-    "tooltip": "Heating Water and Air in a Sealed Container",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/HeatingWaterAndAirInASealedContainer/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Plug Flow Reactor with Heat Transfer Jacket",
-    "href": "https://learncheme.github.io/demos/HeatJacketedPFR/index.html",
-    "image": "",
-    "tooltip": "Plug Flow Reactor with Heat Transfer Jacket",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/HeatJacketedPFR/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Heat Transfer through a Cylinder",
-    "href": "https://learncheme.github.io/demos/HeatTransferThroughACylinder/index.html",
-    "image": "",
-    "tooltip": "Heat Transfer through a Cylinder",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/HeatTransferThroughACylinder/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Heat Exchanger Virtual Lab",
-    "href": "https://learncheme.github.io/demos/HEXLab/index.html",
-    "image": "",
-    "tooltip": "Heat Exchanger Virtual Lab",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/HEXLab/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "High-Pressure Chemical Equilibrium",
-    "href": "https://learncheme.github.io/demos/HighPressureChemicalEquilibrium/index.html",
-    "image": "",
-    "tooltip": "High-Pressure Chemical Equilibrium",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/HighPressureChemicalEquilibrium/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Identify Chemical Potential Plots",
-    "href": "https://learncheme.github.io/demos/IdentifyChemicalPotentialPlots/index.html",
-    "image": "",
-    "tooltip": "Identify Chemical Potential Plots",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/IdentifyChemicalPotentialPlots/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Reversible and Irreversible Expansion and Compression Processes",
-    "href": "https://learncheme.github.io/demos/IdentifyReversibleAndIrreversibleExpansionAndCompression/index.html",
-    "image": "",
-    "tooltip": "Reversible and Irreversible Expansion and Compression Processes",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/IdentifyReversibleAndIrreversibleExpansionAndCompression/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Impinging Jet",
-    "href": "https://learncheme.github.io/demos/ImpingingJet/index.html",
-    "image": "",
-    "tooltip": "Impinging Jet",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ImpingingJet/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Inhibition of Enzyme Reactions in a CSTR and a Batch Reactor",
-    "href": "https://learncheme.github.io/demos/InhibitionOfEnzymeRxnsInCSTRandBatch/index.html",
-    "image": "",
-    "tooltip": "Inhibition of Enzyme Reactions in a CSTR and a Batch Reactor",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/InhibitionOfEnzymeRxnsInCSTRandBatch/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Irreversible and Reversible Temperature Equilibration",
-    "href": "https://learncheme.github.io/demos/IrreversibleReversibleTemperatureEq/index.html",
-    "image": "",
-    "tooltip": "Irreversible and Reversible Temperature Equilibration",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/IrreversibleReversibleTemperatureEq/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Isothermal Plug Flow Reactor with Recycle",
-    "href": "https://learncheme.github.io/demos/IsothermalPlugFlowReactorWithRecycle/dist/index.html",
-    "image": "",
-    "tooltip": "Isothermal Plug Flow Reactor with Recycle",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/IsothermalPlugFlowReactorWithRecycle/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Jablonski Diagram",
-    "href": "https://learncheme.github.io/demos/JablonskiDiagram/index.html",
-    "image": "",
-    "tooltip": "An interactive Jablonski diagram showing photophysical processes and quantum yield.",
-    "description": "An interactive Jablonski diagram showing photophysical processes and quantum yield.",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/JablonskiDiagram/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Langmuir\u2013Hinshelwood Reaction",
-    "href": "https://learncheme.github.io/demos/LangmuirHinshelwoodReaction/dist/index.html",
-    "image": "",
-    "tooltip": "Langmuir\u2013Hinshelwood Reaction",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/LangmuirHinshelwoodReaction/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Langmuir Isotherms",
-    "href": "https://learncheme.github.io/demos/LangmuirIsotherms/index.html",
-    "image": "",
-    "tooltip": "Langmuir Isotherms",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/LangmuirIsotherms/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Interactive Levenspiel Plot",
-    "href": "https://learncheme.github.io/demos/LevenspielPlots/index.html",
-    "image": "",
-    "tooltip": "Interactive Levenspiel Plot",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/LevenspielPlots/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Lever Rule for the Uranium-Titanium Solid-Liquid Phase Diagram",
-    "href": "https://learncheme.github.io/demos/LeverRuleUraniumTitaniumPhaseDiagram/index.html",
-    "image": "",
-    "tooltip": "An interactive simulation demonstrating the lever rule for the uranium-titanium solid-liquid phase diagram.",
-    "description": "An interactive simulation demonstrating the lever rule for the uranium-titanium solid-liquid phase diagram.",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/LeverRuleUraniumTitaniumPhaseDiagram/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Attenuation: Multiple Wavelengths",
-    "href": "https://learncheme.github.io/demos/LightAttenuation-MultipleWavelength/index.html",
-    "image": "",
-    "tooltip": "Attenuation: Multiple Wavelengths",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/LightAttenuation-MultipleWavelength/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Attenuation Simulation",
-    "href": "https://learncheme.github.io/demos/LightAttenuation-SingleAbsorber/index.html",
-    "image": "",
-    "tooltip": "Attenuation Simulation",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/LightAttenuation-SingleAbsorber/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Mass Balances in Absorption and Stripping Units",
-    "href": "https://learncheme.github.io/demos/MassBalancesInAbsorptionAndStrippingUnits/index.html",
-    "image": "",
-    "tooltip": "Mass Balances in Absorption and Stripping Units",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/MassBalancesInAbsorptionAndStrippingUnits/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Measuring Flow Rates with a Pitot Tube",
-    "href": "https://learncheme.github.io/demos/MeasuringFlowRatesWithAPitotTube/index.html",
-    "image": "",
-    "tooltip": "Measuring Flow Rates with a Pitot Tube",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/MeasuringFlowRatesWithAPitotTube/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Material and Energy Balances in a Reactor with Heat Exchange",
-    "href": "https://learncheme.github.io/demos/MEB_ReactorWithHeatExchange/src/html/index.html",
-    "image": "",
-    "tooltip": "Material and Energy Balances in a Reactor with Heat Exchange",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/MEB_ReactorWithHeatExchange/src/html/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Melting Ice Simulation (MIS)",
-    "href": "https://learncheme.github.io/demos/MeltingIce/MIindex.html",
-    "image": "",
-    "tooltip": "Melting Ice Simulation (MIS)",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/MeltingIce/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Membrane Concentration Profile",
-    "href": "https://learncheme.github.io/demos/MembraneConcentrationProfile/index.html",
-    "image": "",
-    "tooltip": "Membrane Concentration Profile",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/MembraneConcentrationProfile/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Membrane Reactor for an Equilibrium-Limited Reaction",
-    "href": "https://learncheme.github.io/demos/MembraneReactorForAnEqmLimitedRxn/index.html",
-    "image": "",
-    "tooltip": "Membrane Reactor for an Equilibrium-Limited Reaction",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/MembraneReactorForAnEqmLimitedRxn/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Interactive Fanning Moody Diagram",
-    "href": "https://learncheme.github.io/demos/MoodyDiagram/index.html",
-    "image": "",
-    "tooltip": "Interactive Fanning Moody Diagram",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/MoodyDiagram/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Multiple Steady States in a CSTR with Heat Exchange",
-    "href": "https://learncheme.github.io/demos/multiple-steady-states-in-a-cstr-with-hex/index.html",
-    "image": "",
-    "tooltip": "Multiple Steady States in a CSTR with Heat Exchange",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/multiple-steady-states-in-a-cstr-with-hex/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Multiple States in an Isothermal Continuous Stirred-Tank Reactor",
-    "href": "https://learncheme.github.io/demos/MultipleSteadyStatesInAnIsothermalCSTR/index.html",
-    "image": "",
-    "tooltip": "Multiple States in an Isothermal Continuous Stirred-Tank Reactor",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/MultipleSteadyStatesInAnIsothermalCSTR/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Multistage Batch Distillation with Azeotrope",
-    "href": "https://learncheme.github.io/demos/MultiStageBatchDistillationWithAzeotrope/index.html",
-    "image": "",
-    "tooltip": "Multistage Batch Distillation with Azeotrope",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/MultiStageBatchDistillationWithAzeotrope/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Multiple States in CSTR Polymerization",
-    "href": "https://learncheme.github.io/demos/MultiSteadyStateCSTRPolymerization/index.html",
-    "image": "",
-    "tooltip": "Multiple States in CSTR Polymerization",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/MultiSteadyStateCSTRPolymerization/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Non-Ideal Vapor-Liquid Equilibrium (VLE) Modeled by the Margules Equation",
-    "href": "https://learncheme.github.io/demos/NonIdealVLEMargulesEquation/index.html",
-    "image": "",
-    "tooltip": "Non-Ideal Vapor-Liquid Equilibrium (VLE) Modeled by the Margules Equation",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/NonIdealVLEMargulesEquation/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Nuclear Fission Chain-Reaction Kinetics",
-    "href": "https://learncheme.github.io/demos/NuclearFissionKinetics/index.html",
-    "image": "",
-    "tooltip": "Nuclear Fission Chain-Reaction Kinetics",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/NuclearFissionKinetics/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Nuclear Fission Chain-Reaction Kinetics",
-    "href": "https://learncheme.github.io/demos/NuclearFusionKinetics/index.html",
-    "image": "",
-    "tooltip": "Nuclear Fission Chain-Reaction Kinetics",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/NuclearFusionKinetics/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Operating a Chemostat (CSTR Bioreactor)",
-    "href": "https://learncheme.github.io/demos/OperatingAChemostat/dist/index.html",
-    "image": "",
-    "tooltip": "A simulation of a chemostat (CSTR bioreactor) showing cell growth, substrate concentration, and production rate versus dilution rate.",
-    "description": "A simulation of a chemostat (CSTR bioreactor) showing cell growth, substrate concentration, and production rate versus dilution rate.",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/OperatingAChemostat/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Osmotic Pressure",
-    "href": "https://learncheme.github.io/demos/OsmoticPressure/index.html",
-    "image": "",
-    "tooltip": "Osmotic Pressure",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/OsmoticPressure/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Fluidization of a Packed Bed",
-    "href": "https://learncheme.github.io/demos/PackedBedFluidization/index.html",
-    "image": "",
-    "tooltip": "Fluidization of a Packed Bed",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/PackedBedFluidization/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Heat Loss from a Cylindrical Reactor",
-    "href": "https://learncheme.github.io/demos/ParallelHeatTransferInACylindricalReactor/index.html",
-    "image": "",
-    "tooltip": "Heat Loss from a Cylindrical Reactor",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ParallelHeatTransferInACylindricalReactor/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Heat Transfer in a Reactor",
-    "href": "https://learncheme.github.io/demos/ParallelHeatTransferStlite/dist/index.html",
-    "image": "",
-    "tooltip": "Heat Transfer in a Reactor",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ParallelHeatTransferStlite/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Parametric Sensitivity of Plug Flow Reactor With Heat Exchange",
-    "href": "https://learncheme.github.io/demos/ParametricSensitivityOfPFRWithHeatExchange/index.html",
-    "image": "",
-    "tooltip": "Parametric Sensitivity of Plug Flow Reactor With Heat Exchange",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ParametricSensitivityOfPFRWithHeatExchange/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Partial Miscibility Binary Liquid",
-    "href": "https://learncheme.github.io/demos/PartialMiscibilityBinaryLiquid/index.html",
-    "image": "",
-    "tooltip": "Partial Miscibility Binary Liquid",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/PartialMiscibilityBinaryLiquid/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Peng-Robinson Equation of State for Mixtures",
-    "href": "https://learncheme.github.io/demos/PengRobinsonEOS/index.html",
-    "image": "",
-    "tooltip": "Peng-Robinson Equation of State for Mixtures",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/PengRobinsonEOS/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "PFR Kinetics: NO2 + CO",
-    "href": "https://learncheme.github.io/demos/PFRKinetics/index.html",
-    "image": "",
-    "tooltip": "PFR Kinetics: NO2 + CO",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/PFRKinetics/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Phase Behavior on a Pressure-Volume Diagram",
-    "href": "https://learncheme.github.io/demos/PhaseBehaviorOnPVDiagram/index.html",
-    "image": "",
-    "tooltip": "Phase Behavior on a Pressure-Volume Diagram",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/PhaseBehaviorOnPVDiagram/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Polymerization in a Batch Reactor",
-    "href": "https://learncheme.github.io/demos/PolymerizationInBatchRxr/index.html",
-    "image": "",
-    "tooltip": "Polymerization in a Batch Reactor",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/PolymerizationInBatchRxr/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Polymer MWD in Batch, PFR and CSTR",
-    "href": "https://learncheme.github.io/demos/PolymerizationReactorMWDs/index.html",
-    "image": "",
-    "tooltip": "Polymer MWD in Batch, PFR and CSTR",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/PolymerizationReactorMWDs/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Polymer Molecular Weights",
-    "href": "https://learncheme.github.io/demos/PolymerMolecularWeightDistributions/index.html",
-    "image": "",
-    "tooltip": "Explore polymer molecular weight distributions and their averages.",
-    "description": "Explore polymer molecular weight distributions and their averages.",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/PolymerMolecularWeightDistributions/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Interactive Psychrometric Chart & Air-Water System Simulator",
-    "href": "https://learncheme.github.io/demos/PsychrometricChartAnalyzer/index.html",
-    "image": "",
-    "tooltip": "Interactive Psychrometric Chart & Air-Water System Simulator",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/PsychrometricChartAnalyzer/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Pressure-Temperature Diagram for a Binary Mixture",
-    "href": "https://learncheme.github.io/demos/PTDiagramForBinaryMixture/index.html",
-    "image": "",
-    "tooltip": "Pressure-Temperature Diagram for a Binary Mixture",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/PTDiagramForBinaryMixture/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Enthalpy of Reaction as a State Function",
-    "href": "https://learncheme.github.io/demos/ReactionStateFunction/dist/index.html",
-    "image": "",
-    "tooltip": "An interactive simulation designed to teach engineering students about state functions and how to calculate heat of reaction.",
-    "description": "An interactive simulation designed to teach engineering students about state functions and how to calculate heat of reaction.",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ReactionStateFunction/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Reactor Design Economics",
-    "href": "https://learncheme.github.io/demos/ReactorDesignEconomics/index.html",
-    "image": "",
-    "tooltip": "Reactor Design Economics",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ReactorDesignEconomics/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Refrigeration Cycle Coefficient of Performance",
-    "href": "https://learncheme.github.io/demos/RefrigerationCycleCOP/index.html",
-    "image": "",
-    "tooltip": "Refrigeration Cycle Coefficient of Performance",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/RefrigerationCycleCOP/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Retrograde Condensation",
-    "href": "https://learncheme.github.io/demos/RetrogradeCondensationOfBinaryMixture/index.html",
-    "image": "",
-    "tooltip": "Retrograde Condensation",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/RetrogradeCondensationOfBinaryMixture/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Reverse Osmosis",
-    "href": "https://learncheme.github.io/demos/ReverseOsmosis/index.html",
-    "image": "",
-    "tooltip": "Reverse Osmosis",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ReverseOsmosis/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Reversible Expansion and Compression Work",
-    "href": "https://learncheme.github.io/demos/ReversibleAdiabaticExpansionCompressionWork/dist/index.html",
-    "image": "",
-    "tooltip": "An interactive simulation designed to teach engineering students about reversible and irreversible expansion and compression work.",
-    "description": "An interactive simulation designed to teach engineering students about reversible and irreversible expansion and compression work.",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ReversibleAdiabaticExpansionCompressionWork/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Reynolds Number Explorer",
-    "href": "https://learncheme.github.io/demos/ReynoldsNumber/index.html",
-    "image": "",
-    "tooltip": "Reynolds Number Explorer",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ReynoldsNumber/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Reaction in an Adiabatic Continuous Stirred-Tank Reactor",
-    "href": "https://learncheme.github.io/demos/RxnInAnAdiabaticCSTR/index.html",
-    "image": "",
-    "tooltip": "Reaction in an Adiabatic Continuous Stirred-Tank Reactor",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/RxnInAnAdiabaticCSTR/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Reaction in an Isothermal Continuous Stirred-Tank Reactor (CSTR)",
-    "href": "https://learncheme.github.io/demos/RxnInIsothermalCSTR/index.html",
-    "image": "",
-    "tooltip": "Reaction in an Isothermal Continuous Stirred-Tank Reactor (CSTR)",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/RxnInIsothermalCSTR/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Reactor Rate and Conversion versus Space Velocity",
-    "href": "https://learncheme.github.io/demos/RxrRateAndConversionVsSpaceVelocity/index.html",
-    "image": "",
-    "tooltip": "Reactor Rate and Conversion versus Space Velocity",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/RxrRateAndConversionVsSpaceVelocity/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Scale Up of a Batch Reactor",
-    "href": "https://learncheme.github.io/demos/ScaleUpOfABatchReactor/dist/index.html",
-    "image": "",
-    "tooltip": "Scale Up of a Batch Reactor",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ScaleUpOfABatchReactor/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Single-Component Fugacity",
-    "href": "https://learncheme.github.io/demos/SingleComponentFugacity/dist/index.html",
-    "image": "",
-    "tooltip": "Plots fugacity of a hypothetical single component as a function of temperature or pressure.",
-    "description": "Plots fugacity of a hypothetical single component as a function of temperature or pressure.",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/SingleComponentFugacity/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Solid-Solid-Liquid Equilibrium",
-    "href": "https://learncheme.github.io/demos/SolidSolidEquilibrium/index.html",
-    "image": "",
-    "tooltip": "Solid-Solid-Liquid Equilibrium",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/SolidSolidEquilibrium/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Solvent Extraction - LearnChemE",
-    "href": "https://learncheme.github.io/demos/SolventExtraction/index.html",
-    "image": "",
-    "tooltip": "Solvent Extraction - LearnChemE",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/SolventExtraction/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Steady State Flow from a Tank",
-    "href": "https://learncheme.github.io/demos/SteadyStateFlowFromATank/SteadyStateFlow/index.html",
-    "image": "",
-    "tooltip": "Steady State Flow from a Tank",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/SteadyStateFlowFromATank/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Steam Table Calculator",
-    "href": "https://learncheme.github.io/demos/SteamTable/index.html",
-    "image": "",
-    "tooltip": "Steam Table Calculator",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/SteamTable/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Temperature-Programmed Desorption",
-    "href": "https://learncheme.github.io/demos/TemperatureProgrammedDesorption/index.html",
-    "image": "",
-    "tooltip": "Temperature-Programmed Desorption",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/TemperatureProgrammedDesorption/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Three Intermolecular Potential Models",
-    "href": "https://learncheme.github.io/demos/ThreeIntermolecularPotentialModels/index.html",
-    "image": "",
-    "tooltip": "Three Intermolecular Potential Models",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ThreeIntermolecularPotentialModels/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Throttling High-Pressure Water",
-    "href": "https://learncheme.github.io/demos/ThrottlingHighPressureLiquidWater/dist/index.html",
-    "image": "",
-    "tooltip": "A simulation of throttling (flash) of high-pressure liquid water through a valve.",
-    "description": "A simulation of throttling (flash) of high-pressure liquid water through a valve.",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ThrottlingHighPressureLiquidWater/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Uranium Isotope Decay",
-    "href": "https://learncheme.github.io/demos/UraniumIsotopeDecay/index.html",
-    "image": "",
-    "tooltip": "Uranium Isotope Decay",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/UraniumIsotopeDecay/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Vapor Pressure of Binary Solutions",
-    "href": "https://learncheme.github.io/demos/VaporPressureofBinarySolutions/dist/index.html",
-    "image": "",
-    "tooltip": "Vapor Pressure of Binary Solutions",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/VaporPressureofBinarySolutions/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Vectors Demonstration",
-    "href": "https://learncheme.github.io/demos/vectors/app.html",
-    "image": "",
-    "tooltip": "Vectors Demonstration",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/vectors/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Visualization of Velocity Profiles",
-    "href": "https://learncheme.github.io/demos/VisualizationOfVelocityProfiles/dist/index.html",
-    "image": "",
-    "tooltip": "Visualization of Velocity Profiles",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/VisualizationOfVelocityProfiles/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Water-Air Mixture",
-    "href": "https://learncheme.github.io/demos/WaterAirVLE/index.html",
-    "image": "",
-    "tooltip": "Water-Air Mixture",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/WaterAirVLE/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Water Contact Angle for Heterogeneous Surface",
-    "href": "https://learncheme.github.io/demos/WaterContactAngleForHeterogeneousSurface/index.html",
-    "image": "",
-    "tooltip": "Water Contact Angle for Heterogeneous Surface",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/WaterContactAngleForHeterogeneousSurface/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "When to Open a Parachute",
-    "href": "https://learncheme.github.io/demos/WhenToOpenAParachute/dist/index.html",
-    "image": "",
-    "tooltip": "When to Open a Parachute",
-    "description": "",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/WhenToOpenAParachute/",
-    "simulation_type": "in-browser"
+    "title":"2D Heat Distribution Simulator",
+    "href":"https://learncheme.github.io/demos/2DHeatDistributionSimulator/index.html",
+    "image":"/home_page/media/demos-2dheatdistributionsimulator.png",
+    "tooltip":"2D Heat Distribution Simulator",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/2DHeatDistributionSimulator/",
+    "simulation_type":"in-browser",
+    "directory":"demos/2DHeatDistributionSimulator",
+    "index":"demos/2DHeatDistributionSimulator/index.html"
+  },
+  {
+    "title":"Adiabatic Compression of Water in Vapor-Liquid Equilibrium (VLE)",
+    "href":"https://learncheme.github.io/demos/AdiabaticCompressionOfWaterInVLE/index.html",
+    "image":"/home_page/media/demos-adiabaticcompressionofwaterinvle.png",
+    "tooltip":"Adiabatic Compression of Water in Vapor-Liquid Equilibrium (VLE)",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/AdiabaticCompressionOfWaterInVLE/",
+    "simulation_type":"in-browser",
+    "directory":"demos/AdiabaticCompressionOfWaterInVLE",
+    "index":"demos/AdiabaticCompressionOfWaterInVLE/index.html"
+  },
+  {
+    "title":"Adiabatic Plug Flow Reactor with Recycle",
+    "href":"https://learncheme.github.io/demos/AdiabaticPFRwithRecycle/index.html",
+    "image":"/home_page/media/demos-adiabaticpfrwithrecycle.png",
+    "tooltip":"Adiabatic Plug Flow Reactor with Recycle",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/AdiabaticPFRwithRecycle/",
+    "simulation_type":"in-browser",
+    "directory":"demos/AdiabaticPFRwithRecycle",
+    "index":"demos/AdiabaticPFRwithRecycle/index.html"
+  },
+  {
+    "title":"Arranging Balls into Boxes",
+    "href":"https://learncheme.github.io/demos/ArrangingBallsIntoBoxes/index.html",
+    "image":"/home_page/media/demos-arrangingballsintoboxes.png",
+    "tooltip":"Arranging Balls into Boxes",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ArrangingBallsIntoBoxes/",
+    "simulation_type":"in-browser",
+    "directory":"demos/ArrangingBallsIntoBoxes",
+    "index":"demos/ArrangingBallsIntoBoxes/index.html"
+  },
+  {
+    "title":"Autothermal Reactor",
+    "href":"https://learncheme.github.io/demos/AutothermalRxr/index.html",
+    "image":"/home_page/media/demos-autothermalrxr.png",
+    "tooltip":"Autothermal Reactor",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/AutothermalRxr/",
+    "simulation_type":"in-browser",
+    "directory":"demos/AutothermalRxr",
+    "index":"demos/AutothermalRxr/index.html"
+  },
+  {
+    "title":"Batch Polymerization Runaway",
+    "href":"https://learncheme.github.io/demos/BatchPolymerizationThermalRunaway/index.html",
+    "image":"/home_page/media/demos-batchpolymerizationthermalrunaway.png",
+    "tooltip":"Batch Polymerization Runaway",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/BatchPolymerizationThermalRunaway/",
+    "simulation_type":"in-browser",
+    "directory":"demos/BatchPolymerizationThermalRunaway",
+    "index":"demos/BatchPolymerizationThermalRunaway/index.html"
+  },
+  {
+    "title":"Batch Radioactive Decay",
+    "href":"https://learncheme.github.io/demos/BatchRadioactiveDecayOfFourIsotopeChain/index.html",
+    "image":"/home_page/media/demos-batchradioactivedecayoffourisotopechain.png",
+    "tooltip":"Batch Radioactive Decay",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/BatchRadioactiveDecayOfFourIsotopeChain/",
+    "simulation_type":"in-browser",
+    "directory":"demos/BatchRadioactiveDecayOfFourIsotopeChain",
+    "index":"demos/BatchRadioactiveDecayOfFourIsotopeChain/index.html"
+  },
+  {
+    "title":"Batch Reactor Data Analysis",
+    "href":"https://learncheme.github.io/demos/BatchReactorDataAnalysis/index.html",
+    "image":"",
+    "tooltip":"Batch Reactor Data Analysis",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/BatchReactorDataAnalysis/",
+    "simulation_type":"in-browser",
+    "directory":"demos/BatchReactorDataAnalysis",
+    "index":"demos/BatchReactorDataAnalysis/index.html"
+  },
+  {
+    "title":"Batch Reactor with Multiple Reactions",
+    "href":"https://learncheme.github.io/demos/BatchReactorWithMultipleReactions/index.html",
+    "image":"/home_page/media/demos-batchreactorwithmultiplereactions.png",
+    "tooltip":"Batch Reactor with Multiple Reactions",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/BatchReactorWithMultipleReactions/",
+    "simulation_type":"in-browser",
+    "directory":"demos/BatchReactorWithMultipleReactions",
+    "index":"demos/BatchReactorWithMultipleReactions/index.html"
+  },
+  {
+    "title":"Benzene-Toluene Txy Diagram",
+    "href":"https://learncheme.github.io/demos/BenzeneTolueneTxyDiagram/index.html",
+    "image":"/home_page/media/demos-benzenetoluenetxydiagram.png",
+    "tooltip":"Benzene-Toluene Txy Diagram",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/BenzeneTolueneTxyDiagram/",
+    "simulation_type":"in-browser",
+    "directory":"demos/BenzeneTolueneTxyDiagram",
+    "index":"demos/BenzeneTolueneTxyDiagram/index.html"
+  },
+  {
+    "title":"Bernoulli's Equation in a Network of Pipes",
+    "href":"https://learncheme.github.io/demos/BernoulliNetworkOfPipes/dist/index.html",
+    "image":"/home_page/media/demos-bernoullinetworkofpipes.png",
+    "tooltip":"Bernoulli's Equation in a Network of Pipes",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/BernoulliNetworkOfPipes/",
+    "simulation_type":"in-browser",
+    "directory":"demos/BernoulliNetworkOfPipes",
+    "index":"demos/BernoulliNetworkOfPipes/dist/index.html"
+  },
+  {
+    "title":"Boltzmann Distribution",
+    "href":"https://learncheme.github.io/demos/BoltzmannDistribution/index.html",
+    "image":"/home_page/media/demos-boltzmanndistribution.png",
+    "tooltip":"Boltzmann Distribution",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/BoltzmannDistribution/",
+    "simulation_type":"in-browser",
+    "directory":"demos/BoltzmannDistribution",
+    "index":"demos/BoltzmannDistribution/index.html"
+  },
+  {
+    "title":"Boundary Layer Flow",
+    "href":"https://learncheme.github.io/demos/BoundaryLayerBetweenParallelPlates/index.html",
+    "image":"/home_page/media/demos-boundarylayerbetweenparallelplates.png",
+    "tooltip":"Boundary Layer Flow",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/BoundaryLayerBetweenParallelPlates/",
+    "simulation_type":"in-browser",
+    "directory":"demos/BoundaryLayerBetweenParallelPlates",
+    "index":"demos/BoundaryLayerBetweenParallelPlates/index.html"
+  },
+  {
+    "title":"Attenuation: Broadband",
+    "href":"https://learncheme.github.io/demos/BroadbandSourceLightAttenuation/index.html",
+    "image":"",
+    "tooltip":"Attenuation: Broadband",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/BroadbandSourceLightAttenuation/",
+    "simulation_type":"in-browser",
+    "directory":"demos/BroadbandSourceLightAttenuation",
+    "index":"demos/BroadbandSourceLightAttenuation/index.html"
+  },
+  {
+    "title":"Capillary Action",
+    "href":"https://learncheme.github.io/demos/CapillaryAction/index.html",
+    "image":"",
+    "tooltip":"Capillary Action",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/CapillaryAction/",
+    "simulation_type":"in-browser",
+    "directory":"demos/CapillaryAction",
+    "index":"demos/CapillaryAction/index.html"
+  },
+  {
+    "title":"Carnot Cycle Simulator",
+    "href":"https://learncheme.github.io/demos/CarnotCyclesWithIrreversibleHeatTransfer/index.html",
+    "image":"",
+    "tooltip":"Carnot Cycle Simulator",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/CarnotCyclesWithIrreversibleHeatTransfer/",
+    "simulation_type":"in-browser",
+    "directory":"demos/CarnotCyclesWithIrreversibleHeatTransfer",
+    "index":"demos/CarnotCyclesWithIrreversibleHeatTransfer/index.html"
+  },
+  {
+    "title":"Chemical Potential Dependence on Temperature and Pressure",
+    "href":"https://learncheme.github.io/demos/ChemicalPotentialDependenceOnTandP/index.html",
+    "image":"",
+    "tooltip":"Chemical Potential Dependence on Temperature and Pressure",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ChemicalPotentialDependenceOnTandP/",
+    "simulation_type":"in-browser",
+    "directory":"demos/ChemicalPotentialDependenceOnTandP",
+    "index":"demos/ChemicalPotentialDependenceOnTandP/index.html"
+  },
+  {
+    "title":"Compare Compressors or Turbines with Different Efficiencies",
+    "href":"https://learncheme.github.io/demos/CompareCompressorsorTurbineswithDifferentEfficiencies/dist/index.html",
+    "image":"",
+    "tooltip":"This simulation compares two adiabatic compressors or turbines with different efficiencies.",
+    "description":"This simulation compares two adiabatic compressors or turbines with different efficiencies.",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/CompareCompressorsorTurbineswithDifferentEfficiencies/",
+    "simulation_type":"in-browser",
+    "directory":"demos/CompareCompressorsorTurbineswithDifferentEfficiencies",
+    "index":"demos/CompareCompressorsorTurbineswithDifferentEfficiencies/dist/index.html"
+  },
+  {
+    "title":"Compare Cubic Equations of State",
+    "href":"https://learncheme.github.io/demos/ComparingCubicEquationsOfState/index.html",
+    "image":"",
+    "tooltip":"Compare Cubic Equations of State",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ComparingCubicEquationsOfState/",
+    "simulation_type":"in-browser",
+    "directory":"demos/ComparingCubicEquationsOfState",
+    "index":"demos/ComparingCubicEquationsOfState/index.html"
+  },
+  {
+    "title":"Compressed-Gas Spray",
+    "href":"https://learncheme.github.io/demos/CompressedGasSpray/dist/index.html",
+    "image":"",
+    "tooltip":"A simulation of a compressed gas spray used to remove dust from electronics.",
+    "description":"A simulation of a compressed gas spray used to remove dust from electronics.",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/CompressedGasSpray/",
+    "simulation_type":"in-browser",
+    "directory":"demos/CompressedGasSpray",
+    "index":"demos/CompressedGasSpray/dist/index.html"
+  },
+  {
+    "title":"Contact Angle Measurement",
+    "href":"https://learncheme.github.io/demos/ContactAngleMeasurement/dist/index.html",
+    "image":"",
+    "tooltip":"Contact Angle Measurement",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ContactAngleMeasurement/",
+    "simulation_type":"in-browser",
+    "directory":"demos/ContactAngleMeasurement",
+    "index":"demos/ContactAngleMeasurement/dist/index.html"
+  },
+  {
+    "title":"Continuous Isotope Production",
+    "href":"https://learncheme.github.io/demos/ContinuousIsotopeProduction/index.html",
+    "image":"",
+    "tooltip":"Continuous Isotope Production",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ContinuousIsotopeProduction/",
+    "simulation_type":"in-browser",
+    "directory":"demos/ContinuousIsotopeProduction",
+    "index":"demos/ContinuousIsotopeProduction/index.html"
+  },
+  {
+    "title":"Continuous Isotope Production with Continuous Removal",
+    "href":"https://learncheme.github.io/demos/ContinuousProductionContinuousRemoval/index.html",
+    "image":"",
+    "tooltip":"Continuous Isotope Production with Continuous Removal",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ContinuousProductionContinuousRemoval/",
+    "simulation_type":"in-browser",
+    "directory":"demos/ContinuousProductionContinuousRemoval",
+    "index":"demos/ContinuousProductionContinuousRemoval/index.html"
+  },
+  {
+    "title":"Continuous Isotope Production with Shutdown",
+    "href":"https://learncheme.github.io/demos/ContinuousProductionWithShutdown/index.html",
+    "image":"",
+    "tooltip":"Continuous Isotope Production with Shutdown",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ContinuousProductionWithShutdown/",
+    "simulation_type":"in-browser",
+    "directory":"demos/ContinuousProductionWithShutdown",
+    "index":"demos/ContinuousProductionWithShutdown/index.html"
+  },
+  {
+    "title":"Eutectic Cooling Curves",
+    "href":"https://learncheme.github.io/demos/CoolingCurvesEutecticSystem/index.html",
+    "image":"",
+    "tooltip":"Eutectic Cooling Curves",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/CoolingCurvesEutecticSystem/",
+    "simulation_type":"in-browser",
+    "directory":"demos/CoolingCurvesEutecticSystem",
+    "index":"demos/CoolingCurvesEutecticSystem/index.html"
+  },
+  {
+    "title":"Diffusion and Reaction in a Catalyst Pellet",
+    "href":"https://learncheme.github.io/demos/DiffusionAndReactionInACatalystPellet/dist/index.html",
+    "image":"",
+    "tooltip":"Diffusion and Reaction in a Catalyst Pellet",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/DiffusionAndReactionInACatalystPellet/",
+    "simulation_type":"in-browser",
+    "directory":"demos/DiffusionAndReactionInACatalystPellet",
+    "index":"demos/DiffusionAndReactionInACatalystPellet/dist/index.html"
+  },
+  {
+    "title":"Diffusion-Controlled Drug Delivery",
+    "href":"https://learncheme.github.io/demos/DiffusionControlledDrugDelivery/index.html",
+    "image":"",
+    "tooltip":"Diffusion-Controlled Drug Delivery",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/DiffusionControlledDrugDelivery/",
+    "simulation_type":"in-browser",
+    "directory":"demos/DiffusionControlledDrugDelivery",
+    "index":"demos/DiffusionControlledDrugDelivery/index.html"
+  },
+  {
+    "title":"Diffusion in Solids",
+    "href":"https://learncheme.github.io/demos/DiffusionInSolids/index.html",
+    "image":"",
+    "tooltip":"Diffusion in Solids",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/DiffusionInSolids/",
+    "simulation_type":"in-browser",
+    "directory":"demos/DiffusionInSolids",
+    "index":"demos/DiffusionInSolids/index.html"
+  },
+  {
+    "title":"DLP Cure Depth Simulator",
+    "href":"https://learncheme.github.io/demos/DLPCureDepth/index.html",
+    "image":"",
+    "tooltip":"DLP Cure Depth Simulator",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/DLPCureDepth/",
+    "simulation_type":"in-browser",
+    "directory":"demos/DLPCureDepth",
+    "index":"demos/DLPCureDepth/index.html"
+  },
+  {
+    "title":"Double-Sided Couette Flow",
+    "href":"https://learncheme.github.io/demos/DoubleSidedCouetteFlow/index.html",
+    "image":"",
+    "tooltip":"Double-Sided Couette Flow",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/DoubleSidedCouetteFlow/",
+    "simulation_type":"in-browser",
+    "directory":"demos/DoubleSidedCouetteFlow",
+    "index":"demos/DoubleSidedCouetteFlow/index.html"
+  },
+  {
+    "title":"Enthalpy and Entropy Departure Functions for Gases",
+    "href":"https://learncheme.github.io/demos/EnthalpyEntropyDepartureFxnsGases/index.html",
+    "image":"",
+    "tooltip":"Enthalpy and Entropy Departure Functions for Gases",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/EnthalpyEntropyDepartureFxnsGases/",
+    "simulation_type":"in-browser",
+    "directory":"demos/EnthalpyEntropyDepartureFxnsGases",
+    "index":"demos/EnthalpyEntropyDepartureFxnsGases/index.html"
+  },
+  {
+    "title":"Enthalpy-Entropy Diagram for Water",
+    "href":"https://learncheme.github.io/demos/EnthalpyEntropyDiagramForWater/index.html",
+    "image":"",
+    "tooltip":"Enthalpy-Entropy Diagram for Water",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/EnthalpyEntropyDiagramForWater/",
+    "simulation_type":"in-browser",
+    "directory":"demos/EnthalpyEntropyDiagramForWater",
+    "index":"demos/EnthalpyEntropyDiagramForWater/index.html"
+  },
+  {
+    "title":"Pressure Drop in a Packed Bed Reactor (PBR) Using the Ergun Equation",
+    "href":"https://learncheme.github.io/demos/ErgunEquationPressureDropPBR/index.html",
+    "image":"",
+    "tooltip":"Pressure Drop in a Packed Bed Reactor (PBR) Using the Ergun Equation",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ErgunEquationPressureDropPBR/",
+    "simulation_type":"in-browser",
+    "directory":"demos/ErgunEquationPressureDropPBR",
+    "index":"demos/ErgunEquationPressureDropPBR/index.html"
+  },
+  {
+    "title":"Ethanol Production Flowsheet",
+    "href":"https://learncheme.github.io/demos/EthanolProduction/index.html",
+    "image":"",
+    "tooltip":"Ethanol Production Flowsheet",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/EthanolProduction/",
+    "simulation_type":"in-browser",
+    "directory":"demos/EthanolProduction",
+    "index":"demos/EthanolProduction/index.html"
+  },
+  {
+    "title":"Steady-State Binary Fickian Diffusion",
+    "href":"https://learncheme.github.io/demos/SteadyStateBinaryFickianDiffusion/index.html",
+    "image":"",
+    "tooltip":"Steady-State Binary Fickian Diffusion",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/SteadyStateBinaryFickianDiffusion/",
+    "simulation_type":"in-browser",
+    "directory":"demos/SteadyStateBinaryFickianDiffusion",
+    "index":"demos/SteadyStateBinaryFickianDiffusion/index.html"
+  },
+  {
+    "title":"Nuclear Fusion Reaction Simulation",
+    "href":"https://learncheme.github.io/demos/NuclearFusionKinetics/index.html",
+    "image":"/home_page/media/under-review-nuclear-fusion-simulation.png",
+    "tooltip":"Nuclear Fusion Reaction Simulation",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/NuclearFissionKinetics/",
+    "simulation_type":"in-browser",
+    "directory":"demos/NuclearFusionKinetics",
+    "index":"demos/NuclearFusionKinetics/index.html"
+  },
+  {
+    "title":"Binary Mixture Evaporation",
+    "href":"https://learncheme.github.io/demos/EvaporationOfBinaryLiqLiqMixtureOnStove/index.html",
+    "image":"",
+    "tooltip":"Binary Mixture Evaporation",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/EvaporationOfBinaryLiqLiqMixtureOnStove/",
+    "simulation_type":"in-browser",
+    "directory":"demos/EvaporationOfBinaryLiqLiqMixtureOnStove",
+    "index":"demos/EvaporationOfBinaryLiqLiqMixtureOnStove/index.html"
+  },
+  {
+    "title":"Feed Stages in a Distillation Column",
+    "href":"https://learncheme.github.io/demos/Feed%20Stages%20in%20a%20Distillation%20Column/dist/index.html",
+    "image":"",
+    "tooltip":"Simulation description here.",
+    "description":"Simulation description here.",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/Feed%20Stages%20in%20a%20Distillation%20Column/",
+    "simulation_type":"in-browser",
+    "directory":"demos/Feed%20Stages%20in%20a%20Distillation%20Column",
+    "index":"demos/Feed%20Stages%20in%20a%20Distillation%20Column/dist/index.html"
+  },
+  {
+    "title":"Flow Between Three Tanks",
+    "href":"https://learncheme.github.io/demos/FlowBetweenThreeTanks/dist/index.html",
+    "image":"",
+    "tooltip":"Flow Between Three Tanks",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/FlowBetweenThreeTanks/",
+    "simulation_type":"in-browser",
+    "directory":"demos/FlowBetweenThreeTanks",
+    "index":"demos/FlowBetweenThreeTanks/dist/index.html"
+  },
+  {
+    "title":"Force Balances on a Truss",
+    "href":"https://learncheme.github.io/demos/ForceBalancesOnATruss/index.html",
+    "image":"",
+    "tooltip":"Force Balances on a Truss",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ForceBalancesOnATruss/",
+    "simulation_type":"in-browser",
+    "directory":"demos/ForceBalancesOnATruss",
+    "index":"demos/ForceBalancesOnATruss/index.html"
+  },
+  {
+    "title":"Fugacities in a Can of Soda",
+    "href":"https://learncheme.github.io/demos/FugacitiesInSodaCan/index.html",
+    "image":"",
+    "tooltip":"Fugacities in a Can of Soda",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/FugacitiesInSodaCan/",
+    "simulation_type":"in-browser",
+    "directory":"demos/FugacitiesInSodaCan",
+    "index":"demos/FugacitiesInSodaCan/index.html"
+  },
+  {
+    "title":"Fugacity Dependence on Pressure in an Ideal Binary Mixture",
+    "href":"https://learncheme.github.io/demos/FugacityDependenceonPressureinanIdealBinaryMixture/dist/index.html",
+    "image":"",
+    "tooltip":"Plots fugacity of a hypothetical single component as a function of temperature or pressure.",
+    "description":"Plots fugacity of a hypothetical single component as a function of temperature or pressure.",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/FugacityDependenceonPressureinanIdealBinaryMixture/",
+    "simulation_type":"in-browser",
+    "directory":"demos/FugacityDependenceonPressureinanIdealBinaryMixture",
+    "index":"demos/FugacityDependenceonPressureinanIdealBinaryMixture/dist/index.html"
+  },
+  {
+    "title":"Fugacity Dependence on Temperature in an Ideal Binary Mixture",
+    "href":"https://learncheme.github.io/demos/FugacityDependenceonTemperatureinanIdealBinaryMixture/dist/index.html",
+    "image":"",
+    "tooltip":"Plots fugacity of a hypothetical single component as a function of temperature or pressure.",
+    "description":"Plots fugacity of a hypothetical single component as a function of temperature or pressure.",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/FugacityDependenceonTemperatureinanIdealBinaryMixture/",
+    "simulation_type":"in-browser",
+    "directory":"demos/FugacityDependenceonTemperatureinanIdealBinaryMixture",
+    "index":"demos/FugacityDependenceonTemperatureinanIdealBinaryMixture/dist/index.html"
+  },
+  {
+    "title":"Fugacity as a Driving Force for Mass Transfer",
+    "href":"https://learncheme.github.io/demos/FugacityDrivingMassTransfer/index.html",
+    "image":"",
+    "tooltip":"Fugacity as a Driving Force for Mass Transfer",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/FugacityDrivingMassTransfer/",
+    "simulation_type":"in-browser",
+    "directory":"demos/FugacityDrivingMassTransfer",
+    "index":"demos/FugacityDrivingMassTransfer/index.html"
+  },
+  {
+    "title":"Fugacity from Equation of State for Water",
+    "href":"https://learncheme.github.io/demos/FugacityFromEOSForWater/index.html",
+    "image":"",
+    "tooltip":"Fugacity from Equation of State for Water",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/FugacityFromEOSForWater/",
+    "simulation_type":"in-browser",
+    "directory":"demos/FugacityFromEOSForWater",
+    "index":"demos/FugacityFromEOSForWater/index.html"
+  },
+  {
+    "title":"Gibbs Phase Rule",
+    "href":"https://learncheme.github.io/demos/GibbsPhaseRule/index.html",
+    "image":"",
+    "tooltip":"Gibbs Phase Rule",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/GibbsPhaseRule/",
+    "simulation_type":"in-browser",
+    "directory":"demos/GibbsPhaseRule",
+    "index":"demos/GibbsPhaseRule/index.html"
+  },
+  {
+    "title":"Heat Exchanger Virtual Lab",
+    "href":"https://learncheme.github.io/demos/HeatExchangerVirtualLabVer/index.html",
+    "image":"",
+    "tooltip":"Heat Exchanger Virtual Lab",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/HeatExchangerVirtualLabVer/",
+    "simulation_type":"in-browser",
+    "directory":"demos/HeatExchangerVirtualLabVer",
+    "index":"demos/HeatExchangerVirtualLabVer/index.html"
+  },
+  {
+    "title":"Heating Water and Air in a Sealed Container",
+    "href":"https://learncheme.github.io/demos/HeatingWaterAndAirInASealedContainer/index.html",
+    "image":"",
+    "tooltip":"Heating Water and Air in a Sealed Container",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/HeatingWaterAndAirInASealedContainer/",
+    "simulation_type":"in-browser",
+    "directory":"demos/HeatingWaterAndAirInASealedContainer",
+    "index":"demos/HeatingWaterAndAirInASealedContainer/index.html"
+  },
+  {
+    "title":"Plug Flow Reactor with Heat Transfer Jacket",
+    "href":"https://learncheme.github.io/demos/HeatJacketedPFR/index.html",
+    "image":"",
+    "tooltip":"Plug Flow Reactor with Heat Transfer Jacket",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/HeatJacketedPFR/",
+    "simulation_type":"in-browser",
+    "directory":"demos/HeatJacketedPFR",
+    "index":"demos/HeatJacketedPFR/index.html"
+  },
+  {
+    "title":"Heat Transfer through a Cylinder",
+    "href":"https://learncheme.github.io/demos/HeatTransferThroughACylinder/index.html",
+    "image":"",
+    "tooltip":"Heat Transfer through a Cylinder",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/HeatTransferThroughACylinder/",
+    "simulation_type":"in-browser",
+    "directory":"demos/HeatTransferThroughACylinder",
+    "index":"demos/HeatTransferThroughACylinder/index.html"
+  },
+  {
+    "title":"Heat Exchanger Virtual Lab",
+    "href":"https://learncheme.github.io/demos/HEXLab/index.html",
+    "image":"",
+    "tooltip":"Heat Exchanger Virtual Lab",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/HEXLab/",
+    "simulation_type":"in-browser",
+    "directory":"demos/HEXLab",
+    "index":"demos/HEXLab/index.html"
+  },
+  {
+    "title":"High-Pressure Chemical Equilibrium",
+    "href":"https://learncheme.github.io/demos/HighPressureChemicalEquilibrium/index.html",
+    "image":"",
+    "tooltip":"High-Pressure Chemical Equilibrium",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/HighPressureChemicalEquilibrium/",
+    "simulation_type":"in-browser",
+    "directory":"demos/HighPressureChemicalEquilibrium",
+    "index":"demos/HighPressureChemicalEquilibrium/index.html"
+  },
+  {
+    "title":"Identify Chemical Potential Plots",
+    "href":"https://learncheme.github.io/demos/IdentifyChemicalPotentialPlots/index.html",
+    "image":"",
+    "tooltip":"Identify Chemical Potential Plots",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/IdentifyChemicalPotentialPlots/",
+    "simulation_type":"in-browser",
+    "directory":"demos/IdentifyChemicalPotentialPlots",
+    "index":"demos/IdentifyChemicalPotentialPlots/index.html"
+  },
+  {
+    "title":"Reversible and Irreversible Expansion and Compression Processes",
+    "href":"https://learncheme.github.io/demos/IdentifyReversibleAndIrreversibleExpansionAndCompression/index.html",
+    "image":"",
+    "tooltip":"Reversible and Irreversible Expansion and Compression Processes",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/IdentifyReversibleAndIrreversibleExpansionAndCompression/",
+    "simulation_type":"in-browser",
+    "directory":"demos/IdentifyReversibleAndIrreversibleExpansionAndCompression",
+    "index":"demos/IdentifyReversibleAndIrreversibleExpansionAndCompression/index.html"
+  },
+  {
+    "title":"Impinging Jet",
+    "href":"https://learncheme.github.io/demos/ImpingingJet/index.html",
+    "image":"",
+    "tooltip":"Impinging Jet",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ImpingingJet/",
+    "simulation_type":"in-browser",
+    "directory":"demos/ImpingingJet",
+    "index":"demos/ImpingingJet/index.html"
+  },
+  {
+    "title":"Inhibition of Enzyme Reactions in a CSTR and a Batch Reactor",
+    "href":"https://learncheme.github.io/demos/InhibitionOfEnzymeRxnsInCSTRandBatch/index.html",
+    "image":"",
+    "tooltip":"Inhibition of Enzyme Reactions in a CSTR and a Batch Reactor",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/InhibitionOfEnzymeRxnsInCSTRandBatch/",
+    "simulation_type":"in-browser",
+    "directory":"demos/InhibitionOfEnzymeRxnsInCSTRandBatch",
+    "index":"demos/InhibitionOfEnzymeRxnsInCSTRandBatch/index.html"
+  },
+  {
+    "title":"Irreversible and Reversible Temperature Equilibration",
+    "href":"https://learncheme.github.io/demos/IrreversibleReversibleTemperatureEq/index.html",
+    "image":"",
+    "tooltip":"Irreversible and Reversible Temperature Equilibration",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/IrreversibleReversibleTemperatureEq/",
+    "simulation_type":"in-browser",
+    "directory":"demos/IrreversibleReversibleTemperatureEq",
+    "index":"demos/IrreversibleReversibleTemperatureEq/index.html"
+  },
+  {
+    "title":"Isothermal Plug Flow Reactor with Recycle",
+    "href":"https://learncheme.github.io/demos/IsothermalPlugFlowReactorWithRecycle/dist/index.html",
+    "image":"",
+    "tooltip":"Isothermal Plug Flow Reactor with Recycle",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/IsothermalPlugFlowReactorWithRecycle/",
+    "simulation_type":"in-browser",
+    "directory":"demos/IsothermalPlugFlowReactorWithRecycle",
+    "index":"demos/IsothermalPlugFlowReactorWithRecycle/dist/index.html"
+  },
+  {
+    "title":"Jablonski Diagram",
+    "href":"https://learncheme.github.io/demos/JablonskiDiagram/index.html",
+    "image":"",
+    "tooltip":"An interactive Jablonski diagram showing photophysical processes and quantum yield.",
+    "description":"An interactive Jablonski diagram showing photophysical processes and quantum yield.",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/JablonskiDiagram/",
+    "simulation_type":"in-browser",
+    "directory":"demos/JablonskiDiagram",
+    "index":"demos/JablonskiDiagram/index.html"
+  },
+  {
+    "title":"Langmuir–Hinshelwood Reaction",
+    "href":"https://learncheme.github.io/demos/LangmuirHinshelwoodReaction/dist/index.html",
+    "image":"",
+    "tooltip":"Langmuir–Hinshelwood Reaction",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/LangmuirHinshelwoodReaction/",
+    "simulation_type":"in-browser",
+    "directory":"demos/LangmuirHinshelwoodReaction",
+    "index":"demos/LangmuirHinshelwoodReaction/dist/index.html"
+  },
+  {
+    "title":"Langmuir Isotherms",
+    "href":"https://learncheme.github.io/demos/LangmuirIsotherms/index.html",
+    "image":"",
+    "tooltip":"Langmuir Isotherms",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/LangmuirIsotherms/",
+    "simulation_type":"in-browser",
+    "directory":"demos/LangmuirIsotherms",
+    "index":"demos/LangmuirIsotherms/index.html"
+  },
+  {
+    "title":"Interactive Levenspiel Plot",
+    "href":"https://learncheme.github.io/demos/LevenspielPlots/index.html",
+    "image":"",
+    "tooltip":"Interactive Levenspiel Plot",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/LevenspielPlots/",
+    "simulation_type":"in-browser",
+    "directory":"demos/LevenspielPlots",
+    "index":"demos/LevenspielPlots/index.html"
+  },
+  {
+    "title":"Lever Rule for the Uranium-Titanium Solid-Liquid Phase Diagram",
+    "href":"https://learncheme.github.io/demos/LeverRuleUraniumTitaniumPhaseDiagram/index.html",
+    "image":"",
+    "tooltip":"An interactive simulation demonstrating the lever rule for the uranium-titanium solid-liquid phase diagram.",
+    "description":"An interactive simulation demonstrating the lever rule for the uranium-titanium solid-liquid phase diagram.",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/LeverRuleUraniumTitaniumPhaseDiagram/",
+    "simulation_type":"in-browser",
+    "directory":"demos/LeverRuleUraniumTitaniumPhaseDiagram",
+    "index":"demos/LeverRuleUraniumTitaniumPhaseDiagram/index.html"
+  },
+  {
+    "title":"Attenuation: Multiple Wavelengths",
+    "href":"https://learncheme.github.io/demos/LightAttenuation-MultipleWavelength/index.html",
+    "image":"",
+    "tooltip":"Attenuation: Multiple Wavelengths",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/LightAttenuation-MultipleWavelength/",
+    "simulation_type":"in-browser",
+    "directory":"demos/LightAttenuation-MultipleWavelength",
+    "index":"demos/LightAttenuation-MultipleWavelength/index.html"
+  },
+  {
+    "title":"Attenuation Simulation",
+    "href":"https://learncheme.github.io/demos/LightAttenuation-SingleAbsorber/index.html",
+    "image":"",
+    "tooltip":"Attenuation Simulation",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/LightAttenuation-SingleAbsorber/",
+    "simulation_type":"in-browser",
+    "directory":"demos/LightAttenuation-SingleAbsorber",
+    "index":"demos/LightAttenuation-SingleAbsorber/index.html"
+  },
+  {
+    "title":"Mass Balances in Absorption and Stripping Units",
+    "href":"https://learncheme.github.io/demos/MassBalancesInAbsorptionAndStrippingUnits/index.html",
+    "image":"",
+    "tooltip":"Mass Balances in Absorption and Stripping Units",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/MassBalancesInAbsorptionAndStrippingUnits/",
+    "simulation_type":"in-browser",
+    "directory":"demos/MassBalancesInAbsorptionAndStrippingUnits",
+    "index":"demos/MassBalancesInAbsorptionAndStrippingUnits/index.html"
+  },
+  {
+    "title":"Measuring Flow Rates with a Pitot Tube",
+    "href":"https://learncheme.github.io/demos/MeasuringFlowRatesWithAPitotTube/index.html",
+    "image":"",
+    "tooltip":"Measuring Flow Rates with a Pitot Tube",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/MeasuringFlowRatesWithAPitotTube/",
+    "simulation_type":"in-browser",
+    "directory":"demos/MeasuringFlowRatesWithAPitotTube",
+    "index":"demos/MeasuringFlowRatesWithAPitotTube/index.html"
+  },
+  {
+    "title":"Material and Energy Balances in a Reactor with Heat Exchange",
+    "href":"https://learncheme.github.io/demos/MEB_ReactorWithHeatExchange/src/html/index.html",
+    "image":"",
+    "tooltip":"Material and Energy Balances in a Reactor with Heat Exchange",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/MEB_ReactorWithHeatExchange/src/html/",
+    "simulation_type":"in-browser",
+    "directory":"demos/MEB_ReactorWithHeatExchange",
+    "index":"demos/MEB_ReactorWithHeatExchange/src/html/index.html"
+  },
+  {
+    "title":"Melting Ice Simulation (MIS)",
+    "href":"https://learncheme.github.io/demos/MeltingIce/MIindex.html",
+    "image":"",
+    "tooltip":"Melting Ice Simulation (MIS)",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/MeltingIce/",
+    "simulation_type":"in-browser",
+    "directory":"demos/MeltingIce",
+    "index":"demos/MeltingIce/MIindex.html"
+  },
+  {
+    "title":"Membrane Concentration Profile",
+    "href":"https://learncheme.github.io/demos/MembraneConcentrationProfile/index.html",
+    "image":"",
+    "tooltip":"Membrane Concentration Profile",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/MembraneConcentrationProfile/",
+    "simulation_type":"in-browser",
+    "directory":"demos/MembraneConcentrationProfile",
+    "index":"demos/MembraneConcentrationProfile/index.html"
+  },
+  {
+    "title":"Membrane Reactor for an Equilibrium-Limited Reaction",
+    "href":"https://learncheme.github.io/demos/MembraneReactorForAnEqmLimitedRxn/index.html",
+    "image":"",
+    "tooltip":"Membrane Reactor for an Equilibrium-Limited Reaction",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/MembraneReactorForAnEqmLimitedRxn/",
+    "simulation_type":"in-browser",
+    "directory":"demos/MembraneReactorForAnEqmLimitedRxn",
+    "index":"demos/MembraneReactorForAnEqmLimitedRxn/index.html"
+  },
+  {
+    "title":"Interactive Fanning Moody Diagram",
+    "href":"https://learncheme.github.io/demos/MoodyDiagram/index.html",
+    "image":"",
+    "tooltip":"Interactive Fanning Moody Diagram",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/MoodyDiagram/",
+    "simulation_type":"in-browser",
+    "directory":"demos/MoodyDiagram",
+    "index":"demos/MoodyDiagram/index.html"
+  },
+  {
+    "title":"Multiple Steady States in a CSTR with Heat Exchange",
+    "href":"https://learncheme.github.io/demos/multiple-steady-states-in-a-cstr-with-hex/index.html",
+    "image":"",
+    "tooltip":"Multiple Steady States in a CSTR with Heat Exchange",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/multiple-steady-states-in-a-cstr-with-hex/",
+    "simulation_type":"in-browser",
+    "directory":"demos/multiple-steady-states-in-a-cstr-with-hex",
+    "index":"demos/multiple-steady-states-in-a-cstr-with-hex/index.html"
+  },
+  {
+    "title":"Multiple States in an Isothermal Continuous Stirred-Tank Reactor",
+    "href":"https://learncheme.github.io/demos/MultipleSteadyStatesInAnIsothermalCSTR/index.html",
+    "image":"",
+    "tooltip":"Multiple States in an Isothermal Continuous Stirred-Tank Reactor",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/MultipleSteadyStatesInAnIsothermalCSTR/",
+    "simulation_type":"in-browser",
+    "directory":"demos/MultipleSteadyStatesInAnIsothermalCSTR",
+    "index":"demos/MultipleSteadyStatesInAnIsothermalCSTR/index.html"
+  },
+  {
+    "title":"Multistage Batch Distillation with Azeotrope",
+    "href":"https://learncheme.github.io/demos/MultiStageBatchDistillationWithAzeotrope/index.html",
+    "image":"",
+    "tooltip":"Multistage Batch Distillation with Azeotrope",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/MultiStageBatchDistillationWithAzeotrope/",
+    "simulation_type":"in-browser",
+    "directory":"demos/MultiStageBatchDistillationWithAzeotrope",
+    "index":"demos/MultiStageBatchDistillationWithAzeotrope/index.html"
+  },
+  {
+    "title":"Multiple States in CSTR Polymerization",
+    "href":"https://learncheme.github.io/demos/MultiSteadyStateCSTRPolymerization/index.html",
+    "image":"",
+    "tooltip":"Multiple States in CSTR Polymerization",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/MultiSteadyStateCSTRPolymerization/",
+    "simulation_type":"in-browser",
+    "directory":"demos/MultiSteadyStateCSTRPolymerization",
+    "index":"demos/MultiSteadyStateCSTRPolymerization/index.html"
+  },
+  {
+    "title":"Non-Ideal Vapor-Liquid Equilibrium (VLE) Modeled by the Margules Equation",
+    "href":"https://learncheme.github.io/demos/NonIdealVLEMargulesEquation/index.html",
+    "image":"",
+    "tooltip":"Non-Ideal Vapor-Liquid Equilibrium (VLE) Modeled by the Margules Equation",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/NonIdealVLEMargulesEquation/",
+    "simulation_type":"in-browser",
+    "directory":"demos/NonIdealVLEMargulesEquation",
+    "index":"demos/NonIdealVLEMargulesEquation/index.html"
+  },
+  {
+    "title":"Nuclear Fission Chain-Reaction Kinetics",
+    "href":"https://learncheme.github.io/demos/NuclearFissionKinetics/index.html",
+    "image":"",
+    "tooltip":"Nuclear Fission Chain-Reaction Kinetics",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/NuclearFissionKinetics/",
+    "simulation_type":"in-browser",
+    "directory":"demos/NuclearFissionKinetics",
+    "index":"demos/NuclearFissionKinetics/index.html"
+  },
+  {
+    "title":"Nuclear Fission Chain-Reaction Kinetics",
+    "href":"https://learncheme.github.io/demos/NuclearFusionKinetics/index.html",
+    "image":"",
+    "tooltip":"Nuclear Fission Chain-Reaction Kinetics",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/NuclearFusionKinetics/",
+    "simulation_type":"in-browser",
+    "directory":"demos/NuclearFusionKinetics",
+    "index":"demos/NuclearFusionKinetics/index.html"
+  },
+  {
+    "title":"Operating a Chemostat (CSTR Bioreactor)",
+    "href":"https://learncheme.github.io/demos/OperatingAChemostat/dist/index.html",
+    "image":"",
+    "tooltip":"A simulation of a chemostat (CSTR bioreactor) showing cell growth, substrate concentration, and production rate versus dilution rate.",
+    "description":"A simulation of a chemostat (CSTR bioreactor) showing cell growth, substrate concentration, and production rate versus dilution rate.",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/OperatingAChemostat/",
+    "simulation_type":"in-browser",
+    "directory":"demos/OperatingAChemostat",
+    "index":"demos/OperatingAChemostat/dist/index.html"
+  },
+  {
+    "title":"Osmotic Pressure",
+    "href":"https://learncheme.github.io/demos/OsmoticPressure/index.html",
+    "image":"",
+    "tooltip":"Osmotic Pressure",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/OsmoticPressure/",
+    "simulation_type":"in-browser",
+    "directory":"demos/OsmoticPressure",
+    "index":"demos/OsmoticPressure/index.html"
+  },
+  {
+    "title":"Fluidization of a Packed Bed",
+    "href":"https://learncheme.github.io/demos/PackedBedFluidization/index.html",
+    "image":"",
+    "tooltip":"Fluidization of a Packed Bed",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/PackedBedFluidization/",
+    "simulation_type":"in-browser",
+    "directory":"demos/PackedBedFluidization",
+    "index":"demos/PackedBedFluidization/index.html"
+  },
+  {
+    "title":"Heat Loss from a Cylindrical Reactor",
+    "href":"https://learncheme.github.io/demos/ParallelHeatTransferInACylindricalReactor/index.html",
+    "image":"",
+    "tooltip":"Heat Loss from a Cylindrical Reactor",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ParallelHeatTransferInACylindricalReactor/",
+    "simulation_type":"in-browser",
+    "directory":"demos/ParallelHeatTransferInACylindricalReactor",
+    "index":"demos/ParallelHeatTransferInACylindricalReactor/index.html"
+  },
+  {
+    "title":"Heat Transfer in a Reactor",
+    "href":"https://learncheme.github.io/demos/ParallelHeatTransferStlite/dist/index.html",
+    "image":"",
+    "tooltip":"Heat Transfer in a Reactor",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ParallelHeatTransferStlite/",
+    "simulation_type":"in-browser",
+    "directory":"demos/ParallelHeatTransferStlite",
+    "index":"demos/ParallelHeatTransferStlite/dist/index.html"
+  },
+  {
+    "title":"Parametric Sensitivity of Plug Flow Reactor With Heat Exchange",
+    "href":"https://learncheme.github.io/demos/ParametricSensitivityOfPFRWithHeatExchange/index.html",
+    "image":"",
+    "tooltip":"Parametric Sensitivity of Plug Flow Reactor With Heat Exchange",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ParametricSensitivityOfPFRWithHeatExchange/",
+    "simulation_type":"in-browser",
+    "directory":"demos/ParametricSensitivityOfPFRWithHeatExchange",
+    "index":"demos/ParametricSensitivityOfPFRWithHeatExchange/index.html"
+  },
+  {
+    "title":"Partial Miscibility Binary Liquid",
+    "href":"https://learncheme.github.io/demos/PartialMiscibilityBinaryLiquid/index.html",
+    "image":"",
+    "tooltip":"Partial Miscibility Binary Liquid",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/PartialMiscibilityBinaryLiquid/",
+    "simulation_type":"in-browser",
+    "directory":"demos/PartialMiscibilityBinaryLiquid",
+    "index":"demos/PartialMiscibilityBinaryLiquid/index.html"
+  },
+  {
+    "title":"Peng-Robinson Equation of State for Mixtures",
+    "href":"https://learncheme.github.io/demos/PengRobinsonEOS/index.html",
+    "image":"",
+    "tooltip":"Peng-Robinson Equation of State for Mixtures",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/PengRobinsonEOS/",
+    "simulation_type":"in-browser",
+    "directory":"demos/PengRobinsonEOS",
+    "index":"demos/PengRobinsonEOS/index.html"
+  },
+  {
+    "title":"PFR Kinetics: NO2 + CO",
+    "href":"https://learncheme.github.io/demos/PFRKinetics/index.html",
+    "image":"",
+    "tooltip":"PFR Kinetics: NO2 + CO",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/PFRKinetics/",
+    "simulation_type":"in-browser",
+    "directory":"demos/PFRKinetics",
+    "index":"demos/PFRKinetics/index.html"
+  },
+  {
+    "title":"Phase Behavior on a Pressure-Volume Diagram",
+    "href":"https://learncheme.github.io/demos/PhaseBehaviorOnPVDiagram/index.html",
+    "image":"",
+    "tooltip":"Phase Behavior on a Pressure-Volume Diagram",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/PhaseBehaviorOnPVDiagram/",
+    "simulation_type":"in-browser",
+    "directory":"demos/PhaseBehaviorOnPVDiagram",
+    "index":"demos/PhaseBehaviorOnPVDiagram/index.html"
+  },
+  {
+    "title":"Polymerization in a Batch Reactor",
+    "href":"https://learncheme.github.io/demos/PolymerizationInBatchRxr/index.html",
+    "image":"",
+    "tooltip":"Polymerization in a Batch Reactor",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/PolymerizationInBatchRxr/",
+    "simulation_type":"in-browser",
+    "directory":"demos/PolymerizationInBatchRxr",
+    "index":"demos/PolymerizationInBatchRxr/index.html"
+  },
+  {
+    "title":"Polymer MWD in Batch, PFR and CSTR",
+    "href":"https://learncheme.github.io/demos/PolymerizationReactorMWDs/index.html",
+    "image":"",
+    "tooltip":"Polymer MWD in Batch, PFR and CSTR",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/PolymerizationReactorMWDs/",
+    "simulation_type":"in-browser",
+    "directory":"demos/PolymerizationReactorMWDs",
+    "index":"demos/PolymerizationReactorMWDs/index.html"
+  },
+  {
+    "title":"Polymer Molecular Weights",
+    "href":"https://learncheme.github.io/demos/PolymerMolecularWeightDistributions/index.html",
+    "image":"",
+    "tooltip":"Explore polymer molecular weight distributions and their averages.",
+    "description":"Explore polymer molecular weight distributions and their averages.",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/PolymerMolecularWeightDistributions/",
+    "simulation_type":"in-browser",
+    "directory":"demos/PolymerMolecularWeightDistributions",
+    "index":"demos/PolymerMolecularWeightDistributions/index.html"
+  },
+  {
+    "title":"Interactive Psychrometric Chart & Air-Water System Simulator",
+    "href":"https://learncheme.github.io/demos/PsychrometricChartAnalyzer/index.html",
+    "image":"",
+    "tooltip":"Interactive Psychrometric Chart & Air-Water System Simulator",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/PsychrometricChartAnalyzer/",
+    "simulation_type":"in-browser",
+    "directory":"demos/PsychrometricChartAnalyzer",
+    "index":"demos/PsychrometricChartAnalyzer/index.html"
+  },
+  {
+    "title":"Pressure-Temperature Diagram for a Binary Mixture",
+    "href":"https://learncheme.github.io/demos/PTDiagramForBinaryMixture/index.html",
+    "image":"",
+    "tooltip":"Pressure-Temperature Diagram for a Binary Mixture",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/PTDiagramForBinaryMixture/",
+    "simulation_type":"in-browser",
+    "directory":"demos/PTDiagramForBinaryMixture",
+    "index":"demos/PTDiagramForBinaryMixture/index.html"
+  },
+  {
+    "title":"Enthalpy of Reaction as a State Function",
+    "href":"https://learncheme.github.io/demos/ReactionStateFunction/dist/index.html",
+    "image":"",
+    "tooltip":"An interactive simulation designed to teach engineering students about state functions and how to calculate heat of reaction.",
+    "description":"An interactive simulation designed to teach engineering students about state functions and how to calculate heat of reaction.",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ReactionStateFunction/",
+    "simulation_type":"in-browser",
+    "directory":"demos/ReactionStateFunction",
+    "index":"demos/ReactionStateFunction/dist/index.html"
+  },
+  {
+    "title":"Reactor Design Economics",
+    "href":"https://learncheme.github.io/demos/ReactorDesignEconomics/index.html",
+    "image":"",
+    "tooltip":"Reactor Design Economics",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ReactorDesignEconomics/",
+    "simulation_type":"in-browser",
+    "directory":"demos/ReactorDesignEconomics",
+    "index":"demos/ReactorDesignEconomics/index.html"
+  },
+  {
+    "title":"Refrigeration Cycle Coefficient of Performance",
+    "href":"https://learncheme.github.io/demos/RefrigerationCycleCOP/index.html",
+    "image":"",
+    "tooltip":"Refrigeration Cycle Coefficient of Performance",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/RefrigerationCycleCOP/",
+    "simulation_type":"in-browser",
+    "directory":"demos/RefrigerationCycleCOP",
+    "index":"demos/RefrigerationCycleCOP/index.html"
+  },
+  {
+    "title":"Retrograde Condensation",
+    "href":"https://learncheme.github.io/demos/RetrogradeCondensationOfBinaryMixture/index.html",
+    "image":"",
+    "tooltip":"Retrograde Condensation",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/RetrogradeCondensationOfBinaryMixture/",
+    "simulation_type":"in-browser",
+    "directory":"demos/RetrogradeCondensationOfBinaryMixture",
+    "index":"demos/RetrogradeCondensationOfBinaryMixture/index.html"
+  },
+  {
+    "title":"Reverse Osmosis",
+    "href":"https://learncheme.github.io/demos/ReverseOsmosis/index.html",
+    "image":"",
+    "tooltip":"Reverse Osmosis",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ReverseOsmosis/",
+    "simulation_type":"in-browser",
+    "directory":"demos/ReverseOsmosis",
+    "index":"demos/ReverseOsmosis/index.html"
+  },
+  {
+    "title":"Reversible Expansion and Compression Work",
+    "href":"https://learncheme.github.io/demos/ReversibleAdiabaticExpansionCompressionWork/dist/index.html",
+    "image":"",
+    "tooltip":"An interactive simulation designed to teach engineering students about reversible and irreversible expansion and compression work.",
+    "description":"An interactive simulation designed to teach engineering students about reversible and irreversible expansion and compression work.",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ReversibleAdiabaticExpansionCompressionWork/",
+    "simulation_type":"in-browser",
+    "directory":"demos/ReversibleAdiabaticExpansionCompressionWork",
+    "index":"demos/ReversibleAdiabaticExpansionCompressionWork/dist/index.html"
+  },
+  {
+    "title":"Reynolds Number Explorer",
+    "href":"https://learncheme.github.io/demos/ReynoldsNumber/index.html",
+    "image":"",
+    "tooltip":"Reynolds Number Explorer",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ReynoldsNumber/",
+    "simulation_type":"in-browser",
+    "directory":"demos/ReynoldsNumber",
+    "index":"demos/ReynoldsNumber/index.html"
+  },
+  {
+    "title":"Reaction in an Adiabatic Continuous Stirred-Tank Reactor",
+    "href":"https://learncheme.github.io/demos/RxnInAnAdiabaticCSTR/index.html",
+    "image":"",
+    "tooltip":"Reaction in an Adiabatic Continuous Stirred-Tank Reactor",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/RxnInAnAdiabaticCSTR/",
+    "simulation_type":"in-browser",
+    "directory":"demos/RxnInAnAdiabaticCSTR",
+    "index":"demos/RxnInAnAdiabaticCSTR/index.html"
+  },
+  {
+    "title":"Reaction in an Isothermal Continuous Stirred-Tank Reactor (CSTR)",
+    "href":"https://learncheme.github.io/demos/RxnInIsothermalCSTR/index.html",
+    "image":"",
+    "tooltip":"Reaction in an Isothermal Continuous Stirred-Tank Reactor (CSTR)",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/RxnInIsothermalCSTR/",
+    "simulation_type":"in-browser",
+    "directory":"demos/RxnInIsothermalCSTR",
+    "index":"demos/RxnInIsothermalCSTR/index.html"
+  },
+  {
+    "title":"Reactor Rate and Conversion versus Space Velocity",
+    "href":"https://learncheme.github.io/demos/RxrRateAndConversionVsSpaceVelocity/index.html",
+    "image":"",
+    "tooltip":"Reactor Rate and Conversion versus Space Velocity",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/RxrRateAndConversionVsSpaceVelocity/",
+    "simulation_type":"in-browser",
+    "directory":"demos/RxrRateAndConversionVsSpaceVelocity",
+    "index":"demos/RxrRateAndConversionVsSpaceVelocity/index.html"
+  },
+  {
+    "title":"Scale Up of a Batch Reactor",
+    "href":"https://learncheme.github.io/demos/ScaleUpOfABatchReactor/dist/index.html",
+    "image":"",
+    "tooltip":"Scale Up of a Batch Reactor",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ScaleUpOfABatchReactor/",
+    "simulation_type":"in-browser",
+    "directory":"demos/ScaleUpOfABatchReactor",
+    "index":"demos/ScaleUpOfABatchReactor/dist/index.html"
+  },
+  {
+    "title":"Single-Component Fugacity",
+    "href":"https://learncheme.github.io/demos/SingleComponentFugacity/dist/index.html",
+    "image":"",
+    "tooltip":"Plots fugacity of a hypothetical single component as a function of temperature or pressure.",
+    "description":"Plots fugacity of a hypothetical single component as a function of temperature or pressure.",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/SingleComponentFugacity/",
+    "simulation_type":"in-browser",
+    "directory":"demos/SingleComponentFugacity",
+    "index":"demos/SingleComponentFugacity/dist/index.html"
+  },
+  {
+    "title":"Solid-Solid-Liquid Equilibrium",
+    "href":"https://learncheme.github.io/demos/SolidSolidEquilibrium/index.html",
+    "image":"",
+    "tooltip":"Solid-Solid-Liquid Equilibrium",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/SolidSolidEquilibrium/",
+    "simulation_type":"in-browser",
+    "directory":"demos/SolidSolidEquilibrium",
+    "index":"demos/SolidSolidEquilibrium/index.html"
+  },
+  {
+    "title":"Solvent Extraction - LearnChemE",
+    "href":"https://learncheme.github.io/demos/SolventExtraction/index.html",
+    "image":"",
+    "tooltip":"Solvent Extraction - LearnChemE",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/SolventExtraction/",
+    "simulation_type":"in-browser",
+    "directory":"demos/SolventExtraction",
+    "index":"demos/SolventExtraction/index.html"
+  },
+  {
+    "title":"Steady State Flow from a Tank",
+    "href":"https://learncheme.github.io/demos/SteadyStateFlowFromATank/SteadyStateFlow/index.html",
+    "image":"",
+    "tooltip":"Steady State Flow from a Tank",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/SteadyStateFlowFromATank/",
+    "simulation_type":"in-browser",
+    "directory":"demos/SteadyStateFlowFromATank",
+    "index":"demos/SteadyStateFlowFromATank/SteadyStateFlow/index.html"
+  },
+  {
+    "title":"Steam Table Calculator",
+    "href":"https://learncheme.github.io/demos/SteamTable/index.html",
+    "image":"",
+    "tooltip":"Steam Table Calculator",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/SteamTable/",
+    "simulation_type":"in-browser",
+    "directory":"demos/SteamTable",
+    "index":"demos/SteamTable/index.html"
+  },
+  {
+    "title":"Temperature-Programmed Desorption",
+    "href":"https://learncheme.github.io/demos/TemperatureProgrammedDesorption/index.html",
+    "image":"",
+    "tooltip":"Temperature-Programmed Desorption",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/TemperatureProgrammedDesorption/",
+    "simulation_type":"in-browser",
+    "directory":"demos/TemperatureProgrammedDesorption",
+    "index":"demos/TemperatureProgrammedDesorption/index.html"
+  },
+  {
+    "title":"Three Intermolecular Potential Models",
+    "href":"https://learncheme.github.io/demos/ThreeIntermolecularPotentialModels/index.html",
+    "image":"",
+    "tooltip":"Three Intermolecular Potential Models",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ThreeIntermolecularPotentialModels/",
+    "simulation_type":"in-browser",
+    "directory":"demos/ThreeIntermolecularPotentialModels",
+    "index":"demos/ThreeIntermolecularPotentialModels/index.html"
+  },
+  {
+    "title":"Throttling High-Pressure Water",
+    "href":"https://learncheme.github.io/demos/ThrottlingHighPressureLiquidWater/dist/index.html",
+    "image":"",
+    "tooltip":"A simulation of throttling (flash) of high-pressure liquid water through a valve.",
+    "description":"A simulation of throttling (flash) of high-pressure liquid water through a valve.",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ThrottlingHighPressureLiquidWater/",
+    "simulation_type":"in-browser",
+    "directory":"demos/ThrottlingHighPressureLiquidWater",
+    "index":"demos/ThrottlingHighPressureLiquidWater/dist/index.html"
+  },
+  {
+    "title":"Uranium Isotope Decay",
+    "href":"https://learncheme.github.io/demos/UraniumIsotopeDecay/index.html",
+    "image":"",
+    "tooltip":"Uranium Isotope Decay",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/UraniumIsotopeDecay/",
+    "simulation_type":"in-browser",
+    "directory":"demos/UraniumIsotopeDecay",
+    "index":"demos/UraniumIsotopeDecay/index.html"
+  },
+  {
+    "title":"Vapor Pressure of Binary Solutions",
+    "href":"https://learncheme.github.io/demos/VaporPressureofBinarySolutions/dist/index.html",
+    "image":"",
+    "tooltip":"Vapor Pressure of Binary Solutions",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/VaporPressureofBinarySolutions/",
+    "simulation_type":"in-browser",
+    "directory":"demos/VaporPressureofBinarySolutions",
+    "index":"demos/VaporPressureofBinarySolutions/dist/index.html"
+  },
+  {
+    "title":"Vectors Demonstration",
+    "href":"https://learncheme.github.io/demos/vectors/app.html",
+    "image":"",
+    "tooltip":"Vectors Demonstration",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/vectors/",
+    "simulation_type":"in-browser",
+    "directory":"demos/vectors",
+    "index":"demos/vectors/app.html"
+  },
+  {
+    "title":"Visualization of Velocity Profiles",
+    "href":"https://learncheme.github.io/demos/VisualizationOfVelocityProfiles/dist/index.html",
+    "image":"",
+    "tooltip":"Visualization of Velocity Profiles",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/VisualizationOfVelocityProfiles/",
+    "simulation_type":"in-browser",
+    "directory":"demos/VisualizationOfVelocityProfiles",
+    "index":"demos/VisualizationOfVelocityProfiles/dist/index.html"
+  },
+  {
+    "title":"Water-Air Mixture",
+    "href":"https://learncheme.github.io/demos/WaterAirVLE/index.html",
+    "image":"",
+    "tooltip":"Water-Air Mixture",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/WaterAirVLE/",
+    "simulation_type":"in-browser",
+    "directory":"demos/WaterAirVLE",
+    "index":"demos/WaterAirVLE/index.html"
+  },
+  {
+    "title":"Water Contact Angle for Heterogeneous Surface",
+    "href":"https://learncheme.github.io/demos/WaterContactAngleForHeterogeneousSurface/index.html",
+    "image":"",
+    "tooltip":"Water Contact Angle for Heterogeneous Surface",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/WaterContactAngleForHeterogeneousSurface/",
+    "simulation_type":"in-browser",
+    "directory":"demos/WaterContactAngleForHeterogeneousSurface",
+    "index":"demos/WaterContactAngleForHeterogeneousSurface/index.html"
+  },
+  {
+    "title":"When to Open a Parachute",
+    "href":"https://learncheme.github.io/demos/WhenToOpenAParachute/dist/index.html",
+    "image":"",
+    "tooltip":"When to Open a Parachute",
+    "description":"",
+    "src":"https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/WhenToOpenAParachute/",
+    "simulation_type":"in-browser",
+    "directory":"demos/WhenToOpenAParachute",
+    "index":"demos/WhenToOpenAParachute/dist/index.html"
   }
 ]
