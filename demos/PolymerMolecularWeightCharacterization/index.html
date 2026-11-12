@@ -1,3 +1,10 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+
 <title>Polymer Molecular Weight Characterization</title>
 <style>
 /* Layout: LearnChemE house style — title strip, view switch + menu row, control band, hi-DPI canvas, readout row */
@@ -60,8 +67,10 @@ window.MathJax={tex:{inlineMath:[['\\(','\\)']]},svg:{fontCache:'global',display
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js" async></script>
 
+</head>
+<body>
+
 <div id="app">
-  <h1>Polymer Molecular Weight Characterization</h1>
   <div class="bar">
     <div class="seg" id="viewSeg" role="group" aria-label="View">
       <button id="vDist" aria-pressed="true" data-v="dist">distribution</button>
@@ -490,3 +499,7 @@ S=sample();syncLabels();readout();
 new ResizeObserver(resize).observe(cv.parentElement);resize();
 })();
 </script>
+
+  
+</body>
+</html>

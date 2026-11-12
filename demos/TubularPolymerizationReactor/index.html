@@ -1,3 +1,10 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+
 <title>Tubular Polymerization Reactor</title>
 <script>
 window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, chtml: { displayAlign: 'left', displayIndent: '1em' }, startup: { typeset: false } };
@@ -63,8 +70,10 @@ canvas { display: block; width: 100%; }
 .grid3 { display: grid; gap: 4px 6px; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); }
 .grid3 canvas { height: 290px; }
 </style>
+</head>
+<body>
+  
 <div id="app">
-<h1>Tubular Polymerization Reactor</h1>
 
 <section class="controls" aria-label="Reactor settings">
   <div class="toprow">
@@ -702,3 +711,6 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') document.que
 let rz; window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => res && drawAll(), 80); });
 update();
 </script>
+
+</body>
+</html>
