@@ -699,5 +699,9 @@ window.MathJax = {
 
 })();
 </script>
+
+<!-- BEGIN: Under Review Warning Component (Delete this entire block to remove) -->
+<div id="review-warning-banner" class="review-warning-container"><style>.review-warning-container{position:fixed;bottom:20px;right:20px;background-color:#fff3cd;color:#856404;border:1px solid #ffeeba;border-left:5px solid #ffc107;padding:16px 20px;box-shadow:0 4px 12px rgba(0,0,0,.15);border-radius:6px;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;z-index:999999;display:flex;align-items:flex-start;gap:15px;max-width:350px;transition:opacity .3s ease,transform .3s ease}.review-warning-container.fade-out{opacity:0;transform:translateY(15px);pointer-events:none}.review-warning-content{flex-grow:1;font-size:14px;line-height:1.4;margin:0}.review-warning-content strong{display:block;margin-bottom:4px;font-size:15px;color:#664d03}.review-warning-close{background:0 0;border:none;color:#856404;font-size:22px;cursor:pointer;padding:0;line-height:.8;opacity:.5;transition:opacity .2s}.review-warning-close:hover{opacity:1}</style><div class="review-warning-content"><strong>⚠️ Simulation Under Review</strong>This content is still being reviewed for quality and accuracy and may be updated in the future. Feel free to <a href="https://learncheme.com/www.learncheme.com/contact-us">send us feedback</a>.</div><button id="review-warning-close-btn" class="review-warning-close" aria-label="Close warning">&times;</button><script>!function(){let e=document.getElementById("review-warning-close-btn"),n=document.getElementById("review-warning-banner");e&&n&&e.addEventListener("click",(()=>{n.classList.add("fade-out"),setTimeout((()=>n.remove()),300)}))}();</script></div>
+<!-- END: Under Review Warning Component -->
 </body>
 </html>
