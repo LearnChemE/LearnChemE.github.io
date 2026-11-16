@@ -378,8 +378,14 @@ function niceTicks(a,b,n){
   return out;
 }
 function setup(cv){
-  var dpr=window.devicePixelRatio||1,w=cv.clientWidth,h=parseInt(cv.getAttribute("height"),10);
-  cv.width=w*dpr;cv.height=h*dpr;
+  /* Keep the CSS (logical) height fixed and separate from the backing-store height.
+     Setting cv.height also rewrites the height attribute, so reading the attribute back
+     on the next redraw would multiply it by devicePixelRatio every frame on HiDPI screens. */
+  if(!cv.dataset.cssH)cv.dataset.cssH=cv.getAttribute("height");
+  var dpr=window.devicePixelRatio||1,h=parseInt(cv.dataset.cssH,10);
+  cv.style.height=h+"px";
+  var w=cv.clientWidth;
+  cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);
   var c=cv.getContext("2d");c.setTransform(dpr,0,0,dpr,0,0);c.clearRect(0,0,w,h);
   return {c:c,w:w,h:h};
 }
