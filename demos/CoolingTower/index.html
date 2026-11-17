@@ -13,6 +13,7 @@ window.MathJax = {
 };
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
+
 <style>
 :root{
   --bg:#fff; --card:#fff; --line:#dbe2ea;
@@ -41,8 +42,10 @@ h1{margin:0;font-size:25px;font-weight:600;color:#000}
 .symlist{margin:0;padding-left:20px}
 .symlist li{margin:5px 0}
 mjx-container[display="true"]{text-align:left!important;margin:6px 0!important}
-.wrap{display:grid;grid-template-columns:320px 1fr;gap:16px;padding:12px 24px 24px;max-width:1400px;margin:0 auto;align-items:start}
-@media(max-width:900px){.wrap{grid-template-columns:1fr;padding:12px 14px 24px}}
+.wrap{display:grid;grid-template-columns:320px minmax(0,1fr);gap:16px;padding:12px 24px 24px;max-width:1400px;margin:0 auto;align-items:start}
+aside{grid-row-start:span 2;}
+@media(max-width:1340px){.wrap{grid-template-columns:320px minmax(0,1fr)}.charts{grid-column:1/3 !important;}aside{grid-row-start:span 1;}}
+@media(max-width:900px){.wrap{grid-template-columns:1fr;padding:12px 14px 24px}.top,.charts{grid-column:1 !important;grid-row:auto !important};aside{grid-row-start:span 1}}
 .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
 .card h2{margin:0 0 8px;font-size:17px;font-weight:600;color:#000;padding-bottom:6px;border-bottom:1px solid var(--line)}
 .ctl{margin:11px 0}
@@ -55,8 +58,7 @@ input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #f
 .presets{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}
 .presets button{font:inherit;font-size:15px;font-weight:400;border:1px solid var(--line);background:#fff;color:#000;border-radius:6px;padding:5px 9px;cursor:pointer}
 .presets button:hover{background:#eef3f9}
-.right{display:grid;gap:16px;min-width:0}
-.top{display:grid;grid-template-columns:minmax(300px,1.15fr) minmax(260px,1fr);gap:16px}
+.top{display:grid;grid-column:2;grid-row:1;grid-template-columns:minmax(300px,1.15fr) minmax(260px,1fr);gap:16px;min-width:0;}
 @media(max-width:1340px){.top{grid-template-columns:1fr}}
 canvas{width:100%;display:block}
 .stats{display:flex;flex-wrap:wrap;gap:8px}
@@ -64,7 +66,8 @@ canvas{width:100%;display:block}
 .stat span{display:block;font-size:17px;color:#000;font-weight:400}
 .stat b{font-size:17px;font-weight:400;color:#000;font-variant-numeric:tabular-nums}
 .stat i{font-style:normal;font-size:17px;color:#000}
-.charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}
+.charts{display:grid;grid-column:2;grid-row:2;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:10px}
+.charts .card{padding:10px}
 .msg{padding:8px 10px;border-radius:7px;font-size:16px;margin-top:8px;display:none;color:#000;max-width:fit-content}
 .msg.warn{background:#fff4e0;border:1px solid #f1cf94;display:inline-block}
 .msg.ok{background:#e8f6ec;border:1px solid #b7e2c3;display:inline-block}
@@ -73,6 +76,7 @@ canvas{width:100%;display:block}
 .chk{font-size:17px;color:#000;font-weight:400;display:flex;align-items:center;gap:7px;margin-top:9px}
 </style>
 </head>
+
 <body>
 <header>
   <div></div>
@@ -156,42 +160,40 @@ canvas{width:100%;display:block}
   </div>
 </div>
 
-<div class="wrap">
+<main class="wrap">
   <aside class="card" id="controls">
     <div class="presets" id="presets"></div>
     <div id="sliders"></div>
     <label class="chk"><input type="checkbox" id="animToggle" checked> Animate schematic</label>
   </aside>
 
-  <main class="right">
-    <div class="top">
-      <div class="card">
-        <h2>Tower schematic</h2>
-        <canvas id="schem" height="368"></canvas>
-      </div>
-      <div class="card">
-        <h2>results</h2>
-        <div class="stats" id="stats"></div>
-        <div class="msg" id="msg"></div>
-      </div>
+  <div class="top">
+    <div class="card">
+      <h2>Tower schematic</h2>
+      <canvas id="schem" height="368"></canvas>
     </div>
+    <div class="card">
+      <h2>results</h2>
+      <div class="stats" id="stats"></div>
+      <div class="msg" id="msg"></div>
+    </div>
+  </div>
 
-    <div class="charts">
-      <div class="card">
-        <h2>Enthalpy diagram</h2>
-        <canvas id="c1" height="330"></canvas>
-      </div>
-      <div class="card">
-        <h2>Temperature profiles along tower</h2>
-        <canvas id="c2" height="330"></canvas>
-      </div>
-      <div class="card">
-        <h2>Cold water temperature vs. L/G</h2>
-        <canvas id="c3" height="330"></canvas>
-      </div>
+  <div class="charts">
+    <div class="card">
+      <h2>Enthalpy diagram</h2>
+      <canvas id="c1" height="330"></canvas>
     </div>
-  </main>
-</div>
+    <div class="card">
+      <h2>Temperature profiles along tower</h2>
+      <canvas id="c2" height="330"></canvas>
+    </div>
+    <div class="card">
+      <h2>Cold water temperature vs. L/G</h2>
+      <canvas id="c3" height="330"></canvas>
+    </div>
+  </div>
+</main>
 
 <script>
 (function(){
@@ -416,7 +418,7 @@ function rotatedLabel(ctx,text,x,y,font,color){
   ctx.restore();
 }
 function axes(g,x0,x1,y0,y1,xl,yl){
-  var pl=64,pr=16,pt=14,pb=48,c=g.c;
+  var compact=g.w<360,pl=compact?50:64,pr=compact?10:16,pt=compact?10:14,pb=compact?42:48,c=g.c;
   var X=function(v){return pl+(v-x0)/(x1-x0)*(g.w-pl-pr);};
   var Y=function(v){return g.h-pb-(v-y0)/(y1-y0)*(g.h-pt-pb);};
   c.font="16px "+FONT;c.fillStyle="#000";c.strokeStyle="#e5eaf0";c.lineWidth=1;
