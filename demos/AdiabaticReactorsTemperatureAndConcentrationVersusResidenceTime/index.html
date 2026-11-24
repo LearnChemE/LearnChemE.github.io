@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Adiabatic Reactors: Temperature and Concentration versus Residence Time</title>
 <script>
   window.MathJax = {
@@ -47,10 +48,17 @@
     position:relative;
     display:flex;
     align-items:center;
-    justify-content:flex-start;
+    justify-content:space-between;
     flex-wrap:wrap;
-    gap:26px;
-    margin-bottom:12px;
+    gap:10px 26px;
+    margin-bottom:10px;
+  }
+  .controls-row2{
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:10px 26px;
+    margin-bottom:10px;
   }
   .toggle-row{
     display:flex;
@@ -69,7 +77,7 @@
   .btn{
     font-family:Helvetica, Arial, sans-serif;
     font-size:13px;
-    padding:6px 16px;
+    padding:6px 14px;
     border:1.5px solid var(--accent);
     background:#fff;
     color:var(--accent);
@@ -82,49 +90,85 @@
     background:var(--accent);
     color:#fff;
   }
+  #reactorToggle [data-reactor="BOTH"], #hystBtn{ font-size:14.95px; }
+  #hystBtn{ margin-left:10px; }
+  .btn:disabled{
+    opacity:0.4;
+    cursor:not-allowed;
+    background:#fff;
+    color:var(--accent);
+  }
   .plot-wrap{
     border:1px solid var(--panel-border);
     border-radius:6px;
     padding:6px 6px 2px 6px;
-    margin-bottom:14px;
-    touch-action:none;
+    margin-bottom:10px;
   }
   canvas#plotCanvas{
     display:block;
     width:100%;
-    cursor:crosshair;
   }
-  .sliders-row{
-    display:flex;
-    gap:24px;
-    justify-content:center;
-    flex-wrap:wrap;
-    margin-bottom:18px;
+  .readout{
+    font-size:14.5px;
+    margin:0 0 14px 0;
+    overflow-x:auto;
   }
-  .slider-line{
-    display:flex;
+  .readout .cap{
+    text-align:center;
+    margin-bottom:4px;
+  }
+  .readout table{
+    border-collapse:collapse;
+    margin:0 auto;
+  }
+  .readout th, .readout td{
+    padding:2px 10px;
+    text-align:center;
+    white-space:nowrap;
+  }
+  .readout th{
+    font-weight:normal;
+    color:#555;
+    border-bottom:1px solid #ddd;
+  }
+  .readout td.unstable{ color:#888; }
+  .readout .traj{
+    text-align:center;
+    margin-top:6px;
+    line-height:1.45;
+  }
+  .sliders-grid{
+    display:grid;
+    grid-template-columns:auto minmax(90px, 156px) auto auto minmax(90px, 156px) auto;
+    gap:8px 6px;
     align-items:center;
-    gap:12px;
     justify-content:center;
-    flex-wrap:wrap;
+    margin-bottom:12px;
   }
-  .slider-line .lbl{
+  .sliders-grid .lbl{
     white-space:nowrap;
     font-size:16.445px;
+    text-align:right;
   }
-  .slider-line input[type=range]{
-    width:220px;
-  }
-  .slider-line .val{
-    font-weight:normal;
+  .sliders-grid .lbl.col2{ padding-left:12px; }
+  .sliders-grid .val{
     color:#000;
     font-size:16.445px;
-    min-width:26px;
+    min-width:36px;
+    white-space:nowrap;
+  }
+  .tau-sym{ font-family:"Times New Roman", Georgia, serif; font-style:italic; font-size:18px; }
+  .action-row{
+    display:flex;
+    justify-content:center;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-bottom:12px;
   }
   input[type=range]{
     -webkit-appearance:none;
     width:100%;
-    height:18px;
+    height:22px;
     background:transparent;
     cursor:pointer;
   }
@@ -187,6 +231,8 @@
     left:0;
     width:529px;
     max-width:78vw;
+    max-height:80vh;
+    overflow-y:auto;
     padding:18px 34px 14px 16px;
     border:1px solid #ccc;
     border-radius:5px;
@@ -206,6 +252,9 @@
   }
   .panelContent-wide{
     width:575px;
+  }
+  #panel-about{
+    width:635px;
   }
   .panelClose{
     position:absolute;
@@ -227,9 +276,11 @@
     margin:0 0 10px 0;
   }
   .panelContent a{ color:var(--accent); }
+  .panelContent p:has(+ .eq){ margin-bottom:2px; }
   .eq{
     display:block;
-    margin:10px 0;
+    margin:0 0 3px 0;
+    padding-left:3ch;
     text-align:left;
   }
   .eq mjx-container{
@@ -237,6 +288,40 @@
     text-align:left !important;
   }
   sub, sup{ font-size:70%; }
+
+  /* ---------- small screens ---------- */
+  @media (max-width:600px){
+    body{ padding:12px 6px 30px 6px; }
+    h1.title{ font-size:16px; }
+    .toggle-row .group-label{ font-size:14px; }
+    .btn{ font-size:12.5px; padding:6px 10px; }
+    .panelBtn{ font-size:14px; padding:6px 12px; }
+    .panel-btn-wrap.anchor-right .panelContent,
+    .panelContent, .panelContent-wide, #panel-about{
+      left:0;
+      right:0;
+      width:auto;
+      max-width:none;
+      padding:16px 30px 12px 12px;
+      font-size:14px;
+    }
+    #reactorToggle [data-reactor="BOTH"], #hystBtn{ font-size:14.4px; }
+    .readout{ font-size:13px; }
+    .readout th, .readout td{ padding:2px 6px; }
+    .sliders-grid{
+      grid-template-columns:60% auto;
+      justify-content:start;
+      gap:2px 10px;
+    }
+    .sliders-grid .lbl{
+      grid-column:1 / 3;
+      text-align:left;
+      font-size:15px;
+      margin-top:6px;
+    }
+    .sliders-grid .val{ font-size:15px; min-width:56px; }
+    .sliders-grid .lbl.col2{ padding-left:0; }
+  }
 </style>
 </head>
 <body>
@@ -247,7 +332,9 @@
     <div class="toggle-row" id="reactorToggle">
       <span class="group-label">reactor type</span>
       <button class="btn active" data-reactor="CSTR">CSTR</button>
-      <button class="btn" data-reactor="PFTR">PFTR</button>
+      <button class="btn" data-reactor="PFR">PFR</button>
+      <button class="btn" data-reactor="BOTH">both</button>
+      <button class="btn" id="hystBtn">&#9654; hysteresis</button>
     </div>
 
     <div id="panelButtons">
@@ -256,7 +343,9 @@
         <div class="panelContent" id="panel-directions">
           <button class="panelClose" data-panel="directions" aria-label="Close">&times;</button>
           <h2 class="panelTitle">Directions</h2>
-          <p>This simulation plots the normalized reactant concentration and temperature versus the residence time for a first-order reaction in either an adiabatic CSTR (continuous stirred tank reactor) or an adiabatic PFR (plug-flow reactor). Set the value of &minus;&Delta;H<sub>R</sub>C<sub>A0</sub>/(&rho;c<sub>p</sub>) with the slider, where &Delta;H<sub>R</sub> is the heat of reaction, &rho; is the fluid density, and c<sub>p</sub> is the fluid heat capacity. For a CSTR, three solutions exist for a range of the residence times; only two solutions are stable.</p>
+          <p>This simulation plots the normalized reactant concentration C<sub>A</sub>/C<sub>A0</sub> (or the conversion X) and the temperature versus the residence time for a first-order reaction in an adiabatic CSTR (continuous stirred-tank reactor), an adiabatic PFR (plug-flow reactor), or both. Use the sliders to set &minus;&Delta;H<sub>R</sub>C<sub>A0</sub>/(&rho;c<sub>p</sub>), the feed temperature, and the residence time, where &Delta;H<sub>R</sub> is the heat of reaction, &rho; is the fluid density, and c<sub>p</sub> is the fluid heat capacity. The table below the plot lists the solutions at the selected residence time. Hover over the plot to read values, or click on it to set the residence time.</p>
+          <p>For a CSTR, three steady states exist over a range of residence times; the middle steady state (dashed) is unstable. Press &ldquo;hysteresis&rdquo; to watch the CSTR outlet jump up at ignition as the residence time slowly increases and jump down at extinction as it decreases.</p>
+          <p>Select &ldquo;heat balance&rdquo; to see the CSTR steady states as intersections of the heat-generation and heat-removal curves. Select &ldquo;dynamics&rdquo; and click on the plot to choose a starting concentration and temperature; the plot then shows how the CSTR moves to one of its stable steady states.</p>
         </div>
       </span>
       <span class="panel-btn-wrap anchor-right">
@@ -264,19 +353,44 @@
         <div class="panelContent panelContent-wide" id="panel-details">
           <button class="panelClose" data-panel="details" aria-label="Close">&times;</button>
           <h2 class="panelTitle">Details</h2>
-          <p>Consider the first-order chemical reaction A&nbsp;&rarr;&nbsp;B taking place either in an adiabatic CSTR or an adiabatic PFR. The rate constant follows the Arrhenius law:</p>
-          <span class="eq">\[ k(T) = 2.6\times10^{20}\exp\!\left(-\dfrac{15000}{T}\right)\ \text{s}^{-1} \]</span>
-          <p>An adiabatic energy balance links the temperature to the extent of reaction:</p>
-          <span class="eq">\[ T = T_0 + \mathcal{J}\,\dfrac{C_{A0}-C_A}{C_{A0}},\qquad T_0 = 300\ \text{K} \]</span>
+          <p>Consider the first-order chemical reaction A&nbsp;&rarr;&nbsp;B taking place in an adiabatic CSTR or an adiabatic PFR. The rate constant follows the Arrhenius law:</p>
+          <span class="eq">\[ k(T) = 2.6\times10^{20}\exp\!\left(-\dfrac{15000}{T}\right)\ \text{min}^{-1} \]</span>
+          <p>An adiabatic energy balance links the temperature to the conversion:</p>
+          <span class="eq">\[ T = T_0 + \mathcal{J}X,\qquad X = \dfrac{C_{A0}-C_A}{C_{A0}} \]</span>
           <p>where</p>
-          <span class="eq">\[ \mathcal{J} = -\dfrac{\Delta H_R C_{A0}}{\rho c_p}, \]</span>
-          <p>&Delta;H<sub>R</sub> is the heat of reaction, &rho; is the fluid density, and c<sub>p</sub> is the fluid heat capacity. The feed concentration is fixed at C<sub>A0</sub>&nbsp;=&nbsp;1.0, and the concentration axis plots the normalized quantity C<sub>A</sub>/C<sub>A0</sub>.</p>
-          <p>For the adiabatic CSTR, the steady-state design equation relates the residence time &tau; to the outlet concentration C<sub>A</sub> implicitly:</p>
+          <span class="eq">\[ \mathcal{J} = -\dfrac{\Delta H_R C_{A0}}{\rho c_p} \]</span>
+          <p>The feed concentration is fixed at C<sub>A0</sub>&nbsp;=&nbsp;1.0, and the concentration axis plots the normalized quantity C<sub>A</sub>/C<sub>A0</sub>. Because \(T\) is linear in \(X\), the conversion and temperature curves coincide when conversion is plotted.</p>
+          <p>For the adiabatic CSTR, the steady-state design equation relates the residence time \(\tau\) to the outlet concentration C<sub>A</sub> implicitly:</p>
           <span class="eq">\[ \tau = \dfrac{C_{A0}-C_A}{C_A\,k(T(C_A))} \]</span>
-          <p>This equation is solved parametrically in C<sub>A</sub>, which reveals that for a range of &tau; there can be up to three steady-state solutions. A linear stability analysis shows that only two of these three solutions are stable; steady-state multiplicity is physically real for this reactor.</p>
-          <p>For the adiabatic PFR (equivalent here to a batch reactor followed along its length, with &tau; playing the role of the space time), the concentration profile is obtained by integrating the ordinary differential equation:</p>
+          <p>This equation is solved parametrically in C<sub>A</sub>, which reveals that for a range of \(\tau\) there can be three steady-state solutions. A linear stability analysis shows that only two of these three solutions are stable; the middle (unstable) steady state is drawn dashed.</p>
+          <p>Dividing the CSTR steady-state energy balance by \(\rho c_p/C_{A0}\) expresses the heat generated by reaction and the heat removed by flow in temperature units:</p>
+          <span class="eq">\[ G(T) = \mathcal{J}\,\dfrac{k\tau}{1+k\tau},\qquad R(T) = T - T_0 \]</span>
+          <p>Steady states are the intersections, \(G = R\). A steady state is stable when \(dR/dT > dG/dT\) at the intersection.</p>
+          <p>When \(\tau\) is increased slowly, the CSTR stays on the low-conversion branch until ignition, where it jumps to high conversion. When \(\tau\) is then decreased, it stays on the high-conversion branch until extinction, so the path up differs from the path down (hysteresis).</p>
+          <p>The &ldquo;dynamics&rdquo; view integrates the unsteady CSTR mole and energy balances from the starting point you select:</p>
+          <span class="eq">\[ \dfrac{dC_A}{dt} = \dfrac{C_{A0}-C_A}{\tau} - k\,C_A \]</span>
+          <span class="eq">\[ \dfrac{dT}{dt} = \dfrac{T_0-T}{\tau} + \mathcal{J}\,k\,\dfrac{C_A}{C_{A0}} \]</span>
+          <p>All trajectories approach the line \(T = T_0 + \mathcal{J}X\) and then move along it to a stable steady state.</p>
+          <p>For the adiabatic PFR (a PFR with constant density behaves like a batch reactor, with \(\tau\) in place of batch time), the concentration profile is obtained by integrating the ordinary differential equation:</p>
           <span class="eq">\[ \dfrac{dC_A}{d\tau} = -k(T(C_A))\,C_A,\qquad C_A(0) = C_{A0} \]</span>
-          <p>Values of the activation energy, pre-exponential factor, and inlet temperature are taken from the original reference. This implementation integrates the PFR equation with a fourth-order Runge&ndash;Kutta method and traces the CSTR relation parametrically in C<sub>A</sub> to reproduce the full multiplicity curve.</p>
+          <p>Values of the activation energy and pre-exponential factor are taken from the original reference, which used an inlet temperature of 300&nbsp;K.</p>
+          <p style="font-weight:bold;margin-top:14px;">Symbols</p>
+          <p>
+            \(C_A\) = concentration of A in the reactor outlet<br>
+            \(C_{A0}\) = feed concentration of A<br>
+            \(c_p\) = fluid heat capacity<br>
+            \(G\) = heat generated by reaction, in temperature units (K)<br>
+            \(\mathcal{J}\) = adiabatic temperature rise for complete conversion (K)<br>
+            \(k\) = rate constant (min<sup>&minus;1</sup>)<br>
+            \(R\) = heat removed by flow, in temperature units (K)<br>
+            \(t\) = time (min)<br>
+            \(T\) = temperature (K)<br>
+            \(T_0\) = inlet temperature (K)<br>
+            \(X\) = conversion of A<br>
+            \(\Delta H_R\) = heat of reaction<br>
+            \(\rho\) = fluid density<br>
+            \(\tau\) = residence time (min)
+          </p>
         </div>
       </span>
       <span class="panel-btn-wrap anchor-right">
@@ -284,22 +398,50 @@
         <div class="panelContent" id="panel-about">
           <button class="panelClose" data-panel="about" aria-label="Close">&times;</button>
           <h2 class="panelTitle">About</h2>
-          <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/VariationOfTemperatureAndConcentrationVersusResidenceTimeFor/" target="_blank" rel="noopener">Mathematica simulation</a> by Housam Binous and Ahmed Bellagi. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988) in collaboration with Washington State University. Address any questions or comments to <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.</p>
+          <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/VariationOfTemperatureAndConcentrationVersusResidenceTimeFor/" target="_blank" rel="noopener">Mathematica simulation</a> by Housam Binous and Ahmed Bellagi. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.</p>
         </div>
       </span>
     </div>
   </div>
 
-  <div class="plot-wrap">
-    <canvas id="plotCanvas"></canvas>
+  <div class="controls-row2">
+    <div class="toggle-row" id="viewToggle">
+      <span class="group-label">view</span>
+      <button class="btn active" data-view="tau">versus <span class="tau-sym" style="font-size:15px;">&tau;</span></button>
+      <button class="btn" data-view="heat">heat balance</button>
+      <button class="btn" data-view="trans">dynamics</button>
+    </div>
+    <div class="toggle-row" id="yToggle">
+      <span class="group-label">plot</span>
+      <button class="btn active" data-y="C">C<sub>A</sub>/C<sub>A0</sub></button>
+      <button class="btn" data-y="X">conversion</button>
+    </div>
   </div>
 
-  <div class="sliders-row">
-    <div class="slider-line">
-      <span class="lbl">&minus;&Delta;H<sub>R</sub>C<sub>A0</sub>/(&rho;c<sub>p</sub>)</span>
-      <input type="range" id="Jslider" min="35" max="45" step="1" value="40">
-      <span class="val" id="Jval">40</span>
-    </div>
+  <div class="sliders-grid">
+    <span class="lbl">&minus;&Delta;H<sub>R</sub>C<sub>A0</sub>/(&rho;c<sub>p</sub>) (K)</span>
+    <input type="range" id="Jslider" min="15" max="60" step="1" value="40" aria-label="adiabatic temperature rise">
+    <span class="val" id="Jval">40</span>
+
+    <span class="lbl col2">feed temperature T<sub>0</sub> (K)</span>
+    <input type="range" id="T0slider" min="290" max="310" step="1" value="300" aria-label="feed temperature">
+    <span class="val" id="T0val">300</span>
+
+    <span class="lbl">residence time <span class="tau-sym">&tau;</span> (min)</span>
+    <input type="range" id="tauSlider" min="0" max="2" step="0.004" value="1" aria-label="residence time">
+    <span class="val" id="tauVal">1.00</span>
+
+  </div>
+
+  <div class="plot-wrap">
+    <canvas id="plotCanvas" aria-label="plot"></canvas>
+  </div>
+
+  <div class="readout" id="readout"></div>
+
+
+  <div class="action-row">
+    <button class="btn" id="clearBtn" style="display:none;">clear trajectories</button>
   </div>
 </div>
 
@@ -307,430 +449,1006 @@
 (function(){
   "use strict";
 
-  // ---------- physics ----------
-  var T0 = 300;
-  var GREEN = '#1B7837';
-  function kRate(T){ return 2.6e20 * Math.exp(-15000/T); }
-  function TofCA(CA, CA0, J){ return T0 + (J/CA0) * (CA0 - CA); }
-
-  // Parametrize the CSTR design equation in CA to capture the (possibly
-  // multi-valued) tau(CA) relationship, including the multiplicity fold.
-  function computeCSTRCurve(CA0, J){
-    var pts = [];
-    var N = 6000;
-    var ratio = 1e-6; // CA_N / CA0
-    for(var i=0;i<=N;i++){
-      var frac = i/N;
-      var CA = CA0 * Math.pow(ratio, frac);
-      var T = TofCA(CA, CA0, J);
-      var k = kRate(T);
-      var tau = (CA0 - CA) / (CA * k);
-      if(!isFinite(tau) || tau < 0) continue;
-      pts.push({tau:tau, CA:CA, T:T});
-      if(tau > 200) break;
-    }
-    return pts;
-  }
-
-  // Integrate the PFR / batch-analog ODE with RK4.
-  function computePFRCurve(CA0, J, tMax){
-    var steps = 6000;
-    var h = tMax/steps;
-    var pts = [];
-    var CA = CA0;
-    pts.push({tau:0, CA:CA0, T:TofCA(CA0,CA0,J)});
-    function f(CAv){
-      var T = TofCA(CAv, CA0, J);
-      return -kRate(T) * CAv;
-    }
-    for(var i=1;i<=steps;i++){
-      var k1 = f(CA);
-      var k2 = f(CA + h/2*k1);
-      var k3 = f(CA + h/2*k2);
-      var k4 = f(CA + h*k3);
-      CA = CA + h/6*(k1+2*k2+2*k3+k4);
-      if(CA < 0) CA = 0;
-      if(CA > CA0) CA = CA0;
-      var t = i*h;
-      var T = TofCA(CA, CA0, J);
-      pts.push({tau:t, CA:CA, T:T});
-    }
-    return pts;
-  }
+  // ---------- colors ----------
+  var GREEN = '#1B7837', NAVY = '#00007A', GEN = '#D95F02', XCOL = '#333333';
+  var HILITE = 'rgba(242,142,43,0.50)', HDOT = '#E66101';
+  var HIGHC = '#B2182B', LOWC = '#2166AC';
 
   // ---------- state ----------
-  var state = {
-    reactor:'CSTR',
-    CA0:1.0,
-    J:40,
-    curve:null,
-    domainMax:{CSTR:2, PFTR:6},
-    hardMax:{CSTR:200, PFTR:30},
-    view:{tauMin:0, tauMax:2}
+  var S = {
+    reactor:'CSTR', view:'tau', yvar:'C',
+    J:40, T0:300, tau:1.0, tauMax:2,
+    cstr:null, pfr:null,
+    hover:null, traj:[], trajAnim:null, hyst:null
   };
 
-  function recompute(){
-    if(state.reactor === 'CSTR'){
-      state.curve = computeCSTRCurve(state.CA0, state.J);
-    } else {
-      state.curve = computePFRCurve(state.CA0, state.J, state.hardMax.PFTR);
+  // ---------- physics (CA normalized by CA0, written c) ----------
+  function kR(T){ return 2.6e20 * Math.exp(-15000/T); }
+  function Tof(c){ return S.T0 + S.J * (1 - c); }
+
+  // CSTR: trace tau(c) parametrically; mark unstable (middle) branch and folds
+  function computeCSTR(){
+    var N = 8000, lnr = Math.log(1e-7), pts = [];
+    for(var i=0;i<=N;i++){
+      var c = Math.exp(lnr*i/N), T = Tof(c);
+      var tau = (1 - c)/(c * kR(T));
+      pts.push({tau:tau, c:c, T:T, unstable:false});
+      if(tau > 1e5) break;
     }
+    for(var j=0;j<pts.length-1;j++){ pts[j].unstable = pts[j+1].tau < pts[j].tau; }
+    var folds = [];
+    for(var m=1;m<pts.length-1;m++){
+      if(pts[m].unstable !== pts[m-1].unstable) folds.push(m);
+    }
+    var ign = null, ext = null;
+    if(folds.length >= 2){ ign = pts[folds[0]]; ext = pts[folds[1]]; }
+    return {pts:pts, ign:ign, ext:ext};
   }
 
-  function resetView(){
-    state.view.tauMin = 0;
-    state.view.tauMax = state.domainMax[state.reactor];
+  // all CSTR steady states at a given tau, ordered from low to high conversion
+  function cstrStates(tau){
+    var P = S.cstr.pts, res = [];
+    for(var i=0;i<P.length-1;i++){
+      var a = P[i].tau - tau, b = P[i+1].tau - tau;
+      if((a <= 0 && b > 0) || (a >= 0 && b < 0)){
+        var hi = P[i].c, lo = P[i+1].c, ga = a;
+        for(var it=0; it<60; it++){
+          var mid = 0.5*(lo+hi);
+          var gm = (1-mid)/(mid*kR(Tof(mid))) - tau;
+          if((gm < 0) === (ga < 0)){ hi = mid; ga = gm; } else { lo = mid; }
+        }
+        var c = 0.5*(lo+hi);
+        res.push({c:c, T:Tof(c), unstable:P[i].unstable});
+      }
+    }
+    return res;
   }
 
-  // ---------- canvas setup ----------
+  // PFR: adaptive-step RK4
+  function computePFR(){
+    var c = 1, t = 0, n = 0;
+    var pts = [{tau:0, c:1, T:Tof(1)}];
+    function f(cv){ return -kR(Tof(cv)) * cv; }
+    while(c > 1e-6 && t < 5000 && n < 100000){
+      var h = Math.min(0.04/kR(Tof(c)), 0.5);
+      var k1 = f(c), k2 = f(c + h/2*k1), k3 = f(c + h/2*k2), k4 = f(c + h*k3);
+      c = c + h/6*(k1 + 2*k2 + 2*k3 + k4);
+      if(c < 0) c = 0;
+      t += h; n++;
+      pts.push({tau:t, c:c, T:Tof(c)});
+    }
+    pts.push({tau:1e6, c:c, T:Tof(c)});
+    return {pts:pts};
+  }
+
+  function pfrAt(tau){
+    var P = S.pfr.pts;
+    if(tau <= 0) return {c:1, T:Tof(1)};
+    var lo = 0, hi = P.length - 1;
+    while(hi - lo > 1){ var m = (lo+hi) >> 1; if(P[m].tau < tau) lo = m; else hi = m; }
+    var a = P[lo], b = P[hi], f = (tau - a.tau)/(b.tau - a.tau);
+    var c = a.c + f*(b.c - a.c);
+    return {c:c, T:Tof(c)};
+  }
+
+  function firstTauBelow(P, cTarget){
+    for(var i=0;i<P.length;i++){ if(P[i].c <= cTarget) return P[i].tau; }
+    return P[P.length-1].tau;
+  }
+
+  var NICE = [0.05,0.1,0.2,0.25,0.3,0.4,0.5,0.6,0.8,1,1.5,2,2.5,3,4,5,6,8,10,12,15,20,25,30,40,50,60,80,100,120,150,200,250,300,400,500];
+  function niceUp(v){
+    for(var i=0;i<NICE.length;i++){ if(NICE[i] >= v - 1e-9) return NICE[i]; }
+    return NICE[NICE.length-1];
+  }
+
+  function computeTauMax(){
+    var m = 0;
+    var useC = (S.reactor !== 'PFR') || S.view !== 'tau';
+    var useP = (S.reactor !== 'CSTR') && S.view === 'tau';
+    if(useC){
+      if(S.cstr.ign) m = Math.max(m, 1.4*S.cstr.ign.tau);
+      else m = Math.max(m, 1.2*firstTauBelow(S.cstr.pts, 0.05));
+    }
+    if(useP){ m = Math.max(m, 1.3*firstTauBelow(S.pfr.pts, 0.01)); }
+    return niceUp(m);
+  }
+
+  // ---------- DOM ----------
   var canvas = document.getElementById('plotCanvas');
   var ctx = canvas.getContext('2d');
-  var CSS_W = 730, CSS_H = 430;
+  var readoutEl = document.getElementById('readout');
+  var Jslider = document.getElementById('Jslider'), Jval = document.getElementById('Jval');
+  var T0slider = document.getElementById('T0slider'), T0val = document.getElementById('T0val');
+  var tauSlider = document.getElementById('tauSlider'), tauVal = document.getElementById('tauVal');
+  var hystBtn = document.getElementById('hystBtn'), clearBtn = document.getElementById('clearBtn');
+
+  var W = 730, H = 430, FS = 1;
 
   function setupCanvas(){
     var rect = canvas.parentElement.getBoundingClientRect();
-    CSS_W = Math.max(320, rect.width - 12);
-    CSS_H = Math.round(CSS_W * 430/730);
+    W = Math.max(260, Math.floor(rect.width - 12));
+    H = Math.round(W * (W < 520 ? 0.80 : 430/730));
+    FS = Math.max(0.62, Math.min(1, W/730));
     var dpr = window.devicePixelRatio || 1;
-    canvas.width = CSS_W * dpr;
-    canvas.height = CSS_H * dpr;
-    canvas.style.width = CSS_W + 'px';
-    canvas.style.height = CSS_H + 'px';
+    canvas.width = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
     ctx.setTransform(dpr,0,0,dpr,0,0);
   }
 
-  // margins
-  var M = {left:66, right:66, top:22, bottom:54};
-
-  function niceDecimals(span){
-    if(span <= 0.3) return 3;
-    if(span <= 1.5) return 2;
-    if(span <= 8) return 1;
-    return 0;
+  function margins(){
+    var right = (S.view === 'tau') ? Math.round(66*FS) : Math.round(22*FS);
+    return {l:Math.round(66*FS), r:right, t:Math.round(14*FS)+4, b:Math.round(54*FS)};
   }
 
-  function fmt(v, dec){ return v.toFixed(dec); }
+  function tickPx(){ return Math.max(11, 17.28*FS); }
+  function titlePx(){ return Math.max(12, 18.72*FS); }
 
-  // Draws text made of {text, sub} segments (sub=true renders smaller & lower,
-  // for proper capital-letter subscripts like "A" and "0"). Optionally paints
-  // a white background box first so the label isn't obscured by plotted curves.
-  function measureSegments(segments, mainFont, subFont){
-    var width = 0;
-    segments.forEach(function(seg){
-      ctx.font = seg.sub ? subFont : mainFont;
-      width += ctx.measureText(seg.text).width;
-    });
-    return width;
+  // ---------- text helpers ----------
+  // segments: {t:text, sub:bool, it:bool}
+  function segFont(s, px){
+    var p = s.sub ? px*0.69 : px;
+    return (s.it ? 'italic ' : '') + p.toFixed(2) + 'px ' +
+      (s.it ? '"Times New Roman", Georgia, serif' : 'Helvetica, Arial, sans-serif');
   }
-
-  function drawSegments(segments, x, y, mainFont, subFont, subOffsetY, color, align){
-    var totalWidth = measureSegments(segments, mainFont, subFont);
-    var startX;
-    if(align === 'center') startX = x - totalWidth/2;
-    else if(align === 'right') startX = x - totalWidth;
-    else startX = x;
+  function richWidth(segs, px){
+    var w = 0;
+    segs.forEach(function(s){ ctx.font = segFont(s, px); w += ctx.measureText(s.t).width; });
+    return w;
+  }
+  function drawRich(segs, x, y, px, color, align){
+    var w = richWidth(segs, px);
+    var sx = align === 'center' ? x - w/2 : (align === 'right' ? x - w : x);
     ctx.textAlign = 'left';
     ctx.textBaseline = 'alphabetic';
     ctx.fillStyle = color;
-    var cx = startX;
-    segments.forEach(function(seg){
-      ctx.font = seg.sub ? subFont : mainFont;
-      var yy = seg.sub ? y + subOffsetY : y;
-      ctx.fillText(seg.text, cx, yy);
-      cx += ctx.measureText(seg.text).width;
+    segs.forEach(function(s){
+      ctx.font = segFont(s, px);
+      ctx.fillText(s.t, sx, s.sub ? y + px*0.31 : y);
+      sx += ctx.measureText(s.t).width;
     });
-    return totalWidth;
+    return w;
+  }
+  function labelBox(segs, x, y, px, color, align){
+    var w = richWidth(segs, px), pad = 3;
+    var sx = align === 'center' ? x - w/2 : (align === 'right' ? x - w : x);
+    ctx.fillStyle = 'rgba(255,255,255,0.88)';
+    ctx.fillRect(sx - pad, y - px*0.85 - pad, w + 2*pad, px*1.25 + 2*pad);
+    drawRich(segs, x, y, px, color, align);
   }
 
-  function drawCurveLabel(segments, x, y, mainPx, subPx, subOffsetY, color, align){
-    var mainFont = mainPx + 'px Helvetica, Arial, sans-serif';
-    var subFont = subPx + 'px Helvetica, Arial, sans-serif';
-    var totalWidth = measureSegments(segments, mainFont, subFont);
-    var startX;
-    if(align === 'center') startX = x - totalWidth/2;
-    else if(align === 'right') startX = x - totalWidth;
-    else startX = x;
-    var pad = 4;
-    var top = y - mainPx*0.80 - pad;
-    var bottom = y + subOffsetY + subPx*0.30 + pad;
-    ctx.fillStyle = 'rgba(255,255,255,0.92)';
-    ctx.fillRect(startX - pad, top, totalWidth + pad*2, bottom - top);
-    drawSegments(segments, x, y, mainFont, subFont, subOffsetY, color, align);
+  var SEG_CA = [{t:'C'},{t:'A',sub:true},{t:'/C'},{t:'A0',sub:true}];
+  function yVarSegs(){ return S.yvar === 'C' ? SEG_CA : [{t:'conversion'}]; }
+  function yVarShort(){ return S.yvar === 'C' ? SEG_CA : [{t:'X',it:true}]; }
+  function yv(c){ return S.yvar === 'C' ? c : 1 - c; }
+
+  // ---------- ticks ----------
+  function niceTicks(a, b, maxN, allow25){
+    var span = b - a, raw = span/maxN;
+    var p = Math.pow(10, Math.floor(Math.log10(raw)));
+    var cands = allow25 ? [1,2,2.5,5,10] : [1,2,5,10];
+    var step = 10*p;
+    for(var i=0;i<cands.length;i++){ if(cands[i]*p >= raw - 1e-12){ step = cands[i]*p; break; } }
+    var ticks = [];
+    var s0 = Math.ceil(a/step - 1e-9)*step;
+    for(var v=s0; v <= b + step*1e-6; v += step) ticks.push(+v.toFixed(10));
+    return {ticks:ticks, step:step};
   }
-
-  function drawAxisTitle(segments, x, y, mainPx, subPx, subOffsetY, color, align){
-    var mainFont = mainPx + 'px Helvetica, Arial, sans-serif';
-    var subFont = subPx + 'px Helvetica, Arial, sans-serif';
-    drawSegments(segments, x, y, mainFont, subFont, subOffsetY, color, align);
+  function decFor(step){
+    for(var d=0; d<5; d++){
+      var v = step*Math.pow(10,d);
+      if(Math.abs(Math.round(v) - v) < 1e-6) return d;
+    }
+    return 4;
   }
+  function tauDec(){ return S.tauMax <= 0.3 ? 3 : (S.tauMax <= 3 ? 2 : (S.tauMax <= 30 ? 1 : 0)); }
+  function fmtTau(v){ return v.toFixed(tauDec()); }
 
-  function render(){
-    var w = CSS_W, h = CSS_H;
-    ctx.clearRect(0,0,w,h);
-
-    var plotW = w - M.left - M.right;
-    var plotH = h - M.top - M.bottom;
-
-    var tauMin = state.view.tauMin, tauMax = state.view.tauMax;
-    var CAmax = 1; // normalized: CA/CA0 ranges 0 to 1
-    var Tmin = T0, Tmax = T0 + state.J;
-
-    function xPix(tau){ return M.left + (tau - tauMin)/(tauMax - tauMin) * plotW; }
-    function yPixCA(ca){ return M.top + (1 - (ca/state.CA0)/CAmax) * plotH; }
-    function yPixT(T){ return M.top + (1 - (T - Tmin)/(Tmax - Tmin)) * plotH; }
-
-    // background / border
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0,0,w,h);
+  // ---------- generic frame ----------
+  function drawFrame(m, pw, ph, xt, xDec, xP, left, right){
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0,0,W,H);
+    var tp = tickPx();
+    ctx.lineWidth = 1;
+    // vertical gridlines and x ticks
+    xt.forEach(function(v){
+      var x = xP(v);
+      ctx.strokeStyle = '#eee';
+      ctx.beginPath(); ctx.moveTo(x, m.t); ctx.lineTo(x, m.t+ph); ctx.stroke();
+      ctx.strokeStyle = '#333';
+      ctx.beginPath(); ctx.moveTo(x, m.t+ph); ctx.lineTo(x, m.t+ph+5); ctx.stroke();
+      ctx.fillStyle = '#222';
+      ctx.font = tp.toFixed(2) + 'px Helvetica, Arial, sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+      ctx.fillText(v.toFixed(xDec), x, m.t+ph+7);
+    });
+    // left axis
+    left.ticks.forEach(function(v){
+      var y = left.yP(v);
+      ctx.strokeStyle = left.color;
+      ctx.beginPath(); ctx.moveTo(m.l-5, y); ctx.lineTo(m.l, y); ctx.stroke();
+      ctx.fillStyle = left.color;
+      ctx.font = tp.toFixed(2) + 'px Helvetica, Arial, sans-serif';
+      ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+      ctx.fillText(v.toFixed(left.dec), m.l-8, y);
+    });
+    ctx.save();
+    ctx.translate(Math.max(14, 20*FS), m.t + ph/2);
+    ctx.rotate(-Math.PI/2);
+    drawRich(left.title, 0, 0, titlePx(), left.color, 'center');
+    ctx.restore();
+    // right axis
+    if(right){
+      right.ticks.forEach(function(v){
+        var y = right.yP(v);
+        ctx.strokeStyle = right.color;
+        ctx.beginPath(); ctx.moveTo(m.l+pw, y); ctx.lineTo(m.l+pw+5, y); ctx.stroke();
+        ctx.fillStyle = right.color;
+        ctx.font = tp.toFixed(2) + 'px Helvetica, Arial, sans-serif';
+        ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+        ctx.fillText(v.toFixed(right.dec), m.l+pw+8, y);
+      });
+      ctx.save();
+      ctx.translate(W - Math.max(12, 18*FS), m.t + ph/2);
+      ctx.rotate(Math.PI/2);
+      drawRich(right.title, 0, 0, titlePx(), right.color, 'center');
+      ctx.restore();
+    }
     ctx.strokeStyle = '#333';
     ctx.lineWidth = 1;
-    ctx.strokeRect(M.left, M.top, plotW, plotH);
+    ctx.strokeRect(m.l, m.t, pw, ph);
+  }
 
-    // gridlines + x ticks
-    var nXt = 6;
-    var tauDec = niceDecimals(tauMax - tauMin);
-    ctx.font = '17.28px Helvetica, Arial, sans-serif';
-    for(var i=0;i<=nXt;i++){
-      var tv = tauMin + (tauMax-tauMin)*i/nXt;
-      var xp = xPix(tv);
-      ctx.strokeStyle = '#eee';
-      ctx.beginPath();
-      ctx.moveTo(xp, M.top);
-      ctx.lineTo(xp, M.top+plotH);
-      ctx.stroke();
-      ctx.strokeStyle = '#333';
-      ctx.beginPath();
-      ctx.moveTo(xp, M.top+plotH);
-      ctx.lineTo(xp, M.top+plotH+5);
-      ctx.stroke();
-      ctx.fillStyle = '#222';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'top';
-      ctx.fillText(fmt(tv, tauDec), xp, M.top+plotH+8);
-    }
+  function drawXTitle(segs, m, pw){
+    drawRich(segs, m.l + pw/2, H - Math.max(6, 8*FS), titlePx(), '#222', 'center');
+  }
 
-    // left y-axis (concentration) ticks
-    var nYt = 5;
-    var caDec = niceDecimals(CAmax);
-    ctx.strokeStyle = GREEN;
-    for(var j=0;j<=nYt;j++){
-      var cv = CAmax * j/nYt;
-      var yp = yPixCA(cv);
-      ctx.beginPath();
-      ctx.moveTo(M.left-5, yp);
-      ctx.lineTo(M.left, yp);
-      ctx.stroke();
-      ctx.fillStyle = GREEN;
-      ctx.textAlign = 'right';
-      ctx.textBaseline = 'middle';
-      ctx.font = '17.28px Helvetica, Arial, sans-serif';
-      ctx.fillText(fmt(cv, caDec), M.left-8, yp);
-    }
-
-    // right y-axis (temperature) ticks
-    ctx.strokeStyle = '#00007A';
-    for(var jj=0;jj<=nYt;jj++){
-      var Tv = Tmin + (Tmax-Tmin)*jj/nYt;
-      var ypT = yPixT(Tv);
-      ctx.beginPath();
-      ctx.moveTo(M.left+plotW, ypT);
-      ctx.lineTo(M.left+plotW+5, ypT);
-      ctx.stroke();
-      ctx.fillStyle = '#00007A';
-      ctx.textAlign = 'left';
-      ctx.textBaseline = 'middle';
-      ctx.font = '17.28px Helvetica, Arial, sans-serif';
-      ctx.fillText(fmt(Tv,0), M.left+plotW+8, ypT);
-    }
-
-    // axis titles
-    ctx.fillStyle = '#222';
-    var xAxisMainFont = '18.72px Helvetica, Arial, sans-serif';
-    var xAxisTauFont = 'italic 18.72px "Times New Roman", Georgia, serif';
-    ctx.font = xAxisMainFont;
-    var xAxisPart1 = 'residence time ';
-    var xAxisPart1Width = ctx.measureText(xAxisPart1).width;
-    ctx.font = xAxisTauFont;
-    var xAxisPart2Width = ctx.measureText('\u03C4').width;
-    var xAxisTotalWidth = xAxisPart1Width + xAxisPart2Width;
-    var xAxisStartX = M.left+plotW/2 - xAxisTotalWidth/2;
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'alphabetic';
-    ctx.font = xAxisMainFont;
-    ctx.fillText(xAxisPart1, xAxisStartX, h-8);
-    ctx.font = xAxisTauFont;
-    ctx.fillText('\u03C4', xAxisStartX + xAxisPart1Width, h-8);
-
-    // left axis title (rotated)
-    ctx.save();
-    ctx.translate(20, M.top+plotH/2);
-    ctx.rotate(-Math.PI/2);
-    drawAxisTitle(
-      [{text:'C', sub:false}, {text:'A', sub:true}, {text:'/C', sub:false}, {text:'A0', sub:true}],
-      0, 0, 18.72, 12.96, 5.76, GREEN, 'center'
-    );
-    ctx.restore();
-
-    // right axis title (rotated)
-    ctx.save();
-    ctx.translate(w-18, M.top+plotH/2);
-    ctx.rotate(Math.PI/2);
-    ctx.fillStyle = '#00007A';
-    ctx.font = '18.72px Helvetica, Arial, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('temperature (K)', 0, 0);
-    ctx.restore();
-
-    // clip to plot area for curves
+  function clipPlot(m, pw, ph){
     ctx.save();
     ctx.beginPath();
-    ctx.rect(M.left, M.top, plotW, plotH);
+    ctx.rect(m.l, m.t, pw, ph);
     ctx.clip();
+  }
 
-    // concentration curve
-    var pts = state.curve;
-    ctx.strokeStyle = GREEN;
-    ctx.lineWidth = 2.4;
-    ctx.beginPath();
-    var started = false;
-    var lastVisible = null;
-    for(var p=0;p<pts.length;p++){
-      var pt = pts[p];
-      if(pt.tau < tauMin - (tauMax-tauMin)*0.02 || pt.tau > tauMax + (tauMax-tauMin)*0.02){
-        started = false;
-        continue;
-      }
-      var px = xPix(pt.tau), py = yPixCA(pt.CA);
-      if(!started){ ctx.moveTo(px,py); started = true; }
-      else ctx.lineTo(px,py);
-      lastVisible = {px:px, py:py, tau:pt.tau};
-    }
-    ctx.stroke();
+  function dashU(){ return [7*FS + 2, 5*FS + 2]; }
 
-    // temperature curve
-    ctx.strokeStyle = '#00007A';
-    ctx.lineWidth = 2.4;
-    ctx.beginPath();
-    started = false;
-    var lastVisibleT = null;
-    for(var p2=0;p2<pts.length;p2++){
-      var pt2 = pts[p2];
-      if(pt2.tau < tauMin - (tauMax-tauMin)*0.02 || pt2.tau > tauMax + (tauMax-tauMin)*0.02){
-        started = false;
-        continue;
-      }
-      var px2 = xPix(pt2.tau), py2 = yPixT(pt2.T);
-      if(!started){ ctx.moveTo(px2,py2); started = true; }
-      else ctx.lineTo(px2,py2);
-      lastVisibleT = {px:px2, py:py2};
+  // CSTR curve with dashed unstable branch
+  function strokeCSTR(xf, yf, color, width){
+    var P = S.cstr.pts;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'butt';
+    var i = 0;
+    while(i < P.length - 1){
+      var u = P[i].unstable;
+      ctx.setLineDash(u ? dashU() : []);
+      ctx.beginPath();
+      ctx.moveTo(xf(P[i]), yf(P[i]));
+      var j = i;
+      while(j < P.length - 1 && P[j].unstable === u){ j++; ctx.lineTo(xf(P[j]), yf(P[j])); }
+      ctx.stroke();
+      i = j;
     }
+    ctx.setLineDash([]);
+  }
+
+  function strokePFR(xf, yf, color, width, dotted){
+    var P = S.pfr.pts;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = dotted ? width + 0.6 : width;
+    ctx.lineJoin = 'round';
+    ctx.lineCap = dotted ? 'round' : 'butt';
+    ctx.setLineDash(dotted ? [0.1, 6*FS + 2] : []);
+    ctx.beginPath();
+    ctx.moveTo(xf(P[0]), yf(P[0]));
+    for(var i=1;i<P.length;i++) ctx.lineTo(xf(P[i]), yf(P[i]));
     ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.lineCap = 'butt';
+  }
+
+  function dot(x, y, r, fill, stroke, open){
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, 2*Math.PI);
+    ctx.fillStyle = open ? '#fff' : fill;
+    ctx.fill();
+    ctx.lineWidth = 1.6;
+    ctx.strokeStyle = stroke;
+    ctx.stroke();
+  }
+  function square(x, y, r, fill, stroke){
+    ctx.fillStyle = fill;
+    ctx.fillRect(x - r, y - r, 2*r, 2*r);
+    ctx.lineWidth = 1.4;
+    ctx.strokeStyle = stroke;
+    ctx.strokeRect(x - r, y - r, 2*r, 2*r);
+  }
+
+  function arrowHead(x, y, dir, size, color){
+    // dir: +1 points down the canvas, -1 points up
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(x, y + dir*size);
+    ctx.lineTo(x - size*0.7, y - dir*size*0.4);
+    ctx.lineTo(x + size*0.7, y - dir*size*0.4);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  // ---------- view 1: versus tau ----------
+  function renderTau(){
+    var m = margins(), pw = W - m.l - m.r, ph = H - m.t - m.b;
+    var tmax = S.tauMax;
+    var xP = function(t){ return m.l + Math.min(t, 3*tmax)/tmax * pw; };
+    var yL = function(c){ return m.t + (1 - yv(c)) * ph; };
+    var yT = function(T){ return m.t + (1 - (T - S.T0)/S.J) * ph; };
+    var showC = S.reactor !== 'PFR', showP = S.reactor !== 'CSTR';
+    var both = S.reactor === 'BOTH';
+    var xMax = W < 520 ? 5 : 8;
+    var xt = niceTicks(0, tmax, xMax, true);
+    var tt = niceTicks(S.T0, S.T0 + S.J, 6, false);
+    var leftColor = S.yvar === 'C' ? GREEN : XCOL;
+
+    drawFrame(m, pw, ph, xt.ticks, decFor(xt.step), xP,
+      {ticks:[0,0.2,0.4,0.6,0.8,1], dec:1, yP:function(v){ return m.t + (1 - v)*ph; }, color:leftColor, title:yVarSegs()},
+      {ticks:tt.ticks, dec:0, yP:yT, color:NAVY, title:[{t:'temperature (K)'}]});
+    drawXTitle([{t:'residence time '},{t:'τ',it:true},{t:' (min)'}], m, pw);
+
+    clipPlot(m, pw, ph);
+
+
+    var C = S.cstr;
+    // hysteresis trail (under the curves)
+    var Hy = S.hyst;
+    if(Hy){
+      var F = Hy.frames, n = Hy.idx;
+      ctx.strokeStyle = HILITE;
+      ctx.lineWidth = 10*FS + 2;
+      ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+      [yL].concat(S.yvar === 'C' ? [function(c){ return yT(Tof(c)); }] : []).forEach(function(yf){
+        ctx.beginPath();
+        ctx.moveTo(xP(F[0].tau), yf(F[0].c));
+        for(var i=1;i<=n;i++) ctx.lineTo(xP(F[i].tau), yf(F[i].c));
+        ctx.stroke();
+      });
+      ctx.lineCap = 'butt';
+    }
+
+    var lw = 2.4;
+    if(showC){
+      if(S.yvar === 'C'){
+        strokeCSTR(function(p){ return xP(p.tau); }, function(p){ return yL(p.c); }, GREEN, lw);
+        strokeCSTR(function(p){ return xP(p.tau); }, function(p){ return yT(p.T); }, NAVY, lw);
+      } else {
+        strokeCSTR(function(p){ return xP(p.tau); }, function(p){ return yL(p.c); }, XCOL, lw);
+      }
+    }
+    if(showP){
+      if(S.yvar === 'C'){
+        strokePFR(function(p){ return xP(p.tau); }, function(p){ return yL(p.c); }, GREEN, lw, both);
+        strokePFR(function(p){ return xP(p.tau); }, function(p){ return yT(p.T); }, NAVY, lw, both);
+      } else {
+        strokePFR(function(p){ return xP(p.tau); }, function(p){ return yL(p.c); }, XCOL, lw, both);
+      }
+    }
+
+    // hysteresis jump arrows and moving point
+    if(Hy){
+      var Fr = Hy.frames, k = Hy.idx;
+      Hy.jumps.forEach(function(jp){
+        if(k >= jp.end){
+          var x = xP(jp.tau), ya = yL(jp.c1), yb = yL(jp.c2);
+          arrowHead(x, (ya + yb)/2, yb > ya ? 1 : -1, 7*FS + 3, HDOT);
+          if(S.yvar === 'C'){
+            var ta = yT(Tof(jp.c1)), tb = yT(Tof(jp.c2));
+            arrowHead(x, (ta + tb)/2, tb > ta ? 1 : -1, 7*FS + 3, HDOT);
+          }
+        }
+      });
+      var cur = Fr[k];
+      dot(xP(cur.tau), yL(cur.c), 5*FS + 2, HDOT, '#000', false);
+      if(S.yvar === 'C') dot(xP(cur.tau), yT(Tof(cur.c)), 5*FS + 2, HDOT, '#000', false);
+    }
 
     ctx.restore();
 
-    // curve labels near a mid-visible point
-    function midPointOnCurve(getY){
-      var best = null, bestDist = Infinity;
-      var targetTau = tauMin + (tauMax-tauMin)*0.62;
-      for(var q=0;q<pts.length;q++){
-        if(pts[q].tau < tauMin || pts[q].tau > tauMax) continue;
-        var d = Math.abs(pts[q].tau - targetTau);
-        if(d < bestDist){ bestDist = d; best = pts[q]; }
+    // ignition / extinction markers
+    var placed = [];
+    if(showC && C.ign){
+      var tp = Math.max(11, 14*FS);
+      var ix = xP(C.ign.tau), iy = yL(C.ign.c), ex = xP(C.ext.tau), ey = yL(C.ext.c);
+      var lc = S.yvar === 'C' ? GREEN : XCOL;
+      if(ix <= m.l + pw){
+        dot(ix, iy, 4*FS + 1.5, lc, lc, false);
+        labelBox([{t:'ignition'}], ix + 8, iy + (S.yvar === 'C' ? -8 : 18), tp, '#000', 'left');
+        placed.push(boxOf([{t:'ignition'}], ix + 8, iy + (S.yvar === 'C' ? -8 : 18), tp, 'left'));
       }
-      return best;
+      if(ex <= m.l + pw){
+        dot(ex, ey, 4*FS + 1.5, lc, lc, false);
+        var ew = richWidth([{t:'extinction'}], tp);
+        var eLeft = ex - 8 - ew > m.l + 4;
+        labelBox([{t:'extinction'}], eLeft ? ex - 8 : ex + 8, ey + (S.yvar === 'C' ? 18 : -8), tp, '#000', eLeft ? 'right' : 'left');
+        placed.push(boxOf([{t:'extinction'}], eLeft ? ex - 8 : ex + 8, ey + (S.yvar === 'C' ? 18 : -8), tp, eLeft ? 'right' : 'left'));
+      }
     }
-    var mCA = midPointOnCurve();
-    if(mCA){
-      drawCurveLabel(
-        [{text:'C', sub:false}, {text:'A', sub:true}, {text:'/C', sub:false}, {text:'A0', sub:true}],
-        xPix(mCA.tau)+6, yPixCA(mCA.CA)-10, 20, 13, 6, GREEN, 'left'
-      );
+
+    // tau marker and solution points
+    if(!Hy || !Hy.running){
+      var tx = xP(S.tau);
+      if(tx >= m.l && tx <= m.l + pw){
+        ctx.strokeStyle = 'rgba(152,0,13,0.7)';
+        ctx.lineWidth = 1.3;
+        ctx.beginPath(); ctx.moveTo(tx, m.t); ctx.lineTo(tx, m.t + ph); ctx.stroke();
+        var r = 4.5*FS + 1.5;
+        if(showC){
+          cstrStates(S.tau).forEach(function(s){
+            if(S.yvar === 'C'){
+              dot(tx, yL(s.c), r, GREEN, GREEN, s.unstable);
+              dot(tx, yT(s.T), r, NAVY, NAVY, s.unstable);
+            } else {
+              dot(tx, yL(s.c), r, XCOL, XCOL, s.unstable);
+            }
+          });
+        }
+        if(showP){
+          var p = pfrAt(S.tau);
+          if(S.yvar === 'C'){
+            square(tx, yL(p.c), r*0.85, GREEN, '#000');
+            square(tx, yT(p.T), r*0.85, NAVY, '#000');
+          } else {
+            square(tx, yL(p.c), r*0.85, XCOL, '#000');
+          }
+        }
+      }
     }
-    var mT = midPointOnCurve();
-    if(mT){
-      drawCurveLabel(
-        [{text:'T', sub:false}],
-        xPix(mT.tau)+6, yPixT(mT.T)+20, 20, 13, 6, '#00007A', 'left'
-      );
+
+    // curve labels
+    var key = ['tau', S.reactor, S.yvar, S.J, S.T0, W, H].join('|');
+    if(labelCache.key !== key){
+      var obs = [];
+      var xOf = function(p){ return xP(p.tau); };
+      var addObs = function(P, yf){ decimate(P.map(function(p){ return {x:xOf(p), y:yf(p)}; }), obs); };
+      var fC = function(p){ return yL(p.c); }, fT = function(p){ return yT(p.T); };
+      if(showC){ addObs(S.cstr.pts, fC); if(S.yvar === 'C') addObs(S.cstr.pts, fT); }
+      if(showP){ addObs(S.pfr.pts, fC); if(S.yvar === 'C') addObs(S.pfr.pts, fT); }
+      var tauAt = function(x){ return (x - m.l)/pw*tmax; };
+      var cY = function(yf){ return function(x){ var st = cstrStates(tauAt(x)); return st.length === 1 ? yf(st[0]) : null; }; };
+      var pY = function(yf){ return function(x){ return yf(pfrAt(tauAt(x))); }; };
+      var cTag = both ? [{t:', CSTR'}] : [], pTag = both ? [{t:', PFR'}] : [];
+      var pc = both ? 0.35 : 0.75, pp = both ? 0.65 : 0.75;
+      var specs = [];
+      if(S.yvar === 'C'){
+        if(showC){
+          specs.push({segs:SEG_CA.concat(cTag), color:GREEN, yAt:cY(fC), pref:pc});
+          specs.push({segs:[{t:'T',it:true}].concat(cTag), color:NAVY, yAt:cY(fT), pref:pc});
+        }
+        if(showP){
+          specs.push({segs:SEG_CA.concat(pTag), color:GREEN, yAt:pY(fC), pref:pp});
+          specs.push({segs:[{t:'T',it:true}].concat(pTag), color:NAVY, yAt:pY(fT), pref:pp});
+        }
+      } else {
+        var one = [{t:'conversion and '},{t:'T',it:true}];
+        if(showC) specs.push({segs:both ? [{t:'CSTR'}] : one, color:XCOL, yAt:cY(fC), pref:pc});
+        if(showP) specs.push({segs:both ? [{t:'PFR'}] : one, color:XCOL, yAt:pY(fC), pref:pp});
+      }
+      var avoid = (showC && C.ign) ? [xP(C.ext.tau) - 25, xP(C.ign.tau) + 25] : null;
+      labelCache = {key:key, labels:placeLabels(specs, obs, placed.slice(), m, pw, ph, avoid)};
+    }
+    drawPlaced(labelCache.labels);
+
+    // hover readout
+    if(S.hover && !(Hy && Hy.running)){
+      var hx = S.hover.x;
+      if(hx >= m.l && hx <= m.l + pw && S.hover.y >= m.t && S.hover.y <= m.t + ph){
+        var ht = (hx - m.l)/pw * tmax;
+        ctx.strokeStyle = '#777';
+        ctx.setLineDash([3,3]);
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(hx, m.t); ctx.lineTo(hx, m.t + ph); ctx.stroke();
+        ctx.setLineDash([]);
+        var lines = [[{t:'τ',it:true},{t:' = ' + fmtTau(ht) + ' min'}]];
+        if(showC){
+          var st = cstrStates(ht);
+          st.forEach(function(s, i){
+            var pre = both ? 'CSTR: ' : (st.length > 1 ? (i+1) + ': ' : '');
+            lines.push([{t:pre}].concat(yVarShort()).concat([{t:' = ' + yv(s.c).toFixed(3) + ', '},{t:'T',it:true},{t:' = ' + s.T.toFixed(1) + ' K' + (s.unstable ? ' (unstable)' : '')}]));
+          });
+        }
+        if(showP){
+          var pp = pfrAt(ht);
+          lines.push([{t:both ? 'PFR: ' : ''}].concat(yVarShort()).concat([{t:' = ' + yv(pp.c).toFixed(3) + ', '},{t:'T',it:true},{t:' = ' + pp.T.toFixed(1) + ' K'}]));
+        }
+        var px = Math.max(11, 13.5*FS), lh = px*1.45, wmax = 0;
+        lines.forEach(function(L){ wmax = Math.max(wmax, richWidth(L, px)); });
+        var bw = wmax + 14, bh = lines.length*lh + 8;
+        var bx = hx + 10; if(bx + bw > m.l + pw) bx = hx - 10 - bw;
+        var by = m.t + 6;
+        ctx.fillStyle = 'rgba(255,255,255,0.94)';
+        ctx.strokeStyle = '#999';
+        ctx.lineWidth = 1;
+        ctx.fillRect(bx, by, bw, bh);
+        ctx.strokeRect(bx, by, bw, bh);
+        lines.forEach(function(L, i){ drawRich(L, bx + 7, by + 4 + lh*(i + 0.78), px, '#222', 'left'); });
+      }
     }
   }
 
-  // ---------- interaction: pan (drag) ----------
-  var isDragging = false, dragStartX = 0, dragStartView = null;
+  // ---------- view 2: heat balance (CSTR) ----------
+  function renderHeat(){
+    var m = margins(), pw = W - m.l - m.r, ph = H - m.t - m.b;
+    var T0 = S.T0, J = S.J;
+    var xP = function(T){ return m.l + (T - T0)/J * pw; };
+    var yP = function(v){ return m.t + (1 - v/J) * ph; };
+    var xt = niceTicks(T0, T0 + J, W < 520 ? 5 : 7, false);
+    var yt = niceTicks(0, J, 6, false);
+    drawFrame(m, pw, ph, xt.ticks, 0, xP,
+      {ticks:yt.ticks, dec:0, yP:yP, color:'#222',
+       title:[{t:'G',it:true},{t:' or '},{t:'R',it:true},{t:' (K)'}]}, null);
+    drawXTitle([{t:'temperature '},{t:'T',it:true},{t:' (K)'}], m, pw);
 
-  canvas.addEventListener('mousedown', function(e){
-    isDragging = true;
-    dragStartX = e.clientX;
-    dragStartView = {tauMin:state.view.tauMin, tauMax:state.view.tauMax};
-  });
-  window.addEventListener('mousemove', function(e){
-    if(!isDragging) return;
-    var plotW = CSS_W - M.left - M.right;
-    var dx = e.clientX - dragStartX;
-    var span = dragStartView.tauMax - dragStartView.tauMin;
-    var dTau = -dx/plotW * span;
-    var newMin = dragStartView.tauMin + dTau;
-    var newMax = dragStartView.tauMax + dTau;
-    if(newMin < 0){ newMax -= newMin; newMin = 0; }
-    state.view.tauMin = newMin;
-    state.view.tauMax = newMax;
-    render();
-  });
-  window.addEventListener('mouseup', function(){ isDragging = false; });
-  canvas.addEventListener('dblclick', function(){ resetView(); render(); });
+    clipPlot(m, pw, ph);
+    var tau = S.tau;
+    // R(T)
+    ctx.strokeStyle = XCOL; ctx.lineWidth = 2.4;
+    ctx.beginPath(); ctx.moveTo(xP(T0), yP(0)); ctx.lineTo(xP(T0 + J), yP(J)); ctx.stroke();
+    // G(T)
+    ctx.strokeStyle = GEN; ctx.lineWidth = 2.4;
+    ctx.beginPath();
+    for(var i=0;i<=500;i++){
+      var T = T0 + J*i/500, kt = kR(T)*tau, g = J*kt/(1 + kt);
+      if(i === 0) ctx.moveTo(xP(T), yP(g)); else ctx.lineTo(xP(T), yP(g));
+    }
+    ctx.stroke();
+    ctx.restore();
 
-  // touch support (basic pinch omitted; single-touch pan)
-  var touchStartX = null, touchStartView = null;
-  canvas.addEventListener('touchstart', function(e){
-    if(e.touches.length===1){
-      touchStartX = e.touches[0].clientX;
-      touchStartView = {tauMin:state.view.tauMin, tauMax:state.view.tauMax};
+    var r = 5*FS + 2;
+    var Hy = S.hyst;
+    if(Hy && Hy.running){
+      var cur = Hy.frames[Hy.idx], Tc = Tof(cur.c);
+      dot(xP(Tc), yP(Tc - T0), r + 1, HDOT, '#000', false);
+    } else {
+      cstrStates(tau).forEach(function(s){
+        dot(xP(s.T), yP(s.T - T0), r, '#000', '#000', s.unstable);
+      });
     }
-  }, {passive:true});
-  canvas.addEventListener('touchmove', function(e){
-    if(e.touches.length===1 && touchStartX!==null){
-      var plotW = CSS_W - M.left - M.right;
-      var dx = e.touches[0].clientX - touchStartX;
-      var span = touchStartView.tauMax - touchStartView.tauMin;
-      var dTau = -dx/plotW * span;
-      var newMin = touchStartView.tauMin + dTau;
-      var newMax = touchStartView.tauMax + dTau;
-      if(newMin < 0){ newMax -= newMin; newMin = 0; }
-      state.view.tauMin = newMin;
-      state.view.tauMax = newMax;
-      render();
+    var tp = Math.max(11, 14.5*FS);
+    var tauSegs = [{t:'τ',it:true},{t:' = ' + fmtTau(tau) + ' min'}];
+    labelBox(tauSegs, m.l + 10, m.t + tp + 6, tp, '#222', 'left');
+
+    var key = ['heat', S.J, S.T0, tau, W, H].join('|');
+    if(labelCache.key !== key){
+      var Gof = function(T){ var kt = kR(T)*tau; return J*kt/(1 + kt); };
+      var Tx = function(x){ return T0 + (x - m.l)/pw*J; };
+      var obs = [], gp = [], rp = [];
+      for(var q=0;q<=300;q++){ var Tq = T0 + J*q/300; gp.push({x:xP(Tq), y:yP(Gof(Tq))}); rp.push({x:xP(Tq), y:yP(Tq - T0)}); }
+      decimate(gp, obs); decimate(rp, obs);
+      var placed = [boxOf(tauSegs, m.l + 10, m.t + tp + 6, tp, 'left')];
+      cstrStates(tau).forEach(function(s){ placed.push(dotBox(xP(s.T), yP(s.T - T0), 16)); });
+      var specs = [
+        {segs:[{t:'G',it:true},{t:'('},{t:'T',it:true},{t:')'}], color:GEN, yAt:function(x){ return yP(Gof(Tx(x))); }, pref:0.5},
+        {segs:[{t:'R',it:true},{t:'('},{t:'T',it:true},{t:')'}], color:XCOL, yAt:function(x){ return yP(Tx(x) - T0); }, pref:0.5}
+      ];
+      labelCache = {key:key, labels:placeLabels(specs, obs, placed, m, pw, ph, null)};
     }
-  }, {passive:true});
+    drawPlaced(labelCache.labels);
+  }
+
+  // ---------- view 3: dynamics (CSTR phase plane) ----------
+  function transAxes(){
+    var m = margins(), pw = W - m.l - m.r, ph = H - m.t - m.b;
+    return {m:m, pw:pw, ph:ph,
+      xP:function(T){ return m.l + (T - S.T0)/(1.25*S.J) * pw; },
+      yP:function(c){ return m.t + (1 - yv(c)) * ph; },
+      Tx:function(x){ return S.T0 + (x - m.l)/pw * 1.25*S.J; },
+      cy:function(y){ var v = 1 - (y - m.t)/ph; return S.yvar === 'C' ? v : 1 - v; }};
+  }
+
+  function renderTrans(){
+    var A = transAxes(), m = A.m, pw = A.pw, ph = A.ph;
+    var xt = niceTicks(S.T0, S.T0 + 1.25*S.J, W < 520 ? 5 : 7, false);
+    var leftColor = S.yvar === 'C' ? GREEN : XCOL;
+    drawFrame(m, pw, ph, xt.ticks, 0, A.xP,
+      {ticks:[0,0.2,0.4,0.6,0.8,1], dec:1, yP:function(v){ return m.t + (1 - v)*ph; }, color:leftColor, title:yVarSegs()}, null);
+    drawXTitle([{t:'temperature '},{t:'T',it:true},{t:' (K)'}], m, pw);
+
+    clipPlot(m, pw, ph);
+    // adiabatic line T = T0 + J X
+    ctx.strokeStyle = '#888'; ctx.lineWidth = 1.5;
+    ctx.setLineDash([6,5]);
+    ctx.beginPath(); ctx.moveTo(A.xP(S.T0), A.yP(1)); ctx.lineTo(A.xP(S.T0 + S.J), A.yP(0)); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // trajectories
+    var anim = S.trajAnim;
+    S.traj.forEach(function(tr, idx){
+      var n = tr.pts.length;
+      if(anim && idx === S.traj.length - 1) n = Math.max(2, Math.round(anim.frac * tr.pts.length));
+      ctx.strokeStyle = tr.color; ctx.lineWidth = 2.2;
+      ctx.lineJoin = 'round';
+      ctx.beginPath();
+      ctx.moveTo(A.xP(tr.pts[0].T), A.yP(tr.pts[0].c));
+      for(var i=1;i<n;i++) ctx.lineTo(A.xP(tr.pts[i].T), A.yP(tr.pts[i].c));
+      ctx.stroke();
+      dot(A.xP(tr.pts[0].T), A.yP(tr.pts[0].c), 3.5*FS + 1.5, tr.color, tr.color, true);
+      var last = tr.pts[n-1];
+      dot(A.xP(last.T), A.yP(last.c), 3*FS + 1.2, tr.color, tr.color, false);
+    });
+    ctx.restore();
+
+    // steady states
+    var r = 5*FS + 2;
+    cstrStates(S.tau).forEach(function(s){
+      dot(A.xP(s.T), A.yP(s.c), r, '#000', '#000', s.unstable);
+    });
+
+    var tp = Math.max(11, 14.5*FS);
+    var topRight = S.yvar === 'C';   // empty corner opposite the adiabatic line
+    labelBox([{t:'τ',it:true},{t:' = ' + fmtTau(S.tau) + ' min'}],
+      topRight ? m.l + pw - 10 : m.l + 10, m.t + tp + 6, tp, '#222', topRight ? 'right' : 'left');
+    var cx = topRight ? m.l + pw - 10 : m.l + 10, al = topRight ? 'right' : 'left';
+    var placed = [boxOf([{t:'τ',it:true},{t:' = ' + fmtTau(S.tau) + ' min'}], cx, m.t + tp + 6, tp, al)];
+    if(S.traj.length === 0){
+      var hint = W < 520 ? 'tap to choose a starting point' : 'click on the plot to choose a starting point';
+      labelBox([{t:hint}], cx, m.t + 2.5*tp + 10, tp, '#98000D', al);
+      placed.push(boxOf([{t:hint}], cx, m.t + 2.5*tp + 10, tp, al));
+    }
+    var key = ['trans', S.yvar, S.J, S.T0, S.tau, S.traj.length, W, H].join('|');
+    if(labelCache.key !== key){
+      var obs = [];
+      S.traj.forEach(function(tr){ decimate(tr.pts.map(function(p){ return {x:A.xP(p.T), y:A.yP(p.c)}; }), obs); });
+      cstrStates(S.tau).forEach(function(s){ placed.push(dotBox(A.xP(s.T), A.yP(s.c), 16)); });
+      var specs = [{segs:[{t:'T',it:true},{t:' = '},{t:'T',it:true},{t:'0',sub:true},{t:' + '},{t:'\uD835\uDCA5'},{t:'X',it:true}], color:'#666',
+        yAt:function(x){ var T = A.Tx(x), c = 1 - (T - S.T0)/S.J; return (c < 0 || c > 1) ? null : A.yP(c); }, pref:0.35}];
+      labelCache = {key:key, labels:placeLabels(specs, obs, placed, m, pw, ph, null)};
+    }
+    drawPlaced(labelCache.labels);
+  }
+
+  function integrateTraj(c, T){
+    var tau = S.tau, J = S.J, T0 = S.T0, t = 0, n = 0;
+    var pts = [{t:0, c:c, T:T}];
+    function f(cv, Tv){ var kk = kR(Tv); return [(1 - cv)/tau - kk*cv, (T0 - Tv)/tau + J*kk*cv]; }
+    var tEnd = 80*tau;
+    while(t < tEnd && n < 60000){
+      var h = Math.min(tau/40, 0.08/kR(T));
+      var a = f(c, T);
+      var b = f(c + h/2*a[0], T + h/2*a[1]);
+      var d = f(c + h/2*b[0], T + h/2*b[1]);
+      var e = f(c + h*d[0], T + h*d[1]);
+      var dc = h/6*(a[0] + 2*b[0] + 2*d[0] + e[0]);
+      var dT = h/6*(a[1] + 2*b[1] + 2*d[1] + e[1]);
+      c = Math.min(1, Math.max(0, c + dc)); T += dT; t += h; n++;
+      pts.push({t:t, c:c, T:T});
+      if(t > 5*tau && Math.abs(dT) < 1e-7*h/tau*J && Math.abs(dc) < 1e-9) break;
+    }
+    // thin to at most ~1500 points for drawing
+    var step = Math.max(1, Math.floor(pts.length/1500)), thin = [];
+    for(var i=0;i<pts.length;i+=step) thin.push(pts[i]);
+    if(thin[thin.length-1] !== pts[pts.length-1]) thin.push(pts[pts.length-1]);
+    var fin = pts[pts.length-1];
+    var settle = 0;
+    for(var j=pts.length-1;j>=0;j--){ if(Math.abs(pts[j].T - fin.T) > 0.01*J){ settle = pts[j].t; break; } }
+    return {pts:thin, start:pts[0], fin:fin, settle:settle};
+  }
+
+  // ---------- hysteresis ----------
+  function buildHyst(){
+    var C = S.cstr, tmax = S.tauMax, tmin = tmax*0.004, N = 260, F = [], jumps = [];
+    function pick(tau, up){
+      var st = cstrStates(tau);
+      if(st.length === 0) return 1;
+      if(!C.ign) return st[0].c;
+      if(up) return tau < C.ign.tau ? st[0].c : st[st.length-1].c;
+      return tau > C.ext.tau ? st[st.length-1].c : st[0].c;
+    }
+    function addJump(tau, c1, c2){
+      var start = F.length;
+      for(var i=0;i<=24;i++) F.push({tau:tau, c:c1 + (c2 - c1)*i/24});
+      jumps.push({tau:tau, c1:c1, c2:c2, end:F.length - 1, start:start});
+    }
+    var prev = null;
+    for(var i=0;i<=N;i++){
+      var t = tmin + (tmax - tmin)*i/N;
+      if(C.ign && prev !== null && prev < C.ign.tau && t >= C.ign.tau){
+        var cu = cstrStates(C.ign.tau*(1 + 1e-6));
+        F.push({tau:C.ign.tau, c:C.ign.c});
+        addJump(C.ign.tau, C.ign.c, cu[cu.length-1].c);
+      }
+      F.push({tau:t, c:pick(t, true)});
+      prev = t;
+    }
+    for(var k=N;k>=0;k--){
+      var t2 = tmin + (tmax - tmin)*k/N;
+      if(C.ign && prev > C.ext.tau && t2 <= C.ext.tau){
+        var cd = cstrStates(C.ext.tau*(1 - 1e-6));
+        F.push({tau:C.ext.tau, c:C.ext.c});
+        addJump(C.ext.tau, C.ext.c, cd[0].c);
+      }
+      F.push({tau:t2, c:pick(t2, false)});
+      prev = t2;
+    }
+    return {frames:F, jumps:jumps, idx:0, running:true, t0:0, dur:9000};
+  }
+
+  function startHyst(){
+    if(S.view === 'trans' || S.reactor === 'PFR') return;
+    S.hyst = buildHyst();
+    S.hyst.tauBefore = S.tau;
+    S.hyst.t0 = performance.now();
+    hystBtn.innerHTML = '&#9632; stop';
+    requestAnimationFrame(stepHyst);
+  }
+  function stepHyst(now){
+    var Hy = S.hyst;
+    if(!Hy || !Hy.running) return;
+    var f = Math.max(0, (now - Hy.t0)/Hy.dur);
+    if(f >= 1){ f = 1; Hy.running = false; hystBtn.innerHTML = '&#9654; hysteresis'; }
+    Hy.idx = Math.round(f*(Hy.frames.length - 1));
+    S.tau = Hy.running ? Hy.frames[Hy.idx].tau : Hy.tauBefore;
+    syncTauSlider();
+    draw();
+    if(Hy.running) requestAnimationFrame(stepHyst);
+  }
+  function stopHyst(clear){
+    if(S.hyst){
+      if(S.hyst.running && !clear){ S.tau = S.hyst.tauBefore; syncTauSlider(); }
+      S.hyst.running = false;
+      if(clear) S.hyst = null;
+    }
+    hystBtn.innerHTML = '&#9654; hysteresis';
+  }
+
+  // ---------- curve labels (placed away from curves and the multiple-solution region) ----------
+  var labelCache = {key:null, labels:[]};
+  function labelPx(){ return Math.max(12, 18*FS); }
+  function boxOf(segs, x, y, px, align){
+    var w = richWidth(segs, px), pad = 3;
+    var sx = align === 'center' ? x - w/2 : (align === 'right' ? x - w : x);
+    return {x0:sx - pad, x1:sx + w + pad, y0:y - px*0.85 - pad, y1:y + px*0.4 + pad};
+  }
+  function dotBox(x, y, r){ return {x0:x - r, x1:x + r, y0:y - r, y1:y + r}; }
+  function decimate(pts, out){
+    var lx = -1e9, ly = -1e9;
+    for(var i=0;i<pts.length;i++){
+      var p = pts[i];
+      if(Math.abs(p.x - lx) + Math.abs(p.y - ly) > 3){ out.push(p); lx = p.x; ly = p.y; }
+    }
+  }
+  // spec: {segs, color, yAt(xPixel) -> yPixel of its own curve or null, pref (0-1)}
+  function placeLabels(specs, obstacles, placed, m, pw, ph, avoid){
+    var out = [], px = labelPx();
+    specs.forEach(function(sp){
+      var w = richWidth(sp.segs, px), best = null, bs = Infinity;
+      function score(b, f, extra){
+        if(b.x0 < m.l + 2 || b.x1 > m.l + pw - 2 || b.y0 < m.t + 2 || b.y1 > m.t + ph - 2) return Infinity;
+        var sc = Math.abs(f - sp.pref)*30 + extra;
+        if(avoid && b.x1 > avoid[0] && b.x0 < avoid[1]) sc += 1e6;
+        for(var k=0;k<obstacles.length;k++){
+          var o = obstacles[k];
+          if(o.x >= b.x0 - 2 && o.x <= b.x1 + 2 && o.y >= b.y0 - 2 && o.y <= b.y1 + 2) sc += 40;
+        }
+        placed.forEach(function(q){ if(b.x1 > q.x0 && b.x0 < q.x1 && b.y1 > q.y0 && b.y0 < q.y1) sc += 1e4; });
+        return sc;
+      }
+      function consider(b, x, base, align, f, extra){
+        var sc = score(b, f, extra);
+        if(sc < bs){ bs = sc; best = {segs:sp.segs, color:sp.color, x:x, y:base, align:align, box:b}; }
+      }
+      for(var f=0.04; f<=0.96; f+=0.02){
+        var x = m.l + f*pw, y0 = sp.yAt(x);
+        if(y0 === null || !isFinite(y0)) continue;
+        // beside the curve (suits steep sections)
+        var bb = y0 + px*0.3;
+        consider(boxOf(sp.segs, x + 10, bb, px, 'left'), x + 10, bb, 'left', f, 8);
+        consider(boxOf(sp.segs, x - 10, bb, px, 'right'), x - 10, bb, 'right', f, 8);
+        // above or below the curve
+        var ys = [], ok = true;
+        for(var q=0;q<=6;q++){
+          var yq = sp.yAt(x - w/2 - 4 + (w + 8)*q/6);
+          if(yq === null || !isFinite(yq)){ ok = false; break; }
+          ys.push(yq);
+        }
+        if(!ok) continue;
+        var yMin = Math.min.apply(null, ys), yMax = Math.max.apply(null, ys);
+        if(yMax - yMin > 3*px) continue;
+        var bu = yMin - 9 - px*0.4, bd = yMax + 9 + px*0.85;
+        consider(boxOf(sp.segs, x, bu, px, 'center'), x, bu, 'center', f, 0);
+        consider(boxOf(sp.segs, x, bd, px, 'center'), x, bd, 'center', f, 0);
+      }
+      if(best){ placed.push(best.box); out.push(best); }
+    });
+    return out;
+  }
+  function drawPlaced(labels){
+    var px = labelPx();
+    labels.forEach(function(L){ labelBox(L.segs, L.x, L.y, px, L.color, L.align); });
+  }
+
+  // ---------- readout table ----------
+  var CA_HTML = 'C<sub>A</sub>/C<sub>A0</sub>';
+  function stateNames(n){
+    if(n === 3) return ['low conversion', 'middle', 'high conversion'];
+    if(n === 2) return ['low conversion', 'high conversion'];
+    return ['unique'];
+  }
+  function updateReadout(){
+    var tau = S.tau, rows = [];
+    var showC = S.view !== 'tau' || S.reactor !== 'PFR';
+    var showP = S.view === 'tau' && S.reactor !== 'CSTR';
+    if(showC){
+      var st = cstrStates(tau), nm = stateNames(st.length);
+      st.forEach(function(s, i){
+        rows.push('<tr' + (s.unstable ? ' class="unstable"' : '') + '><td>CSTR</td><td>' + nm[i] + '</td><td>' + s.c.toFixed(3) +
+          '</td><td>' + (1 - s.c).toFixed(3) + '</td><td>' + s.T.toFixed(1) + '</td><td>' + (s.unstable ? 'unstable' : 'stable') + '</td></tr>');
+      });
+    }
+    if(showP){
+      var p = pfrAt(tau);
+      rows.push('<tr><td>PFR</td><td>outlet</td><td>' + p.c.toFixed(3) + '</td><td>' + (1 - p.c).toFixed(3) +
+        '</td><td>' + p.T.toFixed(1) + '</td><td>&ndash;</td></tr>');
+    }
+    var h = '<div class="cap">solutions at <span class="tau-sym">&tau;</span> = ' + fmtTau(tau) + ' min</div>' +
+      '<table><tr><th>reactor</th><th>solution</th><th>' + CA_HTML + '</th><th>X</th><th>T (K)</th><th>stability</th></tr>' +
+      rows.join('') + '</table>';
+    if(S.view === 'trans' && S.traj.length){
+      var tr = S.traj[S.traj.length - 1];
+      h += '<div class="traj">last trajectory: start ' + CA_HTML + ' = ' + tr.start.c.toFixed(2) + ', T = ' + tr.start.T.toFixed(1) +
+        ' K &rarr; end ' + CA_HTML + ' = ' + tr.fin.c.toFixed(3) + ', T = ' + tr.fin.T.toFixed(1) + ' K<br>(' + tr.label +
+        ' steady state; within 1% of the final temperature after ' + tr.settle.toFixed(tr.settle < 10 ? 2 : 1) + ' min)</div>';
+    }
+    readoutEl.innerHTML = h;
+  }
+
+  // ---------- master draw ----------
+  function draw(){
+    ctx.clearRect(0, 0, W, H);
+    if(S.view === 'tau') renderTau();
+    else if(S.view === 'heat') renderHeat();
+    else renderTrans();
+    updateReadout();
+  }
+
+  function syncTauSlider(){
+    tauSlider.max = S.tauMax;
+    tauSlider.min = S.tauMax/500;
+    tauSlider.step = S.tauMax/500;
+    tauSlider.value = S.tau;
+    tauVal.textContent = fmtTau(S.tau);
+  }
+
+  function recompute(){
+    S.cstr = computeCSTR();
+    S.pfr = computePFR();
+    S.tauMax = computeTauMax();
+    S.tau = Math.min(Math.max(S.tau, S.tauMax/500), S.tauMax);
+    syncTauSlider();
+  }
+
+  function updateButtons(){
+    document.querySelectorAll('#reactorToggle .btn[data-reactor]').forEach(function(b){
+      b.classList.toggle('active', b.getAttribute('data-reactor') === S.reactor);
+    });
+    document.querySelectorAll('#viewToggle .btn').forEach(function(b){
+      var v = b.getAttribute('data-view');
+      b.classList.toggle('active', v === S.view);
+      b.disabled = (v !== 'tau' && S.reactor !== 'CSTR');
+      b.title = b.disabled ? 'available for the CSTR only' : '';
+    });
+    document.querySelectorAll('#yToggle .btn').forEach(function(b){
+      b.classList.toggle('active', b.getAttribute('data-y') === S.yvar);
+    });
+    document.getElementById('yToggle').style.visibility = (S.view === 'heat') ? 'hidden' : 'visible';
+    hystBtn.disabled = (S.view === 'trans' || S.reactor === 'PFR');
+    clearBtn.style.display = (S.view === 'trans') ? '' : 'none';
+  }
 
   // ---------- controls ----------
-  var Jslider = document.getElementById('Jslider');
-  var Jval = document.getElementById('Jval');
-
   Jslider.addEventListener('input', function(){
-    state.J = parseFloat(Jslider.value);
-    Jval.textContent = state.J.toFixed(0);
-    recompute();
-    render();
+    S.J = parseFloat(Jslider.value);
+    Jval.textContent = S.J.toFixed(0);
+    stopHyst(true); S.traj = []; S.trajAnim = null;
+    recompute(); draw();
+  });
+  T0slider.addEventListener('input', function(){
+    S.T0 = parseFloat(T0slider.value);
+    T0val.textContent = S.T0.toFixed(0);
+    stopHyst(true); S.traj = []; S.trajAnim = null;
+    recompute(); draw();
   });
 
-  var reactorBtns = document.querySelectorAll('#reactorToggle .btn');
-  reactorBtns.forEach(function(btn){
+  tauSlider.addEventListener('input', function(){
+    stopHyst(true);
+    S.tau = parseFloat(tauSlider.value);
+    tauVal.textContent = fmtTau(S.tau);
+    S.traj = []; S.trajAnim = null;
+    draw();
+  });
+
+  document.querySelectorAll('#reactorToggle .btn[data-reactor]').forEach(function(btn){
     btn.addEventListener('click', function(){
-      reactorBtns.forEach(function(b){ b.classList.remove('active'); });
-      btn.classList.add('active');
-      state.reactor = btn.getAttribute('data-reactor');
-      resetView();
-      recompute();
-      render();
+      S.reactor = btn.getAttribute('data-reactor');
+      if(S.reactor !== 'CSTR') S.view = 'tau';
+      stopHyst(true);
+      updateButtons(); recompute(); draw();
     });
   });
+  document.querySelectorAll('#viewToggle .btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      if(btn.disabled) return;
+      S.view = btn.getAttribute('data-view');
+      stopHyst(true); S.traj = []; S.trajAnim = null;
+      updateButtons(); setupCanvas(); recompute(); draw();
+    });
+  });
+  document.querySelectorAll('#yToggle .btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      S.yvar = btn.getAttribute('data-y');
+      updateButtons(); draw();
+    });
+  });
+  hystBtn.addEventListener('click', function(){
+    if(S.hyst && S.hyst.running) stopHyst(false);
+    else startHyst();
+    draw();
+  });
+  clearBtn.addEventListener('click', function(){ S.traj = []; S.trajAnim = null; draw(); });
+
+  // ---------- plot interaction: hover, click ----------
+  function evPos(e){
+    var r = canvas.getBoundingClientRect();
+    return {x:e.clientX - r.left, y:e.clientY - r.top};
+  }
+  canvas.addEventListener('mousemove', function(e){
+    if(S.view !== 'tau') return;
+    S.hover = evPos(e);
+    draw();
+  });
+  canvas.addEventListener('mouseleave', function(){
+    if(S.hover){ S.hover = null; draw(); }
+  });
+  canvas.addEventListener('click', function(e){
+    var p = evPos(e);
+    if(S.view === 'tau'){
+      if(S.hyst && S.hyst.running) return;
+      var m = margins(), pw = W - m.l - m.r;
+      if(p.x < m.l || p.x > m.l + pw) return;
+      stopHyst(true);
+      S.tau = Math.min(S.tauMax, Math.max(S.tauMax/500, (p.x - m.l)/pw*S.tauMax));
+      syncTauSlider(); draw();
+    } else if(S.view === 'trans'){
+      var A = transAxes();
+      if(p.x < A.m.l || p.x > A.m.l + A.pw || p.y < A.m.t || p.y > A.m.t + A.ph) return;
+      var c0 = Math.min(1, Math.max(0, A.cy(p.y))), T0i = A.Tx(p.x);
+      var tr = integrateTraj(c0, T0i);
+      var st = cstrStates(S.tau).filter(function(s){ return !s.unstable; });
+      var best = null, bd = Infinity;
+      st.forEach(function(s){ var d = Math.abs(s.T - tr.fin.T); if(d < bd){ bd = d; best = s; } });
+      var hiConv = best ? (1 - best.c) > 0.5 : (1 - tr.fin.c) > 0.5;
+      tr.color = hiConv ? HIGHC : LOWC;
+      tr.label = st.length > 1 ? (hiConv ? 'high-conversion' : 'low-conversion') : 'unique';
+      S.traj.push(tr);
+      if(S.traj.length > 12) S.traj.shift();
+      S.trajAnim = {t0:performance.now(), dur:1300, frac:0};
+      requestAnimationFrame(stepTraj);
+    }
+  });
+  function stepTraj(now){
+    var a = S.trajAnim;
+    if(!a) return;
+    a.frac = Math.max(0, Math.min(1, (now - a.t0)/a.dur));
+    draw();
+    if(a.frac < 1) requestAnimationFrame(stepTraj); else S.trajAnim = null;
+  }
 
   // ---------- Directions/Details/About panel buttons ----------
   var panelBtns = document.querySelectorAll('.panelBtn');
   panelBtns.forEach(function(btn){
     btn.addEventListener('click', function(){
       var name = btn.getAttribute('data-panel');
-      var content = document.getElementById('panel-'+name);
+      var content = document.getElementById('panel-' + name);
       var isOpen = content.classList.contains('open');
       document.querySelectorAll('.panelContent').forEach(function(p){ p.classList.remove('open'); });
       document.querySelectorAll('.panelBtn').forEach(function(b){ b.classList.remove('active'); });
@@ -740,31 +1458,40 @@
       }
     });
   });
-
-  var panelCloseBtns = document.querySelectorAll('.panelClose');
-  panelCloseBtns.forEach(function(closeBtn){
+  document.querySelectorAll('.panelClose').forEach(function(closeBtn){
     closeBtn.addEventListener('click', function(e){
       e.stopPropagation();
       var name = closeBtn.getAttribute('data-panel');
-      var content = document.getElementById('panel-'+name);
-      content.classList.remove('open');
-      var trigger = document.querySelector('.panelBtn[data-panel="'+name+'"]');
+      document.getElementById('panel-' + name).classList.remove('open');
+      var trigger = document.querySelector('.panelBtn[data-panel="' + name + '"]');
       if(trigger) trigger.classList.remove('active');
     });
+  });
+
+  // close any open panel with Esc or a click outside it
+  function closePanels(){
+    document.querySelectorAll('.panelContent').forEach(function(p){ p.classList.remove('open'); });
+    document.querySelectorAll('.panelBtn').forEach(function(b){ b.classList.remove('active'); });
+  }
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' || e.key === 'Esc') closePanels();
+  });
+  document.addEventListener('click', function(e){
+    if(!document.querySelector('.panelContent.open')) return;
+    if(e.target.closest('.panelContent') || e.target.closest('.panelBtn')) return;
+    closePanels();
   });
 
   // ---------- init ----------
   function init(){
     setupCanvas();
-    resetView();
     recompute();
-    render();
+    updateButtons();
+    draw();
   }
-  window.addEventListener('resize', function(){
-    setupCanvas();
-    render();
-  });
+  window.addEventListener('resize', function(){ setupCanvas(); draw(); });
   init();
+
 })();
 </script>
 

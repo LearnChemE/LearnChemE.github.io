@@ -17,8 +17,8 @@ window.MathJax = {
   body { font-family: Helvetica, Arial, sans-serif; color: #222; padding: 16px; }
   #app { position: relative; width: 100%; max-width: 880px; margin: 0 auto; }
   .title { font-size: 21px; font-weight: bold; margin-bottom: 3px; }
-  .subtitle { font-size: 15.6px; color: #555; margin-bottom: 12px; }
-  .btnrow { margin-bottom: 14px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .subtitle { font-size: 15.6px; color: #555; margin-bottom: 12px; padding-left: 38px; }
+  .btnrow { margin-bottom: 14px; display: flex; flex-wrap: wrap; gap: 6px; padding-left: 38px; }
   .infobtn {
     background: #98000D; color: #fff; border: none; padding: 7px 14px;
     margin-right: 0; font-family: Helvetica, Arial, sans-serif; font-size: 14.95px;
@@ -34,14 +34,31 @@ window.MathJax = {
   }
   .ck4-label input[type=checkbox] { width: 16px; height: 16px; accent-color: #98000D; cursor: pointer; margin: 0; }
   .layout { display: flex; gap: 22px; align-items: flex-start; flex-wrap: wrap; }
-  .controls { width: 250px; padding-top: 6px; }
-  .slider-group { margin-bottom: 22px; }
-  .slider-label { font-size: 15px; margin-bottom: 6px; }
+  .controls { width: 212px; padding-top: 6px; padding-left: 38px; }  /* sliders 15% shorter than 250 px */
+  .slider-group { margin-bottom: 10px; }
+  .slider-label { display: block; font-size: 15px; margin-bottom: 6px; }
   .slider-label .nm { font-weight: normal; }
   .slider-val { color: #98000D; font-weight: normal; }
-  input[type=range] { width: 100%; accent-color: #98000D; margin: 0; }
-  .rangerow { display: flex; justify-content: space-between; font-size: 12.65px; color: #888; margin-top: 2px; }
-  canvas { display: block; max-width: 100%; height: auto; }
+  input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+  input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  .rangerow { display: flex; justify-content: space-between; font-size: 14.55px; color: #000; margin-top: 2px; }
+  canvas { display: block; }
+  .plotwrap { flex: 1 1 560px; min-width: 0; max-width: 560px; }
+  /* ---------- Small screens ---------- */
+  @media (max-width: 640px) {
+    body { padding: 10px; }
+    .layout { gap: 10px; }
+    .controls { width: 100%; padding-top: 0; padding-left: 0; }
+    .subtitle, .btnrow { padding-left: 0; }
+    .panel { margin-left: 0; width: 100%; }
+    .slider-group { margin-bottom: 8px; }
+    .infobtn, .ck4-label { font-size: 14px; padding: 7px 11px; }
+    .panel { padding: 14px 16px 16px 16px; }
+    #chainEq { font-size: 15px !important; }
+    .plotwrap { flex-basis: 100%; max-width: 100%; order: -1; } /* graph above sliders so it stays visible while dragging */
+    .slider-label { font-size: 14px; margin-bottom: 2px; }
+  }
   .panel {
     position: relative; width: 100%; max-width: 620px;
     box-sizing: border-box; background: #fff;
@@ -49,7 +66,22 @@ window.MathJax = {
     padding: 18px 22px 20px 22px; font-size: 13.5px; line-height: 1.55;
     display: none; border-radius: 5px; margin-bottom: 16px;
   }
-  .panel h3 { margin: 0 0 10px 0; font-size: 16px; }
+  .panel { margin-left: 38px; width: calc(100% - 38px); }  /* line up with buttons and sliders */
+  .panel h3 { margin: 0 0 4px 0; font-size: 16px; }
+  .panel h3 + p { margin-top: 0; }
+  .panel p { margin: 0 0 8px 0; }
+  .panel p:last-child { margin-bottom: 0; }
+  .panel mjx-container { max-width: 100%; overflow-x: auto; overflow-y: hidden; }
+  /* Details-panel equations: spacing set by the wrapper, not MathJax's default */
+  .panel .eq mjx-container[display="true"] { margin: 0 !important; }
+  .panel .eq { margin: 6px 0; }
+  .panel .eq.eq-first { margin-top: 2px; }        /* less space before the 1st equation */
+  .panel .eq.eq-last  { margin-bottom: 4px; }     /* less space after the 4th equation */
+  .panel .eq.eq-tight { margin: 2px 0 4px 0; }    /* less space around the 5th equation */
+  .panel p.before-eq { margin-bottom: 0; }
+  .panel table.symbols { border-collapse: collapse; margin-top: 2px; }
+  .panel table.symbols td { padding: 1px 10px 1px 0; vertical-align: baseline; }
+  .panel table.symbols td:first-child { white-space: nowrap; }
   .closebtn {
     position: absolute; top: 8px; right: 12px; cursor: pointer; font-size: 20px;
     color: #666; border: none; background: none; line-height: 1;
@@ -62,14 +94,14 @@ window.MathJax = {
 </head>
 <body>
 <div id="app">
-  <div class="subtitle">&rarr; Isotope&nbsp;1 &rarr; Isotope&nbsp;2 &rarr; Isotope&nbsp;3 &rarr; Isotope&nbsp;4 (stable)</div>
+  <div class="subtitle">production &rarr; isotope&nbsp;1 &rarr; isotope&nbsp;2 &rarr; isotope&nbsp;3 &rarr; isotope&nbsp;4 (stable)</div>
 
   <div class="btnrow">
-    <button class="infobtn" onclick="togglePanel('directions')">Directions</button>
-    <button class="infobtn" onclick="togglePanel('details')">Details</button>
-    <button class="infobtn" onclick="togglePanel('about')">About</button>
+    <button class="infobtn" id="btn-directions" onclick="togglePanel('directions')">Directions</button>
+    <button class="infobtn" id="btn-details" onclick="togglePanel('details')">Details</button>
+    <button class="infobtn" id="btn-about" onclick="togglePanel('about')">About</button>
     <button class="infobtn" id="exampleBtn" onclick="showExample()">Example: <sup>211</sup>Pb chain</button>
-    <label class="ck4-label"><input type="checkbox" id="ck4"> Isotope 4</label>
+    <label class="ck4-label"><input type="checkbox" id="ck4"> isotope 4</label>
     <button class="infobtn" id="backBtn" onclick="goBack()" style="display:none;">Go back</button>
   </div>
 
@@ -77,38 +109,54 @@ window.MathJax = {
   <div id="panel-directions" class="panel">
     <button class="closebtn" onclick="togglePanel('directions')">&times;</button>
     <h3>Directions</h3>
-    <p>Isotope&nbsp;1 is continuously produced and it then undergoes radioactive decay.
+    <p>Isotope&nbsp;1 is continuously produced at a constant rate of 30&nbsp;particles/min,
+    and it then undergoes radioactive decay.
     The decay products build up and, if radioactive, later decay with time. In this
     simulation isotope&nbsp;1 decays to isotope&nbsp;2, which decays to isotope&nbsp;3,
     which decays to the stable isotope&nbsp;4. The half-lives of the three decay processes
-    are selected with the sliders. The production rate of isotope&nbsp;1 is selected with
-    a slider. For a given production rate, a steady state concentration of isotopes&nbsp;1,
-    2 and&nbsp;3 is reached. Because isotope&nbsp;4 is stable, the number of isotope&nbsp;4
+    are selected with the sliders. The numbers of particles of isotopes&nbsp;1, 2
+    and&nbsp;3 approach steady-state values, which are shown as dashed lines in the same colors as the curves. Because isotope&nbsp;4 is stable, the number of isotope&nbsp;4
     particles continuously increases with time; by default it is not shown in the graph so
     that the behavior of the other isotopes can be more readily observed, but it can be
-    added to the plot with the Isotope&nbsp;4 checkbox.</p>
+    added to the plot with the isotope&nbsp;4 checkbox.</p>
     <p>Select the Example button to see the decay chain for <sup>211</sup>Pb, continuously
-    produced at 20 particles per minute.</p>
+    produced at 20 particles per minute. In nature, <sup>211</sup>Pb is formed in the
+    actinium decay series from the long-lived <sup>227</sup>Ac (half-life 21.8&nbsp;years)
+    through a sequence of decays that ends with the short-lived <sup>219</sup>Rn and
+    <sup>215</sup>Po, so over a few hours its production rate is essentially constant.</p>
   </div>
 
   <!-- Details -->
   <div id="panel-details" class="panel">
     <button class="closebtn" onclick="togglePanel('details')">&times;</button>
     <h3>Details</h3>
-    <p>The number of particles of each isotope is found by numerically integrating the
+    <p class="before-eq">The number of particles of each isotope is found by numerically integrating the
     coupled first-order rate equations (RK4), starting from zero particles of isotope&nbsp;1:</p>
-    $$\frac{dN_1}{dt} = P - \lambda_1 N_1$$
+    <div class="eq eq-first">$$\frac{dN_1}{dt} = P - \lambda_1 N_1$$</div>
     <p style="margin:2px 0 10px 0;">\(P\) = production rate of isotope&nbsp;1</p>
-    $$\frac{dN_2}{dt} = \lambda_1 N_1 - \lambda_2 N_2$$
-    $$\frac{dN_3}{dt} = \lambda_2 N_2 - \lambda_3 N_3$$
-    $$\frac{dN_4}{dt} = \lambda_3 N_3$$
-    <p>The decay constant of each step is obtained from its half-life:</p>
-    $$\lambda_i = \frac{\ln 2}{(t_{1/2})_i}$$
-    <p style="margin-bottom:0;">Here \(N_i\) is the number of particles of isotope&nbsp;\(i\),
-    \(\lambda_i\) is the decay constant (min<sup>&minus;1</sup>), \((t_{1/2})_i\) is the
-    half-life (min), and \(P\) is the production rate of isotope&nbsp;1 (particles/min).
-    Because isotope&nbsp;1 is continuously produced and isotope&nbsp;4 is stable, the total
+    <div class="eq">$$\frac{dN_2}{dt} = \lambda_1 N_1 - \lambda_2 N_2$$</div>
+    <div class="eq">$$\frac{dN_3}{dt} = \lambda_2 N_2 - \lambda_3 N_3$$</div>
+    <div class="eq eq-last">$$\frac{dN_4}{dt} = \lambda_3 N_3$$</div>
+    <p class="before-eq">The decay constant of each step is obtained from its half-life:</p>
+    <div class="eq eq-tight">$$\lambda_i = \frac{\ln 2}{(t_{1/2})_i}$$</div>
+    <p class="before-eq">The dashed lines show the steady-state numbers of particles of
+    isotopes&nbsp;1, 2 and&nbsp;3, found by setting \(dN_i/dt = 0\):</p>
+    <div class="eq eq-tight">$$N_{i,ss} = \frac{P}{\lambda_i}$$</div>
+    <p>Because isotope&nbsp;1 is continuously produced and isotope&nbsp;4 is stable, the total
     \(N_1+N_2+N_3+N_4\) increases with time.</p>
+    <p>In the <sup>211</sup>Pb example, all <sup>211</sup>Bi is assumed to undergo &alpha; decay
+    to <sup>207</sup>Tl; the minor branch (about 0.3%) in which <sup>211</sup>Bi undergoes
+    &beta;<sup>&minus;</sup> decay to <sup>211</sup>Po, which then &alpha;-decays to
+    <sup>207</sup>Pb, is neglected.</p>
+    <p style="margin:10px 0 0 0;"><b>Symbols</b></p>
+    <table class="symbols">
+      <tr><td>\(N_i\)</td><td>number of particles of isotope&nbsp;\(i\)</td></tr>
+      <tr><td>\(N_{i,ss}\)</td><td>steady-state number of particles of isotope&nbsp;\(i\)</td></tr>
+      <tr><td>\(P\)</td><td>production rate of isotope&nbsp;1 (particles/min)</td></tr>
+      <tr><td>\(t\)</td><td>time (min)</td></tr>
+      <tr><td>\((t_{1/2})_i\)</td><td>half-life of isotope&nbsp;\(i\) (min)</td></tr>
+      <tr><td>\(\lambda_i\)</td><td>decay constant of isotope&nbsp;\(i\) (min<sup>&minus;1</sup>)</td></tr>
+    </table>
   </div>
 
   <!-- About -->
@@ -118,8 +166,8 @@ window.MathJax = {
     <p>This simulation was created in the
     <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and
     Biological Engineering</a> at University of Colorado Boulder for
-    <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by
-    John&nbsp;L.&nbsp;Falconer using Claude AI. It was prepared with financial support from
+    <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> using Claude AI by
+    John&nbsp;L.&nbsp;Falconer in collaboration with Martha&nbsp;A.&nbsp;Grover. It was prepared with financial support from
     the National Science Foundation (DUE 2336987 and 2336988). Address any questions or
     comments to
     <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.</p>
@@ -128,41 +176,34 @@ window.MathJax = {
   <div class="layout">
     <div class="controls">
       <div class="slider-group">
-        <div class="slider-label"><span class="nm">Production rate of isotope 1:</span>
-          <span class="slider-val" id="vP">30</span> /min</div>
-        <input type="range" id="sP" min="10" max="50" step="1" value="30">
-        <div class="rangerow"><span>10</span><span>50</span></div>
-      </div>
-      <div class="slider-group">
-        <div class="slider-label"><span class="nm">Isotope 1 half-life:</span>
-          <span class="slider-val" id="v1">30</span> min</div>
+        <label class="slider-label" for="s1"><span class="nm">isotope 1 half-life:</span>
+          <span class="slider-val" id="v1">30</span> min</label>
         <input type="range" id="s1" min="10" max="50" step="1" value="30">
         <div class="rangerow"><span>10</span><span>50</span></div>
       </div>
       <div class="slider-group">
-        <div class="slider-label"><span class="nm">Isotope 2 half-life:</span>
-          <span class="slider-val" id="v2">5</span> min</div>
+        <label class="slider-label" for="s2"><span class="nm">isotope 2 half-life:</span>
+          <span class="slider-val" id="v2">5</span> min</label>
         <input type="range" id="s2" min="1" max="10" step="0.5" value="5">
         <div class="rangerow"><span>1</span><span>10</span></div>
       </div>
       <div class="slider-group">
-        <div class="slider-label"><span class="nm">Isotope 3 half-life:</span>
-          <span class="slider-val" id="v3">10</span> min</div>
+        <label class="slider-label" for="s3"><span class="nm">isotope 3 half-life:</span>
+          <span class="slider-val" id="v3">10</span> min</label>
         <input type="range" id="s3" min="2" max="20" step="0.5" value="10">
         <div class="rangerow"><span>2</span><span>20</span></div>
       </div>
       <div style="font-size:15px; color:#555; line-height:1.5; margin-top:4px;">
-        At&nbsp;<i>t</i>&nbsp;=&nbsp;0 there are no particles of isotopes&nbsp;1, 2, 3,
-        and&nbsp;4.
+        No isotope particles are present at&nbsp;<i>t</i>&nbsp;=&nbsp;0.
       </div>
     </div>
 
-    <div>
+    <div class="plotwrap" id="plotwrap">
       <div id="chainEq" style="display:none; max-width:560px; width:100%; text-align:center;
                   overflow-x:auto; overflow-y:hidden; margin:0 0 8px 0; font-size:20px;">
         \[ {}^{211}_{82}\text{Pb}\ \xrightarrow{\;\beta^-\;}\ {}^{211}_{83}\text{Bi}\ \xrightarrow{\;\alpha\;}\ {}^{207}_{81}\text{Tl}\ \xrightarrow{\;\beta^-\;}\ {}^{207}_{82}\text{Pb} \]
       </div>
-      <canvas id="plot" width="560" height="430"></canvas>
+      <canvas id="plot" width="560" height="430" role="img" aria-label="Graph of number of particles versus time"></canvas>
     </div>
   </div>
 </div>
@@ -174,8 +215,18 @@ window.MathJax = {
   // ---------- Canvas / hi-DPI ----------
   const canvas = document.getElementById('plot');
   const ctx = canvas.getContext('2d');
-  const CSS_W = 560, CSS_H = 430;
+  // The canvas fills its container (max 560 px wide). On narrow screens the
+  // drawing area shrinks and the fonts scale down a little (never below 80%),
+  // so the graph stays readable without being distorted.
+  const plotwrap = document.getElementById('plotwrap');
+  const BASE_W = 560, BASE_H = 430;
+  let CSS_W = BASE_W, CSS_H = BASE_H;
+  let SCALE = 1;   // font/margin scale for small screens
   function setupHiDPI(){
+    const avail = Math.floor(plotwrap.clientWidth || BASE_W);
+    CSS_W = Math.max(260, Math.min(BASE_W, avail));
+    CSS_H = Math.max(280, Math.round(CSS_W * BASE_H / BASE_W));
+    SCALE = Math.max(0.8, Math.min(1, CSS_W / BASE_W));
     const dpr = window.devicePixelRatio || 1;
     canvas.width  = Math.round(CSS_W * dpr);
     canvas.height = Math.round(CSS_H * dpr);
@@ -185,22 +236,17 @@ window.MathJax = {
   }
   setupHiDPI();
 
-  // Plot geometry (CSS px) - margins widen slightly in the larger-font example view
+  // Plot geometry (CSS px). Margins are recomputed in relayout(): wider in the
+  // larger-font example view, narrower on small screens.
   const M = { l: 66, r: 18, t: 18, b: 54 };
   let PW = CSS_W - M.l - M.r;   // plot width
   let PH = CSS_H - M.t - M.b;   // plot height
-  // Y-axis max is no longer fixed at 1000: with continuous production the
-  // steady-state levels of isotopes 1-3 and the ever-growing isotope 4 can
-  // exceed 1000, so the axis is rescaled each draw to fit the current curves.
+  // Y axis: rescaled on every draw. The top is 15% above the largest plotted
+  // value (curves and steady-state lines), so it changes smoothly as the
+  // sliders move. Gridline spacing is 100, 200 or 500, chosen by the axis size.
   let YMAX = 1000;
   let YSTEP = 200;
 
-  // The axis max scales continuously with the data (a fixed 15% headroom
-  // above the tallest curve) instead of snapping to the next "nice" round
-  // number - that snapping was what made the axis appear to jump in sudden
-  // steps as the sliders moved. Gridline spacing is still restricted to a
-  // fixed set (100/200/500) chosen by how large the curves currently are,
-  // so the tick labels stay tidy even though the axis top does not.
   function niceYAxis(maxVal){
     if (!(maxVal > 0)) return { ymax: 1000, step: 200 };
     const ymax = maxVal * 1.15;
@@ -211,18 +257,21 @@ window.MathJax = {
     return { ymax: ymax, step: step };
   }
 
-  function relayout(fs){
-    M.l = (fs > 1) ? 78 : 66;
-    M.b = (fs > 1) ? 62 : 54;
+  function relayout(big, fs){
+    M.l = Math.round(((big) ? 78 : 66) * fs / (big ? 1.2 : 1));
+    M.b = Math.round(((big) ? 62 : 54) * fs / (big ? 1.2 : 1));
+    M.t = Math.round(18 * SCALE);
+    M.r = Math.round(18 * SCALE);
     PW = CSS_W - M.l - M.r;
     PH = CSS_H - M.t - M.b;
   }
 
   const colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#9467bd'];
 
-  // ---------- Physics: RK4 integration of the Bateman chain ----------
-  // Isotope 1 is now continuously produced at rate P (particles/min) in
-  // addition to decaying, so its rate equation gains a +P source term.
+  // ---------- Physics: RK4 integration of the decay chain ----------
+  // Isotope 1 is produced at a constant rate P (particles/min) and decays;
+  // isotopes 2 and 3 are formed by decay of the previous isotope and decay;
+  // isotope 4 is stable. All four start at zero.
   function deriv(N, l, P){
     return [
       P - l[0]*N[0],
@@ -231,11 +280,11 @@ window.MathJax = {
        l[2]*N[2]
     ];
   }
-  function integrate(hl1, hl2, hl3, P, N1_0, tmax){
+  function integrate(hl1, hl2, hl3, P, tmax){
     const l = [Math.LN2/hl1, Math.LN2/hl2, Math.LN2/hl3];
     const nsteps = 2000;
     const dt = tmax / nsteps;
-    let N = [N1_0, 0, 0, 0];
+    let N = [0, 0, 0, 0];
     const T = new Float64Array(nsteps+1);
     const Y = [new Float64Array(nsteps+1), new Float64Array(nsteps+1),
                new Float64Array(nsteps+1), new Float64Array(nsteps+1)];
@@ -257,7 +306,9 @@ window.MathJax = {
       T[i+1] = (i+1)*dt;
       for (let s=0; s<4; s++) Y[s][i+1] = Math.max(0, N[s]);
     }
-    return { T, Y, tmax };
+    // Steady-state numbers of isotopes 1-3 (dN/dt = 0): N_i,ss = P / lambda_i
+    const Nss = [P/l[0], P/l[1], P/l[2]];
+    return { T, Y, tmax, Nss };
   }
 
   // ---------- Rotated y-axis label ----------
@@ -308,14 +359,15 @@ window.MathJax = {
 
   function draw(sol, step, labels, fs){
     fs = fs || 1;
-    relayout(fs);
+    const big = fs > 1;          // example (211Pb) view uses larger fonts
+    fs = fs * SCALE;             // shrink fonts on narrow screens
+    relayout(big, fs);
     const tmax = sol.tmax;
     ctx.clearRect(0, 0, CSS_W, CSS_H);
 
-    // Isotope 4 is only plotted (and only counted toward the y-axis range)
-    // when the "Isotope 4" checkbox is checked - by default its unbounded
-    // growth is excluded so it doesn't stretch the axis and squeeze the
-    // other curves toward the bottom.
+    // Isotope 4 is plotted (and counted toward the y-axis range) only when the
+    // isotope 4 checkbox is checked, so by default its unbounded growth does not
+    // stretch the axis and squeeze the other curves toward the bottom.
     const showIso4 = !!(ck4 && ck4.checked);
     const nCurves = showIso4 ? 4 : 3;
     let maxVal = 0;
@@ -323,6 +375,8 @@ window.MathJax = {
       const arr = sol.Y[s];
       for (let i=0; i<arr.length; i++) if (arr[i] > maxVal) maxVal = arr[i];
     }
+    // keep the steady-state lines on the plot even if a curve has not reached its line by 175 min
+    for (let s=0; s<3; s++) if (sol.Nss[s] > maxVal) maxVal = sol.Nss[s];
     const yInfo = niceYAxis(maxVal);
     YMAX = yInfo.ymax;
     YSTEP = yInfo.step;
@@ -340,8 +394,7 @@ window.MathJax = {
       ctx.fillText(n, M.l-8, y);
     }
 
-    // x ticks at multiples of the chosen spacing (10/20/30/40/50 min).
-    // tmax is continuous, so the last tick may fall short of the right edge.
+    // x ticks every `step` min (XSTEP = 25) from 0 to tmax (TMAX = 175).
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
     const nt = Math.floor(tmax / step);
@@ -358,6 +411,17 @@ window.MathJax = {
     ctx.strokeStyle = '#333';
     ctx.lineWidth = 1.2;
     ctx.strokeRect(M.l, M.t, PW, PH);
+
+    // Dashed steady-state lines (isotopes 1-3), drawn under the curves
+    ctx.save();
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([7, 5]);
+    for (let s=0; s<3; s++){
+      const y = ypix(sol.Nss[s]);
+      ctx.strokeStyle = colors[s];
+      ctx.beginPath(); ctx.moveTo(M.l, y); ctx.lineTo(M.l+PW, y); ctx.stroke();
+    }
+    ctx.restore();
 
     // Curves (isotope 4 drawn only when its checkbox is checked)
     ctx.lineWidth = 2.2;
@@ -379,7 +443,7 @@ window.MathJax = {
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
     ctx.fillText('time (min)', M.l + PW/2, M.t + PH + 30 * fs);
-    drawYAxisLabel('number of particles', 15, M.t + PH/2, 16.8 * fs);
+    drawYAxisLabel('number of particles', 15 * fs, M.t + PH/2, 16.8 * fs);
 
     // Labels placed directly on the curves (no separate legend)
     const len = sol.T.length;
@@ -388,41 +452,51 @@ window.MathJax = {
     // anchor point) stays inside the plot instead of running off the edge.
     const clampXC = function(x){ return Math.max(M.l+48, Math.min(M.l+PW-48, x)); };
     const clampY = function(y){ return Math.max(M.t+10, Math.min(M.t+PH-8, y)); };
-    function argmax(arr){ let m=0; for (let i=1;i<arr.length;i++) if (arr[i]>arr[m]) m=i; return m; }
-    // With continuous production, isotopes 2 and 3 no longer peak and decay
-    // away - they rise monotonically toward a steady state, so their true
-    // max sits at (or right next to) the last time point. Placing a label
-    // there runs it off the right edge, so fall back to a fixed interior
-    // position whenever the "peak" is really just the end of the window.
-    function peakOrFallback(arr, fallbackFrac){
-      const m = argmax(arr);
-      if (m > 0.9*(len-1)) return Math.round(fallbackFrac*(len-1));
-      return m;
+
+    // Steady-state values: labeled at the right end of each dashed line, just
+    // above it (the curves approach their lines from below). When two lines are
+    // too close for both labels to fit above, the lower line's label goes below it.
+    {
+      const ssFs = 14.4 * fs;
+      const order = [0,1,2].sort(function(a,b){ return sol.Nss[b] - sol.Nss[a]; });
+      let prevY = -1e9;
+      for (let k=0; k<3; k++){
+        const s = order[k];
+        const yLine = ypix(sol.Nss[s]);
+        let y = yLine - 0.6*ssFs;
+        if (y - prevY < 1.05*ssFs) y = yLine + 0.65*ssFs;
+        y = clampY(y);
+        drawCurveLabel(String(Math.round(sol.Nss[s])), M.l + PW - 5, y, colors[s], 'right', ssFs);
+        prevY = y;
+      }
     }
 
-    // Curve-label font: scales with fs, plus a net extra 3.5% in the example (211Pb)
-    // view (15% up for the larger example plot, then reduced 10% per request).
-    const labelFs = 16.8 * fs * (fs > 1 ? 1.035 : 1);
+    // Curve-label font: scales with fs, and is 3.5% larger again in the
+    // example (211Pb) view.
+    const labelFs = 16.8 * fs * (big ? 1.035 : 1);
 
-    // Curve 1 (blue): on the descending curve, upper-left region
+    // Curve labels sit at fixed fractions of the time axis. All of the curves
+    // rise monotonically (production with zero starting amounts), so there is
+    // no peak to label.
+    // Curve 1 (blue): just above and to the right of the rising curve at 12%
     let iA = Math.round(0.12*(len-1));
     drawCurveLabel(labels[0], clampX(xpix(sol.T[iA],tmax)+6),
                    clampY(ypix(sol.Y[0][iA]) - 12*fs), colors[0], 'left', labelFs);
 
-    // Curve 4 (purple): below the rising curve, right region - only when shown
+    // Curve 4 (purple): below the curve at 66% - only when shown
     if (showIso4){
       let iD = Math.round(0.66*(len-1));
       drawCurveLabel(labels[3], clampXC(xpix(sol.T[iD],tmax)),
                      clampY(ypix(sol.Y[3][iD]) + 16*fs), colors[3], 'center', labelFs);
     }
 
-    // Curve 3 (green): above its peak (or, if it only plateaus, an interior point)
-    let iC = peakOrFallback(sol.Y[2], 0.58);
+    // Curve 3 (green): above the curve at 58%
+    let iC = Math.round(0.58*(len-1));
     drawCurveLabel(labels[2], clampXC(xpix(sol.T[iC],tmax)),
                    clampY(ypix(sol.Y[2][iC]) - 13*fs), colors[2], 'center', labelFs);
 
-    // Curve 2 (orange): above its peak (or, if it only plateaus, an interior point)
-    let iB = peakOrFallback(sol.Y[1], 0.38);
+    // Curve 2 (orange): above the curve at 38%
+    let iB = Math.round(0.38*(len-1));
     drawCurveLabel(labels[1], clampXC(xpix(sol.T[iB],tmax)),
                    clampY(ypix(sol.Y[1][iB]) - 13*fs), colors[1], 'center', labelFs);
   }
@@ -465,11 +539,9 @@ window.MathJax = {
   }
 
   // ---------- State + wiring ----------
-  const sP = document.getElementById('sP');
   const s1 = document.getElementById('s1');
   const s2 = document.getElementById('s2');
   const s3 = document.getElementById('s3');
-  const vP = document.getElementById('vP');
   const v1 = document.getElementById('v1');
   const v2 = document.getElementById('v2');
   const v3 = document.getElementById('v3');
@@ -477,8 +549,7 @@ window.MathJax = {
 
   function fmt(x){ return Number.isInteger(x) ? String(x) : x.toFixed(1); }
 
-  // Fixed time axis: 0-175 min for every slider combination (and the pictured
-  // example), so the x-axis no longer zooms in/out as the half-life sliders move.
+  // Fixed time axis: 0-175 min for every slider setting and for the example.
   const TMAX = 175;
   const XSTEP = 25;
 
@@ -486,14 +557,15 @@ window.MathJax = {
   // Isotope labels are structured so the mass number can be drawn as a proper
   // superscript on the canvas (Unicode superscript glyphs render inconsistently
   // across fonts/browsers, e.g. iOS Safari sizes them unevenly).
-  const GENERIC_LABELS = ['Isotope 1', 'Isotope 2', 'Isotope 3', 'Isotope 4'];
+  const GENERIC_LABELS = ['isotope 1', 'isotope 2', 'isotope 3', 'isotope 4'];
   const EXAMPLE_LABELS = [
     { mass: '211', sym: 'Pb' },
     { mass: '211', sym: 'Bi' },
     { mass: '207', sym: 'Tl' },
     { mass: '207', sym: 'Pb' }
   ];
-  const EXAMPLE_HL = { hl1: 36.1, hl2: 2.15, hl3: 4.79 };
+  const EXAMPLE_HL = { hl1: 36.1, hl2: 2.14, hl3: 4.77 };  // 211Pb, 211Bi, 207Tl half-lives (min)
+  const P_FIXED = 30;   // production rate of isotope 1 in the slider case (particles/min)
   const EXAMPLE_P = 20; // 211Pb production rate for the pictured example (particles/min)
 
   const chainEq    = document.getElementById('chainEq');
@@ -502,41 +574,59 @@ window.MathJax = {
   const backBtn    = document.getElementById('backBtn');
   let exampleMode = false;
 
-  function render(hl1, hl2, hl3, P, N1_0, labels, fs){
-    const sol = integrate(hl1, hl2, hl3, P, N1_0, TMAX);
-    draw(sol, XSTEP, labels, fs);
+  // Text alternative for the canvas, for screen readers: what is plotted and
+  // the number of particles of each plotted isotope at the end of the time axis.
+  function describePlot(sol, labels){
+    const n = (ck4 && ck4.checked) ? 4 : 3;
+    const last = sol.T.length - 1;
+    const parts = [];
+    for (let s=0; s<n; s++){
+      const lab = (typeof labels[s] === 'string') ? labels[s] : labels[s].sym + '-' + labels[s].mass;
+      parts.push(lab + ' ' + Math.round(sol.Y[s][last]));
+    }
+    canvas.setAttribute('aria-label',
+      'Graph of number of particles versus time from 0 to ' + TMAX +
+      ' min, starting from zero particles. Number of particles at ' + TMAX +
+      ' min: ' + parts.join(', ') + '.');
   }
 
-  // Slider-driven exploration (generic labels, sliders shown, chain hidden).
-  // Isotope 1 starts at zero - all four isotopes build up from nothing as
-  // isotope 1 is continuously produced.
+  function render(hl1, hl2, hl3, P, labels, fs){
+    const sol = integrate(hl1, hl2, hl3, P, TMAX);
+    draw(sol, XSTEP, labels, fs);
+    describePlot(sol, labels);
+  }
+
+  // Slider case: generic labels, sliders shown, decay-chain equation hidden,
+  // production rate fixed at P_FIXED.
   function update(){
     exampleMode = false;
     controls.style.display = '';
     chainEq.style.display = 'none';
     exampleBtn.classList.remove('active');
     backBtn.style.display = 'none';
-    const P   = parseFloat(sP.value);
+    const P   = P_FIXED;
     const hl1 = parseFloat(s1.value);
     const hl2 = parseFloat(s2.value);
     const hl3 = parseFloat(s3.value);
-    vP.textContent = fmt(P);
     v1.textContent = fmt(hl1);
     v2.textContent = fmt(hl2);
     v3.textContent = fmt(hl3);
-    render(hl1, hl2, hl3, P, 0, GENERIC_LABELS, 1);
+    s1.setAttribute('aria-valuetext', fmt(hl1) + ' min');
+    s2.setAttribute('aria-valuetext', fmt(hl2) + ' min');
+    s3.setAttribute('aria-valuetext', fmt(hl3) + ' min');
+    render(hl1, hl2, hl3, P, GENERIC_LABELS, 1);
   }
 
-  // Pictured example: fixed real half-lives, isotope labels, chain shown, sliders hidden,
-  // and the whole graph rendered 20% larger. 211Pb starts at zero and is continuously
-  // produced at EXAMPLE_P particles/min, matching the general production model.
+  // 211Pb example: real half-lives, isotope labels, decay-chain equation shown,
+  // sliders hidden, production rate EXAMPLE_P. Fonts are 20% larger (fs = 1.2);
+  // the canvas size is unchanged, so the plot area is slightly smaller.
   window.showExample = function(){
     exampleMode = true;
     controls.style.display = 'none';
     chainEq.style.display = 'block';
     exampleBtn.classList.add('active');
     backBtn.style.display = '';
-    render(EXAMPLE_HL.hl1, EXAMPLE_HL.hl2, EXAMPLE_HL.hl3, EXAMPLE_P, 0, EXAMPLE_LABELS, 1.2);
+    render(EXAMPLE_HL.hl1, EXAMPLE_HL.hl2, EXAMPLE_HL.hl3, EXAMPLE_P, EXAMPLE_LABELS, 1.2);
     if (window.MathJax && window.MathJax.typesetPromise){
       window.MathJax.typesetPromise([chainEq]);
     }
@@ -547,39 +637,65 @@ window.MathJax = {
 
   function redraw(){
     if (exampleMode){
-      render(EXAMPLE_HL.hl1, EXAMPLE_HL.hl2, EXAMPLE_HL.hl3, EXAMPLE_P, 0, EXAMPLE_LABELS, 1.2);
+      render(EXAMPLE_HL.hl1, EXAMPLE_HL.hl2, EXAMPLE_HL.hl3, EXAMPLE_P, EXAMPLE_LABELS, 1.2);
     } else {
       render(parseFloat(s1.value), parseFloat(s2.value), parseFloat(s3.value),
-             parseFloat(sP.value), 0, GENERIC_LABELS, 1);
+             P_FIXED, GENERIC_LABELS, 1);
     }
   }
 
-  // ---------- Panels (defined before the first draw so buttons always work) ----------
-  window.togglePanel = function(name){
-    const ids = ['directions','details','about'];
-    ids.forEach(function(id){
-      const el = document.getElementById('panel-'+id);
-      if (id === name){
-        el.style.display = (el.style.display === 'block') ? 'none' : 'block';
-      } else {
-        el.style.display = 'none';
-      }
+  // ---------- Panels ----------
+  // The button of the open panel is shaded darker (the .active style) so it is
+  // clear which one was clicked. Esc or a click/tap outside the panel closes it.
+  const PANEL_IDS = ['directions','details','about'];
+  function setPanel(name){
+    PANEL_IDS.forEach(function(id){
+      const open = (id === name);
+      document.getElementById('panel-'+id).style.display = open ? 'block' : 'none';
+      const b = document.getElementById('btn-'+id);
+      b.classList.toggle('active', open);
+      b.setAttribute('aria-expanded', open ? 'true' : 'false');
     });
+  }
+  function openPanel(){
+    for (let i=0; i<PANEL_IDS.length; i++){
+      if (document.getElementById('panel-'+PANEL_IDS[i]).style.display === 'block') return PANEL_IDS[i];
+    }
+    return null;
+  }
+  window.togglePanel = function(name){
+    setPanel(openPanel() === name ? null : name);
     if (window.MathJax && window.MathJax.typesetPromise){
       window.MathJax.typesetPromise();
     }
   };
+  document.addEventListener('keydown', function(e){
+    if ((e.key === 'Escape' || e.key === 'Esc') && openPanel()) setPanel(null);
+  });
+  document.addEventListener('click', function(e){
+    if (!openPanel()) return;
+    const t = e.target;
+    if (t.closest && (t.closest('.panel') || t.closest('#btn-directions, #btn-details, #btn-about'))) return;
+    setPanel(null);
+  });
 
-  sP.addEventListener('input', update);
   s1.addEventListener('input', update);
   s2.addEventListener('input', update);
   s3.addEventListener('input', update);
   ck4.addEventListener('change', redraw);
-  window.addEventListener('resize', function(){
-    try { setupHiDPI(); redraw(); } catch (e) {}
-  });
+  // Redraw whenever the plot container changes width (rotation, window resize,
+  // controls wrapping above the graph) or the pixel ratio changes (zoom).
+  let _lastW = -1, _lastDpr = -1;
+  function onResize(){
+    const w = plotwrap.clientWidth, dpr = window.devicePixelRatio || 1;
+    if (w === _lastW && dpr === _lastDpr) return;
+    _lastW = w; _lastDpr = dpr;
+    setupHiDPI(); redraw();
+  }
+  if (window.ResizeObserver) new ResizeObserver(onResize).observe(plotwrap);
+  window.addEventListener('resize', onResize);
 
-  try { update(); } catch (e) {}
+  update();
 })();
 </script>
 </body>
