@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shopping Street Analogy for Chromatography</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+  svg: { displayAlign: 'left', fontCache: 'global' } };
+</script>
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.min.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: Helvetica, Arial, sans-serif; font-size: 17px; color: #000; background: #fff; }
+  #app { width: 100%; max-width: 1000px; margin: 0 auto; padding-top: 14px; position: relative; }
+  #title { font-size: 20px; font-weight: bold; text-align: center; margin: 0 0 14px 0; }
+  .row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  #buttonRow { justify-content: space-between; position: relative; row-gap: 10px; }
+  .group { flex-wrap: wrap; }
+  .group { display: flex; gap: 10px; align-items: center; }
+  button { font-family: Helvetica, Arial, sans-serif; font-size: 17px; font-weight: normal; color: #fff; background: #98000D;
+    border: none; border-radius: 5px; padding: 6px 14px; cursor: pointer; }
+  button:hover { background: #b3101e; }
+  button:disabled { background: #c9a0a4; cursor: default; }
+  #sliderRow, #sliderRow2 { margin-top: 14px; gap: 8px 24px; flex-wrap: wrap; min-height: 30px; }
+  #sliderRow input[type=range] { width: 85px; }
+  #sliderRow2 { margin-top: 10px; gap: 8px 16px; }
+  #sliderRow2 input[type=range] { width: 70px; }
+  #sliderRow2 .val { min-width: 20px; }
+  .slider { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .slider .val { min-width: 26px; }
+  input[type=range] { -webkit-appearance: none; appearance: none; width: 100px; height: 5px; background: #bbb; border-radius: 3px; outline: none; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #98000D; cursor: pointer; border: none; }
+  input[type=range]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; background: #98000D; cursor: pointer; border: none; }
+  input[type=range]:disabled::-webkit-slider-thumb { background: #c9a0a4; cursor: default; }
+  input[type=range]:disabled::-moz-range-thumb { background: #c9a0a4; cursor: default; }
+  input[type=range]:disabled { cursor: default; }
+  input[type=range]::-moz-range-track { height: 5px; background: #bbb; border-radius: 3px; }
+  canvas { display: block; }
+  /* canvases keep their drawing size and scale down to fit narrow screens */
+  #streetCanvas { width: 100%; max-width: 1000px; height: auto; }
+  #plotCanvas { width: 90%; max-width: 900px; height: auto; }
+  #rotateHint { display: none; margin: 8px 0; color: #555; }
+  @media (max-width: 1016px) { #app { padding-left: 8px; padding-right: 8px; } }
+  @media (max-width: 700px) {
+    #rightGroup { margin-right: 0 !important; }
+    #timeOut { margin-left: 0 !important; }
+    #smoothLbl { margin-right: 0 !important; }
+    #resBox { margin-left: 0 !important; }
+    .panel { max-width: calc(100vw - 16px) !important; }
+    #detailsPanel .scroll { max-height: 70vh; }
+  }
+  @media (max-width: 600px) and (orientation: portrait) { #rotateHint { display: block; } }
+  #resBox { margin: 4px 0 30px 11%; visibility: hidden; }
+  #resTitle { font-weight: bold; margin-bottom: 4px; }
+  #resTable { border-collapse: collapse; }
+  #resTable th { font-weight: normal; text-align: left; border-bottom: 1px solid #000; padding: 3px 28px 3px 0; }
+  #resTable td { padding: 3px 28px 3px 0; }
+  #resTable td.num { text-align: right; padding-right: 0; }
+  #resTable th:last-child { padding-right: 0; }
+  #readout { margin: 4px 0 8px 0; display: flex; flex-wrap: wrap; gap: 6px 30px; align-items: center; }
+  #smoothLbl { margin-left: auto; margin-right: 12.5%; display: flex; align-items: center; gap: 6px; cursor: pointer; }
+  #smoothChk { width: 16px; height: 16px; margin: 0; accent-color: #98000D; cursor: pointer; }
+  .panel { display: none; position: absolute; z-index: 10; background: #fff; border: 1px solid #888; border-radius: 6px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.25); padding: 14px 18px; width: max-content; max-width: 760px; line-height: 1.4; }
+  .panel.open { display: block; }
+  .panel h3 { margin: 0 30px 8px 0; font-size: 17px; font-weight: bold; color: #000; }
+  .panel p { margin: 0 0 9px 0; }
+  .panel table { border-collapse: collapse; margin: 0 0 10px 0; }
+  .panel td { padding: 2px 18px 2px 0; }
+  .panel .close { position: absolute; top: 6px; right: 10px; background: none; color: #000; font-size: 22px; padding: 0 4px; line-height: 1; }
+  .panel .close:hover { background: none; color: #98000D; }
+  #detailsPanel { padding-right: 6px; }
+  #detailsPanel .scroll { max-height: 520px; overflow-y: auto; padding-right: 14px; }
+  .panel a { color: #98000D; }
+  mjx-container[display="true"] { text-align: left !important; margin: 6px 0 6px 20px !important; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="row" id="buttonRow">
+    <div class="group">
+      <button id="startBtn">start</button>
+      <button id="pauseBtn" disabled>pause</button>
+      <button id="resetBtn">reset</button>
+      <div class="slider" style="margin-left:18px"><span>playback speed</span><input type="range" id="speedSlider" min="0.2" max="5" step="0.1" value="1"><span class="val" id="speedVal">1.0</span></div>
+    </div>
+    <div class="group" id="rightGroup" style="margin-right:7.5%">
+      <button id="directionsBtn" data-panel="directionsPanel">Directions</button>
+      <button id="detailsBtn" data-panel="detailsPanel">Details</button>
+      <button id="aboutBtn" data-panel="aboutPanel">About</button>
+    </div>
+
+    <div class="panel" id="directionsPanel">
+      <button class="close">&times;</button>
+      <h3>Directions</h3>
+      <p>This simulation uses families walking down a shopping street as an analogy for how a gas chromatograph separates molecules.
+        Each family (two grandparents, a mother and father, two teenagers, and two young children) enters the left end of the street together, just as a pulse of a mixture is injected into a column.
+        Everyone walks at the same speed, but as they pass each store, each person may go in and shop for a while.
+        For the default settings, children tend to leave later, but this can be changed with the slider settings.
+        The plot below the street shows when each person leaves the street; it plays the role of the detector signal (the chromatogram).</p>
+      <p>Press "start" to send the families down the street. A person in a store is drawn with a black outline and does not move until they come back out.
+        Each person who leaves the right end of the street is added to the plot as a dot in their group's color, stacked in time intervals so the dots build up peaks.
+        Check the "smooth curves" box to see smooth curves that approximate the dots to better make the analogy to a GC detection.</p>
+      <p>Use the sliders to change the walking speed, the number of families that enter together, the chance that a person goes into each store they pass, and the average time each group spends in a store.
+        The dashed line on the plot is the time to walk the street without stopping.
+        Make all the shopping times equal to see the separation disappear, or give the grandparents the longest shopping time to reverse the order.
+        When you press "start," the current settings are used for that run, and the sliders and the "start" button are locked until you press "reset."
+        The axis scales are set when you press "start" so the time axis ends just after the last person leaves, and they do not change while the families walk.
+        The "playback speed" slider can be changed at any time; it only changes how fast the animation runs.</p>
+    </div>
+
+    <div class="panel" id="detailsPanel">
+      <button class="close">&times;</button>
+      <div class="scroll">
+      <h3>Details</h3>
+      <p>The shopping street is an analogy for a chromatography column:</p>
+      <table>
+        <tr><td>shopping street</td><td>column</td></tr>
+        <tr><td>walking down the street</td><td>flow of the carrier gas</td></tr>
+        <tr><td>stores along the street</td><td>adsorbent coating on the column wall</td></tr>
+        <tr><td>going into a store</td><td>adsorbing on the coating</td></tr>
+        <tr><td>time spent in a store</td><td>adsorption time</td></tr>
+        <tr><td>family entering together</td><td>injected pulse of a mixture</td></tr>
+        <tr><td>groups of different ages</td><td>different kinds of molecules</td></tr>
+        <tr><td>people leaving the street</td><td>detector signal</td></tr>
+      </table>
+      <p>Everyone walks at the same speed \(u\), so a person who never shops walks the street of length \(L\) in time</p>
+      \[ t_M = \frac{L}{u} \]
+      <p>The street has \(N_s\) stores. When a person passes a store door, they go in with probability \(p\).
+        Once inside, they stay for a time drawn from an exponential distribution with mean \(\tau\), which depends on the person's age group:</p>
+      \[ P(t_{shop} &gt; t) = e^{-t/\tau} \]
+      <p>The time a person spends on the street is the walking time plus the time spent in all the stores they visited.
+        The number of stores visited follows a binomial distribution with mean \(N_s p\), so the mean time on the street (the retention time) and its standard deviation are</p>
+      \[ t_R = t_M + N_s\, p\, \tau \]
+      \[ \sigma = \tau \sqrt{N_s\, p\,(2 - p)} \]
+      <p>Because \(\sigma\) is proportional to \(\tau\), groups that shop longer leave later and are spread over a longer time, so their peaks are shorter and broader, as for strongly adsorbed molecules in a chromatograph.
+        The mean time on the street is set by the shopping time, but the spread is set by the randomness of which stores each person visits and how long they stay.
+        Visiting more stores (larger \(p\)) increases \(t_R - t_M\) faster than \(\sigma\), so the peaks become better separated, just as a molecule that adsorbs and desorbs many times gives a sharper peak.</p>
+      <p>The retention factor and the resolution of two neighboring peaks are</p>
+      \[ k = \frac{t_R - t_M}{t_M} \]
+      \[ R_s = \frac{2\,(t_{R,2} - t_{R,1})}{w_{b,1} + w_{b,2}} \]
+      <p>where \(w_b\) is the width of a peak at its base. The simulation estimates each width with the Gaussian-width approximation</p>
+      \[ w_b \approx 4\sigma \]
+      <p>where \(\sigma\) is the standard deviation of the times people in that group leave the street.
+        For a Gaussian peak, tangents drawn through the two inflection points cross the baseline \(4\sigma\) apart, so \(4\sigma\) is the usual base width.
+        The peaks here are not exactly Gaussian (the children's peak, for example, has a long tail of late leavers), so the resolutions in the table below the plot are estimates.
+        Peaks are compared in the order the groups leave the street, so each row of the table is a pair of neighboring peaks.
+        In this simulation, \(L\) = 400 m and \(N_s\) = 16 (8 on each side of the street).</p>
+      <p>Symbols:<br>
+        \(k\) = retention factor<br>
+        \(L\) = length of the street<br>
+        \(N_s\) = number of stores<br>
+        \(p\) = probability that a person goes into a store as they pass it<br>
+        \(R_s\) = resolution<br>
+        \(t\) = time<br>
+        \(t_M\) = time to walk the street without stopping<br>
+        \(t_R\) = mean time a group spends on the street (retention time)<br>
+        \(t_{shop}\) = time a person stays in one store<br>
+        \(u\) = walking speed<br>
+        \(w_b\) = peak width at the base<br>
+        \(\sigma\) = standard deviation of the times people leave the street<br>
+        \(\tau\) = mean time spent in each store visited</p>
+      </div>
+    </div>
+
+    <div class="panel" id="aboutPanel">
+      <button class="close">&times;</button>
+      <h3>About</h3>
+      <p>This simulation was created in the <a href="https://www.colorado.edu/chbe/" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a>
+        at University of Colorado Boulder for <a href="https://learncheme.com/" target="_blank" rel="noopener">LearnChemE.com</a>
+        by John L. Falconer using Claude AI. This simulation is based on an analogy created by Eva Sorenson of University College London. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988).
+        Address any questions or comments to LearnChemE@gmail.com.</p>
+    </div>
+  </div>
+
+  <div class="row" id="sliderRow">
+    <div class="slider"><span>walking speed (m/min)</span><input type="range" id="velSlider" min="40" max="100" step="5" value="60"><span class="val" id="velVal">60</span></div>
+    <div class="slider"><span>number of families</span><input type="range" id="famSlider" min="1" max="20" step="1" value="10"><span class="val" id="famVal">10</span></div>
+    <div class="slider"><span>chance of entering a store (%)</span><input type="range" id="pSlider" min="10" max="100" step="5" value="50"><span class="val" id="pVal">50</span></div>
+  </div>
+  <div class="row" id="sliderRow2">
+    <span style="white-space:nowrap">minutes per store:</span>
+    <div class="slider"><span>grandparents</span><input type="range" id="tauG" min="0" max="20" step="1" value="1"><span class="val" id="tauGVal">1</span></div>
+    <div class="slider"><span>parents</span><input type="range" id="tauP" min="0" max="20" step="1" value="3"><span class="val" id="tauPVal">3</span></div>
+    <div class="slider"><span>teenagers</span><input type="range" id="tauT" min="0" max="20" step="1" value="6"><span class="val" id="tauTVal">6</span></div>
+    <div class="slider"><span>children</span><input type="range" id="tauC" min="0" max="20" step="1" value="12"><span class="val" id="tauCVal">12</span></div>
+  </div>
+
+  <div id="rotateHint">Turn your device sideways for a larger view.</div>
+  <canvas id="streetCanvas" style="margin-top:10px"></canvas>
+  <div id="readout">
+    <span id="timeOut" style="margin-left:10.5%">time = 0 min</span>
+    <span id="inOut">in stores: 0</span>
+    <span id="exitOut">left the street: 0 of 80</span>
+    <label id="smoothLbl"><input type="checkbox" id="smoothChk"> smooth curves</label>
+  </div>
+  <canvas id="plotCanvas"></canvas>
+  <div id="resBox">
+    <div id="resTitle">Estimated resolution</div>
+    <table id="resTable">
+      <tr><th>neighboring peaks</th><th>resolution, <i style="font-family:'Times New Roman',serif">R</i><sub>s</sub></th></tr>
+      <tbody id="resBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  // ---------------- geometry (CSS px) ----------------
+  const CW = 1000, CH = 292;
+  let PW = 900; const PH = 320;   // plot canvas width follows its on-screen width (90% of the street, at most 900)
+  const X0 = 90, X1 = 910, L = X1 - X0;
+  const LEN_M = 400, PXM = L / LEN_M;        // street is 400 m long
+  const SH = 64;                              // store height
+  const yS1 = 12, yT = yS1 + SH;              // top stores, top edge of street
+  const yB = yT + 104, yS2 = yB;              // bottom edge of street, bottom stores
+  const yc = (yT + yB) / 2;
+  const NPS = 8, SW = L / NPS;                // stores per side, store width
+  const NAMES_TOP = ['bakery', 'books', 'clothes', 'café', 'shoes', 'music', 'gifts', 'sports'];
+  const NAMES_BOT = ['toys', 'candy', 'games', 'phones', 'ice cream', 'crafts', 'jewelry', 'pets'];
+  const stores = [];
+  for (let i = 0; i < NPS; i++) {
+    stores.push({ x: X0 + i * SW, top: true, name: NAMES_TOP[i], door: X0 + i * SW + SW * 0.35 });
+    stores.push({ x: X0 + i * SW, top: false, name: NAMES_BOT[i], door: X0 + i * SW + SW * 0.65 });
+  }
+  stores.sort((a, b) => a.door - b.door);
+  const NS = stores.length;
+
+  // groups: grandparents, parents, teenagers, children (2 of each per family)
+  const GROUPS = [
+    { key: 'g', name: 'grandparents', col: '#7a3d9c', H: 25 },
+    { key: 'p', name: 'parents', col: '#1f5fbf', H: 27 },
+    { key: 't', name: 'teenagers', col: '#2a8a3a', H: 23 },
+    { key: 'c', name: 'children', col: '#e07b00', H: 16 }
+  ];
+  // live = slider values; cfg = settings the model, reference line and results use.
+  // cfg follows the sliders until start is pressed, then is frozen until reset.
+  const live = { uM: 60, pEnter: 0.5, nFam: 10, tau: [1, 3, 6, 12] };   // tau = mean minutes in each store visited
+  const snap = o => ({ uM: o.uM, pEnter: o.pEnter, nFam: o.nFam, tau: o.tau.slice() });
+  let cfg = snap(live);
+  let speed = 1, smooth = false;
+  const DT = 0.05;                            // min, used only for the test hooks' stepping
+  const DY = 60;                              // visual lateral wander (px^2/min); does not affect timing
+
+  let people = [], exits = [[], [], [], []], exitList = [];
+  let t = 0, running = false, started = false, finished = false;
+
+  function setupCanvas(cv, w, h) {
+    const dpr = window.devicePixelRatio || 1;
+    cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+
+    const c = cv.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0); return c;
+  }
+  const sctx = setupCanvas(document.getElementById('streetCanvas'), CW, CH);
+  const plotCv = document.getElementById('plotCanvas');
+  const pctx = plotCv.getContext('2d');
+  // draw the plot at its actual on-screen width so its text is always true size;
+  // below 600 px the 600-px drawing is scaled down to fit
+  function sizePlot() {
+    const disp = Math.round(plotCv.getBoundingClientRect().width) || 900;
+    const want = Math.max(600, Math.min(900, disp));
+    const dpr = window.devicePixelRatio || 1;
+    if (want === PW && plotCv.width === Math.round(want * dpr)) return;
+    PW = want;
+    plotCv.width = Math.round(PW * dpr); plotCv.height = Math.round(PH * dpr);
+    pctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  sizePlot();
+  window.addEventListener('resize', sizePlot);
+
+  let spare = null;
+  function gauss() {
+    if (spare !== null) { const v = spare; spare = null; return v; }
+    let u, v, s;
+    do { u = Math.random() * 2 - 1; v = Math.random() * 2 - 1; s = u * u + v * v; } while (s >= 1 || s === 0);
+    const m = Math.sqrt(-2 * Math.log(s) / s); spare = v * m; return u * m;
+  }
+
+  // ---------------- model ----------------
+  // Timing model: every person starts at the street entrance at t = 0 and walks at exactly u.
+  // At each store door they go in with probability p and stay an exponentially distributed time.
+  // The whole schedule (store entry and exit times, and the time they leave the street) is
+  // sampled at start; the animation and the plot are driven only by these event times.
+  //   time to reach door k = (distance to door k)/u + time already spent shopping
+  //   time to leave street = L/u + sum of shopping times
+  // Visual jitter (family clustering along the street, sideways wandering, spot inside a store)
+  // only changes where a person is drawn, never when anything happens.
+  const yLo = g => yT + GROUPS[g].H / 2 + 3, yHi = g => yB - GROUPS[g].H / 2 - 3;
+
+  function makeSchedule(g) {
+    const upx = cfg.uM * PXM, tau = cfg.tau[g];
+    const visits = [];
+    let shopped = 0;
+    for (let k = 0; k < NS; k++) {
+      if (!(tau > 0) || Math.random() >= cfg.pEnter) continue;
+      const tIn = (stores[k].door - X0) / upx + shopped;
+      const d = -tau * Math.log(1 - Math.random());
+      visits.push({ k, tIn, tOut: tIn + d });
+      shopped += d;
+    }
+    return { visits, tExit: L / upx + shopped };
+  }
+
+  // model position from the schedule: in a store, or distance walked along the street
+  function stateAt(m, tt) {
+    const upx = cfg.uM * PXM;
+    let shopped = 0;
+    for (const v of m.visits) {
+      if (tt < v.tIn) break;
+      if (tt < v.tOut) return { store: v };
+      shopped += v.tOut - v.tIn;
+    }
+    return { store: null, x: X0 + upx * (tt - shopped) };
+  }
+
+  function placeInStore(m, v) {
+    const s = stores[v.k], H = GROUPS[m.g].H;
+    v.sx = s.x + 10 + Math.random() * (SW - 20);
+    v.sy = s.top ? yS1 + 26 + H / 2 + Math.random() * Math.max(0, SH - 30 - H)
+                 : yS2 + 4 + H / 2 + Math.random() * Math.max(0, SH - 30 - H);
+  }
+
+  // move the clock to t + dt and update what is drawn; exits are recorded at their exact times
+  function advance(dt) {
+    t += dt;
+    const newExits = [];
+    const wander = Math.sqrt(2 * DY * Math.min(dt, 1));
+    for (const m of people) {
+      if (m.exited) continue;
+      if (t >= m.tExit) { m.exited = true; newExits.push(m); continue; }
+      const st = stateAt(m, t);
+      if (st.store) {
+        if (!m.inStore) { m.inStore = true; m.cur = st.store; }
+        m.cur = st.store;
+      } else {
+        if (m.inStore) {                       // just came back out: start beside that store's door
+          m.inStore = false;
+          m.y = stores[m.cur.k].top ? yLo(m.g) + 2 : yHi(m.g) - 2;
+        }
+        m.mx = st.x;
+        // visual only: sideways wander within the street
+        let ny = m.y + wander * gauss();
+        const lo = yLo(m.g), hi = yHi(m.g);
+        if (ny < lo) ny = 2 * lo - ny; if (ny > hi) ny = 2 * hi - ny;
+        m.y = Math.min(hi, Math.max(lo, ny));
+      }
+    }
+    newExits.sort((p, q) => p.tExit - q.tExit);
+    for (const m of newExits) { exits[m.g].push(m.tExit); exitList.push({ t: m.tExit, g: m.g }); }
+    if (people.every(m => m.exited)) { finished = true; running = false; t = lastExit; }
+  }
+  let lastExit = 0;
+
+  // drawn position: model position plus a family offset that shrinks to zero at the end of the street
+  function drawX(m) {
+    const f = Math.min(1, Math.max(0, (m.mx - X0) / L));
+    return Math.min(X1, m.mx + m.jx * (1 - f));
+  }
+
+  function makePeople(nf) {
+    const out = [];
+    for (let f = 0; f < nf; f++) {
+      const fx = -8 - Math.random() * 30, fy = yT + 18 + Math.random() * (yB - yT - 36);   // visual family cluster
+      for (let g = 0; g < 4; g++) for (let k = 0; k < 2; k++) {
+        const sch = makeSchedule(g);
+        const m = { g, visits: sch.visits, tExit: sch.tExit, exited: false, inStore: false, cur: null,
+          mx: X0, jx: fx + (Math.random() - 0.5) * 14,
+          y: Math.min(yHi(g), Math.max(yLo(g), fy + (Math.random() - 0.5) * 30)) };
+        for (const v of m.visits) placeInStore(m, v);
+        out.push(m);
+      }
+    }
+    return out;
+  }
+
+  function start(nf) {
+    people = makePeople(nf || cfg.nFam);
+    exits = [[], [], [], []]; exitList = []; t = 0; finished = false;
+    lastExit = Math.max(...people.map(m => m.tExit));
+    started = true; running = true;
+  }
+  function resetSim() { people = []; exits = [[], [], [], []]; exitList = []; t = 0; started = false; running = false; finished = false; acc = 0;
+    cfg = snap(live); setLocked(false);
+    smooth = false; const sc = document.getElementById('smoothChk'); if (sc) sc.checked = false;
+    scheduleScale(); }
+
+  // ---------------- axis scales chosen before starting ----------------
+  const NPRE = 20;
+  let scale = { tmax: 200, bin: 5, yTop: 10 };
+  function computeScale() {
+    const pre = makePeople(NPRE).map(m => ({ t: m.tExit, g: m.g }));
+    const tEnd = Math.max(...pre.map(e => e.t));
+    let tmax = Math.max(20, 1.15 * LEN_M / cfg.uM, tEnd * 1.12);
+    const xs = niceStep(tmax, 8); tmax = Math.ceil(tmax / xs) * xs;
+    const bin = binFor(tmax);
+    const counts = new Map();
+    let peak = 0;
+    for (const e of pre) { const b = Math.floor(e.t / bin); const v = (counts.get(b) || 0) + 1; counts.set(b, v); peak = Math.max(peak, v); }
+    const want = Math.max(4, peak * cfg.nFam / NPRE * 1.25);
+    const ys = niceStep(want, 5);
+    scale = { tmax, bin, yTop: Math.ceil(want / ys) * ys };
+  }
+  // dots are a fixed size; the bin is the smallest nice time interval that is at least one dot wide
+  const DOT_R = 5.5, plotW = () => PW - 90 - 25;
+  // tick spacing (1, 2, 2.5 or 5 times a power of 10, 4 to 12 ticks) whose last tick is closest above need
+  function tightAxis(need) {
+    let best = null;
+    const p0 = Math.pow(10, Math.floor(Math.log10(need)) - 2);
+    for (let p = p0; p <= p0 * 1000; p *= 10) for (const f of [1, 2, 2.5, 5]) {
+      const step = f * p, n = Math.ceil(need / step - 1e-9);
+      if (n < 4 || n > 12) continue;
+      const end = n * step;
+      if (!best || end < best.end - 1e-9 || (Math.abs(end - best.end) < 1e-9 && step > best.step)) best = { end, step };
+    }
+    return best || { end: need, step: niceStep(need, 8) };
+  }
+  // axis scales for the run about to be shown: every exit time is already scheduled at start,
+  // so the time axis ends just after the last person leaves and the y axis fits the tallest stack
+  function scaleFromRun() {
+    const tM = LEN_M / cfg.uM;
+    const ax = tightAxis(Math.max(10, 1.15 * tM, 1.05 * lastExit));
+    const tmax = ax.end, xs = ax.step;
+    const bin = binFor(tmax);
+    const counts = new Map(); let peak = 0;
+    for (const m of people) { const b = Math.floor(m.tExit / bin); const v = (counts.get(b) || 0) + 1; counts.set(b, v); peak = Math.max(peak, v); }
+    const want = Math.max(4, peak * 1.15);
+    const ys = niceStep(want, 5);
+    scale = { tmax, xs, bin, yTop: Math.ceil(want / ys) * ys };
+  }
+  function binFor(tmax) {
+    const raw = (2 * DOT_R + 1) * tmax / plotW();
+    for (const b of [0.5, 1, 2, 5, 10, 20, 50]) if (b >= raw) return b;
+    return 100;
+  }
+  let scaleTimer = null;
+  function scheduleScale() {
+    if (started) return;
+    clearTimeout(scaleTimer); scaleTimer = setTimeout(computeScale, 120);
+  }
+
+  // ---------------- drawing: street ----------------
+  function arrow(c, x1, y1, x2, y2) {
+    c.beginPath(); c.moveTo(x1, y1); c.lineTo(x2, y2); c.stroke();
+    const a = Math.atan2(y2 - y1, x2 - x1), hl = 10;
+    c.beginPath(); c.moveTo(x2, y2);
+    c.lineTo(x2 - hl * Math.cos(a - 0.4), y2 - hl * Math.sin(a - 0.4));
+    c.lineTo(x2 - hl * Math.cos(a + 0.4), y2 - hl * Math.sin(a + 0.4)); c.closePath(); c.fill();
+  }
+  function rrect(c, x, y, w, h, r) {
+    c.beginPath(); c.moveTo(x + r, y); c.lineTo(x + w - r, y); c.quadraticCurveTo(x + w, y, x + w, y + r);
+    c.lineTo(x + w, y + h - r); c.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    c.lineTo(x + r, y + h); c.quadraticCurveTo(x, y + h, x, y + h - r);
+    c.lineTo(x, y + r); c.quadraticCurveTo(x, y, x + r, y); c.closePath();
+  }
+  // simple person icon centered at (x, y)
+  function drawPerson(c, x, y, g, outlined) {
+    const G = GROUPS[g], H = G.H;
+    const hr = H * 0.19, bw = H * 0.46, top = y - H / 2;
+    const bodyTop = top + 2 * hr + 1, bh = H - 2 * hr - 1;
+    c.fillStyle = G.col;
+    c.beginPath(); c.arc(x, top + hr, hr, 0, 2 * Math.PI); c.fill();
+    if (outlined) { c.lineWidth = 1.6; c.strokeStyle = '#000'; c.stroke(); }
+    rrect(c, x - bw / 2, bodyTop, bw, bh, Math.min(bw / 2, 4)); c.fill();
+    if (outlined) { c.lineWidth = 1.6; c.strokeStyle = '#000'; c.stroke(); }
+  }
+  function drawStreet() {
+    const c = sctx;
+    c.clearRect(0, 0, CW, CH);
+    c.font = '17px Helvetica, Arial, sans-serif'; c.textBaseline = 'middle';
+    // street
+    c.fillStyle = '#ece8e1'; c.fillRect(X0, yT, L, yB - yT);
+    c.strokeStyle = '#d6d0c6'; c.lineWidth = 1;
+    for (let x = X0 + 20; x < X1; x += 40) { c.beginPath(); c.moveTo(x, yT + 4); c.lineTo(x, yB - 4); c.stroke(); }
+    // stores
+    for (const s of stores) {
+      const y = s.top ? yS1 : yS2;
+      c.fillStyle = '#fbf6ea'; c.fillRect(s.x + 2, y, SW - 4, SH);
+      c.strokeStyle = '#8a7a5c'; c.lineWidth = 1.5; c.strokeRect(s.x + 2, y, SW - 4, SH);
+      // door on the street side
+      c.fillStyle = '#8a5a2b';
+      const dy = s.top ? yT - 3 : yB - 3;
+      c.fillRect(s.door - 9, dy, 18, 6);
+      c.fillStyle = '#000'; c.textAlign = 'center';
+      c.fillText(s.name, s.x + SW / 2, s.top ? y + 13 : y + SH - 13);
+    }
+    // people: walking first, then those in stores
+    for (const m of people) if (!m.exited && !m.inStore) drawPerson(c, drawX(m), m.y, m.g, false);
+    for (const m of people) if (!m.exited && m.inStore) drawPerson(c, m.cur.sx, m.cur.sy, m.g, true);
+    // entrance and exit labels
+    c.fillStyle = '#000'; c.strokeStyle = '#000'; c.lineWidth = 2; c.textAlign = 'center';
+    c.fillText('families', 42, yc - 24); c.fillText('enter', 42, yc - 4);
+    arrow(c, 14, yc + 18, 80, yc + 18);
+    c.fillText('leave', 955, yc - 24); c.fillText('street', 955, yc - 4);
+    arrow(c, 920, yc + 18, 986, yc + 18);
+    // key
+    const ky = yS2 + SH + 22;
+    let kx = X0;
+    c.textAlign = 'left';
+    for (let g = 0; g < 4; g++) {
+      drawPerson(c, kx + 6, ky, g, false);
+      c.fillStyle = '#000'; c.fillText(GROUPS[g].name, kx + 18, ky);
+      kx += 30 + c.measureText(GROUPS[g].name).width + 18;
+    }
+    drawPerson(c, kx + 6, ky, 1, true);
+    c.fillStyle = '#000'; c.fillText('in a store', kx + 18, ky);
+    if (!started) {
+      c.textAlign = 'center'; c.fillStyle = '#555';
+      c.fillText('press "start" to send the families down the street', (X0 + X1) / 2, yc);
+    }
+  }
+
+  // ---------------- drawing: plot ----------------
+  function niceStep(range, target) {
+    const raw = range / target, p = Math.pow(10, Math.floor(Math.log10(raw))), f = raw / p;
+    return (f < 1.5 ? 1 : f < 3 ? 2 : f < 7 ? 5 : 10) * p;
+  }
+  function decimalsOf(step) { return step >= 1 ? 0 : Math.ceil(-Math.log10(step) - 1e-9); }
+  const mean = a => a.reduce((s, v) => s + v, 0) / a.length;
+  const sd = a => { if (a.length < 2) return 0; const m = mean(a); return Math.sqrt(a.reduce((s, v) => s + (v - m) * (v - m), 0) / (a.length - 1)); };
+
+  const yLabCache = { key: '', cv: null, w: 0, h: 0 };
+  function drawYLabel(c, txt, cx, cy) {
+    const dpr = window.devicePixelRatio || 1, font = '17px Helvetica, Arial, sans-serif';
+    const key = txt + '|' + dpr;
+    if (yLabCache.key !== key) {
+      const m = document.createElement('canvas').getContext('2d'); m.font = font;
+      const w = Math.ceil(m.measureText(txt).width) + 4, h = 24;
+      const cv = document.createElement('canvas'); cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+      const o = cv.getContext('2d'); o.setTransform(dpr, 0, 0, dpr, 0, 0);
+      o.font = font; o.fillStyle = '#000'; o.textAlign = 'center'; o.textBaseline = 'top';
+      o.fillText(txt, w / 2, 3);
+      Object.assign(yLabCache, { key, cv, w, h });
+    }
+    c.save(); c.translate(cx, cy); c.rotate(-Math.PI / 2);
+    c.drawImage(yLabCache.cv, -yLabCache.w / 2, -yLabCache.h / 2, yLabCache.w, yLabCache.h);
+    c.restore();
+  }
+  function drawPlot() {
+    const c = pctx;
+    c.clearRect(0, 0, PW, PH);
+    const ml = 90, mr = 25, mt = 15, mb = 60;
+    const w = PW - ml - mr, h = PH - mt - mb;
+    const tM = LEN_M / cfg.uM;
+    let tmax = scale.tmax;
+    if (t > tmax) { tmax = t * 1.1; const st = niceStep(tmax, 8); tmax = Math.ceil(tmax / st) * st; }
+    const xs = (tmax === scale.tmax && scale.xs) ? scale.xs : niceStep(tmax, 8), bin = scale.bin;
+    // stack people in time bins
+    const stacks = new Map();
+    for (const e of exitList) { const b = Math.floor(e.t / bin); if (!stacks.has(b)) stacks.set(b, []); stacks.get(b).push(e.g); }
+    let maxStack = 0; for (const v of stacks.values()) maxStack = Math.max(maxStack, v.length);
+    let yTop = scale.yTop;
+    if (maxStack > yTop) { const st = niceStep(maxStack * 1.1, 5); yTop = Math.ceil(maxStack * 1.1 / st) * st; }
+    const ys = niceStep(yTop, 5);
+    const X = v => ml + w * v / tmax, Y = v => mt + h * (1 - v / yTop);
+
+    c.strokeStyle = '#000'; c.lineWidth = 1; c.strokeRect(ml, mt, w, h);
+    c.font = '16px Helvetica, Arial, sans-serif'; c.fillStyle = '#000';
+    c.textAlign = 'center'; c.textBaseline = 'top';
+    const xd = decimalsOf(xs);
+    for (let v = 0; v <= tmax + 1e-9; v += xs) {
+      const px = X(v); c.beginPath(); c.moveTo(px, mt + h); c.lineTo(px, mt + h - 6); c.stroke();
+      c.fillText(v.toFixed(xd), px, mt + h + 6);
+    }
+    c.textAlign = 'right'; c.textBaseline = 'middle';
+    const yd = decimalsOf(ys);
+    let tickW = 0;
+    for (let v = 0; v <= yTop + 1e-9; v += ys) {
+      const py = Y(v); c.beginPath(); c.moveTo(ml, py); c.lineTo(ml + 6, py); c.stroke();
+      c.fillText(v.toFixed(yd), ml - 6, py);
+      tickW = Math.max(tickW, c.measureText(v.toFixed(yd)).width);
+    }
+    c.font = '17px Helvetica, Arial, sans-serif';
+    c.textAlign = 'center'; c.textBaseline = 'top';
+    c.fillText('time (min)', ml + w / 2, mt + h + 30);
+    drawYLabel(c, 'people leaving per ' + (bin < 1 ? bin.toFixed(1) : bin) + ' min', ml - 6 - tickW - 6 - 8, mt + h / 2);   // y label just left of the tick numbers
+
+    // walking time without stopping
+    const xm = X(tM);
+    if (tM <= tmax) {
+      c.save(); c.setLineDash([6, 5]); c.strokeStyle = '#666'; c.beginPath();
+      c.moveTo(xm, mt); c.lineTo(xm, mt + h); c.stroke(); c.restore();
+    }
+
+    // dots
+    const bw = w * bin / tmax, uh = h / yTop;
+    const r = DOT_R;
+    const topOf = new Map();
+    c.save(); c.beginPath(); c.rect(ml, mt, w, h); c.clip();
+    for (const [b, arr] of stacks) {
+      const cx = X((b + 0.5) * bin);
+      arr.forEach((g, i) => {
+        c.beginPath(); c.arc(cx, Y(i + 0.5), r, 0, 2 * Math.PI); c.fillStyle = GROUPS[g].col; c.globalAlpha = smooth ? 0.35 : 1; c.fill(); c.globalAlpha = 1;
+      });
+      topOf.set(b, Y(arr.length));
+    }
+    // smooth curve for each group, in the same units (people per bin)
+    const sig = 0.9 * bin, NC = 500, kn = bin / (sig * Math.sqrt(2 * Math.PI));
+    const curves = [];
+    for (let g = 0; g < 4; g++) {
+      const pts = [];
+      for (let i = 0; i <= NC; i++) {
+        const tt = tmax * i / NC;
+        if (tt > t && !finished) break;
+        let s = 0; for (const v of exits[g]) { const z = (tt - v) / sig; if (z > -5 && z < 5) s += Math.exp(-0.5 * z * z); }
+        pts.push([tt, s * kn]);
+      }
+      curves.push(pts);
+      if (!smooth || exits[g].length === 0 || pts.length < 2) continue;
+      c.strokeStyle = GROUPS[g].col; c.lineWidth = 2.5; c.beginPath();
+      pts.forEach((p, i) => { const px = X(p[0]), py = Y(p[1]); if (i) c.lineTo(px, py); else c.moveTo(px, py); });
+      c.stroke();
+    }
+    c.restore();
+
+    // text with a white background so it reads over the dots
+    function bgText(txt, x, y, align, base, font, col) {
+      c.font = font; c.textAlign = align; c.textBaseline = base;
+      const tw = c.measureText(txt).width;
+      const x0 = align === 'right' ? x - tw : align === 'center' ? x - tw / 2 : x;
+      const y0 = base === 'top' ? y : base === 'bottom' ? y - 18 : y - 9;
+      c.fillStyle = '#fff'; c.fillRect(x0 - 3, y0 - 2, tw + 6, 21);
+      c.fillStyle = col; c.fillText(txt, x, y);
+      return tw;
+    }
+    if (tM <= tmax) {
+      // two-sided arrow spanning the no-shopping time, 0 to t_M, with the words beside it
+      const ay = mt + 14, x0 = ml + 2, x1 = xm - 2, hl = Math.min(7, (x1 - x0) / 2.5);
+      c.strokeStyle = '#666'; c.fillStyle = '#666'; c.lineWidth = 1.5;
+      c.beginPath(); c.moveTo(x0 + hl, ay); c.lineTo(x1 - hl, ay); c.stroke();
+      for (const [tip, dir] of [[x0, 1], [x1, -1]]) {
+        c.beginPath(); c.moveTo(tip, ay); c.lineTo(tip + dir * hl, ay - 4); c.lineTo(tip + dir * hl, ay + 4); c.closePath(); c.fill();
+      }
+      bgText('no shopping', xm + 6, ay, 'left', 'middle', '16px Helvetica, Arial, sans-serif', '#666');
+    }
+
+    // results at upper right
+    const placed = [];
+    let ty = mt + 8;
+    const done = exits.map(a => a.length === 2 * cfg.nFam);
+    for (let g = 0; g < 4; g++) if (done[g]) {
+      const txt = 'mean time on street, ' + GROUPS[g].name + ' = ' + mean(exits[g]).toFixed(0) + ' min';
+      const tw = bgText(txt, ml + w - 10, ty, 'right', 'top', '17px Helvetica, Arial, sans-serif', GROUPS[g].col);
+      placed.push({ x0: ml + w - 10 - tw, x1: ml + w - 10, y0: ty, y1: ty + 20 });
+      ty += 24;
+    }
+    if (tM <= tmax) { c.font = '16px Helvetica, Arial, sans-serif'; placed.push({ x0: ml, x1: xm + 12 + c.measureText('no shopping').width, y0: mt + 3, y1: mt + 26 }); }
+
+    // labels also stay clear of the dot stacks
+    for (const [b, yy] of topOf) { const bx = X((b + 0.5) * bin); placed.push({ x0: bx - r - 1, x1: bx + r + 1, y0: yy - 1, y1: mt + h }); }
+    // group labels above the peaks of their curves
+    c.font = '16px Helvetica, Arial, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'bottom';
+    const order = [0, 1, 2, 3].filter(g => exits[g].length > 0);
+    for (const g of order) {
+      let ax, ay;
+      if (smooth) {
+        let best = null; for (const p of curves[g]) if (!best || p[1] > best[1]) best = p;
+        if (!best) continue;
+        ax = X(best[0]); ay = Y(best[1]) - 6;
+      } else {
+        const cnt = new Map(); let bestB = 0, bestN = -1;
+        for (const v of exits[g]) { const b = Math.floor(v / bin); const n = (cnt.get(b) || 0) + 1; cnt.set(b, n); if (n > bestN) { bestN = n; bestB = b; } }
+        ax = X((bestB + 0.5) * bin); ay = topOf.get(bestB) - 4;
+      }
+      c.font = '16px Helvetica, Arial, sans-serif';
+      const txt = GROUPS[g].name, tw = c.measureText(txt).width;
+      let lx = Math.min(ml + w - tw / 2 - 4, Math.max(ml + tw / 2 + 4, ax));
+      let ly = Math.max(mt + 22, ay);
+      const hit = (x, y) => placed.some(p => x + tw / 2 > p.x0 && x - tw / 2 < p.x1 && y > p.y0 && y - 18 < p.y1);
+      let guard = 0;
+      while (hit(lx, ly) && ly - 6 >= mt + 22 && guard++ < 60) ly -= 6;
+      guard = 0;
+      while (hit(lx, ly) && guard++ < 200) lx += 6;
+      bgText(txt, lx, ly, 'center', 'bottom', '16px Helvetica, Arial, sans-serif', GROUPS[g].col);
+      placed.push({ x0: lx - tw / 2 - 4, x1: lx + tw / 2 + 4, y0: ly - 18, y1: ly });
+    }
+  }
+
+  let resKey = '';
+  function updateResTable() {
+    const box = document.getElementById('resBox');
+    const allDone = started && exits.every(a => a.length === 2 * cfg.nFam);
+    if (!allDone) { if (resKey) { box.style.visibility = 'hidden'; resKey = ''; } return; }
+    const key = exitList.length + '|' + t;
+    if (key === resKey) return;
+    resKey = key;
+    // neighboring peaks ordered by mean time on the street; w_b = 4 sigma for each peak
+    const ord = [0, 1, 2, 3].sort((i, j) => mean(exits[i]) - mean(exits[j]));
+    const name = g => '<span style="color:' + GROUPS[g].col + '">' + GROUPS[g].name + '</span>';
+    let html = '';
+    for (let k = 0; k < 3; k++) {
+      const i = ord[k], j = ord[k + 1];
+      const den = 4 * sd(exits[i]) + 4 * sd(exits[j]);
+      const rs = den > 0 ? (2 * (mean(exits[j]) - mean(exits[i])) / den).toFixed(2) : '–';
+      html += '<tr><td>' + name(i) + ' and ' + name(j) + '</td><td class="num">' + rs + '</td></tr>';
+    }
+    document.getElementById('resBody').innerHTML = html;
+    box.style.visibility = 'visible';
+  }
+  function updateReadout() {
+    let inS = 0; for (const m of people) if (!m.exited && m.inStore) inS++;
+    const total = 8 * cfg.nFam;
+    document.getElementById('timeOut').textContent = 'time = ' + t.toFixed(0) + ' min';
+    document.getElementById('inOut').textContent = 'in stores: ' + inS;
+    document.getElementById('exitOut').textContent = 'left the street: ' + exitList.length + ' of ' + total;
+  }
+
+  let last = null, acc = 0;
+  function frame(ts) {
+    if (last === null) last = ts;
+    const dtReal = Math.min(0.05, (ts - last) / 1000); last = ts;
+    if (running) {
+      advance(dtReal * speed * 0.4);
+    }
+    drawStreet(); drawPlot(); updateReadout(); updateResTable(); syncButtons();
+    requestAnimationFrame(frame);
+  }
+
+  const pauseBtn = document.getElementById('pauseBtn');
+  function syncButtons() {
+    pauseBtn.disabled = !started || finished;
+    const want = running ? 'pause' : 'play';
+    if (pauseBtn.textContent !== want) pauseBtn.textContent = want;
+  }
+  function computeScaleNow() { const was = started; started = false; people = []; computeScale(); started = was; }
+  // freeze the current slider settings for this run
+  function startRun() {
+    clearTimeout(scaleTimer);
+    cfg = snap(live);
+    start();
+    scaleFromRun();
+    acc = 0;
+    setLocked(true);
+  }
+  const MODEL_SLIDERS = ['velSlider', 'famSlider', 'pSlider', 'tauG', 'tauP', 'tauT', 'tauC'];
+  function setLocked(on) {
+    MODEL_SLIDERS.forEach(id => { document.getElementById(id).disabled = on; });
+    document.getElementById('startBtn').disabled = on;
+  }
+  document.getElementById('startBtn').addEventListener('click', startRun);
+  const smoothChk = document.getElementById('smoothChk');
+  smoothChk.checked = false;
+  smoothChk.addEventListener('change', () => { smooth = smoothChk.checked; });
+  pauseBtn.addEventListener('click', () => { if (started && !finished) running = !running; });
+  document.getElementById('resetBtn').addEventListener('click', resetSim);
+
+  function bindSlider(id, outId, fn) {
+    const s = document.getElementById(id), o = document.getElementById(outId);
+    const upd = () => { const v = parseFloat(s.value); o.textContent = String(v); fn(v); };
+    s.addEventListener('input', upd); upd();
+  }
+  // model sliders change cfg only between runs (they are disabled during a run)
+  function setLive(fn) { fn(); if (!started) { cfg = snap(live); scheduleScale(); } }
+  bindSlider('velSlider', 'velVal', v => setLive(() => { live.uM = v; }));
+  bindSlider('famSlider', 'famVal', v => setLive(() => { live.nFam = v; }));
+  bindSlider('pSlider', 'pVal', v => setLive(() => { live.pEnter = v / 100; }));
+  bindSlider('tauG', 'tauGVal', v => setLive(() => { live.tau[0] = v; }));
+  bindSlider('tauP', 'tauPVal', v => setLive(() => { live.tau[1] = v; }));
+  bindSlider('tauT', 'tauTVal', v => setLive(() => { live.tau[2] = v; }));
+  bindSlider('tauC', 'tauCVal', v => setLive(() => { live.tau[3] = v; }));
+  bindSlider('speedSlider', 'speedVal', v => { speed = v; document.getElementById('speedVal').textContent = v.toFixed(1); });
+  computeScale();
+
+  // ---------------- panels ----------------
+  const panels = Array.from(document.querySelectorAll('.panel'));
+  const buttonRow = document.getElementById('buttonRow');
+  function closeAll() { panels.forEach(p => p.classList.remove('open')); }
+  // Esc, or a click anywhere outside an open panel and its button, closes the panel
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAll(); });
+  document.addEventListener('pointerdown', e => {
+    if (!panels.some(p => p.classList.contains('open'))) return;
+    if (e.target.closest('.panel') || e.target.closest('button[data-panel]')) return;
+    closeAll();
+  });
+  function placePanel(p, btn) {
+    const rowR = buttonRow.getBoundingClientRect(), bR = btn.getBoundingClientRect();
+    p.style.top = (bR.bottom - rowR.top + 6) + 'px';
+    p.style.left = '0px';
+    const pw = p.offsetWidth;
+    let left = bR.right - rowR.left - pw;
+    left = Math.max(0, Math.min(left, rowR.width - pw));
+    p.style.left = left + 'px';
+  }
+  document.querySelectorAll('button[data-panel]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const p = document.getElementById(btn.dataset.panel);
+      const wasOpen = p.classList.contains('open');
+      closeAll();
+      if (!wasOpen) {
+        p.classList.add('open'); placePanel(p, btn);
+        if (window.MathJax && MathJax.typesetPromise && !p.dataset.typeset) {
+          MathJax.typesetPromise([p]).then(() => { p.dataset.typeset = '1'; placePanel(p, btn); });
+        }
+      }
+    });
+  });
+  panels.forEach(p => p.querySelector('.close').addEventListener('click', () => p.classList.remove('open')));
+
+  // test hooks
+  window.__runTo = function (tt) { resetSim(); startRun(); running = false;
+    advance(tt); };
+  window.__finish = function () { if (started && !finished) advance(lastExit - t + 1e-9);
+    return { tM: LEN_M / cfg.uM, cfg, means: exits.map(mean) }; };
+  window.__stats = function () {
+    resetSim(); startRun(); running = false;
+    advance(lastExit - t + 1e-9);
+    return { tM: LEN_M / cfg.uM, means: exits.map(mean), sds: exits.map(sd), scale };
+  };
+
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+
+<!-- BEGIN: Under Review Warning Component (Delete this entire block to remove) -->
+<div id="review-warning-banner" class="review-warning-container"><style>.review-warning-container{position:fixed;bottom:20px;right:20px;background-color:#fff3cd;color:#856404;border:1px solid #ffeeba;border-left:5px solid #ffc107;padding:16px 20px;box-shadow:0 4px 12px rgba(0,0,0,.15);border-radius:6px;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;z-index:999999;display:flex;align-items:flex-start;gap:15px;max-width:350px;transition:opacity .3s ease,transform .3s ease}.review-warning-container.fade-out{opacity:0;transform:translateY(15px);pointer-events:none}.review-warning-content{flex-grow:1;font-size:14px;line-height:1.4;margin:0}.review-warning-content strong{display:block;margin-bottom:4px;font-size:15px;color:#664d03}.review-warning-close{background:0 0;border:none;color:#856404;font-size:22px;cursor:pointer;padding:0;line-height:.8;opacity:.5;transition:opacity .2s}.review-warning-close:hover{opacity:1}</style><div class="review-warning-content"><strong>⚠️ Simulation Under Review</strong>This content is still being reviewed for quality and accuracy and may be updated in the future. Feel free to <a href="https://learncheme.com/www.learncheme.com/contact-us">send us feedback</a>.</div><button id="review-warning-close-btn" class="review-warning-close" aria-label="Close warning">&times;</button><script>!function(){let e=document.getElementById("review-warning-close-btn"),n=document.getElementById("review-warning-banner");e&&n&&e.addEventListener("click",(()=>{n.classList.add("fade-out"),setTimeout((()=>n.remove()),300)}))}();</script></div>
+<!-- END: Under Review Warning Component -->
+</html>

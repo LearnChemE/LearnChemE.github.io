@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Partition Functions</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+  chtml: { displayAlign: 'left', displayIndent: '0.9em' },
+  startup: { typeset: false }
+};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 17px; color: #000; font-weight: normal;
+    background: #fff;
+  }
+  /* keep every control below the top ~40 px strip */
+  #app { padding: 44px 12px 16px 12px; max-width: 1040px; margin: 0 auto; }
+
+  /* ---------- buttons ---------- */
+  .btn {
+    font-family: inherit; font-size: 17px; font-weight: normal;
+    color: #fff; background: #98000D;
+    border: none; border-radius: 5px; padding: 6px 14px;
+    cursor: pointer; touch-action: manipulation;
+  }
+  .btn:hover { background: #b3001a; }
+  .btn.active, .btn:active { background: #4d0007; }
+  .btn:focus:not(:focus-visible) { outline: none; }
+  #btnRow { position: relative; display: flex; gap: 8px; flex-wrap: wrap; margin-left: 18px; }
+
+  /* ---------- flyout panels ---------- */
+  .panel {
+    display: none; position: absolute; top: calc(100% + 6px); left: 0;
+    z-index: 50; background: #fff; color: #000;
+    border: 1px solid #888; border-radius: 6px;
+    box-shadow: 0 4px 16px rgba(0,0,0,.25);
+    width: max-content; max-width: min(640px, calc(100vw - 24px));
+    padding: 0;
+  }
+  .panel.open { display: block; }
+  .panel .phead {
+    position: sticky; top: 0; background: #fff;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 10px 4px 14px;
+  }
+  .panel .ptitle { font-size: 17px; font-weight: normal; color: #000; }
+  .panel .close {
+    font-size: 24px; line-height: 1; background: none; border: none;
+    cursor: pointer; color: #000; padding: 0 4px; font-family: inherit;
+  }
+  .panel .pbody { padding: 0 14px 12px 14px; line-height: 1.4; }
+  .panel p { margin: 0 0 10px 0; }
+  #detailsPanel { max-height: 72vh; overflow: hidden; }
+  #detailsPanel .pscroll { max-height: calc(72vh - 44px); overflow-y: auto; }
+  .panel a { color: #98000D; }
+  .sym td { padding: 2px 10px 2px 0; vertical-align: top; }
+  mjx-container[display="true"] { margin: 6px 0 !important; }
+
+  /* ---------- controls ---------- */
+  .controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 22px; margin-bottom: 10px; padding-left: 74px; }
+  @media (max-width: 500px) { .controls, .vals { padding-left: 0 !important; } }
+  .ctl { display: flex; align-items: center; gap: 6px; }
+  select {
+    font-family: inherit; font-size: 17px; color: #000; font-weight: normal;
+    width: auto; padding: 2px 2px; border: 1px solid #888; border-radius: 4px; background: #fff;
+  }
+  .slider-wrap { display: flex; align-items: center; gap: 8px; }
+  .slider-wrap input[type="range"] { width: min(170px, 42vw); margin-bottom: 0; }
+  #degCtls { flex-wrap: wrap; row-gap: 6px; }
+
+  input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+
+  /* ---------- figures ---------- */
+  #main { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
+  .fig { display: flex; flex-direction: column; gap: 6px; }
+  canvas { display: block; touch-action: pan-y; }
+  .vals { margin-top: 10px; line-height: 1.5; padding-left: 74px; }  /* lines up with the energy axis (leftW) */
+  .vals .line { display: flex; flex-wrap: wrap; column-gap: 20px; }
+  .vals .item { white-space: nowrap; font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div class="controls">
+    <div class="ctl">
+      <label for="nLevels">number of energy levels</label>
+      <select id="nLevels"><option>2</option><option selected>3</option><option>4</option></select>
+    </div>
+    <div class="ctl" id="degCtls">
+      <span>degeneracies</span>
+    </div>
+    <button class="btn" id="newBtn">new energy levels</button>
+  </div>
+  <div class="controls">
+    <div class="slider-wrap">
+      <label for="Tslider">temperature</label>
+      <input type="range" id="Tslider" min="10" max="2000" step="5" value="300">
+      <span id="Tval">300 K</span>
+    </div>
+    <div id="btnRow">
+      <button class="btn pbtn" data-panel="directionsPanel">Directions</button>
+      <button class="btn pbtn" data-panel="detailsPanel">Details</button>
+      <button class="btn pbtn" data-panel="aboutPanel">About</button>
+
+      <div class="panel" id="directionsPanel">
+        <div class="phead"><span class="ptitle">Directions</span><button class="close" aria-label="close">×</button></div>
+        <div class="pbody">
+          <p>This simulation shows how the molecular partition function of a system with a few discrete energy levels determines its thermodynamic properties. Particles are distributed among the energy levels according to the Boltzmann distribution, and the partition function, internal energy, heat capacity, entropy, and Helmholtz free energy are calculated from that distribution as functions of temperature.</p>
+          <p>Select the number of energy levels (2 to 4) and the degeneracy of each level (1 to 4). The simulation picks the energy spacings; click "new energy levels" to get a different set. The ground level is at zero energy.</p>
+          <p>The energy-level diagram on the left shows each quantum state as a short horizontal line; a level with degeneracy <i>g</i> has <i>g</i> states at the same energy. The dots are 40 particles distributed among the states at the selected temperature, and the number of particles in each level is shown on the right. Move the temperature slider to see how the particles move to higher levels as temperature increases. The orange bar on the energy axis (and the dashed line across the levels) has a height equal to the thermal energy <i>RT</i>; a level becomes significantly populated when <i>RT</i> becomes comparable to its energy.</p>
+          <p>Use the drop-down menu above the plot to choose which property is plotted versus temperature. The dot on the plot marks the current temperature, and the two lines below the figures list the property values at that temperature (per mole of particles).</p>
+        </div>
+      </div>
+
+      <div class="panel" id="detailsPanel">
+        <div class="phead"><span class="ptitle">Details</span><button class="close" aria-label="close">×</button></div>
+        <div class="pscroll"><div class="pbody">
+          <p>The molecular partition function for a set of energy levels, each with energy \(\varepsilon_i\) and degeneracy \(g_i\), is</p>
+          \[ q = \sum_i g_i \exp\!\left(-\frac{\varepsilon_i}{k_B T}\right) \]
+          <p>The ground level is the energy reference, \(\varepsilon_0 = 0\). The fraction of particles in level \(i\) follows the Boltzmann distribution:</p>
+          \[ p_i = \frac{N_i}{N} = \frac{g_i \exp\!\left(-\varepsilon_i / k_B T\right)}{q} \]
+          <p>Expressing level energies per mole, \(E_i = N_A \varepsilon_i\), so that \(E_i / RT = \varepsilon_i / k_B T\), the molar thermodynamic properties are</p>
+          \[ U = \sum_i E_i \, p_i = RT^2 \left(\frac{\partial \ln q}{\partial T}\right)_V \]
+          \[ C_V = \left(\frac{\partial U}{\partial T}\right)_V = \frac{1}{RT^2}\left[\sum_i E_i^2 \, p_i - \left(\sum_i E_i \, p_i\right)^2\right] \]
+          \[ S = \frac{U}{T} + R \ln q \]
+          \[ A = U - TS = -RT \ln q \]
+          <p>At low temperature, all particles are in the ground level, so \(q \to g_0\), \(U \to 0\), and \(S \to R \ln g_0\). At high temperature, all states are equally populated, so \(q \to \sum_i g_i\) and \(S \to R \ln \sum_i g_i\). The heat capacity goes through a maximum (a Schottky anomaly) at the temperature where particles move most rapidly into the upper levels, and it approaches zero at both low and high temperature because the number of levels is finite.</p>
+          <p>The diagram uses 40 particles; the numbers in each level are the Boltzmann fractions multiplied by 40 and rounded so that they add to 40.</p>
+          <p>Symbols:</p>
+          <table class="sym">
+            <tr><td>\(A\)</td><td>molar Helmholtz free energy (kJ/mol)</td></tr>
+            <tr><td>\(C_V\)</td><td>molar heat capacity at constant volume (J/[mol K])</td></tr>
+            <tr><td>\(E_i\)</td><td>energy of level \(i\) per mole (kJ/mol)</td></tr>
+            <tr><td>\(g_i\)</td><td>degeneracy of level \(i\) (number of states with energy \(\varepsilon_i\))</td></tr>
+            <tr><td>\(i\)</td><td>energy level index (0 is the ground level)</td></tr>
+            <tr><td>\(k_B\)</td><td>Boltzmann constant (1.381 × 10<sup>−23</sup> J/K)</td></tr>
+            <tr><td>\(N\)</td><td>total number of particles</td></tr>
+            <tr><td>\(N_A\)</td><td>Avogadro's number (6.022 × 10<sup>23</sup> mol<sup>−1</sup>)</td></tr>
+            <tr><td>\(N_i\)</td><td>number of particles in level \(i\)</td></tr>
+            <tr><td>\(p_i\)</td><td>fraction of particles in level \(i\)</td></tr>
+            <tr><td>\(q\)</td><td>molecular partition function</td></tr>
+            <tr><td>\(R\)</td><td>ideal gas constant (8.314 J/[mol K])</td></tr>
+            <tr><td>\(S\)</td><td>molar entropy (J/[mol K])</td></tr>
+            <tr><td>\(T\)</td><td>temperature (K)</td></tr>
+            <tr><td>\(U\)</td><td>molar internal energy relative to the ground level (kJ/mol)</td></tr>
+            <tr><td>\(\varepsilon_i\)</td><td>energy of level \(i\) per particle (J)</td></tr>
+          </table>
+        </div></div>
+      </div>
+
+      <div class="panel" id="aboutPanel">
+        <div class="phead"><span class="ptitle">About</span><button class="close" aria-label="close">×</button></div>
+        <div class="pbody" style="max-width:560px">
+          <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank" rel="noopener">LearnChemE.com</a> by John L. Falconer using Claude AI. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="main">
+    <div class="fig" id="diagFig">
+      <canvas id="diag"></canvas>
+    </div>
+    <div class="fig" id="plotFig">
+      <div class="ctl">
+        <label for="plotSel">plot</label>
+        <select id="plotSel">
+          <option value="q">partition function</option>
+          <option value="U">internal energy</option>
+          <option value="Cv">heat capacity</option>
+          <option value="S">entropy</option>
+          <option value="A">Helmholtz free energy</option>
+          <option value="p">fraction of particles in each level</option>
+        </select>
+      </div>
+      <canvas id="plot"></canvas>
+    </div>
+  </div>
+  <div class="vals" id="vals"></div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  const R = 8.314;          // J/(mol K)
+  const NPART = 40;         // particles drawn in the diagram
+  const TMAX = 2000;
+  const COLORS = ["#0050c8", "#c00000", "#008a2e", "#8a3fbf"];
+  const FONT = "Helvetica, Arial, sans-serif";
+
+  const state = {
+    n: 3,
+    g: [1, 2, 3, 2],
+    E: [0, 0, 0, 0],      // kJ/mol
+    T: 300,
+    plot: "q"
+  };
+
+  /* ---------------- physics ---------------- */
+  function pickEnergies() {
+    let e = 0;
+    state.E[0] = 0;
+    for (let i = 1; i < 4; i++) {
+      e += Math.round((1.5 + Math.random() * 4.5) * 10) / 10;   // spacing 1.5–6.0 kJ/mol
+      state.E[i] = Math.round(e * 10) / 10;
+    }
+  }
+
+  function props(T) {
+    const n = state.n, w = [];
+    let q = 0;
+    for (let i = 0; i < n; i++) {
+      const wi = state.g[i] * Math.exp(-state.E[i] * 1000 / (R * T));
+      w.push(wi); q += wi;
+    }
+    const p = w.map(v => v / q);
+    let U = 0, E2 = 0;
+    for (let i = 0; i < n; i++) { U += state.E[i] * p[i]; E2 += state.E[i] * state.E[i] * p[i]; }
+    const Cv = Math.max(0, (E2 - U * U)) * 1e6 / (R * T * T);   // J/(mol K)
+    const S = U * 1000 / T + R * Math.log(q);                    // J/(mol K)
+    const A = -R * T * Math.log(q) / 1000;                        // kJ/mol
+    return { q, p, U, Cv, S, A };
+  }
+
+  function particleCounts(p) {
+    const raw = p.map(v => v * NPART);
+    const c = raw.map(Math.floor);
+    let left = NPART - c.reduce((a, b) => a + b, 0);
+    const order = raw.map((v, i) => [v - Math.floor(v), i]).sort((a, b) => b[0] - a[0]);
+    for (let k = 0; k < left; k++) c[order[k][1]]++;
+    return c;
+  }
+
+  /* ---------------- canvas helpers ---------------- */
+  function setupCanvas(cv, w, h) {
+    const d = window.devicePixelRatio || 1;
+    cv.width = Math.round(w * d); cv.height = Math.round(h * d);
+    cv.style.width = w + "px"; cv.style.height = h + "px";
+    const c = cv.getContext("2d");
+    c.setTransform(d, 0, 0, d, 0, 0);
+    return c;
+  }
+
+  // rich text: $...$ toggles italic, _x or _{xx} is a subscript
+  function parseRich(s) {
+    const segs = []; let italic = false, i = 0, buf = "";
+    const flush = () => { if (buf) { segs.push({ t: buf, it: italic, sub: false }); buf = ""; } };
+    while (i < s.length) {
+      const ch = s[i];
+      if (ch === "$") { flush(); italic = !italic; i++; }
+      else if (ch === "_") {
+        flush(); let sub = "";
+        if (s[i + 1] === "{") { const j = s.indexOf("}", i + 2); sub = s.slice(i + 2, j); i = j + 1; }
+        else { sub = s[i + 1]; i += 2; }
+        segs.push({ t: sub, it: false, sub: true });
+      } else { buf += ch; i++; }
+    }
+    flush();
+    return segs;
+  }
+  function richFont(seg, size) {
+    const sz = seg.sub ? Math.round(size * 0.72) : size;
+    return (seg.it ? "italic " : "") + sz + "px " + FONT;
+  }
+  function richWidth(c, s, size) {
+    let w = 0;
+    for (const seg of parseRich(s)) { c.font = richFont(seg, size); w += c.measureText(seg.t).width; }
+    return w;
+  }
+  // draws with alphabetic baseline at y
+  function drawRich(c, s, x, y, size, align, color) {
+    const w = richWidth(c, s, size);
+    if (align === "center") x -= w / 2; else if (align === "right") x -= w;
+    c.fillStyle = color || "#000"; c.textBaseline = "alphabetic"; c.textAlign = "left";
+    for (const seg of parseRich(s)) {
+      c.font = richFont(seg, size);
+      c.fillText(seg.t, x, seg.sub ? y + size * 0.25 : y);
+      x += c.measureText(seg.t).width;
+    }
+    return w;
+  }
+  // y-axis label: draw horizontally on an offscreen canvas, then rotate
+  function drawYLabel(c, s, cx, cy, size) {
+    const d = window.devicePixelRatio || 1;
+    const w = Math.ceil(richWidth(c, s, size)) + 4, h = Math.ceil(size * 1.5);
+    const off = document.createElement("canvas");
+    off.width = w * d; off.height = h * d;
+    const oc = off.getContext("2d"); oc.setTransform(d, 0, 0, d, 0, 0);
+    drawRich(oc, s, 2, size * 1.05, size, "left", "#000");
+    c.save(); c.translate(cx, cy); c.rotate(-Math.PI / 2);
+    c.drawImage(off, -w / 2, -h / 2, w, h);
+    c.restore();
+  }
+
+  function niceStep(range, target) {
+    const raw = range / target;
+    const mag = Math.pow(10, Math.floor(Math.log10(raw)));
+    const f = raw / mag;
+    const nf = f < 1.5 ? 1 : f < 2.25 ? 2 : f < 3.5 ? 2.5 : f < 7.5 ? 5 : 10;
+    return nf * mag;
+  }
+  function decimalsFor(step) {
+    let d = 0;
+    while (d < 6 && Math.abs(Math.round(step * Math.pow(10, d)) - step * Math.pow(10, d)) > 1e-6) d++;
+    return d;
+  }
+  function fmt(v, d) {
+    const s = Math.abs(v) < 0.5 * Math.pow(10, -d) ? (0).toFixed(d) : v.toFixed(d);
+    return s.replace("-", "−");
+  }
+
+  /* ---------------- energy-level diagram ---------------- */
+  const diag = document.getElementById("diag");
+  let dW = 380, dH = 430;
+
+  function drawDiagram(pr) {
+    const c = setupCanvas(diag, dW, dH);
+    c.clearRect(0, 0, dW, dH);
+    const n = state.n;
+    const counts = particleCounts(pr.p);
+    const leftW = 74, rightW = 40;
+    const x0 = leftW + 46, x1 = dW - rightW - 6;
+    const xIdx = leftW + 34;   // column for level numbers
+    const top = 70, bot = dH - 30;
+    const Emax = state.E[n - 1];
+    const yOf = E => bot - (E / Emax) * (bot - top);
+
+    drawRich(c, NPART + " particles", dW - 4, 20, 17, "right");
+    {
+      c.font = "17px " + FONT;
+      let mw = 0;
+      for (let i = 0; i < n; i++) mw = Math.max(mw, c.measureText(fmt(state.E[i], 1)).width);
+      drawYLabel(c, "energy (kJ/mol)", leftW - 8 - mw - 13, (top + bot) / 2, 17);
+    }
+    drawRich(c, "number", dW - 4, 44, 17, "right");
+
+    // energy axis arrow
+    c.strokeStyle = "#000"; c.lineWidth = 1;
+    c.beginPath(); c.moveTo(leftW, bot + 6); c.lineTo(leftW, top - 22); c.stroke();
+    c.beginPath(); c.moveTo(leftW - 5, top - 14); c.lineTo(leftW, top - 24); c.lineTo(leftW + 5, top - 14); c.closePath();
+    c.fillStyle = "#000"; c.fill();
+
+    // RT bar on the energy axis
+    {
+      const RT = R * state.T / 1000;            // kJ/mol
+      const RTCOL = "#d96c00";
+      const bx = leftW + 6, bw = 12;
+      const capped = RT > Emax * (bot - top + 8) / (bot - top);
+      const yTop = capped ? top - 8 : yOf(RT);
+      c.fillStyle = "rgba(240, 140, 30, 0.55)"; c.strokeStyle = RTCOL; c.lineWidth = 1.5;
+      c.fillRect(bx, yTop, bw, bot - yTop); c.strokeRect(bx, yTop, bw, bot - yTop);
+      if (capped) {
+        c.fillStyle = RTCOL;
+        c.beginPath(); c.moveTo(bx - 3, yTop); c.lineTo(bx + bw / 2, yTop - 10); c.lineTo(bx + bw + 3, yTop); c.closePath(); c.fill();
+      } else {
+        c.save(); c.setLineDash([5, 4]); c.strokeStyle = RTCOL; c.lineWidth = 1.2;
+        c.beginPath(); c.moveTo(bx + bw, yTop); c.lineTo(x1, yTop); c.stroke(); c.restore();
+      }
+      drawRich(c, "$RT$ = " + (RT < 9.995 ? RT.toFixed(2) : RT.toFixed(1)) + " kJ/mol", window.innerWidth <= 500 ? 0 : leftW, 20, 17, "left", RTCOL);   // aligns with the controls' left edge
+    }
+
+    const gap = 8, dotD = 7, r = 2.8;
+    for (let i = 0; i < n; i++) {
+      const y = yOf(state.E[i]);
+      const g = state.g[i];
+      const sw = ((x1 - x0) - (g - 1) * gap) / g;
+      // energy value
+      drawRich(c, fmt(state.E[i], 1), leftW - 8, y + 6, 17, "right");
+      // states
+      const base = Math.floor(counts[i] / g), extra = counts[i] % g;
+      for (let s = 0; s < g; s++) {
+        const sx = x0 + s * (sw + gap);
+        c.strokeStyle = "#000"; c.lineWidth = 2;
+        c.beginPath(); c.moveTo(sx, y); c.lineTo(sx + sw, y); c.stroke();
+        const ns = base + (s < extra ? 1 : 0);
+        const perRow = Math.max(1, Math.floor(sw / dotD));
+        c.fillStyle = COLORS[i];
+        for (let k = 0; k < ns; k++) {
+          const row = Math.floor(k / perRow), col = k % perRow;
+          const inRow = Math.min(perRow, ns - row * perRow);
+          const rowW = inRow * dotD;
+          const cx = sx + (sw - rowW) / 2 + col * dotD + dotD / 2;
+          const cy = y - 5 - row * dotD;
+          c.beginPath(); c.arc(cx, cy, r, 0, 2 * Math.PI); c.fill();
+        }
+      }
+      drawRich(c, String(counts[i]), dW - 4, y + 6, 17, "right", COLORS[i]);
+      // level number (white backing so the dashed RT line passes behind it)
+      c.font = "17px " + FONT;
+      const iw = c.measureText(String(i)).width;
+      c.fillStyle = "#fff"; c.fillRect(xIdx - iw / 2 - 2, y - 9, iw + 4, 17);
+      drawRich(c, String(i), xIdx, y + 6, 17, "center", COLORS[i]);
+    }
+  }
+
+  /* ---------------- property plot ---------------- */
+  const plot = document.getElementById("plot");
+  let pW = 560, pH = 430;
+  const YLAB = {
+    q: "partition function, $q$",
+    U: "internal energy, $U$ (kJ/mol)",
+    Cv: "heat capacity, $C$_V (J/[mol K])",
+    S: "entropy, $S$ (J/[mol K])",
+    A: "Helmholtz free energy, $A$ (kJ/mol)",
+    p: "fraction of particles in level"
+  };
+
+  function drawPlot(prNow) {
+    const c = setupCanvas(plot, pW, pH);
+    c.clearRect(0, 0, pW, pH);
+    const mR = 18, mT = 14, mB = 58;
+    let mL = 82;
+    const Y0 = pH - mB, Y1 = mT;
+    const key = state.plot;
+
+    // data
+    const Ts = [], series = [];
+    const nS = key === "p" ? state.n : 1;
+    for (let k = 0; k < nS; k++) series.push([]);
+    for (let j = 0; j <= 400; j++) {
+      const T = Math.max(2, j * TMAX / 400);
+      Ts.push(T);
+      const pr = props(T);
+      if (key === "p") for (let k = 0; k < nS; k++) series[k].push(pr.p[k]);
+      else series[0].push(pr[key]);
+    }
+
+    let ymin, ymax;
+    if (key === "p") { ymin = 0; ymax = 1; }
+    else {
+      const all = series[0];
+      ymin = Math.min(0, ...all); ymax = Math.max(0, ...all);
+      if (key === "q") ymin = 0;
+      if (ymax - ymin < 1e-9) ymax = ymin + 1;
+    }
+    const yStep = niceStep(ymax - ymin, 5);
+    ymin = Math.floor(ymin / yStep + 1e-9) * yStep;
+    ymax = Math.ceil(ymax / yStep - 1e-9) * yStep;
+    if (key === "p") { ymin = 0; ymax = 1; }
+    const yDec = decimalsFor(key === "p" ? 0.2 : yStep);
+    const ysT = key === "p" ? 0.2 : yStep;
+    c.font = "16px " + FONT;
+    let tickW = 0;
+    for (let v = ymin; v <= ymax + ysT * 1e-6; v += ysT) tickW = Math.max(tickW, c.measureText(fmt(v, yDec)).width);
+    mL = Math.ceil(tickW + 6 + 30);
+    const X0 = mL, X1 = pW - mR;
+    const yLabX = X0 - 6 - tickW - 13;
+    const sx = T => X0 + (T / TMAX) * (X1 - X0);
+    const sy = v => Y0 - (v - ymin) / (ymax - ymin) * (Y0 - Y1);
+
+    // frame & ticks
+    c.strokeStyle = "#000"; c.lineWidth = 1;
+    c.strokeRect(X0, Y1, X1 - X0, Y0 - Y1);
+    c.font = "16px " + FONT; c.fillStyle = "#000";
+    c.textAlign = "center"; c.textBaseline = "top";
+    for (let T = 0; T <= TMAX + 1e-6; T += 500) {
+      const x = sx(T);
+      c.beginPath(); c.moveTo(x, Y0); c.lineTo(x, Y0 - 6); c.stroke();
+      c.fillText(String(T), x, Y0 + 5);
+    }
+    c.textAlign = "right"; c.textBaseline = "middle";
+    const ys = key === "p" ? 0.2 : yStep;
+    for (let v = ymin; v <= ymax + ys * 1e-6; v += ys) {
+      const y = sy(v);
+      c.beginPath(); c.moveTo(X0, y); c.lineTo(X0 + 6, y); c.stroke();
+      c.fillText(fmt(v, yDec), X0 - 6, y);
+    }
+    // axis labels
+    drawRich(c, "temperature (K)", (X0 + X1) / 2, pH - 12, 17, "center");
+    drawYLabel(c, YLAB[key], yLabX, (Y0 + Y1) / 2, 17);
+
+    // curves
+    const pix = [];
+    c.save(); c.beginPath(); c.rect(X0, Y1, X1 - X0, Y0 - Y1); c.clip();
+    for (let k = 0; k < nS; k++) {
+      const col = key === "p" ? COLORS[k] : "#0050c8";
+      const pts = series[k].map((v, j) => [sx(Ts[j]), sy(v)]);
+      pix.push(pts);
+      c.strokeStyle = col; c.lineWidth = 2.5; c.beginPath();
+      pts.forEach((pt, j) => j ? c.lineTo(pt[0], pt[1]) : c.moveTo(pt[0], pt[1]));
+      c.stroke();
+    }
+    c.restore();
+
+    // current-temperature markers
+    const dots = [];
+    for (let k = 0; k < nS; k++) {
+      const v = key === "p" ? prNow.p[k] : prNow[key];
+      const x = sx(state.T), y = sy(v);
+      dots.push([x, y]);
+      c.fillStyle = key === "p" ? COLORS[k] : "#0050c8";
+      c.strokeStyle = "#000"; c.lineWidth = 1;
+      c.beginPath(); c.arc(x, y, 6, 0, 2 * Math.PI); c.fill(); c.stroke();
+    }
+
+    // on-curve labels (multiple curves only)
+    if (key === "p") placeLabels(c, pix, dots, { X0, X1, Y0, Y1 });
+  }
+
+  function placeLabels(c, pix, dots, box) {
+    const placed = [];
+    const h = 18;
+    c.font = "17.6px " + FONT;   // 16px + 10%
+    const hitsCurves = (r) => {
+      for (const pts of pix) for (const [x, y] of pts)
+        if (x > r.x - 3 && x < r.x + r.w + 3 && y > r.y - 3 && y < r.y + r.h + 3) return true;
+      for (const [x, y] of dots)
+        if (x > r.x - 8 && x < r.x + r.w + 8 && y > r.y - 8 && y < r.y + r.h + 8) return true;
+      return false;
+    };
+    const overlapsPlaced = r => placed.some(q => !(r.x + r.w + 4 < q.x || q.x + q.w + 4 < r.x || r.y + r.h + 2 < q.y || q.y + q.h + 2 < r.y));
+    for (let k = 0; k < pix.length; k++) {
+      const text = "level " + k;
+      const w = c.measureText(text).width;
+      const cands = [];
+      for (let j = 20; j <= 380; j += 8) {
+        const [x, y] = pix[k][j];
+        let sep = Infinity;
+        for (let m = 0; m < pix.length; m++) if (m !== k) sep = Math.min(sep, Math.abs(pix[m][j][1] - y));
+        for (const dy of [-(h + 7), 7, -(h + 16), 16]) cands.push({ x: x - w / 2, y: y + dy, w, h, sep });
+      }
+      cands.sort((a, b) => b.sep - a.sep);
+      let chosen = null;
+      for (const r of cands) {
+        if (r.x < box.X0 + 4 || r.x + r.w > box.X1 - 4 || r.y < box.Y1 + 4 || r.y + r.h > box.Y0 - 4) continue;
+        if (hitsCurves(r) || overlapsPlaced(r)) continue;
+        chosen = r; break;
+      }
+      if (!chosen) chosen = cands.find(r => r.x >= box.X0 && r.x + r.w <= box.X1 && r.y >= box.Y1 && r.y + r.h <= box.Y0 && !overlapsPlaced(r)) || cands[0];
+      placed.push(chosen);
+      c.fillStyle = COLORS[k]; c.textAlign = "left"; c.textBaseline = "top";
+      c.fillText(text, chosen.x, chosen.y + 1);
+    }
+  }
+
+  /* ---------------- table ---------------- */
+  // at most 3 significant figures, no exponent notation
+  function sig3(v) {
+    if (!isFinite(v) || Math.abs(v) < 5e-4) return "0";
+    let str = String(Number(v.toPrecision(3)));
+    if (/e/i.test(str)) str = Number(v.toPrecision(3)).toFixed(6).replace(/0+$/, "").replace(/\.$/, "");
+    return str.replace("-", "\u2212");
+  }
+  function updateTable(pr) {
+    const it = (lab, val, unit) => `<span class="item">${lab} = ${sig3(val)}${unit ? " " + unit : ""}</span>`;
+    document.getElementById("vals").innerHTML =
+      `<div class="line">${it("partition function, <i>q</i>", pr.q, "")}${it("internal energy, <i>U</i>", pr.U, "kJ/mol")}${it("heat capacity, <i>C</i><sub>V</sub>", pr.Cv, "J/(mol K)")}</div>` +
+      `<div class="line">${it("entropy, <i>S</i>", pr.S, "J/(mol K)")}${it("Helmholtz free energy, <i>A</i>", pr.A, "kJ/mol")}</div>`;
+  }
+
+  /* ---------------- controls ---------------- */
+  const degCtls = document.getElementById("degCtls");
+  const degSel = [];
+  for (let i = 0; i < 4; i++) {
+    const wrap = document.createElement("span");
+    wrap.className = "ctl";
+    wrap.innerHTML = `<label for="g${i}"><i>g</i><sub>${i}</sub></label>`;
+    const s = document.createElement("select");
+    s.id = "g" + i;
+    for (let v = 1; v <= 4; v++) { const o = document.createElement("option"); o.textContent = v; s.appendChild(o); }
+    s.value = state.g[i];
+    s.addEventListener("change", () => { state.g[i] = +s.value; update(); });
+    wrap.appendChild(s);
+    degCtls.appendChild(wrap);
+    degSel.push(wrap);
+  }
+  function showDeg() { degSel.forEach((w, i) => w.style.display = i < state.n ? "flex" : "none"); }
+
+  document.getElementById("nLevels").addEventListener("change", e => { state.n = +e.target.value; showDeg(); update(); });
+  document.getElementById("newBtn").addEventListener("click", () => { pickEnergies(); update(); });
+  document.getElementById("plotSel").addEventListener("change", e => { state.plot = e.target.value; update(); });
+  const Ts = document.getElementById("Tslider");
+  Ts.addEventListener("input", () => { state.T = +Ts.value; update(); });
+
+  function update() {
+    document.getElementById("Tval").textContent = state.T + " K";
+    const pr = props(state.T);
+    drawDiagram(pr);
+    drawPlot(pr);
+    updateTable(pr);
+  }
+
+  function resize() {
+    const avail = document.getElementById("main").clientWidth;
+    if (avail >= 900) {
+      dW = 380; pW = Math.round(0.85 * Math.min(620, avail - dW - 16)); pH = dH = 430;
+    } else {
+      dW = Math.min(380, avail); pW = Math.min(620, avail);
+      dH = avail < 500 ? 300 : 400;
+      pH = Math.max(300, Math.min(430, Math.round(pW * 0.8)));
+    }
+    update();
+  }
+  window.addEventListener("resize", resize);
+
+  /* ---------------- panels ---------------- */
+  const pbtns = Array.from(document.querySelectorAll(".pbtn"));
+  let mathDone = false;
+  function closeAll() {
+    document.querySelectorAll(".panel").forEach(p => p.classList.remove("open"));
+    pbtns.forEach(b => b.classList.remove("active"));
+  }
+  function positionPanel(panel, btn) {
+    panel.style.left = btn.offsetLeft + "px";
+    const r = panel.getBoundingClientRect();
+    const over = r.right - (window.innerWidth - 8);
+    if (over > 0) panel.style.left = Math.max(-btn.parentElement.getBoundingClientRect().left + 8, btn.offsetLeft - over) + "px";
+  }
+  pbtns.forEach(btn => {
+    btn.addEventListener("click", e => {
+      e.stopPropagation();
+      const panel = document.getElementById(btn.dataset.panel);
+      const wasOpen = panel.classList.contains("open");
+      closeAll();
+      if (!wasOpen) {
+        panel.classList.add("open"); btn.classList.add("active");
+        positionPanel(panel, btn);
+        if (panel.id === "detailsPanel" && !mathDone && window.MathJax && MathJax.typesetPromise) {
+          mathDone = true;
+          MathJax.typesetPromise([panel]).then(() => positionPanel(panel, btn)).catch(() => { mathDone = false; });
+        }
+      }
+    });
+  });
+  document.querySelectorAll(".panel .close").forEach(x => x.addEventListener("click", e => { e.stopPropagation(); closeAll(); }));
+  document.addEventListener("keydown", e => { if (e.key === "Escape") closeAll(); });
+  document.addEventListener("pointerdown", e => {
+    if (e.target.closest(".panel") || e.target.closest(".pbtn")) return;
+    closeAll();
+  });
+
+  pickEnergies();
+  showDeg();
+  resize();
+})();
+</script>
+
+<!-- BEGIN: Under Review Warning Component (Delete this entire block to remove) -->
+<div id="review-warning-banner" class="review-warning-container"><style>.review-warning-container{position:fixed;bottom:20px;right:20px;background-color:#fff3cd;color:#856404;border:1px solid #ffeeba;border-left:5px solid #ffc107;padding:16px 20px;box-shadow:0 4px 12px rgba(0,0,0,.15);border-radius:6px;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;z-index:999999;display:flex;align-items:flex-start;gap:15px;max-width:350px;transition:opacity .3s ease,transform .3s ease}.review-warning-container.fade-out{opacity:0;transform:translateY(15px);pointer-events:none}.review-warning-content{flex-grow:1;font-size:14px;line-height:1.4;margin:0}.review-warning-content strong{display:block;margin-bottom:4px;font-size:15px;color:#664d03}.review-warning-close{background:0 0;border:none;color:#856404;font-size:22px;cursor:pointer;padding:0;line-height:.8;opacity:.5;transition:opacity .2s}.review-warning-close:hover{opacity:1}</style><div class="review-warning-content"><strong>⚠️ Simulation Under Review</strong>This content is still being reviewed for quality and accuracy and may be updated in the future. Feel free to <a href="https://learncheme.com/www.learncheme.com/contact-us">send us feedback</a>.</div><button id="review-warning-close-btn" class="review-warning-close" aria-label="Close warning">&times;</button><script>!function(){let e=document.getElementById("review-warning-close-btn"),n=document.getElementById("review-warning-banner");e&&n&&e.addEventListener("click",(()=>{n.classList.add("fade-out"),setTimeout((()=>n.remove()),300)}))}();</script></div>
+<!-- END: Under Review Warning Component -->
+</body>
+</html>
