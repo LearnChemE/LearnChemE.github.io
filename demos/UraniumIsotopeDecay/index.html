@@ -26,30 +26,35 @@
     margin:10px auto;
     padding:0 6px;
     -webkit-font-smoothing:antialiased;
-    position:relative;
   }
   #plot-wrap{ width:100%; }
-  canvas#plot{ display:block; width:660px; max-width:100%; height:440px; }
+  canvas#plot{ display:block; width:100%; max-width:660px; height:auto; margin:0 auto; }
 
-  .control-wrap{ margin-top:6px; }
-  .controls{
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-start;
-    gap:14px;
-  }
-  .sliders{ flex:0 0 auto; width:300px; }
-  .slider-row{ margin:6px 0 14px 0; }
-  .slider-label{ font-size:var(--tf); margin-bottom:4px; }
+  .control-wrap{ position:relative; margin:0 0 2px 0; }
+  .controls{ display:flex; flex-direction:column; gap:10px; padding-left:15.76%; }  /* 104/660: line up with the y-axis */
+  .row{ display:flex; justify-content:space-between; align-items:flex-start; gap:18px; }
+  .sliders{ display:flex; gap:22px; }
+  .slider-row{ margin:4px 0 4px 0; }
+  .slider-label{ font-size:16.56px; margin-bottom:4px; }
   .slider-line{ display:flex; align-items:center; gap:10px; }
-  .slider-line input[type=range]{
-    width:180px;               /* shortened so buttons fit to the right */
-    /* accent-color:var(--red);
-    cursor:pointer; */
+  input[type="range"]{
+    --accent:#98000D; --grey:#999; --fill:50%;
+    -webkit-appearance:none; appearance:none;
+    width:100%; height:5px; border-radius:3px;
+    outline:none; opacity:.95; margin:0;
+    -webkit-transition:.2s; transition:opacity .2s;
+    background:var(--grey);
   }
-  /* slider */
-  input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
-  
+  input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none; appearance:none;
+    width:15px; height:15px; border:2px solid #fff; border-radius:50%;
+    background:var(--accent); cursor:pointer; box-shadow:0 1px 2px rgba(0,0,0,.35);
+  }
+  input[type="range"]::-moz-range-thumb{
+    width:15px; height:15px; border:2px solid #fff; border-radius:50%;
+    background:var(--accent); cursor:pointer; box-shadow:0 1px 2px rgba(0,0,0,.35);
+  }
+  .slider-line input[type=range]{ width:140px; flex:0 0 auto; }
   .slider-val{
     font-size:var(--sf);
     min-width:84px;
@@ -57,7 +62,7 @@
     font-variant-numeric:tabular-nums;
   }
 
-  .buttons{ flex:0 0 auto; display:flex; flex-direction:row; gap:8px; }
+  .buttons{ flex:0 0 auto; display:flex; flex-direction:row; gap:8px; justify-content:flex-start; }
   .buttons button{
     background:var(--red);
     color:#fff;
@@ -74,7 +79,7 @@
 
   .panel{
     position:absolute;
-    top:0px;
+    top:calc(100% + 8px);
     left:0;
     right:0;
     background:#fff;
@@ -82,7 +87,7 @@
     border-radius:4px;
     box-shadow:0 3px 12px rgba(0,0,0,0.16);
     padding:16px 40px 18px 18px;
-    font-size:var(--tf);
+    font-size:14.9px;
     line-height:1.42;
     z-index:20;
     display:none;
@@ -102,14 +107,27 @@
   .panel p{ margin:0 0 10px 0; }
   .panel p:last-child{ margin-bottom:0; }
   mjx-container{ margin:2px 0 !important; }
+
+  /* small screens: stack sliders and buttons, let everything use full width */
+  @media (max-width:560px){
+    #app{ padding:0 10px; }
+    .row{ flex-direction:column; align-items:stretch; gap:10px; }
+    .sliders{ flex-direction:column; width:100%; gap:0; }
+    .slider-line input[type=range]{ flex:1; width:auto; }
+    .buttons{ justify-content:flex-start; flex-wrap:wrap; }
+    .panel{ padding:14px 36px 14px 14px; }
+  }
 </style>
 </head>
 <body>
 <div id="app">
-  <div id="plot-wrap"><canvas id="plot" width="660" height="440"></canvas></div>
-
   <div class="control-wrap">
     <div class="controls">
+      <div class="buttons">
+        <button data-panel="directions">Directions</button>
+        <button data-panel="details">Details</button>
+        <button data-panel="about">About</button>
+      </div>
       <div class="sliders">
         <div class="slider-row">
           <div class="slider-label">initial number of atoms</div>
@@ -119,27 +137,21 @@
           </div>
         </div>
         <div class="slider-row">
-          <div class="slider-label">generic decay constant <em>&#955;</em></div>
+          <div class="slider-label">generic decay constant <em>&#955;</em> (yr<sup>&#8722;1</sup>)</div>
           <div class="slider-line">
             <input id="k" type="range" min="1e-10" max="3e-9" step="5.8e-12" value="2.3e-9">
             <span class="slider-val" id="kval"></span>
           </div>
         </div>
       </div>
-
-      <div class="buttons">
-        <button data-panel="directions">Directions</button>
-        <button data-panel="details">Details</button>
-        <button data-panel="about">About</button>
-      </div>
     </div>
 
     <div class="panel" id="panel-directions">
       <button class="close" aria-label="close">&times;</button>
       <p>This simulation shows radioactive decay for the two most abundant uranium
-      isotopes, U-235 and U-238. Use the sliders to set the initial number of atoms
-      <em>N</em><sub>0</sub> and the generic decay constant <em>k</em>. Decay curves for
-      U-235 (blue) and U-238 (orange) are plotted, together with a generic decay curve
+      isotopes, <sup>235</sup>U and <sup>238</sup>U. Use the sliders to set the initial number of atoms
+      <em>N</em><sub>0</sub> for all three curves and the generic decay constant <em>&#955;</em>. Decay curves for
+      <sup>235</sup>U (blue) and <sup>238</sup>U (orange) are plotted, together with a generic decay curve
       (green) for the selected decay constant. The red dots mark the half-life of each
       decay.</p>
     </div>
@@ -149,14 +161,15 @@
       <p>Radioactive decay has the form of exponential decay:</p>
       <p>$$N(t) = N_0\, e^{-\lambda t}$$</p>
       <p>where \(N(t)\) is the number of nuclei remaining at time \(t\) (in years) for an
-      initial number \(N_0\) in the sample, and \(\lambda\) is the decay constant, which is
-      specific to the individual isotope:</p>
-      <p>$$\lambda_{238} = 1.54\times10^{-10}\ \text{yr}^{-1}\ \ \text{for U-238}$$</p>
-      <p>$$\lambda_{235} = 9.90\times10^{-10}\ \text{yr}^{-1}\ \ \text{for U-235}$$</p>
-      <p>The half-life \(t_{1/2}\) is the time for half of the sample to decay:</p>
+      initial number \(N_0\) in the sample, and \(\lambda\) is the decay constant. Each
+      isotope's \(\lambda\) is calculated from its half-life \(t_{1/2}\), the time for half
+      of the sample to decay:</p>
+      <p>$$\lambda = \frac{\ln 2}{t_{1/2}}$$</p>
+      <p id="hl-source"></p>
+      <p id="eq-lambda-vals"></p>
+      <p>At the half-life, half of the initial sample remains:</p>
       <p>$$N(t_{1/2}) = \frac{N_0}{2} = N_0\, e^{-\lambda t_{1/2}}$$</p>
-      <p>$$t_{1/2} = \frac{\ln 2}{\lambda}$$</p>
-      <p>where \(N_0\) is the initial number of nuclei.</p>
+      <p>where \(N_0\) is the initial number of nuclei and \(N(t_{1/2})\) is the number of nuclei remaining.</p>
       <p>The green curve is a generic decay for the decay constant \(\lambda\) set with the slider.</p>
     </div>
 
@@ -173,6 +186,8 @@
       questions or comments to LearnChemE@gmail.com.</p>
     </div>
   </div>
+
+  <div id="plot-wrap"><canvas id="plot" width="660" height="440"></canvas></div>
 </div>
 
 <script>
@@ -180,11 +195,25 @@
   "use strict";
 
   // ---- constants / physics ----
-  var K235 = 9.90e-10;   // U-235 decay constant (yr^-1)  -> blue
-  var K238 = 1.54e-10;   // U-238 decay constant (yr^-1)  -> orange
-  var TMAX = 1e10;       // time axis max (years)
-  var YMAX = 1e10;       // atoms axis max
   var LN2  = Math.LN2;
+  // Sourced half-lives (years) from IAEA decay data — the single source of truth.
+  // Everything else (decay constants, curves, markers, Details) is derived from these.
+  var T12  = { u235: 703.8e6, u238: 4.468e9 };
+  var K235 = LN2 / T12.u235;   // U-235 decay constant (yr^-1)  -> blue
+  var K238 = LN2 / T12.u238;   // U-238 decay constant (yr^-1)  -> orange
+  var TMAX = 1e10;             // time axis max (years)
+  var YMAX = 1e10;             // atoms axis max
+
+  // Discrete slider values so each step changes the displayed mantissa by exactly 0.1
+  var n0Vals=[], kVals=[], gi;
+  for(gi=50;gi<=100;gi++) n0Vals.push(gi*1e8);   // 5.0e9 .. 1.0e10  (0.1 x10^9 per step)
+  for(gi=10;gi<=99;gi++)  kVals.push(gi*1e-11);  // 1.0e-10 .. 9.9e-10 (0.1 x10^-10 per step)
+  for(gi=10;gi<=30;gi++)  kVals.push(gi*1e-10);  // 1.0e-9 .. 3.0e-9  (0.1 x10^-9 per step)
+  function nearestIndex(arr,v){
+    var bi=0,bd=Infinity;
+    for(var j=0;j<arr.length;j++){ var d=Math.abs(arr[j]-v); if(d<bd){bd=d;bi=j;} }
+    return bi;
+  }
 
   var COL235 = '#5E81B5';   // Mathematica default blue
   var COL238 = '#E19C24';   // Mathematica default orange
@@ -218,28 +247,48 @@
     if(m>=10){ m/=10; e++; }
     return (m===1?'':m+'\u00D7') + '10' + sup(e);
   }
-  // snap to one-decimal mantissa (used for both display and physics)
-  function snap1(v){
-    if(v<=0) return 0;
-    var e=Math.floor(Math.log10(v));
-    var m=v/Math.pow(10,e);
-    m=Math.round(m*10)/10;
-    if(m>=10){ m/=10; e++; }
-    return m*Math.pow(10,e);
+  // ---- Details panel values (derived from the stored half-lives) ----
+  // LaTeX scientific notation with a given number of significant figures
+  function sciTeX(v, sig){
+    var e=Math.floor(Math.log10(Math.abs(v)));
+    var ms=(v/Math.pow(10,e)).toFixed(sig-1);
+    if(parseFloat(ms)>=10){ e++; ms=(parseFloat(ms)/10).toFixed(sig-1); }
+    return ms + '\\times10^{' + e + '}';
+  }
+  // half-life in words: 703.8e6 -> "703.8 million years", 4.468e9 -> "4.468 billion years"
+  function hlWords(y){
+    var val, unit='';
+    if(y>=1e9){ val=y/1e9; unit=' billion'; }
+    else if(y>=1e6){ val=y/1e6; unit=' million'; }
+    else { val=y; }
+    return (+val.toFixed(4)) + unit + ' years';
+  }
+  function fillDetails(){
+    document.getElementById('hl-source').innerHTML =
+      'Using measured half-lives of ' + hlWords(T12.u235) + ' for <sup>235</sup>U and ' +
+      hlWords(T12.u238) + ' for <sup>238</sup>U ' +
+      '(<a href="https://inis.iaea.org/records/k5g24-thw10" target="_blank" rel="noopener">IAEA decay data</a>):';
+    document.getElementById('eq-lambda-vals').textContent =
+      '$$\\lambda_{235} = ' + sciTeX(K235,3) + '\\ \\text{yr}^{-1}, \\quad \\lambda_{238} = ' +
+      sciTeX(K238,3) + '\\ \\text{yr}^{-1}$$';
+    if(window.MathJax && MathJax.startup && MathJax.startup.promise){
+      MathJax.startup.promise.then(function(){
+        if(MathJax.typesetPromise) MathJax.typesetPromise([document.getElementById('panel-details')]);
+      });
+    }
   }
 
   // ---- canvas setup (hi-DPI) ----
   var canvas=document.getElementById('plot');
   var ctx=canvas.getContext('2d');
   var CSSW=660, CSSH=440;
-  var M={top:26, right:26, bottom:74, left:104};
+  var M={top:14, right:26, bottom:74, left:104};
   var plotW, plotH;
 
   function setupCanvas(){
     var dpr=window.devicePixelRatio||1;
-    var rect=canvas.getBoundingClientRect();
-    CSSW=rect.width||660; CSSH=440;
-    canvas.width=Math.round(CSSW*dpr);
+    CSSW=660; CSSH=440;                 // fixed drawing coordinate space
+    canvas.width=Math.round(CSSW*dpr);  // CSS scales the element down to fit the screen
     canvas.height=Math.round(CSSH*dpr);
     ctx.setTransform(dpr,0,0,dpr,0,0);
     plotW=CSSW-M.left-M.right;
@@ -292,7 +341,7 @@
     ctx.restore();
   }
 
-  function drawCurveLabel(text, color, rate, n0, yFrac){
+  function drawCurveLabel(text, color, rate, n0, yFrac, fontPx){
     // place label where the curve crosses y = yFrac*n0
     var t=Math.log(1/yFrac)/rate;
     var y=yFrac*n0;
@@ -301,7 +350,7 @@
     var align='left', ox=8;
     if(px > M.left+plotW*0.6){ align='right'; ox=-8; }
     px=Math.max(M.left+4, Math.min(M.left+plotW-4, px));
-    ctx.font=CURVE_LBL_FONT+'px '+FONT;
+    ctx.font=(fontPx||CURVE_LBL_FONT)+'px '+FONT;
     ctx.textAlign=align;
     ctx.textBaseline='bottom';
     ctx.lineWidth=4; ctx.strokeStyle='rgba(255,255,255,0.92)';
@@ -311,8 +360,8 @@
   }
 
   function draw(){
-    var n0=snap1(parseFloat(document.getElementById('n0').value));
-    var k =snap1(parseFloat(document.getElementById('k').value));
+    var n0=n0Value();
+    var k =kValue();
 
     ctx.clearRect(0,0,CSSW,CSSH);
     ctx.fillStyle='#fff';
@@ -368,7 +417,7 @@
       ctx.beginPath();
       ctx.moveTo(px, M.top+plotH); ctx.lineTo(px, M.top+plotH+6);
       ctx.stroke();
-      ctx.fillText(sciTick(t), px, M.top+plotH+9);
+      ctx.fillText(String(Math.round(t/1e9)), px, M.top+plotH+9);  // ticks in billions of years
     });
     // y
     ctx.textAlign='right'; ctx.textBaseline='middle';
@@ -384,21 +433,26 @@
     ctx.font=AXLBL_FONT+'px '+FONT;
     ctx.fillStyle='#000';
     ctx.textAlign='center'; ctx.textBaseline='alphabetic';
-    ctx.fillText('time (years)', M.left+plotW/2, M.top+plotH+52);   // below x-axis
+    ctx.fillText('time (billion years)', M.left+plotW/2, M.top+plotH+52);   // below x-axis
     drawYAxisLabel('atoms remaining', M.left-66, M.top+plotH/2);    // left of y-axis
 
     // on-curve labels (replace legend)
     drawCurveLabel('generic', COLGEN, k,    n0, 0.78);
-    drawCurveLabel('U-235',   COL235, K235, n0, 0.55);
-    drawCurveLabel('U-238',   COL238, K238, n0, 0.30);
+    drawCurveLabel(sup(235)+'U', COL235, K235, n0, 0.55, CURVE_LBL_FONT*1.1);
+    drawCurveLabel(sup(238)+'U', COL238, K238, n0, 0.30, CURVE_LBL_FONT*1.1);
   }
 
   // ---- sliders ----
+  function n0Value(){ return n0Vals[+document.getElementById('n0').value]; }
+  function kValue(){  return kVals[+document.getElementById('k').value]; }
+  function setupSliders(){
+    var n0=document.getElementById('n0'), k=document.getElementById('k');
+    n0.min=0; n0.max=n0Vals.length-1; n0.step=1; n0.value=nearestIndex(n0Vals,7.5e9);
+    k.min=0;  k.max=kVals.length-1;  k.step=1;  k.value=nearestIndex(kVals,2.3e-9);
+  }
   function updateVals(){
-    document.getElementById('n0val').textContent =
-      sci1(snap1(parseFloat(document.getElementById('n0').value)));
-    document.getElementById('kval').textContent =
-      sci1(snap1(parseFloat(document.getElementById('k').value)));
+    document.getElementById('n0val').textContent = sci1(n0Value());
+    document.getElementById('kval').textContent  = sci1(kValue());
   }
   function onInput(){ updateVals(); draw(); }
   document.getElementById('n0').addEventListener('input', onInput);
@@ -422,9 +476,17 @@
   document.querySelectorAll('.panel .close').forEach(function(x){
     x.addEventListener('click', closeAll);
   });
+  // close on Escape, or on a click outside an open panel (button/panel clicks are handled above)
+  document.addEventListener('keydown', function(e){
+    if(e.key==='Escape' || e.key==='Esc') closeAll();
+  });
+  document.addEventListener('click', function(e){
+    if(e.target.closest('.panel') || e.target.closest('.buttons')) return;
+    closeAll();
+  });
 
   // ---- init ----
-  function init(){ setupCanvas(); updateVals(); draw(); }
+  function init(){ setupCanvas(); setupSliders(); updateVals(); fillDetails(); draw(); }
   window.addEventListener('resize', function(){ setupCanvas(); draw(); });
   init();
 })();

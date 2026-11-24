@@ -1,3 +1,8 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>High-Pressure Chemical Equilibrium</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js"></script>
 <style>
@@ -17,6 +22,7 @@
     --series-extent-fill:#c1571c22;
     --series-kv:#187a63;
     --series-kv-fill:#187a6322;
+    --series-ideal:#3d63a6;
     --close:#8c2f2f;
     --axis-stroke:#63645f;
     --info-bg:#b3261e;
@@ -43,6 +49,7 @@
       --series-extent-fill:#e8823f2a;
       --series-kv:#4fbf9f;
       --series-kv-fill:#4fbf9f2a;
+      --series-ideal:#8fb2ea;
       --close:#e08585;
       --axis-stroke:#a5a29a;
       --info-bg:#c23b32;
@@ -67,6 +74,7 @@
     --series-extent-fill:#e8823f2a;
     --series-kv:#4fbf9f;
     --series-kv-fill:#4fbf9f2a;
+    --series-ideal:#8fb2ea;
     --close:#e08585;
     --axis-stroke:#a5a29a;
     --info-bg:#c23b32;
@@ -113,6 +121,7 @@
     border:1px solid var(--border);
     border-radius:10px;
     box-shadow:var(--shadow);
+    overflow:hidden;
   }
 
   .panel{
@@ -127,7 +136,27 @@
   .temp-row{
     display:flex;
     align-items:center;
-    gap:12px;
+    gap:12px 16px;
+    flex-wrap:wrap;
+  }
+  .slider-group{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex:0 1 auto;
+  }
+  .temp-row .temp-label{min-width:5.5em;}
+  .temp-row .util-group{margin-left:auto;}
+  .xmode{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .xmode-caption{
+    font-family:var(--font-display);
+    font-size:14.95px;
+    color:var(--text);
+    white-space:nowrap;
   }
   .temp-row .temp-label{
     font-family:var(--font-display);
@@ -136,7 +165,9 @@
     white-space:nowrap;
   }
   .temp-row input[type=range]{
-    flex:1;
+    flex:0 1 245px;     /* half of the former full-width slider */
+    width:245px;
+    min-width:110px;
     -webkit-appearance:none;
     appearance:none;
     height:4px;
@@ -182,7 +213,7 @@
     border:1px solid var(--border-strong);
     border-radius:5px;
     padding:4px 8px;
-    min-width:64px;
+    min-width:72px;
     text-align:center;
     white-space:nowrap;
   }
@@ -206,7 +237,7 @@
     background:var(--surface);
     border:none;
     border-right:1px solid var(--border-strong);
-    padding:7px 12px;
+    padding:7px 10px;
     cursor:pointer;
     transition:background .12s ease, color .12s ease;
   }
@@ -234,7 +265,8 @@
     border-color:var(--info-bg);
   }
   .util-group button.seg{
-    font-size:13.8px;
+    font-size:13.2px;
+    padding:7px 9px;
     background:var(--info-bg);
     color:var(--info-fg);
     border-right:1px solid rgba(255,255,255,0.35);
@@ -277,10 +309,25 @@
   .series-extent-fill{fill:var(--series-extent);}
   .series-kv-stroke{stroke:var(--series-kv);}
   .series-kv-fill{fill:var(--series-kv);}
+  .series-ideal-stroke{stroke:var(--series-ideal);stroke-dasharray:7,4;}
+  .xh-dot-ideal{fill:var(--surface);stroke:var(--series-ideal);stroke-width:2;}
+  .ref-iso{stroke:var(--text-muted);stroke-width:1.4;opacity:.38;fill:none;}
+  .ref-label{fill:var(--text-muted);font-family:var(--font-display);opacity:.85;}
+  .curve-label{
+    font-family:var(--font-display);
+    font-weight:700;
+    paint-order:stroke;
+    stroke:var(--surface);
+    stroke-width:4px;
+    stroke-linejoin:round;
+  }
+  .curve-label.pr{fill:var(--series-extent);}
+  .curve-label.ideal{fill:var(--series-ideal);}
   .marker-ring{stroke:var(--surface);}
 
   .overlay{
     position:absolute;
+    z-index:10;
     left:6px;
     right:6px;
     top:6px;
@@ -335,6 +382,9 @@
   .overlay-body{
     padding:14px 20px 20px;
     overflow-y:auto;
+    flex:1 1 auto;
+    min-height:0;
+    -webkit-overflow-scrolling:touch;
     font-family:var(--font-body);
     font-size:13.5px;
     line-height:1.6;
@@ -343,14 +393,19 @@
   .overlay-body p{margin:0 0 12px;}
   .overlay-body mjx-container[display="true"]{
     text-align:left !important;
-    margin-left:0 !important;
-    margin-right:0 !important;
+    margin:2px 0 !important;
+    overflow-x:auto;
+    overflow-y:hidden;
+    max-width:100%;
+    padding:2px 0;
   }
+  .overlay-body p.eq{margin:0 0 6px;}
+  .overlay-body p:has(+ p.eq){margin-bottom:4px;}
   .overlay-body h4{
     font-family:var(--font-display);
-    font-size:12px;
-    letter-spacing:0.08em;
-    text-transform:uppercase;
+    font-size:14px;
+    font-weight:700;
+    letter-spacing:0.005em;
     color:var(--text-muted);
     margin:18px 0 8px;
   }
@@ -374,7 +429,8 @@
   .prop-table{
     width:100%;
     border-collapse:collapse;
-    font-size:12.5px;
+    font-family:inherit;      /* same font and size as the Details text */
+    font-size:inherit;
     margin:8px 0 14px;
     font-variant-numeric:tabular-nums;
   }
@@ -384,12 +440,8 @@
     border-bottom:1px solid var(--border);
   }
   .prop-table th{
-    font-family:var(--font-display);
     font-weight:bold;
     color:var(--text-muted);
-    font-size:11px;
-    text-transform:uppercase;
-    letter-spacing:0.04em;
   }
   .overlay-body a{ color:var(--accent); }
   .overlay-body code{
@@ -398,58 +450,117 @@
     border-radius:4px;
     font-size:12px;
   }
-  .tooltip{
+  @media (max-width:760px){
+    .xmode{width:100%;}
+    .xmode .toggle-group{flex:1;}
+    .slider-group{width:100%;}
+    .temp-row .util-group{margin-left:0;}
+    .row-divider{display:none;}
+    .toggle-group, .util-group{width:100%;}
+    .toggle-group button.seg, .util-group button.seg{flex:1 1 0;line-height:1.25;}
+  }
+  @media (max-width:600px){
+    body{padding:12px 8px 24px;}
+    .app{gap:10px;}
+    header.masthead h1{font-size:20px;}
+    .panel{padding:12px 12px 12px;gap:12px;}
+    .temp-row{gap:10px;}
+    .temp-row input[type=range]{height:6px;}
+    .temp-row input[type=range]::-webkit-slider-thumb{width:22px;height:22px;}
+    .temp-row input[type=range]::-moz-range-thumb{width:20px;height:20px;}
+    .button-row{gap:8px;}
+    .row-divider{display:none;}
+    .toggle-group, .util-group{width:100%;}
+    .toggle-group button.seg, .util-group button.seg{flex:1 1 0;padding:10px 6px;line-height:1.25;}
+    .util-group button.seg{font-size:13px;}
+    .overlay{position:fixed;left:8px;right:8px;top:8px;z-index:20;}
+    .overlay-fill{bottom:8px;}
+    .overlay-auto{max-height:calc(100% - 16px);}
+    .overlay-body{padding:12px 14px 16px;font-size:13px;}
+    .close-x{width:36px;height:36px;font-size:20px;}
+  }
+  #chart{touch-action:pan-y;-webkit-user-select:none;user-select:none;}
+  #chart:focus{outline:none;}
+  #chart:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;border-radius:6px;}
+  .xh-line{stroke:var(--text-muted);stroke-width:1.2;stroke-dasharray:4,3;}
+  .xh-hline{stroke:var(--text-muted);stroke-width:1;stroke-dasharray:2,3;opacity:.7;}
+  .xh-dot{stroke:var(--surface);stroke-width:2;}
+  .xh-readout{
     position:absolute;
     pointer-events:none;
-    background:var(--text);
-    color:var(--surface);
+    background:var(--surface);
+    color:var(--text);
+    border:1px solid var(--border-strong);
     font-family:var(--font-display);
     font-variant-numeric:tabular-nums;
-    font-size:12px;
-    padding:5px 8px;
-    border-radius:5px;
+    font-size:12.5px;
+    line-height:1.45;
+    padding:5px 9px;
+    border-radius:6px;
     box-shadow:var(--shadow);
-    opacity:0;
-    transition:opacity .08s ease;
     white-space:nowrap;
     z-index:5;
+    opacity:0;
+    transition:opacity .1s ease;
   }
+  .xh-readout b{font-weight:700;}
+  .xh-readout .mut{color:var(--text-muted);}
+  .plot-hint{
+    margin:0;
+    padding:2px 12px 10px;
+    font-size:13.2px;
+    color:var(--text-muted);
+    text-align:center;
+    text-wrap:balance;
+  }
+  .plot-hint span{display:inline-block;
+  }
+
 </style>
+</head>
+<body>
 
 <div class="app">
-  <!-- <header class="masthead">
-    <h1>High-Pressure Chemical Equilibrium</h1>
-  </header> -->
-
   <div class="card">
     <div class="panel">
       <div class="temp-row">
-        <span class="temp-label">temperature</span>
-        <input type="range" id="tempSlider" min="550" max="850" step="1" value="700" aria-label="Temperature in kelvin">
-        <span class="readout"><span id="tempValue">700</span>&nbsp;K</span>
-      </div>
-      <div class="button-row">
-        <div class="toggle-group" role="group" aria-label="Quantity to plot">
-          <button class="seg active" data-plot="extent" type="button">extent of reaction</button>
-          <button class="seg" data-plot="kv" type="button">non-ideal gas correction factor</button>
+        <div class="slider-group">
+          <span class="temp-label" id="sliderLabel">temperature</span>
+          <input type="range" id="tempSlider" min="550" max="850" step="1" value="700" aria-label="Temperature in kelvin">
+          <span class="readout"><span id="tempValue">700</span>&nbsp;<span id="sliderUnit">K</span></span>
         </div>
-        <div class="row-divider"></div>
         <div class="util-group" role="group" aria-label="Simulation information">
           <button class="seg" data-panel="directions" type="button">Directions</button>
           <button class="seg" data-panel="details" type="button">Details</button>
           <button class="seg" data-panel="about" type="button">About</button>
         </div>
       </div>
+      <div class="button-row">
+        <div class="toggle-group" id="plotToggle" role="group" aria-label="Quantity to plot">
+          <button class="seg active" data-plot="extent" type="button">fractional conversion</button>
+          <button class="seg" data-plot="kv" type="button">non-ideal gas correction factor</button>
+        </div>
+        <div class="xmode">
+          <span class="xmode-caption">versus</span>
+          <div class="toggle-group" id="xToggle" role="group" aria-label="Plot versus">
+            <button class="seg active" data-xmode="P" type="button">pressure</button>
+            <button class="seg" data-xmode="T" type="button">temperature</button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="plot-wrap">
-      <svg id="chart" viewBox="0 0 620 500" xmlns="http://www.w3.org/2000/svg"></svg>
-      <div class="tooltip" id="tooltip"></div>
+      <svg id="chart" viewBox="0 0 620 500" xmlns="http://www.w3.org/2000/svg" tabindex="0" role="slider"
+           aria-label="Pressure readout: use left and right arrow keys to move along the curve"
+           aria-valuemin="1" aria-valuemax="690" aria-valuenow="300"></svg>
+      <div class="xh-readout" id="xhReadout" aria-hidden="true"></div>
+      <p class="plot-hint"><span>Hover, tap, or drag on the plot to read values.</span> <span>Keyboard: press Tab to select the plot, then use the arrow keys.</span></p>
 
       <div class="overlay overlay-auto" id="panel-directions" hidden>
         <div class="overlay-head"><h3>Directions</h3><button class="close-x" data-close aria-label="Close directions">&times;</button></div>
         <div class="overlay-body">
-          <p>The Peng&ndash;Robinson equation of state is used to compute the extent of reaction and the correction factor due to gas-phase nonideality, as a result of the high pressure applied in the synthesis of ammonia (3H&#8322; + N&#8322; &#8652; 2NH&#8323;). The simulation plots these two quantities versus pressure for temperatures ranging from 550&nbsp;K to 850&nbsp;K. The extent of reaction approaches one at high pressure and low temperature. The non-ideal gas correction factor is close to one at low pressure and considerably less than one at high pressure.</p>
+          <p>The Peng&ndash;Robinson equation of state is used to compute the extent of reaction and the correction factor due to gas-phase nonideality, as a result of the high pressure applied in the synthesis of ammonia (1.5H&#8322; + 0.5N&#8322; &#8652; NH&#8323;). The simulation plots these two quantities either versus pressure (1 to 700&nbsp;bar) at a temperature set with the slider (550&nbsp;K to 850&nbsp;K), or versus temperature at a pressure set with the slider. The extent of reaction approaches one at high pressure and low temperature. The non-ideal gas correction factor is close to one at low pressure and considerably less than one at high pressure and low temperature.</p>
           <p>The correction factor due to gas-phase nonideality is given by \(\varphi_{\mathrm{NH_3}}\big/\big(\varphi_{\mathrm{H_2}}^{1.5}\,\varphi_{\mathrm{N_2}}^{0.5}\big)\), where \(\varphi_{\mathrm{NH_3}}\), \(\varphi_{\mathrm{N_2}}\), and \(\varphi_{\mathrm{H_2}}\) are the fugacity coefficients of the species involved; they are calculated using the Peng&ndash;Robinson equation of state.</p>
         </div>
       </div>
@@ -458,26 +569,28 @@
         <div class="overlay-head"><h3>Details</h3><button class="close-x" data-close aria-label="Close details">&times;</button></div>
         <div class="overlay-body">
           <h4>Extent of reaction</h4>
-          <p>Starting from a stoichiometric feed of 1&nbsp;mol N&#8322; and 3&nbsp;mol H&#8322;, and letting \(\xi\) be the extent of reaction (0 to 1), the equilibrium mole fractions are</p>
-          <p>\[y_{\mathrm{H_2}}=\frac{1.5(1-\xi)}{2-\xi},\qquad y_{\mathrm{N_2}}=\frac{0.5(1-\xi)}{2-\xi},\qquad y_{\mathrm{NH_3}}=\frac{\xi}{2-\xi}\]</p>
+          <p>Starting from a stoichiometric feed of 1&nbsp;mol N&#8322; and 3&nbsp;mol H&#8322;, and letting \(\xi\) be the extent of reaction (0 to 1), the equilibrium mole fractions are given below. For this feed, \(\xi\) equals the fractional conversion of N&#8322; (and of H&#8322;), which is the quantity plotted.</p>
+          <p class="eq">\[y_{\mathrm{H_2}}=\frac{1.5(1-\xi)}{2-\xi},\qquad y_{\mathrm{N_2}}=\frac{0.5(1-\xi)}{2-\xi},\qquad y_{\mathrm{NH_3}}=\frac{\xi}{2-\xi}\]</p>
 
           <h4>Peng&ndash;Robinson equation of state</h4>
           <p>The vapor-phase compressibility factor \(Z\) of the mixture solves</p>
-          <p>\[Z^3-(1-B)Z^2+(A-3B^2-2B)Z-(AB-B^2-B^3)=0\]</p>
+          <p class="eq">\[Z^3-(1-B)Z^2+(A-3B^2-2B)Z-(AB-B^2-B^3)=0\]</p>
           <p>with mixing rules and pure-component parameters</p>
-          <p>\[A=\sum_i\sum_j y_iy_jA_{ij},\quad A_{ij}=\sqrt{A_iA_j}\,(1-k_{ij}),\quad B=\sum_i y_iB_i\]</p>
-          <p>\[A_i=\frac{a_i(T)\,P}{(RT)^2},\qquad B_i=\frac{b_i P}{RT},\qquad b_i=0.0778\,R\,\frac{T_{c,i}}{P_{c,i}}\]</p>
-          <p>\[a_i(T)=0.45724\,R^2\frac{T_{c,i}^2}{P_{c,i}}\Big[1+m_i\big(1-\sqrt{T/T_{c,i}}\,\big)\Big]^2,\qquad m_i=0.37464+1.54226\,\omega_i-0.26992\,\omega_i^2\]</p>
+          <p class="eq">\[A=\sum_i\sum_j y_iy_jA_{ij},\quad A_{ij}=\sqrt{A_iA_j}\,(1-k_{ij}),\quad B=\sum_i y_iB_i\]</p>
+          <p class="eq">\[A_i=\frac{a_i(T)\,P}{(RT)^2},\qquad B_i=\frac{b_i P}{RT},\qquad b_i=0.0778\,R\,\frac{T_{c,i}}{P_{c,i}}\]</p>
+          <p class="eq">\[a_i(T)=0.45724\,R^2\frac{T_{c,i}^2}{P_{c,i}}\Big[1+m_i\big(1-\sqrt{T/T_{c,i}}\,\big)\Big]^2\]</p>
+          <p class="eq">\[m_i=0.37464+1.54226\,\omega_i-0.26992\,\omega_i^2\]</p>
 
           <h4>Fugacity coefficients</h4>
-          <p>\[\ln\varphi_i=(Z-1)\frac{B_i}{B}-\ln(Z-B)-\frac{A}{2\sqrt2\,B}\left(\frac{2\sum_j y_jA_{ij}}{A}-\frac{B_i}{B}\right)\ln\!\left(\frac{Z+(1+\sqrt2)B}{Z+(1-\sqrt2)B}\right)\]</p>
-          <p>\[K_v=\frac{\varphi_{\mathrm{NH_3}}}{\varphi_{\mathrm{H_2}}^{1.5}\,\varphi_{\mathrm{N_2}}^{0.5}}\]</p>
+          <p class="eq">\[\begin{aligned}\ln\varphi_i={}&(Z-1)\frac{B_i}{B}-\ln(Z-B)\\ &-\frac{A}{2\sqrt2\,B}\left(\frac{2\sum_j y_jA_{ij}}{A}-\frac{B_i}{B}\right)\ln\!\left(\frac{Z+(1+\sqrt2)B}{Z+(1-\sqrt2)B}\right)\end{aligned}\]</p>
+          <p class="eq">\[K_v=\frac{\varphi_{\mathrm{NH_3}}}{\varphi_{\mathrm{H_2}}^{1.5}\,\varphi_{\mathrm{N_2}}^{0.5}}\]</p>
 
           <h4>Chemical equilibrium</h4>
           <p>The extent of reaction is found by solving the Peng&ndash;Robinson cubic together with the equilibrium relation</p>
-          <p>\[K(T)=\frac{y_{\mathrm{NH_3}}}{y_{\mathrm{H_2}}^{1.5}\,y_{\mathrm{N_2}}^{0.5}}\cdot\frac{P^{\circ}}{P}\cdot K_v,\qquad P^{\circ}=1\text{ atm}\]</p>
+          <p class="eq">\[K(T)=\frac{y_{\mathrm{NH_3}}}{y_{\mathrm{H_2}}^{1.5}\,y_{\mathrm{N_2}}^{0.5}}\cdot\frac{P^{\circ}}{P}\cdot K_v,\qquad P^{\circ}=1\text{ atm}\]</p>
           <p>where the standard-state equilibrium constant \(K(T)\), with \(T\) in kelvin, is</p>
-          <p>\[K(T)=\frac{3.3885364\times10^{12}}{(1.8\,T)^{3.5312124}}\exp\!\left[\begin{aligned}&4641.1884\Big(\tfrac1T-\tfrac1{298.15}\Big)+0.0016755\,(T-298.15)\\[-2pt] -{}&8.219068\times10^{-9}(T^2-298.15^2)+2.7468727\times10^{-11}(T^3-298.15^3)\end{aligned}\right]\]</p>
+          <p class="eq">\[K(T)=\frac{3.3885364\times10^{12}}{(1.8\,T)^{3.5312124}}\,e^{\,\theta(T)}\]</p>
+          <p class="eq">\[\begin{aligned}\theta(T)={}&4641.1884\Big(\tfrac1T-\tfrac1{298.15}\Big)+0.0016755\,(T-298.15)\\ &-8.219068\times10^{-9}(T^2-298.15^2)\\ &+2.7468727\times10^{-11}(T^3-298.15^3)\end{aligned}\]</p>
 
           <h4>Symbols</h4>
           <table class="symbol-table">
@@ -495,10 +608,10 @@
 
           <h4>Pure-component properties</h4>
           <table class="prop-table">
-            <tr><th>Species</th><th>T<sub>c</sub> (&deg;R)</th><th>P<sub>c</sub> (psia)</th><th>&omega;</th></tr>
-            <tr><td>H&#8322;</td><td>59.7</td><td>190.8</td><td>0.000</td></tr>
-            <tr><td>N&#8322;</td><td>227.3</td><td>492.9</td><td>0.0206</td></tr>
-            <tr><td>NH&#8323;</td><td>730.2</td><td>1653.7</td><td>0.2582</td></tr>
+            <tr><th>Species</th><th>T<sub>c</sub> (K)</th><th>P<sub>c</sub> (bar)</th><th>&omega;</th></tr>
+            <tr><td>H&#8322;</td><td>33.2</td><td>13.16</td><td>&minus;0.216</td></tr>
+            <tr><td>N&#8322;</td><td>126.3</td><td>33.98</td><td>0.038</td></tr>
+            <tr><td>NH&#8323;</td><td>405.7</td><td>114.0</td><td>0.253</td></tr>
           </table>
         </div>
       </div>
@@ -521,7 +634,8 @@
   const R = 1.987; // engineering units consistent with Tc (deg R) and Pc (psia)
   const Pc = {1:190.8, 2:492.9, 3:1653.7};   // 1=H2, 2=N2, 3=NH3
   const Tc = {1:59.7, 2:227.3, 3:730.2};
-  const omega = {1:0.0, 2:0.0206, 3:0.2582};
+  // Acentric factors: Smith, Van Ness & Abbott, Intro. to Chem. Eng. Thermodynamics, App. B
+  const omega = {1:-0.216, 2:0.038, 3:0.253};
   const kij = {"1,1":0,"2,2":0,"3,3":0,"1,2":-0.036,"2,1":-0.036,"1,3":0,"3,1":0,"3,2":0.222,"2,3":0.222};
   const PSI_PER_BAR = 14.5037738;
   const PSI_PER_ATM = 14.69;
@@ -613,35 +727,107 @@
   }
 
   // ---------- Data generation ----------
-  const P_MIN_PSI = 10, P_MAX_PSI = 10010, N_POINTS = 25;
-  function computeCurve(T_K){
-    const pts = [];
-    for(let n=0;n<N_POINTS;n++){
-      const P_psi = P_MIN_PSI + (P_MAX_PSI-P_MIN_PSI)*n/(N_POINTS-1);
-      const {Xs,Kv} = solveEquilibrium(T_K,P_psi);
-      pts.push({P_bar: P_psi/PSI_PER_BAR, Xs, Kv});
+  // Two modes: "P" plots versus pressure at the slider temperature;
+  // "T" plots versus temperature at the slider pressure.
+  const P_MIN_BAR = 1, P_MAX_BAR = 700, P_STEP_BAR = 25;
+  const T_MIN_K = 550, T_MAX_K = 850, T_STEP_K = 10;
+  const MARKER_P_BAR = [P_MIN_BAR];
+  for(let P=P_STEP_BAR; P<=P_MAX_BAR+1e-9; P+=P_STEP_BAR) MARKER_P_BAR.push(P);
+  const MARKER_T_K = [];
+  for(let T=T_MIN_K; T<=T_MAX_K+1e-9; T+=T_STEP_K) MARKER_T_K.push(T);
+  // Ideal-gas extent (K_v = 1): K = xi(2-xi) / [0.5^0.5 1.5^1.5 (1-xi)^2] * P°/P,
+  // monotonic in xi, solved by bisection.
+  const STOICH = Math.pow(0.5,0.5)*Math.pow(1.5,1.5);
+  function idealExtent(T_K,P_psi){
+    const target = Keq(T_K)*STOICH*(P_psi/PSI_PER_ATM);
+    let lo=0, hi=1;
+    for(let k=0;k<60;k++){
+      const m=(lo+hi)/2;
+      if(m*(2-m)/((1-m)*(1-m)) < target) lo=m; else hi=m;
     }
-    return pts;
+    return (lo+hi)/2;
   }
+  const N_LINE = 100;
+  function pointAt(T_K,P_bar){
+    const P_psi = P_bar*PSI_PER_BAR;
+    const {Xs,Kv} = solveEquilibrium(T_K,P_psi);
+    return {T:T_K, P_bar, Xs, Kv, Xid: idealExtent(T_K,P_psi)};
+  }
+  // Versus pressure: markers on the bar grid; 100 line points clustered at
+  // low pressure (quadratic spacing) where the extent rises steeply.
+  function curveVsP(T_K){
+    const markers = MARKER_P_BAR.map(P=>({...pointAt(T_K,P), x:P}));
+    const line = [];
+    for(let n=0;n<N_LINE;n++){
+      const f=n/(N_LINE-1), P=P_MIN_BAR+(P_MAX_BAR-P_MIN_BAR)*f*f;
+      line.push({...pointAt(T_K,P), x:P});
+    }
+    return {markers, line};
+  }
+  // Versus temperature: markers every 10 K; 100 evenly spaced line points.
+  function curveVsT(P_bar){
+    const markers = MARKER_T_K.map(T=>({...pointAt(T,P_bar), x:T}));
+    const line = [];
+    for(let n=0;n<N_LINE;n++){
+      const T=T_MIN_K+(T_MAX_K-T_MIN_K)*n/(N_LINE-1);
+      line.push({...pointAt(T,P_bar), x:T});
+    }
+    return {markers, line};
+  }
+
+  // ---------- Mode definitions ----------
+  const MODES = {
+    P: {xMin:0,   xMax:700, ticks:[0,100,200,300,400,500,600,700], title:"pressure (bar)",
+        lo:P_MIN_BAR, hi:P_MAX_BAR, unit:"bar", name:"P", step:10, bigStep:50,
+        refs:[550,700,850], refUnit:"K", refEm:2.7, curve:()=>curveVsP(state.T), refCurve:v=>curveVsP(v).line,
+        slider:{label:"temperature", min:T_MIN_K, max:T_MAX_K, unit:"K", aria:"Temperature in kelvin"}},
+    T: {xMin:550, xMax:850, ticks:[550,600,650,700,750,800,850], title:"temperature (K)",
+        lo:T_MIN_K, hi:T_MAX_K, unit:"K", name:"T", step:5, bigStep:25,
+        refs:[100,300,700], refUnit:"bar", refEm:3.75, curve:()=>curveVsT(state.P), refCurve:v=>curveVsT(v).line,
+        slider:{label:"pressure", min:P_MIN_BAR, max:P_MAX_BAR, unit:"bar", aria:"Pressure in bar"}}
+  };
+  const state = {mode:"P", T:700, P:300};
+  const M = ()=>MODES[state.mode];
 
   // ---------- Chart rendering (inline SVG) ----------
   const svg = document.getElementById("chart");
   const SVGNS = "http://www.w3.org/2000/svg";
-  const W = 620, H = 500;
+  const W = 620;
+  let H = 500;
   const margin = {top:22, right:22, bottom:74, left:78};
-  const plotW = W - margin.left - margin.right;
-  const plotH = H - margin.top - margin.bottom;
+  let plotW = W - margin.left - margin.right;
+  let plotH = H - margin.top - margin.bottom;
   const BASE_TICK_FONT = 12, BASE_LABEL_FONT = 14; // baseline sizes: ticks +40%, axis titles +40% then -10%
-  const TICK_FONT = +(BASE_TICK_FONT*1.4).toFixed(1);
-  const LABEL_FONT = +(BASE_LABEL_FONT*1.4*0.9).toFixed(1);
   const BASE_MARKER_R = 5;
-  const MARKER_R = BASE_MARKER_R*0.8; // 20% smaller
+  let TICK_FONT, LABEL_FONT, MARKER_R, TITLE_X, REF_FONT;
+  // On narrow screens the SVG is scaled down, so enlarge fonts/markers in SVG
+  // units to keep them legible, and reshape the plot to a taller aspect ratio.
+  function updateLayout(){
+    const px = svg.getBoundingClientRect().width || W;
+    const k = Math.min(1.7, Math.max(1, 560/px));
+    TICK_FONT = +(BASE_TICK_FONT*1.4*k).toFixed(1);
+    LABEL_FONT = +(BASE_LABEL_FONT*1.4*0.9*k).toFixed(1);
+    MARKER_R = BASE_MARKER_R*0.8*Math.min(k,1.4);
+    H = k>1.15 ? 620 : 500;
+    // Axis titles sit just outside the tick labels: tick labels are
+    // ~1.45 em wide ("0.0") and 12 SVG units from the axis.
+    const tickW = TICK_FONT*1.45;
+    margin.left = Math.round(12 + tickW + LABEL_FONT*0.45 + LABEL_FONT*0.8 + 4);
+    margin.bottom = Math.round(8 + TICK_FONT + LABEL_FONT*1.3 + LABEL_FONT*0.3 + 4);
+    REF_FONT = +(TICK_FONT*0.92).toFixed(1);   // same size as the curve labels
+    margin.right = Math.round(Math.max(22*k, REF_FONT*M().refEm + 10));   // room for reference-curve labels
+    TITLE_X = Math.round(margin.left - 12 - tickW - LABEL_FONT*0.45);
+    plotW = W - margin.left - margin.right;
+    // plot area is 85% of its original height (graph height reduced by 15%)
+    H = Math.round(margin.top + margin.bottom + 0.85*(H - margin.top - margin.bottom));
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    plotH = H - margin.top - margin.bottom;
+  }
 
-  const xTicks = [0,100,200,300,400,500,600,700];
   const yTicks = [0,0.2,0.4,0.6,0.8,1.0];
-  const xMax = 700, yMax = 1.0;
-
-  function sx(P_bar){ return margin.left + (P_bar/xMax)*plotW; }
+  const yMax = 1.0;
+  function sx(xv){ const m=M(); return margin.left + (xv-m.xMin)/(m.xMax-m.xMin)*plotW; }
+  function xFromSvg(xSvg){ const m=M(); return m.xMin + (xSvg-margin.left)/plotW*(m.xMax-m.xMin); }
   function sy(v){ return margin.top + (1-(v/yMax))*plotH; }
 
   function el(tag, attrs, parent){
@@ -652,19 +838,26 @@
   }
 
   let currentPlot = "extent";
-  let currentData = [];
+  // Plot definitions: field plotted, ideal-gas companion field (if any), axis title.
+  const PLOTS = {
+    extent: {key:"Xs", ideal:"Xid", yLabel:"fractional conversion", stroke:"series-extent-stroke", fill:"series-extent-fill"},
+    kv:     {key:"Kv", ideal:null,  yLabel:"non-ideal gas correction factor", stroke:"series-kv-stroke", fill:"series-kv-fill"}
+  };
+  let currentData = {markers:[], line:[]};
 
   function render(){
+    updateLayout();
     svg.innerHTML = "";
+    const m = M();
     // frame box
     el("rect",{x:margin.left,y:margin.top,width:plotW,height:plotH,fill:"none",class:"frame-box","stroke-width":1.2},svg);
 
     // gridlines + x ticks
-    xTicks.forEach(t=>{
+    m.ticks.forEach(t=>{
       const x = sx(t);
       el("line",{x1:x,y1:margin.top,x2:x,y2:margin.top+plotH,class:"gridline"},svg);
       el("line",{x1:x,y1:margin.top+plotH,x2:x,y2:margin.top+plotH+6,class:"tick-mark"},svg);
-      el("text",{x:x,y:margin.top+plotH+22,"text-anchor":"middle","font-size":TICK_FONT,class:"axis-tick"},svg).textContent = t;
+      el("text",{x:x,y:margin.top+plotH+8+TICK_FONT,"text-anchor":"middle","font-size":TICK_FONT,class:"axis-tick"},svg).textContent = t;
     });
     // y ticks
     yTicks.forEach(t=>{
@@ -675,69 +868,330 @@
     });
 
     // axis titles
-    el("text",{x:margin.left+plotW/2,y:H-14,"text-anchor":"middle","font-size":LABEL_FONT,class:"axis-title"},svg).textContent = "Pressure (bar)";
-    const yLabel = currentPlot==="extent" ? "Extent of reaction" : "Non-ideal gas correction factor";
-    const yTitle = el("text",{x:28,y:margin.top+plotH/2,"text-anchor":"middle","font-size":LABEL_FONT,class:"axis-title",transform:`rotate(-90 28 ${margin.top+plotH/2})`},svg);
-    yTitle.textContent = yLabel;
+    el("text",{x:margin.left+plotW/2,y:margin.top+plotH+8+TICK_FONT+LABEL_FONT*1.3,"text-anchor":"middle","font-size":LABEL_FONT,class:"axis-title"},svg).textContent = m.title;
+    const cfg = PLOTS[currentPlot];
+    const yTitle = el("text",{x:TITLE_X,y:margin.top+plotH/2,"text-anchor":"middle","font-size":LABEL_FONT,class:"axis-title",transform:`rotate(-90 ${TITLE_X} ${margin.top+plotH/2})`},svg);
+    yTitle.textContent = cfg.yLabel;
 
     // data
-    const strokeClass = currentPlot==="extent" ? "series-extent-stroke" : "series-kv-stroke";
-    const fillClass = currentPlot==="extent" ? "series-extent-fill" : "series-kv-fill";
-    const key = currentPlot==="extent" ? "Xs" : "Kv";
-    const pathPts = currentData.map(d=>`${sx(d.P_bar)},${sy(d[key])}`).join(" ");
-    el("polyline",{points:pathPts,fill:"none","stroke-width":2,class:strokeClass},svg);
+    const strokeClass = cfg.stroke, fillClass = cfg.fill, key = cfg.key;
+    const hasIdeal = !!cfg.ideal;
+    const clip = el("clipPath",{id:"plotClip"},el("defs",{},svg));
+    el("rect",{x:margin.left,y:margin.top,width:plotW,height:plotH},clip);
 
-    currentData.forEach(d=>{
-      const c = el("circle",{cx:sx(d.P_bar),cy:sy(d[key]),r:MARKER_R,class:fillClass+" marker-ring","stroke-width":1,style:"cursor:pointer"},svg);
-      c.addEventListener("mousemove",(ev)=>showTooltip(ev,d,key));
-      c.addEventListener("mouseleave",hideTooltip);
-      c.addEventListener("mouseenter",(ev)=>showTooltip(ev,d,key));
+    // faint reference curves (Peng–Robinson): isotherms versus P, isobars versus T,
+    // labelled in the right margin
+    const refLabels = m.refs.map(v=>{
+      const line = refLine(v);
+      const pts = line.map(d=>`${sx(d.x).toFixed(2)},${sy(d[key]).toFixed(2)}`).join(" ");
+      el("polyline",{points:pts,class:"ref-iso","clip-path":"url(#plotClip)"},svg);
+      return {v, y: sy(line[line.length-1][key])};
+    }).sort((a,b)=>a.y-b.y);
+    for(let i=1;i<refLabels.length;i++){            // keep labels from overlapping
+      if(refLabels[i].y - refLabels[i-1].y < REF_FONT*1.05) refLabels[i].y = refLabels[i-1].y + REF_FONT*1.05;
+    }
+    refLabels.forEach(r=>{
+      el("text",{x:margin.left+plotW+4, y:(r.y+REF_FONT*0.35).toFixed(1), "font-size":REF_FONT, class:"ref-label"},svg).textContent = `${r.v} ${m.refUnit}`;
     });
+    if(hasIdeal){
+      const idealPts = currentData.line.map(d=>`${sx(d.x).toFixed(2)},${sy(d[cfg.ideal]).toFixed(2)}`).join(" ");
+      el("polyline",{points:idealPts,fill:"none","stroke-width":2,class:"series-ideal-stroke","clip-path":"url(#plotClip)"},svg);
+    }
+    const pathPts = currentData.line.map(d=>`${sx(d.x).toFixed(2)},${sy(d[key]).toFixed(2)}`).join(" ");
+    el("polyline",{points:pathPts,fill:"none","stroke-width":2,"stroke-linejoin":"round",class:strokeClass,"clip-path":"url(#plotClip)"},svg);
+
+    currentData.markers.forEach(d=>{
+      el("circle",{cx:sx(d.x),cy:sy(d[key]),r:MARKER_R,class:fillClass+" marker-ring","stroke-width":1,"pointer-events":"none"},svg);
+    });
+
+    // Peng–Robinson extent always lies above the ideal-gas extent (K_v < 1)
+    labelBoxes = !hasIdeal ? [] :
+      drawCurveLabels({field:"Xs", text:"Peng–Robinson", cls:"pr"}, {field:"Xid", text:"ideal gas", cls:"ideal"});
+
+    // crosshair layer (updated in place while dragging)
+    xh.layer = el("g",{"pointer-events":"none"},svg);
+    xh.hline = el("line",{class:"xh-hline"},xh.layer);
+    xh.vline = el("line",{class:"xh-line"},xh.layer);
+    xh.dotIdeal = hasIdeal ? el("circle",{r:MARKER_R*1.3,class:"xh-dot-ideal"},xh.layer) : null;
+    xh.dot = el("circle",{r:MARKER_R*1.6,class:fillClass+" xh-dot"},xh.layer);
+    updateCrosshair();
   }
 
-  function formatSig(v, sig){
-    if(v===0) return "0";
-    const digits = sig - Math.ceil(Math.log10(Math.abs(v)));
-    return v.toFixed(Math.max(0, Math.min(6, digits)));
+  // ---------- Direct curve labels (extent plot) ----------
+  // The label of the upper curve goes above it and the label of the lower
+  // curve below it. If there is no room (curve near 1 or 0), the label goes in
+  // the gap between the curves. Positions are searched from the right end of
+  // the plot leftward, and labels never overlap each other.
+  let labelBoxes = [];
+  function curveY(field, xv){          // SVG y of a series at x-axis value xv
+    const L = currentData.line;
+    if(xv <= L[0].x) return sy(L[0][field]);
+    for(let i=1;i<L.length;i++){
+      if(L[i].x >= xv){
+        const a=L[i-1], b=L[i], t=(xv-a.x)/(b.x-a.x);
+        return sy(a[field] + t*(b[field]-a[field]));
+      }
+    }
+    return sy(L[L.length-1][field]);
+  }
+  function spanY(field, x0, x1){       // min and max SVG y of a series over SVG x in [x0,x1]
+    let lo=Infinity, hi=-Infinity;
+    for(let n=0;n<=16;n++){
+      const y = curveY(field, xFromSvg(x0 + (x1-x0)*n/16));
+      lo=Math.min(lo,y); hi=Math.max(hi,y);
+    }
+    return [lo,hi];
+  }
+  function drawCurveLabels(upper, lower){
+    const fs = +(TICK_FONT*0.92).toFixed(1);
+    const pad = fs*0.35;
+    const top = margin.top + 3, bottom = margin.top + plotH - 3;
+    const right = margin.left + plotW - 6;
+    const make = (txt, cls)=>{
+      const t = el("text",{"font-size":fs,"text-anchor":"start",class:"curve-label "+cls,"pointer-events":"none"},svg);
+      t.textContent = txt;
+      return {t, w: t.getComputedTextLength()};
+    };
+    const up = make(upper.text, upper.cls), lo = make(lower.text, lower.cls);
+    const asc = fs*0.78, desc = fs*0.22;          // text box above/below baseline
+    const boxes = [];
+    const hits = (x, base, w)=>boxes.some(b=>x < b.x+b.w+4 && x+w > b.x-4 && base-asc < b.y+b.h+2 && base+desc > b.y-2);
+    const place = (lab, x, baseline)=>{
+      lab.t.setAttribute("x", x.toFixed(1));
+      lab.t.setAttribute("y", baseline.toFixed(1));
+      boxes.push({x, y: baseline-asc, w: lab.w, h: asc+desc});
+    };
+    const step = plotW/40;
+    // tryPlace(lab, fn): fn(x0, x1) returns a baseline or null; scanned right to left
+    const tryPlace = (lab, fn)=>{
+      for(let xr=right; xr>=margin.left+lab.w+10; xr-=step){
+        const x0 = xr-lab.w, base = fn(x0-4, xr+4);
+        if(base!==null && !hits(x0, base, lab.w)){ place(lab, x0, base); return true; }
+      }
+      return false;
+    };
+    const below = f => (a,b)=>{ const [,yMx]=spanY(f,a,b); const base=yMx+pad+asc; return base+desc<=bottom-2 ? base : null; };
+    const above = f => (a,b)=>{ const [yMn]=spanY(f,a,b); const base=yMn-pad-desc; return base-asc>=top ? base : null; };
+    const gapUnder = (fu,fl) => (a,b)=>{ const [,yMaxU]=spanY(fu,a,b), [yMinL]=spanY(fl,a,b);
+      const base=yMaxU+pad*0.6+asc; return base+desc<=yMinL-pad*0.6 ? base : null; };
+    const gapOver = (fu,fl) => (a,b)=>{ const [,yMaxU]=spanY(fu,a,b), [yMinL]=spanY(fl,a,b);
+      const base=yMinL-pad*0.6-desc; return base-asc>=yMaxU+pad*0.6 ? base : null; };
+
+    if(!tryPlace(lo, below(lower.field)) && !tryPlace(lo, gapOver(upper.field, lower.field))){
+      const x0=right-lo.w, [yMn]=spanY(lower.field, x0-4, right+4); place(lo, x0, yMn-pad*0.5-desc);
+    }
+    if(!tryPlace(up, above(upper.field)) && !tryPlace(up, gapUnder(upper.field, lower.field))){
+      const x0=right-up.w, [,yMx]=spanY(upper.field, x0-4, right+4); place(up, x0, yMx+pad*0.5+asc);
+    }
+    return boxes;
   }
 
-  const tooltip = document.getElementById("tooltip");
-  function showTooltip(ev,d,key){
-    const label = key==="Xs" ? "Extent of reaction" : "Correction factor";
-    tooltip.innerHTML = `P = ${formatSig(d.P_bar,3)} bar<br>${label} = ${d[key].toFixed(4)}`;
-    const wrapRect = svg.parentElement.getBoundingClientRect();
-    tooltip.style.left = (ev.clientX - wrapRect.left + 12) + "px";
-    tooltip.style.top = (ev.clientY - wrapRect.top - 34) + "px";
-    tooltip.style.opacity = "1";
+  // ---------- Crosshair readout (mouse, touch, and keyboard) ----------
+  // The readout solves the equilibrium exactly at the crosshair position,
+  // so values are not limited to the plotted points. Each mode remembers
+  // its own crosshair position.
+  const xh = {pos:{P:300, T:700}, shown:false, dragging:false, layer:null, vline:null, hline:null, dot:null, cacheKey:"", val:null};
+  const readout = document.getElementById("xhReadout");
+  function updateAriaRange(){
+    const m = M();
+    svg.setAttribute("aria-valuemin", m.lo);
+    svg.setAttribute("aria-valuemax", m.hi);
+    svg.setAttribute("aria-label", `${m.name==="P" ? "Pressure" : "Temperature"} readout: use left and right arrow keys to move along the curve`);
   }
-  function hideTooltip(){ tooltip.style.opacity = "0"; }
 
-  function recompute(T_K){
-    currentData = computeCurve(T_K);
+  function crossValues(){
+    const xv = xh.pos[state.mode];
+    const T = state.mode==="P" ? state.T : xv;
+    const P = state.mode==="P" ? xv : state.P;
+    const k = T+"|"+P;
+    if(k!==xh.cacheKey){ xh.val = pointAt(T, P); xh.cacheKey = k; }
+    return xh.val;
+  }
+  function fmtX(xv){
+    if(state.mode==="T") return `${xv.toFixed(0)} K`;
+    return `${(xv>=10 || Number.isInteger(xv)) ? xv.toFixed(0) : xv.toFixed(1)} bar`;
+  }
+  function updateCrosshair(){
+    if(!xh.layer) return;
+    const v = crossValues();
+    const cfg = PLOTS[currentPlot], key = cfg.key;
+    const xv = xh.pos[state.mode];
+    const x = sx(xv), y = sy(v[key]);
+    xh.vline.setAttribute("x1",x); xh.vline.setAttribute("x2",x);
+    xh.vline.setAttribute("y1",margin.top); xh.vline.setAttribute("y2",margin.top+plotH);
+    xh.hline.setAttribute("x1",margin.left); xh.hline.setAttribute("x2",x);
+    xh.hline.setAttribute("y1",y); xh.hline.setAttribute("y2",y);
+    xh.dot.setAttribute("cx",x); xh.dot.setAttribute("cy",y);
+    if(xh.dotIdeal){ xh.dotIdeal.setAttribute("cx",x); xh.dotIdeal.setAttribute("cy",sy(v[cfg.ideal])); }
+    xh.layer.style.display = xh.shown ? "" : "none";
+
+    const xTxt = fmtX(xv);
+    const ext = v.Xs.toFixed(3), kv = v.Kv.toFixed(3), exid = v.Xid.toFixed(3);
+    const idealSpan = t => `<span style="color:var(--series-ideal)">${t}</span>`;
+    let body, aria;
+    if(key==="Xs"){
+      body = `<b>conversion = ${ext}</b><br>${idealSpan(`ideal-gas conversion = ${exid}`)}<br><span class="mut">correction factor = ${kv}</span>`;
+      aria = `fractional conversion ${ext}, ideal-gas conversion ${exid}, correction factor ${kv}`;
+    } else {
+      body = `<b>correction factor = ${kv}</b><br><span class="mut">conversion = ${ext}</span>`;
+      aria = `correction factor ${kv}, fractional conversion ${ext}`;
+    }
+    readout.innerHTML = `<span class="mut">${state.mode} =</span> ${xTxt}<br>` + body;
+    svg.setAttribute("aria-valuenow", xv.toFixed(0));
+    svg.setAttribute("aria-valuetext", `${xTxt}: ${aria}`);
+
+    if(!xh.shown){ readout.style.opacity="0"; return; }
+    // Place the HTML readout inside the plot area where it hides the least:
+    // candidates are beside the crosshair (top/bottom, right/left) and the four
+    // corners; each is scored by curve points covered and by covering the
+    // crosshair line, dot, or a curve label.
+    const wrap = svg.parentElement.getBoundingClientRect();
+    const r = svg.getBoundingClientRect();
+    const k = r.width / W;
+    const ox = r.left - wrap.left, oy = r.top - wrap.top;
+    readout.style.opacity = "1";
+    const bw = readout.offsetWidth, bh = readout.offsetHeight;
+    const pad = 6;
+    const L = ox + margin.left*k + pad, R = ox + (margin.left+plotW)*k - pad;
+    const Tp = oy + margin.top*k + pad, B = oy + (margin.top+plotH)*k - pad;
+    const px = ox + x*k, py = oy + y*k;
+    const clampX = q => Math.min(Math.max(q, L), R - bw);
+    const xs = [px + 12, px - bw - 12, L, R - bw].map(clampX);
+    const ys = [Tp, B - bh];
+    const pts = [];
+    currentData.line.forEach(d=>{
+      pts.push([ox + sx(d.x)*k, oy + sy(d[key])*k]);
+      if(cfg.ideal) pts.push([ox + sx(d.x)*k, oy + sy(d[cfg.ideal])*k]);
+    });
+    if(cfg.ideal) pts.push([px, oy + sy(v[cfg.ideal])*k]);
+    let best = null;
+    xs.forEach((bx,ix)=>ys.forEach(by=>{
+      const mm = 8;
+      let score = 0;
+      pts.forEach(([qx,qy])=>{ if(qx>bx-mm && qx<bx+bw+mm && qy>by-mm && qy<by+bh+mm) score += 1; });
+      if(px>bx-mm && px<bx+bw+mm && py>by-mm && py<by+bh+mm) score += 1000;   // covers the dot
+      labelBoxes.forEach(lb=>{                                                 // covers a curve label
+        const lx=ox+lb.x*k, ly=oy+lb.y*k, lw=lb.w*k, lh=lb.h*k;
+        if(lx<bx+bw && lx+lw>bx && ly<by+bh && ly+lh>by) score += 200;
+      });
+      if(px>bx-4 && px<bx+bw+4) score += 40;                                   // covers the crosshair line
+      score += ix<2 ? 0 : 0.5;                                                 // slight preference for beside-the-line
+      if(!best || score < best.score) best = {score, bx, by};
+    }));
+    readout.style.left = best.bx + "px";
+    readout.style.top = best.by + "px";
+  }
+  function setCross(xv){
+    const m = M();
+    xv = Math.min(m.hi, Math.max(m.lo, xv));
+    xh.pos[state.mode] = state.mode==="P" ? +xv.toFixed(xv>=10 ? 0 : 1) : Math.round(xv);
+    xh.shown = true;
+    updateCrosshair();
+  }
+  function setCrossFromClient(clientX){
+    const r = svg.getBoundingClientRect();
+    setCross(xFromSvg((clientX - r.left) / r.width * W));
+  }
+  function insidePlotX(clientX, slack){
+    const r = svg.getBoundingClientRect();
+    const xSvg = (clientX - r.left) / r.width * W;
+    return xSvg >= margin.left - slack && xSvg <= margin.left + plotW + slack;
+  }
+  svg.addEventListener("pointerdown",(ev)=>{
+    if(!insidePlotX(ev.clientX, 20)) return;
+    xh.dragging = true;
+    try{ svg.setPointerCapture(ev.pointerId); }catch(e){}
+    setCrossFromClient(ev.clientX);
+  });
+  svg.addEventListener("pointermove",(ev)=>{
+    if(xh.dragging || (ev.pointerType==="mouse" && insidePlotX(ev.clientX, 0))) setCrossFromClient(ev.clientX);
+  });
+  const endDrag = (ev)=>{ xh.dragging=false; try{ svg.releasePointerCapture(ev.pointerId); }catch(e){} };
+  svg.addEventListener("pointerup", endDrag);
+  svg.addEventListener("pointercancel", endDrag);
+  svg.addEventListener("pointerleave",(ev)=>{
+    if(ev.pointerType==="mouse" && !xh.dragging && document.activeElement!==svg){ xh.shown=false; updateCrosshair(); }
+  });
+  svg.addEventListener("focus",()=>{ xh.shown=true; updateCrosshair(); });
+  svg.addEventListener("blur",()=>{ xh.shown=false; updateCrosshair(); });
+  svg.addEventListener("keydown",(ev)=>{
+    const m = M();
+    const s1 = ev.shiftKey ? m.bigStep : m.step, s2 = m.bigStep;
+    let v = xh.pos[state.mode];
+    // steps snap to round values (10 bar / 5 K; Shift or Page keys: 50 bar / 25 K)
+    switch(ev.key){
+      case "ArrowRight": case "ArrowUp":   v = (Math.floor(v/s1+1e-9)+1)*s1; break;
+      case "ArrowLeft":  case "ArrowDown": v = (Math.ceil(v/s1-1e-9)-1)*s1; break;
+      case "PageUp":   v = (Math.floor(v/s2+1e-9)+1)*s2; break;
+      case "PageDown": v = (Math.ceil(v/s2-1e-9)-1)*s2; break;
+      case "Home": v = m.lo; break;
+      case "End":  v = m.hi; break;
+      default: return;
+    }
+    ev.preventDefault();
+    setCross(v);
+  });
+
+  // Reference curves (isotherms versus P, isobars versus T), computed once each
+  const refCache = {};
+  function refLine(v){
+    const k = state.mode+"|"+v;
+    if(!refCache[k]) refCache[k] = M().refCurve(v);
+    return refCache[k];
+  }
+
+  function recompute(){
+    currentData = M().curve();
     render();
   }
 
   // ---------- Controls wiring ----------
   const slider = document.getElementById("tempSlider");
   const tempValue = document.getElementById("tempValue");
+  const sliderLabel = document.getElementById("sliderLabel");
+  const sliderUnit = document.getElementById("sliderUnit");
   function updateSliderFill(){
     const min = +slider.min, max = +slider.max, val = +slider.value;
     const pct = ((val-min)/(max-min))*100;
     slider.style.setProperty("--fill", pct+"%");
   }
-  slider.addEventListener("input", ()=>{
+  // The slider sets temperature when plotting versus pressure, and pressure
+  // when plotting versus temperature.
+  function configureSlider(){
+    const sc = M().slider;
+    slider.min = sc.min; slider.max = sc.max; slider.step = 1;
+    slider.value = state.mode==="P" ? state.T : state.P;
+    slider.setAttribute("aria-label", sc.aria);
+    sliderLabel.textContent = sc.label;
+    sliderUnit.textContent = sc.unit;
     tempValue.textContent = slider.value;
     updateSliderFill();
-    recompute(+slider.value);
+  }
+  slider.addEventListener("input", ()=>{
+    if(state.mode==="P") state.T = +slider.value; else state.P = +slider.value;
+    tempValue.textContent = slider.value;
+    updateSliderFill();
+    recompute();
   });
-  updateSliderFill();
 
-  document.querySelectorAll(".toggle-group button.seg").forEach(btn=>{
+  document.querySelectorAll("#plotToggle button.seg").forEach(btn=>{
     btn.addEventListener("click", ()=>{
-      document.querySelectorAll(".toggle-group button.seg").forEach(b=>b.classList.remove("active"));
+      document.querySelectorAll("#plotToggle button.seg").forEach(b=>b.classList.remove("active"));
       btn.classList.add("active");
       currentPlot = btn.dataset.plot;
       render();
+    });
+  });
+  document.querySelectorAll("#xToggle button.seg").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      if(state.mode===btn.dataset.xmode) return;
+      document.querySelectorAll("#xToggle button.seg").forEach(b=>b.classList.remove("active"));
+      btn.classList.add("active");
+      state.mode = btn.dataset.xmode;
+      xh.cacheKey = "";
+      configureSlider();
+      updateAriaRange();
+      recompute();
     });
   });
 
@@ -756,6 +1210,7 @@
       if(!isOpen){
         panel.hidden = false;
         btn.classList.add("active");
+        fitEquations(panel);
       }
     });
   });
@@ -765,6 +1220,49 @@
     });
   });
 
-  recompute(+slider.value);
+  // Shrink wide display equations so they fit narrow panels (min 55%; any
+  // remaining overflow scrolls horizontally).
+  function fitEquations(panel){
+    const run=()=>{
+      panel.querySelectorAll('mjx-container[display="true"]').forEach(m=>{
+        m.style.fontSize="";
+        const avail=m.clientWidth, need=m.scrollWidth;
+        if(avail>0 && need>avail+1){
+          m.style.fontSize=(Math.max(0.55, avail/need)*100).toFixed(1)+"%";
+        }
+      });
+    };
+    if(window.MathJax && MathJax.startup && MathJax.startup.promise) MathJax.startup.promise.then(()=>requestAnimationFrame(run));
+    else run();
+  }
+  document.addEventListener("keydown",(ev)=>{
+    if(ev.key==="Escape" || ev.key==="Esc") closeAllPanels();
+  });
+  document.addEventListener("pointerdown",(ev)=>{
+    if(!document.querySelector(".overlay:not([hidden])")) return;
+    if(ev.target.closest(".overlay") || ev.target.closest(".util-group")) return;
+    closeAllPanels();
+  });
+  document.addEventListener("pointerdown",(ev)=>{
+    if(ev.target.closest("#chart") || ev.target.closest("#tempSlider") || ev.target.closest(".toggle-group")) return;
+    if(xh.shown && document.activeElement!==svg){ xh.shown=false; updateCrosshair(); }
+  });
+  let resizeTimer=null, lastWidth=0;
+  window.addEventListener("resize",()=>{
+    clearTimeout(resizeTimer);
+    resizeTimer=setTimeout(()=>{
+      const w=svg.getBoundingClientRect().width;
+      if(Math.abs(w-lastWidth)>1){ lastWidth=w; render(); }
+      const open=document.querySelector(".overlay:not([hidden])");
+      if(open) fitEquations(open);
+    },120);
+  });
+
+  configureSlider();
+  updateAriaRange();
+  recompute();
+  lastWidth = svg.getBoundingClientRect().width;
 })();
 </script>
+</body>
+</html>

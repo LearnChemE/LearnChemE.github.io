@@ -16,7 +16,7 @@ window.MathJax = {
   :root{
     --lc-red:#98000D;
     --lc-red-dark:#7a000a;
-    --ink:#222;
+    --ink:#000;
     --panel-bg:#ffffff;
     --panel-border:#c9c9c9;
     --bg:#fff;
@@ -25,6 +25,7 @@ window.MathJax = {
   html,body{
     margin:0; padding:0;
     font-family: Helvetica, Arial, sans-serif;
+    font-size:17px;
     background:var(--bg);
     color:var(--ink);
   }
@@ -38,22 +39,16 @@ window.MathJax = {
     font-size:22px;
     font-weight:700;
     text-align:center;
-    margin:4px 0 10px 0;
+    margin:4px 0 12px 0;
     color:var(--ink);
   }
-  .subtitle{
-    text-align:center;
-    font-size:13px;
-    color:#555;
-    margin:-6px 0 14px 0;
-  }
 
-  /* ---------- Button row + flyout panels ---------- */
+  /* ---------- buttons + flyout panels ---------- */
   .btnrow{
     display:flex;
+    flex-wrap:wrap;
     justify-content:center;
-    gap:10px;
-    margin-bottom:6px;
+    gap:8px;
     position:relative;
     z-index:50;
   }
@@ -62,126 +57,134 @@ window.MathJax = {
     color:#fff;
     border:none;
     border-radius:5px;
-    padding:8px 20px;
+    padding:8px 14px;
     font-family:Helvetica, Arial, sans-serif;
-    font-size:15.4px;
+    font-size:17px;
     font-weight:400;
     cursor:pointer;
-    letter-spacing:0.3px;
     box-shadow:0 1px 2px rgba(0,0,0,0.25);
-    transition:background .12s ease;
   }
   .lc-btn:hover{ background:var(--lc-red-dark); }
   .lc-btn.active{ outline:2px solid #333; outline-offset:1px; }
 
-  .panel-anchor{
-    position:relative;
-    height:0;
-  }
+  .panel-anchor{ position:relative; height:0; }
   .flyout{
     position:absolute;
-    top:6px;
-    left:50%;
-    transform:translateX(-50%);
-    width:min(680px, 94vw);
-    max-height:min(72vh, 620px);
+    top:15px;
+    left:0;
+    width:min(560px, 94vw);
+    max-height:min(76vh, 640px);
     overflow-y:auto;
     background:var(--panel-bg);
     border:1px solid var(--panel-border);
     border-radius:8px;
     box-shadow:0 10px 30px rgba(0,0,0,0.28);
-    padding:18px 22px 20px 22px;
+    padding:14px 20px 18px 20px;
     z-index:100;
     text-align:left;
-    font-size:14.5px;
-    line-height:1.5;
+    font-size:17px;
+    line-height:1.45;
+    color:#000;
   }
   .flyout[hidden]{ display:none !important; }
   .flyout h2{
-    margin:0 0 10px 0;
+    margin:0 0 8px 0;
     font-size:17px;
-    color:var(--lc-red);
-    padding-right:26px;
+    font-weight:400;
+    color:#000;
+    padding-right:28px;
+    cursor:move;
+    user-select:none;
   }
   .flyout .closeX{
-    position:absolute;
-    top:8px;
-    right:10px;
-    width:26px;
-    height:26px;
+    position:sticky;
+    float:right;
+    top:0;
+    margin:-6px -10px 0 0;
+    width:30px;
+    height:30px;
     border:none;
-    background:transparent;
-    font-size:20px;
+    background:#fff;
+    font-size:24px;
     line-height:1;
-    color:#666;
+    color:#444;
     cursor:pointer;
     font-family:Helvetica,Arial,sans-serif;
+    z-index:2;
   }
   .flyout .closeX:hover{ color:var(--lc-red); }
   .flyout p{ margin:0 0 10px 0; }
   .flyout ul{ margin:0 0 10px 20px; padding:0; }
   .flyout li{ margin-bottom:6px; }
   .flyout a{ color:var(--lc-red); }
-  .eqwrap{ margin:10px 0 14px 4px; }
+  .eqwrap{ margin:8px 0 12px 4px; overflow-x:auto; overflow-y:hidden; padding:2px 0; }
   mjx-container[jax="CHTML"][display="true"]{
     text-align:left !important;
-    margin:8px 0 8px 4px !important;
+    margin:6px 0 6px 4px !important;
   }
-  #panelDetails{ width:min(960px, 96vw); }
-  .longeq mjx-container[jax="CHTML"][display="true"]{ font-size:85% !important; }
+  #panelDetails{ width:min(840px, 96vw); }
+  .symlist{ margin:0 0 10px 12px; line-height:1.55; }
+  .symlist b{ font-weight:400; }
+  #panelAbout{ width:min(575px, 94vw); }
 
-  /* ---------- Main simulation layout ---------- */
+  /* ---------- main layout ---------- */
   .simwrap{
     background:#fff;
     border:1px solid #d8d8d6;
     border-radius:8px;
     padding:14px 16px 16px 16px;
+    position:relative;
   }
   .simgrid{
-    display:flex;
-    flex-wrap:wrap;
-    gap:16px;
-    align-items:flex-start;
+    display:grid;
+    grid-template-columns:minmax(0,768px) 300px;
+    grid-template-areas:"diag btns" "diag side";
+    grid-template-rows:auto 1fr;
+    gap:12px 16px;
     justify-content:center;
+    align-items:start;
   }
-  .diagramcol{
-    flex:1 1 640px;
-    max-width:640px;
-    min-width:280px;
-  }
+  .btnrow{ grid-area:btns; }
+  .diagramcol{ grid-area:diag; min-width:0; position:relative; }
   .sidecol{
-    flex:1 1 300px;
+    grid-area:side;
     display:flex;
     flex-direction:column;
     gap:12px;
-    width:100%;
-    max-width:300px;
-    min-width:240px;
+    min-width:0;
   }
-  canvas{ display:block; touch-action:none; max-width:100%; height:auto; }
-  #ptCanvas, #qualCanvas{ width:100%; }
-  .simgrid{ overflow-x:auto; }
-  #ptCanvas{ cursor:default; border:1px solid #ddd; border-radius:4px; background:#fff;}
-  #qualCanvas{ border:1px solid #ddd; border-radius:4px; background:#fff;}
-  #cellCanvas{ border:1px solid #ddd; border-radius:4px; background:#fff;}
+  .cellrow{ display:flex; gap:10px; align-items:flex-start; }
+  canvas{ display:block; touch-action:none; }
+  canvas[hidden]{ display:none; }
+  .pxywrap{ display:flex; justify-content:center; margin-top:14px; }
+  .pxywrap:has(canvas[hidden]){ display:none; }
+  #ptCanvas{ border:1px solid #ddd; border-radius:4px; background:#fff; }
+  #qualCanvas, #pxyCanvas, #cellCanvas{ border:1px solid #ddd; border-radius:4px; background:#fff; }
+  .busy{
+    position:absolute; left:0; right:0; top:40%;
+    text-align:center; font-size:17px; color:#000;
+    pointer-events:none;
+  }
+  .busy span{ background:rgba(255,255,255,0.92); padding:6px 12px; border:1px solid #ccc; border-radius:5px; }
 
   .readout{
     border:1px solid #ddd;
     border-radius:6px;
-    padding:10px 12px;
+    padding:8px 10px;
     background:#fafafa;
-    font-size:16.2px;
-    line-height:1.55;
+    font-size:16px;
+    line-height:1.5;
+    flex:1;
+    min-width:0;
   }
-  .readout .row{ display:flex; justify-content:space-between; }
+  .readout .row{ display:flex; justify-content:space-between; gap:6px; }
   .readout .lab{ color:#000; }
-  .readout .val{ font-weight:400; color:#000; }
-  .phasepill{
-    display:inline-block;
-    font-weight:400;
-    color:#000;
-  }
+  .readout .ind{ padding-left:12px; }
+  .readout .val{ color:#000; text-align:right; white-space:nowrap; }
+  .readout .gap{ margin-top:5px; }
+  .dot{ display:inline-block; width:11px; height:11px; border-radius:50%; border:1px solid #222; margin-right:5px; vertical-align:-1px; }
 
+  /* ---------- controls ---------- */
   .controls{
     margin-top:14px;
     display:flex;
@@ -191,162 +194,202 @@ window.MathJax = {
   .ctrlrow{
     display:flex;
     align-items:center;
-    gap:18px;
+    column-gap:22px;
+    row-gap:10px;
     flex-wrap:wrap;
   }
-  .ctrlrow.single-line{ row-gap:10px; }
-  .sliderpair{
+  .sliderpair, .checkpair, .radiogroup{
     display:flex;
     align-items:center;
     gap:6px;
-  }
-  .ctrlrow label{
-    font-size:18px;
-    font-weight:400;
+    font-size:17px;
     white-space:nowrap;
   }
+  .radiogroup label, .checkpair label{ cursor:pointer; }
+  .radiogroup input, .checkpair input{ accent-color:var(--lc-red); width:16px; height:16px; margin:0 2px 0 0; cursor:pointer; }
   .ctrlrow input[type=range]{
-    accent-color:var(--lc-red);
+    -webkit-appearance:none;
+    appearance:none;
+    height:5px;
+    border-radius:3px;
+    outline:none;
+    background:#999;
+    width:120px;
+    flex:0 0 120px;
+    margin:0;
   }
-  .ctrlrow input[type=range].shortslider{
-    flex:0 0 130px;
-    width:130px;
+  .ctrlrow input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none; appearance:none;
+    width:17px; height:17px;
+    border:2px solid #fff; border-radius:50%;
+    background:var(--lc-red); cursor:pointer;
+    box-shadow:0 1px 2px rgba(0,0,0,.35);
   }
-
-
-input[type="range"]{
-  margin-top:.7em;
-    --accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:210px;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
-input[type="range"]::-webkit-slider-thumb{
-    -webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
-input[type="range"]::-moz-range-thumb{
-    width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
-
-  .ctrlrow .readoutnum{
-    width:90px;
-    text-align:left;
-    font-size:18px;
-    font-variant-numeric:tabular-nums;
+  .ctrlrow input[type=range]::-moz-range-thumb{
+    width:17px; height:17px;
+    border:2px solid #fff; border-radius:50%;
+    background:var(--lc-red); cursor:pointer;
+    box-shadow:0 1px 2px rgba(0,0,0,.35);
   }
+  .ctrlrow input:disabled{ opacity:0.45; cursor:default; }
+  .optrow{ margin-top:6px; justify-content:space-between; column-gap:10px; }
+  .optrow .radiogroup, .optrow .checkpair, .optrow .animbtn{ font-size:16px; }
+  .optrow .animbtn{ padding:6px 10px; }
+  .sliderrow{ margin-top:8px; column-gap:16px; row-gap:4px; }
+  .readoutnum{ min-width:74px; font-variant-numeric:tabular-nums; }
   .animbtn{
     background:var(--lc-red);
     color:#fff;
-    border:1.5px solid var(--lc-red);
+    border:none;
     border-radius:5px;
-    padding:6px 14px;
+    padding:7px 14px;
     font-family:Helvetica,Arial,sans-serif;
-    font-size:15.73px;
+    font-size:17px;
     font-weight:400;
     cursor:pointer;
   }
-  .animbtn:hover{ background:#7a0009; }
-  .animbtn:disabled{ opacity:0.5; cursor:default; }
+  .animbtn:hover{ background:var(--lc-red-dark); }
+  .loadmsg{ text-align:center; padding:60px 10px; color:#000; font-size:17px; }
 
-  .loadmsg{
-    text-align:center;
-    padding:60px 10px;
-    color:#666;
-    font-size:14px;
+  /* ---------- narrower screens: one column ---------- */
+  @media (max-width:1120px){
+    .simgrid{
+      grid-template-columns:minmax(0,768px);
+      grid-template-areas:"btns" "diag" "side";
+      grid-template-rows:auto;
+    }
+    .sidecol{ flex-direction:row; flex-wrap:wrap; justify-content:center; align-items:flex-start; }
+    .sidecol > *{ flex:0 1 300px; }
+    .sidecol > canvas{ flex:0 0 auto; }
   }
-  .footer-credit{
-    text-align:center;
-    font-size:11.5px;
-    color:#888;
-    margin-top:14px;
+  @media (max-width:560px){
+    #app{ padding:10px 6px 20px 6px; }
+    h1.title{ font-size:19px; margin-bottom:8px; }
+    .simwrap{ padding:8px 6px 12px 6px; }
+    .lc-btn{ padding:7px 14px; }
+    .ctrlrow{ column-gap:14px; }
+    .sliderpair, .checkpair, .radiogroup{ font-size:16px; }
+    .ctrlrow input[type=range]{ width:101px; flex-basis:101px; }
+    .sidecol > *{ flex:1 1 100%; }
+    .sidecol > canvas{ flex:0 0 auto; align-self:center; }
+    .optrow{ justify-content:flex-start; column-gap:16px; }
   }
 </style>
 </head>
 <body>
 <div id="app">
 
-  <div class="btnrow">
-    <button class="lc-btn" id="btnDirections" type="button">Directions</button>
-    <button class="lc-btn" id="btnDetails" type="button">Details</button>
-    <button class="lc-btn" id="btnAbout" type="button">About</button>
-  </div>
-  <div class="panel-anchor">
+  <div class="panel-anchor" id="panelAnchor">
 
     <div class="flyout" id="panelDirections" hidden>
       <button class="closeX" data-close="panelDirections" aria-label="Close">&times;</button>
       <h2>Directions</h2>
-      <p>This simulation shows the pressure&ndash;temperature (P&ndash;T) phase envelope of a fixed-composition binary
-      mixture (70 mol % methane, 30 mol % n-heptane), computed with the Peng&ndash;Robinson equation of state.
-      In the pink area in the pressure&ndash;temperature plot, retrograde condensation occurs &mdash; that is, when
-      the pressure is lowered at constant temperature, liquid condenses.</p>
+      <p>This simulation shows the pressure&ndash;temperature (P&ndash;T) phase envelope of a methane/n-heptane mixture of
+      fixed composition, calculated with the Peng&ndash;Robinson equation of state. Inside the envelope, vapor and liquid
+      coexist. At temperatures between the critical point and the cricondentherm, lowering the pressure at constant
+      temperature first <i>condenses</i> liquid: this is retrograde condensation. It happens in the pink region, which lies
+      between the upper dew-point curve and the curve of maximum liquid volume.</p>
       <ul>
-        <li><b>Drag the vertical dashed line</b> left or right (or use the <b>Temperature</b> slider) to choose an isotherm.</li>
-        <li><b>Drag the filled circle</b> up or down along that line (or use the <b>Pressure</b> slider) to change the pressure at fixed temperature.</li>
-        <li>The panel on the right reports the phase state, the liquid fraction, and (when two phases are present) the
-        methane mole fraction in each phase. The small cylinder sketches the liquid (blue, bottom) and vapor (top)
-        volumes in a constant-composition PVT cell.</li>
-        <li>The small plot shows liquid volume fraction versus pressure along the <i>current</i> isotherm &mdash; watch how
-        its shape changes as you move the temperature slider through the shaded band.</li>
-        <li>Choose a temperature inside the shaded pink band (between the critical point and the cricondentherm) and
-        press <b>Animate depressurization</b>. Starting from single-phase vapor at high pressure, watch liquid
-        <i>appear</i> as pressure falls, pass through a maximum, and then <i>disappear</i> again &mdash; all without ever
-        crossing a bubble-point curve. This is retrograde condensation.</li>
-        <li>For comparison, move the temperature below the critical point: the same isothermal depressurization now shows
-        the ordinary behavior &mdash; a single dew point, followed by a liquid fraction that decreases monotonically to zero.</li>
+        <li>Drag the dashed line (or use the temperature slider) to choose a temperature. Drag the large dot
+        (or use the pressure slider) to change the pressure. The cursor changes shape over the parts you can drag.</li>
+        <li>The dot is colored by phase: blue for single-phase liquid, orange for single-phase vapor, and dark red for
+        vapor + liquid. The bubble-point curve is blue and the dew-point curve is orange.</li>
+        <li>The panel at the right lists the phase, the liquid fraction by volume (the fraction of the cell volume filled by
+        liquid) and by moles, the methane mole fraction in each phase, and the phase densities. The cylinder shows the liquid
+        (blue, bottom) and vapor (pale orange, top) volumes in a closed cell. The small plot shows the liquid volume fraction along
+        the current path.</li>
+        <li>Choose a temperature between the critical point and the cricondentherm and press <b>animate depressurization</b>.
+        Starting from single-phase vapor at high pressure, liquid appears as the pressure falls, passes through a maximum
+        (on the curve of maximum liquid volume), and then vaporizes again at the lower dew point.</li>
+        <li>For comparison, choose a temperature below the critical point: the mixture is liquid at high pressure, reaches
+        its bubble point, and the liquid volume fraction then falls steadily to zero at the dew point.</li>
+        <li>Select <b>constant P</b> to move along an isobar instead; the button then reads <b>animate heating</b>. At a
+        pressure between the critical pressure and the cricondenbar, heating the liquid first vaporizes some of it and then
+        condenses it again (retrograde vaporization, pink region on that setting).</li>
+        <li>The methane mole fraction slider changes the feed composition; the envelope is recalculated when you release it.
+        Check <b>log P axis</b> to see the low-pressure dew curve, <b>quality lines</b> to show curves of constant liquid volume
+        percent (5, 10, 20, 40, 60 and 80 %), and <b>P&ndash;x&ndash;y diagram</b> to show the phase diagram at the current temperature.</li>
       </ul>
     </div>
 
     <div class="flyout" id="panelDetails" hidden>
       <button class="closeX" data-close="panelDetails" aria-label="Close">&times;</button>
       <h2>Details</h2>
-      <p><b>Retrograde condensation</b> For a mixture of two or more components, the dew-point curve on a P&ndash;T
-      diagram extends to temperatures above the mixture's critical temperature, out to the <i>cricondentherm</i> &mdash;
-      the highest temperature at which two phases can coexist. At any temperature between the critical temperature and
-      the cricondentherm, a vertical (constant-T) line crosses the dew curve <i>twice</i>: once at high pressure and
-      once at low pressure. Between those two dew points the mixture is two-phase.</p>
-      <p>Consider an isothermal depressurization starting as a single-phase vapor above the upper dew point. As pressure
-      falls, the mixture crosses the upper (retrograde) dew point and liquid begins to condense &mdash; even though the
-      pressure is decreasing, which is the opposite of ordinary intuition. The liquid volume fraction rises, reaches a
-      maximum, and then falls back to zero at the lower dew point, after which the system is single-phase vapor again.
-      This behavior, unique to multicomponent mixtures, is called <i>isothermal retrograde condensation</i>.</p>
-      <p><b>Key points on the envelope</b></p>
-      <ul>
-        <li><b>Cricondentherm</b> &mdash; highest temperature at which liquid and vapor can coexist (on the dew curve).</li>
-        <li><b>Cricondenbar</b> &mdash; highest pressure at which liquid and vapor can coexist.</li>
-        <li><b>Critical point</b> (<i>T<sub>c</sub></i>, <i>P<sub>c</sub></i>) &mdash; bubble and dew curves meet; liquid and vapor become identical.</li>
-      </ul>
-      <p><b>Peng&ndash;Robinson equation of state</b></p>
+      <p>For a mixture, the dew-point curve on a P&ndash;T diagram extends to temperatures above the mixture critical
+      temperature, out to the <i>cricondentherm</i>, the highest temperature at which two phases coexist. At a temperature
+      between the critical temperature and the cricondentherm, a vertical (constant-T) line crosses the dew curve twice. In
+      an isothermal depressurization from single-phase vapor, liquid condenses at the upper dew point even though the
+      pressure is decreasing (isothermal retrograde condensation). The liquid volume rises to a maximum and then falls back
+      to zero at the lower dew point. Retrograde condensation occurs only between the upper dew point and the pressure of
+      maximum liquid volume; the pink region is bounded by the upper dew-point curve and the curve of maximum liquid volume,
+      which runs from the critical point to the cricondentherm.</p>
+      <p>Similarly, when the critical point lies below the cricondenbar (the highest pressure at which two phases coexist),
+      heating a liquid at a pressure between the critical pressure and the cricondenbar crosses the bubble curve twice. Liquid
+      vaporizes, passes through a minimum liquid volume, and then <i>condenses</i> as the temperature continues to rise
+      (retrograde vaporization). The retrograde region for heating is bounded by the bubble curve and the curve of minimum
+      liquid volume along isobars.</p>
+      <p>The P&ndash;x&ndash;y diagram at the current temperature explains this behavior. The vapor (dew) curve, y versus P,
+      bends back toward lower methane fractions as it approaches the mixture critical point at the top of the loop. A
+      vertical line at the feed composition z<sub>1</sub> can therefore cross the dew curve twice.</p>
+      <p>Peng&ndash;Robinson equation of state:</p>
       <div class="eqwrap">
-        \[ P = \frac{RT}{V-b} - \frac{a\alpha}{V(V+b) + b(V-b)} \]
+        \[ P = \frac{RT}{\underline{V}-b} - \frac{a\alpha}{\underline{V}(\underline{V}+b) + b(\underline{V}-b)} \]
         \[ a_i = 0.45724\,\frac{R^2 T_{c,i}^2}{P_{c,i}}, \qquad b_i = 0.07780\,\frac{R T_{c,i}}{P_{c,i}} \]
-        \[ \alpha_i(T) = \Big[1 + \kappa_i\big(1-\sqrt{T/T_{c,i}}\big)\Big]^2, \qquad
+        \[ \alpha_i = \Big[1 + \kappa_i\big(1-\sqrt{T/T_{c,i}}\big)\Big]^2, \qquad
            \kappa_i = 0.37464 + 1.54226\,\omega_i - 0.26992\,\omega_i^2 \]
       </div>
-      <p><b>Mixing rules and fugacity coefficient</b> (van der Waals one-fluid, k<sub>ij</sub> = 0):</p>
+      <p>Mixing rules (van der Waals one-fluid, with k<sub>12</sub> = 0) and fugacity coefficient:</p>
       <div class="eqwrap">
-        \[ a_{mix} = \sum_i \sum_j x_i x_j \sqrt{a_i \alpha_i \, a_j \alpha_j}\,(1-k_{ij}), \qquad
-           b_{mix} = \sum_i x_i b_i \]
+        \[ (a\alpha)_{mix} = \sum_i \sum_j x_i x_j \sqrt{a_i \alpha_i \, a_j \alpha_j}\,(1-k_{ij}), \qquad b_{mix} = \sum_i x_i b_i \]
+        \[ \begin{aligned} \ln \hat\phi_i = {} & \frac{b_i}{b_{mix}}(Z-1) - \ln(Z-B) \\
+           & - \frac{A}{2\sqrt{2}\,B}\left(\frac{2\sum_j x_j\sqrt{a_i\alpha_i\,a_j\alpha_j}(1-k_{ij})}{(a\alpha)_{mix}} - \frac{b_i}{b_{mix}}\right)
+             \ln\!\left(\frac{Z+(1+\sqrt2)B}{Z+(1-\sqrt2)B}\right) \end{aligned} \]
+        \[ A = \frac{(a\alpha)_{mix}P}{R^2T^2}, \qquad B = \frac{b_{mix}P}{RT}, \qquad
+           K_i = \frac{y_i}{x_i} = \frac{\hat\phi_i^{\,L}}{\hat\phi_i^{\,V}} \]
       </div>
-      <div class="eqwrap">
-        \[ \ln \hat\phi_i = \frac{b_i}{b_{mix}}(Z-1) - \ln(Z-B)
-           - \frac{A}{2\sqrt{2}\,B}\left(\frac{2\sum_j x_j\sqrt{a_i\alpha_i\,a_j\alpha_j}(1-k_{ij})}{a_{mix}} - \frac{b_i}{b_{mix}}\right)
-             \ln\!\left(\frac{Z+(1+\sqrt2)B}{Z+(1-\sqrt2)B}\right) \]
-      </div>
-      <div class="eqwrap">
-        \[ A = \frac{a_{mix}P}{R^2T^2}, \qquad B = \frac{b_{mix}P}{RT}, \qquad
-           K_i = \frac{\hat\phi_i^{\,L}(x)}{\hat\phi_i^{\,V}(y)} \]
-      </div>
-      <p><b>Isothermal&ndash;isobaric flash (Rachford&ndash;Rice), binary case</b> For a binary feed with overall mole
-      fractions $z_1,z_2$, vapor fraction $V$ satisfies $\sum_i z_i(K_i-1)/[1+V(K_i-1)] = 0$, which for two components
-      reduces to a closed-form expression:</p>
+      <p>Flash calculation (Rachford&ndash;Rice, closed form for a binary): the vapor mole fraction V of the mixture is</p>
       <div class="eqwrap">
         \[ V = \frac{-\big[z_1(K_1-1) + z_2(K_2-1)\big]}{(K_1-1)(K_2-1)}, \qquad
            x_i = \frac{z_i}{1+V(K_i-1)}, \qquad y_i = K_i x_i \]
       </div>
-      <p>The simulation iterates this flash (updating $K_i$ from the Peng&ndash;Robinson fugacity coefficients each pass)
-      at whatever temperature and pressure you select, so every liquid fraction and phase composition shown is computed
-      directly from the equation of state &mdash; not read from a stored table.</p>
-      <p><b>Component constants used</b></p>
-      <ul>
-        <li>Methane: <i>T<sub>c</sub></i> = 190.6 K, <i>P<sub>c</sub></i> = 46.0 bar, <i>&omega;</i> = 0.011</li>
-        <li>n-Heptane: <i>T<sub>c</sub></i> = 540.2 K, <i>P<sub>c</sub></i> = 27.4 bar, <i>&omega;</i> = 0.351</li>
-      </ul>
-      <p id="computedNumbers">Computed for this mixture (z<sub>1</sub> = 0.70): critical point, cricondentherm, and
-      cricondenbar values are shown once the diagram loads.</p>
+      <p>The K values are updated from the fugacity coefficients until the fugacities of each component are equal in the two
+      phases (successive substitution, finished with Newton's method near the critical point). Every value shown is calculated
+      from the equation of state at the selected temperature and pressure; a dash is shown if the calculation does not converge.</p>
+      <p>Liquid volume fraction: both phases are at the same T and P, so the molar volume of each phase is ZRT/P and</p>
+      <div class="eqwrap">
+        \[ \text{liquid volume fraction} = \frac{(1-V)\,Z_L}{(1-V)\,Z_L + V Z_V} \]
+        \[ \rho_L = \frac{P\,(x_1 M_1 + x_2 M_2)}{Z_L R T}, \qquad \rho_V = \frac{P\,(y_1 M_1 + y_2 M_2)}{Z_V R T} \]
+      </div>
+      <p>The liquid is much denser than the vapor, so the liquid volume fraction is much smaller than the liquid mole fraction,
+      except near the critical point, where the two densities approach each other. Quality lines are curves of constant liquid
+      volume fraction; they all meet at the critical point.</p>
+      <p>Constants: methane T<sub>c</sub> = 190.6 K, P<sub>c</sub> = 46.0 bar, &omega; = 0.011, M = 16.04 g/mol;
+      n-heptane T<sub>c</sub> = 540.2 K, P<sub>c</sub> = 27.4 bar, &omega; = 0.351, M = 100.20 g/mol.</p>
+      <p id="computedNumbers"></p>
+      <p><b>Symbols</b></p>
+      <div class="symlist">
+        <div><b>a, b</b> = equation-of-state parameters</div>
+        <div><b>A, B</b> = dimensionless equation-of-state parameters</div>
+        <div><b>k<sub>ij</sub></b> = binary interaction parameter</div>
+        <div><b>K<sub>i</sub></b> = vapor&ndash;liquid equilibrium ratio of component i</div>
+        <div><b>M<sub>i</sub></b> = molecular weight of component i (kg/mol)</div>
+        <div><b>P</b> = pressure (Pa)</div>
+        <div><b>P<sub>c</sub></b> = critical pressure (Pa)</div>
+        <div><b>R</b> = gas constant (8.314 J/(mol K))</div>
+        <div><b>T</b> = temperature (K)</div>
+        <div><b>T<sub>c</sub></b> = critical temperature (K)</div>
+        <div><b><u>V</u></b> = molar volume (m<sup>3</sup>/mol)</div>
+        <div><b>V</b> = vapor mole fraction of the mixture</div>
+        <div><b>x<sub>i</sub></b> = mole fraction of component i in the liquid</div>
+        <div><b>y<sub>i</sub></b> = mole fraction of component i in the vapor</div>
+        <div><b>z<sub>i</sub></b> = mole fraction of component i in the feed</div>
+        <div><b>Z</b> = compressibility factor</div>
+        <div><b>&alpha;, &kappa;</b> = temperature-dependence terms in the equation of state</div>
+        <div><b>&rho;</b> = density (kg/m<sup>3</sup>)</div>
+        <div><b>&phi;&#770;<sub>i</sub></b> = fugacity coefficient of component i</div>
+        <div><b>&omega;</b> = acentric factor</div>
+        <div><b>subscripts</b> = 1 = methane, 2 = n-heptane, L = liquid, V = vapor, mix = mixture</div>
+      </div>
     </div>
 
     <div class="flyout" id="panelAbout" hidden>
@@ -361,284 +404,623 @@ input[type="range"]::-moz-range-thumb{
   </div>
 
   <div class="simwrap">
-    <div id="loadMsg" class="loadmsg">Computing the phase envelope with the Peng&ndash;Robinson equation of state&hellip;</div>
+    <div id="loadMsg" class="loadmsg">Calculating the phase envelope with the Peng&ndash;Robinson equation of state&hellip;</div>
     <div class="simgrid" id="simGrid" hidden>
-      <div class="diagramcol">
-        <canvas id="ptCanvas" width="640" height="480"></canvas>
+      <div class="btnrow" id="btnRow">
+        <button class="lc-btn" id="btnDirections" type="button">Directions</button>
+        <button class="lc-btn" id="btnDetails" type="button">Details</button>
+        <button class="lc-btn" id="btnAbout" type="button">About</button>
       </div>
-      <div class="sidecol">
-        <canvas id="qualCanvas" width="300" height="238"></canvas>
-        <div style="display:flex; gap:12px; align-items:flex-start;">
-          <canvas id="cellCanvas" width="90" height="221"></canvas>
-          <div class="readout" id="readout" style="flex:1;">
+      <div class="diagramcol" id="diagramCol">
+        <canvas id="ptCanvas"></canvas>
+        <div class="busy" id="busyMsg" hidden><span>calculating the envelope&hellip;</span></div>
+        <div class="ctrlrow optrow" id="optRow">
+          <div class="radiogroup" role="radiogroup">
+            <label><input type="radio" name="pathMode" value="T" checked> constant T</label>
+            <label><input type="radio" name="pathMode" value="P"> constant P</label>
+          </div>
+          <button class="animbtn" id="animBtn" type="button">animate depressurization</button>
+          <div class="checkpair"><label><input type="checkbox" id="chkLog"> log P axis</label></div>
+          <div class="checkpair"><label><input type="checkbox" id="chkQual"> quality lines</label></div>
+          <div class="checkpair"><label><input type="checkbox" id="chkPxy"> P&ndash;x&ndash;y diagram</label></div>
+        </div>
+        <div class="ctrlrow sliderrow" id="controlsWrap">
+          <div class="sliderpair">
+            <label for="Tslider">temperature</label>
+            <input type="range" id="Tslider" min="0" max="1000" value="500">
+            <span class="readoutnum" id="TsliderVal">&ndash;</span>
+          </div>
+          <div class="sliderpair">
+            <label for="Pslider">pressure</label>
+            <input type="range" id="Pslider" min="0" max="1000" value="500">
+            <span class="readoutnum" id="PsliderVal">&ndash;</span>
+          </div>
+          <div class="sliderpair">
+            <label for="Zslider">methane mole fraction</label>
+            <input type="range" id="Zslider" min="30" max="80" step="5" value="70">
+            <span class="readoutnum" id="ZsliderVal">0.70</span>
+          </div>
+        </div>
+      </div>
+      <div class="sidecol" id="sideCol">
+        <canvas id="qualCanvas"></canvas>
+        <div class="cellrow">
+          <canvas id="cellCanvas"></canvas>
+          <div class="readout" id="readout">
             <div class="row"><span class="lab">temperature</span><span class="val" id="roT">&ndash;</span></div>
             <div class="row"><span class="lab">pressure</span><span class="val" id="roP">&ndash;</span></div>
-            <div class="row" style="margin-top:6px;"><span class="lab">phase</span><span id="roPhase" class="phasepill">&ndash;</span></div>
-            <div class="row" style="margin-top:6px;"><span class="lab">liquid fraction</span><span class="val" id="roL">&ndash;</span></div>
-            <div class="row"><span class="lab">x<sub>methane</sub> (liquid)</span><span class="val" id="roX">&ndash;</span></div>
+            <div class="row gap"><span class="lab" id="roPhase">&ndash;</span></div>
+            <div class="row gap"><span class="lab">liquid fraction</span></div>
+            <div class="row"><span class="lab ind">by volume</span><span class="val" id="roLv">&ndash;</span></div>
+            <div class="row"><span class="lab ind">by moles</span><span class="val" id="roLm">&ndash;</span></div>
+            <div class="row gap"><span class="lab">x<sub>methane</sub> (liquid)</span><span class="val" id="roX">&ndash;</span></div>
             <div class="row"><span class="lab">y<sub>methane</sub> (vapor)</span><span class="val" id="roY">&ndash;</span></div>
+            <div class="row gap"><span class="lab">density (kg/m<sup>3</sup>)</span></div>
+            <div class="row"><span class="lab ind">liquid</span><span class="val" id="roRhoL">&ndash;</span></div>
+            <div class="row"><span class="lab ind">vapor</span><span class="val" id="roRhoV">&ndash;</span></div>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="controls" id="controlsWrap" hidden>
-      <div class="ctrlrow single-line">
-        <div class="sliderpair">
-          <label for="Tslider">temperature, T</label>
-          <input type="range" id="Tslider" class="shortslider" min="0" max="1000" value="700">
-          <span class="readoutnum" id="TsliderVal">&ndash;</span>
-        </div>
-        <div class="sliderpair">
-          <label for="Pslider">pressure, P</label>
-          <input type="range" id="Pslider" class="shortslider" min="0" max="1000" value="500">
-          <span class="readoutnum" id="PsliderVal">&ndash;</span>
-        </div>
-        <button class="animbtn" id="animBtn" type="button">animate depressurization &darr;P</button>
-      </div>
-    </div>
+    <div class="pxywrap"><canvas id="pxyCanvas" hidden></canvas></div>
   </div>
-
-  <div class="footer-credit">LearnChemE &middot; Department of Chemical and Biological Engineering, University of Colorado Boulder</div>
 </div>
 
 <script>
 /* =========================================================================
-   PENG-ROBINSON EOS — binary flash engine (methane(1) / n-heptane(2))
+   PENG-ROBINSON EOS: binary flash engine (methane (1) / n-heptane (2))
    ========================================================================= */
 const R_GAS = 8.314462618;
 const COMP_Tc = [190.56, 540.2];      // K
 const COMP_Pc = [4599000.0, 2740000.0]; // Pa
 const COMP_w  = [0.011, 0.351];
 const KIJ = 0.0;
-const Z_FEED = [0.70, 0.30];
+const M_W = [0.016043, 0.100204]; // kg/mol (methane, n-heptane)
 
 function prAB(T){
   const kappa = COMP_w.map(wi => 0.37464 + 1.54226*wi - 0.26992*wi*wi);
   const alpha = kappa.map((k,i)=> Math.pow(1 + k*(1-Math.sqrt(T/COMP_Tc[i])), 2));
   const a = alpha.map((al,i)=> 0.45724*Math.pow(R_GAS*COMP_Tc[i],2)/COMP_Pc[i]*al);
   const b = COMP_Tc.map((tci,i)=> 0.07780*R_GAS*tci/COMP_Pc[i]);
-  return {a,b};
+  return {a, b, a01: Math.sqrt(a[0]*a[1])*(1-KIJ)};
 }
-function cubicRealRoots(c2,c1,c0){
-  const b=c2, c=c1, d=c0;
-  const p = (3*c - b*b)/3;
-  const q = (2*b*b*b - 9*b*c + 27*d)/27;
-  const offset = b/3;
-  const disc = (q*q/4) + (p*p*p/27);
-  let roots;
-  if (disc > 1e-14){
-    const sq = Math.sqrt(disc);
-    const u1 = Math.cbrt(-q/2 + sq), u2 = Math.cbrt(-q/2 - sq);
-    roots = [u1+u2-offset];
-  } else if (disc < -1e-14){
-    const r = Math.sqrt(-p*p*p/27);
-    const phi = Math.acos(Math.max(-1,Math.min(1,-q/(2*r))));
-    const m = 2*Math.sqrt(-p/3);
-    roots = [ m*Math.cos(phi/3)-offset, m*Math.cos((phi+2*Math.PI)/3)-offset, m*Math.cos((phi+4*Math.PI)/3)-offset ];
-  } else {
-    const u = Math.cbrt(-q/2);
-    roots = [2*u-offset, -u-offset];
-  }
-  return roots;
-}
+// real roots of Z^3 + c2 Z^2 + c1 Z + c0 = 0; returns the largest (vapor) or smallest (liquid)
+// root greater than B, polished with Newton steps (Cardano's formula loses relative accuracy
+// in Z - B for the dense liquid root at low pressure, which would put noise into ln phi)
 function solveZ(A,B,phase){
   const c2=-(1-B), c1=A-3*B*B-2*B, c0=-(A*B-B*B-B*B*B);
-  let roots = cubicRealRoots(c2,c1,c0).filter(r=>r>B+1e-12);
-  if (roots.length===0) roots = cubicRealRoots(c2,c1,c0);
-  return phase==='vapor'? Math.max(...roots) : Math.min(...roots);
+  const p = (3*c1 - c2*c2)/3;
+  const q = (2*c2*c2*c2 - 9*c2*c1 + 27*c0)/27;
+  const off = c2/3;
+  const disc = (q*q/4) + (p*p*p/27);
+  let Z;
+  if (disc > 1e-14){
+    const sq = Math.sqrt(disc);
+    Z = Math.cbrt(-q/2 + sq) + Math.cbrt(-q/2 - sq) - off;
+  } else {
+    let r0, r1, r2;
+    if (disc < -1e-14){
+      const r = Math.sqrt(-p*p*p/27);
+      const ph = Math.acos(Math.max(-1,Math.min(1,-q/(2*r))));
+      const m = 2*Math.sqrt(-p/3);
+      r0 = m*Math.cos(ph/3)-off; r1 = m*Math.cos((ph+2*Math.PI)/3)-off; r2 = m*Math.cos((ph+4*Math.PI)/3)-off;
+    } else {
+      const u = Math.cbrt(-q/2);
+      r0 = 2*u-off; r1 = -u-off; r2 = r1;
+    }
+    const lim = B+1e-12;
+    let best = null;
+    for (const r of [r0,r1,r2]){
+      if (!(r>lim)) continue;
+      if (best===null || (phase==='vapor' ? r>best : r<best)) best=r;
+    }
+    if (best===null) best = phase==='vapor' ? Math.max(r0,r1,r2) : Math.min(r0,r1,r2);
+    Z = best;
+  }
+  for (let k=0;k<3;k++){
+    const f = ((Z + c2)*Z + c1)*Z + c0;
+    const fp = (3*Z + 2*c2)*Z + c1;
+    if (fp===0) break;
+    const Zn = Z - f/fp;
+    if (!(Zn>B)) break;
+    Z = Zn;
+  }
+  return Z;
+}
+// ln(phi_i) for a binary at mole fractions (x0, 1-x0); returns [lnphi0, lnphi1, Z]
+function lnPhiBin(T,P,x0,ab,phase){
+  const a0=ab.a[0], a1=ab.a[1], b0=ab.b[0], b1=ab.b[1], a01=ab.a01;
+  const x1=1-x0;
+  const amix = x0*x0*a0 + 2*x0*x1*a01 + x1*x1*a1;
+  const bmix = x0*b0 + x1*b1;
+  const RT = R_GAS*T;
+  const A = amix*P/(RT*RT), B = bmix*P/RT;
+  const Z = solveZ(A,B,phase);
+  const lg = Math.log(Math.max(Z-B,1e-300));
+  const lr = Math.log((Z+(1+Math.SQRT2)*B)/(Z+(1-Math.SQRT2)*B));
+  const k = A/(2*Math.SQRT2*B);
+  const s0 = x0*a0 + x1*a01, s1 = x0*a01 + x1*a1;
+  return [ (b0/bmix)*(Z-1) - lg - k*(2*s0/amix - b0/bmix)*lr,
+           (b1/bmix)*(Z-1) - lg - k*(2*s1/amix - b1/bmix)*lr, Z ];
 }
 function fugacityCoeff(T,P,x,ab,phase){
-  const {a,b} = ab;
-  const n=x.length;
-  let amix=0;
-  for (let i=0;i<n;i++) for (let j=0;j<n;j++) amix += x[i]*x[j]*Math.sqrt(a[i]*a[j])*(1-KIJ);
-  let bmix=0; for (let i=0;i<n;i++) bmix += x[i]*b[i];
-  const A = amix*P/((R_GAS*T)*(R_GAS*T));
-  const B = bmix*P/(R_GAS*T);
-  const Z = solveZ(A,B,phase);
-  const lnphi = new Array(n);
-  for (let i=0;i<n;i++){
-    let s=0; for (let j=0;j<n;j++) s += x[j]*Math.sqrt(a[i]*a[j])*(1-KIJ);
-    lnphi[i] = (b[i]/bmix)*(Z-1) - Math.log(Math.max(Z-B,1e-12))
-      - (A/(2*Math.SQRT2*B))*(2*s/amix - b[i]/bmix)
-        * Math.log((Z+(1+Math.SQRT2)*B)/(Z+(1-Math.SQRT2)*B));
-  }
-  return {phi: lnphi.map(Math.exp), Z};
+  const r = lnPhiBin(T,P,x[0],ab,phase);
+  return {phi:[Math.exp(r[0]),Math.exp(r[1])], Z:r[2]};
 }
 function wilsonK(T,P){
   return COMP_Tc.map((tci,i)=> (COMP_Pc[i]/P)*Math.exp(5.373*(1+COMP_w[i])*(1-tci/T)) );
 }
+// One successive-substitution map: given ln K, do the binary Rachford-Rice flash and
+// return updated ln K from the PR fugacity coefficients (plus phase info).
+function ssMap(T,P,z,ab,lnK){
+  const K0=Math.exp(lnK[0]), K1=Math.exp(lnK[1]);
+  const denom=(K0-1)*(K1-1);
+  if (!isFinite(denom) || Math.abs(denom)<1e-14) return null;
+  const V = -(z[0]*(K0-1)+z[1]*(K1-1))/denom;
+  const Vc = Math.min(Math.max(V,-1.0),2.0);
+  let x0 = z[0]/(1+Vc*(K0-1)), x1 = z[1]/(1+Vc*(K1-1));
+  if (!(x0>0) || !(x1>0)) return null;
+  let sx=x0+x1; x0/=sx; x1/=sx;
+  let y0=K0*x0, y1=K1*x1; const sy=y0+y1; y0/=sy; y1/=sy;
+  const fl = lnPhiBin(T,P,x0,ab,'liquid');
+  const fv = lnPhiBin(T,P,y0,ab,'vapor');
+  const g=[fl[0]-fv[0], fl[1]-fv[1]];
+  if (!isFinite(g[0])||!isFinite(g[1])) return null;
+  return {g, V, x:[x0,x1], y:[y0,y1], ZL:fl[2], ZV:fv[2]};
+}
+// Flash: successive substitution with dominant-eigenvalue acceleration, then Newton
+// (finite-difference Jacobian) if SS has not converged. conv=true only when the
+// fugacity equations are satisfied to tol.
 function flashBinary(T,P,z,Kinit,maxit,tol){
-  maxit = maxit||300; tol = tol||1e-9;
+  maxit = maxit||300; tol = tol||1e-11;
   const ab = prAB(T);
-  let K = Kinit.slice();
-  let V=0.5, x=null, y=null, it=0;
+  let lnK = Kinit.map(Math.log);
+  let m=null, dPrev=null, it=0, errPrev=Infinity;
+  const done = (conv)=> m? {V:m.V,K:lnK.map(Math.exp),x:m.x,y:m.y,ZL:m.ZL,ZV:m.ZV,it,conv}
+                         : {V:null,K:lnK.map(Math.exp),x:null,y:null,it,conv:false};
   for (it=0; it<maxit; it++){
-    const K1=K[0], K2=K[1];
-    const denom=(K1-1)*(K2-1);
-    if (Math.abs(denom)<1e-14) return {V:null,K,x:null,y:null,it};
-    V = -(z[0]*(K1-1)+z[1]*(K2-1))/denom;
-    const Vc = Math.min(Math.max(V,-1.0),2.0);
-    x = z.map((zi,i)=> zi/(1+Vc*(K[i]-1)));
-    if (x.some(v=>v<=0)) return {V:null,K,x:null,y:null,it};
-    let sx=x.reduce((a,b)=>a+b,0); x=x.map(v=>v/sx);
-    y = x.map((xi,i)=> K[i]*xi);
-    if (y.some(v=>v<=0)) return {V:null,K,x:null,y:null,it};
-    let sy=y.reduce((a,b)=>a+b,0); y=y.map(v=>v/sy);
-    const {phi:phiL} = fugacityCoeff(T,P,x,ab,'liquid');
-    const {phi:phiV} = fugacityCoeff(T,P,y,ab,'vapor');
-    const Knew = phiL.map((v,i)=> v/phiV[i]);
-    let err=0; for (let i=0;i<K.length;i++) err=Math.max(err, Math.abs(Knew[i]/K[i]-1));
-    K = Knew;
-    if (err<tol) break;
+    m = ssMap(T,P,z,ab,lnK);
+    if (!m) return {V:null,K:lnK.map(Math.exp),x:null,y:null,it,conv:false};
+    const d=[m.g[0]-lnK[0], m.g[1]-lnK[1]];
+    const err=Math.max(Math.abs(d[0]),Math.abs(d[1]));
+    if (err<tol){ return done(true); }
+    // stalled at the round-off floor (err no longer falling): let Newton finish
+    if (err<1e-9 && err>0.5*errPrev) break;
+    // slow linear convergence (near a phase boundary or the critical point): switch to Newton
+    if (it>=30 && err>0.7*errPrev) break;
+    errPrev=err;
+    lnK=m.g;
+    if (Math.max(Math.abs(lnK[0]),Math.abs(lnK[1]))<1e-6) return done(false); // collapsing to trivial solution
+    if (dPrev && it%5===4){
+      const lam=(d[0]*dPrev[0]+d[1]*dPrev[1])/(dPrev[0]*dPrev[0]+dPrev[1]*dPrev[1]);
+      if (lam>0 && lam<0.999){ const s=lam/(1-lam); lnK=[lnK[0]+s*d[0], lnK[1]+s*d[1]]; }
+    }
+    dPrev=d;
   }
-  return {V,K,x,y,it};
+  // Newton on F(lnK) = g(lnK) - lnK
+  for (let k=0;k<40;k++,it++){
+    m = ssMap(T,P,z,ab,lnK);
+    if (!m) return {V:null,K:lnK.map(Math.exp),x:null,y:null,it,conv:false};
+    const F=[m.g[0]-lnK[0], m.g[1]-lnK[1]];
+    const errN=Math.max(Math.abs(F[0]),Math.abs(F[1]));
+    // Newton converges quadratically, so 1e-9 here is converged to round-off
+    if (errN<Math.max(tol,1e-9)) return done(true);
+    const J=[[0,0],[0,0]];
+    for (let j=0;j<2;j++){
+      const h=1e-7*Math.max(1,Math.abs(lnK[j]));
+      const lp=lnK.slice(); lp[j]+=h;
+      const mp=ssMap(T,P,z,ab,lp);
+      if (!mp) return done(false);
+      for (let i=0;i<2;i++) J[i][j]=((mp.g[i]-lp[i])-F[i])/h;
+    }
+    const det=J[0][0]*J[1][1]-J[0][1]*J[1][0];
+    if (!isFinite(det) || Math.abs(det)<1e-300) return done(false);
+    let dx=[(-F[0]*J[1][1]+F[1]*J[0][1])/det, (-J[0][0]*F[1]+J[1][0]*F[0])/det];
+    const step=Math.max(Math.abs(dx[0]),Math.abs(dx[1]));
+    if (step>0.5) dx=dx.map(v=>v*0.5/step);
+    lnK=[lnK[0]+dx[0], lnK[1]+dx[1]];
+    if (Math.max(Math.abs(lnK[0]),Math.abs(lnK[1]))<1e-6) return done(false);
+  }
+  m = ssMap(T,P,z,ab,lnK);
+  return done(false);
+}
+// Liquid VOLUME fraction from a converged flash: liquid moles (1-V) times molar volume
+// Z_L RT/P, divided by total volume. RT/P cancels, so only the two Z values are needed.
+function liqVolFrac(r){
+  const L=1-r.V;
+  return L*r.ZL/(L*r.ZL + r.V*r.ZV);
 }
 function isTwoPhase(T,P,z,Kwarm){
   const r = flashBinary(T,P,z,Kwarm);
-  if (r.V===null) return {ok:false,K:Kwarm};
-  const trivial = Math.max(...r.K.map(k=>Math.abs(k-1))) < 1e-3;
+  if (r.V===null || !r.conv) return {ok:false,K:Kwarm};
+  const trivial = Math.max(...r.K.map(k=>Math.abs(Math.log(k)))) < 1e-4;
   const ok = r.V>0 && r.V<1 && !trivial;
   return {ok, K: ok? r.K : Kwarm};
 }
-function findBounds(T,z,Pguess,Plo,Phi){
-  Plo = Plo||1e2; Phi = Phi||260e5;
+function findBounds(T,z,Pguess,Plo,Phi,hint){
+  Plo = Plo||10; Phi = Phi||500e5;
   let Kw = wilsonK(T,Pguess);
-  const n=60;
-  const Ps=[]; for (let j=0;j<n;j++) Ps.push(Plo*Math.pow(Phi/Plo, j/(n-1)));
+  const tp = (P,K)=>{ let r=isTwoPhase(T,P,z,K); if (!r.ok) r=isTwoPhase(T,P,z,wilsonK(T,P)); return r; };
+  let Ps, n;
+  if (hint){
+    // start from a nearby envelope (previous temperature): short local grids
+    Ps=null;
+  }
+  n=60;
+  Ps=[]; for (let j=0;j<n;j++) Ps.push(Plo*Math.pow(Phi/Plo, j/(n-1)));
+  if (hint && hint.Pmax/hint.Pmin>1.25){
+    // local brackets around the boundaries of a nearby envelope
+    const Pm=Math.sqrt(hint.Pmin*hint.Pmax);
+    const rm=tp(Pm,Kw);
+    if (rm.ok){
+      const bis=(inside,outside,K)=>{
+        for (let it=0; it<20; it++){
+          const mid=Math.sqrt(inside*outside);
+          const r=isTwoPhase(T,mid,z,K);
+          if (r.ok){ inside=mid; K=r.K; } else outside=mid;
+        }
+        return inside;
+      };
+      let res=[null,null];
+      // lower boundary
+      {
+        const fin=Math.min(Math.sqrt(hint.Pmin*Pm), hint.Pmin*1.15), fout=Math.max(Plo,hint.Pmin*0.87);
+        const ri=tp(fin,rm.K), ro=isTwoPhase(T,fout,z,ri.ok?ri.K:rm.K);
+        if (ri.ok && !ro.ok) res[0]=bis(fin,fout,ri.K);
+      }
+      {
+        const fin=Math.max(Math.sqrt(hint.Pmax*Pm), hint.Pmax*0.87), fout=Math.min(Phi,hint.Pmax*1.15);
+        const ri=tp(fin,rm.K), ro=isTwoPhase(T,fout,z,ri.ok?ri.K:rm.K);
+        if (ri.ok && !ro.ok) res[1]=bis(fin,fout,ri.K);
+      }
+      if (res[0]!==null && res[1]!==null) return {Pmin:res[0], Pmax:res[1]};
+    }
+  }
   let insideIdx=-1;
-  for (let j=0;j<n;j++){
-    const r = isTwoPhase(T,Ps[j],z,Kw);
-    if (r.ok){ insideIdx=j; Kw=r.K; break; }
+  if (hint){
+    const Pm=Math.sqrt(hint.Pmin*hint.Pmax);
+    const r=tp(Pm,Kw);
+    if (r.ok){ Kw=r.K; insideIdx=0; while (insideIdx<n-1 && Ps[insideIdx+1]<Pm) insideIdx++; }
+  }
+  if (insideIdx===-1){
+    for (let j=0;j<n;j++){
+      const r = tp(Ps[j],Kw);
+      if (r.ok){ insideIdx=j; Kw=r.K; break; }
+    }
   }
   if (insideIdx===-1) return null;
-  let lo = insideIdx>0?Ps[insideIdx-1]:Plo, hi=Ps[insideIdx];
-  for (let it=0; it<40; it++){
-    const mid=(lo+hi)/2;
+  // walk down to the first non-two-phase grid point
+  const Kmid=Kw.slice();
+  let j1=insideIdx;
+  while (j1>0){ const r=tp(Ps[j1-1],Kw); if (!r.ok) break; Kw=r.K; j1--; }
+  let lo = j1>0?Ps[j1-1]:Plo, hi=Ps[j1];
+  for (let it=0; it<34; it++){
+    const mid=Math.sqrt(lo*hi);
     const r = isTwoPhase(T,mid,z,Kw);
-    if (r.ok) hi=mid; else lo=mid;
+    if (r.ok){ hi=mid; Kw=r.K; } else lo=mid;
   }
   const Pmin=hi;
+  Kw=Kmid;
   let j2=insideIdx;
   while (j2<n-1){
-    const r = isTwoPhase(T,Ps[j2+1],z,Kw);
+    const r = tp(Ps[j2+1],Kw);
     if (!r.ok) break;
     Kw=r.K; j2++;
   }
   let lo2=Ps[j2], hi2 = j2+1<n?Ps[j2+1]:Phi;
-  for (let it=0; it<40; it++){
-    const mid=(lo2+hi2)/2;
+  for (let it=0; it<34; it++){
+    const mid=Math.sqrt(lo2*hi2);
     const r = isTwoPhase(T,mid,z,Kw);
-    if (r.ok) lo2=mid; else hi2=mid;
+    if (r.ok){ lo2=mid; Kw=r.K; } else hi2=mid;
   }
   const Pmax=lo2;
   return {Pmin,Pmax};
 }
 
 /* =========================================================================
-   PAGE-LOAD PHYSICS SETUP: envelope table + critical point + cricondentherm
-   + cricondenbar, all computed live from the EOS.
+   ENVELOPE AND DERIVED CURVES for a feed of methane mole fraction z1
    ========================================================================= */
-const PHYS = { envelope: [], Tc:null, Pc:null, Tct:null, Pct:null, Tcb:null, Pcb:null,
-               Tmin:200, Tmax:495 };
-
-function computeEnvelope(){
-  const z = Z_FEED;
-  const pts = [];
-  let Tlo=200, Thi=490;
-  // bisection to find cricondentherm (largest T with a valid two-phase region)
-  {
-    let lo=440, hi=490;
-    while (hi-lo>0.05){
-      const m=(lo+hi)/2;
-      const b=findBounds(m,z,90e5);
-      if (b) lo=m; else hi=m;
-    }
-    const b = findBounds(lo,z,90e5);
-    PHYS.Tct = lo; PHYS.Pct = (b.Pmin+b.Pmax)/2;
-  }
-  const Tmax = PHYS.Tct;
-  PHYS.Tmax = Math.min(495, Tmax+14);
-
-  // envelope table from 200 K up to just past cricondentherm
-  for (let T=200; T<=Tmax+0.6; T+=2){
-    const Tc_ = Math.min(T, Tmax-0.05);
-    const b = findBounds(Tc_, z, 60e5);
-    if (b) pts.push({T:Tc_, Pmin:b.Pmin, Pmax:b.Pmax});
-  }
-  // make sure the very tip (cricondentherm) is included
-  pts.push({T:Tmax, Pmin:PHYS.Pct, Pmax:PHYS.Pct});
-  pts.sort((a,b)=>a.T-b.T);
-  PHYS.envelope = pts;
-
-  // cricondenbar: max of Pmax over table
-  let best=pts[0];
-  for (const p of pts) if (p.Pmax>best.Pmax) best=p;
-  PHYS.Tcb = best.T; PHYS.Pcb = best.Pmax;
-
-  // critical point: bisect for where the liquid fraction near the Pmax
-  // boundary stops rising monotonically toward the boundary (bubble -> dew)
-  function turnedOver(T){
-    const b = findBounds(T,z,120e5);
-    if (!b) return null;
-    const P1 = b.Pmin+0.97*(b.Pmax-b.Pmin);
-    const P2 = b.Pmin+0.99*(b.Pmax-b.Pmin);
-    let Kw = wilsonK(T,P1);
-    const r1 = flashBinary(T,P1,z,Kw,500,1e-12);
-    if (r1.V===null) return null;
-    Kw = r1.K;
-    const r2 = flashBinary(T,P2,z,Kw,500,1e-12);
-    if (r2.V===null) return null;
-    return (1-r2.V) < (1-r1.V);
-  }
-  let lo=Math.max(300,Tmax-160), hi=Tmax-1;
-  // find a lo where turnedOver is false
-  while (turnedOver(lo)!==false && lo>210) lo -= 20;
-  for (let it=0; it<28; it++){
-    const mid=(lo+hi)/2;
-    const t = turnedOver(mid);
-    if (t===null){ hi=mid; continue; }
-    if (t) hi=mid; else lo=mid;
-  }
-  const bc = findBounds(lo,z,120e5);
-  PHYS.Tc = lo; PHYS.Pc = bc.Pmax;
-}
-
-function envelopeAt(T){
-  const pts = PHYS.envelope;
+function interpEnv(pts,T){
   if (T<=pts[0].T) return {Pmin:pts[0].Pmin, Pmax:pts[0].Pmax};
-  if (T>=pts[pts.length-1].T) return {Pmin:pts[pts.length-1].Pmin, Pmax:pts[pts.length-1].Pmax};
-  for (let i=0;i<pts.length-1;i++){
-    if (T>=pts[i].T && T<=pts[i+1].T){
-      const f=(T-pts[i].T)/(pts[i+1].T-pts[i].T);
-      return {
-        Pmin: pts[i].Pmin+f*(pts[i+1].Pmin-pts[i].Pmin),
-        Pmax: pts[i].Pmax+f*(pts[i+1].Pmax-pts[i].Pmax)
-      };
+  const n=pts.length;
+  if (T>=pts[n-1].T) return {Pmin:pts[n-1].Pmin, Pmax:pts[n-1].Pmax};
+  let lo=0, hi=n-1;
+  while (hi-lo>1){ const m=(lo+hi)>>1; if (pts[m].T<=T) lo=m; else hi=m; }
+  const a=pts[lo], b=pts[hi], f=(T-a.T)/(b.T-a.T);
+  return {Pmin:a.Pmin+f*(b.Pmin-a.Pmin), Pmax:a.Pmax+f*(b.Pmax-a.Pmax)};
+}
+
+// upper boundary is a dew point (true) or bubble point (false): just inside it the
+// mixture is almost all vapor (V near 1) on a dew curve and almost all liquid on a bubble curve
+function upperIsDew(T,z,hint){
+  const b = findBounds(T,z,120e5,null,null,hint);
+  if (!b) return null;
+  // march from the middle of the two-phase range toward the upper boundary (warm starts)
+  let K = wilsonK(T,Math.sqrt(b.Pmin*b.Pmax)), r=null;
+  for (const f of [0.5,0.2,0.05,0.01,1e-3,1e-4]){
+    const P = b.Pmax - f*(b.Pmax-b.Pmin);
+    r = flashBinary(T,P,z,K,2000,1e-12);
+    if (r.V===null || !r.conv) return null;
+    K = r.K;
+  }
+  return r.V > 0.5;
+}
+
+// liquid volume fraction profile along an isotherm (n interior points)
+function isothermProfile(T,z,b,n){
+  const out=[];
+  let K = wilsonK(T,(b.Pmin+b.Pmax)/2);
+  const mid=Math.floor(n/2);
+  const Ps=[]; for (let i=0;i<n;i++) Ps.push(b.Pmin+(b.Pmax-b.Pmin)*(i+0.5)/n);
+  const L=new Array(n).fill(null);
+  let Kf=K.slice();
+  for (let i=mid;i<n;i++){ const r=flashBinary(T,Ps[i],z,Kf,300,1e-11); if (r.conv&&r.V>0&&r.V<1){ Kf=r.K; L[i]=liqVolFrac(r);} }
+  let Kb=K.slice();
+  for (let i=mid-1;i>=0;i--){ const r=flashBinary(T,Ps[i],z,Kb,300,1e-11); if (r.conv&&r.V>0&&r.V<1){ Kb=r.K; L[i]=liqVolFrac(r);} }
+  for (let i=0;i<n;i++) if (L[i]!==null) out.push({P:Ps[i], L:L[i]});
+  return out;
+}
+
+function lvAt(T,P,z,Kw){
+  const r=flashBinary(T,P,z,Kw||wilsonK(T,P),2000,1e-12);
+  if (r.V===null || !r.conv || !(r.V>0 && r.V<1)) return null;
+  return {L:liqVolFrac(r), K:r.K};
+}
+
+// golden-section search for an extremum of the liquid volume fraction between a and c
+function goldenExt(fun,a,c,sign){
+  const g=(Math.sqrt(5)-1)/2;
+  let x1=c-g*(c-a), x2=a+g*(c-a), f1=sign*fun(x1), f2=sign*fun(x2);
+  for (let it=0; it<36; it++){
+    if (f1>f2){ c=x2; x2=x1; f2=f1; x1=c-g*(c-a); f1=sign*fun(x1); }
+    else { a=x1; x1=x2; f1=f2; x2=a+g*(c-a); f2=sign*fun(x2); }
+  }
+  return (a+c)/2;
+}
+
+// two-phase temperature interval along an isobar (single interval for P below the cricondenbar)
+function isobarBounds(env,P){
+  const z=env.z, pts=env.pts;
+  let inside=[];
+  for (const p of pts) inside.push(P>p.Pmin && P<p.Pmax);
+  let i0=inside.indexOf(true);
+  if (i0<0) return null;
+  let i1=inside.lastIndexOf(true);
+  const refine=(Tout,Tin)=>{
+    let Kw=wilsonK(Tin,P);
+    for (let it=0; it<34; it++){
+      const m=(Tout+Tin)/2;
+      const r=isTwoPhase(m,P,z,Kw);
+      if (r.ok){ Tin=m; Kw=r.K; } else Tout=m;
+    }
+    return Tin;
+  };
+  const Tlo = i0>0 ? refine(pts[i0-1].T, pts[i0].T) : pts[0].T;
+  const Thi = i1<pts.length-1 ? refine(pts[i1+1].T, pts[i1].T) : pts[pts.length-1].T;
+  return {Tlo, Thi};
+}
+
+function computeEnvelope(z1){
+  const z=[z1,1-z1];
+  const env={z, z1};
+  // cricondentherm
+  let lo=250, hi=539;
+  let lastB=findBounds(lo,z,90e5);
+  if (!lastB){ lo=200; lastB=findBounds(lo,z,90e5); }
+  while (hi-lo>0.02){
+    const m=(lo+hi)/2;
+    const b=findBounds(m,z,90e5,null,null,lastB);
+    if (b){ lo=m; lastB=b; } else hi=m;
+  }
+  const bt=lastB;
+  env.Tct=lo; env.Pct=(bt.Pmin+bt.Pmax)/2;
+  const Tmax=env.Tct;
+
+  const pts=[];
+  const T0=200, dT=Math.max(1,(Tmax-T0)/110);
+  let hint=null;
+  for (let T=T0; T<Tmax-dT*0.5; T+=dT){
+    const b=findBounds(T,z,60e5,null,null,hint);
+    if (b){ pts.push({T, Pmin:b.Pmin, Pmax:b.Pmax}); hint=b; }
+  }
+  for (let k=1;k<8;k++){
+    const T=Tmax-dT*(1-k/8)*1.0;
+    if (T<=pts[pts.length-1].T) continue;
+    const b=findBounds(T,z,60e5,null,null,hint);
+    if (b){ pts.push({T, Pmin:b.Pmin, Pmax:b.Pmax}); hint=b; }
+  }
+  pts.push({T:Tmax, Pmin:env.Pct, Pmax:env.Pct});
+
+  // critical point
+  env.Tc=null; env.Pc=null;
+  let tLow=null;
+  for (let i=0;i<pts.length && i<20;i++){ const t=upperIsDew(pts[i].T,z,pts[i]); if (t!==null){ tLow=t; break; } }
+  if (tLow===false){
+    let a=pts[0].T+0.5, c=Tmax-0.3;
+    for (let it=0; it<24; it++){
+      const m=(a+c)/2, t=upperIsDew(m,z,interpEnv(pts,m));
+      if (t===null || t) c=m; else a=m;
+    }
+    env.Tc=(a+c)/2;
+    const bc=findBounds(env.Tc,z,120e5,null,null,interpEnv(pts,env.Tc));
+    env.Pc=bc.Pmax;
+    pts.push({T:env.Tc, Pmin:bc.Pmin, Pmax:bc.Pmax});
+    pts.sort((p,q)=>p.T-q.T);
+  }
+  env.pts=pts;
+  let best=pts[0]; for (const p of pts) if (p.Pmax>best.Pmax) best=p;
+  env.Tcb=best.T; env.Pcb=best.Pmax;
+  // refine the cricondenbar
+  {
+    const f=T=>{ const b=findBounds(T,z,120e5,null,null,interpEnv(pts,T)); return b? b.Pmax : 0; };
+    const Tb=goldenExt(f, Math.max(pts[0].T,best.T-dT*2), Math.min(Tmax,best.T+dT*2), 1);
+    env.Tcb=Tb; env.Pcb=f(Tb);
+  }
+
+  // locus of maximum liquid volume along isotherms, Tc < T < Tct (retrograde condensation)
+  env.maxLiq=[];
+  const TcEff = env.Tc!==null ? env.Tc : pts[0].T;
+  if (env.Tc!==null) env.maxLiq.push({T:env.Tc, P:env.Pc});
+  const nT=22;
+  for (let k=1;k<nT;k++){
+    const T=TcEff+(Tmax-TcEff)*k/nT;
+    const b=interpEnv(pts,T);
+    const prof=isothermProfile(T,z,b,30);
+    if (prof.length<3) continue;
+    let ib=0; prof.forEach((p,i)=>{ if (p.L>prof[ib].L) ib=i; });
+    let Kw=null;
+    const fun=P=>{ const r=lvAt(T,P,z,Kw); if(!r) return -1; Kw=r.K; return r.L; };
+    const a=prof[Math.max(0,ib-1)].P, c=prof[Math.min(prof.length-1,ib+1)].P;
+    env.maxLiq.push({T, P:goldenExt(fun,a,c,1)});
+  }
+  env.maxLiq.push({T:Tmax, P:env.Pct});
+
+  env.minLiq=null; env.quality=null;   // computed on demand
+  return env;
+}
+
+// pure-component (n-heptane) vapor pressure from the PR equation: P <- P * phiL/phiV
+function psatHeptane(T){
+  const ab=prAB(T);
+  let P=COMP_Pc[1]*Math.pow(10, 7/3*(1+COMP_w[1])*(1-COMP_Tc[1]/T));
+  for (let it=0; it<200; it++){
+    const l=lnPhiBin(T,P,0,ab,'liquid'), v=lnPhiBin(T,P,0,ab,'vapor');
+    if (Math.abs(l[2]-v[2])<1e-6) return null;      // single root: no saturation (T too high)
+    const Pn=P*Math.exp(l[1]-v[1]);
+    if (Math.abs(Pn/P-1)<1e-11){ P=Pn; break; }
+    P=Pn;
+  }
+  return P;
+}
+
+// P-x-y loop at temperature T: liquid (x) and vapor (y) methane mole fractions versus P,
+// from the heptane vapor pressure up to the mixture critical point at this T
+function computePxy(T){
+  const Ps=psatHeptane(T);
+  if (!Ps) return null;
+  const pts=[{P:Ps, x:0, y:0}];
+  // first point just above the heptane vapor pressure, started from Wilson K values
+  let P=null, K=null, z=null;
+  for (const f of [1.02,1.05,1.1,1.2,1.3,1.5,2,3]){
+    const Pt=Ps*f, Kt=wilsonK(T,Pt);
+    const x0=(1-Kt[1])/(Kt[0]-Kt[1]), y0=Kt[0]*x0;
+    const zt = (x0>0 && y0<1) ? (x0+y0)/2 : 0.02;
+    const r=flashBinary(T,Pt,[zt,1-zt],Kt,2000,1e-12);
+    if (r.V!==null && r.conv && Math.abs(Math.log(r.K[0]))>1e-4){ P=Pt; K=r.K; z=[(r.x[0]+r.y[0])/2,0]; z[1]=1-z[0]; break; }
+  }
+  if (P===null) return null;
+  let dP=Math.max(P*0.08, 2e4);
+  let fails=0;
+  while (pts.length<400){
+    const r=flashBinary(T,P,z,K,2000,1e-12);
+    const ok = r.V!==null && r.conv && Math.abs(Math.log(r.K[0]))>1e-4;
+    if (ok){
+      pts.push({P, x:r.x[0], y:r.y[0]});
+      K=r.K; z=[(r.x[0]+r.y[0])/2, 1-(r.x[0]+r.y[0])/2];
+      const gap=r.y[0]-r.x[0];
+      // smaller steps as the phases approach each other
+      dP=Math.min(dP*1.3, 5e5, Math.max(2e4, 0.6*gap*P));
+      P+=dP;
+    } else {
+      P-=dP; dP/=3; fails++;
+      if (dP<200 || fails>25) break;
+      P+=dP;
     }
   }
-  return {Pmin:pts[pts.length-1].Pmin, Pmax:pts[pts.length-1].Pmax};
+  const last=pts[pts.length-1];
+  const crit={P:last.P, x:(last.x+last.y)/2};
+  return {T, pts, crit};
 }
-</script>
 
+// locus of minimum liquid volume along isobars, Pc < P < cricondenbar (retrograde vaporization)
+function computeMinLiq(env){
+  const z=env.z;
+  env.minLiq=[];
+  if (env.Tc!==null && env.Pcb>env.Pc*1.002){
+    env.minLiq.push({T:env.Tc, P:env.Pc});
+    const nP=16;
+    for (let k=1;k<nP;k++){
+      const P=env.Pc+(env.Pcb-env.Pc)*k/nP;
+      const ib=isobarBounds(env,P);
+      if (!ib) continue;
+      let Kw=null;
+      const fun=T=>{ const r=lvAt(T,P,z,Kw); if(!r) return 2; Kw=r.K; return r.L; };
+      // coarse scan
+      let tb=ib.Tlo, fb=2;
+      for (let j=1;j<30;j++){ const T=ib.Tlo+(ib.Thi-ib.Tlo)*j/30; const v=fun(T); if (v<fb){fb=v; tb=T;} }
+      const w=(ib.Thi-ib.Tlo)/30;
+      env.minLiq.push({T:goldenExt(fun,Math.max(ib.Tlo,tb-w),Math.min(ib.Thi,tb+w),-1), P});
+    }
+    env.minLiq.push({T:env.Tcb, P:env.Pcb});
+  }
+
+}
+
+// quality lines: constant liquid volume fraction
+function computeQuality(env){
+  const z=env.z, pts=env.pts, Tmax=env.Tct;
+  env.quality={};
+  const levels=[0.05,0.10,0.20,0.40,0.60,0.80];
+  levels.forEach(l=>env.quality[l]={rise:[],fall:[]});
+  for (let i=0;i<pts.length;i++){
+    const T=pts[i].T;
+    if (T>=Tmax-1e-6 || pts[i].Pmax-pts[i].Pmin<1e3) continue;
+    const prof=isothermProfile(T,z,pts[i],48);
+    if (prof.length<4) continue;
+    // add boundary end points
+    const full=[{P:pts[i].Pmin,L:0}].concat(prof,[{P:pts[i].Pmax,L:(env.Tc!==null&&T<env.Tc)?1:0}]);
+    for (const l of levels){
+      for (let j=0;j<full.length-1;j++){
+        const a=full[j], b=full[j+1];
+        if ((a.L-l)*(b.L-l)<0){
+          const P=a.P+(l-a.L)/(b.L-a.L)*(b.P-a.P);
+          (b.L>a.L ? env.quality[l].rise : env.quality[l].fall).push({T,P});
+        }
+      }
+    }
+  }
+}
+
+</script>
 <script>
 /* =========================================================================
-   FLYOUT PANEL MECHANICS
+   FLYOUT PANELS: toggle from buttons, close with ×, Esc or a click outside,
+   drag by the heading
    ========================================================================= */
 (function(){
-  const buttons = [
+  const pairs = [
     {btn:'btnDirections', panel:'panelDirections'},
     {btn:'btnDetails',    panel:'panelDetails'},
     {btn:'btnAbout',      panel:'panelAbout'}
   ];
+  const anchor = document.getElementById('panelAnchor');
   function closeAll(){
-    buttons.forEach(({btn,panel})=>{
+    pairs.forEach(({btn,panel})=>{
       document.getElementById(panel).hidden = true;
       document.getElementById(btn).classList.remove('active');
     });
   }
-  buttons.forEach(({btn,panel})=>{
+  function place(el){
+    const aR = anchor.getBoundingClientRect();
+    const bR = document.getElementById('btnRow').getBoundingClientRect();
+    const appR = document.getElementById('app').getBoundingClientRect();
+    el.style.top = Math.round(bR.bottom - aR.top + 8) + 'px';
+    const w = el.offsetWidth;
+    const twoCol = getComputedStyle(document.getElementById('simGrid')).gridTemplateAreas.includes('btns') &&
+                   window.innerWidth > 1120;
+    let left;
+    if (twoCol){
+      // wide layout: open at the left so the right side of the diagram (the retrograde
+      // region) and the readouts stay visible
+      left = 24;
+    } else {
+      left = (appR.width - w)/2;
+    }
+    left = Math.max(4 - (appR.left - aR.left), Math.min(left, window.innerWidth - appR.left - w - 4));
+    el.style.left = Math.round(left) + 'px';
+  }
+  pairs.forEach(({btn,panel})=>{
     document.getElementById(btn).addEventListener('click', ()=>{
       const el = document.getElementById(panel);
       const wasHidden = el.hidden;
@@ -646,516 +1028,741 @@ function envelopeAt(T){
       if (wasHidden){
         el.hidden = false;
         document.getElementById(btn).classList.add('active');
-        // clamp within viewport
-        requestAnimationFrame(()=>{
-          const r = el.getBoundingClientRect();
-          if (r.right > window.innerWidth - 8){
-            el.style.left = 'auto';
-            el.style.right = '8px';
-            el.style.transform = 'none';
-          }
-        });
-        if (window.MathJax && window.MathJax.typesetPromise){
-          window.MathJax.typesetPromise([el]);
-        }
+        place(el);
+        el.scrollTop = 0;
+        if (window.MathJax && window.MathJax.typesetPromise) window.MathJax.typesetPromise([el]);
       }
     });
   });
   document.querySelectorAll('.closeX').forEach(x=>{
     x.addEventListener('click', ()=>{
       document.getElementById(x.dataset.close).hidden = true;
-      buttons.forEach(({btn,panel})=>{ if(panel===x.dataset.close) document.getElementById(btn).classList.remove('active'); });
+      pairs.forEach(({btn,panel})=>{ if (panel===x.dataset.close) document.getElementById(btn).classList.remove('active'); });
     });
   });
-  document.addEventListener('keydown', (e)=>{ if (e.key==='Escape') closeAll(); });
+  document.addEventListener('keydown', e=>{ if (e.key==='Escape') closeAll(); });
+  document.addEventListener('pointerdown', e=>{
+    const open = pairs.find(({panel})=>!document.getElementById(panel).hidden);
+    if (!open) return;
+    if (e.target.closest('.flyout') || e.target.closest('.lc-btn')) return;
+    closeAll();
+  });
+  window.addEventListener('resize', ()=>{
+    const open = pairs.find(({panel})=>!document.getElementById(panel).hidden);
+    if (open) place(document.getElementById(open.panel));
+  });
+  // drag a panel by its heading
+  document.querySelectorAll('.flyout h2').forEach(h=>{
+    const el = h.parentElement;
+    let start=null;
+    h.addEventListener('pointerdown', e=>{
+      start = {x:e.clientX, y:e.clientY, l:parseFloat(el.style.left)||0, t:parseFloat(el.style.top)||0};
+      h.setPointerCapture(e.pointerId);
+      e.preventDefault();
+    });
+    h.addEventListener('pointermove', e=>{
+      if (!start) return;
+      el.style.left = (start.l + e.clientX - start.x) + 'px';
+      el.style.top  = Math.max(0, start.t + e.clientY - start.y) + 'px';
+    });
+    const end = ()=>{ start=null; };
+    h.addEventListener('pointerup', end);
+    h.addEventListener('pointercancel', end);
+  });
 })();
-</script>
 
-<script>
 /* =========================================================================
-   CANVAS RENDERING + INTERACTION
+   STATE
    ========================================================================= */
+const COL = {
+  bubble:'#1f4e9c', dew:'#d0700a', liquid:'#1f4e9c', vapor:'#d0700a', two:'#98000D',
+  envFill:'rgba(120,170,215,0.28)', retro:'rgba(240,140,152,0.72)', retroEdge:'#8a3540',
+  path:'#98000D', grid:'#e8e8e8', axis:'#888', qual:'#555'
+};
+let env = null;
+const state = {
+  T:455, P:120e5, z1:0.70, mode:'T', logP:false, showQ:false, showPxy:false,
+  phase:'vapor', Lv:0, Lm:0, x1:null, y1:null, rhoL:null, rhoV:null, lastK:null,
+  dragging:null, animating:false, qual:null, qualKey:'', pxy:null, pxyT:null
+};
+let AXIS = { Tmin:200, Tmax:500, Pmax:245e5, PminLog:1e3 };
+
+/* ---------- canvases ---------- */
 const ptCanvas = document.getElementById('ptCanvas');
 const qualCanvas = document.getElementById('qualCanvas');
 const cellCanvas = document.getElementById('cellCanvas');
+const pxyCanvas = document.getElementById('pxyCanvas');
 const ctxPT = ptCanvas.getContext('2d');
 const ctxQ  = qualCanvas.getContext('2d');
 const ctxC  = cellCanvas.getContext('2d');
+const ctxX  = pxyCanvas.getContext('2d');
+let PT_W=768, PT_H=560, Q_W=300, Q_H=270, C_W=86, C_H=250, X_W=300, X_H=280;
 
-function hiDPI(canvas, ctx, cssW, cssH){
+function hiDPI(canvas, ctx, w, h){
   const dpr = window.devicePixelRatio || 1;
-  canvas.style.width = cssW+'px';
-  canvas.style.height = cssH+'px';
-  canvas.width = Math.round(cssW*dpr);
-  canvas.height = Math.round(cssH*dpr);
+  canvas.style.width = w+'px'; canvas.style.height = h+'px';
+  canvas.width = Math.round(w*dpr); canvas.height = Math.round(h*dpr);
   ctx.setTransform(dpr,0,0,dpr,0,0);
 }
-let PT_W=640, PT_H=480;
-let Q_W=300, Q_H=238;
-let C_W=90, C_H=221;
-
 function resizeCanvases(){
-  const diagramColWidth = ptCanvas.parentElement.clientWidth || 640;
-  const newPTW = Math.max(280, Math.min(640, Math.floor(diagramColWidth)));
-  const newPTH = Math.round(newPTW*480/640);
-  if (newPTW !== PT_W || newPTH !== PT_H){
-    PT_W = newPTW; PT_H = newPTH;
-    hiDPI(ptCanvas, ctxPT, PT_W, PT_H);
+  const dw = document.getElementById('diagramCol').clientWidth || 768;
+  PT_W = Math.max(280, Math.min(768, Math.floor(dw)));
+  PT_H = Math.round(PT_W*(PT_W<500 ? 0.86 : 0.73));
+  hiDPI(ptCanvas, ctxPT, PT_W, PT_H);
+  const sideW = document.getElementById('sideCol').clientWidth || 300;
+  const sw = window.innerWidth<=560 ? Math.min(420, sideW) : Math.min(300, sideW);
+  Q_W = Math.max(240, sw); Q_H = Math.round(Math.min(Q_W,320)*0.9);
+  hiDPI(qualCanvas, ctxQ, Q_W, Q_H);
+  const avail = (document.querySelector('.simwrap').clientWidth || 400) - 8;
+  X_W = Math.max(260, Math.min(460, avail)); X_H = Math.round(X_W*0.85);
+  hiDPI(pxyCanvas, ctxX, X_W, X_H);
+  hiDPI(cellCanvas, ctxC, C_W, C_H);
+}
+function fsBase(){ return PT_W>=600 ? 17 : (PT_W>=430 ? 15 : 13); }
+function font(px){ return px+'px Helvetica, Arial, sans-serif'; }
+
+/* ---------- coordinate transforms ---------- */
+function margins(){
+  const f=fsBase();
+  return {left:Math.round(f*3.9), right:12, top:14, bottom:Math.round(f*3.0)};
+}
+function xOfT(T){ const m=margins(); return m.left + (T-AXIS.Tmin)/(AXIS.Tmax-AXIS.Tmin)*(PT_W-m.left-m.right); }
+function TofX(x){ const m=margins(); return AXIS.Tmin + (x-m.left)/(PT_W-m.left-m.right)*(AXIS.Tmax-AXIS.Tmin); }
+function yOfP(P){
+  const m=margins(), h=PT_H-m.top-m.bottom;
+  if (state.logP){
+    const lp=Math.log10(Math.max(P,1)), l0=Math.log10(AXIS.PminLog), l1=Math.log10(AXIS.Pmax);
+    return PT_H-m.bottom - (lp-l0)/(l1-l0)*h;
   }
-  const sideColWidth = qualCanvas.parentElement.clientWidth || 300;
-  const newQW = Math.max(220, Math.min(300, Math.floor(sideColWidth)));
-  const newQH = Math.round(newQW*238/300);
-  if (newQW !== Q_W || newQH !== Q_H){
-    Q_W = newQW; Q_H = newQH;
-    hiDPI(qualCanvas, ctxQ, Q_W, Q_H);
+  return PT_H-m.bottom - P/AXIS.Pmax*h;
+}
+function PofY(y){
+  const m=margins(), h=PT_H-m.top-m.bottom, f=(PT_H-m.bottom-y)/h;
+  if (state.logP){
+    const l0=Math.log10(AXIS.PminLog), l1=Math.log10(AXIS.Pmax);
+    return Math.pow(10, l0+f*(l1-l0));
+  }
+  return f*AXIS.Pmax;
+}
+function Pfloor(){ return state.logP ? AXIS.PminLog : 1e3; }
+function clampT(T){ return Math.min(AXIS.Tmax, Math.max(AXIS.Tmin, T)); }
+function clampP(P){ return Math.min(AXIS.Pmax, Math.max(Pfloor(), P)); }
+
+function niceStep(range,n){
+  const rough=range/n, mag=Math.pow(10,Math.floor(Math.log10(rough))), r=rough/mag;
+  return (r<1.5?1:r<3?2:r<7?5:10)*mag;
+}
+function ticks(lo,hi,n){
+  const s=niceStep(hi-lo,n), out=[];
+  for (let t=Math.ceil(lo/s-1e-9)*s; t<=hi+1e-9; t+=s) out.push(Math.round(t/s)*s);
+  return {list:out, step:s};
+}
+function fmtTick(v,step){
+  const d = step>=1 ? 0 : Math.min(3, Math.ceil(-Math.log10(step)-1e-9));
+  return v.toFixed(d);
+}
+
+/* =========================================================================
+   PHYSICS AT THE CURRENT POINT
+   ========================================================================= */
+function phaseAt(T,P,Kwarm){
+  const z=env.z;
+  let r = flashBinary(T,P,z,Kwarm||wilsonK(T,P),300,1e-11);
+  const good = rr => rr.V!==null && rr.conv && rr.V>0 && rr.V<1 &&
+                     Math.max(Math.abs(Math.log(rr.K[0])),Math.abs(Math.log(rr.K[1])))>1e-4;
+  let two = good(r);
+  const b = interpEnv(env.pts,T);
+  const inside = T<env.Tct && P>b.Pmin*1.01 && P<b.Pmax*0.99;
+  if (!two && inside && Kwarm){ r = flashBinary(T,P,z,wilsonK(T,P),300,1e-11); two = good(r); }
+  if (two) return {phase:'two', Lv:liqVolFrac(r), Lm:1-r.V, r};
+  if (inside) return {phase:'unknown', Lv:null, Lm:null, r:null};
+  if (env.Tc!==null && T<env.Tc && T<env.Tct && P>Math.sqrt(b.Pmin*b.Pmax)) return {phase:'liquid', Lv:1, Lm:1, r:null};
+  return {phase:'vapor', Lv:0, Lm:0, r:null};
+}
+function density(T,P,x0,phase){
+  const ab=prAB(T), Z=lnPhiBin(T,P,x0,ab,phase)[2];
+  const M=x0*M_W[0]+(1-x0)*M_W[1];
+  return P*M/(Z*R_GAS*T);
+}
+function updateCurrentPoint(){
+  const T=state.T, P=state.P;
+  const res = phaseAt(T,P,state.lastK);
+  state.phase=res.phase; state.Lv=res.Lv; state.Lm=res.Lm;
+  state.x1=null; state.y1=null; state.rhoL=null; state.rhoV=null;
+  if (res.phase==='two'){
+    const r=res.r;
+    state.x1=r.x[0]; state.y1=r.y[0]; state.lastK=r.K;
+    state.rhoL = P*(r.x[0]*M_W[0]+r.x[1]*M_W[1])/(r.ZL*R_GAS*T);
+    state.rhoV = P*(r.y[0]*M_W[0]+r.y[1]*M_W[1])/(r.ZV*R_GAS*T);
+  } else {
+    state.lastK=null;
+    if (res.phase==='liquid') state.rhoL = density(T,P,env.z1,'liquid');
+    if (res.phase==='vapor')  state.rhoV = density(T,P,env.z1,'vapor');
   }
 }
-hiDPI(ptCanvas, ctxPT, PT_W, PT_H);
-hiDPI(qualCanvas, ctxQ, Q_W, Q_H);
-hiDPI(cellCanvas, ctxC, C_W, C_H);
-window.addEventListener('resize', ()=>{
-  resizeCanvases();
-  if (PHYS.envelope && PHYS.envelope.length) fullRender();
-});
 
-const MARGIN = {left:76, right:22, top:20, bottom:56};
-let AXIS = { Tmin:200, Tmax:495, Pmin:0, Pmax:240e5 }; // Pa
-
-function xOfT(T){ return MARGIN.left + (T-AXIS.Tmin)/(AXIS.Tmax-AXIS.Tmin)*(PT_W-MARGIN.left-MARGIN.right); }
-function yOfP(P){ return PT_H-MARGIN.bottom - (P-AXIS.Pmin)/(AXIS.Pmax-AXIS.Pmin)*(PT_H-MARGIN.top-MARGIN.bottom); }
-function TofX(x){ return AXIS.Tmin + (x-MARGIN.left)/(PT_W-MARGIN.left-MARGIN.right)*(AXIS.Tmax-AXIS.Tmin); }
-function PofY(y){ return AXIS.Pmin + (PT_H-MARGIN.bottom-y)/(PT_H-MARGIN.top-MARGIN.bottom)*(AXIS.Pmax-AXIS.Pmin); }
-
-const state = { T: 460, P: 60e5, lastK: null, lastT: null, qualCurve: [], dragging:null };
-
-function niceTicks(lo,hi,n){
-  const range = hi-lo;
-  const rough = range/n;
-  const mag = Math.pow(10, Math.floor(Math.log10(rough)));
-  const norm = rough/mag;
-  let step;
-  if (norm<1.5) step=1*mag; else if (norm<3) step=2*mag; else if (norm<7) step=5*mag; else step=10*mag;
-  const ticks=[];
-  let t = Math.ceil(lo/step)*step;
-  for (; t<=hi+1e-9; t+=step) ticks.push(Math.round(t*1000)/1000);
-  return ticks;
+/* ---------- liquid volume fraction along the current path ---------- */
+function computePathCurve(){
+  const n=50;
+  if (state.mode==='T'){
+    const T=state.T, b=interpEnv(env.pts,T);
+    if (T>=env.Tct || b.Pmax-b.Pmin<1e3) return {none:true};
+    const lo=Math.max(b.Pmin*0.85, b.Pmin-0.06*(b.Pmax-b.Pmin)), hi=b.Pmax+0.06*(b.Pmax-b.Pmin);
+    const xs=[]; for (let i=0;i<n;i++) xs.push(lo+(hi-lo)*i/(n-1));
+    const L=sweep(xs, P=>[T,P]);
+    const pts=xs.map((P,i)=>({x:P,L:L[i]})).filter(p=>p.L!==null);
+    const top = (env.Tc!==null && T<env.Tc) ? 1 : 0;
+    pts.push({x:b.Pmin,L:0}); pts.push({x:b.Pmax,L:top});
+    pts.sort((p,q)=>p.x-q.x);
+    return {lo, hi, pts, ends:[{x:b.Pmin, kind:'dew'}, {x:b.Pmax, kind: top? 'bubble':'dew'}]};
+  } else {
+    const P=state.P, ib=isobarBounds(env,P);
+    if (!ib || ib.Thi-ib.Tlo<0.05) return {none:true};
+    const w=ib.Thi-ib.Tlo;
+    const lo=Math.max(AXIS.Tmin, ib.Tlo-0.06*w), hi=Math.min(AXIS.Tmax, ib.Thi+0.06*w);
+    const xs=[]; for (let i=0;i<n;i++) xs.push(lo+(hi-lo)*i/(n-1));
+    const L=sweep(xs, T=>[T,P]);
+    const pts=xs.map((T,i)=>({x:T,L:L[i]})).filter(p=>p.L!==null);
+    const ends=[];
+    const kindAt = T=>{
+      const b=interpEnv(env.pts,T);
+      const upper = Math.abs(Math.log(P/b.Pmax)) < Math.abs(Math.log(P/b.Pmin));
+      return (upper && env.Tc!==null && T<env.Tc) ? 'bubble' : 'dew';
+    };
+    if (ib.Tlo>AXIS.Tmin+0.01){ const k=kindAt(ib.Tlo); ends.push({x:ib.Tlo,kind:k}); pts.push({x:ib.Tlo,L:k==='bubble'?1:0}); }
+    if (ib.Thi<env.Tct-0.01 || true){ const k=kindAt(ib.Thi); ends.push({x:ib.Thi,kind:k}); pts.push({x:ib.Thi,L:k==='bubble'?1:0}); }
+    pts.sort((p,q)=>p.x-q.x);
+    return {lo, hi, pts, ends};
+  }
+}
+// phase-by-phase sweep with warm starts outward from the middle
+function sweep(xs, TP){
+  const n=xs.length, out=new Array(n).fill(null), mid=Math.floor(n/2);
+  let K=null;
+  for (let i=mid;i<n;i++){ const [T,P]=TP(xs[i]); const r=phaseAt(T,P,K); out[i]=r.Lv; K = r.r? r.r.K : null; }
+  K=null;
+  for (let i=mid-1;i>=0;i--){ const [T,P]=TP(xs[i]); const r=phaseAt(T,P,K); out[i]=r.Lv; K = r.r? r.r.K : null; }
+  return out;
 }
 
-function drawArrowLine(c,x1,y1,x2,y2){
+/* =========================================================================
+   DRAWING: P-T DIAGRAM
+   ========================================================================= */
+function polyPath(c, pts, fx, fy, move){
+  pts.forEach((p,i)=>{ const x=fx(p), y=fy(p); if (i===0 && move!==false) c.moveTo(x,y); else c.lineTo(x,y); });
+}
+function haloText(c, text, x, y, color, lw){
+  c.lineJoin='round';
+  c.lineWidth=lw||4; c.strokeStyle='rgba(255,255,255,0.95)';
+  c.strokeText(text, x, y);
+  c.fillStyle=color; c.fillText(text, x, y);
+}
+function arrow(c,x1,y1,x2,y2,head){
+  head=head||8;
   c.beginPath(); c.moveTo(x1,y1); c.lineTo(x2,y2); c.stroke();
-  const angle = Math.atan2(y2-y1, x2-x1);
-  const headLen = 8;
-  c.beginPath();
-  c.moveTo(x2,y2);
-  c.lineTo(x2-headLen*Math.cos(angle-Math.PI/6), y2-headLen*Math.sin(angle-Math.PI/6));
-  c.lineTo(x2-headLen*Math.cos(angle+Math.PI/6), y2-headLen*Math.sin(angle+Math.PI/6));
-  c.closePath();
-  c.fill();
+  const a=Math.atan2(y2-y1,x2-x1);
+  c.beginPath(); c.moveTo(x2,y2);
+  c.lineTo(x2-head*Math.cos(a-Math.PI/7), y2-head*Math.sin(a-Math.PI/7));
+  c.lineTo(x2-head*Math.cos(a+Math.PI/7), y2-head*Math.sin(a+Math.PI/7));
+  c.closePath(); c.fill();
+}
+function lerpLocus(locus, key, v, outKey){
+  for (let i=0;i<locus.length-1;i++){
+    const a=locus[i], b=locus[i+1];
+    if ((v-a[key])*(v-b[key])<=0 && a[key]!==b[key]) return a[outKey]+(v-a[key])/(b[key]-a[key])*(b[outKey]-a[outKey]);
+  }
+  return null;
 }
 
 function drawPT(){
-  const c=ctxPT;
+  const c=ctxPT, m=margins(), fs=fsBase();
   c.clearRect(0,0,PT_W,PT_H);
-  c.font='18px Helvetica, Arial, sans-serif';
+  const pl=m.left, pr=PT_W-m.right, pt=m.top, pb=PT_H-m.bottom;
+  const fx=p=>xOfT(p.T);
 
-  // retrograde band (behind everything)
-  const xTc = xOfT(PHYS.Tc), xTct = xOfT(PHYS.Tct);
-  c.fillStyle = 'rgba(246,184,189,0.55)';
-  c.fillRect(xTc, MARGIN.top, xTct-xTc, PT_H-MARGIN.top-MARGIN.bottom);
-
-  // axes box
-  c.strokeStyle='#888'; c.lineWidth=1;
-  c.strokeRect(MARGIN.left, MARGIN.top, PT_W-MARGIN.left-MARGIN.right, PT_H-MARGIN.top-MARGIN.bottom);
-
-  // ticks + gridlines
-  c.fillStyle='#444';
-  c.strokeStyle='#eee';
-  const Tticks = niceTicks(AXIS.Tmin,AXIS.Tmax,7);
-  c.font='18px Helvetica, Arial, sans-serif';
-  Tticks.forEach(T=>{
+  // grid + ticks
+  c.font=font(fs-1); c.lineWidth=1;
+  const Tt=ticks(AXIS.Tmin,AXIS.Tmax, PT_W<500?4:7);
+  Tt.list.forEach(T=>{
     const x=xOfT(T);
-    c.beginPath(); c.moveTo(x,MARGIN.top); c.lineTo(x,PT_H-MARGIN.bottom); c.stroke();
-    c.fillStyle='#444';
-    c.textAlign='center'; c.textBaseline='top';
-    c.fillText(T.toFixed(0), x, PT_H-MARGIN.bottom+8);
+    c.strokeStyle=COL.grid; c.beginPath(); c.moveTo(x,pt); c.lineTo(x,pb); c.stroke();
+    c.fillStyle='#000'; c.textAlign= x>PT_W-14 ? 'right' : 'center'; c.textBaseline='top';
+    c.fillText(T.toFixed(0), x>PT_W-14 ? PT_W-2 : x, pb+6);
   });
-  const Pticks = niceTicks(AXIS.Pmin/1e5,AXIS.Pmax/1e5,6);
-  Pticks.forEach(Pb=>{
+  let Pt;
+  if (state.logP){
+    Pt=[]; for (let e=Math.ceil(Math.log10(AXIS.PminLog/1e5)); Math.pow(10,e)*1e5<=AXIS.Pmax*1.0001; e++) Pt.push(Math.pow(10,e));
+  } else Pt=ticks(0,AXIS.Pmax/1e5, PT_H<380?4:6).list;
+  Pt.forEach(Pb=>{
     const y=yOfP(Pb*1e5);
-    c.strokeStyle='#eee';
-    c.beginPath(); c.moveTo(MARGIN.left,y); c.lineTo(PT_W-MARGIN.right,y); c.stroke();
-    c.fillStyle='#444';
-    c.textAlign='right'; c.textBaseline='middle';
-    c.fillText(Pb.toFixed(0), MARGIN.left-10, y);
+    c.strokeStyle=COL.grid; c.beginPath(); c.moveTo(pl,y); c.lineTo(pr,y); c.stroke();
+    c.fillStyle='#000'; c.textAlign='right'; c.textBaseline='middle';
+    c.fillText(Pb>=1 ? Pb.toFixed(0) : String(Pb), pl-6, y);
   });
-  c.fillStyle='#222'; c.textAlign='center'; c.textBaseline='alphabetic';
-  c.font='18px Helvetica, Arial, sans-serif';
-  c.fillText('temperature, T (K)', (MARGIN.left+PT_W-MARGIN.right)/2, PT_H-8);
+  c.strokeStyle=COL.axis; c.strokeRect(pl,pt,pr-pl,pb-pt);
+  c.font=font(fs); c.fillStyle='#000'; c.textAlign='center'; c.textBaseline='alphabetic';
+  c.fillText('temperature (K)', (pl+pr)/2, PT_H-6);
+  c.save(); c.translate(fs*0.95+2,(pt+pb)/2); c.rotate(-Math.PI/2);
+  c.textBaseline='middle'; c.fillText('pressure (bar)'+(state.logP?', log scale':''), 0, 0); c.restore();
+
+  // everything inside the plot area is clipped
   c.save();
-  c.translate(18, (MARGIN.top+PT_H-MARGIN.bottom)/2);
-  c.rotate(-Math.PI/2);
-  c.textAlign='center';
-  c.fillText('pressure, P (bar)', 0, 0);
+  c.beginPath(); c.rect(pl,pt,pr-pl,pb-pt); c.clip();
+  const pts=env.pts;
+  const fyMin=p=>yOfP(p.Pmin), fyMax=p=>yOfP(p.Pmax);
+
+  // envelope fill
+  c.beginPath(); polyPath(c,pts,fx,fyMin);
+  for (let i=pts.length-1;i>=0;i--) c.lineTo(fx(pts[i]), fyMax(pts[i]));
+  c.closePath(); c.fillStyle=COL.envFill; c.fill();
+
+  // retrograde region for the current path type
+  const retro = retroRegion();
+  if (retro){
+    c.beginPath(); polyPath(c,retro.poly,fx,p=>yOfP(p.P)); c.closePath();
+    c.fillStyle=COL.retro; c.fill();
+    c.beginPath(); polyPath(c,retro.locus,fx,p=>yOfP(p.P));
+    c.strokeStyle=COL.retroEdge; c.lineWidth=1.3; c.stroke();
+  }
+
+  // quality lines
+  if (state.showQ && env.quality) drawQuality(c);
+
+  // phase boundaries: bubble curve (upper branch left of the critical point) and dew curve
+  c.lineWidth=2.4; c.lineJoin='round';
+  const Tc=env.Tc;
+  const upperBubble = Tc!==null ? pts.filter(p=>p.T<=Tc) : [];
+  const upperDew = Tc!==null ? pts.filter(p=>p.T>=Tc) : pts;
+  if (upperBubble.length>1){ c.beginPath(); polyPath(c,upperBubble,fx,fyMax); c.strokeStyle=COL.bubble; c.stroke(); }
+  c.beginPath(); polyPath(c,upperDew,fx,fyMax);
+  for (let i=pts.length-1;i>=0;i--) c.lineTo(fx(pts[i]), fyMin(pts[i]));
+  c.strokeStyle=COL.dew; c.stroke();
+  // left edge of the plotted envelope (domain limit, not a phase boundary)
+  c.beginPath(); c.moveTo(fx(pts[0]),fyMin(pts[0])); c.lineTo(fx(pts[0]),fyMax(pts[0]));
+  c.strokeStyle='#bbb'; c.lineWidth=1; c.stroke();
   c.restore();
 
-  // envelope path (Pmin branch then back along Pmax branch)
-  const pts = PHYS.envelope;
-  c.beginPath();
-  pts.forEach((p,i)=>{
-    const x=xOfT(p.T), y=yOfP(p.Pmin);
-    if (i===0) c.moveTo(x,y); else c.lineTo(x,y);
-  });
-  for (let i=pts.length-1;i>=0;i--){
-    c.lineTo(xOfT(pts[i].T), yOfP(pts[i].Pmax));
-  }
-  c.closePath();
-  c.fillStyle='rgba(120,170,215,0.30)';
-  c.fill();
-  c.lineWidth=2; c.strokeStyle='#2a2a2a';
-  c.stroke();
+  // labels: regions and curves
+  drawLabels(c, fs);
+  if (retro) drawRetroLabel(c, fs, retro);
 
-  // critical point (label to the right, with white halo for legibility)
+  // key points
+  c.font=font(fs-1);
+  if (Tc!==null){
+    const x=xOfT(Tc), y=yOfP(env.Pc);
+    c.beginPath(); c.arc(x,y,4.5,0,2*Math.PI); c.fillStyle='#000'; c.fill();
+    c.textAlign='left'; c.textBaseline='bottom';
+    haloText(c,'critical point', x+7, y-3, '#000');
+  }
   {
-    const x=xOfT(PHYS.Tc), y=yOfP(PHYS.Pc);
+    const x=xOfT(env.Tcb), y=yOfP(env.Pcb);
     c.beginPath(); c.arc(x,y,4,0,2*Math.PI); c.fillStyle='#000'; c.fill();
-    c.font='18px Helvetica, Arial, sans-serif';
-    c.textAlign='left'; c.textBaseline='middle';
-    haloText(c, 'C', x+11, y-2, '#000');
+    c.textAlign='center'; c.textBaseline='bottom';
+    haloText(c,'cricondenbar', x, y-6, '#000');
   }
-  // cricondenbar (near the top — anchor label close to its point on the curve)
-  const dyCricondenbar = -14;
-  drawMarker(c, PHYS.Tcb, PHYS.Pcb, '#1c6e3e', 'cricondenbar', -8, dyCricondenbar, false, 'right');
-
-  // retrograde region annotation: arrows on each side + label to the left of the left arrow
   {
-    const arrowLen = 20;
-    const label = 'retrograde region';
-    c.font='18px Helvetica, Arial, sans-serif';
-    const textW = c.measureText(label).width;
-    const rightX = xTct + arrowLen;
-    const leftX = xTc - arrowLen - 8 - textW;
-    // Scan the dome's upper boundary across the whole horizontal span the annotation
-    // occupies (text + both arrows) and sit just above its highest point there, so the
-    // label and arrows never dip into the shaded two-phase region — with a small
-    // clear-air gap, but never above the top margin. Also stay clear of the
-    // cricondenbar label itself, which sits close to its own point on the curve.
-    let minCurveY = Infinity;
-    const steps = 24;
-    for (let i=0;i<=steps;i++){
-      const x = leftX + (rightX-leftX)*i/steps;
-      const T = AXIS.Tmin + (x-MARGIN.left)/(PT_W-MARGIN.left-MARGIN.right)*(AXIS.Tmax-AXIS.Tmin);
-      const y = yOfP(envelopeAt(T).Pmax);
-      if (y < minCurveY) minCurveY = y;
-    }
-    const domeBasedY = minCurveY - 12;
-    const cricondenbarLabelY = yOfP(PHYS.Pcb) + dyCricondenbar;
-    const stackBasedY = cricondenbarLabelY - 18;
-    const yAnnot = Math.max(MARGIN.top+9, Math.min(domeBasedY, stackBasedY));
-    c.lineWidth = 1.8;
-    c.strokeStyle = '#8a3540'; c.fillStyle = '#8a3540';
-    drawArrowLine(c, xTc-arrowLen, yAnnot, xTc, yAnnot);
-    drawArrowLine(c, xTct+arrowLen, yAnnot, xTct, yAnnot);
-    c.font='18px Helvetica, Arial, sans-serif';
+    const x=xOfT(env.Tct), y=yOfP(env.Pct);
+    c.beginPath(); c.arc(x,y,4,0,2*Math.PI); c.fillStyle='#000'; c.fill();
     c.textAlign='right'; c.textBaseline='middle';
-    c.fillText(label, xTc-arrowLen-8, yAnnot);
+    haloText(c,'cricondentherm', x-8, y, '#000');
   }
 
-  // isotherm line
-  const xT = xOfT(state.T);
-  c.save();
-  c.setLineDash([5,4]);
-  c.strokeStyle='#98000D'; c.lineWidth=1.6;
-  c.beginPath(); c.moveTo(xT, MARGIN.top); c.lineTo(xT, PT_H-MARGIN.bottom); c.stroke();
-  c.restore();
-  // isotherm drag handle (top)
-  c.fillStyle='#98000D';
-  c.beginPath();
-  c.moveTo(xT-6, MARGIN.top-2); c.lineTo(xT+6, MARGIN.top-2); c.lineTo(xT, MARGIN.top+9); c.closePath();
-  c.fill();
-
-  // cricondentherm (near the right tip — anchor label to the left; drawn after the isotherm
-  // line so its white background box fully covers the dashed line where they'd overlap)
-  drawMarker(c, PHYS.Tct, PHYS.Pct, '#7a3ea1', 'cricondentherm', -8, -12, false, 'right', true);
-
+  // path line + handle
+  c.save(); c.setLineDash([6,4]); c.strokeStyle=COL.path; c.lineWidth=1.7;
+  if (state.mode==='T'){
+    const x=xOfT(state.T);
+    c.beginPath(); c.moveTo(x,pt); c.lineTo(x,pb); c.stroke();
+    c.restore(); c.fillStyle=COL.path;
+    c.beginPath(); c.moveTo(x-7,pt); c.lineTo(x+7,pt); c.lineTo(x,pt+10); c.closePath(); c.fill();
+  } else {
+    const y=yOfP(state.P);
+    c.beginPath(); c.moveTo(pl,y); c.lineTo(pr,y); c.stroke();
+    c.restore(); c.fillStyle=COL.path;
+    c.beginPath(); c.moveTo(pr,y-7); c.lineTo(pr,y+7); c.lineTo(pr-10,y); c.closePath(); c.fill();
+  }
   // state point
-  const xP = xOfT(state.T), yP = yOfP(state.P);
-  const phase = state.phase;
-  let col = '#4a90c4';
-  if (phase==='two') col='#98000D';
-  else if (phase==='liquid') col='#2e7d32';
-  else if (phase==='dense') col='#555';
-  c.save();
-  c.setLineDash([3,3]);
-  c.strokeStyle='#999';
-  c.beginPath(); c.moveTo(MARGIN.left, yP); c.lineTo(xP, yP); c.stroke();
-  c.restore();
-  c.beginPath();
-  c.arc(xP,yP,6.3,0,2*Math.PI);
-  c.fillStyle=col; c.fill();
-  c.lineWidth=1.5; c.strokeStyle='#222'; c.stroke();
-}
-
-function haloText(c, text, x, y, color){
-  c.lineWidth=3.5; c.strokeStyle='rgba(255,255,255,0.92)';
-  c.strokeText(text, x, y);
-  c.fillStyle=color;
-  c.fillText(text, x, y);
-}
-function drawMarker(c,T,P,color,label,dx,dy,dashed,align,bgBox){
-  const x=xOfT(T), y=yOfP(P);
-  if (dashed){
-    c.save();
-    c.setLineDash([3,3]);
-    c.strokeStyle='#bbb';
-    c.beginPath(); c.moveTo(x,y); c.lineTo(x, PT_H-MARGIN.bottom); c.stroke();
-    c.beginPath(); c.moveTo(x,y); c.lineTo(MARGIN.left, y); c.stroke();
-    c.restore();
+  {
+    const x=xOfT(state.T), y=yOfP(state.P);
+    c.beginPath(); c.arc(x,y,7,0,2*Math.PI);
+    c.fillStyle = phaseColor(state.phase); c.fill();
+    c.lineWidth=1.6; c.strokeStyle='#000'; c.stroke();
   }
-  c.beginPath(); c.arc(x,y,4,0,2*Math.PI);
-  c.fillStyle=color; c.fill();
-  c.font='16.2px Helvetica, Arial, sans-serif';
-  c.textAlign = align || (dx<0 ? 'right':'left');
+}
+function phaseColor(ph){ return ph==='two'?COL.two : ph==='liquid'?COL.liquid : ph==='vapor'?COL.vapor : '#999'; }
+
+function retroRegion(){
+  const pts=env.pts;
+  if (state.mode==='T'){
+    if (env.Tc===null || !env.maxLiq || env.maxLiq.length<3) return null;
+    const up=pts.filter(p=>p.T>=env.Tc).map(p=>({T:p.T,P:p.Pmax}));
+    const poly=up.concat(env.maxLiq.slice().reverse());
+    return {poly, locus:env.maxLiq, label:'retrograde condensation', up};
+  } else {
+    if (!env.minLiq || env.minLiq.length<3) return null;
+    const up=pts.filter(p=>p.T>=env.Tcb && p.T<=env.Tc).map(p=>({T:p.T,P:p.Pmax}));
+    const poly=up.concat(env.minLiq);
+    return {poly, locus:env.minLiq, label:'retrograde vaporization', up};
+  }
+}
+function drawRetroLabel(c, fs, retro){
+  // point in the middle of the region
+  let tip;
+  if (state.mode==='T'){
+    const Tm=env.Tc+0.45*(env.Tct-env.Tc);
+    const Pu=interpEnv(env.pts,Tm).Pmax, Pl=lerpLocus(env.maxLiq,'T',Tm,'P') || Pu;
+    tip={x:xOfT(Tm), y:(yOfP(Pu)+yOfP(Pl))/2};
+  } else {
+    const Pm=env.Pc+0.5*(env.Pcb-env.Pc);
+    const Tl=lerpLocus(env.minLiq,'P',Pm,'T');
+    const ib=isobarBoundsCached(Pm);
+    if (Tl===null || !ib) return;
+    tip={x:(xOfT(Tl)+xOfT(ib.Thi))/2, y:yOfP(Pm)};
+  }
+  c.font=font(fs-1);
+  const words=retro.label.split(' ');
+  const tw=Math.max(...words.map(w=>c.measureText(w).width));
+  const m=margins();
+  const xLab=PT_W-m.right-tw-8;
+  // linear axis: top right corner (empty vapor region above the dome); log axis: the dome
+  // is squeezed against the top, so put the label in the vapor region below the cricondentherm
+  const yLab = state.logP ? Math.min(PT_H-m.bottom-3*fs, yOfP(env.Pct)+3.2*fs) : m.top+fs*1.4;
+  c.textAlign='left'; c.textBaseline='middle';
+  haloText(c, words[0], xLab, yLab, COL.retroEdge);
+  haloText(c, words[1], xLab, yLab+fs+2, COL.retroEdge);
+  c.strokeStyle=COL.retroEdge; c.fillStyle=COL.retroEdge; c.lineWidth=1.5;
+  if (state.logP) arrow(c, xLab+tw*0.3, yLab-fs*0.8, tip.x, tip.y+2);
+  else arrow(c, xLab+tw*0.3, yLab+fs*1.7, tip.x, tip.y-2);
+}
+let _ibCache={};
+function isobarBoundsCached(P){
+  const k=env.z1+':'+P.toFixed(0);
+  if (!(k in _ibCache)) _ibCache[k]=isobarBounds(env,P);
+  return _ibCache[k];
+}
+function drawLabels(c, fs){
+  const pts=env.pts;
+  c.font=font(fs);
   c.textBaseline='middle';
-  if (bgBox){
-    const tw = c.measureText(label).width;
-    const pad = 3;
-    const lx = x+dx, ly = y+dy;
-    let boxLeft = lx - pad;
-    if (c.textAlign==='right') boxLeft = lx - tw - pad;
-    else if (c.textAlign==='center') boxLeft = lx - tw/2 - pad;
-    c.fillStyle = '#fff';
-    c.fillRect(boxLeft, ly-9-pad, tw+2*pad, 18+2*pad);
+  const m=margins();
+  // liquid region (above the bubble curve) only if a bubble curve is on the plot
+  if (env.Tc!==null){
+    const T=AXIS.Tmin+0.08*(AXIS.Tmax-AXIS.Tmin);
+    const Pb=interpEnv(pts,T).Pmax;
+    const y=Math.min(yOfP(Pb)-fs*1.6, (m.top+yOfP(Pb))/2);
+    if (y>m.top+fs){ c.textAlign='left'; haloText(c,'liquid', xOfT(T)-4, y, COL.liquid); }
   }
-  haloText(c, label, x+dx, y+dy, color);
+  // vapor region: right of the cricondentherm
+  {
+    const x=(xOfT(env.Tct)+PT_W-m.right)/2;
+    const y=yOfP(env.Pct)+ (PT_H-m.bottom-yOfP(env.Pct))*(state.logP?0.62:0.45);
+    c.textAlign='center'; haloText(c,'vapor', Math.min(x, PT_W-m.right-c.measureText('vapor').width/2-3), y, COL.vapor);
+  }
+  // two-phase region
+  {
+    const T=AXIS.Tmin+(state.logP?0.3:0.42)*(env.Tct-AXIS.Tmin);
+    const b=interpEnv(pts,T);
+    const y=state.logP ? yOfP(Math.sqrt(b.Pmin*b.Pmax)) : yOfP(0.45*b.Pmin+0.55*b.Pmax)+fs;
+    c.textAlign='center'; haloText(c,'vapor + liquid', xOfT(T), y, '#000');
+  }
+  // curve labels
+  c.font=font(fs-1);
+  if (env.Tc!==null){
+    const T=AXIS.Tmin+0.5*(env.Tcb-AXIS.Tmin);
+    const P=interpEnv(pts,T).Pmax;
+    c.textAlign='left'; c.textBaseline='middle';
+    haloText(c,'bubble-point curve', xOfT(T)+8, yOfP(P)+fs*0.9, COL.bubble);
+  }
+  {
+    const T=env.Tct-0.3*(env.Tct-AXIS.Tmin);
+    const P=interpEnv(pts,T).Pmin;
+    if (state.logP){
+      // on the log axis the lower dew curve is well above the axis: label it on its vapor side
+      c.textAlign='left'; c.textBaseline='top';
+      haloText(c,'dew-point curve', xOfT(T)+14, yOfP(P)+10, COL.dew);
+    } else {
+      c.textAlign='right'; c.textBaseline='bottom';
+      const y=Math.min(yOfP(P)-6, PT_H-m.bottom-fs*0.9);
+      haloText(c,'dew-point curve', xOfT(T)-4, y, COL.dew);
+    }
+  }
+}
+function drawQuality(c){
+  const levels=Object.keys(env.quality).map(Number).sort((a,b)=>a-b);
+  const fs=fsBase();
+  c.save();
+  c.setLineDash([4,3]); c.lineWidth=1.2; c.strokeStyle=COL.qual;
+  const labels=[];
+  for (const l of levels){
+    const q=env.quality[l];
+    const rise=q.rise.slice().sort((a,b)=>a.T-b.T), fall=q.fall.slice().sort((a,b)=>b.T-a.T);
+    let line=rise.concat(fall);
+    if (env.Tc!==null && fall.length) line.push({T:env.Tc,P:env.Pc});
+    if (line.length<2) continue;
+    c.beginPath(); polyPath(c,line,p=>xOfT(p.T),p=>yOfP(p.P)); c.stroke();
+    // label on the line at a low temperature, well away from the retrograde region
+    const Tref = env.Tc!==null ? env.Tc : env.Tct;
+    const TL = AXIS.Tmin + 0.3*(Tref-AXIS.Tmin);
+    const PL = lerpLocus(rise,'T',TL,'P');
+    if (PL!==null) labels.push({x:xOfT(TL), y:yOfP(PL), t:Math.round(l*100)+'%'});
+  }
+  c.restore();
+  // labels sit on the lines (white halo breaks the dashed line behind the text)
+  c.font=font(fs-2); c.textAlign='center'; c.textBaseline='middle';
+  let lastY=1e9;
+  labels.sort((a,b)=>b.y-a.y).forEach(L=>{
+    const y=Math.min(L.y, lastY-(fs-1));
+    haloText(c,L.t,L.x,y,'#333',5);
+    lastY=y;
+  });
 }
 
-function computeQualCurve(T){
-  const b = envelopeAt(T);
-  const margin = 0.03*(b.Pmax-b.Pmin || b.Pmax*0.05);
-  const lo = Math.max(b.Pmin-margin, b.Pmin*0.6, 1e3);
-  const hi = b.Pmax+margin;
-  const n=46;
-  const curve=[];
-  let Kw = wilsonK(T, b.Pmin+0.5*(b.Pmax-b.Pmin));
-  // walk outward from mid to both ends for warm-start stability
-  const mid = Math.floor(n/2);
-  const Ps = []; for (let i=0;i<n;i++) Ps.push(lo+(hi-lo)*i/(n-1));
-  const Ls = new Array(n).fill(null);
-  let Kfwd = Kw.slice();
-  for (let i=mid;i<n;i++){
-    const r = flashBinary(T,Ps[i],Z_FEED,Kfwd,400,1e-11);
-    if (r.V===null){ Kfwd = wilsonK(T,Ps[i]); continue; }
-    Kfwd = r.K;
-    Ls[i] = Math.min(1,Math.max(0,1-r.V));
-  }
-  let Kbwd = Kw.slice();
-  for (let i=mid-1;i>=0;i--){
-    const r = flashBinary(T,Ps[i],Z_FEED,Kbwd,400,1e-11);
-    if (r.V===null){ Kbwd = wilsonK(T,Ps[i]); continue; }
-    Kbwd = r.K;
-    Ls[i] = Math.min(1,Math.max(0,1-r.V));
-  }
-  for (let i=0;i<n;i++) if (Ls[i]!==null) curve.push({P:Ps[i], L:Ls[i]});
-  return {curve, lo, hi};
-}
-
+/* =========================================================================
+   DRAWING: SMALL PLOT (liquid volume fraction along the path)
+   ========================================================================= */
 function drawQual(){
-  const c=ctxQ;
-  c.clearRect(0,0,Q_W,Q_H);
-  const m={left:54,right:14,top:42,bottom:40};
-  const {curve, lo, hi} = state.qualCurve;
-  c.strokeStyle='#888'; c.lineWidth=1;
-  c.strokeRect(m.left,m.top,Q_W-m.left-m.right,Q_H-m.top-m.bottom);
-  c.font='16px Helvetica, Arial, sans-serif';
-  c.fillStyle='#222'; c.textAlign='center'; c.textBaseline='middle';
-  c.fillText('liquid fraction vs. P', (m.left+Q_W-m.right)/2, 20);
-
-  if (!curve || curve.length<2 || (hi-lo) < Math.max(1e4, 0.01*hi)){
-    c.fillStyle='#777'; c.font='17px Helvetica, Arial, sans-serif'; c.textAlign='center'; c.textBaseline='middle';
-    c.fillText('No two-phase region exists', (m.left+Q_W-m.right)/2, (m.top+Q_H-m.bottom)/2-9);
-    c.fillText('at this temperature.', (m.left+Q_W-m.right)/2, (m.top+Q_H-m.bottom)/2+15);
+  const c=ctxQ; c.clearRect(0,0,Q_W,Q_H);
+  const m={left:46,right:14,top:46,bottom:44};
+  const pl=m.left, pr=Q_W-m.right, pt=m.top, pb=Q_H-m.bottom;
+  c.fillStyle='#000'; c.font=font(16); c.textAlign='center'; c.textBaseline='middle';
+  c.fillText('liquid volume fraction', (pl+pr)/2, 14);
+  const q=state.qual;
+  if (!q || q.none || q.pts.length<2){
+    c.strokeStyle=COL.axis; c.strokeRect(pl,pt,pr-pl,pb-pt);
+    c.font=font(16);
+    c.fillText('no two-phase region', (pl+pr)/2, (pt+pb)/2-10);
+    c.fillText(state.mode==='T'?'at this temperature':'at this pressure', (pl+pr)/2, (pt+pb)/2+12);
     return;
   }
+  const xOf=v=>pl+(v-q.lo)/(q.hi-q.lo)*(pr-pl);
+  const yOf=L=>pb-L*(pb-pt);
+  // grid + ticks
+  c.font=font(15); c.lineWidth=1;
+  [0,0.25,0.5,0.75,1].forEach(L=>{
+    c.strokeStyle=COL.grid; c.beginPath(); c.moveTo(pl,yOf(L)); c.lineTo(pr,yOf(L)); c.stroke();
+    c.fillStyle='#000'; c.textAlign='right'; c.textBaseline='middle';
+    c.fillText((L*100).toFixed(0), pl-5, yOf(L));
+  });
+  const scale = state.mode==='T' ? 1e5 : 1;
+  const tk=ticks(q.lo/scale, q.hi/scale, 4);
+  tk.list.forEach(v=>{
+    const x=xOf(v*scale);
+    if (x<pl-1 || x>pr+1) return;
+    c.strokeStyle=COL.grid; c.beginPath(); c.moveTo(x,pt); c.lineTo(x,pb); c.stroke();
+    c.fillStyle='#000'; c.textAlign='center'; c.textBaseline='top';
+    c.fillText(fmtTick(v,tk.step), x, pb+4);
+  });
+  c.strokeStyle=COL.axis; c.strokeRect(pl,pt,pr-pl,pb-pt);
+  c.fillStyle='#000'; c.textAlign='center'; c.textBaseline='bottom';
+  c.fillText(state.mode==='T' ? 'pressure (bar)' : 'temperature (K)', (pl+pr)/2, Q_H-3);
+  c.save(); c.translate(13,(pt+pb)/2); c.rotate(-Math.PI/2); c.textBaseline='middle'; c.fillText('%', 0, 0); c.restore();
 
-  const xOf = P => m.left + (P-lo)/(hi-lo)*(Q_W-m.left-m.right);
-  const yOf = L => Q_H-m.bottom - L*(Q_H-m.top-m.bottom-8);
-
-  c.fillStyle='#555'; c.textAlign='right'; c.textBaseline='middle'; c.font='15px Helvetica, Arial, sans-serif';
-  [0,0.5,1].forEach(L=>{ c.fillText((L*100).toFixed(0)+'%', m.left-6, yOf(L)); });
-  c.textAlign='center'; c.textBaseline='top';
-  c.fillText(lo.toFixed ? (lo/1e5).toFixed(0) : '', m.left, Q_H-m.bottom+6);
-  c.fillText((hi/1e5).toFixed(0), Q_W-m.right, Q_H-m.bottom+6);
-  c.fillText('P (bar)', (m.left+Q_W-m.right)/2, Q_H-m.bottom+6);
-
-  if (curve && curve.length>1){
-    c.beginPath();
-    curve.forEach((pt,i)=>{
-      const x=xOf(pt.P), y=yOf(pt.L);
-      if (i===0) c.moveTo(x,y); else c.lineTo(x,y);
-    });
-    c.strokeStyle='#98000D'; c.lineWidth=2; c.stroke();
+  // curve
+  c.save(); c.beginPath(); c.rect(pl,pt-2,pr-pl,pb-pt+4); c.clip();
+  c.beginPath(); q.pts.forEach((p,i)=>{ const x=xOf(p.x), y=yOf(p.L); if(i===0) c.moveTo(x,y); else c.lineTo(x,y); });
+  c.strokeStyle=COL.two; c.lineWidth=2; c.stroke();
+  c.restore();
+  // phase-boundary markers
+  c.font=font(14);
+  q.ends.forEach(e=>{
+    const L = e.kind==='bubble'?1:0, x=xOf(e.x), y=yOf(L);
+    c.beginPath(); c.arc(x,y,4,0,2*Math.PI); c.fillStyle=e.kind==='bubble'?COL.bubble:COL.dew; c.fill();
+    c.textAlign = x<(pl+pr)/2 ? 'left' : 'right'; c.textBaseline = L? 'top':'bottom';
+    haloText(c, e.kind==='bubble'?'bubble pt':'dew pt', x+(x<(pl+pr)/2?5:-5), y+(L?5:-5), e.kind==='bubble'?COL.bubble:COL.dew, 3);
+  });
+  // extremum inside the two-phase range (max for an isotherm, min for an isobar)
+  const inner=q.pts.filter(p=>p.L>0 && p.L<1);
+  if (inner.length>3){
+    let ext=inner[0];
+    const wantMax = state.mode==='T';
+    for (const p of inner) if (wantMax ? p.L>ext.L : p.L<ext.L) ext=p;
+    const i=q.pts.indexOf(ext);
+    const isInterior = i>0 && i<q.pts.length-1 &&
+      (wantMax ? (q.pts[i-1].L<ext.L && q.pts[i+1].L<=ext.L) : (q.pts[i-1].L>ext.L && q.pts[i+1].L>=ext.L)) &&
+      q.ends.every(e=> wantMax ? true : e.kind==='bubble');
+    const atEdge = wantMax ? (Math.max(...q.ends.map(e=>e.kind==='bubble'?1:0))===1) : false;
+    if (isInterior && !atEdge){
+      const x=xOf(ext.x), y=yOf(ext.L);
+      c.beginPath(); c.arc(x,y,4,0,2*Math.PI); c.fillStyle='#000'; c.fill();
+      c.textAlign='center'; c.textBaseline = wantMax?'bottom':'top';
+      haloText(c, wantMax?'max':'min', x, y+(wantMax?-6:6), '#000', 3);
+    }
+  }
+  // direction of the animated path
+  c.strokeStyle='#000'; c.fillStyle='#000'; c.lineWidth=1.4; c.font=font(14);
+  const ya=33;
+  if (state.mode==='T'){
+    arrow(c, pr-8, ya, pr-58, ya, 7);
+    c.textAlign='right'; c.textBaseline='middle'; c.fillText('lower P', pr-64, ya);
+  } else {
+    arrow(c, pl+8, ya, pl+58, ya, 7);
+    c.textAlign='left'; c.textBaseline='middle'; c.fillText('higher T', pl+64, ya);
   }
   // current point
-  const x=xOf(state.P), y=yOf(state.L===null?0:state.L);
-  if (state.P>=lo && state.P<=hi){
-    c.beginPath(); c.arc(x,y,4,0,2*Math.PI);
-    c.fillStyle='#222'; c.fill();
+  const xv = state.mode==='T' ? state.P : state.T;
+  if (xv>=q.lo && xv<=q.hi && state.Lv!==null){
+    c.beginPath(); c.arc(xOf(xv), yOf(state.Lv), 5.5, 0, 2*Math.PI);
+    c.fillStyle=phaseColor(state.phase); c.fill(); c.lineWidth=1.2; c.strokeStyle='#000'; c.stroke();
   }
 }
 
+/* =========================================================================
+   DRAWING: PVT CELL
+   ========================================================================= */
 function drawCell(){
-  const c=ctxC;
-  c.clearRect(0,0,C_W,C_H);
-  const cellX=20, cellY=16, cellW=50, cellH=182;
-  const L = state.L===null? (state.phase==='liquid'?1:0) : state.L;
-  const liqH = cellH*L;
-  const topColor = state.phase==='dense' ? '#dcd7e8' : '#dbe9f5';
-  // top phase (vapor, or dense supercritical-like fluid)
-  c.fillStyle=topColor;
-  c.fillRect(cellX, cellY, cellW, cellH-liqH);
-  // liquid (bottom)
-  c.fillStyle='#5f9bd1';
-  c.fillRect(cellX, cellY+cellH-liqH, cellW, liqH);
-  c.strokeStyle='#333'; c.lineWidth=1.5;
-  c.strokeRect(cellX, cellY, cellW, cellH);
-  c.font='14px Helvetica, Arial, sans-serif'; c.fillStyle='#333'; c.textAlign='center';
-  c.fillText('PVT cell', cellX+cellW/2, cellY+cellH+18);
-  c.font='12px Helvetica, Arial, sans-serif'; c.fillStyle='#444';
+  const c=ctxC; c.clearRect(0,0,C_W,C_H);
+  const x=18, y=12, w=50, h=C_H-46;
+  const L = state.Lv===null ? 0 : state.Lv;
+  const lh=h*L;
+  c.fillStyle = state.phase==='unknown' ? '#eee' : '#fde6c4';
+  c.fillRect(x,y,w,h-lh);
+  c.fillStyle='#2f6db5';
+  c.fillRect(x,y+h-lh,w,lh);
+  c.strokeStyle='#000'; c.lineWidth=1.5; c.strokeRect(x,y,w,h);
+  c.font=font(15); c.fillStyle='#000'; c.textAlign='center'; c.textBaseline='top';
+  c.fillText('cell', x+w/2, y+h+8);
+  c.font=font(13);
   if (state.phase==='two'){
-    c.fillText('vapor', cellX+cellW/2, cellY+13);
-    c.fillStyle='#fff';
-    c.fillText('liquid', cellX+cellW/2, cellY+cellH-8);
-  } else if (state.phase==='dense'){
-    c.fillText('dense fluid', cellX+cellW/2, cellY+cellH/2);
+    c.textBaseline='top'; c.fillStyle='#000'; c.fillText('vapor', x+w/2, y+4);
+    if (lh>18){ c.textBaseline='bottom'; c.fillStyle='#fff'; c.fillText('liquid', x+w/2, y+h-3); }
   } else if (state.phase==='vapor'){
-    c.fillText('vapor', cellX+cellW/2, cellY+cellH/2);
+    c.textBaseline='middle'; c.fillStyle='#000'; c.fillText('vapor', x+w/2, y+h/2);
   } else if (state.phase==='liquid'){
-    c.fillStyle='#fff';
-    c.fillText('liquid', cellX+cellW/2, cellY+cellH/2);
+    c.textBaseline='middle'; c.fillStyle='#fff'; c.fillText('liquid', x+w/2, y+h/2);
   }
 }
 
-/* ---------- physics update for the current (T,P) point ---------- */
-function updateCurrentPoint(){
-  const T=state.T, P=state.P;
-  if (state.lastT===null || Math.abs(T-state.lastT)>0.001 || !state.lastK){
-    state.lastK = wilsonK(T,P);
+/* =========================================================================
+   DRAWING: P-x-y DIAGRAM AT THE CURRENT TEMPERATURE
+   ========================================================================= */
+function drawPxy(){
+  const c=ctxX; c.clearRect(0,0,X_W,X_H);
+  const m={left:50,right:12,top:30,bottom:44};
+  const pl=m.left, pr=X_W-m.right, pt=m.top, pb=X_H-m.bottom;
+  c.fillStyle='#000'; c.font=font(16); c.textAlign='center'; c.textBaseline='middle';
+  c.fillText('P–x–y diagram at '+state.T.toFixed(1)+' K', (pl+pr)/2, 13);
+  const d=state.pxy;
+  if (!d){
+    c.strokeStyle=COL.axis; c.strokeRect(pl,pt,pr-pl,pb-pt);
+    c.fillText('not available at this', (pl+pr)/2, (pt+pb)/2-10);
+    c.fillText('temperature', (pl+pr)/2, (pt+pb)/2+12);
+    return;
   }
-  const r = flashBinary(T,P,Z_FEED,state.lastK,300,1e-10);
-  const b = envelopeAt(T);
-  if (r.V!==null && r.V>0 && r.V<1 && Math.max(...r.K.map(k=>Math.abs(k-1)))>1e-3){
-    state.phase='two'; state.L=1-r.V; state.x1=r.x[0]; state.y1=r.y[0];
-    state.lastK = r.K;
-  } else {
-    state.x1=null; state.y1=null;
-    if (P<=b.Pmin){ state.phase='vapor'; state.L=0; }
-    else if (P>=b.Pmax){
-      if (T<PHYS.Tc){ state.phase='liquid'; state.L=1; }
-      else { state.phase='dense'; state.L=null; }
-    } else {
-      // inside nominal bounds but flash failed (very near boundary) - snap using proximity
-      const fr = (P-b.Pmin)/Math.max(b.Pmax-b.Pmin,1e-6);
-      state.phase='two'; state.L = Math.max(0,Math.min(1, fr<0.5? fr*0.2 : 1-(1-fr)*0.2));
-    }
-    state.lastK = wilsonK(T, Math.min(Math.max(P,1e4),2.4e7));
+  const Pmax = Math.max(d.crit.P, state.P)*1.08;
+  const xOf=v=>pl+v*(pr-pl), yOf=P=>pb-P/Pmax*(pb-pt);
+  c.font=font(15); c.lineWidth=1;
+  [0,0.2,0.4,0.6,0.8,1].forEach(v=>{
+    const x=xOf(v);
+    c.strokeStyle=COL.grid; c.beginPath(); c.moveTo(x,pt); c.lineTo(x,pb); c.stroke();
+    c.fillStyle='#000'; c.textAlign='center'; c.textBaseline='top';
+    c.fillText(v===0||v===1?v.toFixed(0):v.toFixed(1), x, pb+4);
+  });
+  const tk=ticks(0,Pmax/1e5,4);
+  tk.list.forEach(v=>{
+    const y=yOf(v*1e5);
+    c.strokeStyle=COL.grid; c.beginPath(); c.moveTo(pl,y); c.lineTo(pr,y); c.stroke();
+    c.fillStyle='#000'; c.textAlign='right'; c.textBaseline='middle';
+    c.fillText(fmtTick(v,tk.step), pl-5, y);
+  });
+  c.strokeStyle=COL.axis; c.strokeRect(pl,pt,pr-pl,pb-pt);
+  c.fillStyle='#000'; c.textAlign='center'; c.textBaseline='bottom';
+  c.fillText('methane mole fraction', (pl+pr)/2, X_H-3);
+  c.save(); c.translate(12,(pt+pb)/2); c.rotate(-Math.PI/2); c.textBaseline='middle'; c.fillText('pressure (bar)',0,0); c.restore();
+
+  const pts=d.pts.concat([{P:d.crit.P, x:d.crit.x, y:d.crit.x}]);
+  c.save(); c.beginPath(); c.rect(pl,pt,pr-pl,pb-pt); c.clip();
+  c.fillStyle=COL.envFill;
+  c.beginPath(); pts.forEach((p,i)=>{ const X=xOf(p.x), Y=yOf(p.P); if(i===0) c.moveTo(X,Y); else c.lineTo(X,Y); });
+  for (let i=pts.length-1;i>=0;i--) c.lineTo(xOf(pts[i].y), yOf(pts[i].P));
+  c.closePath(); c.fill();
+  c.lineWidth=2.2;
+  c.beginPath(); pts.forEach((p,i)=>{ const X=xOf(p.x), Y=yOf(p.P); if(i===0) c.moveTo(X,Y); else c.lineTo(X,Y); });
+  c.strokeStyle=COL.bubble; c.stroke();
+  c.beginPath(); pts.forEach((p,i)=>{ const X=xOf(p.y), Y=yOf(p.P); if(i===0) c.moveTo(X,Y); else c.lineTo(X,Y); });
+  c.strokeStyle=COL.dew; c.stroke();
+  // feed composition and current pressure
+  c.setLineDash([5,4]); c.lineWidth=1.4; c.strokeStyle='#000';
+  c.beginPath(); c.moveTo(xOf(env.z1),pt); c.lineTo(xOf(env.z1),pb); c.stroke();
+  c.strokeStyle=COL.path;
+  c.beginPath(); c.moveTo(pl,yOf(state.P)); c.lineTo(pr,yOf(state.P)); c.stroke();
+  c.setLineDash([]);
+  c.restore();
+  // critical point
+  c.beginPath(); c.arc(xOf(d.crit.x), yOf(d.crit.P), 4, 0, 2*Math.PI); c.fillStyle='#000'; c.fill();
+  // tie line
+  if (state.phase==='two' && state.x1!==null){
+    const y=yOf(state.P);
+    c.strokeStyle='#000'; c.lineWidth=1.5;
+    c.beginPath(); c.moveTo(xOf(state.x1),y); c.lineTo(xOf(state.y1),y); c.stroke();
+    [[state.x1,COL.liquid],[state.y1,COL.vapor]].forEach(([v,col])=>{
+      c.beginPath(); c.arc(xOf(v),y,4.5,0,2*Math.PI); c.fillStyle=col; c.fill(); c.lineWidth=1; c.strokeStyle='#000'; c.stroke();
+    });
   }
-  state.lastT = T;
+  c.beginPath(); c.arc(xOf(env.z1), yOf(state.P), 5, 0, 2*Math.PI);
+  c.fillStyle=phaseColor(state.phase); c.fill(); c.lineWidth=1.2; c.strokeStyle='#000'; c.stroke();
+  // labels
+  c.font=font(14); c.textBaseline='middle';
+  {
+    // bubble curve label to the upper left of the curve, dew label right of its widest point
+    let iL=0; for (let i=0;i<d.pts.length;i++) if (d.pts[i].P<0.55*d.crit.P) iL=i;
+    const pL=d.pts[iL];
+    c.textAlign='right'; haloText(c,'bubble (x)', xOf(pL.x)-6, yOf(pL.P)-8, COL.bubble, 3);
+    let iV=0; d.pts.forEach((p,i)=>{ if (p.y>d.pts[iV].y) iV=i; });
+    const pV=d.pts[iV];
+    const xr=xOf(pV.y)+6, tw=c.measureText('dew (y)').width;
+    if (xr+tw < pr-2){ c.textAlign='left'; haloText(c,'dew (y)', xr, yOf(pV.P)+14, COL.dew, 3); }
+    else { c.textAlign='right'; haloText(c,'dew (y)', xOf(pV.y)-6, yOf(pV.P)+30, COL.dew, 3); }
+    c.textAlign='left'; haloText(c,'liquid', pl+6, pt+12, COL.liquid, 3);
+  }
+  c.textAlign='left'; c.textBaseline='bottom'; haloText(c,'z', xOf(env.z1)+4, pb-3, '#000', 3);
 }
 
-function fmtBar(Pa){ return (Pa/1e5).toFixed(1)+' bar'; }
+/* =========================================================================
+   READOUT, SLIDERS, RENDER LOOP
+   ========================================================================= */
+function fmtBar(Pa){ const b=Pa/1e5; return (b<1? b.toPrecision(2) : b<10 ? b.toFixed(2) : b.toFixed(1))+' bar'; }
 function fmtK(T){ return T.toFixed(1)+' K'; }
-
 function refreshReadout(){
   document.getElementById('roT').textContent = fmtK(state.T);
   document.getElementById('roP').textContent = fmtBar(state.P);
-  const pill = document.getElementById('roPhase');
-  if (state.phase==='two'){ pill.textContent='two-phase (V+L)'; }
-  else if (state.phase==='liquid'){ pill.textContent='single-phase liquid'; }
-  else if (state.phase==='dense'){ pill.textContent='single phase (dense fluid)'; }
-  else { pill.textContent='single-phase vapor'; }
-  document.getElementById('roL').textContent = state.L===null? '–' : (state.L*100).toFixed(1)+' %';
+  const names = {two:'vapor + liquid', liquid:'single-phase liquid', vapor:'single-phase vapor', unknown:'not converged'};
+  document.getElementById('roPhase').innerHTML =
+    '<span class="dot" style="background:'+phaseColor(state.phase)+'"></span>'+names[state.phase];
+  const pct=v=> v===null? '–' : (v*100).toFixed(1)+' %';
+  document.getElementById('roLv').textContent = pct(state.Lv);
+  document.getElementById('roLm').textContent = pct(state.Lm);
   document.getElementById('roX').textContent = state.x1===null? '–' : state.x1.toFixed(3);
   document.getElementById('roY').textContent = state.y1===null? '–' : state.y1.toFixed(3);
+  document.getElementById('roRhoL').textContent = state.rhoL===null? '–' : state.rhoL.toFixed(0);
+  document.getElementById('roRhoV').textContent = state.rhoV===null? '–' : state.rhoV.toFixed(0);
 }
 
-let qualDirty = true;
-function fullRender(){
-  updateCurrentPoint();
-  if (qualDirty){
-    state.qualCurve = computeQualCurve(state.T);
-    qualDirty = false;
-  }
-  drawPT();
-  drawQual();
-  drawCell();
-  refreshReadout();
-  syncSlidersFromState();
+const Tslider=document.getElementById('Tslider'), Pslider=document.getElementById('Pslider'), Zslider=document.getElementById('Zslider');
+function PfromSlider(f){
+  if (state.logP){ const l0=Math.log10(AXIS.PminLog), l1=Math.log10(AXIS.Pmax); return Math.pow(10,l0+f*(l1-l0)); }
+  return Math.max(1e3, f*AXIS.Pmax);
 }
-
-/* ---------- sliders ---------- */
-const Tslider = document.getElementById('Tslider');
-const Pslider = document.getElementById('Pslider');
-let sliderSyncGuard=false;
-function syncSlidersFromState(){
-  sliderSyncGuard=true;
-  const tFrac = (state.T-AXIS.Tmin)/(AXIS.Tmax-AXIS.Tmin);
-  Tslider.value = Math.round(tFrac*1000);
-  const pFrac = (state.P-AXIS.Pmin)/(AXIS.Pmax-AXIS.Pmin);
-  Pslider.value = Math.round(Math.min(1,Math.max(0,pFrac))*1000);
+function sliderFromP(P){
+  if (state.logP){ const l0=Math.log10(AXIS.PminLog), l1=Math.log10(AXIS.Pmax); return (Math.log10(P)-l0)/(l1-l0); }
+  return P/AXIS.Pmax;
+}
+function syncSliders(){
+  Tslider.value = Math.round((state.T-AXIS.Tmin)/(AXIS.Tmax-AXIS.Tmin)*1000);
+  Pslider.value = Math.round(Math.min(1,Math.max(0,sliderFromP(state.P)))*1000);
   document.getElementById('TsliderVal').textContent = fmtK(state.T);
   document.getElementById('PsliderVal').textContent = fmtBar(state.P);
-  sliderSyncGuard=false;
 }
-Tslider.addEventListener('input', ()=>{
-  if (sliderSyncGuard) return;
-  const frac = Tslider.value/1000;
-  state.T = AXIS.Tmin + frac*(AXIS.Tmax-AXIS.Tmin);
-  qualDirty = true;
-  requestRender();
-});
-Pslider.addEventListener('input', ()=>{
-  if (sliderSyncGuard) return;
-  const frac = Pslider.value/1000;
-  state.P = AXIS.Pmin + frac*(AXIS.Pmax-AXIS.Pmin);
-  requestRender();
-});
 
-/* ---------- pointer dragging on the main canvas ---------- */
-function canvasPos(evt){
-  const r = ptCanvas.getBoundingClientRect();
-  return { x:(evt.clientX-r.left)*(PT_W/r.width), y:(evt.clientY-r.top)*(PT_H/r.height) };
+function pathKey(){ return state.mode+':'+(state.mode==='T'? state.T.toFixed(3) : state.P.toFixed(0))+':'+env.z1; }
+function fullRender(){
+  updateCurrentPoint();
+  const k=pathKey();
+  if (k!==state.qualKey){ state.qual=computePathCurve(); state.qualKey=k; }
+  if (state.showPxy && (state.pxyT===null || Math.abs(state.pxyT-state.T)>1e-6)){
+    state.pxy=computePxy(state.T); state.pxyT=state.T;
+  }
+  drawPT(); drawQual(); drawCell(); refreshReadout(); syncSliders();
+  if (state.showPxy) drawPxy();
 }
-ptCanvas.addEventListener('pointerdown', (evt)=>{
-  const pos = canvasPos(evt);
-  const xT = xOfT(state.T), yP = yOfP(state.P);
-  const dPoint = Math.hypot(pos.x-xT, pos.y-yP);
-  if (dPoint < 14){
-    state.dragging = 'point';
-  } else if (Math.abs(pos.x-xT) < 10){
-    state.dragging = 'isotherm';
-  } else {
-    state.dragging = 'isotherm';
-    state.T = Math.min(AXIS.Tmax, Math.max(AXIS.Tmin, TofX(pos.x)));
-    qualDirty = true;
-  }
-  ptCanvas.setPointerCapture(evt.pointerId);
-  requestRender();
-});
-ptCanvas.addEventListener('pointermove', (evt)=>{
-  if (!state.dragging) return;
-  const pos = canvasPos(evt);
-  if (state.dragging==='isotherm'){
-    state.T = Math.min(AXIS.Tmax, Math.max(AXIS.Tmin, TofX(pos.x)));
-    qualDirty = true;
-  } else if (state.dragging==='point'){
-    state.P = Math.min(AXIS.Pmax, Math.max(1e3, PofY(pos.y)));
-  }
-  requestRender();
-});
-function endDrag(evt){ state.dragging=null; }
-ptCanvas.addEventListener('pointerup', endDrag);
-ptCanvas.addEventListener('pointercancel', endDrag);
-
 let rafPending=false;
 function requestRender(){
   if (rafPending) return;
@@ -1163,62 +1770,191 @@ function requestRender(){
   requestAnimationFrame(()=>{ rafPending=false; fullRender(); });
 }
 
-/* ---------- animate depressurization ---------- */
+Tslider.addEventListener('input', ()=>{
+  if (state.animating) return;
+  state.T = AXIS.Tmin + Tslider.value/1000*(AXIS.Tmax-AXIS.Tmin);
+  requestRender();
+});
+Pslider.addEventListener('input', ()=>{
+  if (state.animating) return;
+  state.P = clampP(PfromSlider(Pslider.value/1000));
+  requestRender();
+});
+Zslider.addEventListener('input', ()=>{
+  document.getElementById('ZsliderVal').textContent=(Zslider.value/100).toFixed(2);
+});
+Zslider.addEventListener('change', ()=>{
+  const z1=Zslider.value/100;
+  if (Math.abs(z1-env.z1)<1e-9) return;
+  recompute(z1);
+});
+document.querySelectorAll('input[name=pathMode]').forEach(r=>r.addEventListener('change', ()=>{
+  state.mode = document.querySelector('input[name=pathMode]:checked').value;
+  document.getElementById('animBtn').textContent = state.mode==='T' ? 'animate depressurization' : 'animate heating';
+  if (state.mode==='P' && !env.minLiq){ computeMinLiq(env); }
+  requestRender();
+}));
+document.getElementById('chkLog').addEventListener('change', e=>{ state.logP=e.target.checked; state.P=clampP(state.P); requestRender(); });
+document.getElementById('chkQual').addEventListener('change', e=>{
+  state.showQ=e.target.checked;
+  if (state.showQ && !env.quality){ withBusy('calculating quality lines…', ()=>{ computeQuality(env); requestRender(); }); }
+  else requestRender();
+});
+document.getElementById('chkPxy').addEventListener('change', e=>{
+  state.showPxy=e.target.checked;
+  pxyCanvas.hidden=!state.showPxy;
+  state.pxyT=null;
+  requestRender();
+});
+
+function withBusy(msg, fn){
+  const b=document.getElementById('busyMsg');
+  b.firstElementChild.textContent=msg; b.hidden=false;
+  setTimeout(()=>{ try{ fn(); } finally { b.hidden=true; } }, 30);
+}
+
+/* ---------- dragging on the P-T diagram ---------- */
+function canvasPos(evt){
+  const r=ptCanvas.getBoundingClientRect();
+  return {x:(evt.clientX-r.left)*(PT_W/r.width), y:(evt.clientY-r.top)*(PT_H/r.height)};
+}
+function hitTest(pos, touch){
+  const rp = touch ? 22 : 12, rl = touch ? 16 : 8;
+  const xp=xOfT(state.T), yp=yOfP(state.P);
+  if (Math.hypot(pos.x-xp,pos.y-yp)<rp) return 'point';
+  const m=margins();
+  if (pos.x<m.left-4 || pos.x>PT_W-m.right+4 || pos.y<m.top-6 || pos.y>PT_H-m.bottom+4) return null;
+  if (state.mode==='T' && Math.abs(pos.x-xp)<rl) return 'line';
+  if (state.mode==='P' && Math.abs(pos.y-yp)<rl) return 'line';
+  return null;
+}
+function cursorFor(hit){
+  if (!hit) return 'default';
+  // in constant-T mode the line moves in T (sideways) and the point in P (up/down); reversed for constant P
+  const horizontal = (state.mode==='T') === (hit==='line');
+  return horizontal ? 'ew-resize' : 'ns-resize';
+}
+ptCanvas.addEventListener('pointerdown', evt=>{
+  if (state.animating) return;
+  const hit=hitTest(canvasPos(evt), evt.pointerType==='touch');
+  if (!hit) return;
+  state.dragging=hit;
+  ptCanvas.setPointerCapture(evt.pointerId);
+  evt.preventDefault();
+});
+ptCanvas.addEventListener('pointermove', evt=>{
+  const pos=canvasPos(evt);
+  if (!state.dragging){
+    ptCanvas.style.cursor = state.animating ? 'default' : cursorFor(hitTest(pos,false));
+    return;
+  }
+  const movesT = (state.mode==='T') === (state.dragging==='line');
+  if (movesT) state.T=clampT(TofX(pos.x)); else state.P=clampP(PofY(pos.y));
+  requestRender();
+});
+function endDrag(){ state.dragging=null; }
+ptCanvas.addEventListener('pointerup', endDrag);
+ptCanvas.addEventListener('pointercancel', endDrag);
+
+/* ---------- animation (controls are locked while it runs) ---------- */
 let animTimer=null;
+function setLocked(lock){
+  state.animating=lock;
+  document.querySelectorAll('#controlsWrap input, #optRow input').forEach(i=>{ i.disabled=lock; });
+}
+function stopAnim(){
+  if (animTimer){ clearInterval(animTimer); animTimer=null; }
+  setLocked(false);
+  document.getElementById('animBtn').textContent = state.mode==='T' ? 'animate depressurization' : 'animate heating';
+}
 document.getElementById('animBtn').addEventListener('click', ()=>{
-  const btn = document.getElementById('animBtn');
-  if (animTimer){ clearInterval(animTimer); animTimer=null; btn.textContent='animate depressurization ↓P'; return; }
-  const b = envelopeAt(state.T);
-  state.P = Math.min(AXIS.Pmax, b.Pmax*1.25);
-  qualDirty = true;
-  const Pstart = state.P;
-  const Pend = Math.max(1e3, b.Pmin*0.6);
-  const steps = 160;
-  let i=0;
-  btn.textContent='stop';
-  animTimer = setInterval(()=>{
+  if (animTimer){ stopAnim(); return; }
+  let from, to, set;
+  if (state.mode==='T'){
+    const b = state.T<env.Tct ? interpEnv(env.pts,state.T) : {Pmin:env.Pct*0.5, Pmax:env.Pct};
+    from = Math.min(AXIS.Pmax, b.Pmax*1.15+0.02*AXIS.Pmax);
+    to = state.logP ? Math.max(AXIS.PminLog, b.Pmin*0.3) : Math.max(1e3, b.Pmin*0.5);
+    set = v=>{ state.P=v; };
+  } else {
+    const ib = isobarBounds(env,state.P);
+    const span = AXIS.Tmax-AXIS.Tmin;
+    from = ib ? Math.max(AXIS.Tmin, ib.Tlo-0.05*span) : AXIS.Tmin;
+    to   = ib ? Math.min(AXIS.Tmax, ib.Thi+0.05*span) : AXIS.Tmax;
+    set = v=>{ state.T=v; };
+  }
+  const steps=170; let i=0;
+  const logStep = state.mode==='T' && state.logP;
+  setLocked(true);
+  document.getElementById('animBtn').textContent='stop';
+  set(from); requestRender();
+  animTimer=setInterval(()=>{
     i++;
-    const f = i/steps;
-    state.P = Pstart + (Pend-Pstart)*f;
+    const f=i/steps;
+    set(logStep ? from*Math.pow(to/from,f) : from+(to-from)*f);
     requestRender();
-    if (i>=steps){ clearInterval(animTimer); animTimer=null; btn.textContent='animate depressurization ↓P'; }
+    if (i>=steps) stopAnim();
   }, 35);
 });
 
 /* =========================================================================
-   BOOT
+   ENVELOPE (RE)CALCULATION AND BOOT
    ========================================================================= */
-function fmtNum(x,d){ return x.toFixed(d); }
+function setAxes(){
+  const span=env.Tct-200;
+  AXIS.Tmin=200;
+  AXIS.Tmax=Math.ceil((env.Tct+0.13*span)/10)*10;
+  AXIS.Pmax=Math.ceil(env.Pcb*1.15/1e6)*1e6;
+  AXIS.PminLog=1e3;
+}
+function updateComputedNumbers(){
+  const f=(v,d)=>v.toFixed(d);
+  let s='Calculated for this mixture (z<sub>1</sub> = '+f(env.z1,2)+'): ';
+  if (env.Tc!==null) s+='critical point T<sub>c</sub> = '+f(env.Tc,1)+' K, P<sub>c</sub> = '+f(env.Pc/1e5,1)+' bar; ';
+  s+='cricondentherm '+f(env.Tct,1)+' K at '+f(env.Pct/1e5,0)+' bar; cricondenbar '+f(env.Pcb/1e5,1)+' bar at '+f(env.Tcb,0)+' K.';
+  if (env.Tc!==null) s+=' Isothermal retrograde condensation is possible from '+f(env.Tc,0)+' K to '+f(env.Tct,0)+' K.';
+  document.getElementById('computedNumbers').innerHTML=s;
+}
+function recompute(z1){
+  if (animTimer) stopAnim();
+  withBusy('calculating the envelope…', ()=>{
+    const fracT=(state.T-AXIS.Tmin)/(AXIS.Tmax-AXIS.Tmin), oldEnv=env;
+    env=computeEnvelope(z1);
+    _ibCache={};
+    if (state.mode==='P') computeMinLiq(env);
+    if (state.showQ) computeQuality(env);
+    setAxes();
+    // keep the point at the same place relative to the new envelope's retrograde range
+    if (oldEnv && oldEnv.Tc!==null && env.Tc!==null){
+      const g=(state.T-oldEnv.Tc)/(oldEnv.Tct-oldEnv.Tc);
+      state.T = clampT(env.Tc + g*(env.Tct-env.Tc));
+    } else state.T=clampT(AXIS.Tmin+fracT*(AXIS.Tmax-AXIS.Tmin));
+    state.P=clampP(state.P);
+    state.lastK=null; state.qualKey=''; state.pxyT=null;
+    updateComputedNumbers();
+    fullRender();
+  });
+}
 function boot(){
+  env=computeEnvelope(0.70);
+  document.getElementById('loadMsg').hidden=true;
+  document.getElementById('simGrid').hidden=false;
+  document.getElementById('controlsWrap').hidden=false;
   resizeCanvases();
-  computeEnvelope();
-  AXIS.Tmin = 200;
-  AXIS.Tmax = PHYS.Tmax;
-  AXIS.Pmax = PHYS.Pcb*1.15;
-
-  state.T = Math.min(PHYS.Tc + (PHYS.Tct-PHYS.Tc)*0.5, PHYS.Tct-2);
-  const b0 = envelopeAt(state.T);
-  state.P = b0.Pmin + 0.35*(b0.Pmax-b0.Pmin);
-
-  document.getElementById('computedNumbers').innerHTML =
-    'Computed for this mixture (z<sub>1</sub> = 0.70): critical point <i>T<sub>c</sub></i> ≈ '+fmtNum(PHYS.Tc,0)+' K, '+
-    '<i>P<sub>c</sub></i> ≈ '+fmtNum(PHYS.Pc/1e5,0)+' bar; cricondentherm ≈ '+fmtNum(PHYS.Tct,0)+' K at '+fmtNum(PHYS.Pct/1e5,0)+
-    ' bar; cricondenbar ≈ '+fmtNum(PHYS.Pcb/1e5,0)+' bar at '+fmtNum(PHYS.Tcb,0)+' K. The retrograde region spans about '+
-    fmtNum(PHYS.Tct-PHYS.Tc,0)+' K, from the critical temperature to the cricondentherm.';
-
-  document.getElementById('loadMsg').hidden = true;
-  document.getElementById('simGrid').hidden = false;
-  document.getElementById('controlsWrap').hidden = false;
-  resizeCanvases();
-
-  qualDirty = true;
+  setAxes();
+  state.T = env.Tc!==null ? env.Tc+0.35*(env.Tct-env.Tc) : 0.5*(AXIS.Tmin+AXIS.Tmax);
+  const b=interpEnv(env.pts,state.T);
+  state.P = b.Pmin+0.6*(b.Pmax-b.Pmin);
+  updateComputedNumbers();
   fullRender();
 }
-if (document.readyState==='complete' || document.readyState==='interactive'){
-  setTimeout(boot, 30);
-} else {
-  window.addEventListener('DOMContentLoaded', ()=>setTimeout(boot,30));
-}
+let resizeTimer=null;
+window.addEventListener('resize', ()=>{
+  clearTimeout(resizeTimer);
+  resizeTimer=setTimeout(()=>{ if (env){ resizeCanvases(); fullRender(); } }, 60);
+});
+if (document.readyState!=='loading') setTimeout(boot, 30);
+else window.addEventListener('DOMContentLoaded', ()=>setTimeout(boot,30));
+
 </script>
 </body>
 </html>

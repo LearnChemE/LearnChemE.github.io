@@ -50,18 +50,27 @@ aside{grid-row-start:span 2;}
 .card h2{margin:0 0 8px;font-size:17px;font-weight:600;color:#000;padding-bottom:6px;border-bottom:1px solid var(--line)}
 .ctl{margin:11px 0}
 .ctl label{display:flex;justify-content:space-between;font-size:17px;color:#000}
-.ctl label b{font-weight:400;font-variant-numeric:tabular-nums}
-.ctl small{color:#5b6b7a;display:block;font-size:14px;font-weight:400}
+.ctl label{gap:8px}
+.ctl label b{font-weight:400;font-variant-numeric:tabular-nums;white-space:nowrap}
+.ctl small{color:#000;display:block;font-size:14px;font-weight:400}
 input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
 input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
 input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
-.presets{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}
-.presets button{font:inherit;font-size:15px;font-weight:400;border:1px solid var(--line);background:#fff;color:#000;border-radius:6px;padding:5px 9px;cursor:pointer}
-.presets button:hover{background:#eef3f9}
-.top{display:grid;grid-column:2;grid-row:1;grid-template-columns:minmax(300px,1.15fr) minmax(260px,1fr);gap:16px;min-width:0;}
+.presets{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px}
+.presets button{font:inherit;font-size:15px;font-weight:400;border:1px solid #4a9fd8;background:#5aaee6;color:#fff;border-radius:6px;padding:5px 7px;cursor:pointer}
+.presets button:hover{background:#4a9fd8}
+.presets button.sel{background:#1d5f99;border-color:#1d5f99}
+.grpHead{font-size:17px;font-weight:600;color:#000;margin:14px 0 2px}
+.grp .ctl{margin-left:14px}
+.right{display:grid;gap:16px;min-width:0}
+.top{display:grid;grid-template-columns:minmax(300px,1.15fr) minmax(260px,1fr);gap:16px}
 @media(max-width:1340px){.top{grid-template-columns:1fr}}
 canvas{width:100%;display:block}
-.stats{display:flex;flex-wrap:wrap;gap:8px}
+.stats{display:block}
+.statGrp{display:flex;flex-wrap:wrap;gap:8px}
+.statHead{font-size:17px;font-weight:600;color:#000;margin:10px 0 6px}
+.statHead:first-child{margin-top:0}
+.statGrp+.statGrp{margin-top:8px}
 .stat{flex:0 0 auto;border:1px solid var(--line);border-radius:8px;padding:7px 9px;background:#fbfcfd}
 .stat span{display:block;font-size:17px;color:#000;font-weight:400}
 .stat b{font-size:17px;font-weight:400;color:#000;font-variant-numeric:tabular-nums}
@@ -95,7 +104,8 @@ canvas{width:100%;display:block}
   <div class="panelBody">
     <p>This simulation shows how a counter-flow, evaporative cooling tower cools hot water by bringing it into direct contact with air. Water trickles downward through a bed of fill while air is drawn upward; a small fraction of the water evaporates, and that evaporation removes most of the heat from the rest of the water. The simulation solves the Merkel equation for the tower's performance.</p>
     <p>Use the sliders to set the hot water inlet temperature, the air's dry-bulb and wet-bulb temperatures, the water-to-air mass ratio (L/G), the packing capability (KaV/L), the inlet water flow rate, and the cycles of concentration. The preset buttons load typical operating conditions.</p>
-    <p>The schematic shows water cooling as it falls through the fill and air warming and picking up moisture as it rises. The cold water leaving the basin is pumped through a heat exchanger, where it absorbs heat from whatever is being cooled, and returns to the top of the tower as the hot water shown entering the fill &mdash; the same water is recirculated continuously around this loop. To minimize build up of dissolved solids in the water in the basin, some water is removed in a blowdown stream. Because of blowdown and because some water evaporates, makeup water is added to the basin to maintain a constant flow rate of water through the system. The enthalpy diagram shows the driving force between the air and the saturation curve. The blue line shows the air enthalpy at the bottom and top of the tower but it uses the water temperature at those locations for the x axis. The middle chart shows water and air temperature through the height of the fill. The third chart shows how the cold water temperature depends on L/G at the current packing capability.</p>
+    <p>The schematic shows water cooling as it falls through the fill and air warming and picking up moisture as it rises. The cold water leaving the basin is pumped through a heat exchanger, where it absorbs heat from whatever is being cooled, and returns to the top of the tower as the hot water shown entering the fill &mdash; the same water is recirculated continuously around this loop. Note that the heat exchanger and the cooling tower are not on the same scale.</p>
+     <p>To minimize build up of dissolved solids in the water in the basin, some water is removed in a blowdown stream. Because of blowdown and because some water evaporates, makeup water is added to the basin to maintain a constant flow rate of water through the system. The enthalpy diagram shows the driving force between the air and the saturation curve. The blue line shows the air enthalpy at the bottom and top of the tower but it uses the water temperature at those locations for the x axis. The middle chart shows water and air temperature through the height of the fill. The third chart shows how the cold water temperature depends on L/G at the current packing capability.</p>
     <p class="symTitle">Things to try</p>
     <ul class="symlist">
       <li><b>Approach vs. wet bulb.</b> Lower the wet-bulb temperature and watch the cold water follow it down. The cold water can never reach the wet bulb; the gap is the approach.</li>
@@ -209,6 +219,14 @@ function Wfrom(Tdb,Twb){
   var w=Ws(Twb);
   return ((2501-2.326*Twb)*w-1.006*(Tdb-Twb))/(2501+1.86*Tdb-4.186*Twb);
 }
+/* relative humidity of air at (Tdb, Twb) */
+function RHfrom(Tdb,Twb){var W=Wfrom(Tdb,Twb);return (W*P/(0.622+W))/Psat(Tdb);}
+/* lowest wet bulb (on the 0.5 °C slider grid, and >= 2 °C) that keeps RH >= 5% */
+function TwbMin(Tdb){
+  var lo=-30,hi=Tdb;
+  for(var i=0;i<60;i++){var m=(lo+hi)/2;if(RHfrom(Tdb,m)<0.05)lo=m;else hi=m;}
+  return Math.min(Tdb,Math.max(2,Math.ceil(hi*2-1e-9)/2));
+}
 function Tdbfrom(h,W){return (h-2501*W)/(1.006+1.86*W);}
 
 /* ---------- Merkel model ---------- */
@@ -320,13 +338,13 @@ document.addEventListener("keydown",function(e){if(e.key==="Escape")closeAllPane
 /* ---------- state & UI ---------- */
 var S={Th:40,Tdb:30,Twb:22,LG:1.2,M:1.5,L:100,COC:4};
 var defs=[
- {k:"Th", name:"Hot water inlet temperature", u:"°C", min:25,max:60,step:0.5,d:1},
- {k:"Tdb",name:"Air dry-bulb temperature", u:"°C", min:5,max:45,step:0.5,d:1},
- {k:"Twb",name:"Air wet-bulb temperature", u:"°C", min:2,max:45,step:0.5,d:1,note:"Cannot exceed dry bulb"},
- {k:"LG", name:"Water-to-air mass ratio, L/G", u:"", min:0.4,max:3,step:0.05,d:2,note:"kg water per kg dry air"},
- {k:"M",  name:"Packing capability, KaV/L", u:"", min:0.2,max:4,step:0.05,d:2,note:"Merkel number; larger = more fill"},
- {k:"L",  name:"Inlet water flow rate, L", u:"kg/s", min:10,max:500,step:5,d:0},
- {k:"COC",name:"Cycles of concentration", u:"", min:1.5,max:8,step:0.5,d:1,note:"Sets blowdown and makeup"}
+ {k:"Tdb",g:"Inlet air temperatures",name:"Dry bulb", u:"°C", min:5,max:45,step:0.5,d:1},
+ {k:"Twb",g:"Inlet air temperatures",name:"Wet bulb", u:"°C", min:2,max:45,step:0.5,d:1,note:"Cannot exceed dry bulb"},
+ {k:"Th", g:"Water",name:"Hot water inlet temperature", u:"°C", min:25,max:60,step:0.5,d:1},
+ {k:"L",  g:"Water",name:"Inlet water flow rate, L", u:"kg/s", min:10,max:500,step:5,d:0},
+ {k:"LG", g:"Water",name:"Water-to-air mass ratio, L/G", u:"", min:0.4,max:3,step:0.05,d:2,note:"kg water per kg dry air"},
+ {k:"COC",g:"Water",name:"Cycles of concentration", u:"", min:1.5,max:8,step:0.5,d:1,note:"Sets blowdown and makeup"},
+ {k:"M",  name:"Packing capability, KaV/L", u:"", min:0.2,max:4,step:0.05,d:2,note:"Merkel number; larger = more fill"}
 ];
 var presets={
  "Summer design":{Th:40,Tdb:33,Twb:25,LG:1.2,M:1.5,L:100,COC:4},
@@ -335,31 +353,69 @@ var presets={
  "Undersized fill":{Th:40,Tdb:30,Twb:22,LG:1.2,M:0.5,L:100,COC:4},
  "Winter":{Th:32,Tdb:5,Twb:2,LG:1.0,M:1.5,L:100,COC:4}
 };
-var sl=document.getElementById("sliders"),els={};
+var sl=document.getElementById("sliders"),els={},grps={};
 defs.forEach(function(d){
+  var host=sl;
+  if(d.g){
+    if(!grps[d.g]){
+      var gd=document.createElement("div");gd.className="grp";
+      var h=document.createElement("div");h.className="grpHead";h.textContent=d.g;
+      gd.appendChild(h);sl.appendChild(gd);grps[d.g]=gd;
+    }
+    host=grps[d.g];
+  }
   var div=document.createElement("div");div.className="ctl";
   div.innerHTML='<label><span>'+d.name+'</span><b id="v_'+d.k+'"></b></label>'+
    '<input type="range" id="r_'+d.k+'" min="'+d.min+'" max="'+d.max+'" step="'+d.step+'">'+
    (d.note?'<small>'+d.note+'</small>':'');
-  sl.appendChild(div);
+  host.appendChild(div);
   els[d.k]={r:div.querySelector("input"),v:div.querySelector("b"),d:d};
-  els[d.k].r.addEventListener("input",function(){S[d.k]=parseFloat(this.value);onInput(d.k);});
+  els[d.k].r.addEventListener("input",function(){S[d.k]=parseFloat(this.value);selPreset(null);onInput(d.k);});
 });
 function syncUI(){
-  els.Twb.r.max=S.Tdb;
+  els.Twb.r.min=TwbMin(S.Tdb);els.Twb.r.max=S.Tdb;
   defs.forEach(function(d){
     var e=els[d.k];e.r.value=S[d.k];
     e.v.textContent=S[d.k].toFixed(d.d)+(d.u?" "+d.u:"");
   });
 }
+/* ---------- minimum heat duty ----------
+   Heat duty = L*CL*range must stay >= QMIN. When a slider move would take it below that, the
+   slider stops at the last value (on its own step grid) that still meets the limit, with the
+   other settings held as they are. */
+var QMIN=1.5; // MW
+var lastGood=Object.assign({},S),qLimited=false;
+function applyClamps(s,k){
+  if(k==="Tdb"){if(s.Twb>s.Tdb)s.Twb=s.Tdb;var tmin=TwbMin(s.Tdb);if(s.Twb<tmin)s.Twb=tmin;}
+}
+function heatDutyOK(s){
+  if(!(s.Th>s.Twb+0.3))return false;
+  var W=Wfrom(s.Tdb,s.Twb),hin=hAir(s.Tdb,W);
+  var rg=s.Th-solveTc(s.Th,s.Twb,s.LG,hin,s.M);
+  return s.L*CL*rg/1000>=QMIN-1e-9;
+}
 function onInput(k){
-  if(k==="Tdb"&&S.Twb>S.Tdb)S.Twb=S.Tdb;
+  var trial=Object.assign({},lastGood);trial[k]=S[k];applyClamps(trial,k);
+  qLimited=false;
+  if(!heatDutyOK(trial)){
+    qLimited=true;
+    var st=els[k].d.step,old=lastGood[k],v=S[k],dir=v>old?-1:1,found=null;
+    for(var x=v+dir*st;dir<0?x>=old-1e-9:x<=old+1e-9;x+=dir*st){
+      var t=Object.assign({},lastGood);t[k]=parseFloat((Math.round(x/st)*st).toFixed(4));applyClamps(t,k);
+      if(heatDutyOK(t)){found=t;break;}
+    }
+    trial=found||Object.assign({},lastGood);
+  }
+  Object.assign(S,trial);lastGood=Object.assign({},S);
   syncUI();update();
 }
-var pdiv=document.getElementById("presets");
+var pdiv=document.getElementById("presets"),presetBtns={};
+/* highlight the chosen preset; moving any slider clears the highlight */
+function selPreset(n){Object.keys(presetBtns).forEach(function(k){
+  presetBtns[k].classList.toggle("sel",k===n);presetBtns[k].setAttribute("aria-pressed",k===n?"true":"false");});}
 Object.keys(presets).forEach(function(n){
-  var b=document.createElement("button");b.type="button";b.textContent=n;
-  b.onclick=function(){Object.assign(S,presets[n]);syncUI();c3Y=null;update();};
+  var b=document.createElement("button");b.type="button";b.textContent=n;presetBtns[n]=b;
+  b.onclick=function(){Object.assign(S,presets[n]);lastGood=Object.assign({},S);qLimited=false;selPreset(n);syncUI();c3Y=null;update();};
   pdiv.appendChild(b);
 });
 var statsEl=document.getElementById("stats"),msgEl=document.getElementById("msg");
@@ -701,12 +757,30 @@ function chart3(r){
     c.beginPath();c.moveTo(A.X(r.LGmax),A.pt);c.lineTo(A.X(r.LGmax),g.h-A.pb);
     c.strokeStyle="#dc2f2f";c.setLineDash([6,4]);c.lineWidth=1.4;c.stroke();c.setLineDash([]);
     var lgPt=pts[0];for(var pi=0;pi<pts.length;pi++){if(Math.abs(pts[pi][0]-r.LGmax)<Math.abs(lgPt[0]-r.LGmax))lgPt=pts[pi];}
-    var lgCandidates=[A.Y(lgPt[1])-16,A.Y(lgPt[1])+22,g.h-A.pb-10];
-    var lgLb=null,avoid=[wbLimLb,hotInLb,kavLb,tcValLb];
-    for(var li=0;li<lgCandidates.length;li++){
-      var lc=calcLabelX(c,"limiting L/G",A.X(r.LGmax),lgCandidates[li],"#dc2f2f",A,g,false,16);
-      var hit=false;for(var ai=0;ai<avoid.length;ai++){if(boxOverlap(lc,avoid[ai])){hit=true;break;}}
-      if(!hit){lgLb=lc;break;}
+    /* the operating-point dot (and the green L/G line through it) is also something the label
+       must not sit on - when the operating L/G is near the limit the dot lands right where the
+       label would go. Try above/below the curve on either side of the dashed line, then near
+       the bottom and the top of the plot. */
+    var dX=A.X(S.LG),dY=A.Y(r.Tc);
+    var dotLb={left:dX-9,right:dX+9,top:dY-9,bottom:dY+9};
+    var opLineLb={left:dX-1,right:dX+1,top:A.pt,bottom:g.h-A.pb};
+    var yC=A.Y(lgPt[1]);
+    var lgCandidates=[[yC-16,false],[yC+22,false],[yC-16,true],[yC+22,true],
+      [yC-40,false],[yC+46,false],[yC-40,true],[yC+46,true],
+      [g.h-A.pb-10,false],[g.h-A.pb-10,true],[A.pt+40,false],[A.pt+40,true]];
+    var lgLb=null,avoid=[wbLimLb,hotInLb,kavLb,tcValLb,dotLb],soft=[opLineLb];
+    /* test the whole footprint: the label plus its connector arrow over to the dashed line */
+    function lgSpan(lc){var lx=A.X(r.LGmax);return {left:Math.min(lc.left,lx-2),right:Math.max(lc.right,lx+2),top:lc.top,bottom:lc.bottom};}
+    function lgHits(lc,list){var sp=lgSpan(lc);for(var ai=0;ai<list.length;ai++){if(boxOverlap(sp,list[ai]))return true;}return false;}
+    function lgFits(lc){return lc.top>=A.pt+2&&lc.bottom<=g.h-A.pb-2;}
+    /* first pass: avoid everything including the green line; second pass: allow crossing
+       the green line (the label's white plate covers it) but never the dot */
+    for(var pass=0;pass<2&&!lgLb;pass++){
+      for(var li=0;li<lgCandidates.length;li++){
+        var lc=calcLabelX(c,"limiting L/G",A.X(r.LGmax),lgCandidates[li][0],"#dc2f2f",A,g,lgCandidates[li][1],16);
+        if(!lgFits(lc)||lgHits(lc,avoid)||(pass===0&&lgHits(lc,soft)))continue;
+        lgLb=lc;break;
+      }
     }
     if(!lgLb)lgLb=calcLabelX(c,"limiting L/G",A.X(r.LGmax),lgCandidates[0],"#dc2f2f",A,g,false,16);
     /* the short connector arrow between the label and the dashed line sits outside lgLb's own
@@ -732,24 +806,29 @@ function fmt(v,d){return isFinite(v)?v.toFixed(d):"—";}
 function stat(name,val,unit){var sp=(unit.charAt(0)==="°"||unit==="%")?"":" ";return '<div class="stat"><span>'+name+'</span><b>'+val+'</b><i>'+sp+unit+'</i></div>';}
 function results(r){
   statsEl.innerHTML=
+   '<div class="statHead">Water</div><div class="statGrp">'+
    stat("cold water T",fmt(r.Tc,1),"°C")+
    stat("range",fmt(r.range,1),"°C")+
    stat("approach",fmt(r.approach,1),"°C")+
    stat("effectiveness",fmt(r.eff*100,0),"%")+
-   stat("heat duty",fmt(r.Q,2),"MW")+
-   stat("dry air flow rate, G",fmt(r.G,0),"kg/s")+
-   stat("air out, dry bulb",fmt(r.Taout,1),"°C")+
-   stat("inlet RH",fmt(r.RHin,0),"%")+
    stat("evaporation rate",fmt(r.evap,2),"kg/s")+
    stat("evap. rate / L",fmt(r.evapPct,2),"%")+
    stat("blowdown",fmt(r.blow,2),"kg/s")+
-   stat("makeup",fmt(r.makeup,2),"kg/s");
+   stat("makeup",fmt(r.makeup,2),"kg/s")+
+   '</div><div class="statHead">Air</div><div class="statGrp">'+
+   stat("dry air flow rate, G",fmt(r.G,0),"kg/s")+
+   stat("inlet RH",fmt(r.RHin,0),"%")+
+   stat("air out, dry bulb",fmt(r.Taout,1),"°C")+
+   '</div><div class="statGrp">'+
+   stat("heat duty",isFinite(r.Q)?r.Q.toPrecision(3):"—","MW")+
+   '</div>';
   var m=[],cls="ok";
   if(!r.coolable){m.push("Hot water is not meaningfully warmer than the wet bulb, so the tower cannot cool it.");cls="warn";}
   else{
     if(S.LG>r.LGmax*0.98&&isFinite(r.LGmax))m.push("L/G is at or above the limiting value: the air cannot carry away that much heat.");
     if(r.approach<1.5)m.push("Approach below about 1.5 °C is uneconomical in practice: the tower would be huge for very little gain.");
     if(r.fog)m.push("Exit air is supersaturated, so expect a visible plume.");
+    if(qLimited)m.push("That slider stopped where the heat duty reaches its 1.5 MW minimum.");
     cls=m.length?"warn":"ok";
     if(!m.length)m.push("Operating point is within a reasonable design window.");
   }

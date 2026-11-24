@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Temperature-Programmed Desorption</title>
 <style>
   html, body {
@@ -18,12 +19,27 @@
     box-sizing: border-box;
     position: relative;
   }
+  .title-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 16px;
+    margin-bottom: 12px;
+  }
+  .title-row h1.title {
+    margin: 0;
+  }
   h1.title {
     font-size: 19px;
     font-weight: bold;
     text-align: left;
     margin: 0 0 12px 0;
     font-family: Helvetica, Arial, sans-serif;
+  }
+  /* Controls start at the left edge of the plot's y-axis title (set from JS) */
+  .controls-row, .sliders-row {
+    margin-left: var(--ctrl-indent, 0px);
   }
   .controls-row {
     display: flex;
@@ -40,6 +56,16 @@
   .control-label {
     font-size: 15.6px;
     color: #000;
+  }
+  .slider-value sup, .control-label sup { line-height: 0; }
+  /* Inactive slider (the quantity being compared is fixed by the curves) */
+  .slider-block.inactive .control-label,
+  .slider-block.inactive .slider-value { color: #aaaaaa; }
+  input[type="range"]:disabled { opacity: 0.45; cursor: default; }
+  input[type="range"]:disabled::-webkit-slider-thumb { background: #999999; cursor: default; }
+  input[type="range"]:disabled::-moz-range-thumb { background: #999999; cursor: default; }
+  .control-label sub {
+    line-height: 0;   /* keep subscript from changing the label height */
   }
   .setter-row {
     display: flex;
@@ -71,10 +97,14 @@
     position: relative;
   }
   .sliders-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 28px;
+    /* Two columns keep the pairs together: Ea | A, then theta0 | beta */
+    display: grid;
+    grid-template-columns: repeat(2, max-content);
+    gap: 8px 24px;   /* row gap, column gap */
     margin-bottom: 8px;
+  }
+  @media (max-width: 520px) {
+    .sliders-row { grid-template-columns: max-content; }
   }
   .slider-block {
     display: flex;
@@ -87,11 +117,13 @@
     gap: 8px;
   }
   .slider-line input[type=range] {
-    width: 210px;
+    width: 137px;   /* 65% of the original 210px */
+    max-width: 100%;
   }
   .slider-value {
     font-size: 15.6px;
     min-width: 50px;
+    white-space: nowrap;
     text-align: left;
   }
   #plotCanvas {
@@ -123,7 +155,7 @@
     position: absolute;
     border: 1px solid #c8c8c8;
     border-radius: 4px;
-    padding: 30px 16px 16px 16px;
+    padding: 10px 40px 12px 16px;
     font-size: 14.6px;
     line-height: 1.5;
     background: #fafafa;
@@ -156,7 +188,7 @@
     color: #ffffff;
   }
   .panel h3 {
-    margin: 16px 0 8px 0;
+    margin: 10px 0 2px 0;
     font-size: 15.3px;
     color: #98000D;
   }
@@ -164,89 +196,121 @@
     margin-top: 0;
   }
   .panel p {
-    margin: 12px 0;
+    margin: 8px 0;
+  }
+  .panel h3 + p {
+    margin-top: 2px;
   }
   .eq {
     font-style: italic;
-    margin: 6px 0;
+  }
+  #plotCanvas {
+    max-width: 100%;
+  }
+  @media (max-width: 520px) {
+    #app { padding: 10px 10px 16px 10px; }
+    .controls-row, .sliders-row { gap: 12px; }
+    .bottom-btn { padding: 5px 10px; }
   }
   a {
     color: #98000D;
   }
+  input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}
+  input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
 </style>
 </head>
 <body>
 <div id="app">
-  <!-- <h1 class="title">Temperature-Programmed Desorption</h1> -->
+  <div class="title-row">
+    <div class="bottom-buttons">
+      <button class="bottom-btn" id="btnDirections">Directions</button>
+      <button class="bottom-btn" id="btnDetails">Details</button>
+      <button class="bottom-btn" id="btnAbout">About</button>
+    </div>
+  </div>
 
   <div class="controls-row">
     <div class="control-group">
-      <div class="control-label"><i>x</i> axis</div>
-      <div class="setter-row" id="axisSetter">
-        <button class="setter-btn active" data-val="T">temperature</button>
-        <button class="setter-btn" data-val="t">time</button>
+      <div class="control-label" id="axisLabel"><i>x</i> axis</div>
+      <div class="setter-row" id="axisSetter" role="group" aria-labelledby="axisLabel">
+        <button class="setter-btn active" data-val="T" aria-pressed="true">temperature</button>
+        <button class="setter-btn" data-val="t" aria-pressed="false">time</button>
       </div>
     </div>
     <div class="control-group">
-      <div class="control-label">desorption order</div>
-      <div class="setter-row" id="orderSetter">
-        <button class="setter-btn" data-val="0">0</button>
-        <button class="setter-btn active" data-val="1">1</button>
-        <button class="setter-btn" data-val="2">2</button>
+      <div class="control-label" id="orderLabel">desorption order</div>
+      <div class="setter-row" id="orderSetter" role="group" aria-labelledby="orderLabel">
+        <button class="setter-btn" data-val="0" aria-pressed="false">0</button>
+        <button class="setter-btn active" data-val="1" aria-pressed="true">1</button>
+        <button class="setter-btn" data-val="2" aria-pressed="false">2</button>
       </div>
     </div>
     <div class="control-group">
-      <div class="control-label">&nbsp;</div>
-      <div class="bottom-buttons">
-        <button class="bottom-btn" id="btnDirections">Directions</button>
-        <button class="bottom-btn" id="btnDetails">Details</button>
-        <button class="bottom-btn" id="btnAbout">About</button>
+      <div class="control-label" id="compareLabel">compare</div>
+      <div class="setter-row" id="compareSetter" role="group" aria-labelledby="compareLabel">
+        <button class="setter-btn active" data-val="beta" aria-pressed="true">heating rate</button>
+        <button class="setter-btn" data-val="cov" aria-pressed="false">coverage</button>
       </div>
     </div>
   </div>
 
   <div class="sliders-row">
     <div class="slider-block">
-      <div class="control-label">activation energy (kJ/mol)</div>
+      <div class="control-label" id="eaLabel">activation energy (kJ/mol)</div>
       <div class="slider-line">
-        <input type="range" id="eaSlider" min="100" max="200" step="1" value="150">
+        <input type="range" id="eaSlider" aria-labelledby="eaLabel" min="100" max="200" step="1" value="150">
         <span class="slider-value" id="eaValue">150</span>
       </div>
     </div>
 
     <div class="slider-block">
-      <div class="control-label">fractional surface coverage</div>
+      <div class="control-label" id="aLabel">pre-exponential factor <span id="aUnits">(s<sup>&minus;1</sup>)</span></div>
       <div class="slider-line">
-        <input type="range" id="ca0Slider" min="0.4" max="1" step="0.01" value="0.5">
+        <input type="range" id="aSlider" aria-labelledby="aLabel" aria-valuetext="1.0 times 10 to the 13" min="12" max="14" step="0.1" value="13">
+        <span class="slider-value" id="aValue">1.0 &times; 10<sup>13</sup></span>
+      </div>
+    </div>
+
+    <div class="slider-block" id="ca0Block">
+      <div class="control-label" id="ca0Label">initial fractional surface coverage, <i>&theta;</i><sub>0</sub></div>
+      <div class="slider-line">
+        <input type="range" id="ca0Slider" aria-labelledby="ca0Label" min="0.05" max="1" step="0.01" value="0.5">
         <span class="slider-value" id="ca0Value">0.50</span>
+      </div>
+    </div>
+
+    <div class="slider-block" id="betaBlock">
+      <div class="control-label" id="betaLabel">heating rate, <i>&beta;</i> (K/s)</div>
+      <div class="slider-line">
+        <input type="range" id="betaSlider" aria-labelledby="betaLabel" min="1" max="10" step="1" value="3">
+        <span class="slider-value" id="betaValue">3</span>
       </div>
     </div>
   </div>
 
-  <canvas id="plotCanvas"></canvas>
+  <canvas id="plotCanvas" role="img" aria-label="Plot of desorption rate"></canvas>
 
   <div class="panel" id="panelDirections">
     <span class="panel-close" data-close="panelDirections">&times;</span>
     <h3>Directions</h3>
-    <p>During temperature-programmed desorption (TPD), a molecule is adsorbed on a solid surface, the temperature is ramped linearly with time, and the rate of desorption is measured. The rates of desorption are plotted versus either temperature or time (select with buttons) for three heating rates (1, 3 and 10 K/s). Select the desorption order with buttons; vary the desorption activation energy and the initial fractional surface coverage with sliders.</p>
+    <p>During temperature-programmed desorption (TPD), a molecule is adsorbed on a solid surface, the temperature is ramped linearly with time, and the rate of desorption is measured. The rates of desorption are plotted versus either temperature or time (select with buttons) either for three heating rates (1, 3 and 10 K/s) at one initial coverage, or for three initial fractional surface coverages (&theta;<sub>0</sub> = 0.1, 0.5 and 1.0) at one heating rate; choose which with the compare buttons. The slider for the quantity being compared is inactive. Select the desorption order with buttons; vary the desorption activation energy, the pre-exponential factor, the initial fractional surface coverage (&theta;<sub>0</sub>) and the heating rate with sliders.</p>
   </div>
 
   <div class="panel" id="panelDetails">
     <span class="panel-close" data-close="panelDetails">&times;</span>
     <h3>Details</h3>
     <p>As the heating rate increases, the temperature at which the desorption rate is a maximum (peak temperature) increases, and the maximum rate of desorption increases. When plotted on a time scale, as the heating rate increases, the maximum rate of desorption occurs at shorter times. As the activation energy for desorption increases, the peak temperature increases. This is one of the most widely-used techniques for characterizing catalysts and porous materials and for studying catalytic mechanisms.</p>
-    <h3>Mole balance:</h3>
-    <p class="eq">dC<sub>A</sub>/dt = A e<sup>&minus;E<sub>a</sub>/(RT)</sup> C<sub>A</sub><sup>n</sup>,</p>
-    <p>where C<sub>A</sub> is the concentration of A (mol/L), t is time (s), at t&nbsp;=&nbsp;0, C<sub>A</sub>&nbsp;=&nbsp;C<sub>A,0</sub> is the saturation coverage (mol/L), n is order of reaction, A is a pre-exponential factor, E<sub>a</sub> is activation energy (kJ/mol), R is the ideal gas constant (kJ/(mol&nbsp;K)) and T is temperature (K).</p>
-    <h3>Temperature-time relation:</h3>
-    <p class="eq">dT/dt = &beta;,</p>
+    <p>Mole balance: <span class="eq">d&theta;/dt = &minus;A e<sup>&minus;E<sub>a</sub>/(RT)</sup> &theta;<sup>n</sup></span>,</p>
+    <p>where &theta; is the fractional surface coverage, t is time (s), at t&nbsp;=&nbsp;0, &theta;&nbsp;=&nbsp;&theta;<sub>0</sub> is the initial fractional surface coverage, n is the desorption order, A is the pre-exponential factor (s<sup>&minus;1</sup>), E<sub>a</sub> is the activation energy (kJ/mol), R is the ideal gas constant (kJ/(mol&nbsp;K)) and T is temperature (K). The desorption rate, &minus;d&theta;/dt, has units of s<sup>&minus;1</sup>.</p>
+    <p>Temperature-time relation: <span class="eq">dT/dt = &beta;</span>,</p>
     <p>where &beta; is the heating rate (K/s).</p>
   </div>
 
   <div class="panel" id="panelAbout">
     <span class="panel-close" data-close="panelAbout">&times;</span>
     <h3>About</h3>
-    <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a Mathematica simulation by Rachael L. Baumann. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988) in collaboration with Washington State University. Address any questions or comments to <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.</p>
+    <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by John L. Falconer using Claude AI. It is a JavaScript/HTML5 implementation of a Mathematica simulation by Rachael L. Baumann. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988). Address any questions or comments to <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.</p>
   </div>
 
 </div>
@@ -258,20 +322,23 @@
   // ---------- Physical model ----------
   var T0 = 300;         // K
   var R = 0.008314;      // kJ/(mol K)
-  var A = 1e13;          // 1/s pre-exponential factor
   var betas = [1, 3, 10]; // K/s
-  var colors = { 1: "#0000FF", 3: "#000000", 10: "#009900" };
+  var coverages = [0.1, 0.5, 1.0]; // initial fractional coverages for "coverage" view
+  var seriesColors = ["#0000FF", "#000000", "#009900"];
 
   var state = {
     axis: "T",   // "T" or "t"
     n: 1,
     Ea: 150,
-    Ca0: 0.5
+    Ca0: 0.5,
+    logA: 13,    // log10 of the pre-exponential factor
+    mode: "beta", // "beta": compare heating rates; "cov": compare coverages
+    beta: 3      // heating rate (K/s) used in coverage view
   };
 
   function rate(Ca, T, Ea, n) {
     if (Ca <= 1e-5) return 0;
-    var k = A * Math.exp(-Ea / (R * T));
+    var k = Math.pow(10, state.logA) * Math.exp(-Ea / (R * T));
     return k * Math.pow(Ca, n);
   }
 
@@ -309,16 +376,38 @@
   var canvas = document.getElementById("plotCanvas");
   var ctx = canvas.getContext("2d");
 
-  var cssWidth = 672, cssHeight = 480;
+  var BASE_W = 672, BASE_H = 480;
+  var cssWidth = BASE_W, cssHeight = BASE_H;
+  var plotScale = 1;   // on-screen size / logical size of the canvas
   var padLeft = 92, padRight = 18, padTop = 44, padBottom = 62;
 
+  // Drawing uses fixed logical coordinates (cssWidth x cssHeight); the canvas
+  // is scaled down to fit narrow screens.
   function setupCanvas() {
     var dpr = window.devicePixelRatio || 1;
-    canvas.style.width = cssWidth + "px";
-    canvas.style.height = cssHeight + "px";
-    canvas.width = Math.round(cssWidth * dpr);
-    canvas.height = Math.round(cssHeight * dpr);
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    var appEl = document.getElementById("app");
+    var cs = window.getComputedStyle(appEl);
+    var avail = appEl.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    // On narrow screens use a narrower logical plot (min 460 px) so text stays readable
+    cssWidth = Math.max(460, Math.min(BASE_W, Math.floor(avail)));
+    cssHeight = Math.round(BASE_H * Math.max(0.8, cssWidth / BASE_W));
+    var s = Math.min(1, avail / cssWidth);
+    plotScale = s;
+
+    // Indent the controls so their left edge lines up with the left edge of the
+    // rotated y-axis title. Uses the usual tick-label width ("0.00") so the
+    // controls don't jump when the y scale changes.
+    ctx.font = "18px Helvetica, Arial, sans-serif";
+    var refTickW = ctx.measureText("0.00").width;
+    var refTitleX = Math.max(22, padLeft - 8 - refTickW - 10);
+    var titleLeft = refTitleX - 17;   // 17 = tallest glyph (superscript) above the title baseline
+    document.getElementById("app").style.setProperty("--ctrl-indent", Math.max(0, titleLeft * s) + "px");
+    var w = cssWidth * s, h = cssHeight * s;
+    canvas.style.width = w + "px";
+    canvas.style.height = h + "px";
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    ctx.setTransform(dpr * s, 0, 0, dpr * s, 0, 0);
   }
   setupCanvas();
 
@@ -351,32 +440,52 @@
     // Compute curves
     var steps = 3000;
     var curves = [];
-    var xMax = -Infinity, yMax = -Infinity;
-    var xMin = 0, yMin = 0;
+    var yMax = 0, yMin = 0;   // yMax = tallest peak of the three curves
+    var xMin = state.axis === "T" ? T0 : 0;
+    var xMax = state.axis === "T" ? 900 : 520;
 
-    for (var bi = 0; bi < betas.length; bi++) {
-      var beta = betas[bi];
-      var tEnd;
-      if (state.axis === "T") {
-        tEnd = (900 - T0) / beta;
-      } else {
-        tEnd = 520;
-      }
-      var sol = integrate(beta, state.Ea, state.n, state.Ca0, tEnd, steps);
-      curves.push({ beta: beta, sol: sol });
-
-      var xArr = state.axis === "T" ? sol.T : sol.t;
-      var xEndVal = xArr[xArr.length - 1];
-      if (xEndVal > xMax) xMax = xEndVal;
-      for (var i = 0; i < sol.rate.length; i++) {
-        if (sol.rate[i] > yMax) yMax = sol.rate[i];
-      }
+    // The three curves: heating rates at one coverage, or coverages at one heating rate
+    var series = [];
+    if (state.mode === "beta") {
+      betas.forEach(function(b) {
+        series.push({ beta: b, theta: state.Ca0, segs: [["\u03B2 = " + b]], desc: "heating rate " + b + " K/s" });
+      });
+    } else {
+      coverages.forEach(function(th) {
+        series.push({ beta: state.beta, theta: th, segs: [["\u03B8"], ["0", true], [" = " + th.toFixed(1)]],
+                      desc: "initial coverage " + th.toFixed(1) });
+      });
     }
 
-    if (state.axis === "T") {
-      xMin = T0; xMax = 900;
-    } else {
-      xMin = 0; xMax = 520;
+    function computeCurves(tEndTime) {
+      curves = [];
+      yMax = 0;
+      for (var bi = 0; bi < series.length; bi++) {
+        var beta = series[bi].beta;
+        var tEnd = state.axis === "T" ? (900 - T0) / beta : tEndTime;
+        var sol = integrate(beta, state.Ea, state.n, series[bi].theta, tEnd, steps);
+        curves.push({ sol: sol, segs: series[bi].segs, desc: series[bi].desc, color: seriesColors[bi] });
+        for (var i = 0; i < sol.rate.length; i++) {
+          if (sol.rate[i] > yMax) yMax = sol.rate[i];
+        }
+      }
+    }
+    computeCurves(520);
+
+    // Zero order versus time: if every curve finishes desorbing in less than
+    // 50 s, shorten the time axis (to 10, 20 or 50 s) so the curves can be seen,
+    // and recompute on the shorter interval for good time resolution.
+    if (state.n === 0 && state.axis === "t") {
+      var tDone = 0;
+      curves.forEach(function(cv) {
+        var r = cv.sol.rate, tt = cv.sol.t, last = 0;
+        for (var i = 0; i < r.length; i++) { if (r[i] > 0) last = i; }
+        tDone = Math.max(tDone, tt[Math.min(last + 1, r.length - 1)]);
+      });
+      if (tDone < 50) {
+        xMax = [10, 20, 50].filter(function(v) { return v >= 1.1 * tDone; })[0] || 50;
+        computeCurves(xMax);
+      }
     }
 
     // Fixed y-axis scale per desorption order (independent of Ea and Ca0)
@@ -384,9 +493,25 @@
     var yStepByOrder = { 0: 0.10, 1: 0.05, 2: 0.05 };
     var yAxisMax = yAxisMaxByOrder[state.n];
     var yStep = yStepByOrder[state.n];
+    var yDecimals = 2;
+
+    // Shrink the axis maximum by factors of 3 while the tallest peak (plus a
+    // 5% margin) still fits below one third of it. Changing only by factors
+    // of 3 keeps the scale from changing with every small slider move.
+    // If the tallest peak is above the axis maximum (possible with a large
+    // pre-exponential factor), enlarge the axis by factors of 3 instead.
+    var SCALE_FACTOR = 3;
+    var rescaled = false;
+    while (yMax > 0 && 1.05 * yMax < yAxisMax / SCALE_FACTOR) { yAxisMax /= SCALE_FACTOR; rescaled = true; }
+    while (1.05 * yMax > yAxisMax) { yAxisMax *= SCALE_FACTOR; rescaled = true; }
+    if (rescaled) {
+      yStep = niceStep(yAxisMax, 5);
+      yDecimals = Math.max(2, Math.ceil(-Math.log10(yStep) - 1e-9));
+    }
 
     // Nice round step size for the x axis
-    var xStep = 100; // both temperature (300-900) and time (0-520) read cleanly in steps of 100
+    var xStep = 100; // temperature (300-900) and full time scale (0-520) read cleanly in steps of 100
+    if (xMax !== 520 && state.axis === "t") xStep = niceStep(xMax, 5);
 
     function xToPx(x) {
       return padLeft + (x - xMin) / (xMax - xMin) * plotW;
@@ -420,13 +545,18 @@
     // Ticks: y axis, nice round increments
     ctx.textAlign = "right";
     ctx.textBaseline = "middle";
-    for (var yv = 0; yv <= yAxisMax + 1e-12; yv += yStep) {
+    var maxTickW = 0;
+    var nYTicks = Math.floor(yAxisMax / yStep + 1e-9);   // top of axis may fall between ticks
+    for (var yi = 0; yi <= nYTicks; yi++) {
+      var yv = yi * yStep;
       var py = yToPx(yv);
       ctx.beginPath();
       ctx.moveTo(padLeft - 5, py);
       ctx.lineTo(padLeft, py);
       ctx.stroke();
-      ctx.fillText(formatTick(yv, 2), padLeft - 8, py);
+      var tickText = formatTick(yv, yDecimals);
+      maxTickW = Math.max(maxTickW, ctx.measureText(tickText).width);
+      ctx.fillText(tickText, padLeft - 8, py);
     }
 
     // Axis labels (identical font for x and y titles)
@@ -439,14 +569,16 @@
 
     // Draw y-axis title manually (no unicode superscript glyph, so font stays consistent)
     ctx.save();
-    ctx.translate(20, padTop + plotH / 2);
+    // Place the title just outside the widest tick label (its baseline faces the axis)
+    var yTitleX = Math.max(22, padLeft - 8 - maxTickW - 10);
+    ctx.translate(yTitleX, padTop + plotH / 2);
     ctx.rotate(-Math.PI / 2);
     ctx.font = axisTitleFont;
     ctx.textAlign = "center";
     ctx.textBaseline = "alphabetic";
-    var part1 = "rate (mol/dm";
-    var part2 = "3";
-    var part3 = "/s)";
+    var part1 = "rate (s";
+    var part2 = "\u22121";
+    var part3 = ")";
     var w1 = ctx.measureText(part1).width;
     var w2c = ctx.measureText(part2).width * 0.72; // superscript slightly narrower
     var w3 = ctx.measureText(part3).width;
@@ -460,61 +592,232 @@
     ctx.fillText(part3, startX + w1 + w2c, 0);
     ctx.restore();
 
-    // Title (heating rate context)
-    ctx.font = "15px " + FONT;
-    ctx.textAlign = "left";
-    ctx.fillText("\u03B2 = heating rate (K/s)", padLeft, 22);
+    // Text with optional subscripts: segs = [[text], [text, true (subscript)], ...]
+    function segsWidth(segs, size, weight) {
+      var wSum = 0;
+      segs.forEach(function(sg) {
+        ctx.font = weight + (sg[1] ? 0.7 * size : size) + "px " + FONT;
+        wSum += ctx.measureText(sg[0]).width;
+      });
+      return wSum;
+    }
+    function drawSegs(segs, x, y, size, weight) {
+      ctx.textAlign = "left";
+      segs.forEach(function(sg) {
+        ctx.font = weight + (sg[1] ? 0.7 * size : size) + "px " + FONT;
+        ctx.fillText(sg[0], x, sg[1] ? y + 0.3 * size : y);
+        x += ctx.measureText(sg[0]).width;
+      });
+    }
 
-    // Curves + inline labels (no legend)
+    // Title above the plot; same on-screen size as the control labels (15.6px)
+    ctx.fillStyle = "#000000";
+    ctx.textBaseline = "alphabetic";
+    var titleSegs = state.mode === "beta"
+      ? [["\u03B2 = heating rate (K/s)"]]
+      : [["\u03B8"], ["0", true], [" = initial fractional surface coverage;  \u03B2 = " + state.beta + " K/s"]];
+    var titleSize = 15.6 / plotScale;
+    if (state.mode === "cov" && padLeft + segsWidth(titleSegs, titleSize, "") > cssWidth - 4) {
+      titleSegs = [["\u03B8"], ["0", true], [" = initial coverage;  \u03B2 = " + state.beta + " K/s"]];
+    }
+    var titleX = padLeft;
+    if (titleX + segsWidth(titleSegs, titleSize, "") > cssWidth - 4) {
+      titleX = Math.max(4, cssWidth - 4 - segsWidth(titleSegs, titleSize, ""));
+    }
+    drawSegs(titleSegs, titleX, 22, titleSize, "");
+
+    // Curves (clipped to the plot frame)
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(padLeft, padTop, plotW, plotH);
+    ctx.clip();
     ctx.lineWidth = 2.2;
-    var minLabelY = padTop + 20; // keep labels from crowding the top frame
+    var curvePts = [];   // screen points for each curve: [x0, y0, x1, y1, ...]
+    var curveInfo = [];
     for (var ci = 0; ci < curves.length; ci++) {
       var c = curves[ci];
       var xArr = state.axis === "T" ? c.sol.T : c.sol.t;
       var rArr = c.sol.rate;
-      ctx.strokeStyle = colors[c.beta];
-      ctx.beginPath();
-      var started = false;
+      var pts = [];
       var maxIdx = 0, maxVal = -Infinity;
+      ctx.strokeStyle = c.color;
+      ctx.beginPath();
       for (var i = 0; i < xArr.length; i++) {
-        var xv2 = xArr[i];
-        if (xv2 > xMax) break;
-        var px2 = xToPx(xv2);
+        if (xArr[i] > xMax) break;
+        var px2 = xToPx(xArr[i]);
         var py2 = yToPx(rArr[i]);
-        if (!started) { ctx.moveTo(px2, py2); started = true; }
-        else { ctx.lineTo(px2, py2); }
+        if (i === 0) ctx.moveTo(px2, py2); else ctx.lineTo(px2, py2);
+        pts.push(px2, py2);
         if (rArr[i] > maxVal) { maxVal = rArr[i]; maxIdx = i; }
       }
       ctx.stroke();
+      curvePts.push(pts);
+      curveInfo.push({ idx: ci, segs: c.segs, desc: c.desc, color: c.color, rate: rArr, maxIdx: maxIdx, maxVal: maxVal, pts: pts,
+                       peakX: xArr[maxIdx] });
+    }
+    ctx.restore();
 
-      // Determine label position
-      ctx.fillStyle = colors[c.beta];
-      ctx.font = "bold 15px " + FONT;
-      var text = "\u03B2 = " + c.beta;
+    // Text description of the plot for screen readers
+    var isT = state.axis === "T";
+    var peakList = curveInfo.map(function(ci2) {
+      return ci2.desc + ", peak at " + Math.round(ci2.peakX) + (isT ? " K" : " s") +
+             ", maximum rate " + ci2.maxVal.toPrecision(2) + " per second";
+    }).join("; ");
+    canvas.setAttribute("aria-label",
+      "Plot of desorption rate versus " + (isT ? "temperature" : "time") +
+      " for order " + state.n + " desorption, activation energy " + Math.round(state.Ea) +
+      " kJ/mol, pre-exponential factor " + (Math.pow(10, state.logA - Math.floor(state.logA + 1e-9))).toFixed(1) +
+      " times 10 to the " + Math.floor(state.logA + 1e-9) +
+      (state.mode === "beta"
+        ? ", initial coverage " + state.Ca0.toFixed(2) + ", three heating rates. "
+        : ", heating rate " + state.beta + " K/s, three initial coverages. ") + peakList + ".");
 
-      if (state.axis === "T" && (c.beta === 1 || c.beta === 3)) {
-        // Place label to the left of the curve, on its rising (ascending) branch
-        var threshold = 0.35 * maxVal;
-        var ascIdx = 0;
-        for (var k = 0; k <= maxIdx; k++) {
-          if (rArr[k] >= threshold) { ascIdx = k; break; }
+    // ----- Curve labels with collision avoidance -----
+    ctx.font = "bold 15px " + FONT;
+    var LABEL_H = 16, GAP = 8, PAD = 3;
+    var placed = [];
+
+    // Does the segment (x1,y1)-(x2,y2) intersect rectangle r? (Liang-Barsky)
+    function segHitsRect(x1, y1, x2, y2, r) {
+      var rx2 = r.x + r.w, ry2 = r.y + r.h;
+      if (Math.max(x1, x2) < r.x || Math.min(x1, x2) > rx2 ||
+          Math.max(y1, y2) < r.y || Math.min(y1, y2) > ry2) return false;
+      var dx = x2 - x1, dy = y2 - y1, t0 = 0, t1 = 1;
+      var p = [-dx, dx, -dy, dy];
+      var q = [x1 - r.x, rx2 - x1, y1 - r.y, ry2 - y1];
+      for (var k = 0; k < 4; k++) {
+        if (p[k] === 0) { if (q[k] < 0) return false; }
+        else {
+          var t = q[k] / p[k];
+          if (p[k] < 0) { if (t > t1) return false; if (t > t0) t0 = t; }
+          else { if (t < t0) return false; if (t < t1) t1 = t; }
         }
-        var lx = xToPx(xArr[ascIdx]);
-        var ly = yToPx(rArr[ascIdx]);
-        ly = Math.max(ly, minLabelY);
-        ctx.textAlign = "right";
-        ctx.textBaseline = "middle";
-        ctx.fillText(text, lx - 10, ly);
-      } else {
-        // Place label above the peak, clamped so it doesn't crowd the top frame
-        var labelX = xToPx(xArr[maxIdx]);
-        var labelY = yToPx(maxVal);
-        labelX = Math.min(Math.max(labelX, padLeft + 26), padLeft + plotW - 26);
-        labelY = Math.max(labelY - 12, minLabelY);
-        ctx.textAlign = "center";
-        ctx.textBaseline = "bottom";
-        ctx.fillText(text, labelX, labelY);
       }
+      return true;
+    }
+
+    // Do segments p1-p2 and p3-p4 cross?
+    function segsCross(x1, y1, x2, y2, x3, y3, x4, y4) {
+      var d = (x2 - x1) * (y4 - y3) - (y2 - y1) * (x4 - x3);
+      if (d === 0) return false;
+      var ua = ((x3 - x1) * (y4 - y3) - (y3 - y1) * (x4 - x3)) / d;
+      var ub = ((x3 - x1) * (y2 - y1) - (y3 - y1) * (x2 - x1)) / d;
+      return ua >= 0 && ua <= 1 && ub >= 0 && ub <= 1;
+    }
+
+    // Penalty for a label rectangle: crossings with any curve, overlap with labels,
+    // and any other curve passing between the label and its anchor on its own curve
+    function labelCost(r, own) {
+      if (r.x < padLeft + PAD || r.x + r.w > padLeft + plotW - PAD ||
+          r.y < padTop + PAD || r.y + r.h > padTop + plotH - PAD) return Infinity;
+      var rp = { x: r.x - PAD, y: r.y - PAD, w: r.w + 2 * PAD, h: r.h + 2 * PAD };
+      var cost = 0;
+      for (var a = 0; a < placed.length; a++) {
+        var o = placed[a];
+        if (rp.x < o.x + o.w && rp.x + rp.w > o.x && rp.y < o.y + o.h && rp.y + rp.h > o.y) cost += 1000;
+      }
+      for (var cc = 0; cc < curvePts.length; cc++) {
+        var P = curvePts[cc];
+        for (var m = 0; m + 3 < P.length; m += 2) {
+          if (segHitsRect(P[m], P[m + 1], P[m + 2], P[m + 3], rp)) cost += 1;
+          if (r.cx !== undefined && cc !== own &&
+              segsCross(r.cx, r.cy, r.ax, r.ay, P[m], P[m + 1], P[m + 2], P[m + 3])) cost += 1000;
+        }
+      }
+      return cost;
+    }
+
+    function clampX(x, w) {
+      return Math.min(Math.max(x, padLeft + PAD), padLeft + plotW - PAD - w);
+    }
+
+    // A leader line must stay at least 6 px from other leader lines and must
+    // not pass through another label
+    var leaders = [];
+    function distPtSeg(px, py, s2) {
+      var dx = s2[2] - s2[0], dy2 = s2[3] - s2[1];
+      var L2 = dx * dx + dy2 * dy2;
+      var t = L2 > 0 ? Math.max(0, Math.min(1, ((px - s2[0]) * dx + (py - s2[1]) * dy2) / L2)) : 0;
+      var qx = s2[0] + t * dx - px, qy = s2[1] + t * dy2 - py;
+      return Math.sqrt(qx * qx + qy * qy);
+    }
+    function leaderIsClear(seg) {
+      for (var q = 0; q <= 20; q++) {
+        var px = seg[0] + (seg[2] - seg[0]) * q / 20, py = seg[1] + (seg[3] - seg[1]) * q / 20;
+        for (var a = 0; a < leaders.length; a++) {
+          if (distPtSeg(px, py, leaders[a]) < 6) return false;
+        }
+        for (var b = 0; b < placed.length; b++) {
+          var o = placed[b];
+          if (px > o.x - 2 && px < o.x + o.w + 2 && py > o.y - 2 && py < o.y + o.h + 2) return false;
+        }
+      }
+      return true;
+    }
+
+    // Label the smallest peaks first: they have the fewest free spots
+    var order = curveInfo.slice().sort(function(a, b) { return a.maxVal - b.maxVal; });
+    for (var li = 0; li < order.length; li++) {
+      var info = order[li];
+      var w = segsWidth(info.segs, 15, "bold ");
+      var P = info.pts, nPts = P.length / 2;
+      var pkI = Math.min(info.maxIdx, nPts - 1);
+      var pkX = P[2 * pkI], pkY = P[2 * pkI + 1];
+
+      // Candidate positions: above peak, then beside rising / falling branch
+      var cands = [];
+      var c0 = { x: clampX(pkX - w / 2, w), y: pkY - GAP - LABEL_H, w: w, h: LABEL_H };
+      c0.cx = Math.min(Math.max(pkX, c0.x), c0.x + w); c0.cy = c0.y + LABEL_H; c0.ax = pkX; c0.ay = pkY;
+      cands.push(c0);
+      var fracs = [0.5, 0.3, 0.7, 0.15];
+      for (var fi = 0; fi < fracs.length; fi++) {
+        var thr = fracs[fi] * info.maxVal, k;
+        for (k = 0; k <= pkI; k++) { if (info.rate[k] >= thr) break; }
+        cands.push({ x: P[2 * k] - GAP - w, y: P[2 * k + 1] - LABEL_H / 2, w: w, h: LABEL_H,
+                     cx: P[2 * k] - GAP, cy: P[2 * k + 1], ax: P[2 * k] - 1, ay: P[2 * k + 1] });
+        for (k = pkI; k < nPts - 1; k++) { if (info.rate[k + 1] < thr) break; }
+        cands.push({ x: P[2 * k] + GAP, y: P[2 * k + 1] - LABEL_H / 2, w: w, h: LABEL_H,
+                     cx: P[2 * k] + GAP, cy: P[2 * k + 1], ax: P[2 * k] + 1, ay: P[2 * k + 1] });
+      }
+
+      var best = null, bestCost = Infinity;
+      for (var cIdx = 0; cIdx < cands.length; cIdx++) {
+        var cost = labelCost(cands[cIdx], info.idx);
+        if (cost < bestCost) { bestCost = cost; best = cands[cIdx]; }
+        if (cost === 0) break;
+      }
+
+      // Fallback: raise the label above the peak and draw a leader line
+      var leader = false, leaderSeg = null;
+      if (bestCost > 0) {
+        var shifts = [-w / 2, -w - 4, 4, -w - 24, 24, -w - 44, 44];
+        for (var dy = 2 * GAP; pkY - dy - LABEL_H >= padTop + PAD; dy += 6) {
+          var found = false;
+          for (var si = 0; si < shifts.length; si++) {
+            var r = { x: clampX(pkX + shifts[si], w), y: pkY - dy - LABEL_H, w: w, h: LABEL_H };
+            var seg = [Math.min(Math.max(pkX, r.x), r.x + r.w), r.y + r.h + 1, pkX, pkY - 3];
+            if (labelCost(r, -1) === 0 && leaderIsClear(seg)) {
+              best = r; bestCost = 0; leader = true; leaderSeg = seg; found = true; break;
+            }
+          }
+          if (found) break;
+        }
+      }
+      if (!best) best = { x: clampX(pkX - w / 2, w), y: Math.max(padTop + PAD, pkY - GAP - LABEL_H), w: w, h: LABEL_H };
+
+      ctx.fillStyle = info.color;
+      ctx.strokeStyle = info.color;
+      if (leader) {
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(leaderSeg[0], leaderSeg[1]);
+        ctx.lineTo(leaderSeg[2], leaderSeg[3]);
+        ctx.stroke();
+        leaders.push(leaderSeg);
+      }
+      ctx.textBaseline = "middle";
+      drawSegs(info.segs, best.x, best.y + best.h / 2 + 1, 15, "bold ");
+      placed.push(best);
     }
   }
 
@@ -524,8 +827,12 @@
     var btns = container.querySelectorAll(".setter-btn");
     btns.forEach(function(btn) {
       btn.addEventListener("click", function() {
-        btns.forEach(function(b) { b.classList.remove("active"); });
+        btns.forEach(function(b) {
+          b.classList.remove("active");
+          b.setAttribute("aria-pressed", "false");
+        });
         btn.classList.add("active");
+        btn.setAttribute("aria-pressed", "true");
         onChange(btn.getAttribute("data-val"));
         draw();
       });
@@ -533,7 +840,44 @@
   }
 
   setupSetter("axisSetter", function(val) { state.axis = val; });
-  setupSetter("orderSetter", function(val) { state.n = parseInt(val, 10); });
+  // Units of the pre-exponential factor depend on the desorption order
+  setupSetter("orderSetter", function(val) {
+    state.n = parseInt(val, 10);
+  });
+
+  // Compare view: the slider for the quantity being compared is inactive
+  function updateInactiveSliders() {
+    var pairs = [["betaBlock", "betaSlider", state.mode === "beta"],
+                 ["ca0Block", "ca0Slider", state.mode === "cov"]];
+    pairs.forEach(function(p) {
+      document.getElementById(p[0]).classList.toggle("inactive", p[2]);
+      document.getElementById(p[1]).disabled = p[2];
+    });
+  }
+  setupSetter("compareSetter", function(val) {
+    state.mode = val;
+    updateInactiveSliders();
+  });
+  updateInactiveSliders();
+
+  var betaSlider = document.getElementById("betaSlider");
+  var betaValue = document.getElementById("betaValue");
+  betaSlider.addEventListener("input", function() {
+    state.beta = parseFloat(betaSlider.value);
+    betaValue.textContent = state.beta.toString();
+    draw();
+  });
+
+  var aSlider = document.getElementById("aSlider");
+  var aValue = document.getElementById("aValue");
+  aSlider.addEventListener("input", function() {
+    state.logA = parseFloat(aSlider.value);
+    var ex = Math.floor(state.logA + 1e-9);
+    var mant = Math.pow(10, state.logA - ex);
+    aValue.innerHTML = mant.toFixed(1) + " &times; 10<sup>" + ex + "</sup>";
+    aSlider.setAttribute("aria-valuetext", mant.toFixed(1) + " times 10 to the " + ex);
+    draw();
+  });
 
   var eaSlider = document.getElementById("eaSlider");
   var eaValue = document.getElementById("eaValue");
@@ -559,15 +903,12 @@
     var gapBelow = 8;
     var margin = 4;
     var top = btnRect.bottom - appRect.top + gapBelow;
-    var left, width;
-    if (fullWidth) {
-      // Not tied to the button's left edge - use nearly the full container width
-      left = margin;
-      width = appRect.width - 2 * margin;
-    } else {
-      left = btnRect.left - appRect.left;
-      width = Math.max(260, appRect.width - left - margin);
-    }
+    // All panels share one width: 85% of the container width, so they are no
+    // wider than the figure. They start at the figure's left edge.
+    var width = 0.85 * (appRect.width - 2 * margin);
+    var canvasRect = document.getElementById("plotCanvas").getBoundingClientRect();
+    var left = Math.max(margin, canvasRect.left - appRect.left);
+    if (left + width > appRect.width - margin) left = appRect.width - margin - width;
     panel.style.left = left + "px";
     panel.style.top = top + "px";
     panel.style.width = width + "px";
@@ -604,7 +945,29 @@
     });
   });
 
+  function closeAllPanels() {
+    document.querySelectorAll(".panel").forEach(function(p) { p.classList.remove("visible"); });
+    document.querySelectorAll(".bottom-btn").forEach(function(b) { b.classList.remove("open"); });
+  }
+
+  // Close panels with Escape key
+  document.addEventListener("keydown", function(e) {
+    if (e.key === "Escape" || e.key === "Esc") closeAllPanels();
+  });
+
+  // Close panels when clicking outside a panel (clicks on the panel buttons are handled by their toggles)
+  document.addEventListener("click", function(e) {
+    if (e.target.closest(".panel") || e.target.closest(".bottom-btn")) return;
+    closeAllPanels();
+  });
+
+  var lastWidth = window.innerWidth;
   window.addEventListener("resize", function() {
+    if (window.innerWidth !== lastWidth) {
+      lastWidth = window.innerWidth;
+      setupCanvas();
+      draw();
+    }
     document.querySelectorAll(".panel.visible").forEach(function(p) {
       var name = p.id.replace("panel", "");
       var btn = document.getElementById("btn" + name);

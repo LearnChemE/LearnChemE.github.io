@@ -11,6 +11,7 @@
     --text:#000;
   }
   *{ box-sizing:border-box; }
+  [hidden]{ display:none !important; }
   html,body{
     margin:0;
     padding:0;
@@ -19,16 +20,15 @@
     font-family:Helvetica, Arial, sans-serif;
   }
   .app{
-    max-width:560px;
+    max-width:820px;
     margin:0 auto;
     padding:20px 16px 40px 16px;
   }
   h1.title{
-    font-family:Helvetica, Arial, sans-serif;
     font-size:28px;
     font-weight:600;
     text-align:center;
-    margin:0 0 16px 0;
+    margin:0 0 14px 0;
     color:#000;
   }
   .toolbar{
@@ -40,10 +40,8 @@
     margin-bottom:10px;
   }
   .ctrl-label{
-    font-size:19.55px;
-    font-weight:400;
+    font-size:18px;
     color:#000;
-    font-family:Helvetica, Arial, sans-serif;
   }
   .btn-group{
     display:flex;
@@ -52,7 +50,6 @@
   button.ui-btn{
     font-family:Helvetica, Arial, sans-serif;
     font-size:17px;
-    font-weight:400;
     color:#000;
     background:#ffffff;
     border:2px solid var(--red);
@@ -61,48 +58,100 @@
     cursor:pointer;
     line-height:1.3;
   }
-  button.ui-btn:hover{
-    background:#fbeced;
-  }
-  button.ui-btn.active{
-    background:var(--red-tint);
-  }
+  button.ui-btn:hover{ background:#fbeced; }
+  button.ui-btn.active{ background:var(--red-tint); }
   button.ui-btn.info-btn{
     background:var(--red);
     color:#ffffff;
-    border:2px solid var(--red);
   }
-  button.ui-btn.info-btn:hover{
-    background:#7a000a;
+  button.ui-btn.info-btn:hover{ background:#7a000a; }
+  button.ui-btn.info-btn.active,
+  button.ui-btn.info-btn.active:hover{
+    background:#c9434d;   /* lighter red while its panel is open */
+    color:#ffffff;
   }
-  button.ui-btn.info-btn.active{
-    background:#ffffff;
-    color:var(--red);
-  }
+  button.ui-btn:disabled{ opacity:0.45; cursor:default; }
   .divider{
     width:1px;
     height:26px;
     background:#ccc;
   }
-  .stage{
-    position:relative;
-    margin:0 auto;
-    width:470px;
-    max-width:100%;
+  .opt-row{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    justify-content:center;
+    gap:10px 14px;
   }
-  canvas#plot{
-    display:block;
-    width:100%;
-    height:auto;
-    touch-action:none;
-    cursor:crosshair;
+  select.ui-select{
+    font-family:Helvetica, Arial, sans-serif;
+    font-size:17px;
+    border:2px solid var(--red);
+    border-radius:5px;
+    padding:4px 6px;
+    background:#fff;
+    color:#000;
+  }
+  .slider-wrap{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:17px;
+  }
+  #pVal{ display:inline-block; min-width:4.2em; }
+  .chk{
+    font-size:16px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    cursor:pointer;
+  }
+  input[type=checkbox]{ accent-color:var(--red); }
+  /* Slider style */
+  input[type="range"]{--accent:#98000D;--grey:#999;--fill:50%;-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;outline:none;opacity:.95;margin-bottom:.5rem;-webkit-transition:.2s;transition:opacity .2s;background:var(--grey)}input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}input[type="range"]::-moz-range-thumb{width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  /* Track left of the thumb filled with the accent color; --fill is set from JS */
+  input[type="range"]{ background:linear-gradient(to right, var(--accent) 0 var(--fill), var(--grey) var(--fill) 100%); }
+  .slider-wrap input[type="range"]{ width:130px; margin-bottom:0; }
+  .viz{ position:relative; }
+  .readout{
+    border:1px solid #d6d6d6;
+    border-radius:6px;
+    padding:8px 14px;
+    margin:0 auto 10px auto;
+    max-width:780px;
+    font-size:16px;
+    line-height:1.45;
+  }
+  .rt-title{ font-weight:600; }
+  .readout.c1{ min-height:114px; }
+  .readout.c2{ min-height:170px; }
+  .rt-k{ color:#555; }
+  .fval{ color:var(--red); font-weight:700; }
+  .sep{ color:#bbb; margin:0 10px; }
+  .rt-vals{ color:#000; font-size:16px; }
+  .figs{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    align-items:flex-start;
+    gap:12px;
+  }
+  .stage{ width:460px; max-width:100%; }
+  .cool-wrap{ width:296px; max-width:64.35%; } /* 296/460: same scale as the diagram when stacked */
+  .cool-wrap .ui-btn{ display:block; margin:4px auto 0 auto; }
+  canvas{ display:block; width:100%; height:auto; }
+  canvas#plot{ touch-action:none; cursor:crosshair; }
+  canvas#plot:focus-visible{ outline:2px solid var(--red); outline-offset:2px; }
+  .caption{
+    text-align:center;
+    font-size:15px;
+    color:#444;
+    margin:8px auto 0 auto;
+    max-width:700px;
   }
   .panel{
     position:absolute;
-    top:0;
-    left:0;
-    right:0;
-    bottom:0;
+    top:0; left:0; right:0; bottom:0;
     background:#ffffff;
     border:2px solid var(--red);
     border-radius:4px;
@@ -111,7 +160,7 @@
     flex-direction:column;
     box-shadow:0 4px 14px rgba(0,0,0,0.18);
   }
-  .panel[hidden]{ display:none; }
+  .panel.fit{ bottom:auto; max-height:100%; }  /* Directions and About: only as tall as their text */
   .panel-header{
     display:flex;
     align-items:center;
@@ -119,16 +168,9 @@
     padding:8px 10px 4px 16px;
     flex:0 0 auto;
   }
-  .panel-header .panel-title{
-    font-size:17px;
-    font-weight:400;
-    color:#000;
-    font-family:Helvetica, Arial, sans-serif;
-  }
+  .panel-header .panel-title{ font-size:17px; color:#000; }
   .close-btn{
-    font-family:Helvetica, Arial, sans-serif;
     font-size:17px;
-    font-weight:400;
     color:#000;
     background:#ffffff;
     border:1px solid #999;
@@ -142,36 +184,44 @@
     justify-content:center;
     padding:0;
   }
-  .close-btn:hover{
-    background:#f0f0f0;
-  }
+  .close-btn:hover{ background:#f0f0f0; }
   .panel-body{
     flex:1 1 auto;
     min-height:0;
     overflow-y:auto;
     padding:0 20px 18px 20px;
     font-size:17px;
-    font-weight:400;
     color:#000;
-    font-family:Helvetica, Arial, sans-serif;
     line-height:1.5;
   }
-  .panel-body p{
-    margin:0 0 14px 0;
-    text-align:left;
-  }
-  .panel-body a{
-    color:var(--red);
-  }
-  .eqn{
-    text-align:left;
-    margin:8px 0 16px 0;
-  }
-  .symbols{
-    margin-top:6px;
-  }
-  mjx-container{
-    margin:0 !important;
+  .panel-body p{ margin:0 0 14px 0; text-align:left; }
+  .panel-body ul{ margin:-8px 0 14px 0; padding-left:22px; }
+  .panel-body li{ margin:0 0 4px 0; }
+  .panel-body a{ color:var(--red); }
+  .eqn{ text-align:left; margin:0 0 6px 0; padding-left:0.85em; overflow-x:auto; overflow-y:hidden; } /* about three spaces; wide equations scroll on phones */
+  .panel-body p:has(+ .eqn){ margin-bottom:6px; }
+  .symbols-title{ font-weight:600; margin:18px 0 6px 0 !important; }
+  .symbols{ margin:0; padding:0; list-style:none; }
+  .symbols li{ margin:0 0 4px 0; }
+  mjx-container{ margin:0 !important; }
+  @media (max-width: 600px){
+    .app{ padding:12px 8px 28px 8px; }
+    h1.title{ font-size:23px; margin-bottom:10px; }
+    .ctrl-label{ font-size:16px; }
+    .divider{ display:none; }
+    .toolbar{ gap:8px 10px; }
+    button.ui-btn{ font-size:15px; padding:4px 10px; }
+    select.ui-select{ font-size:15px; }
+    .slider-wrap{ font-size:15px; }
+    .chk{ font-size:15px; }
+    .readout{ font-size:15px; padding:6px 10px; }
+    .readout.c1{ min-height:172px; }
+    .readout.c2{ min-height:267px; }
+    .caption{ font-size:14px; }
+    /* Info panels cover the screen and scroll on small screens */
+    .panel{ position:fixed; top:8px; left:8px; right:8px; bottom:8px; z-index:100; }
+    .panel.fit{ bottom:auto; max-height:calc(100% - 16px); }
+    .panel-body{ font-size:15px; padding:0 14px 14px 14px; }
   }
 </style>
 </head>
@@ -191,16 +241,63 @@
     </div>
   </div>
 
-  <div class="stage" id="stage">
-    <canvas id="plot"></canvas>
+  <div class="toolbar">
+    <div class="opt-row" id="opts1">
+      <span class="ctrl-label">Substance:</span>
+      <div class="btn-group" id="presetGroup">
+        <button class="ui-btn active" data-p="generic" type="button">generic</button>
+        <button class="ui-btn" data-p="water" type="button">water</button>
+        <button class="ui-btn" data-p="co2" type="button">CO&#8322;</button>
+      </div>
+    </div>
+    <div class="opt-row" id="opts2" hidden>
+      <label class="ctrl-label" for="diagSel">Diagram:</label>
+      <select class="ui-select" id="diagSel">
+        <option value="eutectic">simple eutectic</option>
+        <option value="solidsoln">solid solution</option>
+        <option value="azeotrope">minimum-boiling azeotrope</option>
+        <option value="partial">partially miscible liquids</option>
+      </select>
+      <span class="slider-wrap">
+        <label for="pSlider">pressure</label>
+        <input type="range" id="pSlider" min="0.5" max="2" step="0.01" value="1">
+        <span id="pVal">1.00 <i>p</i><sub>0</sub></span>
+      </span>
+    </div>
+    <label class="chk"><input type="checkbox" id="snapBox" checked> snap to lines and points</label>
+  </div>
 
-    <div class="panel" id="panel-directions" hidden>
+  <div class="viz" id="viz">
+    <div class="readout" id="readout" aria-live="polite"></div>
+
+    <div class="figs">
+      <div class="stage">
+        <canvas id="plot" tabindex="0" aria-label="Phase diagram. Drag the locator, or click here and use the arrow keys, to choose a state. Shift plus arrow moves faster."></canvas>
+      </div>
+      <div class="cool-wrap" id="coolWrap" hidden>
+        <canvas id="coolPlot" aria-label="Cooling curve: temperature versus time"></canvas>
+        <button class="ui-btn" id="coolBtn" type="button">cool from locator</button>
+      </div>
+    </div>
+    <p class="caption" id="caption"></p>
+
+    <div class="panel fit" id="panel-directions" hidden>
       <div class="panel-header">
         <span class="panel-title">Directions</span>
         <button class="close-btn" data-close="directions" type="button" aria-label="Close">&times;</button>
       </div>
       <div class="panel-body">
-        <p>If a system in thermodynamic equilibrium contains <em>P</em> phases and <em>C</em> components, then the phase rule states that the number of degrees of freedom is given by <em>F</em>&nbsp;=&nbsp;<em>C</em>&nbsp;&minus;&nbsp;<em>P</em>&nbsp;+&nbsp;2. Degrees of freedom <em>F</em> represents the number of intensive variables (such as pressure, temperature, and composition) that can be varied arbitrarily over some finite range without changing the number of phases. This simulation considers only the simplest cases of one- and two-component systems. Omitted are such phenomena as multiple crystal structures, solid solutions, partial miscibility of liquids, and azeotrope formation. You can drag the locator over various regions of the phase diagrams. For one-component systems, this selects values for the pressure and temperature. For two-component systems, this selects the temperature and composition. The two-component phase diagram should actually be three-dimensional, with pressure providing an additional degree of freedom.</p>
+        <p>Choose one or two components. Drag the locator to select a state, or click the diagram and move the locator with the arrow keys (hold Shift to move faster). The box above the diagram lists the phases present, their compositions and amounts, and the number of degrees of freedom <em>F</em>&nbsp;=&nbsp;<em>C</em>&nbsp;&minus;&nbsp;<em>P</em>&nbsp;+&nbsp;2, the number of intensive variables (temperature, pressure, compositions) that can be changed independently without changing the number of phases. When &ldquo;snap to lines and points&rdquo; is checked, the locator jumps onto a line or special point when it gets close, which makes two- and three-phase states easy to reach.</p>
+        <p><strong>One component:</strong> the diagram is pressure versus temperature. Select a generic substance, water (the melting curve slopes backward), or CO&#8322; (the triple point is above 1&nbsp;atm, so solid CO&#8322; sublimes at 1&nbsp;atm). The dashed lines from the critical point bound the supercritical region.</p>
+        <p><strong>Two components:</strong> the diagram is temperature versus overall mole fraction of B at the pressure set by the slider; pressure is a third variable that is not plotted. Four types of diagrams are available:</p>
+        <ul>
+          <li><em>simple eutectic:</em> A and B are completely miscible as liquids and completely immiscible as solids.</li>
+          <li><em>solid solution:</em> A and B are completely miscible in both the liquid and the solid.</li>
+          <li><em>minimum-boiling azeotrope:</em> at the azeotrope the liquid and vapor have the same composition.</li>
+          <li><em>partially miscible liquids:</em> the liquids are only partially miscible below the upper critical solution temperature (UCST).</li>
+        </ul>
+        <p>In two-phase regions, the horizontal tie line connects the compositions of the coexisting phases, and the lever rule gives their amounts. Press &ldquo;cool from locator&rdquo; to remove heat at a constant rate from a mixture at the locator position; the resulting cooling curve (temperature versus time) is plotted to the right, and dots mark where a new phase appears.</p>
+        <p>All diagrams are schematic and the values are in arbitrary units. Omitted are such phenomena as multiple crystal structures and the pressure dependence of melting.</p>
       </div>
     </div>
 
@@ -210,21 +307,47 @@
         <button class="close-btn" data-close="details" type="button" aria-label="Close">&times;</button>
       </div>
       <div class="panel-body">
-        <p>Following is a compact derivation of the phase rule. At equilibrium, the chemical potential of each component is equal across every phase boundary, as are the temperature and pressure (taking account of hydrostatic effects, if necessary):</p>
-        <div class="eqn">\[ \mu_1 = \mu_2 = \cdots = \mu_C \]</div>
-        <p>This gives a total of</p>
-        <div class="eqn">\[ C + 2 \]</div>
-        <p>variables &mdash; the <em>C</em> chemical potentials (or compositions) plus temperature and pressure. However, these variables must conform to an equation of state in each of the <em>P</em> phases, which removes one degree of freedom per phase. This leaves</p>
-        <div class="eqn">\[ F = C + 2 - P \]</div>
-        <p>arbitrary intensive variables &mdash; the Gibbs phase rule:</p>
+        <p>Consider a system of <em>C</em> components distributed among <em>P</em> phases. At equilibrium the temperature, the pressure \(p\) and the chemical potential of each component are the same in every phase (pressure is written \(p\) here to distinguish it from the number of phases <em>P</em>):</p>
+        <div class="eqn">\[ T^{(1)} = T^{(2)} = \cdots = T^{(P)}, \qquad p^{(1)} = p^{(2)} = \cdots = p^{(P)} \]</div>
+        <div class="eqn">\[ \mu_i^{(1)} = \mu_i^{(2)} = \cdots = \mu_i^{(P)}, \qquad i = 1, 2, \ldots, C \]</div>
+        <p>The intensive state of the whole system is therefore described by <em>C</em>&nbsp;+&nbsp;2 variables: \(T\), \(p\) and \(\mu_1, \ldots, \mu_C\). They are not independent, because each phase must satisfy its own Gibbs&ndash;Duhem equation,</p>
+        <div class="eqn">\[ S^{(\alpha)}\,dT - V^{(\alpha)}\,dp + \sum_{i=1}^{C} n_i^{(\alpha)}\,d\mu_i = 0, \qquad \alpha = 1, \ldots, P \]</div>
+        <p>which gives <em>P</em> relations among them. The number of intensive variables that can be changed independently is the Gibbs phase rule:</p>
         <div class="eqn">\[ F = C - P + 2 \]</div>
-        <p>Remarkably, Gibbs' phase rule is isomorphic with Euler's formula, relating the number of vertices, edges, and faces of a simply-connected polyhedron:</p>
+        <p><strong>Extra constraints.</strong> Some special states obey additional conditions. If there are \(r\) of them,</p>
+        <div class="eqn">\[ F = C - P + 2 - r \]</div>
+        <p>At the critical point of a pure substance, liquid and gas become identical (one phase), and two extra conditions hold (\(r = 2\)), so \(F = 1 - 1 + 2 - 2 = 0\). At an azeotrope, liquid and vapor have the same composition (\(r = 1\)), so \(F = 2 - 2 + 2 - 1 = 1\). At the upper critical solution temperature (UCST) of a binary, two liquid phases become identical (\(r = 2\)), so \(F = 2 - 1 + 2 - 2 = 1\).</p>
+        <p><strong>Fixed pressure.</strong> The two-component diagrams are drawn at constant pressure, which uses up one degree of freedom: \(F' = C - P + 1 - r\). A state with \(F' = 0\), such as a eutectic or an azeotrope, is invariant at that pressure.</p>
+        <p><strong>Lever rule.</strong> In a two-phase region the tie line joins the compositions \(x_B^{(\alpha)}\) and \(x_B^{(\beta)}\) of the coexisting phases. For an overall composition \(z_B\), the fraction of the material in phase \(\beta\) is</p>
+        <div class="eqn">\[ \frac{n^{(\beta)}}{n^{(\alpha)} + n^{(\beta)}} = \frac{z_B - x_B^{(\alpha)}}{x_B^{(\beta)} - x_B^{(\alpha)}} \]</div>
+        <p><strong>Cooling curves.</strong> The cooling curve assumes that heat is removed at a constant rate, with a constant heat capacity and constant heats of fusion and vaporization. The curve becomes less steep when a phase that releases latent heat starts to form (vapor condensing or crystals forming), and the temperature stays constant while \(F' = 0\) (eutectic or azeotrope). Splitting one liquid into two releases very little heat, so it causes no visible break.</p>
+        <p><strong>Pressure.</strong> Raising the pressure raises boiling temperatures substantially, whereas melting temperatures change very little. In this simulation the solid&ndash;liquid curves and the liquid&ndash;liquid curve do not change with pressure.</p>
+        <p>Gibbs' phase rule is formally analogous to Euler's formula, which relates the numbers of vertices, edges and faces of a convex polyhedron. Written as \(P - C + F = 2\), the phase rule has the same form:</p>
         <div class="eqn">\[ V - E + F = 2 \]</div>
-        <p class="symbols"><em>C</em> = number of components&nbsp;&nbsp;|&nbsp;&nbsp;<em>P</em> = number of phases&nbsp;&nbsp;|&nbsp;&nbsp;<em>F</em> = degrees of freedom&nbsp;&nbsp;|&nbsp;&nbsp;\(\mu_i\) = chemical potential of component <em>i</em>&nbsp;&nbsp;|&nbsp;&nbsp;<em>V</em>, <em>E</em>, <em>F</em> (Euler) = vertices, edges, faces</p>
+        <p class="symbols-title">Symbols</p>
+        <ul class="symbols">
+          <li><em>C</em> = number of components</li>
+          <li><em>P</em> = number of phases</li>
+          <li><em>F</em> = number of degrees of freedom</li>
+          <li><em>F</em>&prime; = number of degrees of freedom at fixed pressure</li>
+          <li>\(r\) = number of extra constraints (special conditions such as a critical point or an azeotrope)</li>
+          <li>\(T\) = temperature</li>
+          <li>\(p\) = pressure</li>
+          <li>\(i\) = index of a component (\(i = 1, \ldots, C\))</li>
+          <li>\(\alpha\) = index of a phase (\(\alpha = 1, \ldots, P\))</li>
+          <li>\(\mu_i^{(\alpha)}\) = chemical potential of component \(i\) in phase \(\alpha\)</li>
+          <li>\(S^{(\alpha)}\) = entropy of phase \(\alpha\)</li>
+          <li>\(V^{(\alpha)}\) = volume of phase \(\alpha\)</li>
+          <li>\(n_i^{(\alpha)}\) = moles of component \(i\) in phase \(\alpha\)</li>
+          <li>\(n^{(\alpha)}\) = total moles in phase \(\alpha\)</li>
+          <li>\(x_B^{(\alpha)}\) = mole fraction of B in phase \(\alpha\)</li>
+          <li>\(z_B\) = overall mole fraction of B in the system</li>
+          <li><em>V</em>, <em>E</em>, <em>F</em> (Euler's formula) = numbers of vertices, edges and faces of a polyhedron</li>
+        </ul>
       </div>
     </div>
 
-    <div class="panel" id="panel-about" hidden>
+    <div class="panel fit" id="panel-about" hidden>
       <div class="panel-header">
         <span class="panel-title">About</span>
         <button class="close-btn" data-close="about" type="button" aria-label="Close">&times;</button>
@@ -253,47 +376,58 @@ window.MathJax = {
 (function(){
   "use strict";
 
-  // ---------- Layout constants (CSS-pixel / data space) ----------
-  var PAD_LEFT = 72, PAD_RIGHT = 20, PAD_TOP = 56, PAD_BOTTOM = 56;
+  // ---------- Layout constants (CSS pixels; data space is 0-100 on both axes) ----------
+  var PAD_LEFT = 64, PAD_RIGHT = 16, PAD_TOP = 16, PAD_BOTTOM = 56;
   var PLOT = 380;
-  var CSS_W = PAD_LEFT + PLOT + PAD_RIGHT;   // 472
-  var CSS_H = PAD_TOP + PLOT + PAD_BOTTOM;   // 492
+  var CSS_W = PAD_LEFT + PLOT + PAD_RIGHT;   // 460
+  var CSS_H = PAD_TOP + PLOT + PAD_BOTTOM;   // 452
   var SCALE = PLOT / 100;
-  var FONT = '17px Helvetica, Arial, sans-serif';
-  var FONT_AXIS = '20.4px Helvetica, Arial, sans-serif';      // axis labels, both figures: +20%
-  var FONT_REGION1 = '21.25px Helvetica, Arial, sans-serif';  // solid/liquid/gas labels, P-T figure: +25%
-  var FONT_LIQVAP2 = '19.55px Helvetica, Arial, sans-serif';  // "liquid (melt)"/"vapor" labels, T-x figure: +15%
-  var FONT_SAMELT = '14.5px Helvetica, Arial, sans-serif';    // "solid A + melt": slightly smaller so it clears the curve
+  var COOL_PAD_L = 44, COOL_PAD_R = 16, COOL_PLOT_W = 236;
+  var COOL_W = COOL_PAD_L + COOL_PLOT_W + COOL_PAD_R; // 296
+  var FF = ' Helvetica, Arial, sans-serif';
+  var FONT_AXIS = '20px' + FF;
+  var FONT_LABEL = '18px' + FF;
+  var FONT_SMALL = '15px' + FF;
+
+  var SNAP_PT = 10, SNAP_CURVE = 7, DETECT = 2.5;  // tolerances in CSS px
+  var LF = 25, LV = 40;          // latent heats of fusion and vaporization (heat capacity = 1)
+  var COOL_MS = 7000;            // duration of the cooling animation
 
   var canvas = document.getElementById('plot');
   var ctx = canvas.getContext('2d');
+  var ccan = document.getElementById('coolPlot');
+  var cctx = ccan.getContext('2d');
+  var currentDpr = 0;
+  // On narrow screens the canvas is shrunk to fit, which would shrink its text too.
+  // TS enlarges canvas text (up to 30%) so that it stays readable.
+  var TS = 1;
+  function updateTextScale(){
+    var w = canvas.getBoundingClientRect().width || CSS_W;
+    TS = clamp(CSS_W / w, 1, 1.3);
+  }
+  function sf(font){
+    return font.replace(/^([\d.]+)px/, function(m, n){ return (n * TS).toFixed(1) + 'px'; });
+  }
 
-  function setupCanvas(){
+  function setupCanvases(){
     var dpr = window.devicePixelRatio || 1;
     canvas.width = Math.round(CSS_W * dpr);
     canvas.height = Math.round(CSS_H * dpr);
-    // Intentionally no inline canvas.style.width/height: the stylesheet's
-    // width:100%/height:auto (with the canvas's intrinsic width/height
-    // attributes above) keeps the plot responsive on narrow screens.
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ccan.width = Math.round(COOL_W * dpr);
+    ccan.height = Math.round(CSS_H * dpr);
+    cctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    var changed = dpr !== currentDpr;
+    currentDpr = dpr;
+    return changed;
   }
-  setupCanvas();
 
-  function dataToPx(x, y){
-    return { x: PAD_LEFT + x * SCALE, y: PAD_TOP + (100 - y) * SCALE };
-  }
-  function pxToData(px, py){
-    return { x: (px - PAD_LEFT) / SCALE, y: 100 - (py - PAD_TOP) / SCALE };
-  }
+  // ---------- Generic helpers ----------
   function clamp(v, lo, hi){ return Math.max(lo, Math.min(hi, v)); }
+  function dataToPx(x, y){ return { x: PAD_LEFT + x * SCALE, y: PAD_TOP + (100 - y) * SCALE }; }
+  function pxToData(px, py){ return { x: (px - PAD_LEFT) / SCALE, y: 100 - (py - PAD_TOP) / SCALE }; }
+  function yPx(y){ return PAD_TOP + (100 - y) * SCALE; }
 
-  // ---------- State ----------
-  var state = {
-    component: 1,
-    loc: { x: 50, y: 50 }
-  };
-
-  // ---------- Curve sampling helpers ----------
   function samplePath(fn, t0, t1, n){
     var pts = [];
     for (var i = 0; i <= n; i++){
@@ -302,11 +436,38 @@ window.MathJax = {
     }
     return pts;
   }
-  function strokeDataPath(pts, opts){
+  // Solve f(x) = target for monotone f on [a, b] by bisection.
+  function solveMono(f, a, b, target){
+    var fa = f(a) - target;
+    for (var k = 0; k < 60; k++){
+      var m = 0.5 * (a + b), fm = f(m) - target;
+      if ((fm > 0) === (fa > 0)){ a = m; fa = fm; } else { b = m; }
+    }
+    return 0.5 * (a + b);
+  }
+  function nearestOnPolyline(pts, x, y){
+    var best = { d: Infinity, x: x, y: y };
+    for (var i = 0; i < pts.length - 1; i++){
+      var ax = pts[i].x, ay = pts[i].y, bx = pts[i + 1].x, by = pts[i + 1].y;
+      var dx = bx - ax, dy = by - ay, L2 = dx * dx + dy * dy;
+      var t = L2 > 0 ? clamp(((x - ax) * dx + (y - ay) * dy) / L2, 0, 1) : 0;
+      var px = ax + t * dx, py = ay + t * dy;
+      var d = Math.hypot(x - px, y - py);
+      if (d < best.d) best = { d: d, x: px, y: py };
+    }
+    return best;
+  }
+
+  function strokePts(pts, opts){
     opts = opts || {};
     ctx.save();
+    ctx.beginPath();
+    ctx.rect(PAD_LEFT, PAD_TOP, PLOT, PLOT);
+    ctx.clip();
     ctx.strokeStyle = opts.color || '#000';
     ctx.lineWidth = opts.width || 2;
+    ctx.setLineDash(opts.dash || []);
+    ctx.lineJoin = 'round';
     ctx.beginPath();
     for (var i = 0; i < pts.length; i++){
       var p = dataToPx(pts[i].x, pts[i].y);
@@ -315,203 +476,530 @@ window.MathJax = {
     ctx.stroke();
     ctx.restore();
   }
-  function fillDotData(x, y, r, color){
+  function dot(x, y, r, color){
     var p = dataToPx(x, y);
     ctx.save();
     ctx.fillStyle = color;
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 1.5;
     ctx.beginPath();
     ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
     ctx.fill();
+    ctx.stroke();
     ctx.restore();
   }
-  function labelData(text, x, y, angleDeg, opts){
+  function label(text, x, y, opts){
     opts = opts || {};
     var p = dataToPx(x, y);
     ctx.save();
-    ctx.fillStyle = '#000';
-    ctx.font = opts.font || FONT;
+    ctx.fillStyle = opts.color || '#000';
+    ctx.font = sf(opts.font || FONT_LABEL);
     ctx.textAlign = opts.align || 'center';
     ctx.textBaseline = 'middle';
     ctx.translate(p.x, p.y);
-    if (angleDeg) ctx.rotate(-angleDeg * Math.PI / 180);
+    if (opts.angle) ctx.rotate(-opts.angle * Math.PI / 180);
     ctx.fillText(text, 0, 0);
     ctx.restore();
   }
 
-  // ---------- Region classification (for area shading) ----------
-  function classify1(x, y){
-    if (x <= 30){
-      return (y > (10 + 0.02 * x * x)) ? 'solid' : 'gas';
-    } else if (x <= 70){
-      var boil = 28 + 0.01 * (x - 30) * (x - 30);
-      if (y <= boil) return 'gas';
-      if (y >= 28 && x <= (25.4 + 0.139 * y)) return 'solid';
-      return 'liquid';
-    } else {
-      return (y > 44) ? 'liquid' : 'gas';
+  // ---------- Phase objects ----------
+  var SHORT = {
+    'liquid': 'L', 'vapor': 'V', 'melt': 'L', 'solid A': 'A', 'solid B': 'B',
+    'solid solution': 'S', 'liquid L₁': 'L₁', 'liquid L₂': 'L₂'
+  };
+  function ph(name, kind, x, f){ return { name: name, kind: kind, x: x, f: f, s: SHORT[name] || '' }; }
+
+  var TITLES = {
+    V: 'vapor', L: 'liquid', LV: 'liquid + vapor', sAL: 'solid A + melt', sBL: 'solid B + melt',
+    sAsB: 'solid A + solid B', SS: 'solid solution', SSL: 'solid solution + melt', LL: 'two liquid phases'
+  };
+
+  var FREE = {
+    one2: 'Temperature, pressure and composition can all be changed independently. At fixed pressure, temperature and composition are both free.',
+    two2: 'Choosing the temperature and pressure fixes the composition of each phase (the ends of the tie line); at fixed pressure only the temperature is free. The overall composition sets only the amounts (lever rule).',
+    sAsB: 'Both solids are pure, so their compositions are fixed. Temperature and pressure are free (at fixed pressure, only temperature). The overall composition sets only how much of each solid is present.',
+    eutectic: 'Choosing the pressure fixes the eutectic temperature and the melt composition. At fixed pressure nothing can change, so on cooling the temperature stays here until all the melt has frozen.',
+    eutecticLine: 'Solid A, solid B and melt of the eutectic composition coexist for any overall composition. Choosing the pressure fixes everything else; at fixed pressure, cooling stalls here until the melt is gone.',
+    azeo: 'The liquid and vapor have the same composition, which is one extra constraint (r = 1). Choose the pressure and the azeotrope temperature and composition are fixed. At fixed pressure the azeotrope boils at constant temperature, like a pure substance.',
+    ucst: 'The two liquid phases become identical, which adds two constraints (r = 2). Choose the pressure and the critical solution temperature and composition are fixed.'
+  };
+
+  // ---------- Two-component building blocks ----------
+  // Vapor-liquid "lens" between boiling points TA (pure A) and TB (pure B).
+  function makeLens(TA, TB){
+    var D = TB - TA;
+    return {
+      lo: function(z){ var s = z / 100; return TA + D * (0.25 * s + 0.75 * s * s); },
+      hi: function(z){ var s = z / 100; return TA + D * (1.75 * s - 0.75 * s * s); },
+      invLo: function(T){ var r = clamp((T - TA) / D, 0, 1); return 100 * (-0.25 + Math.sqrt(0.0625 + 3 * r)) / 1.5; },
+      invHi: function(T){ var r = clamp((T - TA) / D, 0, 1); return 100 * (1.75 - Math.sqrt(Math.max(0, 3.0625 - 3 * r))) / 1.5; }
+    };
+  }
+  function lvPhases(lens, z, T){
+    var xL = lens.invLo(T), xV = lens.invHi(T);
+    var fV = Math.abs(xV - xL) > 1e-9 ? clamp((z - xL) / (xV - xL), 0, 1) : 0.5;
+    return { key: 'LV', list: [ph('liquid', 'L', xL, 1 - fV), ph('vapor', 'V', xV, fV)] };
+  }
+  function bubbleCurve(fn, a, b){
+    return { pts: samplePath(fn, a, b, 100), name: 'bubble-point curve', desc: 'the first bubble of vapor is forming', side: 1 };
+  }
+  function dewCurve(fn, a, b){
+    return { pts: samplePath(fn, a, b, 100), name: 'dew-point curve', desc: 'the first drop of liquid is forming', side: -1 };
+  }
+  function lensLabel(lo, hi, x, text){
+    function mid(t){ return 0.5 * (lo(t) + hi(t)); }
+    var slope = (mid(x + 1) - mid(x - 1)) / 2;
+    return { t: text, x: x, y: mid(x), a: Math.atan(slope) * 180 / Math.PI, f: FONT_SMALL };
+  }
+
+  // ---------- Two-component diagrams (sh = shift of boiling temperatures with pressure) ----------
+  function dEutectic(sh){
+    var Te = 12, xe = 40, lens = makeLens(50 + sh, 90 + sh);
+    function liqL(z){ return 30 - 0.15 * z - 0.0075 * z * z; }
+    function liqR(z){ var u = 100 - z; return 45 - 0.25 * u - 0.005 * u * u; }
+    function invL(T){ return (-0.15 + Math.sqrt(Math.max(0, 0.0225 - 0.03 * (T - 30)))) / 0.015; }
+    function invR(T){ return 100 - (-0.25 + Math.sqrt(Math.max(0, 0.0625 - 0.02 * (T - 45)))) / 0.01; }
+    function key(z, T){
+      if (T < Te) return 'sAsB';
+      if (T >= lens.hi(z)) return 'V';
+      if (T > lens.lo(z)) return 'LV';
+      if (z < xe){ if (T < liqL(z)) return 'sAL'; }
+      else if (T < liqR(z)) return 'sBL';
+      return 'L';
     }
+    function phases(z, T){
+      var k = key(z, T), xl, f;
+      switch (k){
+        case 'sAsB': return { key: k, list: [ph('solid A', 'S', 0, (100 - z) / 100), ph('solid B', 'S', 100, z / 100)] };
+        case 'V': return { key: k, list: [ph('vapor', 'V', z, 1)] };
+        case 'LV': return lvPhases(lens, z, T);
+        case 'sAL':
+          xl = invL(T); f = clamp(z / xl, 0, 1);
+          return { key: k, list: [ph('solid A', 'S', 0, 1 - f), ph('melt', 'L', xl, f)] };
+        case 'sBL':
+          xl = invR(T); f = clamp((100 - z) / (100 - xl), 0, 1);
+          return { key: k, list: [ph('solid B', 'S', 100, 1 - f), ph('melt', 'L', xl, f)] };
+      }
+      return { key: 'L', list: [ph('liquid', 'L', z, 1)] };
+    }
+    var threeList = [ph('solid A', 'S', 0, null), ph('solid B', 'S', 100, null), ph('melt', 'L', xe, null)];
+    return {
+      key: key, phases: phases, def: { x: 30, y: 40 },
+      caption: 'A and B are completely miscible as liquids and completely immiscible as solids.',
+      curves: [
+        { pts: [{ x: 0, y: Te }, { x: 100, y: Te }], name: 'eutectic temperature',
+          special: { title: 'eutectic temperature (three phases)', list: threeList, C: 2, P: 3, r: 0, free: FREE.eutecticLine } },
+        { pts: samplePath(liqL, 0, xe, 60), name: 'liquidus', desc: 'the first crystals of solid A are forming', side: -1 },
+        { pts: samplePath(liqR, xe, 100, 60), name: 'liquidus', desc: 'the first crystals of solid B are forming', side: -1 },
+        bubbleCurve(lens.lo, 0, 100),
+        dewCurve(lens.hi, 0, 100)
+      ],
+      points: [
+        { x: xe, y: Te, color: '#1a4fd6', label: 'eutectic', lx: xe, ly: 7.5, la: 'center',
+          info: { title: 'eutectic point', list: threeList, C: 2, P: 3, r: 0, free: FREE.eutectic } }
+      ],
+      labels: [
+        { t: 'solid A + solid B', x: 72, y: 5.5, f: FONT_SMALL },
+        { t: 'solid A + melt', x: 17, y: 15.5, f: FONT_SMALL },
+        { t: 'solid B + melt', x: 76, y: 21, f: FONT_SMALL },
+        { t: 'liquid (melt)', x: 50, y: 40, f: FONT_LABEL },
+        { t: 'vapor', x: 25, y: 93, f: FONT_LABEL },
+        lensLabel(lens.lo, lens.hi, 50, 'liquid + vapor')
+      ]
+    };
   }
 
-  function classify2(x, y){
-    if (y < 10) return 'ssB';
-    if (x < 40 && y <= (-0.00525 * x * x - 0.04 * x + 20)) return 'sAmelt';
-    if (x >= 40 && y <= (-0.005944 * x * x + 1.2489 * x - 30.44)) return 'sBmelt';
-    var upper = -0.003 * x * x + 0.7 * x + 50;
-    var lower = 0.003 * x * x + 0.1 * x + 50;
-    if (y <= upper && y >= lower) return 'liquidVapor';
-    if (y >= upper) return 'vapor';
-    return 'liquid';
+  function dSolidSoln(sh){
+    var melt = makeLens(20, 45), lens = makeLens(50 + sh, 90 + sh);
+    function key(z, T){
+      if (T < melt.lo(z)) return 'SS';
+      if (T < melt.hi(z)) return 'SSL';
+      if (T >= lens.hi(z)) return 'V';
+      if (T > lens.lo(z)) return 'LV';
+      return 'L';
+    }
+    function phases(z, T){
+      var k = key(z, T);
+      if (k === 'SS') return { key: k, list: [ph('solid solution', 'S', z, 1)] };
+      if (k === 'SSL'){
+        var xS = melt.invLo(T), xL = melt.invHi(T);
+        var fL = (xS - xL) > 1e-9 ? clamp((xS - z) / (xS - xL), 0, 1) : 0.5;
+        return { key: k, list: [ph('solid solution', 'S', xS, 1 - fL), ph('melt', 'L', xL, fL)] };
+      }
+      if (k === 'V') return { key: k, list: [ph('vapor', 'V', z, 1)] };
+      if (k === 'LV') return lvPhases(lens, z, T);
+      return { key: 'L', list: [ph('liquid', 'L', z, 1)] };
+    }
+    return {
+      key: key, phases: phases, def: { x: 30, y: 40 },
+      caption: 'A and B are completely miscible in both the liquid and the solid.',
+      curves: [
+        { pts: samplePath(melt.lo, 0, 100, 100), name: 'solidus', desc: 'the solid is just starting to melt', side: 1 },
+        { pts: samplePath(melt.hi, 0, 100, 100), name: 'liquidus', desc: 'the first crystals of solid solution are forming', side: -1 },
+        bubbleCurve(lens.lo, 0, 100),
+        dewCurve(lens.hi, 0, 100)
+      ],
+      points: [],
+      labels: [
+        { t: 'solid solution', x: 65, y: 12, f: FONT_LABEL },
+        lensLabel(melt.lo, melt.hi, 50, 'solid + melt'),
+        { t: 'liquid (melt)', x: 55, y: 44, f: FONT_LABEL },
+        { t: 'vapor', x: 25, y: 93, f: FONT_LABEL },
+        lensLabel(lens.lo, lens.hi, 50, 'liquid + vapor')
+      ]
+    };
   }
 
+  function dAzeotrope(sh){
+    var TA = 80 + sh, TB = 90 + sh, Taz = 48 + sh, xaz = 55;
+    function h(s){ return 2 * s - s * s; }                     // bubble-curve shape
+    function g(s){ return 0.5 * s + 2 * s * s - 1.5 * s * s * s; } // dew-curve shape
+    function branch(fn){
+      return function(z){
+        if (z <= xaz) return TA + (Taz - TA) * fn(z / xaz);
+        return TB + (Taz - TB) * fn((100 - z) / (100 - xaz));
+      };
+    }
+    var bub = branch(h), dew = branch(g);
+    function key(z, T){
+      if (T >= dew(z)) return 'V';
+      if (T > bub(z)) return 'LV';
+      return 'L';
+    }
+    function phases(z, T){
+      var k = key(z, T);
+      if (k === 'V') return { key: k, list: [ph('vapor', 'V', z, 1)] };
+      if (k === 'L') return { key: k, list: [ph('liquid', 'L', z, 1)] };
+      var a = z <= xaz ? 0 : xaz, b = z <= xaz ? xaz : 100;
+      var xL = solveMono(bub, a, b, T), xV = solveMono(dew, a, b, T);
+      var fV = Math.abs(xV - xL) > 1e-9 ? clamp((z - xL) / (xV - xL), 0, 1) : 0.5;
+      return { key: 'LV', list: [ph('liquid', 'L', xL, 1 - fV), ph('vapor', 'V', xV, fV)] };
+    }
+    return {
+      key: key, phases: phases, def: { x: 30, y: 30 },
+      caption: 'Minimum-boiling azeotrope: at the azeotrope the liquid and vapor have the same composition.',
+      curves: [
+        bubbleCurve(bub, 0, xaz), bubbleCurve(bub, xaz, 100),
+        dewCurve(dew, 0, xaz), dewCurve(dew, xaz, 100)
+      ],
+      points: [
+        { x: xaz, y: Taz, color: '#d21f1f', label: 'azeotrope', lx: xaz, ly: Taz - 5, la: 'center',
+          info: { title: 'azeotrope', list: [ph('liquid', 'L', xaz, null), ph('vapor', 'V', xaz, null)], C: 2, P: 2, r: 1, free: FREE.azeo } }
+      ],
+      labels: [
+        { t: 'liquid', x: 50, y: 25, f: FONT_LABEL },
+        { t: 'vapor', x: 55, y: 85, f: FONT_LABEL },
+        lensLabel(bub, dew, 27.5, 'L + V'),
+        lensLabel(bub, dew, 77.5, 'L + V')
+      ]
+    };
+  }
+
+  function dPartial(sh){
+    var Tc = 45, xc = 50, W = 42, EXP = 0.35, lens = makeLens(58 + sh, 92 + sh);
+    function half(T){ return T < Tc ? W * Math.pow((Tc - T) / Tc, EXP) : 0; }
+    function key(z, T){
+      if (T >= lens.hi(z)) return 'V';
+      if (T > lens.lo(z)) return 'LV';
+      if (T < Tc && Math.abs(z - xc) < half(T)) return 'LL';
+      return 'L';
+    }
+    function phases(z, T){
+      var k = key(z, T);
+      if (k === 'V') return { key: k, list: [ph('vapor', 'V', z, 1)] };
+      if (k === 'LV') return lvPhases(lens, z, T);
+      if (k === 'LL'){
+        var x1 = xc - half(T), x2 = xc + half(T);
+        var f2 = clamp((z - x1) / (x2 - x1), 0, 1);
+        return { key: k, list: [ph('liquid L₁', 'L', x1, 1 - f2), ph('liquid L₂', 'L', x2, f2)] };
+      }
+      return { key: 'L', list: [ph('liquid', 'L', z, 1)] };
+    }
+    var bin = [];
+    for (var i = 0; i <= 200; i++){
+      var u = -1 + 2 * i / 200;
+      bin.push({ x: xc + W * u, y: Tc - Tc * Math.pow(Math.abs(u), 1 / EXP) });
+    }
+    return {
+      key: key, phases: phases, def: { x: 30, y: 30 },
+      caption: 'The liquids are only partially miscible below the upper critical solution temperature (UCST).',
+      curves: [
+        { pts: bin, name: 'solubility curve', desc: 'a second liquid phase is just appearing', side: -1 },
+        bubbleCurve(lens.lo, 0, 100),
+        dewCurve(lens.hi, 0, 100)
+      ],
+      points: [
+        { x: xc, y: Tc, color: '#d21f1f', label: 'UCST', lx: xc, ly: Tc + 4, la: 'center',
+          info: { title: 'upper critical solution temperature (UCST)', list: [ph('liquid', 'L', xc, 1)], C: 2, P: 1, r: 2, free: FREE.ucst } }
+      ],
+      labels: [
+        { t: 'two liquids', x: 50, y: 18, f: FONT_LABEL },
+        { t: 'liquid', x: 84, y: 42, f: FONT_LABEL },
+        { t: 'vapor', x: 22, y: 93, f: FONT_LABEL },
+        lensLabel(lens.lo, lens.hi, 50, 'liquid + vapor')
+      ]
+    };
+  }
+
+  var DIAGRAMS = { eutectic: dEutectic, solidsoln: dSolidSoln, azeotrope: dAzeotrope, partial: dPartial };
+
+  // ---------- One-component substances ----------
+  var PRESETS = {
+    generic: { Tt: 30, Pt: 28, Tc: 70, Pc: 44, topX: 40, atm: 36,
+      labels: { solid: [14, 55], liquid: [48, 60], gas: [60, 14] },
+      tl: [33, 24, 'left'], cl: [72, 40.5, 'left'],
+      caption: 'Schematic diagram in arbitrary units. The dashed lines from the critical point bound the supercritical region.' },
+    water: { Tt: 30, Pt: 14, Tc: 78, Pc: 60, topX: 24, atm: 30,
+      labels: { solid: [13, 55], liquid: [48, 48], gas: [68, 17] },
+      tl: [33, 10, 'left'], cl: [76, 63.5, 'right'],
+      caption: 'Water: the melting curve slopes backward because ice is less dense than liquid water, so raising the pressure lowers the melting point.' },
+    co2: { Tt: 40, Pt: 50, Tc: 62, Pc: 72, topX: 46, atm: 10,
+      labels: { solid: [17, 62], liquid: [52, 86], gas: [64, 28] },
+      tl: [43, 46, 'left'], cl: [64, 68, 'left'],
+      caption: 'CO₂: the triple point is above 1 atm, so at 1 atm the solid sublimes directly to gas (dry ice).' }
+  };
+
+  var FREE1 = {
+    one: 'Temperature and pressure can both be changed independently without changing the number of phases.',
+    sub: 'One variable is free: choose the temperature and the sublimation pressure is fixed (or choose the pressure and the sublimation temperature is fixed).',
+    vap: 'One variable is free: choose the temperature and the vapor pressure is fixed (or choose the pressure and the boiling point is fixed).',
+    melt: 'One variable is free: choose the pressure and the melting temperature is fixed.',
+    triple: 'Nothing can be changed: solid, liquid and gas coexist only at this one temperature and pressure.',
+    crit: 'The critical point satisfies two extra conditions, (∂p/∂V)<sub>T</sub> = 0 and (∂²p/∂V²)<sub>T</sub> = 0, so r = 2 and nothing can be changed. It is a one-phase point, not a three-phase point.'
+  };
+
+  function build1(pr, presetName){
+    var Tt = pr.Tt, Pt = pr.Pt, Tc = pr.Tc, Pc = pr.Pc;
+    var D = Tc - Tt, dP = Pc - Pt;
+    var s0 = 0.4 * dP / D, k = 0.6 * dP / (D * D);    // positive slope at the triple point
+    var m = (pr.topX - Tt) / (100 - Pt);
+    function sub(x){ return Pt * (x / Tt) * (x / Tt); }
+    function vap(x){ var d = x - Tt; return Pt + s0 * d + k * d * d; }
+    function fx(y){ return Tt + m * (y - Pt); }
+    function key(x, y){
+      if (y >= Pt){
+        if (x <= fx(y)) return 'solid';
+        if (x < Tt) return 'liquid';
+        if (x < Tc) return y > vap(x) ? 'liquid' : 'gas';
+        return y > Pc ? 'scf' : 'gas';
+      }
+      if (x <= Tt) return y > sub(x) ? 'solid' : 'gas';
+      return 'gas';
+    }
+    var S = { name: 'solid' }, L = { name: 'liquid' }, G = { name: 'gas' };
+    var meltFree = FREE1.melt + (presetName === 'water' ? ' For water this curve slopes to the left because ice is less dense than liquid water.' : '');
+    return {
+      key: key,
+      regions: {
+        solid: { title: 'solid', list: [S], C: 1, P: 1, r: 0, free: FREE1.one },
+        liquid: { title: 'liquid', list: [L], C: 1, P: 1, r: 0, free: FREE1.one },
+        gas: { title: 'gas', list: [G], C: 1, P: 1, r: 0, free: FREE1.one },
+        scf: { title: 'supercritical fluid', list: [{ name: 'supercritical fluid' }], C: 1, P: 1, r: 0,
+          free: FREE1.one + ' Above both the critical temperature and the critical pressure there is no boundary between liquid and gas.' }
+      },
+      curves: [
+        { pts: samplePath(sub, 0, Tt, 80), info: { title: 'sublimation curve', list: [S, G], C: 1, P: 2, r: 0, free: FREE1.sub } },
+        { pts: samplePath(vap, Tt, Tc, 80), info: { title: 'vaporization (boiling) curve', list: [L, G], C: 1, P: 2, r: 0, free: FREE1.vap } },
+        { pts: [{ x: Tt, y: Pt }, { x: pr.topX, y: 100 }], info: { title: 'melting (freezing) curve', list: [S, L], C: 1, P: 2, r: 0, free: meltFree } }
+      ],
+      points: [
+        { x: Tt, y: Pt, color: '#1a4fd6', label: 'triple point', lx: pr.tl[0], ly: pr.tl[1], la: pr.tl[2],
+          info: { title: 'triple point', list: [S, L, G], C: 1, P: 3, r: 0, free: FREE1.triple } },
+        { x: Tc, y: Pc, color: '#d21f1f', label: 'critical point', lx: pr.cl[0], ly: pr.cl[1], la: pr.cl[2],
+          info: { title: 'critical point', list: [{ name: 'one fluid phase (liquid and gas are identical)' }], C: 1, P: 1, r: 2, free: FREE1.crit } }
+      ]
+    };
+  }
+
+  // ---------- Region shading ----------
   function liquidColor1(y){
-    // Continuous gradient by pressure alone (no hard cutoff at the
-    // liquid/gas boundary curve): lightest at the bottom of the plot,
-    // fading into the gas region, deepening toward the top.
+    // Liquid and gas share one continuous gradient by pressure, emphasizing
+    // that liquid and gas are continuously connected around the critical point.
     var t = clamp(y / 100, 0, 1);
-    var c0 = [254, 243, 242];
-    var c1 = [205, 60, 50];
+    var c0 = [254, 243, 242], c1 = [205, 60, 50];
     return [
       Math.round(c0[0] + (c1[0] - c0[0]) * t),
       Math.round(c0[1] + (c1[1] - c0[1]) * t),
       Math.round(c0[2] + (c1[2] - c0[2]) * t),
-      255
+      0
     ];
   }
-
-  function colorFn1(x, y){
-    var cat = classify1(x, y);
-    if (cat === 'solid') return [219, 233, 251, 255];
-    return liquidColor1(y); // liquid and gas share one continuous red gradient by pressure
+  // Fourth entry = 1 to hatch the region with horizontal tie lines (two-phase regions).
+  var COL2 = {
+    V: [207, 232, 251, 0], L: [215, 245, 208, 0], LV: [214, 236, 226, 1],
+    sAL: [255, 242, 179, 1], sBL: [255, 242, 179, 1], SSL: [255, 242, 179, 1],
+    sAsB: [224, 224, 224, 1], SS: [226, 226, 240, 0], LL: [232, 222, 246, 1]
+  };
+  function colorOf1(x, y){
+    if (cur1.key(x, y) === 'solid') return [219, 233, 251, 0];
+    return liquidColor1(y);
   }
+  function colorOf2(x, y){ return COL2[cur2.key(x, y)]; }
 
-  function colorFn2(x, y){
-    switch (classify2(x, y)){
-      case 'ssB': return [224, 224, 224, 255];
-      case 'sAmelt': return [255, 242, 179, 255];
-      case 'sBmelt': return [255, 242, 179, 255];
-      case 'liquid': return [215, 245, 208, 255];
-      case 'liquidVapor': return null;
-      case 'vapor': return [207, 232, 251, 255];
-    }
-    return null;
-  }
-
-  function buildRegionMap(colorFn){
+  function buildMap(colorOf){
+    var dpr = window.devicePixelRatio || 1;
+    var N = Math.round(PLOT * dpr);
     var off = document.createElement('canvas');
-    off.width = PLOT;
-    off.height = PLOT;
+    off.width = N; off.height = N;
     var octx = off.getContext('2d');
-    var img = octx.createImageData(PLOT, PLOT);
-    for (var j = 0; j < PLOT; j++){
-      var dataY = 100 - j / SCALE;
-      for (var i = 0; i < PLOT; i++){
-        var dataX = i / SCALE;
-        var rgba = colorFn(dataX, dataY);
-        var idx = (j * PLOT + i) * 4;
-        if (rgba){
-          img.data[idx] = rgba[0];
-          img.data[idx + 1] = rgba[1];
-          img.data[idx + 2] = rgba[2];
-          img.data[idx + 3] = rgba[3] == null ? 255 : rgba[3];
-        } else {
-          img.data[idx + 3] = 0;
-        }
+    var img = octx.createImageData(N, N);
+    var sp = Math.max(4, Math.round(9 * dpr)), lw = Math.max(1, Math.round(dpr));
+    for (var j = 0; j < N; j++){
+      var dataY = 100 - (j + 0.5) / N * 100;
+      var hatchRow = (j % sp) < lw;
+      for (var i = 0; i < N; i++){
+        var dataX = (i + 0.5) / N * 100;
+        var c = colorOf(dataX, dataY);
+        var idx = (j * N + i) * 4;
+        if (!c){ img.data[idx + 3] = 0; continue; }
+        var k = (c[3] && hatchRow) ? 0.87 : 1;
+        img.data[idx] = Math.round(c[0] * k);
+        img.data[idx + 1] = Math.round(c[1] * k);
+        img.data[idx + 2] = Math.round(c[2] * k);
+        img.data[idx + 3] = 255;
       }
     }
     octx.putImageData(img, 0, 0);
     return off;
   }
 
-  var regionMap1 = buildRegionMap(colorFn1);
-  var regionMap2 = buildRegionMap(colorFn2);
+  // ---------- State ----------
+  var state = {
+    component: 1,
+    preset: 'generic',
+    diagram: 'eutectic',
+    pressure: 1,
+    loc: { x: 50, y: 50 },
+    feature: null
+  };
+  var cur1, cur2, map1, map2;
+  function rebuild1(){ cur1 = build1(PRESETS[state.preset], state.preset); map1 = buildMap(colorOf1); }
+  function rebuild2(){ cur2 = DIAGRAMS[state.diagram](8 * Math.log2(state.pressure)); map2 = buildMap(colorOf2); }
+  function geo(){ return state.component === 1 ? cur1 : cur2; }
 
-  // ---------- Region logic (ported from the Mathematica source) ----------
-  function msg1(x, y){
-    if (Math.pow(x - 30, 2) + Math.pow(y - 28, 2) <= 2.25){
-      return ['C = 1, P = 3,     F = C − P + 2 = 0', 'triple point'];
+  // ---------- Locator placement, snapping and feature detection ----------
+  function findFeature(x, y, tolPt, tolCv){
+    var g = geo(), best = null, i, d;
+    for (i = 0; i < g.points.length; i++){
+      var p = g.points[i];
+      d = Math.hypot(x - p.x, y - p.y);
+      if (d * SCALE <= tolPt && (!best || d < best.d)) best = { d: d, f: p, x: p.x, y: p.y };
     }
-    if (Math.pow(x - 70, 2) + Math.pow(y - 44, 2) <= 2.25){
-      return ['C = 1, P = 3,     F = C − P + 2 = 0', 'critical point'];
+    if (best) return best;
+    for (i = 0; i < g.curves.length; i++){
+      var r = nearestOnPolyline(g.curves[i].pts, x, y);
+      if (r.d * SCALE <= tolCv && (!best || r.d < best.d)) best = { d: r.d, f: g.curves[i], x: r.x, y: r.y };
     }
-    if (x < 30 && y >= 9.5 + 0.02 * x * x && y <= 10.5 + 0.02 * x * x){
-      return ['C = 1, P = 2,     F = C − P + 2 = 1', 'sublimation curve'];
-    }
-    if (y > 28 && x >= 0.139 * y + 25.4 && x <= 0.139 * y + 26.8){
-      return ['C = 1, P = 2,     F = C − P + 2 = 1', 'freezing curve'];
-    }
-    if (x > 30 && x < 70 && y >= 27.5 + 0.01 * Math.pow(x - 30, 2) && y <= 28.5 + 0.01 * Math.pow(x - 30, 2)){
-      return ['C = 1, P = 2,     F = C − P + 2 = 1', 'boiling curve'];
-    }
-    if (x > 70 && y > 44){
-      return ['C = 1, P = 1,     F = C − P + 2 = 2', 'supercritical fluid'];
-    }
-    return ['C = 1, P = 1,     F = C − P + 2 = 2', 'one phase'];
+    return best;
+  }
+  function clampLoc(p){
+    var lo = state.component === 2 ? 1 : 0, hi = state.component === 2 ? 99 : 100;
+    return { x: clamp(p.x, lo, hi), y: clamp(p.y, 0, 100) };
+  }
+  // mode: 'drag' (snapping allowed) or 'key' / 'anim' (detection only)
+  var tolScale = 1;  // converts on-screen pixels to canvas pixels (and enlarges targets for fingers)
+  function placeLocator(raw, mode){
+    raw = clampLoc(raw);
+    var snap = mode === 'drag' && document.getElementById('snapBox').checked;
+    var k = mode === 'drag' ? tolScale : 1;
+    var hit = snap ? findFeature(raw.x, raw.y, SNAP_PT * k, SNAP_CURVE * k) : findFeature(raw.x, raw.y, DETECT * k, DETECT * k);
+    state.loc = (snap && hit) ? clampLoc({ x: hit.x, y: hit.y }) : raw;
+    state.feature = hit ? hit.f : null;
   }
 
-  function msg2(x, y){
-    if (y < 10){
-      return ['C = 2, P = 2,     F = C − P + 2 = 2', 'solid A + solid B'];
+  // ---------- Description of the current state ----------
+  function describe(){
+    var L = state.loc, f = state.feature, p;
+    if (state.component === 1){
+      if (f) return f.info;
+      return cur1.regions[cur1.key(L.x, L.y)];
     }
-    if (x < 40 && y >= 10 && y <= (-0.00525 * x * x - 0.04 * x + 20)){
-      return ['C = 2, P = 2,     F = C − P + 2 = 2', 'solid A + melt'];
+    if (f){
+      if (f.info) return f.info;
+      if (f.special) return f.special;
+      p = cur2.phases(L.x, clamp(L.y + f.side * 0.05, 0, 100));
+      return {
+        title: f.name, list: p.list, C: 2, P: p.list.length, r: 0,
+        free: 'On this line ' + f.desc + '. ' + (p.list.length === 2 ? FREE.two2 : FREE.one2)
+      };
     }
-    if (x >= 40 && y >= 10 && y <= (-0.005944 * x * x + 1.2489 * x - 30.44)){
-      return ['C = 2, P = 2,     F = C − P + 2 = 2', 'solid B + melt'];
+    p = cur2.phases(L.x, L.y);
+    return {
+      title: TITLES[p.key], list: p.list, C: 2, P: p.list.length, r: 0,
+      free: p.key === 'sAsB' ? FREE.sAsB : (p.list.length === 1 ? FREE.one2 : FREE.two2)
+    };
+  }
+
+  function phaseListHTML(d, two){
+    return d.list.map(function(p){
+      var s = '<b>' + p.name + '</b>';
+      if (two && p.x != null){
+        var parts = ['<i>x</i><sub>B</sub> = ' + (p.x / 100).toFixed(2)];
+        if (p.f != null && d.list.length > 1) parts.push(Math.round(p.f * 100) + '%');
+        s += ' (' + parts.join(', ') + ')';
+      }
+      return s;
+    }).join(' + ');
+  }
+  function formulaHTML(d, two){
+    var F = d.C - d.P + 2 - d.r;
+    var s = '<i>C</i> = ' + d.C + ', <i>P</i> = ' + d.P + (d.r ? ', <i>r</i> = ' + d.r : '') +
+      ': &nbsp;<i>F</i> = <i>C</i> − <i>P</i> + 2' + (d.r ? ' − <i>r</i>' : '') +
+      ' = <span class="fval">' + F + '</span>';
+    if (two){
+      s += '<span class="sep">|</span>at fixed pressure: <i>F</i>′ = <i>C</i> − <i>P</i> + 1' +
+        (d.r ? ' − <i>r</i>' : '') + ' = <span class="fval">' + (F - 1) + '</span>';
     }
-    var upper = -0.003 * x * x + 0.7 * x + 50;
-    var lower = 0.003 * x * x + 0.1 * x + 50;
-    if (y <= upper && y >= lower){
-      return ['C = 2, P = 2,     F = C − P + 2 = 2', 'liquid + vapor A + B'];
-    }
-    if (y >= upper){
-      return ['C = 2, P = 1,     F = C − P + 2 = 3', 'vapor A + B'];
-    }
-    if (Math.pow(x - 40, 2) + Math.pow(y - 10, 2) < 2){
-      return ['C = 2, P = 3,     F = C − P + 2 = 1', 'eutectic'];
-    }
-    return ['C = 2, P = 1,     F = C − P + 2 = 3', 'liquid A + B'];
+    return s;
+  }
+  function valuesHTML(){
+    // Only the overall composition is shown (two components); temperature and pressure
+    // are schematic, and pressure is shown next to its slider.
+    return 'overall mole fraction B, <i>z</i><sub>B</sub> = ' + (state.loc.x / 100).toFixed(2);
+  }
+  var readout = document.getElementById('readout');
+  // Fixed minimum heights (set per mode in CSS) keep the figure from jumping while dragging.
+  function renderReadout(d){
+    var two = state.component === 2;
+    readout.className = 'readout c' + state.component;
+    readout.innerHTML =
+      // Inside a region the phase list already names the region, so no heading is shown.
+      // On a line or at a special point, its name goes on the same line as the phases.
+      '<div>' + (state.feature ? '<span class="rt-title">' + d.title + '</span><span class="sep">|</span>' : '') +
+      '<span class="rt-k">Phases present:</span> ' + phaseListHTML(d, two) + '</div>' +
+      '<div>' + formulaHTML(d, two) + '</div>' +
+      '<div>' + d.free + '</div>' +
+      (two ? '<div class="rt-vals">' + valuesHTML() + '</div>' : '');
   }
 
   // ---------- Drawing ----------
-  function drawFrame(xLabel, yLabel){
-    ctx.save();
-    ctx.strokeStyle = '#000';
-    ctx.lineWidth = 1.5;
-    ctx.strokeRect(PAD_LEFT, PAD_TOP, PLOT, PLOT);
-    ctx.restore();
-
-    ctx.save();
-    ctx.fillStyle = '#000';
-    ctx.font = FONT_AXIS;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'alphabetic';
-    ctx.fillText(xLabel, PAD_LEFT + PLOT / 2, PAD_TOP + PLOT + 34);
-    ctx.restore();
-
-    ctx.save();
-    ctx.fillStyle = '#000';
-    ctx.font = FONT_AXIS;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.translate(PAD_LEFT - 48, PAD_TOP + PLOT / 2);
-    ctx.rotate(-Math.PI / 2);
-    ctx.fillText(yLabel, 0, 0);
-    ctx.restore();
+  function drawFrame(c, x0, w, xLabel, yLabel){
+    c.save();
+    c.strokeStyle = '#000';
+    c.lineWidth = 1.5;
+    c.strokeRect(x0, PAD_TOP, w, PLOT);
+    c.fillStyle = '#000';
+    c.font = sf(FONT_AXIS);
+    c.textAlign = 'center';
+    c.textBaseline = 'alphabetic';
+    c.fillText(xLabel, x0 + w / 2, PAD_TOP + PLOT + 18 + 16 * TS);
+    c.textBaseline = 'middle';
+    c.translate(x0 - 22, PAD_TOP + PLOT / 2);
+    c.rotate(-Math.PI / 2);
+    c.fillText(yLabel, 0, 0);
+    c.restore();
   }
-
-  function drawTopMessage(line1, line2){
-    ctx.save();
-    ctx.fillStyle = '#000';
-    ctx.font = FONT;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(line1, PAD_LEFT + PLOT / 2, 20);
-    ctx.fillText(line2, PAD_LEFT + PLOT / 2, 42);
-    ctx.restore();
+  function drawLabels(list){
+    list.forEach(function(l){ label(l.t, l.x, l.y, { font: l.f, angle: l.a }); });
   }
-
-  function drawLocator(x, y){
-    var p = dataToPx(x, y);
+  function drawPoints(list){
+    list.forEach(function(p){
+      dot(p.x, p.y, 5, p.color);
+      label(p.label, p.lx, p.ly, { font: FONT_SMALL, align: p.la });
+    });
+  }
+  function drawLocator(){
+    var p = dataToPx(state.loc.x, state.loc.y);
     ctx.save();
     ctx.strokeStyle = '#000';
     ctx.fillStyle = 'rgba(255,255,255,0.85)';
@@ -521,98 +1009,197 @@ window.MathJax = {
     ctx.fill();
     ctx.stroke();
     ctx.beginPath();
-    ctx.moveTo(p.x - 10, p.y);
-    ctx.lineTo(p.x + 10, p.y);
-    ctx.moveTo(p.x, p.y - 10);
-    ctx.lineTo(p.x, p.y + 10);
+    ctx.moveTo(p.x - 10, p.y); ctx.lineTo(p.x + 10, p.y);
+    ctx.moveTo(p.x, p.y - 10); ctx.lineTo(p.x, p.y + 10);
     ctx.stroke();
     ctx.restore();
   }
-
-  function drawComponent1(){
-    ctx.drawImage(regionMap1, PAD_LEFT, PAD_TOP);
-
-    var sv = samplePath(function(t){ return 10 + 0.02 * t * t; }, 0, 30, 60);
-    var lv = samplePath(function(t){ return 28 + 0.01 * (t - 30) * (t - 30); }, 30, 70, 60);
-    var freeze = [{ x: 30, y: 28 }, { x: 40, y: 100 }];
-
-    strokeDataPath(sv, { color: '#000', width: 2 });
-    strokeDataPath(lv, { color: '#000', width: 2 });
-    strokeDataPath(freeze, { color: '#000', width: 2 });
-
-    fillDotData(30, 28, 5, '#1a4fd6');
-    fillDotData(70, 44, 5, '#d21f1f');
-
-    labelData('solid', 15, 50, 0, { font: FONT_REGION1 });
-    labelData('liquid', 45, 40, 0, { font: FONT_REGION1 });
-    labelData('gas', 60, 15, 0, { font: FONT_REGION1 });
-
-    drawFrame('temperature', 'pressure');
-
-    var m = msg1(state.loc.x, state.loc.y);
-    drawTopMessage(m[0], m[1]);
+  function drawTieLine(d){
+    if (!d.list || d.list.length < 2) return;
+    var xs = d.list.map(function(p){ return p.x; });
+    var lo = Math.min.apply(null, xs), hi = Math.max.apply(null, xs);
+    if (hi - lo < 0.5) return;
+    var T = state.loc.y;
+    strokePts([{ x: lo, y: T }, { x: hi, y: T }], { color: '#333', width: 1.5 });
+    d.list.forEach(function(p){
+      dot(p.x, T, 4.5, '#333');
+      var lx = clamp(p.x, 3, 97);
+      label(p.s, lx, T + 3.6, { font: FONT_SMALL, color: '#222' });
+    });
   }
 
-  function drawComponent2(){
-    ctx.drawImage(regionMap2, PAD_LEFT, PAD_TOP);
-
-    var lv2Upper = samplePath(function(z){ return -0.003 * z * z + 0.7 * z + 50; }, 0, 100, 80);
-    var lv2Lower = samplePath(function(z){ return 0.003 * z * z + 0.1 * z + 50; }, 0, 100, 80);
-    var solidusFlat = [{ x: 0, y: 10 }, { x: 100, y: 10 }];
-    var liqLeft = samplePath(function(z){ return -0.00525 * z * z - 0.04 * z + 20; }, 0, 40, 40);
-    var liqRight = samplePath(function(z){ return -0.005944 * z * z + 1.2489 * z - 30.44; }, 40, 100, 60);
-
-    strokeDataPath(lv2Upper, { color: '#000', width: 2 });
-    strokeDataPath(lv2Lower, { color: '#000', width: 2 });
-    strokeDataPath(solidusFlat, { color: '#000', width: 2 });
-    strokeDataPath(liqLeft, { color: '#000', width: 2 });
-    strokeDataPath(liqRight, { color: '#000', width: 2 });
-
-    labelData('solid A + solid B', 50, 3.5, 0);
-    labelData('solid A + melt', 16, 12.5, 0, { font: FONT_SAMELT });
-    labelData('solid B + melt', 78, 20, 0);
-    labelData('liquid (melt)', 50, 44, 0, { font: FONT_LIQVAP2 });
-    labelData('vapor', 50, 90, 0, { font: FONT_LIQVAP2 });
-    labelData('liquid + vapor', 50, 70, 22.5);
-
-    drawFrame('mole fraction B', 'temperature');
-
-    var m = msg2(state.loc.x, state.loc.y);
-    drawTopMessage(m[0], m[1]);
+  function draw1(){
+    var pr = PRESETS[state.preset];
+    ctx.drawImage(map1, PAD_LEFT, PAD_TOP, PLOT, PLOT);
+    strokePts([{ x: pr.Tc, y: pr.Pc }, { x: pr.Tc, y: 100 }], { color: 'rgba(0,0,0,0.45)', width: 1.2, dash: [5, 4] });
+    strokePts([{ x: pr.Tc, y: pr.Pc }, { x: 100, y: pr.Pc }], { color: 'rgba(0,0,0,0.45)', width: 1.2, dash: [5, 4] });
+    strokePts([{ x: 0, y: pr.atm }, { x: 100, y: pr.atm }], { color: '#444', width: 1.2, dash: [8, 5] });
+    label('1 atm', 1.5, pr.atm + 2.6, { font: FONT_SMALL, align: 'left', color: '#333' });
+    cur1.curves.forEach(function(c){ strokePts(c.pts, { width: 2 }); });
+    var L = pr.labels;
+    label('solid', L.solid[0], L.solid[1], { font: FONT_LABEL });
+    label('liquid', L.liquid[0], L.liquid[1], { font: FONT_LABEL });
+    label('gas', L.gas[0], L.gas[1], { font: FONT_LABEL });
+    drawPoints(cur1.points);
+    drawFrame(ctx, PAD_LEFT, PLOT, 'temperature', 'pressure');
+  }
+  function draw2(d){
+    ctx.drawImage(map2, PAD_LEFT, PAD_TOP, PLOT, PLOT);
+    cur2.curves.forEach(function(c){ strokePts(c.pts, { width: 2 }); });
+    drawLabels(cur2.labels);
+    drawTieLine(d);
+    drawPoints(cur2.points);
+    drawFrame(ctx, PAD_LEFT, PLOT, 'overall mole fraction B', 'temperature');
   }
 
   function render(){
+    updateTextScale();
     ctx.clearRect(0, 0, CSS_W, CSS_H);
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, CSS_W, CSS_H);
-
-    if (state.component === 1) drawComponent1(); else drawComponent2();
-    drawLocator(state.loc.x, state.loc.y);
+    var d = describe();
+    if (state.component === 1) draw1(); else draw2(d);
+    drawLocator();
+    renderReadout(d);
+    drawCool();
   }
 
-  // ---------- Interaction: dragging the locator ----------
-  var dragging = false;
+  // ---------- Cooling curve ----------
+  var cool = { pts: null, events: [], tEnd: 0, shown: 0, anim: null, z: 0, start: 0 };
+  var coolBtn = document.getElementById('coolBtn');
 
+  function enthalpy(z, T){
+    var list = cur2.phases(z, T).list, fl = 0, fv = 0;
+    list.forEach(function(p){ if (p.kind === 'L') fl += p.f; else if (p.kind === 'V') fv += p.f; });
+    return T + LF * (fl + fv) + LV * fv;
+  }
+  function tAtTemp(t){
+    var a = cool.pts, lo = 0, hi = a.length - 1;
+    if (t <= a[0].t) return a[0].T;
+    if (t >= a[hi].t) return a[hi].T;
+    while (hi - lo > 1){ var m = (lo + hi) >> 1; if (a[m].t <= t) lo = m; else hi = m; }
+    var span = a[hi].t - a[lo].t;
+    return span > 0 ? a[lo].T + (a[hi].T - a[lo].T) * (t - a[lo].t) / span : a[hi].T;
+  }
+  function resetCoolBtn(){
+    coolBtn.textContent = 'cool from locator';
+    coolBtn.classList.remove('active');
+  }
+  function stopCooling(clear){
+    if (cool.anim){ cancelAnimationFrame(cool.anim); cool.anim = null; }
+    resetCoolBtn();
+    if (clear) cool.pts = null;
+  }
+  function startCooling(){
+    if (cool.anim){ stopCooling(false); render(); return; }
+    var z = state.loc.x, T0 = state.loc.y;
+    if (T0 < 3) return;
+    var pts = [], events = [], H0 = enthalpy(z, T0), prevKey = cur2.key(z, T0);
+    for (var T = T0; T >= 1; T -= 0.05){
+      var k = cur2.key(z, T), t = H0 - enthalpy(z, T);
+      if (k !== prevKey && pts.length){ events.push(pts[pts.length - 1]); prevKey = k; }
+      pts.push({ t: t, T: T });
+    }
+    cool.pts = pts; cool.events = events; cool.tEnd = pts[pts.length - 1].t || 1;
+    cool.z = z; cool.shown = 0; cool.start = performance.now();
+    coolBtn.textContent = 'stop';
+    coolBtn.classList.add('active');
+    cool.anim = requestAnimationFrame(coolStep);
+  }
+  function coolStep(now){
+    var p = Math.min(1, (now - cool.start) / COOL_MS);
+    cool.shown = p * cool.tEnd;
+    placeLocator({ x: cool.z, y: tAtTemp(cool.shown) }, 'anim');
+    if (p < 1){ cool.anim = requestAnimationFrame(coolStep); }
+    else { cool.anim = null; resetCoolBtn(); }
+    render();
+  }
+  function wrapText(c, text, maxW){
+    var words = text.split(' '), lines = [], line = '';
+    words.forEach(function(w){
+      var test = line ? line + ' ' + w : w;
+      if (line && c.measureText(test).width > maxW){ lines.push(line); line = w; } else line = test;
+    });
+    if (line) lines.push(line);
+    return lines;
+  }
+  function drawCool(){
+    if (state.component !== 2) return;
+    var c = cctx, x0 = COOL_PAD_L;
+    c.clearRect(0, 0, COOL_W, CSS_H);
+    c.fillStyle = '#fff';
+    c.fillRect(0, 0, COOL_W, CSS_H);
+    // guide at the locator temperature (shared temperature scale with the phase diagram)
+    c.save();
+    c.strokeStyle = 'rgba(0,0,0,0.25)';
+    c.setLineDash([4, 4]);
+    c.beginPath();
+    c.moveTo(x0, yPx(state.loc.y)); c.lineTo(x0 + COOL_PLOT_W, yPx(state.loc.y));
+    c.stroke();
+    c.restore();
+    c.save();
+    c.fillStyle = '#000';
+    c.font = sf('16px' + FF);   // same size and color as the text in the panel above the figures
+    c.textAlign = 'center';
+    c.textBaseline = 'middle';
+    c.fillText('cooling curve', x0 + COOL_PLOT_W / 2, PAD_TOP + 14 * TS);
+    if (!cool.pts){
+      var lines = wrapText(c, 'Place the locator, then press \u201ccool from locator\u201d', COOL_PLOT_W - 20);
+      var lh = 20 * TS, y0 = PAD_TOP + PLOT / 2 - (lines.length - 1) * lh / 2;
+      lines.forEach(function(s, i){ c.fillText(s, x0 + COOL_PLOT_W / 2, y0 + i * lh); });
+    }
+    c.restore();
+    if (cool.pts){
+      var W = COOL_PLOT_W - 8;
+      c.save();
+      c.strokeStyle = '#98000D';
+      c.lineWidth = 2.5;
+      c.lineJoin = 'round';
+      c.beginPath();
+      var first = true;
+      for (var i = 0; i < cool.pts.length; i++){
+        var q = cool.pts[i];
+        if (q.t > cool.shown) break;
+        var X = x0 + 4 + q.t / cool.tEnd * W, Y = yPx(q.T);
+        if (first){ c.moveTo(X, Y); first = false; } else c.lineTo(X, Y);
+      }
+      if (cool.shown < cool.tEnd && !first){
+        c.lineTo(x0 + 4 + cool.shown / cool.tEnd * W, yPx(tAtTemp(cool.shown)));
+      }
+      c.stroke();
+      cool.events.forEach(function(e){
+        if (e.t > cool.shown) return;
+        c.fillStyle = '#1a4fd6';
+        c.strokeStyle = '#fff';
+        c.lineWidth = 1.5;
+        c.beginPath();
+        c.arc(x0 + 4 + e.t / cool.tEnd * W, yPx(e.T), 4.5, 0, Math.PI * 2);
+        c.fill();
+        c.stroke();
+      });
+      c.restore();
+    }
+    drawFrame(c, x0, COOL_PLOT_W, 'time', 'temperature');
+  }
+
+  // ---------- Interaction: dragging and keyboard ----------
+  var dragging = false;
   function eventToData(e){
     var rect = canvas.getBoundingClientRect();
-    var cssScale = CSS_W / rect.width; // account for responsive scaling
-    var px = (e.clientX - rect.left) * cssScale;
-    var py = (e.clientY - rect.top) * cssScale;
-    var d = pxToData(px, py);
-    return { x: clamp(d.x, 0, 100), y: clamp(d.y, 0, 100) };
+    var s = CSS_W / rect.width;
+    tolScale = s * (e.pointerType === 'touch' ? 1.6 : 1);
+    return pxToData((e.clientX - rect.left) * s, (e.clientY - rect.top) * s);
   }
-
   canvas.addEventListener('pointerdown', function(e){
     dragging = true;
     canvas.setPointerCapture(e.pointerId);
-    var d = eventToData(e);
-    state.loc = d;
+    stopCooling(true);
+    placeLocator(eventToData(e), 'drag');
     render();
   });
   canvas.addEventListener('pointermove', function(e){
     if (!dragging) return;
-    var d = eventToData(e);
-    state.loc = d;
+    placeLocator(eventToData(e), 'drag');
     render();
   });
   canvas.addEventListener('pointerup', function(e){
@@ -620,17 +1207,93 @@ window.MathJax = {
     try { canvas.releasePointerCapture(e.pointerId); } catch (err) {}
   });
   canvas.addEventListener('pointercancel', function(){ dragging = false; });
+  canvas.addEventListener('keydown', function(e){
+    var st = e.shiftKey ? 2 : 0.25, dx = 0, dy = 0;
+    switch (e.key){
+      case 'ArrowLeft': dx = -st; break;
+      case 'ArrowRight': dx = st; break;
+      case 'ArrowUp': dy = st; break;
+      case 'ArrowDown': dy = -st; break;
+      default: return;
+    }
+    e.preventDefault();
+    stopCooling(true);
+    placeLocator({ x: state.loc.x + dx, y: state.loc.y + dy }, 'key');
+    render();
+  });
 
-  // ---------- Component setter buttons ----------
+  // ---------- Controls ----------
+  var caption = document.getElementById('caption');
+  function updateCaption(){
+    // Two-component diagram descriptions are in the Directions panel instead.
+    caption.textContent = state.component === 1 ? PRESETS[state.preset].caption : '';
+    caption.hidden = state.component !== 1;
+  }
+  function resetLocator(){
+    var def = state.component === 1 ? { x: 50, y: 50 } : cur2.def;
+    placeLocator(def, 'key');
+  }
+
   var componentGroup = document.getElementById('componentGroup');
   componentGroup.addEventListener('click', function(e){
     var btn = e.target.closest('button[data-c]');
     if (!btn) return;
     state.component = parseInt(btn.getAttribute('data-c'), 10);
-    var buttons = componentGroup.querySelectorAll('button');
-    buttons.forEach(function(b){ b.classList.toggle('active', b === btn); });
+    componentGroup.querySelectorAll('button').forEach(function(b){ b.classList.toggle('active', b === btn); });
+    document.getElementById('opts1').hidden = state.component !== 1;
+    document.getElementById('opts2').hidden = state.component !== 2;
+    document.getElementById('coolWrap').hidden = state.component !== 2;
+    stopCooling(true);
+    resetLocator();
+    updateCaption();
     render();
   });
+
+  var presetGroup = document.getElementById('presetGroup');
+  presetGroup.addEventListener('click', function(e){
+    var btn = e.target.closest('button[data-p]');
+    if (!btn) return;
+    state.preset = btn.getAttribute('data-p');
+    presetGroup.querySelectorAll('button').forEach(function(b){ b.classList.toggle('active', b === btn); });
+    rebuild1();
+    placeLocator(state.loc, 'key');
+    updateCaption();
+    render();
+  });
+
+  document.getElementById('diagSel').addEventListener('change', function(e){
+    state.diagram = e.target.value;
+    stopCooling(true);
+    rebuild2();
+    resetLocator();
+    updateCaption();
+    render();
+  });
+
+  var pSlider = document.getElementById('pSlider');
+  var pVal = document.getElementById('pVal');
+  var pPending = false;
+  function updateSliderFill(){
+    var f = (pSlider.value - pSlider.min) / (pSlider.max - pSlider.min) * 100;
+    pSlider.style.setProperty('--fill', f + '%');
+  }
+  updateSliderFill();
+  pSlider.addEventListener('input', function(){
+    updateSliderFill();
+    state.pressure = parseFloat(pSlider.value);
+    pVal.innerHTML = state.pressure.toFixed(2) + ' <i>p</i><sub>0</sub>';
+    stopCooling(true);
+    if (pPending) return;
+    pPending = true;
+    requestAnimationFrame(function(){
+      pPending = false;
+      rebuild2();
+      placeLocator(state.loc, 'key');
+      render();
+    });
+  });
+
+  coolBtn.addEventListener('click', startCooling);
 
   // ---------- Info panels (Directions / Details / About) ----------
   var panels = {
@@ -639,14 +1302,10 @@ window.MathJax = {
     about: document.getElementById('panel-about')
   };
   var infoButtons = document.querySelectorAll('button[data-panel]');
-
   function closeAllPanels(){
-    Object.keys(panels).forEach(function(key){
-      panels[key].hidden = true;
-    });
+    Object.keys(panels).forEach(function(k){ panels[k].hidden = true; });
     infoButtons.forEach(function(b){ b.classList.remove('active'); });
   }
-
   function openPanel(name){
     var alreadyOpen = !panels[name].hidden;
     closeAllPanels();
@@ -657,23 +1316,33 @@ window.MathJax = {
       });
     }
   }
-
   infoButtons.forEach(function(btn){
-    btn.addEventListener('click', function(){
-      openPanel(btn.getAttribute('data-panel'));
-    });
+    btn.addEventListener('click', function(){ openPanel(btn.getAttribute('data-panel')); });
   });
-
   document.querySelectorAll('button[data-close]').forEach(function(btn){
-    btn.addEventListener('click', function(){
-      closeAllPanels();
-    });
+    btn.addEventListener('click', closeAllPanels);
   });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeAllPanels(); });
+  // Close an open panel when the user clicks anywhere outside it. The click that
+  // closes a panel is swallowed so it does not also move the locator.
+  document.addEventListener('pointerdown', function(e){
+    var open = Object.keys(panels).filter(function(k){ return !panels[k].hidden; });
+    if (!open.length) return;
+    if (panels[open[0]].contains(e.target)) return;
+    if (e.target.closest('button[data-panel]')) return; // info buttons toggle panels themselves
+    closeAllPanels();
+    if (e.target === canvas){ e.stopPropagation(); e.preventDefault(); }
+  }, true);
 
   // ---------- Init ----------
+  setupCanvases();
+  rebuild1();
+  rebuild2();
+  resetLocator();
+  updateCaption();
   render();
   window.addEventListener('resize', function(){
-    setupCanvas();
+    if (setupCanvases()){ rebuild1(); rebuild2(); }
     render();
   });
 })();

@@ -55,7 +55,9 @@ input[type=range]:focus-visible{outline:2px solid #000;outline-offset:2px}
 .panel-body{overflow-y:auto;padding:0 16px 14px;line-height:1.45}
 .panel-body p{margin:0 0 6px;max-width:60ch}
 .panel-body a{color:var(--red)}
-.panel-body mjx-container[display="true"]{text-align:left!important;margin:0 0 4px!important}
+.panel-body mjx-container[display="true"]{text-align:left!important;margin:-4px 0 9px!important}
+.panel-body .ref{font-size:15.3px}
+.panel-body .symhead{font-weight:bold}
 .symbols{margin:4px 0 0;padding-left:0;list-style:none}
 .symbols li{margin:2px 0}
 </style>
@@ -85,9 +87,9 @@ input[type=range]:focus-visible{outline:2px solid #000;outline-offset:2px}
       \[ \mathrm{Cs^+} + \overline{\mathrm{Na^+}} \rightleftharpoons \overline{\mathrm{Cs^+}} + \mathrm{Na^+} \]
       <p>where the overbar denotes the solid phase. The selectivity coefficient of a site, written with equivalent fractions, is</p>
       \[ K_C = \frac{Q_{Cs}\,C_{Na}}{Q_{Na}\,C_{Cs}} = \frac{\bar{X}_{Cs}\,(1-X_{Cs})}{(1-\bar{X}_{Cs})\,X_{Cs}} \]
-      <p>The equivalent fractions in the liquid and solid are</p>
+      <p>where the Q's are solid-phase concentrations and the C's are liquid-phase concentrations. The equivalent fractions in the liquid and solid are</p>
       \[ X_{Cs} = \frac{C_{Cs}}{C_0}, \qquad \bar{X}_{Cs} = \frac{Q_{Cs}}{Q_0} \]
-      <p>For a single type of site with an ideal solid phase, solving for the solid fraction gives the isotherm</p>
+      <p>where \(C_0\) is the total liquid-phase concentration (\(C_{Cs} + C_{Na}\)) and \(Q_0\) is the total exchange capacity of the solid. For a single type of site with an ideal solid phase, solving for the solid fraction gives the isotherm</p>
       \[ \bar{X}_{Cs} = \frac{K_C\,X_{Cs}}{1+(K_C-1)\,X_{Cs}} \]
       <p>which is concave for K<sub>C</sub> &gt; 1, a straight line for K<sub>C</sub> = 1, and convex for K<sub>C</sub> &lt; 1. When two types of sites exchange independently, the isotherm is the capacity-weighted sum of the two single-site isotherms (eq 21 in Zheng et al.):</p>
       \[ \bar{X}_{Cs} = \bar{X}_{01}\,\frac{K_{C1}\,X_{Cs}}{1+(K_{C1}-1)\,X_{Cs}} + \bar{X}_{02}\,\frac{K_{C2}\,X_{Cs}}{1+(K_{C2}-1)\,X_{Cs}} \]
@@ -95,8 +97,8 @@ input[type=range]:focus-visible{outline:2px solid #000;outline-offset:2px}
       <p>Each dashed curve in the plot is one term of this sum. At low cesium concentration the isotherm reduces to Henry's law, with an initial slope equal to the capacity-weighted average selectivity:</p>
       \[ \bar{X}_{Cs} \approx \left(\bar{X}_{01}K_{C1} + \bar{X}_{02}K_{C2}\right) X_{Cs} \]
       <p>When one site has K<sub>C</sub> &gt; 1 and the other has K<sub>C</sub> &lt; 1, the isotherm can have an inflection: the selective site fills first, and the other site loads only at high liquid-phase cesium fractions. For CST, the measured K<sub>C</sub> for Cs<sup>+</sup>/Na<sup>+</sup> is about 10<sup>4</sup>, so cesium is strongly removed even from waste that is about 5 M in sodium, where X<sub>Cs</sub> is around 10<sup>−4</sup>.</p>
-      <p>Reference: Z. Zheng, C. V. Philip, R. G. Anthony, J. L. Krumhansl, D. E. Trudell, and J. E. Miller, "Ion exchange of group I metals by hydrous crystalline silicotitanates," <i>Ind. Eng. Chem. Res.</i> <b style="font-weight:normal">35</b> (1996) 4246–4256.</p>
-      <p>Symbols:</p>
+      <p class="ref">Reference: Z. Zheng, C. V. Philip, R. G. Anthony, J. L. Krumhansl, D. E. Trudell, and J. E. Miller, "Ion exchange of group I metals by hydrous crystalline silicotitanates," <i>Ind. Eng. Chem. Res.</i> <b style="font-weight:normal">35</b> (1996) 4246–4256.</p>
+      <p class="symhead">Symbols</p>
       <ul class="symbols">
         <li>\(C_{Cs}, C_{Na}\) = liquid-phase concentrations (equiv/L)</li>
         <li>\(C_0\) = total liquid-phase concentration, \(C_{Cs}+C_{Na}\) (equiv/L)</li>
