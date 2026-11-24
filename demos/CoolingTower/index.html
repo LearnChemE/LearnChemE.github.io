@@ -85,6 +85,7 @@ canvas{width:100%;display:block}
 .chk{font-size:17px;color:#000;font-weight:400;display:flex;align-items:center;gap:7px;margin-top:9px}
 </style>
 </head>
+
 <body>
 <header>
   <div></div>
@@ -169,7 +170,7 @@ canvas{width:100%;display:block}
   </div>
 </div>
 
-<div class="wrap">
+<main class="wrap">
   <aside class="card" id="controls">
     <div class="presets" id="presets"></div>
     <div id="sliders"></div>
@@ -435,8 +436,14 @@ function niceTicks(a,b,n){
   return out;
 }
 function setup(cv){
-  var dpr=window.devicePixelRatio||1,w=cv.clientWidth,h=parseInt(cv.getAttribute("height"),10);
-  cv.width=w*dpr;cv.height=h*dpr;
+  /* Keep the CSS (logical) height fixed and separate from the backing-store height.
+     Setting cv.height also rewrites the height attribute, so reading the attribute back
+     on the next redraw would multiply it by devicePixelRatio every frame on HiDPI screens. */
+  if(!cv.dataset.cssH)cv.dataset.cssH=cv.getAttribute("height");
+  var dpr=window.devicePixelRatio||1,h=parseInt(cv.dataset.cssH,10);
+  cv.style.height=h+"px";
+  var w=cv.clientWidth;
+  cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);
   var c=cv.getContext("2d");c.setTransform(dpr,0,0,dpr,0,0);c.clearRect(0,0,w,h);
   return {c:c,w:w,h:h};
 }
@@ -467,7 +474,7 @@ function rotatedLabel(ctx,text,x,y,font,color){
   ctx.restore();
 }
 function axes(g,x0,x1,y0,y1,xl,yl){
-  var pl=64,pr=16,pt=14,pb=48,c=g.c;
+  var compact=g.w<360,pl=compact?50:64,pr=compact?10:16,pt=compact?10:14,pb=compact?42:48,c=g.c;
   var X=function(v){return pl+(v-x0)/(x1-x0)*(g.w-pl-pr);};
   var Y=function(v){return g.h-pb-(v-y0)/(y1-y0)*(g.h-pt-pb);};
   c.font="16px "+FONT;c.fillStyle="#000";c.strokeStyle="#e5eaf0";c.lineWidth=1;
